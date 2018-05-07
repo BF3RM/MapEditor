@@ -33,7 +33,7 @@ function CreateGizmo(x, y, z){
 	var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1);
 	var material = new THREE.MeshLambertMaterial( { map: texture } );
 	control = new THREE.TransformControls( camera, renderer.domElement );
-	control.addEventListener( 'change', render );
+	control.addEventListener( 'change', onControlChanged );
 	mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	control.attach( mesh );
@@ -51,25 +51,15 @@ function SetGizmoAt(x, y, z){
 }
 
 function HideGizmo(){
-	// control.detach(mesh);
-	// control.detach();
-	// scene.remove(mesh);
-	// mesh.geometry.dispose();
-	// mesh.material.dispose();
-	// mesh = undefined;
+	grid.visible = false;
+	control.visible = false;
+	mesh.visible = false;
 
-	// scene.remove(control);
-	// control.geometry.dispose();
-	// control.material.dispose();
-	// control = undefined;
-	// scene.remove(control);
-	// scene.remove(mesh);
-	// scene.remove(grid);
-	// control.dispose();
 	render();
 }
 
 function ShowGizmo(){
+	control.visible = true;
 	grid.visible = true;
 	mesh.visible = true;
 
@@ -86,6 +76,18 @@ function render() {
 	if (control == null) {return}
 	control.update();
 	renderer.render( scene, camera );
+}
+
+function onControlChanged() {
+	if (selectedEntityID < 0 ) {
+		return;
+	}
+	// console.log(control.position.toString());
+	let position = control.position;
+	let args = selectedEntityID.toString() + ":" + control.position.x.toString() + ":" + control.position.y.toString() + ":" + control.position.z.toString() + ":";
+	console.log(args);
+	WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityPos', args);
+	render();
 }
 
 function UpdateCameraPos(x, y, z){

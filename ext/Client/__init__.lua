@@ -30,6 +30,8 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DisableKeyboard', self, self.OnDisableKeyboard)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
+	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityPos', self, self.OnSetEntityPos)
+
 
 end
 
@@ -88,28 +90,69 @@ function MapEditorClient:OnDisableKeyboard()
 end
 
 function MapEditorClient:OnSelectEntity(p_ID) 
+	
 	if self.selectedEntityID < 0 then
-		-- WebUI:ExecuteJS("ShowGizmo()")
+		WebUI:ExecuteJS("ShowGizmo()")
 	end
 
 	self.selectedEntityID = tonumber(p_ID)
 
 	local entities = self.spawnedEntities[self.selectedEntityID]
 
-	-- for i, entity in ipairs(entities) do
 	local entity = SpatialEntity(entities[1])
 
 	if entity ~= nil then
-		local pos = entity.transform.trans
+		local transform = entity.transform
+		-- print("6-----------")
+		local pos = transform.trans
+			-- print("7-------------")
+
 		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' )
+			-- print("8-------------")
+
 	end
-	-- end
+
 end
 
 function MapEditorClient:OnUnselectEntity(p_ID) 
-	-- WebUI:ExecuteJS("HideGizmo()")
+	WebUI:ExecuteJS("HideGizmo()")
 	self.selectedEntityID = -1
 end
+
+function MapEditorClient:OnSetEntityPos(p_Args) 
+	print("OnSetEntityPos "..p_Args)
+
+	local p_ArgsArray = split(p_Args, ":")
+
+
+	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
+		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
+	end
+
+	local s_Entities = self.spawnedEntities[tonumber(p_ArgsArray[1])]
+
+	for _, l_Entity in ipairs(s_Entities) do
+		local s_Entity = SpatialEntity(l_Entity)
+
+		if s_Entity ~= nil then
+			print("moving")
+			local s_Position =  Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
+			print( s_Position )
+			local s_Transform = LinearTransform(
+					s_Entity.transform.left,
+					s_Entity.transform.up,
+					s_Entity.transform.forward,
+					s_Position
+				)
+			s_Entity.transform = s_Transform
+			-- WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' )
+		else
+			print("entity was null")
+		end
+	end
+
+end
+
 
 function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
 	print(p_ParamsCombined)
