@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title></title>
+
+
+		<link rel="stylesheet" href="style/style.css">
+		<link rel="stylesheet" href="style/reset.css">
+		<link rel="stylesheet" href="style/jquery.dataTables.min.css">
+
+	</head>
+	<body>
+		<div id="page">
+			<div id="webgl">
+			</div>
+			<div id="menu">
+				<div id="emitters">
+					<table id="blueprint_list" class="display">
+					<thead>
+						<tr>
+							<th>InstanceGuid</th>
+							<th>PartitionGuid</th>
+							<th>Type</th>
+							<th>Name</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+					</table>
+				</div>
+
+				<div id="table2">
+					<table id="entity_list" class="display">
+					<thead>
+						<tr>
+							<th>Object ID</th>
+							<th>Name</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+					</table>
+				</div>
+			</div>
+			
+		</div>
+
+
+	</body>
+			<script src="script/jquery-3.1.1.min.js"></script>
+		<script src="script/jquery.dataTables.min.js"></script>
+
+		<script src="script/three.min.js"></script>
+		<script src="script/TransformControls.js"></script>
+		<script src="script/webgl.js"></script>
+
+		<script src="script/script.js"></script>
+		
+		<script>
+			$(document).ready(function () {
+				if(window.location.href.indexOf("webui") == -1) {
+					Debug();
+				}
+			});
+		</script>
+</html>

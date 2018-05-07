@@ -1,0 +1,9 @@
+{
+	"Name": "MapEditor",
+	"Authors": ["Powback"],
+	"Description": "An ingame map editor",
+	"URL": "none",
+	"Version": 0,
+	"HasWebUI": true,
+	"HasVeniceEXT": true
+}

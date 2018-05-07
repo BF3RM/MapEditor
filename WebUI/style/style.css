@@ -1,0 +1,65 @@
+::-webkit-scrollbar { 
+	display: none; 
+}
+
+#page {
+	margin: 0px;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	/*position: relative;*/
+}
+
+#webgl {
+	margin: 0px;
+	padding: 0;
+	position: absolute;
+	overflow: hidden;
+}
+
+
+li {
+	list-style: none;
+}
+#menu{
+	padding: 5px;
+	position:absolute;
+	overflow: hidden;
+}
+
+#emitters {
+	position: relative;
+	font-size: 15px;
+	width: 40vw;
+	height: 45vh;
+	overflow: scroll;
+	border: 1px solid black;
+
+	/*background-color: white;*/
+	overflow-x: hidden;
+}
+#table2 {
+	position: relative;
+	font-size: 15px;
+	width: 40vw;
+	height: 45vh;
+	overflow: scroll;
+	/*background-color: white;*/
+	overflow-x: hidden;
+	border: 1px solid black;
+}
+
+.selectedItem{
+	background-color: red;
+	color: red;
+}
+
+#marker{
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	width: 20px;
+	height: 20px;
+	background-color: rgba(244, 66, 179,1);
+}
