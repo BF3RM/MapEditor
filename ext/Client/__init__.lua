@@ -31,6 +31,7 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityPos', self, self.OnSetEntityPos)
+	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityRot', self, self.OnSetEntityRot)
 
 
 end
@@ -59,19 +60,6 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 
 	WebUI:ExecuteJS(string.format('UpdateCameraPos(%s, %s, %s);', pos.x, pos.y, pos.z))
 	WebUI:ExecuteJS(string.format('UpdateCameraAngle(%s, %s, %s,%s, %s, %s,%s, %s, %s);', left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z))
-
-
-	-- local entities = self.spawnedEntities[self.selectedEntityID]
-
-	-- for i, entity in ipairs(entities) do
-	-- 	local e = SpatialEntity(entity)
-
-	-- 	local wts = SharedUtils:WorldToScreen(e.transform.trans)
-
-	-- 	if wts ~= nil then
-	-- 		WebUI:ExecuteJS('UpdateMarker('.. wts.x ..','.. wts.y..')' )
-	-- 	end
-	-- end
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -102,13 +90,11 @@ function MapEditorClient:OnSelectEntity(p_ID)
 	local entity = SpatialEntity(entities[1])
 
 	if entity ~= nil then
-		local transform = entity.transform
-		-- print("6-----------")
-		local pos = transform.trans
-			-- print("7-------------")
 
-		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' )
-			-- print("8-------------")
+		local pos = entity.transform.trans
+
+		-- TODO: send rotation too and apply it if gizmo is on local state
+		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' ) 
 
 	end
 
@@ -122,7 +108,7 @@ end
 function MapEditorClient:OnSetEntityPos(p_Args) 
 	print("OnSetEntityPos "..p_Args)
 
-	local p_ArgsArray = split(p_Args, ":")
+	local p_ArgsArray = split(p_Args, ",")
 
 
 	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
@@ -145,7 +131,42 @@ function MapEditorClient:OnSetEntityPos(p_Args)
 					s_Position
 				)
 			s_Entity.transform = s_Transform
-			-- WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' )
+		else
+			print("entity was null")
+		end
+	end
+
+end
+
+function MapEditorClient:OnSetEntityRot(p_Args) 
+	print("OnSetEntityPos "..p_Args)
+
+	local p_ArgsArray = split(p_Args, ",")
+
+
+	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
+		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
+	end
+
+	local s_Entities = self.spawnedEntities[tonumber(p_ArgsArray[1])]
+
+	for _, l_Entity in ipairs(s_Entities) do
+		local s_Entity = SpatialEntity(l_Entity)
+
+		if s_Entity ~= nil then
+			print("moving")
+			local s_Left 		 = Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
+			local s_Up 			 = Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
+			local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
+			local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
+			print( s_Position )
+			local s_Transform = LinearTransform(
+					s_Left,
+					s_Up,
+					s_Forward,
+					s_Position
+				)
+			s_Entity.transform = s_Transform
 		else
 			print("entity was null")
 		end
@@ -244,7 +265,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
-		print(#self.spawnedEntities)
+		
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
@@ -257,6 +278,18 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		--WebUI:BringToFront()
 		WebUI:DisableMouse()
 		-- WebUI:Hide()
+	end
+
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_Q) then
+		WebUI:ExecuteJS("SetGizmoMode(\'translate\')")
+	end
+
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_W) then
+		WebUI:ExecuteJS("SetGizmoMode(\'rotate\')")
+	end
+
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_E) then
+		WebUI:ExecuteJS("SetGizmoMode(\'scale\')")
 	end
 end
 

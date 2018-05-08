@@ -8,8 +8,9 @@ function Debug(){
 	RegisterInstances(json);
 	OnSpawnedEntity(1, "111")
 	OnSpawnedEntity(2, "222")
-	SetGizmoAt(550, 115, 261)
-	// CreateGizmo(550, 115, 261);
+	selectedEntityID = 1;
+	SetGizmoAt(550, 115, 261);
+	ShowGizmo();
 }
 
 var table, tabletwo = null;
@@ -34,7 +35,6 @@ function drawTable(data) {
 
 		drawRow(i, data[i]);
 	}
-	
 }
 
 function DrawTable() {

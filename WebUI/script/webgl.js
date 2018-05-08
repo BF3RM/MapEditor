@@ -23,6 +23,10 @@ function init() {
 
 
 function CreateGizmo(x, y, z){
+	if (grid != null) {
+		console.log("Gizmo already exist")
+	}
+
 	grid = new THREE.GridHelper( 15, 10 )
 	scene.add( grid );
 	grid.position.set(x, y, z);
@@ -33,13 +37,17 @@ function CreateGizmo(x, y, z){
 	var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1);
 	var material = new THREE.MeshLambertMaterial( { map: texture } );
 	control = new THREE.TransformControls( camera, renderer.domElement );
+	control.setSpace("local");
 	control.addEventListener( 'change', onControlChanged );
 	mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
+
 	control.attach( mesh );
 	scene.add( control );
 
 	mesh.position.set(x, y, z );
+
+	HideGizmo();
 
 	render();
 }
@@ -82,12 +90,27 @@ function onControlChanged() {
 	if (selectedEntityID < 0 ) {
 		return;
 	}
-	// console.log(control.position.toString());
-	let position = control.position;
-	let args = selectedEntityID.toString() + ":" + control.position.x.toString() + ":" + control.position.y.toString() + ":" + control.position.z.toString() + ":";
-	console.log(args);
-	WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityPos', args);
 	render();
+	switch ( control.getMode() ) {
+		case "translate": 
+			let position = control.position;
+			let args = selectedEntityID + "," + position.toArray().toString();
+			console.log(args);
+			WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityPos', args);
+			break;
+		case "rotate": 
+			let m = mesh.matrixWorld.toArray().toString();
+			let args2 = selectedEntityID + "," + m;
+			console.log(args2);
+
+			WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityRot', args2);
+			break;
+		case "scale": 
+			break;
+
+	}
+
+	
 }
 
 function UpdateCameraPos(x, y, z){
@@ -96,7 +119,7 @@ function UpdateCameraPos(x, y, z){
 	// render();
 }
 
-function UpdateCameraAngle(lx, ly, lz ,ux ,uy ,uz ,fx ,fy ,fz){
+function UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz){
 	let m = new THREE.Matrix4();
 
 	m.set( lx, ux, fx, 0,
@@ -109,7 +132,13 @@ function UpdateCameraAngle(lx, ly, lz ,ux ,uy ,uz ,fx ,fy ,fz){
 	render();
 }
 
-function setFov(fov) {
-	camera.fov = fov;
+function SetFov(p_Fov) {
+	camera.fov = p_Fov;
 	camera.updateProjectionMatrix();
+}
+
+function SetGizmoMode(p_Mode) {
+	if (control.visible == true) {
+		control.setMode( p_Mode );
+	}
 }
