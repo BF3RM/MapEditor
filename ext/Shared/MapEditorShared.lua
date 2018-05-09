@@ -31,17 +31,18 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 			break
 		end
 
-		if(l_Instance.typeName == "ObjectBlueprint" or
-			l_Instance.typeName == "PrefabBlueprint") then
 
-			local s_Instance = _G[l_Instance.typeName](l_Instance)
+		if(l_Instance.typeInfo.name == "ObjectBlueprint" or
+			l_Instance.typeInfo.name == "PrefabBlueprint") then
 
+			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
+			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
 			-- We're not storing the actual instance since we'd rather look it up manually in case of a reload.
 			self.m_Instances[#self.m_Instances + 1] = {
 				instanceGuid = tostring(l_Instance.instanceGuid),
 				partitionGuid = tostring(p_Partition.guid),
 				name = s_Instance.name,
-				typeName = l_Instance.typeName
+				typeName = l_Instance.typeInfo.name
 			}
 		end
 

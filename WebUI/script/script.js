@@ -24,6 +24,7 @@ if (debug) {
 }
 
 function RegisterInstances(p_Instances) {
+	console.log("registering instances");
 	instances = JSON.parse(p_Instances);
 	drawTable(instances);
 }
@@ -146,4 +147,11 @@ function OnSpawnedEntity(p_ID, p_InstanceName) {
 function ClearTable(p_Table){
 	// console.log(p_Table.rows( ).count())
 	p_Table.clear().draw();
+}
+
+function DeleteSelectedEntity(){
+	if (selectedEntityID < 0 ) {
+		return
+	}
+	WebUI.Call('DispatchEventLocal', 'MapEditor:DeleteEntity', selectedEntityID)
 }

@@ -26,8 +26,8 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DisableKeyboard', self, self.OnDisableKeyboard)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityPos', self, self.OnSetEntityPos)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityRot', self, self.OnSetEntityRot)
+	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityMatrix', self, self.OnSetEntityMatrix)
+	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
 end
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
@@ -60,7 +60,9 @@ function MapEditorClient:OnEngineMessage(p_Message)
 
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		print("MessageType.ClientLevelFinalizedMessage")
+		-- print(Shared.m_Instances)
 		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_Instances)))
+
 	end
 end
 
@@ -69,6 +71,22 @@ function MapEditorClient:OnEnableKeyboard()
 end
 function MapEditorClient:OnDisableKeyboard() 
 		WebUI:DisableKeyboard()
+end
+
+function MapEditorClient:OnDeleteEntity(p_ID)
+	if p_ID ~= self.selectedEntityID then 
+		error("Trying to delete an entity that's not selected. Parameter: "..p_ID..", selected ID: ".. self.selectedEntityID)
+	end
+
+	-- local s_Entities = self.spawnedEntities[p_ID]
+
+	-- for _, l_Entity in ipairs(s_Entities) do
+	-- 	local s_Entity = SpatialEntity(l_Entity)
+
+	-- 	if s_Entity ~= nil then
+	-- 		s_Entity:Destroy()
+	-- 	end
+	-- end
 end
 
 function MapEditorClient:OnSelectEntity(p_ID) 
@@ -97,40 +115,8 @@ function MapEditorClient:OnUnselectEntity(p_ID)
 	self.selectedEntityID = -1
 end
 
-function MapEditorClient:OnSetEntityPos(p_Args) 
-	print("OnSetEntityPos "..p_Args)
-
-	local p_ArgsArray = split(p_Args, ",")
-
-
-	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
-		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
-	end
-
-	local s_Entities = self.spawnedEntities[tonumber(p_ArgsArray[1])]
-
-	for _, l_Entity in ipairs(s_Entities) do
-		local s_Entity = SpatialEntity(l_Entity)
-
-		if s_Entity ~= nil then
-			print("moving")
-			local s_Position =  Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
-			print( s_Position )
-			local s_Transform = LinearTransform(
-					s_Entity.transform.left,
-					s_Entity.transform.up,
-					s_Entity.transform.forward,
-					s_Position
-				)
-			s_Entity.transform = s_Transform
-		else
-			print("entity was null")
-		end
-	end
-end
-
-function MapEditorClient:OnSetEntityRot(p_Args) 
-	print("OnSetEntityPos "..p_Args)
+function MapEditorClient:OnSetEntityMatrix(p_Args) 
+	print("OnSetEntityMatrix "..p_Args)
 
 	local p_ArgsArray = split(p_Args, ",")
 
@@ -144,12 +130,12 @@ function MapEditorClient:OnSetEntityRot(p_Args)
 		local s_Entity = SpatialEntity(l_Entity)
 
 		if s_Entity ~= nil then
-			print("moving")
+			-- print("moving")
 			local s_Left 		 = Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
 			local s_Up 			 = Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
 			local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
 			local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
-			print( s_Position )
+			-- print( s_Position )
 			local s_Transform = LinearTransform(
 					s_Left,
 					s_Up,
@@ -175,7 +161,7 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 		return
 	end
 	
-	self.spawnEntity = {name = p_GuidSplit[1], instance = _G[s_Instance.typeName](s_Instance)}
+	self.spawnEntity = {name = p_GuidSplit[1], instance = _G[s_Instance.typeInfo.name](s_Instance)}
 	
 end
 
@@ -209,7 +195,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
         local s_Raycast = RaycastManager:Raycast(s_CameraTransform.trans, s_CastPosition, 2)
 		print("raycast did")
 		if(s_Raycast ~= nil) then
-			print(tostring(s_Raycast.rigidBody.typeName))
+			-- print(tostring(s_Raycast.rigidBody.typeInfo.name))
 		else
 			return
 		end		

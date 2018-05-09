@@ -91,24 +91,35 @@ function onControlChanged() {
 		return;
 	}
 	render();
-	switch ( control.getMode() ) {
-		case "translate": 
-			let position = control.position;
-			let args = selectedEntityID + "," + position.toArray().toString();
-			console.log(args);
-			WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityPos', args);
-			break;
-		case "rotate": 
-			let m = mesh.matrixWorld.toArray().toString();
-			let args2 = selectedEntityID + "," + m;
-			console.log(args2);
 
-			WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityRot', args2);
-			break;
-		case "scale": 
-			break;
+	let matrix = mesh.matrixWorld.toArray().toString();
+	let args = selectedEntityID + "," + matrix;
+	console.log(args);
 
-	}
+	WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+
+	// switch ( control.getMode() ) {
+	// 	case "translate": 
+	// 		let position = control.position;
+	// 		let args = selectedEntityID + "," + position.toArray().toString();
+	// 		console.log(args);
+	// 		WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityPos', args);
+	// 		break;
+	// 	case "rotate":
+	// 	case "scale":  
+	// 		let m = mesh.matrixWorld.toArray().toString();
+	// 		let args2 = selectedEntityID + "," + m;
+	// 		console.log(args2);
+
+	// 		WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityRot', args2);
+	// 		break;
+	// 	case "scale": 
+	// 		let ma = mesh.matrixWorld.toArray().toString();
+	// 		let args3 = selectedEntityID + "," + ma;
+	// 		// console.log(args3);
+	// 		break;
+
+	// }
 
 	
 }
