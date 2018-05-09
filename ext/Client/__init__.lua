@@ -1,21 +1,17 @@
 class 'MapEditorClient'
 local Shared = require '__shared/MapEditorShared'
 
-
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
 	self:RegisterVars()
 	self:RegisterEvents()
 	Shared:__init()
-
 end
-
 
 function MapEditorClient:RegisterVars()
 	self.spawnedEntities = {}
 	self.selectedEntityID = -1
 end
-
 
 function MapEditorClient:RegisterEvents()
 	--Game events
@@ -32,8 +28,6 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityPos', self, self.OnSetEntityPos)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityRot', self, self.OnSetEntityRot)
-
-
 end
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
@@ -47,7 +41,7 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	else
 		m_Soldier = s_Player.soldier
 	end
-	if(m_Soldier == nil) then
+	if(m_Soldier == nil and not s_Player.teamID == 0) then
 		return
 	end
 
@@ -95,9 +89,7 @@ function MapEditorClient:OnSelectEntity(p_ID)
 
 		-- TODO: send rotation too and apply it if gizmo is on local state
 		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' ) 
-
 	end
-
 end
 
 function MapEditorClient:OnUnselectEntity(p_ID) 
@@ -135,14 +127,12 @@ function MapEditorClient:OnSetEntityPos(p_Args)
 			print("entity was null")
 		end
 	end
-
 end
 
 function MapEditorClient:OnSetEntityRot(p_Args) 
 	print("OnSetEntityPos "..p_Args)
 
 	local p_ArgsArray = split(p_Args, ",")
-
 
 	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
 		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
@@ -171,9 +161,7 @@ function MapEditorClient:OnSetEntityRot(p_Args)
 			print("entity was null")
 		end
 	end
-
 end
-
 
 function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
 	print(p_ParamsCombined)
@@ -191,7 +179,6 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 	
 end
 
-
 function MapEditorClient:OnUpdateInput(p_Delta)
 	--We need to do the raycast in a physics update apparently.
 	if(self.spawnEntity ~= nil) then
@@ -203,27 +190,23 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		end
 
 		local s_Soldier = s_Player.soldier
-		if s_Soldier == nil then
+		if s_Soldier == nil  and not s_Player.teamID == 0 then
 			return
 		end
 
 		local s_Transform = ClientUtils:GetCameraTransform()
+		local s_CastDistance = 10000;
 
-		s_Transform = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
+        local s_CameraTransform = ClientUtils:GetCameraTransform()
 
-		local newTransform = s_Soldier.transform
-		newTransform.forward = s_Transform
-		newTransform.up = ClientUtils:GetCameraTransform().up
-		newTransform.left = ClientUtils:GetCameraTransform().left
+        local s_CameraForward = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
 
-		local newX = (s_Transform.x * 1000) + s_Soldier.transform.trans.x
-		local newY = (s_Transform.y * 1000) + s_Soldier.transform.trans.y
-		local newZ = (s_Transform.z * 1000) + s_Soldier.transform.trans.z
-		newTransform.trans = Vec3(newX,newY,newZ)
+		local s_CastPosition = Vec3(s_CameraTransform.trans.x + (s_CameraForward.x*s_CastDistance),
+									s_CameraTransform.trans.y + (s_CameraForward.y*s_CastDistance),
+									s_CameraTransform.trans.z + (s_CameraForward.z*s_CastDistance))
 
-
-		print("starting raycast")
-		local s_Raycast = RaycastManager:Raycast(ClientUtils:GetCameraTransform().trans, newTransform.trans, 2)
+        print("starting raycast")
+        local s_Raycast = RaycastManager:Raycast(s_CameraTransform.trans, s_CastPosition, 2)
 		print("raycast did")
 		if(s_Raycast ~= nil) then
 			print(tostring(s_Raycast.rigidBody.typeName))
