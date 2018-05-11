@@ -30,6 +30,8 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
 end
 
+----------- Game functions----------------
+
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	if self.selectedEntityID < 0 then
 		return
@@ -56,113 +58,23 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	WebUI:ExecuteJS(string.format('UpdateCameraAngle(%s, %s, %s,%s, %s, %s,%s, %s, %s);', left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z))
 end
 
+function MapEditorClient:OnLoaded()
+	print("init")
+	-- Initialize our custom WebUI package.
+	WebUI:Init()
+
+	-- Show our custom WebUI package.
+	WebUI:Show()
+end
+
 function MapEditorClient:OnEngineMessage(p_Message) 
 
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		print("MessageType.ClientLevelFinalizedMessage")
-		-- print(Shared.m_Instances)
-		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_Instances)))
+		-- print(Shared.m_BlueprintInstances)
+		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_BlueprintInstances)))
 
 	end
-end
-
-function MapEditorClient:OnEnableKeyboard() 
-		WebUI:EnableKeyboard()
-end
-function MapEditorClient:OnDisableKeyboard() 
-		WebUI:DisableKeyboard()
-end
-
-function MapEditorClient:OnDeleteEntity(p_ID)
-	if p_ID ~= self.selectedEntityID then 
-		error("Trying to delete an entity that's not selected. Parameter: "..p_ID..", selected ID: ".. self.selectedEntityID)
-	end
-
-	-- local s_Entities = self.spawnedEntities[p_ID]
-
-	-- for _, l_Entity in ipairs(s_Entities) do
-	-- 	local s_Entity = SpatialEntity(l_Entity)
-
-	-- 	if s_Entity ~= nil then
-	-- 		s_Entity:Destroy()
-	-- 	end
-	-- end
-end
-
-function MapEditorClient:OnSelectEntity(p_ID) 
-	
-	if self.selectedEntityID < 0 then
-		WebUI:ExecuteJS("ShowGizmo()")
-	end
-
-	self.selectedEntityID = tonumber(p_ID)
-
-	local entities = self.spawnedEntities[self.selectedEntityID]
-
-	local entity = SpatialEntity(entities[1])
-
-	if entity ~= nil then
-
-		local pos = entity.transform.trans
-
-		-- TODO: send rotation too and apply it if gizmo is on local state
-		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' ) 
-	end
-end
-
-function MapEditorClient:OnUnselectEntity(p_ID) 
-	WebUI:ExecuteJS("HideGizmo()")
-	self.selectedEntityID = -1
-end
-
-function MapEditorClient:OnSetEntityMatrix(p_Args) 
-	print("OnSetEntityMatrix "..p_Args)
-
-	local p_ArgsArray = split(p_Args, ",")
-
-	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
-		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
-	end
-
-	local s_Entities = self.spawnedEntities[tonumber(p_ArgsArray[1])]
-
-	for _, l_Entity in ipairs(s_Entities) do
-		local s_Entity = SpatialEntity(l_Entity)
-
-		if s_Entity ~= nil then
-			-- print("moving")
-			local s_Left 		 = Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
-			local s_Up 			 = Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
-			local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
-			local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
-			-- print( s_Position )
-			local s_Transform = LinearTransform(
-					s_Left,
-					s_Up,
-					s_Forward,
-					s_Position
-				)
-			s_Entity.transform = s_Transform
-		else
-			print("entity was null")
-		end
-	end
-end
-
-function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
-	print(p_ParamsCombined)
-	local p_GuidSplit = split(p_ParamsCombined, ":")
-	print(p_GuidSplit[1])
-	print(p_GuidSplit[2])
-	print(p_GuidSplit[3])
-	local s_Instance = ResourceManager:FindInstanceByGUID(Guid(p_GuidSplit[2]), Guid(p_GuidSplit[3]))
-	if(s_Instance == nil) then
-		print("Attempted to spawn an instance that doesn't exist: " .. p_PartitionGuid .. " | " .. p_InstanceGuid)
-		return
-	end
-	
-	self.spawnEntity = {name = p_GuidSplit[1], instance = _G[s_Instance.typeInfo.name](s_Instance)}
-	
 end
 
 function MapEditorClient:OnUpdateInput(p_Delta)
@@ -202,7 +114,9 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 
 		-- RAYCAST END
 		local s_Instance = self.spawnEntity.instance
-		local s_InstanceName = self.spawnEntity.name
+		-- local s_InstanceName = self.spawnEntity.name
+		local s_InstanceBlueprintID = self.spawnEntity.blueprintID
+
 
 		print(tostring(s_Instance))
 		print("raycast didnt stop us, no sir")
@@ -229,7 +143,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 
 		self.spawnEntity = nil
 		
-		self:RegisterEntity(s_InstanceName, prefabEntities)
+		self:RegisterEntity(s_InstanceBlueprintID, prefabEntities)
 		
 	end
 
@@ -262,30 +176,135 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	end
 end
 
-function MapEditorClient:RegisterEntity(p_InstanceName, p_EntityArray) 
+----------- WebUI functions----------------
+
+function MapEditorClient:OnEnableKeyboard() 
+		WebUI:EnableKeyboard()
+end
+function MapEditorClient:OnDisableKeyboard() 
+		WebUI:DisableKeyboard()
+end
+
+function MapEditorClient:OnDeleteEntity(p_ID)
+	if p_ID ~= self.selectedEntityID then 
+		error("Trying to delete an entity that's not selected. Parameter: "..p_ID..", selected ID: ".. self.selectedEntityID)
+	end
+
+	local s_Entities = self.spawnedEntities[p_ID]
+
+	for _, l_Entity in ipairs(s_Entities) do
+		-- local s_Entity = SpatialEntity(l_Entity)
+
+		-- if s_Entity ~= nil then
+			-- l_Entity:Destroy()
+			l_Entity = nil
+		-- end
+	end
+
+	self.spawnedEntities[p_ID] = nil
+	WebUI:ExecuteJS("RemoveEntityFromList("..p_ID..")")
+
+end
+
+function MapEditorClient:OnSelectEntity(p_ID) 
+	
+	if self.selectedEntityID < 0 then
+		WebUI:ExecuteJS("ShowGizmo()")
+	end
+
+	self.selectedEntityID = tonumber(p_ID)
+
+	local entities = self.spawnedEntities[self.selectedEntityID]
+
+	local entity = SpatialEntity(entities[1])
+
+	if entity ~= nil then
+
+		local pos = entity.transform.trans
+
+		-- TODO: send rotation too and apply it if gizmo is on local state
+		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' ) 
+	end
+end
+
+function MapEditorClient:OnUnselectEntity(p_ID) 
+	WebUI:ExecuteJS("HideGizmo()")
+	self.selectedEntityID = -1
+end
+
+function MapEditorClient:OnSetEntityMatrix(p_Args) 
+	-- print("OnSetEntityMatrix "..p_Args)
+
+	local p_ArgsArray = split(p_Args, ",")
+
+	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
+		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
+	end
+
+	local s_Entities = self.spawnedEntities[tonumber(p_ArgsArray[1])]
+
+	for _, l_Entity in ipairs(s_Entities) do
+		local s_Entity = SpatialEntity(l_Entity)
+
+		if s_Entity ~= nil then
+			-- print("moving")
+			local s_Left 		 = Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
+			local s_Up 			 = Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
+			local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
+			local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
+			-- print( s_Position )
+			local s_Transform = LinearTransform(
+					s_Left,
+					s_Up,
+					s_Forward,
+					s_Position
+				)
+			s_Entity.transform = s_Transform
+		else
+			print("entity was null")
+		end
+	end
+end
+
+function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
+	-- print("---------------------")
+	print(p_ParamsCombined)
+	local p_GuidSplit = split(p_ParamsCombined, ":")
+	-- print(p_GuidSplit[1])
+	-- print(p_GuidSplit[2])
+	-- print(p_GuidSplit[3])
+	local s_Instance = ResourceManager:FindInstanceByGUID(Guid(p_GuidSplit[1]), Guid(p_GuidSplit[2]))
+	if(s_Instance == nil) then
+		print("Attempted to spawn an instance that doesn't exist: " .. p_PartitionGuid .. " | " .. p_InstanceGuid)
+		return
+	end
+	
+	self.spawnEntity = {blueprintID = p_GuidSplit[2], instance = _G[s_Instance.typeInfo.name](s_Instance)}
+	
+end
+
+--------------- Class functions ---------------
+
+function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray) 
 	if p_EntityArray == nil or #p_EntityArray == 0 then
 		return
 	end
 
+	local s_ID = #self.spawnedEntities + 1
 	table.insert(self.spawnedEntities, p_EntityArray)
-	local s_ID = #self.spawnedEntities
-	print(s_ID)
-	print("Registered entity: "..p_InstanceName)
 
-	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\")', s_ID, p_InstanceName))
+	print(p_BlueprintID)
+
+	-- local s_BlueprintName = Shared.m_BlueprintInstances[p_InstanceBlueprintID].name
+	
+	-- print("Registered entity: "..s_BlueprintName.." with id: ".. s_ID)
+
+	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\")', s_ID, p_BlueprintID))
 end
 
-function MapEditorClient:SendBlueprint(p_Name, p_Guid) 
-	WebUI:ExecuteJS(string.format('AddEffect(\"%s\", \"%s\")', p_Name, p_Guid))
-end
 
-function MapEditorClient:OnLoaded()
-	print("init")
-	-- Initialize our custom WebUI package.
-	WebUI:Init()
-
-	-- Show our custom WebUI package.
-	WebUI:Show()
+function MapEditorClient:SerializeEntities()
+	-- for _, entityInfo in pairs(self.spawnedEntities)
 end
 
 function split(pString, pPattern)
@@ -306,7 +325,6 @@ function split(pString, pPattern)
 	end
 	return Table
 end
-
 
 g_MapEditorClient = MapEditorClient()
 

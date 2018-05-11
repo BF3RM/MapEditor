@@ -8,7 +8,7 @@ end
 
 
 function MapEditorShared:RegisterVars()
-	self.m_Instances = {}
+	self.m_BlueprintInstances = {}
 end
 
 
@@ -38,7 +38,8 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
 			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
 			-- We're not storing the actual instance since we'd rather look it up manually in case of a reload.
-			self.m_Instances[#self.m_Instances + 1] = {
+			local s_ID = #self.m_BlueprintInstances + 1
+			self.m_BlueprintInstances[s_ID] = {
 				instanceGuid = tostring(l_Instance.instanceGuid),
 				partitionGuid = tostring(p_Partition.guid),
 				name = s_Instance.name,

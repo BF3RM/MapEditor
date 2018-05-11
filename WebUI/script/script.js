@@ -13,7 +13,7 @@ function Debug(){
 	ShowGizmo();
 }
 
-var table, tabletwo = null;
+var blueprintTable, entityTable = null;
 var debug = false;
 var instances = null;
 var selectedEntityID = -1;
@@ -24,7 +24,8 @@ if (debug) {
 }
 
 function RegisterInstances(p_Instances) {
-	console.log("registering instances");
+
+	// console.log(p_Instances);
 	instances = JSON.parse(p_Instances);
 	drawTable(instances);
 }
@@ -39,7 +40,7 @@ function drawTable(data) {
 }
 
 function DrawTable() {
-	table = $('#blueprint_list').DataTable({
+	blueprintTable = $('#blueprint_list').DataTable({
 		select: true,
 		"columnDefs": [{
 			"targets": [0],
@@ -51,33 +52,25 @@ function DrawTable() {
 	});
 
 	$('#blueprint_list tbody').on('click', 'tr', function() {
-		let data = table.row(this).data();
+		let data = blueprintTable.row(this).data();
 
-		SpawnInstance(data[3], data[1], data[0]);
+		SpawnInstance(data[1], data[0]);
 	});
 
-	tabletwo = $('#entity_list').DataTable({
-		buttons: [
-			{
-				text: 'Clear All -debug',
-				action: function ( ) {
-					// ClearTable()
-				}
-			}
-		],
+	entityTable = $('#entity_list').DataTable({
 		select: true,
-		"columnDefs": [{
-			"targets": [0],
-			"visible": true,
-		}, {
-			"targets": [1],
-			"visible": true,
-		}]
+		// "columnDefs": [{
+		// 	"targets": [0],
+		// 	"visible": true,
+		// }, {
+		// 	"targets": [1],
+		// 	"visible": true,
+		// }]
 	});
 
 	$('#entity_list tbody').on('click', 'tr', function(){
 
-		let data = tabletwo.row(this).data();
+		let data = entityTable.row(this).data();
 		let id = data[0];
 		console.log(id );
 
@@ -110,9 +103,9 @@ function DrawTable() {
 	});
 }
 
-function SpawnInstance(p_Name, p_PartitionGuid, p_InstanceGuid) {
-	console.log(p_Name + " | " + p_PartitionGuid + " | " + p_InstanceGuid)
-	WebUI.Call('DispatchEventLocal', 'MapEditor:SpawnInstance', p_Name + ":" + p_PartitionGuid + ":" + p_InstanceGuid)
+function SpawnInstance( p_PartitionGuid, p_InstanceGuid) {
+	console.log(p_PartitionGuid + " | " + p_InstanceGuid)
+	WebUI.Call('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid)
 }
 
 function EnableKeyboard() {
@@ -124,24 +117,28 @@ function DisableKeyboard() {
 }
 
 function drawRow(id, rowData) {
-	table.row.add( [ rowData.instanceGuid, rowData.partitionGuid, rowData.typeName, rowData.name] ).draw()
+	blueprintTable.row.add( [  rowData.instanceGuid, rowData.partitionGuid, rowData.typeName, rowData.name] ).draw()
+
 }
 
 /*
 	entities table
 */
 
-// var onEntityTableClick = 
-
-
-function OnSpawnedEntity(p_ID, p_InstanceName) {
+function OnSpawnedEntity(p_ID, p_BlueprintID) {
 
 	//Reset table if you reload the mod
 	if (p_ID == 1) {
-		ClearTable(tabletwo)
+		ClearTable(entityTable)
 	}
- 
-	tabletwo.row.add( [ p_ID, p_InstanceName ] ).draw()
+
+	blueprintTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+		var data = this.data();
+		// console.log(rowIdx+", "+data[4])
+		if (data[0] == p_BlueprintID) {
+			entityTable.row.add( [ p_ID, data[3] ] ).draw()
+		}
+	});
 }
 
 function ClearTable(p_Table){
@@ -154,4 +151,18 @@ function DeleteSelectedEntity(){
 		return
 	}
 	WebUI.Call('DispatchEventLocal', 'MapEditor:DeleteEntity', selectedEntityID)
+}
+
+function RemoveEntityFromList(p_ID){
+	// console.log(entityTable.row( p_ID-1 ).data())
+	let row = entityTable.row( p_ID - 1 );
+
+	row.remove().draw();
+	if (p_ID == selectedEntityID){
+		selectedEntityID = -1;
+
+		$(".selectedItem").removeClass("selectedItem");
+
+		WebUI.Call('DispatchEventLocal', 'MapEditor:UnselectEntity', id)
+	}
 }
