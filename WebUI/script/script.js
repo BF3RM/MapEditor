@@ -2,17 +2,8 @@
  * Created by Powback on 30.04.2018.
  */
 
-function Debug(){
-	$('body').css("background", 'url(\"img/bf3bg.png\")');
-	$('body').css("background-size", 'cover');
-	RegisterInstances(json);
-	OnSpawnedEntity(1, "111")
-	OnSpawnedEntity(2, "222")
-	selectedEntityID = 1;
-	SetGizmoAt(550, 115, 261);
-	ShowGizmo();
-}
 
+var blueprintArray, entityArray;
 var blueprintTable, entityTable = null;
 var debug = false;
 var instances = null;
@@ -23,10 +14,37 @@ if (debug) {
 	RegisterInstances(json);
 }
 
+function Debug(){
+	$('body').css("background", 'url(\"img/bf3bg.png\")');
+	$('body').css("background-size", 'cover');
+	RegisterInstances(json);
+
+	selectedEntityID = 1;
+	SetGizmoAt(1,0,0,0,1,0,0,0,1, 550, 115, 261);
+	ShowGizmo();
+	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25")
+	OnSpawnedEntity(2, "627ED3E0-C04B-F5AE-A3F6-578465DBB787")
+}
+
 function RegisterInstances(p_Instances) {
 
 	// console.log(p_Instances);
 	instances = JSON.parse(p_Instances);
+
+	blueprintArray = {};
+	entityArray = {};
+
+	for (var i = instances.length - 1; i >= 0; i--) {
+		let id = instances[i].instanceGuid
+		
+		blueprintArray[id] = {
+			typeName: instances[i].typeName,
+			blueprintName: instances[i].name,
+			partitionGuid: instances[i].partitionGuid,
+			instanceGuid: instances[i].instanceGuid,
+		}
+	}
+
 	drawTable(instances);
 }
 
@@ -132,17 +150,12 @@ function OnSpawnedEntity(p_ID, p_BlueprintID) {
 		ClearTable(entityTable)
 	}
 
-	blueprintTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-		var data = this.data();
-		// console.log(rowIdx+", "+data[4])
-		if (data[0] == p_BlueprintID) {
-			entityTable.row.add( [ p_ID, data[3] ] ).draw()
-		}
-	});
+	let data = blueprintArray[p_BlueprintID];
+	entityTable.row.add( [ p_ID, data.blueprintName ] ).draw();
+	entityArray[p_ID] = {id: p_ID, blueprintID: p_BlueprintID};
 }
 
 function ClearTable(p_Table){
-	// console.log(p_Table.rows( ).count())
 	p_Table.clear().draw();
 }
 
@@ -154,10 +167,11 @@ function DeleteSelectedEntity(){
 }
 
 function RemoveEntityFromList(p_ID){
-	// console.log(entityTable.row( p_ID-1 ).data())
 	let row = entityTable.row( p_ID - 1 );
 
 	row.remove().draw();
+	entityTable[p_ID] = null;
+
 	if (p_ID == selectedEntityID){
 		selectedEntityID = -1;
 

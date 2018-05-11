@@ -52,7 +52,15 @@ function CreateGizmo(x, y, z){
 	render();
 }
 
-function SetGizmoAt(x, y, z){
+function SetGizmoAt(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z,){
+	let m = new THREE.Matrix4();
+
+	m.set( lx, ux, fx, 0,
+			   ly, uy, fy, 0,
+			   lz, uz, fz, 0,
+			   0, 0, 0, 0 );
+	grid.setRotationFromMatrix(m);
+	mesh.setRotationFromMatrix(m);
 	grid.position.set(x, y, z);
 	mesh.position.set(x, y, z );
 	render();
@@ -97,31 +105,6 @@ function onControlChanged() {
 	console.log(args);
 
 	WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
-
-	// switch ( control.getMode() ) {
-	// 	case "translate": 
-	// 		let position = control.position;
-	// 		let args = selectedEntityID + "," + position.toArray().toString();
-	// 		console.log(args);
-	// 		WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityPos', args);
-	// 		break;
-	// 	case "rotate":
-	// 	case "scale":  
-	// 		let m = mesh.matrixWorld.toArray().toString();
-	// 		let args2 = selectedEntityID + "," + m;
-	// 		console.log(args2);
-
-	// 		WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityRot', args2);
-	// 		break;
-	// 	case "scale": 
-	// 		let ma = mesh.matrixWorld.toArray().toString();
-	// 		let args3 = selectedEntityID + "," + ma;
-	// 		// console.log(args3);
-	// 		break;
-
-	// }
-
-	
 }
 
 function UpdateCameraPos(x, y, z){

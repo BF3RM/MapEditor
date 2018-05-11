@@ -114,7 +114,6 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 
 		-- RAYCAST END
 		local s_Instance = self.spawnEntity.instance
-		-- local s_InstanceName = self.spawnEntity.name
 		local s_InstanceBlueprintID = self.spawnEntity.blueprintID
 
 
@@ -220,10 +219,16 @@ function MapEditorClient:OnSelectEntity(p_ID)
 
 	if entity ~= nil then
 
+		local left = entity.transform.left
+		local up = entity.transform.up
+		local forward = entity.transform.forward
+
 		local pos = entity.transform.trans
 
 		-- TODO: send rotation too and apply it if gizmo is on local state
-		WebUI:ExecuteJS('SetGizmoAt('.. pos.x ..','.. pos.y..','.. pos.z..')' ) 
+		WebUI:ExecuteJS(string.format('SetGizmoAt(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);', 
+			left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
+
 	end
 end
 
@@ -293,18 +298,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray)
 	local s_ID = #self.spawnedEntities + 1
 	table.insert(self.spawnedEntities, p_EntityArray)
 
-	print(p_BlueprintID)
-
-	-- local s_BlueprintName = Shared.m_BlueprintInstances[p_InstanceBlueprintID].name
-	
-	-- print("Registered entity: "..s_BlueprintName.." with id: ".. s_ID)
-
 	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\")', s_ID, p_BlueprintID))
-end
-
-
-function MapEditorClient:SerializeEntities()
-	-- for _, entityInfo in pairs(self.spawnedEntities)
 end
 
 function split(pString, pPattern)
