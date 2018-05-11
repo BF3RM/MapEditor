@@ -104,6 +104,8 @@ function onControlChanged() {
 	let args = selectedEntityID + "," + matrix;
 	console.log(args);
 
+	entityArray[selectedEntityID].matrix = matrix;
+
 	WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
 }
 

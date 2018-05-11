@@ -19,7 +19,7 @@ function Debug(){
 	$('body').css("background-size", 'cover');
 	RegisterInstances(json);
 
-	selectedEntityID = 1;
+	// selectedEntityID = 1;
 	SetGizmoAt(1,0,0,0,1,0,0,0,1, 550, 115, 261);
 	ShowGizmo();
 	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25")
@@ -36,7 +36,7 @@ function RegisterInstances(p_Instances) {
 
 	for (var i = instances.length - 1; i >= 0; i--) {
 		let id = instances[i].instanceGuid
-		
+
 		blueprintArray[id] = {
 			typeName: instances[i].typeName,
 			blueprintName: instances[i].name,
@@ -104,7 +104,7 @@ function DrawTable() {
 		else{
 			//select
 			selectedEntityID = id;
-
+			
 			$(".selectedItem").removeClass("selectedItem");
 
 			$(this).addClass("selectedItem");
@@ -152,7 +152,7 @@ function OnSpawnedEntity(p_ID, p_BlueprintID) {
 
 	let data = blueprintArray[p_BlueprintID];
 	entityTable.row.add( [ p_ID, data.blueprintName ] ).draw();
-	entityArray[p_ID] = {id: p_ID, blueprintID: p_BlueprintID};
+	entityArray[p_ID] = {id: p_ID, blueprintID: p_BlueprintID, matrix: ""};
 }
 
 function ClearTable(p_Table){
@@ -179,4 +179,22 @@ function RemoveEntityFromList(p_ID){
 
 		WebUI.Call('DispatchEventLocal', 'MapEditor:UnselectEntity', id)
 	}
+}
+
+function Serialize(){
+	let array = [];
+
+	Object.keys(entityArray).forEach(function(key,index) {
+		let blueprintID = entityArray[key].blueprintID;
+		let data = blueprintArray[blueprintID]
+
+		array.push({
+			partitionGuid: data.partitionGuid,
+			instanceGuid: data.instanceGuid,
+			matrix: entityArray[key].matrix,
+		});
+	});
+
+	var myJSON = JSON.stringify(array);
+	console.log(myJSON)
 }
