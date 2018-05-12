@@ -196,7 +196,7 @@ function Serialize(){
 	});
 
 	var prefix =
-		'return = [[\n';
+		'return [[\n';
 
 	var suffix = '\n]]\n\n\n'
 
@@ -204,3 +204,10 @@ function Serialize(){
 	// console.log(myJSON)
 	$("#CurrentState").text(prefix + myJSON + suffix);
 }
+
+$(document).on('focus', 'textarea', function() {
+	EnableKeyboard();
+});
+$(document).on('focusout', 'textarea', function() {
+	DisableKeyboard();
+});

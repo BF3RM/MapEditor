@@ -1,5 +1,6 @@
 class 'MapEditorClient'
 local Shared = require '__shared/MapEditorShared'
+local JSONentities = require '__shared/JSONentities'
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
@@ -65,6 +66,8 @@ function MapEditorClient:OnLoaded()
 
 	-- Show our custom WebUI package.
 	WebUI:Show()
+
+	self:LoadJSONEntities()
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -309,6 +312,62 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 
 	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
 end
+
+function MapEditorClient:LoadJSONEntities() 
+	if JSONentities == nil or JSONentities == true then
+		print("No entities saved in JSON")
+		return
+	end
+
+	print("Found JSON table, applying..")
+
+	local entitiesArray = json.decode(JSONentities)
+
+	if entitiesArray == nil then
+		print("JSON string is not valid")
+		return
+	end
+
+
+
+	-- print(entitiesArray)
+
+	for k, entityInfo in ipairs(entitiesArray) do
+		local s_Instance = ResourceManager:FindInstanceByGUID(Guid(entityInfo.partitionGuid), Guid(entityInfo.instanceGuid))
+
+		if(s_Instance == nil) then
+			print("Attempted to spawn an instance that doesn't exist: " .. entityInfo.partitionGuid .. " | " .. entityInfo.instanceGuid)
+			goto continue
+		end
+
+		local m = split(entityInfo.matrix, ",")
+
+		for i,v in ipairs(m) do
+			m[i] = tonumber(v)
+		end
+
+		local s_Transform = LinearTransform(Vec3(m[1],m[2],m[3]),Vec3(m[5],m[6],m[7]),Vec3(m[9],m[10],m[11]),Vec3(m[13],m[14],m[15]))
+		
+		-- print("Spawning!")
+
+		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(s_Instance, s_Transform, true)
+		print("Spawned!")
+
+		if(prefabEntities == nil) then
+			print("Unable to spawn shit.")
+		end
+
+		for i, entity in ipairs(prefabEntities) do
+			entity:Init(Realm.Realm_Client, true)
+		end
+
+		self:RegisterEntity(entityInfo.instanceGuid, prefabEntities, s_Transform)
+		
+
+		::continue::
+	end
+end
+
 
 function split(pString, pPattern)
 	local Table = {}  -- NOTE: use {n = 0} in Lua-5.0
