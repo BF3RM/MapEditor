@@ -170,14 +170,14 @@ function RemoveEntityFromList(p_ID){
 	let row = entityTable.row( p_ID - 1 );
 
 	row.remove().draw();
-	entityTable[p_ID] = null;
+	delete entityArray[p_ID];
 
 	if (p_ID == selectedEntityID){
 		selectedEntityID = -1;
 
 		$(".selectedItem").removeClass("selectedItem");
 
-		WebUI.Call('DispatchEventLocal', 'MapEditor:UnselectEntity', id)
+		WebUI.Call('DispatchEventLocal', 'MapEditor:UnselectEntity', p_ID)
 	}
 }
 

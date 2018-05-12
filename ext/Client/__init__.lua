@@ -66,8 +66,6 @@ function MapEditorClient:OnLoaded()
 
 	-- Show our custom WebUI package.
 	WebUI:Show()
-
-	self:LoadJSONEntities()
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -75,8 +73,10 @@ function MapEditorClient:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		print("MessageType.ClientLevelFinalizedMessage")
 		-- print(Shared.m_BlueprintInstances)
-		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_BlueprintInstances)))
 
+	
+		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_BlueprintInstances)))
+		self:LoadJSONEntities() --Might be better to call this after a bit, so we are sure that all the blueprints are stored in js
 	end
 end
 
@@ -218,6 +218,10 @@ function MapEditorClient:OnSelectEntity(p_ID)
 
 	local entities = self.spawnedEntities[self.selectedEntityID]
 
+	if entities == nil then
+		return
+	end
+
 	local entity = SpatialEntity(entities[1])
 
 	if entity ~= nil then
@@ -307,7 +311,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 	local s_Forward = p_EntityTransform.forward
 	local s_Pos = p_EntityTransform.trans
 
-	local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
+	local s_MatrixString = string.format('%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,1', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
 	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
