@@ -59,6 +59,8 @@ function SetGizmoAt(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z,){
 			   ly, uy, fy, 0,
 			   lz, uz, fz, 0,
 			   0, 0, 0, 0 );
+	grid.scale.set(1,1,1);
+	mesh.scale.set(1,1,1);
 	grid.setRotationFromMatrix(m);
 	mesh.setRotationFromMatrix(m);
 	grid.position.set(x, y, z);
