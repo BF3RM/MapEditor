@@ -48,13 +48,20 @@
 				<button onClick="DeleteSelectedEntity()">
 					Delete selected entity
 				</button>
+				<button onClick="Serialize()">
+					Serialize entities
+				</button>
+				<button onclick="document.execCommand('Copy');">
+					Copy to clipboard
+				</button>
+				<textarea id="CurrentState" onclick="this.focus();this.select();" readonly="readonly"></textarea>
 			</div>
 			
 		</div>
 
 
 	</body>
-			<script src="script/jquery-3.1.1.min.js"></script>
+		<script src="script/jquery-3.1.1.min.js"></script>
 		<script src="script/jquery.dataTables.min.js"></script>
 
 		<script src="script/three.min.js"></script>

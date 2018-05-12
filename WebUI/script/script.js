@@ -22,8 +22,8 @@ function Debug(){
 	// selectedEntityID = 1;
 	SetGizmoAt(1,0,0,0,1,0,0,0,1, 550, 115, 261);
 	ShowGizmo();
-	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25")
-	OnSpawnedEntity(2, "627ED3E0-C04B-F5AE-A3F6-578465DBB787")
+	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25", "1,0,0,0,0,1,0,0,0,0,1,0,549.7808420254872,115,261,1")
+	OnSpawnedEntity(2, "627ED3E0-C04B-F5AE-A3F6-578465DBB787", "1,0,0,0,0,1,0,0,0,0,1,0,548.904210127436,115,261,1")
 }
 
 function RegisterInstances(p_Instances) {
@@ -143,7 +143,7 @@ function drawRow(id, rowData) {
 	entities table
 */
 
-function OnSpawnedEntity(p_ID, p_BlueprintID) {
+function OnSpawnedEntity(p_ID, p_BlueprintID, p_MatrixString) {
 
 	//Reset table if you reload the mod
 	if (p_ID == 1) {
@@ -152,7 +152,7 @@ function OnSpawnedEntity(p_ID, p_BlueprintID) {
 
 	let data = blueprintArray[p_BlueprintID];
 	entityTable.row.add( [ p_ID, data.blueprintName ] ).draw();
-	entityArray[p_ID] = {id: p_ID, blueprintID: p_BlueprintID, matrix: ""};
+	entityArray[p_ID] = {id: p_ID, blueprintID: p_BlueprintID, matrix: p_MatrixString};
 }
 
 function ClearTable(p_Table){
@@ -195,6 +195,12 @@ function Serialize(){
 		});
 	});
 
+	var prefix =
+		'return = [[\n';
+
+	var suffix = '\n]]\n\n\n'
+
 	var myJSON = JSON.stringify(array);
-	console.log(myJSON)
+	// console.log(myJSON)
+	$("#CurrentState").text(prefix + myJSON + suffix);
 }

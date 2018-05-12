@@ -141,8 +141,8 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		end
 
 		self.spawnEntity = nil
-		
-		self:RegisterEntity(s_InstanceBlueprintID, prefabEntities)
+
+		self:RegisterEntity(s_InstanceBlueprintID, prefabEntities, s_Transform)
 		
 	end
 
@@ -279,6 +279,7 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 	-- print(p_GuidSplit[2])
 	-- print(p_GuidSplit[3])
 	local s_Instance = ResourceManager:FindInstanceByGUID(Guid(p_GuidSplit[1]), Guid(p_GuidSplit[2]))
+
 	if(s_Instance == nil) then
 		print("Attempted to spawn an instance that doesn't exist: " .. p_PartitionGuid .. " | " .. p_InstanceGuid)
 		return
@@ -290,7 +291,7 @@ end
 
 --------------- Class functions ---------------
 
-function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray) 
+function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTransform) 
 	if p_EntityArray == nil or #p_EntityArray == 0 then
 		return
 	end
@@ -298,7 +299,15 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray)
 	local s_ID = #self.spawnedEntities + 1
 	table.insert(self.spawnedEntities, p_EntityArray)
 
-	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\")', s_ID, p_BlueprintID))
+	local s_Left = p_EntityTransform.left
+	local s_Up = p_EntityTransform.up
+	local s_Forward = p_EntityTransform.forward
+	local s_Pos = p_EntityTransform.trans
+
+	local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
+		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
+
+	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
 end
 
 function split(pString, pPattern)

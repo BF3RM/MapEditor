@@ -55,11 +55,9 @@ li {
 	color: red;
 }
 
-#marker{
-	position: absolute;
-	left: 0px;
-	right: 0px;
-	width: 20px;
-	height: 20px;
-	background-color: rgba(244, 66, 179,1);
+#CurrentState {
+	width: 100%;
+	background-color: #d0d0d0;
+	height: calc(100% - 145px);
+	resize: none;
 }
