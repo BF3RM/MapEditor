@@ -47,7 +47,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 			}
 		end
 
-		::continue
+		::continue::
 	end
 end
 
