@@ -28,7 +28,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 	for _, l_Instance in ipairs(s_Instances) do
 		if l_Instance == nil then
 			print('Instance is null?')
-			break
+			goto continue
 		end
 
 
@@ -47,7 +47,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 			}
 		end
 
-
+		::continue
 	end
 end
 

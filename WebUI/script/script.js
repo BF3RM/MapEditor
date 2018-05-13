@@ -24,6 +24,7 @@ function Debug(){
 	ShowGizmo();
 	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25", "1,0,0,0,0,1,0,0,0,0,1,0,549.7808420254872,115,261,1")
 	OnSpawnedEntity(2, "627ED3E0-C04B-F5AE-A3F6-578465DBB787", "1,0,0,0,0,1,0,0,0,0,1,0,548.904210127436,115,261,1")
+	OnSpawnedEntity(3, "B8DFA3D3-893D-89C9-2146-8D1F3121BAC5", "1,0,0,0,0,1,0,0,0,0,1,0,548.2,115,261,1")
 }
 
 function RegisterInstances(p_Instances) {
@@ -167,9 +168,21 @@ function DeleteSelectedEntity(){
 }
 
 function RemoveEntityFromList(p_ID){
-	let row = entityTable.row( p_ID - 1 );
 
-	row.remove().draw();
+	let isRemoved = false;
+
+	entityTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+		if (isRemoved) {
+			return
+		}
+		var data = this.data();
+
+		if (data[0] == p_ID) {
+			isRemoved = true;
+			this.remove().draw();
+		}
+	});
+
 	delete entityArray[p_ID];
 
 	if (p_ID == selectedEntityID){
