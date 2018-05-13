@@ -11,7 +11,7 @@ function init() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 	
-	camera = new THREE.PerspectiveCamera( 74, window.innerWidth / window.innerHeight, 0.01, 3000 );
+	camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 3000 );
 	camera.position.set( 538, 120, 330 );
 	
 	scene = new THREE.Scene();
