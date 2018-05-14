@@ -1,14 +1,18 @@
 ::-webkit-scrollbar { 
 	display: none; 
 }
-
+* { padding: 0; margin: 0; }
+html, body, #fullheight {
+    min-height: 100% !important;
+    height: 100%;
+}
 #page {
 	margin: 0px;
 	padding: 0;
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-	/*position: relative;*/
+	font-family: sans-serif;
 }
 
 #webgl {
@@ -140,4 +144,42 @@ li.ui-widget-seperator {
     height: 0px;
     border-bottom: 1px solid #afafaf;
     margin: 5px;
+}
+
+#inspector {
+	width: 25%;
+	background-color: #fff;
+}
+#inspector #objectInspector {
+    margin: 5px;
+}
+#inspector .header {
+    background-color: #D94C42;
+    padding: 5px;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+}
+
+.transform input {
+    width: calc(33.33% - 30px);
+    margin: 2px;
+}
+
+.transform {
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+
+#inspector .name input {
+    width: calc(100% - 5px);
+}
+canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+#page div {
+	z-index: 1;
 }

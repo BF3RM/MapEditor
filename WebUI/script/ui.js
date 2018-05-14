@@ -13,3 +13,13 @@ $('#worldSpace input').checkboxradio({
 	 icon: false
 });
 
+$( "#inspector" ).draggable({
+	handle: ".header",
+	containment: "parent"  
+}).resizable( {
+	handles: "n, e, s, w, ne, se, sw, nw",
+    minHeight: 200,
+    minWidth: 200,
+   	containment: "#page"
+
+});

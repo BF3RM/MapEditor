@@ -15,6 +15,7 @@ if (debug) {
 }
 
 function Debug(){
+	debug = true;
 	$('body').css("background", 'url(\"img/bf3bg.png\")');
 	$('body').css("background-size", 'cover');
 	RegisterInstances(json);

@@ -9,7 +9,7 @@ function init() {
 
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	document.body.appendChild( renderer.domElement );
+	$('#page').append( renderer.domElement );
 	
 	camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 3000 );
 	camera.position.set( 538, 120, 330 );
@@ -39,6 +39,9 @@ function CreateGizmo(x, y, z){
 	control = new THREE.TransformControls( camera, renderer.domElement );
 	control.setSpace("local");
 	control.addEventListener( 'change', onControlChanged );
+	control.addEventListener( 'mouseUp', onMouseUp, false);
+	control.addEventListener( 'mouseDown', onMouseDown, false);
+
 	mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 
@@ -107,8 +110,8 @@ function onControlChanged() {
 	console.log(args);
 
 	entityArray[selectedEntityID].matrix = matrix;
-
-	WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+	if(!debug)
+		WebUI.Call('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
 }
 
 function UpdateCameraPos(x, y, z){
@@ -139,4 +142,11 @@ function SetGizmoMode(p_Mode) {
 	if (control.visible == true) {
 		control.setMode( p_Mode );
 	}
+}
+
+function onMouseUp(e) {
+	$('#page canvas').css("z-index", 0)
+}
+function onMouseDown(e) {
+	$('#page canvas').css("z-index", 1)
 }

@@ -32,7 +32,7 @@
 						</li>
 						<li><div>Menu</div>
 							<ul>
-								<li><div>Inspector</div></li>
+								<li><div onclick="$('#inspector').toggle()">Inspector</div></li>
 								<li class="ui-widget-seperator">___</li>
 								<li><div>Objects</div></li>
 								<li><div>Emitters</div></li>
@@ -129,6 +129,48 @@
 					Serialize entities
 				</button>
 				<textarea id="CurrentState" onclick="this.focus();this.select();" readonly="readonly"></textarea>
+			</div>
+			<div id="inspector" style="display: none">
+				<div class="header">
+					<h1>Inspector</h1>
+					<div id="windowControls">
+						<button>X</button>
+					</div>
+				</div>
+				<div id="objectInspector">
+					<div class="name">
+						<input type="text" value="Some/Object">
+					</div>
+					<div class="transform">
+						<h2>Transform</h2>
+						<div class="trans">
+							<label for="transx">x:</label>
+							<input type="number" name="transx" value="0">
+							<label for="transy">y:</label>
+							<input type="number" name="transy" value="0">
+							<label for="transz">z:</label>
+							<input type="number" name="transz" value="0">
+						</div>
+						<h2>Rotation</h2>
+						<div class="rotation">
+							<label for="rotx">x:</label>
+							<input type="number" name="rotx" value="0">
+							<label for="roty">y:</label>
+							<input type="number" name="roty" value="0">
+							<label for="rotz">z:</label>
+							<input type="number" name="rotz" value="0">
+						</div>
+						<h2>Scale</h2>
+						<div class="scale">
+							<label for="scalex">x:</label>
+							<input type="number" name="scalex" value="1">
+							<label for="scaley">y:</label>
+							<input type="number" name="scaley" value="1">
+							<label for="scalez">z:</label>
+							<input type="number" name="scalez" value="1">
+						</div>
+					</div>
+				</div>
 			</div>
 			
 		</div>
