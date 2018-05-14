@@ -183,3 +183,6 @@ canvas {
 #page div {
 	z-index: 1;
 }
+#toolbar div {
+    z-index: 9;
+}
