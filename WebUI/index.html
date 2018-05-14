@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<title></title>
 
-
+		<link rel="stylesheet" href="style/jquery-ui.min.css">
 		<link rel="stylesheet" href="style/style.css">
 		<link rel="stylesheet" href="style/reset.css">
 		<link rel="stylesheet" href="style/jquery.dataTables.min.css">
@@ -13,10 +13,87 @@
 	</head>
 	<body>
 		<div id="page">
+			<div id="toolbar">
+				<div id="toolbarLeft">
+					<ul id="menubar">
+						<li><div>File</div>
+							<ul>
+								<li><div>New Project</div></li>
+								<li><div>Save</div></li>
+								<li><div>Load</div></li>
+								<li><div>Reset</div></li>
+							</ul>
+						</li>
+						<li><div>Edit</div>
+							<ul>
+								<li><div>Undo</div></li>
+								<li><div>Redo</div></li>
+							</ul>
+						</li>
+						<li><div>Menu</div>
+							<ul>
+								<li><div>Inspector</div></li>
+								<li class="ui-widget-seperator">___</li>
+								<li><div>Objects</div></li>
+								<li><div>Emitters</div></li>
+								<li><div>Lights</div></li>
+							</ul>
+						</li>
+					</ul>
+					<div id="tools">
+						<label for="tools-1">S</label>
+						<input type="radio" name="tools" id="tools-1" checked="">
+						<label for="tools-2">M</label>
+						<input type="radio" name="tools" id="tools-2">
+						<label for="tools-3">R</label>
+						<input type="radio" name="tools" id="tools-3">
+						<label for="tools-4">S</label>
+						<input type="radio" name="tools" id="tools-4">
+					</div>
+
+					<div id="worldSpace">
+						<label for="worldSpace-1">World</label>
+						<input type="radio" name="worldSpace" id="worldSpace-1" checked="">
+						<label for="worldSpace-2">Local</label>
+						<input type="radio" name="worldSpace" id="worldSpace-2">
+					</div>
+				</div>
+				<div id="toolbarCenter">
+				</div>
+				<div id="toolbarRight">
+					<select name="WorldView" id="worldView">
+						<option value="0" selected="selected">Default</option>
+						<option value="1">Raw Linear</option>
+						<option value="2">Raw Linear Alpha</option>
+						<option value="3">Diffuse</option>
+						<option value="4">Specular</option>
+						<option value="5">Emissive</option>
+						<option value="6">Normal</option>
+						<option value="7">Smoothness</option>
+						<option value="8">Material</option>
+						<option value="9">Light</option>
+						<option value="10">Light Diffuse</option>
+						<option value="11">Light Specular</option>
+						<option value="12">Light Indirect</option>
+						<option value="13">Light Translucency</option>
+						<option value="14">Light Overdraw</option>
+						<option value="15">Sky Visibility</option>
+						<option value="16">Sky Visibility Raw</option>
+						<option value="17">Overdraw</option>
+						<option value="18">Dynamic AO</option>
+						<option value="19">Occluders</option>
+						<option value="20">Radiosity Light Maps</option>
+						<option value="21">Radiosity Diffuse Color</option>
+						<option value="22">Radiosity Target UV</option>
+						<option value="23">Velocity Vector</option>
+						<option value="24">Distortion Vector</option>
+					</select>
+				</div>
+			</div>
 			<div id="webgl">
 			</div>
 			<div id="menu">
-				<div id="emitters">
+				<div id="objects">
 					<table id="blueprint_list" class="display">
 					<thead>
 						<tr>
@@ -58,14 +135,18 @@
 
 
 	</body>
-		<script src="script/jquery-3.1.1.min.js"></script>
-		<script src="script/jquery.dataTables.min.js"></script>
 
-		<script src="script/three.min.js"></script>
+		<script src="script/libs/jquery-3.1.1.min.js"></script>
+		<script src="script/libs/jquery-ui.min.js"></script>
+		<script src="script/libs/jquery.dataTables.min.js"></script>
+
+
+		<script src="script/libs/three.min.js"></script>
 		<script src="script/TransformControls.js"></script>
 		<script src="script/webgl.js"></script>
 
 		<script src="script/script.js"></script>
+		<script src="script/ui.js"></script>
 		
 		<script>
 			$(document).ready(function () {
