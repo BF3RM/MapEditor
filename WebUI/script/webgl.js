@@ -105,6 +105,9 @@ function onControlChanged() {
 	}
 	render();
 
+	//TODO: Invert this method.
+	//We should get the matrix and apply it to the mesh, not the other way around.
+	
 	let matrix = mesh.matrixWorld.toArray().toString();
 	let args = selectedEntityID + "," + matrix;
 	console.log(args);
@@ -139,9 +142,30 @@ function SetFov(p_Fov) {
 }
 
 function SetGizmoMode(p_Mode) {
-	if (control.visible == true) {
-		control.setMode( p_Mode );
+	var radio = $('#tools #' + p_Mode);
+    radio[0].checked = true;
+    $('#tools input').button("refresh");
+
+	if(p_Mode == "select") {
+		HideGizmo();
+		return
 	}
+
+	if (control.visible == false) {
+		ShowGizmo();
+	}
+	control.setMode( p_Mode );
+}
+function SetWorldSpace(p_Space) {
+	if(p_Space == "local" || p_Space == "world") {
+		control.setSpace(p_Space);
+		var radio = $('#worldSpace #' + p_Space);
+	    radio[0].checked = true;
+	    $('#worldSpace input').button("refresh");
+	} else {
+		console.error("Tried to set an invalid world space")
+	}
+
 }
 
 function onMouseUp(e) {

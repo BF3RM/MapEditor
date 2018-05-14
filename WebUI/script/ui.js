@@ -7,11 +7,10 @@ $('#worldView').selectmenu();
 
 $('#tools input').checkboxradio({
 	 icon: false
-});
-
+}).on( "change", toolsChanged );
 $('#worldSpace input').checkboxradio({
 	 icon: false
-});
+}).on( "change", worldChanged );
 
 $( "#inspector" ).draggable({
 	handle: ".header",
@@ -23,3 +22,11 @@ $( "#inspector" ).draggable({
    	containment: "#page"
 
 });
+
+
+function toolsChanged(e) {
+	SetGizmoMode(e.target.id);
+}
+function worldChanged(e) {
+	SetWorldSpace(e.target.id);
+}
