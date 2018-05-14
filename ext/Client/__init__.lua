@@ -29,6 +29,9 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityMatrix', self, self.OnSetEntityMatrix)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
+
+	--NetEvents
+	NetEvents:Subscribe('MapEditor:RoundReset', self, self.OnRoundReset)
 end
 
 ----------- Game functions----------------
@@ -39,14 +42,11 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	end
 
 	local s_Player = PlayerManager:GetLocalPlayer()
-	if s_Player == nil or s_Player.soldier == nil then
-		m_Soldier = nil
-	else
-		m_Soldier = s_Player.soldier
-	end
-	if(m_Soldier == nil and not s_Player.teamID == 0) then
+	if s_Player == nil then
 		return
 	end
+
+	local m_Soldier = s_Player.soldier
 
 	local s_Transform = ClientUtils:GetCameraTransform()
 	local pos = s_Transform.trans
@@ -66,6 +66,12 @@ function MapEditorClient:OnLoaded()
 
 	-- Show our custom WebUI package.
 	WebUI:Show()
+end
+
+function MapEditorClient:OnRoundReset()
+	self.spawnedEntities = {}
+	self.selectedEntityID = -1
+	WebUI:ExecuteJS('OnRoundReset()')
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -98,16 +104,16 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		local s_Transform = ClientUtils:GetCameraTransform()
 		local s_CastDistance = 10000;
 
-        local s_CameraTransform = ClientUtils:GetCameraTransform()
+		local s_CameraTransform = ClientUtils:GetCameraTransform()
 
-        local s_CameraForward = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
+		local s_CameraForward = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
 
 		local s_CastPosition = Vec3(s_CameraTransform.trans.x + (s_CameraForward.x*s_CastDistance),
-									s_CameraTransform.trans.y + (s_CameraForward.y*s_CastDistance),
-									s_CameraTransform.trans.z + (s_CameraForward.z*s_CastDistance))
+																s_CameraTransform.trans.y + (s_CameraForward.y*s_CastDistance),
+																s_CameraTransform.trans.z + (s_CameraForward.z*s_CastDistance))
 
-        print("starting raycast")
-        local s_Raycast = RaycastManager:Raycast(s_CameraTransform.trans, s_CastPosition, 2)
+		print("starting raycast")
+		local s_Raycast = RaycastManager:Raycast(s_CameraTransform.trans, s_CastPosition, 2)
 		print("raycast did")
 		if(s_Raycast ~= nil) then
 			-- print(tostring(s_Raycast.rigidBody.typeInfo.name))

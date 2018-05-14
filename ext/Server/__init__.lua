@@ -16,8 +16,11 @@ end
 
 function MapEditorServer:RegisterEvents()
 	self.m_EngineMessageEvent = Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
-	
-	
+	self.m_OnRoundReset = Events:Subscribe("Server:RoundReset", self, self.OnRoundReset)
+end
+
+function MapEditorServer:OnRoundReset()
+	NetEvents:BroadcastLocal('MapEditor:RoundReset')
 end
 
 function MapEditorServer:OnEngineMessage(p_Message) 
