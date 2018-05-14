@@ -1,7 +1,12 @@
 ::-webkit-scrollbar { 
 	display: none; 
 }
-* { padding: 0; margin: 0; }
+
+* { 
+    padding: 0;
+    margin: 0; 
+    user-select: none;
+}
 html, body, #fullheight {
     min-height: 100% !important;
     height: 100%;

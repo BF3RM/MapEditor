@@ -29,6 +29,7 @@ function MapEditorClient:RegisterEvents()
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityMatrix', self, self.OnSetEntityMatrix)
 	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
+	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetViewmode', self, self.OnSetViewmode)
 
 	--NetEvents
 	NetEvents:Subscribe('MapEditor:RoundReset', self, self.OnRoundReset)
@@ -170,27 +171,24 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		WebUI:DisableMouse()
 		-- WebUI:Hide()
 	end
-
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_Q) then
-		WebUI:ExecuteJS("SetGizmoMode(\'translate\')")
-	end
-
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_W) then
-		WebUI:ExecuteJS("SetGizmoMode(\'rotate\')")
-	end
-
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_E) then
-		WebUI:ExecuteJS("SetGizmoMode(\'scale\')")
-	end
 end
 
 ----------- WebUI functions----------------
 
 function MapEditorClient:OnEnableKeyboard() 
-		WebUI:EnableKeyboard()
+	WebUI:EnableKeyboard()
 end
 function MapEditorClient:OnDisableKeyboard() 
-		WebUI:DisableKeyboard()
+	WebUI:DisableKeyboard()
+end
+function MapEditorClient:OnSetViewmode(p_ViewMode)
+	local m_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
+	if m_WorldRenderSettings ~= nil then
+		local s_WorldRenderSettings = WorldRenderSettings(m_WorldRenderSettings)
+		s_WorldRenderSettings.viewMode = p_ViewMode
+	else 
+		print("Failed to get WorldRenderSettings")
+	end
 end
 
 function MapEditorClient:OnDeleteEntity(p_ID)

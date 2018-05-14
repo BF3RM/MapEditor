@@ -1,25 +1,29 @@
-$( "#menubar" ).menu({
-	position: {at: "left bottom"},
+$("#menubar").menu({
+	position: {
+		at: "left bottom"
+	},
 	items: "> :not(.ui-widget-seperator)"
 });
 
-$('#worldView').selectmenu();
+$('#worldView').selectmenu({
+	change: worldViewChanged
+});
 
 $('#tools input').checkboxradio({
-	 icon: false
-}).on( "change", toolsChanged );
+	icon: false
+}).on("change", toolsChanged);
 $('#worldSpace input').checkboxradio({
-	 icon: false
-}).on( "change", worldChanged );
+	icon: false
+}).on("change", worldChanged);
 
-$( "#inspector" ).draggable({
+$("#inspector").draggable({
 	handle: ".header",
-	containment: "parent"  
-}).resizable( {
+	containment: "parent"
+}).resizable({
 	handles: "n, e, s, w, ne, se, sw, nw",
-    minHeight: 200,
-    minWidth: 200,
-   	containment: "#page"
+	minHeight: 200,
+	minWidth: 200,
+	containment: "#page"
 
 });
 
@@ -27,6 +31,11 @@ $( "#inspector" ).draggable({
 function toolsChanged(e) {
 	SetGizmoMode(e.target.id);
 }
+
 function worldChanged(e) {
 	SetWorldSpace(e.target.id);
+}
+
+function worldViewChanged(e, ui) {
+	SendEvent('DispatchEventLocal', 'MapEditor:SetViewmode', ui.item.value)
 }
