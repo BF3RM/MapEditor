@@ -91,7 +91,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	--We need to do the raycast in a physics update apparently.
 	if(self.spawnEntity ~= nil) then
 		-- RAYCAST START
-
+		print("Spawning: " .. self.spawnEntity.instance.name)
 		local s_Player = PlayerManager:GetLocalPlayer()
 		if s_Player == nil then
 			return
