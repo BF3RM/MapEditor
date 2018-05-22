@@ -12,7 +12,8 @@ $('#worldView').selectmenu({
 $('#tools').find('input').checkboxradio({
 	icon: false
 }).on("change", toolsChanged);
-$('#wo').find('input').checkboxradio({
+
+$('#worldSpace').find('input').checkboxradio({
 	icon: false
 }).on("change", worldChanged);
 
