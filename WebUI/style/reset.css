@@ -29,7 +29,7 @@ footer, header, hgroup, menu, nav, section {
 	display: block;
 }
 body {
-	margin: 0px;
+	margin: 0;
 	overflow: hidden;
 	line-height: 1;
 }

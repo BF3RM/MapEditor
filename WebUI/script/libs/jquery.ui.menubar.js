@@ -74,17 +74,17 @@ $.widget( "ui.menubar", {
                   menu = input.next(that.options.menuElement);
 
               input.on("click.menubar focus.menubar mouseenter.menubar", function (event) {
-                if (event.type == "focus" && !event.originalEvent)
+                if (event.type === "focus" && !event.originalEvent)
                   return;
                 event.preventDefault();
 
                 // TODO can we simplify or extractthis check? especially the last two expressions
                 // there's a similar active[0] == menu[0] check in _open
-                if (event.type == "click" && menu.is(":visible") && that.active && that.active[0] == menu[0]) {
+                if (event.type === "click" && menu.is(":visible") && that.active && that.active[0] === menu[0]) {
                   that._close();
                   return;
                 }
-                if ((that.open && event.type == "mouseenter") || event.type == "click" || that.options.autoExpand) {
+                if ((that.open && event.type === "mouseenter") || event.type === "click" || that.options.autoExpand) {
                   if ( that.options.autoExpand ) 
                     clearTimeout(that.closeTimer); 
                   that._open(event, menu);
@@ -126,7 +126,7 @@ $.widget( "ui.menubar", {
       });
       that._on({
         keydown : function (event) {
-          if (event.keyCode == $.ui.keyCode.ESCAPE && that.active && that.active.menu("collapse", event) !== true) {
+          if (event.keyCode === $.ui.keyCode.ESCAPE && that.active && that.active.menu("collapse", event) !== true) {
             var active = that.active;
             that.active.blur();
             that._close(event);
@@ -194,7 +194,7 @@ $.widget( "ui.menubar", {
     },
     _open : function (event, menu) {
       // on a single-button menubar, ignore reopening the same menu
-      if (this.active && this.active[0] == menu[0])
+      if (this.active && this.active[0] === menu[0])
         return;
         
       if ( this.active ) {

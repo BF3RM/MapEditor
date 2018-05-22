@@ -14,27 +14,32 @@ Init();
 
 function Debug() {
 	debug = true;
-	$('body').css("background", 'url(\"img/bf3bg.png\")');
-	$('body').css("background-size", 'cover');
+	$('body').css({
+		"background": 'url(\"img/bf3bg.png\"',
+		'background-size': 'cover'
+	});
 	RegisterInstances(json);
 
 	// selectedEntityID = 1;
 	SetGizmoAt(1, 0, 0, 0, 1, 0, 0, 0, 1, 550, 115, 261);
 	ShowGizmo();
-	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25", "1,0,0,0,0,1,0,0,0,0,1,0,549.7808420254872,115,261,1")
-	OnSpawnedEntity(2, "627ED3E0-C04B-F5AE-A3F6-578465DBB787", "1,0,0,0,0,1,0,0,0,0,1,0,548.904210127436,115,261,1")
+	OnSpawnedEntity(1, "A789BD70-2F4F-B974-7D80-8ECB5A29BE25", "1,0,0,0,0,1,0,0,0,0,1,0,549.7808420254872,115,261,1");
+	OnSpawnedEntity(2, "627ED3E0-C04B-F5AE-A3F6-578465DBB787", "1,0,0,0,0,1,0,0,0,0,1,0,548.904210127436,115,261,1");
 	OnSpawnedEntity(3, "B8DFA3D3-893D-89C9-2146-8D1F3121BAC5", "1,0,0,0,0,1,0,0,0,0,1,0,548.2,115,261,1")
 }
 
 function SendEvent(type, name, parameter) {
-	if (debug)
-		return
+
+	if (debug) {
+		console.log(name + " = " + parameter);
+		return;
+	}
 	WebUI.Call(type, name, parameter)
 }
 
 function Init() {
-	InitTables()
-	blueprintArray = {}
+	InitTables();
+	blueprintArray = {};
 	entityArray = {}
 }
 
@@ -43,13 +48,13 @@ function RegisterInstances(p_Instances) {
 	instances = JSON.parse(p_Instances);
 
 	for (var i = instances.length - 1; i >= 0; i--) {
-		let id = instances[i].instanceGuid
+		let id = instances[i].instanceGuid;
 
 		blueprintArray[id] = {
 			typeName: instances[i].typeName,
 			name: instances[i].name,
 			partitionGuid: instances[i].partitionGuid,
-			instanceGuid: instances[i].instanceGuid,
+			instanceGuid: instances[i].instanceGuid
 		}
 	}
 
@@ -57,7 +62,7 @@ function RegisterInstances(p_Instances) {
 }
 
 function FillBlueprintTable() {
-	Object.keys(blueprintArray).forEach(function(key, index) {
+	Object.keys(blueprintArray).forEach(function (key, index) {
 		DrawBlueprintRow(blueprintArray[key]); // Redundant?
 	})
 }
@@ -68,14 +73,14 @@ function InitTables() {
 		select: true,
 		"columnDefs": [{
 			"targets": [0],
-			"visible": false,
+			"visible": false
 		}, {
 			"targets": [1],
-			"visible": false,
+			"visible": false
 		}]
 	});
 
-	$('#blueprint_list tbody').on('click', 'tr', function() {
+	$('#blueprint_list').find('tbody').on('click', 'tr', function () {
 		let data = blueprintTable.row(this).data();
 
 		SpawnInstance(data[1], data[0]);
@@ -85,20 +90,20 @@ function InitTables() {
 		select: true
 	});
 
-	$('#entity_list tbody').on('click', 'tr', function() {
+	$('#entity_list').find('tbody').on('click', 'tr', function () {
 
 		let data = entityTable.row(this).data();
 		let id = data[0];
 		console.log(id);
 
-		if (selectedEntityID == id) {
+		if (selectedEntityID === id) {
 			//unselect
 
 			selectedEntityID = -1;
 
 			$(this).removeClass("selectedItem");
 
-			SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', id)
+			SendEvent('DispatchEventLocal', 'MapEditor:DeselectEntity', id)
 		} else {
 			//select
 			selectedEntityID = id;
@@ -113,31 +118,17 @@ function InitTables() {
 			SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', id)
 		}
 	});
-
-	$("input").focus(function() {
-		EnableKeyboard();
-	});
-	$("input").blur(function() {
-		DisableKeyboard();
-	});
 }
 
 function SpawnInstance(p_PartitionGuid, p_InstanceGuid) {
-	console.log(p_PartitionGuid + " | " + p_InstanceGuid)
+	console.log(p_PartitionGuid + " | " + p_InstanceGuid);
 	SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid)
 }
 
-function EnableKeyboard() {
-	SendEvent('DispatchEventLocal', 'MapEditor:EnableKeyboard')
-}
 
-function DisableKeyboard() {
-	SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
-}
 
 function DrawBlueprintRow(rowData) {
 	blueprintTable.row.add([rowData.instanceGuid, rowData.partitionGuid, rowData.typeName, rowData.name]).draw()
-
 }
 
 /*
@@ -162,24 +153,24 @@ function OnSpawnedEntity(p_ID, p_BlueprintID, p_MatrixString) {
 
 
 function OnRoundReset() {
-	console.log("OnRoundReset-----------------")
+	console.log("OnRoundReset-----------------");
 	ClearBlueprintTable();
 	ClearEntityTable();
 }
 
 function ClearBlueprintTable() {
-	console.log(blueprintArray)
+	console.log(blueprintArray);
 	blueprintArray = {};
-	console.log(blueprintArray)
+	console.log(blueprintArray);
 	blueprintTable.clear().draw();
 }
 
 
 function ClearEntityTable() {
 	// for (var member in 	entityArray) delete entityArray[member];
-	console.log(entityArray)
+	console.log(entityArray);
 	entityArray = {};
-	console.log(entityArray)
+	console.log(entityArray);
 	entityTable.clear().draw();
 }
 
@@ -194,13 +185,13 @@ function RemoveEntityFromList(p_ID) {
 
 	let isRemoved = false;
 
-	entityTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+	entityTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
 		if (isRemoved) {
 			return
 		}
 		var data = this.data();
 
-		if (data[0] == p_ID) {
+		if (data[0] === p_ID) {
 			isRemoved = true;
 			this.remove().draw();
 		}
@@ -208,7 +199,7 @@ function RemoveEntityFromList(p_ID) {
 
 	delete entityArray[p_ID];
 
-	if (p_ID == selectedEntityID) {
+	if (p_ID === selectedEntityID) {
 		selectedEntityID = -1;
 
 		$(".selectedItem").removeClass("selectedItem");
@@ -220,30 +211,23 @@ function RemoveEntityFromList(p_ID) {
 function Serialize() {
 	let array = [];
 
-	Object.keys(entityArray).forEach(function(key, index) {
+	Object.keys(entityArray).forEach(function (key, index) {
 		let blueprintID = entityArray[key].blueprintID;
-		let data = blueprintArray[blueprintID]
+		let data = blueprintArray[blueprintID];
 
 		array.push({
 			partitionGuid: data.partitionGuid,
 			instanceGuid: data.instanceGuid,
-			matrix: entityArray[key].matrix,
+			matrix: entityArray[key].matrix
 		});
 	});
 
 	let prefix =
 		'return [[\n';
 
-	let suffix = '\n]]\n\n\n'
+	let suffix = '\n]]\n\n\n';
 
 	let myJSON = JSON.stringify(array);
 	// console.log(myJSON)
 	$("#CurrentState").text(prefix + myJSON + suffix);
 }
-
-$(document).on('focus', 'textarea', function() {
-	EnableKeyboard();
-});
-$(document).on('focusout', 'textarea', function() {
-	DisableKeyboard();
-});

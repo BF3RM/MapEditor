@@ -12,7 +12,7 @@ html, body, #fullheight {
     height: 100%;
 }
 #page {
-	margin: 0px;
+	margin: 0;
 	padding: 0;
 	width: 100%;
 	height: 100%;
@@ -21,7 +21,7 @@ html, body, #fullheight {
 }
 
 #webgl {
-	margin: 0px;
+	margin: 0;
 	padding: 0;
 	position: absolute;
 	overflow: hidden;
@@ -100,7 +100,7 @@ div#tools {
 #toolbarLeft, #toolbarCenter, #toolbarRight {
 	display: flex;
 }
-#toolbarLeft #tools, #toolbarLeft #worldSpace, {
+#toolbarLeft #tools, #toolbarLeft #worldSpace {
 	display: flex;
 }
 button#playButton {
@@ -146,7 +146,7 @@ button#playButton {
 
 li.ui-widget-seperator {
     font-size: 0;
-    height: 0px;
+    height: 0;
     border-bottom: 1px solid #afafaf;
     margin: 5px;
 }

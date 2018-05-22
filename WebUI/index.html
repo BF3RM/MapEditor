@@ -9,8 +9,8 @@
 		<link rel="stylesheet" href="style/style.css">
 		<link rel="stylesheet" href="style/reset.css">
 		<link rel="stylesheet" href="style/jquery.dataTables.min.css">
-
-	</head>
+        <script src="script/controls.js"></script>
+    </head>
 	<body>
 		<div id="page">
 			<div id="toolbar">
@@ -61,7 +61,7 @@
 				<div id="toolbarCenter">
 				</div>
 				<div id="toolbarRight">
-					<select name="WorldView" id="worldView">
+                    <select name="WorldView" id="worldView">
 						<option value="0" selected="selected">Default</option>
 						<option value="1">Raw Linear</option>
 						<option value="2">Raw Linear Alpha</option>
@@ -139,7 +139,7 @@
 				</div>
 				<div id="objectInspector">
 					<div class="name">
-						<input type="text" value="Some/Object">
+                        <label for="objectName">Name</label><input id="objectName" type="text" value="Some/Object">
 					</div>
 					<div class="transform">
 						<h2>Transform</h2>
@@ -189,7 +189,7 @@
 		
 		<script>
 			$(document).ready(function () {
-				if(window.location.href.indexOf("webui") == -1) {
+				if(window.location.href.indexOf("webui") === -1) {
 					Debug();
 				}
 			});

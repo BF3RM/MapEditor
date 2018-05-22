@@ -1,6 +1,7 @@
 class 'MapEditorClient'
 local Shared = require '__shared/MapEditorShared'
 local JSONentities = require '__shared/JSONentities'
+--local Freecam = require 'freecam'
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
@@ -10,8 +11,14 @@ function MapEditorClient:__init()
 end
 
 function MapEditorClient:RegisterVars()
+	self.spawnEntity = nil
 	self.spawnedEntities = {}
 	self.selectedEntityID = -1
+	self.isFreecam = true
+	self.raycastTransform = nil
+
+	self.castDistance = 100
+	self.fallbackDistance = 5
 end
 
 function MapEditorClient:RegisterEvents()
@@ -22,14 +29,19 @@ function MapEditorClient:RegisterEvents()
 	self.m_EngineUpdateEvent = Events:Subscribe("Engine:Update", self, self.OnUpdate)
 
 	--WebUI events
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SpawnInstance', self, self.OnSpawnInstance)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:EnableKeyboard', self, self.OnEnableKeyboard)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DisableKeyboard', self, self.OnDisableKeyboard)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:UnselectEntity', self, self.OnUnselectEntity)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetEntityMatrix', self, self.OnSetEntityMatrix)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
-	self.m_SetEffectEvent = Events:Subscribe('MapEditor:SetViewmode', self, self.OnSetViewmode)
+	Events:Subscribe('MapEditor:SpawnInstance', self, self.OnSpawnInstance)
+	Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
+	Events:Subscribe('MapEditor:DeselectEntity', self, self.OnDeselectEntity)
+	Events:Subscribe('MapEditor:SetEntityMatrix', self, self.OnSetEntityMatrix)
+	Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
+	Events:Subscribe('MapEditor:SetViewmode', self, self.OnSetViewmode)
+
+	-- Controls
+	Events:Subscribe('MapEditor:EnableKeyboard', self, self.OnEnableKeyboard)
+	Events:Subscribe('MapEditor:DisableKeyboard', self, self.OnDisableKeyboard)
+
+	Events:Subscribe('MapEditor:EnableFreecam', self, self.OnEnableFreecam)
+
 
 	--NetEvents
 	NetEvents:Subscribe('MapEditor:RoundReset', self, self.OnRoundReset)
@@ -38,16 +50,11 @@ end
 ----------- Game functions----------------
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
+	-- TODO: Move this to controls
+
 	if self.selectedEntityID < 0 then
 		return
 	end
-
-	local s_Player = PlayerManager:GetLocalPlayer()
-	if s_Player == nil then
-		return
-	end
-
-	local m_Soldier = s_Player.soldier
 
 	local s_Transform = ClientUtils:GetCameraTransform()
 	local pos = s_Transform.trans
@@ -61,11 +68,7 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorClient:OnLoaded()
-	print("init")
-	-- Initialize our custom WebUI package.
 	WebUI:Init()
-
-	-- Show our custom WebUI package.
 	WebUI:Show()
 end
 
@@ -89,56 +92,53 @@ end
 
 function MapEditorClient:OnUpdateInput(p_Delta)
 	--We need to do the raycast in a physics update apparently.
-	if(self.spawnEntity ~= nil) then
-		-- RAYCAST START
-		print("Spawning: " .. self.spawnEntity.instance.name)
-		local s_Player = PlayerManager:GetLocalPlayer()
-		if s_Player == nil then
-			return
-		end
 
-		local s_Soldier = s_Player.soldier
-		if s_Soldier == nil  and not s_Player.teamID == 0 then
-			return
-		end
+	if(self.isFreecam == true) then 
 
 		local s_Transform = ClientUtils:GetCameraTransform()
-		local s_CastDistance = 10000;
 
-		local s_CameraTransform = ClientUtils:GetCameraTransform()
+		if(s_Transform.trans == Vec3(0,0,0)) then -- Camera is below the ground. Creating an entity here would be useless.
+			self.raycastTransform = nil
+			return
+		end
+
+		-- The freecam transform is inverted. Invert it back
 
 		local s_CameraForward = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
 
-		local s_CastPosition = Vec3(s_CameraTransform.trans.x + (s_CameraForward.x*s_CastDistance),
-																s_CameraTransform.trans.y + (s_CameraForward.y*s_CastDistance),
-																s_CameraTransform.trans.z + (s_CameraForward.z*s_CastDistance))
+		local s_CastPosition = Vec3(s_Transform.trans.x + (s_CameraForward.x*self.castDistance),
+									s_Transform.trans.y + (s_CameraForward.y*self.castDistance),
+									s_Transform.trans.z + (s_CameraForward.z*self.castDistance))
 
-		print("starting raycast")
-		local s_Raycast = RaycastManager:Raycast(s_CameraTransform.trans, s_CastPosition, 2)
-		print("raycast did")
+		local s_Raycast = RaycastManager:Raycast(s_Transform.trans, s_CastPosition, 2)
+
+		local s_Transform = LinearTransform(
+			Vec3(1,0,0),
+			Vec3(0,1,0),
+			Vec3(0,0,1),
+			s_Transform.trans
+		)
+
 		if(s_Raycast ~= nil) then
-			-- print(tostring(s_Raycast.rigidBody.typeInfo.name))
+			s_Transform.trans = s_Raycast.position
 		else
-			return
-		end		
-
-		-- RAYCAST END
-		local s_Instance = self.spawnEntity.instance
-		local s_InstanceBlueprintID = self.spawnEntity.blueprintID
-
-
-		print(tostring(s_Instance))
-		print("raycast didnt stop us, no sir")
-		if(s_Raycast == nil or s_Raycast.position == nil) then
-			print("Raycast didn't hit nothin")
-			return
+			-- Raycast didn't hit anything. Spawn it in front of the player instead.
+			s_Transform.trans = Vec3(s_Transform.trans.x + (s_CameraForward.x*self.fallbackDistance),
+								s_Transform.trans.y + (s_CameraForward.y*self.fallbackDistance),
+								s_Transform.trans.z + (s_CameraForward.z*self.fallbackDistance))
 		end
 
-		local s_Transform = LinearTransform(Vec3(1,0,0),Vec3(0,1,0),Vec3(0,0,1),Vec3(0,0,0))
-		s_Transform.trans = s_Raycast.position
-		print("Spawning!")
+		self.raycastTransform = s_Transform
 
-		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(s_Instance, s_Transform, true)
+	end
+
+	-- This also crashes if we do it outside of Update.
+
+	if(self.spawnEntity ~= nil and self.raycastTransform ~= nil) then
+
+		print("Spawning: " .. self.spawnEntity.instance.name)
+
+		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(self.spawnEntity.instance, self.raycastTransform, true)
 		print("Spawned!")
 
 		if(prefabEntities == nil) then
@@ -150,26 +150,34 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 			entity:Init(Realm.Realm_Client, true)
 		end
 
+		
+		
+
+		self:RegisterEntity(self.spawnEntity.blueprintID, prefabEntities, self.raycastTransform)
 		self.spawnEntity = nil
 
-		self:RegisterEntity(s_InstanceBlueprintID, prefabEntities, s_Transform)
-		
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
-		
-	end
-
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
 		WebUI:BringToFront()
 		WebUI:EnableMouse()
 		WebUI:Show()
 	end
 
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
 		--WebUI:BringToFront()
 		WebUI:DisableMouse()
 		-- WebUI:Hide()
+	end
+
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
+
+	end
+
+	-- We let go of right mouse button. Activate the UI again.
+	if(self.isFreecam and InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1)) then
+		WebUI:EnableMouse()
+		WebUI:EnableKeyboard()
 	end
 end
 
@@ -181,10 +189,14 @@ end
 function MapEditorClient:OnDisableKeyboard() 
 	WebUI:DisableKeyboard()
 end
+function MapEditorClient:OnEnableFreecam()
+	WebUI:DisableKeyboard()
+	WebUI:DisableMouse()
+end
 function MapEditorClient:OnSetViewmode(p_ViewMode)
-	local m_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
-	if m_WorldRenderSettings ~= nil then
-		local s_WorldRenderSettings = WorldRenderSettings(m_WorldRenderSettings)
+	local p_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
+	if p_WorldRenderSettings ~= nil then
+		local s_WorldRenderSettings = WorldRenderSettings(p_WorldRenderSettings)
 		s_WorldRenderSettings.viewMode = p_ViewMode
 	else 
 		print("Failed to get WorldRenderSettings")
@@ -229,7 +241,6 @@ function MapEditorClient:OnSelectEntity(p_ID)
 	local entity = SpatialEntity(entities[1])
 
 	if entity ~= nil then
-
 		local left = entity.transform.left
 		local up = entity.transform.up
 		local forward = entity.transform.forward
@@ -243,7 +254,7 @@ function MapEditorClient:OnSelectEntity(p_ID)
 	end
 end
 
-function MapEditorClient:OnUnselectEntity(p_ID) 
+function MapEditorClient:OnDeselectEntity(p_ID)
 	WebUI:ExecuteJS("HideGizmo()")
 	self.selectedEntityID = -1
 end
@@ -264,8 +275,8 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 
 		if s_Entity ~= nil then
 			-- print("moving")
-			local s_Left 		 = Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
-			local s_Up 			 = Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
+			local s_Left 		= Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
+			local s_Up 			= Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
 			local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
 			local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
 			-- print( s_Position )
@@ -276,6 +287,7 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 					s_Position
 				)
 			s_Entity.transform = s_Transform
+			print(tostring(s_Transform))
 		else
 			print("entity was null")
 		end
@@ -296,6 +308,7 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 		return
 	end
 	
+	-- This entity will be spawned in Update. We can't create entities outside it. (Or maybe because it's started from an event?)
 	self.spawnEntity = {blueprintID = p_GuidSplit[2], instance = _G[s_Instance.typeInfo.name](s_Instance)}
 	
 end
@@ -307,6 +320,8 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 		return
 	end
 
+	-- TODO: Make the WebUI calculate the ID instead.
+
 	local s_ID = #self.spawnedEntities + 1
 	table.insert(self.spawnedEntities, p_EntityArray)
 
@@ -315,6 +330,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 	local s_Forward = p_EntityTransform.forward
 	local s_Pos = p_EntityTransform.trans
 
+	-- The WebUI canvas requires a Vec4
 	local s_MatrixString = string.format('%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,1', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 

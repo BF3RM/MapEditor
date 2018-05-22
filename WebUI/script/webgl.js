@@ -13,6 +13,20 @@ function init() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	$('#page').append(renderer.domElement);
 
+    $('canvas').mousedown(function(event) {
+        switch (event.which) {
+            case 1: // Left mouse
+                break;
+            case 2:// middle mouse
+                break;
+            case 3: // right mouse
+                EnableFreecam();
+                break;
+            default:
+                alert('You have a strange Mouse!');
+        }
+    });
+
 	camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
 	camera.position.set(538, 120, 330);
 
@@ -29,9 +43,6 @@ function CreateGizmo(x, y, z) {
 		console.log("Gizmo already exist")
 	}
 
-	grid = new THREE.GridHelper(15, 10)
-	scene.add(grid);
-	grid.position.set(x, y, z);
 
 	texture = new THREE.TextureLoader().load('textures/crate.gif', render);
 	texture.mapping = THREE.UVMapping;
@@ -59,24 +70,21 @@ function CreateGizmo(x, y, z) {
 	render();
 }
 
-function SetGizmoAt(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z, ) {
+function SetGizmoAt(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
 	let m = new THREE.Matrix4();
 
 	m.set(lx, ux, fx, 0,
 		ly, uy, fy, 0,
 		lz, uz, fz, 0,
 		0, 0, 0, 0);
-	grid.scale.set(1, 1, 1);
+
 	mesh.scale.set(1, 1, 1);
-	grid.setRotationFromMatrix(m);
 	mesh.setRotationFromMatrix(m);
-	grid.position.set(x, y, z);
 	mesh.position.set(x, y, z);
 	render();
 }
 
 function HideGizmo() {
-	grid.visible = false;
 	control.visible = false;
 	mesh.visible = false;
 
@@ -85,7 +93,6 @@ function HideGizmo() {
 
 function ShowGizmo() {
 	control.visible = true;
-	grid.visible = true;
 	mesh.visible = true;
 
 	render();
@@ -150,25 +157,25 @@ function SetFov(p_Fov) {
 function SetGizmoMode(p_Mode) {
 	var radio = $('#tools #' + p_Mode);
 	radio[0].checked = true;
-	$('#tools input').button("refresh");
+	$('#tools').find('input').button("refresh");
 
-	if (p_Mode == "select") {
+	if (p_Mode === "select") {
 		HideGizmo();
 		return
 	}
 
-	if (control.visible == false) {
+	if (control.visible === false) {
 		ShowGizmo();
 	}
 	control.setMode(p_Mode);
 }
 
 function SetWorldSpace(p_Space) {
-	if (p_Space == "local" || p_Space == "world") {
+	if (p_Space === "local" || p_Space === "world") {
 		control.setSpace(p_Space);
 		var radio = $('#worldSpace #' + p_Space);
 		radio[0].checked = true;
-		$('#worldSpace input').button("refresh");
+		$('#worldSpace').find('input').button("refresh");
 	} else {
 		console.error("Tried to set an invalid world space")
 	}
@@ -176,9 +183,9 @@ function SetWorldSpace(p_Space) {
 }
 
 function onMouseUp(e) {
-	$('#page canvas').css("z-index", 0)
+	$('#page').find('canvas').css("z-index", 0)
 }
 
 function onMouseDown(e) {
-	$('#page canvas').css("z-index", 1)
+	$('#page').find('canvas').css("z-index", 1)
 }

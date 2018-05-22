@@ -9,10 +9,10 @@ $('#worldView').selectmenu({
 	change: worldViewChanged
 });
 
-$('#tools input').checkboxradio({
+$('#tools').find('input').checkboxradio({
 	icon: false
 }).on("change", toolsChanged);
-$('#worldSpace input').checkboxradio({
+$('#wo').find('input').checkboxradio({
 	icon: false
 }).on("change", worldChanged);
 
@@ -29,7 +29,7 @@ $("#inspector").draggable({
 
 
 function toolsChanged(e) {
-	SetGizmoMode(e.target.id);
+    SetGizmoMode(e.target.id);
 }
 
 function worldChanged(e) {
