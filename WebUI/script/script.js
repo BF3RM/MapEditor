@@ -46,7 +46,7 @@ function Init() {
 function RegisterInstances(p_Instances) {
 
 	instances = JSON.parse(p_Instances);
-
+	console.log(instances)
 	for (var i = instances.length - 1; i >= 0; i--) {
 		let id = instances[i].instanceGuid;
 
@@ -54,7 +54,8 @@ function RegisterInstances(p_Instances) {
 			typeName: instances[i].typeName,
 			name: instances[i].name,
 			partitionGuid: instances[i].partitionGuid,
-			instanceGuid: instances[i].instanceGuid
+			instanceGuid: instances[i].instanceGuid,
+			variations: instances[i].variations
 		}
 	}
 
@@ -62,8 +63,8 @@ function RegisterInstances(p_Instances) {
 }
 
 function FillBlueprintTable() {
-	Object.keys(blueprintArray).forEach(function (key, index) {
-		DrawBlueprintRow(blueprintArray[key]); // Redundant?
+	Object.keys(blueprintArray).forEach(function(key, index) {
+		DrawBlueprintRow(key, blueprintArray[key]); // Redundant?
 	})
 }
 
@@ -74,23 +75,30 @@ function InitTables() {
 		"columnDefs": [{
 			"targets": [0],
 			"visible": false
-		}, {
-			"targets": [1],
-			"visible": false
 		}]
 	});
 
-	$('#blueprint_list').find('tbody').on('click', 'tr', function () {
+	$('#blueprint_list').find('tbody').on('click', 'tr', function() {
 		let data = blueprintTable.row(this).data();
+		let instance = blueprintArray[data[0]]
+		let instanceGuid = instance.instanceGuid
+		let partitionGuid = instance.partitionGuid
+		let variations = instance.variations
 
-		SpawnInstance(data[1], data[0]);
+		if (variations.length == null) {
+			variations = [-1];
+			console.log("Missing variation for " + instanceGuid + ", defaulting to 0");
+		}
+
+		console.log(instance)
+		SpawnInstance(partitionGuid, instanceGuid, variations[0]);
 	});
 
 	entityTable = $('#entity_list').DataTable({
 		select: true
 	});
 
-	$('#entity_list').find('tbody').on('click', 'tr', function () {
+	$('#entity_list').find('tbody').on('click', 'tr', function() {
 
 		let data = entityTable.row(this).data();
 		let id = data[0];
@@ -120,15 +128,15 @@ function InitTables() {
 	});
 }
 
-function SpawnInstance(p_PartitionGuid, p_InstanceGuid) {
-	console.log(p_PartitionGuid + " | " + p_InstanceGuid);
-	SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid)
+function SpawnInstance(p_PartitionGuid, p_InstanceGuid, p_Variation) {
+	console.log(p_PartitionGuid + " | " + p_InstanceGuid + " | " + p_Variation);
+	SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid + ":" + p_Variation)
 }
 
 
 
-function DrawBlueprintRow(rowData) {
-	blueprintTable.row.add([rowData.instanceGuid, rowData.partitionGuid, rowData.typeName, rowData.name]).draw()
+function DrawBlueprintRow(key, rowData) {
+	blueprintTable.row.add([key, rowData.typeName, rowData.name]).draw()
 }
 
 /*
@@ -185,7 +193,7 @@ function RemoveEntityFromList(p_ID) {
 
 	let isRemoved = false;
 
-	entityTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+	entityTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
 		if (isRemoved) {
 			return
 		}
@@ -211,7 +219,7 @@ function RemoveEntityFromList(p_ID) {
 function Serialize() {
 	let array = [];
 
-	Object.keys(entityArray).forEach(function (key, index) {
+	Object.keys(entityArray).forEach(function(key, index) {
 		let blueprintID = entityArray[key].blueprintID;
 		let data = blueprintArray[blueprintID];
 

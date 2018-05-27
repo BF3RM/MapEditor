@@ -82,10 +82,9 @@ function MapEditorClient:OnEngineMessage(p_Message)
 
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		print("MessageType.ClientLevelFinalizedMessage")
-		-- print(Shared.m_BlueprintInstances)
-
+		Shared:FillVariations()
 	
-		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_BlueprintInstances)))
+		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_Blueprints)))
 		self:LoadJSONEntities() --Might be better to call this after a bit, so we are sure that all the blueprints are stored in js
 	end
 end
@@ -138,7 +137,11 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 
 		print("Spawning: " .. self.spawnEntity.instance.name)
 
-		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(self.spawnEntity.instance, self.raycastTransform, true)
+		local params = EntityCreationParams()
+		params.transform = self.raycastTransform
+		params.variationNameHash = self.spawnEntity.variation
+
+		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(self.spawnEntity.instance, params)
 		print("Spawned!")
 
 		if(prefabEntities == nil) then
@@ -297,19 +300,24 @@ end
 function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
 	-- print("---------------------")
 	print(p_ParamsCombined)
-	local p_GuidSplit = split(p_ParamsCombined, ":")
-	-- print(p_GuidSplit[1])
-	-- print(p_GuidSplit[2])
-	-- print(p_GuidSplit[3])
-	local s_Instance = ResourceManager:FindInstanceByGUID(Guid(p_GuidSplit[1]), Guid(p_GuidSplit[2]))
+	local s_Parameters = split(p_ParamsCombined, ":")
+	local s_PartitionGuid = s_Parameters[1]
+	local s_InstanceGuid = s_Parameters[2]
+	local s_Variation = s_Parameters[3]
+	if(s_Variation == "-1") then
+		print("Variation not passed! Defaulting to 0")
+		s_Variation = 0
+	end
+
+	local s_Instance = ResourceManager:FindInstanceByGUID(Guid(s_PartitionGuid), Guid(s_InstanceGuid))
 
 	if(s_Instance == nil) then
-		print("Attempted to spawn an instance that doesn't exist: " .. p_PartitionGuid .. " | " .. p_InstanceGuid)
+		print("Attempted to spawn an instance that doesn't exist: " .. s_PartitionGuid .. " | " .. s_InstanceGuid)
 		return
 	end
 	
 	-- This entity will be spawned in Update. We can't create entities outside it. (Or maybe because it's started from an event?)
-	self.spawnEntity = {blueprintID = p_GuidSplit[2], instance = _G[s_Instance.typeInfo.name](s_Instance)}
+	self.spawnEntity = {blueprintID = s_InstanceGuid, instance = _G[s_Instance.typeInfo.name](s_Instance), variation = s_Variation}
 	
 end
 
