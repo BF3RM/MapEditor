@@ -20,25 +20,41 @@ $('#worldSpace').find('input').checkboxradio({
 
 jQuery('.scrollbar-outer').scrollbar();
 
-$('.window').each(function () {
-    $(this).resizable({
+$('.window').each(function() {
+	$(this).resizable({
 		handles: "n, e, s, w, ne, se, sw, nw",
 		minHeight: 200,
 		minWidth: 200,
 		containment: "#page",
-        alsoResize: $(this).find('.scroll-wrapper'),
-    });
+		alsoResize: $(this).find('.scroll-wrapper'),
+	});
 
-    $(this).draggable({
+	$(this).draggable({
 		handle: $(this).find('.header'),
 		containment: "#page"
 	})
 
 });
 
+variationDialog = $("#variation-dialog").dialog({
+	autoOpen: false,
+	height: "auto",
+	width: "auto",
+	modal: true,
+	buttons: {
+		"Spawn object!": ConfirmInstanceSpawn,
+		Cancel: function() {
+			variationDialog.dialog("close");
+		}
+	},
+	close: function() {
+		variationDialog.dialog("close");
+	}
+});
+
 
 function toolsChanged(e) {
-    SetGizmoMode(e.target.id);
+	SetGizmoMode(e.target.id);
 }
 
 function worldChanged(e) {

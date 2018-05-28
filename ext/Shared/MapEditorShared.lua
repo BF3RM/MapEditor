@@ -52,7 +52,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 					return
 				end
 			end
-			self.m_Blueprints[#self.m_Blueprints + 1] = {
+			self.m_Blueprints[tostring(l_Instance.instanceGuid)] = {
 				instanceGuid = tostring(l_Instance.instanceGuid),
 				partitionGuid = tostring(p_Partition.guid),
 				name = s_Instance.name,
@@ -80,7 +80,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorShared:FillVariations()
-	for key, database in ipairs(self.m_MeshVariationDatabases) do
+	for key, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database
 		for k, v in ipairs(s_Instance.entries) do
 			local l_mvdEntry = MeshVariationDatabaseEntry(v)
@@ -96,8 +96,7 @@ function MapEditorShared:FillVariations()
 			table.insert(self.m_Variations[l_MeshGuid], l_mvdEntry.variationAssetNameHash)
 		end
 	end
-
-	for k, v in ipairs(self.m_Blueprints) do
+	for k, v in pairs(self.m_Blueprints) do
 		if(self.m_Meshes[v.name:lower() .. "_mesh"] == nil) then
 			print("Missing: " .. v.name .. "_mesh")
 		else
@@ -105,6 +104,7 @@ function MapEditorShared:FillVariations()
 
 			if(self.m_Variations[l_MeshGuid] ~= nil ) then
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
+				print(k)
 			else 
 				print("No variation for " .. v.name)
 			end
