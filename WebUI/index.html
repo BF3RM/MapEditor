@@ -10,6 +10,8 @@
 		<link rel="stylesheet" href="style/reset.css">
 		<link rel="stylesheet" href="style/jquery.dataTables.min.css">
 		<link rel="stylesheet" href="style/jstree.min.css">
+		<link rel="stylesheet" href="style/jquery.scrollbar.css">
+
     </head>
 	<body>
 		<div id="page">
@@ -94,7 +96,6 @@
 			<div id="webgl">
 			</div>
 			<div id="menu">
-				<div id="jstree"></div>
 				<div id="table2">
 					<table id="entity_list" class="display">
 					<thead>
@@ -116,44 +117,60 @@
 				</button>
 				<textarea id="CurrentState" onclick="this.focus();this.select();" readonly="readonly"></textarea>
 			</div>
-			<div id="inspector" style="display: none">
+			<div id="treeview" class="window">
+				<div class="header">
+					<h1>Blueprints</h1>
+					<div id="windowControls">
+						<button>X</button>
+					</div>
+				</div>
+				<input class="search-input form-control"></input>
+				<button onclick="$('#jstree').jstree('open_all');">Expand</button>
+				<button onclick="$('#jstree').jstree('close_all');">Collapse</button>
+				<div class="content scrollbar-outer">
+					<div id="jstree"></div>
+				</div>
+			</div>
+			<div id="inspector" class="window" style="display: none">
 				<div class="header">
 					<h1>Inspector</h1>
 					<div id="windowControls">
 						<button>X</button>
 					</div>
 				</div>
-				<div id="objectInspector">
-					<div class="name">
-                        <label for="objectName">Name</label><input id="objectName" type="text" value="Some/Object">
-					</div>
-					<div class="transform">
-						<h2>Transform</h2>
-						<div class="trans">
-							<label for="transx">x:</label>
-							<input type="number" name="transx" id="transx" value="0">
-							<label for="transy">y:</label>
-							<input type="number" name="transy" id="transy" value="0">
-							<label for="transz">z:</label>
-							<input type="number" name="transz" id="transz" value="0">
+				<div class="content">
+					<div id="objectInspector">
+						<div class="name">
+	                        <label for="objectName">Name</label><input id="objectName" type="text" value="Some/Object">
 						</div>
-						<h2>Rotation</h2>
-						<div class="rotation">
-							<label for="rotx">x:</label>
-							<input type="number" name="rotx" id="rotx" value="0">
-							<label for="roty">y:</label>
-							<input type="number" name="roty" id="roty" value="0">
-							<label for="rotz">z:</label>
-							<input type="number" name="rotz" id="rotz" value="0">
-						</div>
-						<h2>Scale</h2>
-						<div class="scale">
-							<label for="scalex">x:</label>
-							<input type="number" name="scalex" id="scalex" value="1">
-							<label for="scaley">y:</label>
-							<input type="number" name="scaley" id="scaley" value="1">
-							<label for="scalez">z:</label>
-							<input type="number" name="scalez" id="scalez" value="1">
+						<div class="transform">
+							<h2>Transform</h2>
+							<div class="trans">
+								<label for="transx">x:</label>
+								<input type="number" name="transx" id="transx" value="0">
+								<label for="transy">y:</label>
+								<input type="number" name="transy" id="transy" value="0">
+								<label for="transz">z:</label>
+								<input type="number" name="transz" id="transz" value="0">
+							</div>
+							<h2>Rotation</h2>
+							<div class="rotation">
+								<label for="rotx">x:</label>
+								<input type="number" name="rotx" id="rotx" value="0">
+								<label for="roty">y:</label>
+								<input type="number" name="roty" id="roty" value="0">
+								<label for="rotz">z:</label>
+								<input type="number" name="rotz" id="rotz" value="0">
+							</div>
+							<h2>Scale</h2>
+							<div class="scale">
+								<label for="scalex">x:</label>
+								<input type="number" name="scalex" id="scalex" value="1">
+								<label for="scaley">y:</label>
+								<input type="number" name="scaley" id="scaley" value="1">
+								<label for="scalez">z:</label>
+								<input type="number" name="scalez" id="scalez" value="1">
+							</div>
 						</div>
 					</div>
 				</div>
@@ -164,6 +181,7 @@
 		<script src="script/libs/jquery-3.1.1.min.js"></script>
 		<script src="script/libs/jquery-ui.min.js"></script>
 		<script src="script/libs/jquery.dataTables.min.js"></script>
+		<script src="script/libs/jquery.scrollbar.min.js"></script>
 		<script src="script/libs/jstree.min.js"></script>
 
 

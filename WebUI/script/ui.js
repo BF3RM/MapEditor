@@ -17,14 +17,22 @@ $('#worldSpace').find('input').checkboxradio({
 	icon: false
 }).on("change", worldChanged);
 
-$("#inspector").draggable({
-	handle: ".header",
-	containment: "parent"
-}).resizable({
-	handles: "n, e, s, w, ne, se, sw, nw",
-	minHeight: 200,
-	minWidth: 200,
-	containment: "#page"
+
+jQuery('.scrollbar-outer').scrollbar();
+
+$('.window').each(function () {
+    $(this).resizable({
+		handles: "n, e, s, w, ne, se, sw, nw",
+		minHeight: 200,
+		minWidth: 200,
+		containment: "#page",
+        alsoResize: $(this).find('.scroll-wrapper'),
+    });
+
+    $(this).draggable({
+		handle: $(this).find('.header'),
+		containment: "#page"
+	})
 
 });
 

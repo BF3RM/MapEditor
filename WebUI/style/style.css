@@ -151,14 +151,18 @@ li.ui-widget-seperator {
     margin: 5px;
 }
 
-#inspector {
+.window {
 	width: 25%;
+    height: 25%;
 	background-color: #fff;
+    max-height: 90%;
+    position: absolute;
 }
-#inspector #objectInspector {
-    margin: 5px;
+
+.window .content {
+    max-height: calc(100% - 60px);
 }
-#inspector .header {
+.window .header {
     background-color: #D94C42;
     padding: 5px;
     font-weight: bold;
@@ -191,3 +195,8 @@ canvas {
 #toolbar div {
     z-index: 9;
 }
+
+.window {
+    z-index: 100;
+}
+        
