@@ -19,7 +19,7 @@ class UI {
 
 		$('#tools').find('input').checkboxradio({
 			icon: false
-		}).on("change", this.toolsChanged);
+		}).on("change", UI.toolsChanged);
 
 		$('#worldSpace').find('input').checkboxradio({
 			icon: false
@@ -47,8 +47,9 @@ class UI {
 	}
 
 	static toolsChanged(e) {
-		SetGizmoMode(e.target.id);
 		console.log("kek")
+
+		renderer.SetGizmoMode(e.target.id);
 	}
 
 	static worldChanged(e) {
@@ -68,7 +69,7 @@ class UI {
 			width: "auto",
 			modal: true,
 			buttons: {
-				"Spawn object!": ConfirmInstanceSpawn,
+				"Spawn object!": this.OnConfirmInstanceSpawn,
 				Cancel: function() {
 					dialogs["variation"].dialog("close");
 				}
@@ -80,4 +81,11 @@ class UI {
 
 		return dialogs;
 	}
+
+	OnConfirmInstanceSpawn() {
+		editor.ConfirmInstanceSpawn();
+		$(this).dialog("close");
+	}
+
+
 }

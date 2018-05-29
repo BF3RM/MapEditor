@@ -2,7 +2,6 @@ class TreeView {
 	constructor(instances) {
 		this.data = this.ParseStructure(instances);
 		this.tree = document.createElement("div");
-		this.Initialize()
 	}
 	Initialize() {
 		this.InitializeTree();
@@ -98,7 +97,7 @@ class TreeView {
 			}
 			var id = data.node.original.id;
 			if (id != null) {
-				PrepareInstanceSpawn(id);
+				editor.PrepareInstanceSpawn(id);
 			}
 		})
 	}

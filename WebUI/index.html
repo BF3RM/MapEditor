@@ -206,14 +206,16 @@
     <script src="script/treeview.js"></script>
     <script src="script/controls.js"></script>
     <script src="script/ui.js"></script>
-    <script src="script/script.js"></script>
-    <!--<script src="script/editor.js"></script>-->
+    <!--<script src="script/script.js"></script>-->
+    <script src="script/editor.js"></script>
 
     <script>
-			$(document).ready(function () {
-				if(window.location.href.indexOf("webui") === -1) {
-					Debug();
-				}
-			});
+
+            let debug = false;
+            if(window.location.href.indexOf("webui") === -1) {
+                debug = true;
+            }
+            var editor = new Editor(debug);
+
 		</script>
 </html>

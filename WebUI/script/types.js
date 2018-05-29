@@ -36,7 +36,8 @@ class LinearTransform {
 		return [this.left.x, this.left.y, this.left.z, this.up.x, this.up.y, this.up.z, this.forward.x, this.forward.y, this.forward.z, this.trans.x, this.trans.y, this.trans.z];
 	}
 
-	setMatrix(matrix) {
+	setMatrix(matrixString) {
+		//TODO split!
 		this.left.x = matrix[0];
 		this.left.y = matrix[1];
 		this.left.z = matrix[2];

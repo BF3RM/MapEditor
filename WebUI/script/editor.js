@@ -1,18 +1,36 @@
 class Editor {
-	constructor() {
+	constructor(debug) {
+
+		this.ui = new UI();
 		this.blueprints = {};
-		this.debug = false;
+		this.debug = debug;
+		this.blueprintTree = {};
 
 		this.confirmedBlueprints = {};
+		this.spawnedEntities = {};
+
+		this.selectedEntity = null;
+
+		this.confirmInstance = null;
+
+		this.Initialize();
 	}
 
 	Initialize() {
-
+		if(this.debug) {
+			$('body').css({
+				"background": 'url(\"img/bf3bg.png\"',
+				'background-size': 'cover'
+			});
+		}
+		var imported = document.createElement('script');
+		imported.src = 'script/debugData.js';
+		document.head.appendChild(imported);
 	}
 
 	SendEvent(type, name, parameter) {
 
-		if (self.debug) {
+		if (this.debug) {
 			console.log(name + " = " + parameter);
 			return;
 		}
@@ -20,14 +38,15 @@ class Editor {
 	}
 
 	RegisterInstances(p_Instances) {
-
-		Object.keys(JSON.parse(p_Instances)).forEach(function (key) {
-			let blueprint = blueprintArray[key];
-			this.blueprints[key] = new Blueprint(blueprint.partitionGuid, blueprint.instanceGuid, blueprint.name, blueprint.variations);
-		});
-
-
-		$('#treeView').find('.content').append(new TreeView(blueprints).tree);
+		console.log(this.blueprints);
+		let blueprints = JSON.parse(p_Instances);
+		for (var key in blueprints) {
+			this.blueprints[key] = new Blueprint(blueprints[key].partitionGuid, blueprints[key].instanceGuid, blueprints[key].name, blueprints[key].variations);
+		};
+		// Move this?
+		this.blueprintTree = new TreeView(this.blueprints);
+		$('#treeView').find('.content').append(this.blueprintTree.tree);
+		this.blueprintTree.Initialize();
 	}
 
 	static SpawnBlueprint(instance, variation) {
@@ -35,5 +54,52 @@ class Editor {
 		//this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid + ":" + p_Variation)
 	}
 
+	OnSpawnedEntity(id, blueprintGuid, matrixString) {
+		//entityTable.row.add([p_ID, data.name]).draw();
+		//TODO: Check if this instance actually exists.
+		this.spawnedEntities[id] = new GameObject(id, "Blueprint", new LinearTransform().setMatrix(matrixString), this.blueprints[blueprintGuid]);
+	}
+
+	ClearSpawnedEntities() {
+		this.spawnedEntities.clear();
+	}
+	DeleteSelectedEntity() {
+		//TODO: Maybe a message that confirms the deletion?
+		let id = this.selectedEntity.id;
+		this.selectedEntity = null;
+		SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', id)
+	}
+
+	PrepareInstanceSpawn(p_InstanceGuid) {
+		let instance = this.blueprints[p_InstanceGuid];
+		let variations = instance.variations;
+
+		//Check if we have any variations for the object
+		if (variations.length == null) {
+			// There are no variations, let's set it to -1 so the engine will know we're missing it.
+			//TODO: Add variation shit here.
+			instance.variations = [-1]
+		}
+
+		//Check if we've previously spawned this object.
+		if (this.confirmedBlueprints[p_InstanceGuid] == null) {
+			this.confirmInstance = instance;
+			console.log("Unknown variation!");
+			// Bring up warning dialog.
+			this.ui.dialogs["variation"].dialog("open");
+		} else {
+			this.SpawnInstance(instance, variations[0]);
+		}
+	}
+
+	ConfirmInstanceSpawn() {
+		this.SpawnInstance(this.confirmInstance);
+		this.confirmedBlueprints[this.confirmInstance.instanceGuid] = true;
+	}
+
+	SpawnInstance(instance, variation = 0) {
+		console.log(instance);
+		this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
+	}
 
 }
