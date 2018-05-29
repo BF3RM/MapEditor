@@ -17,8 +17,8 @@ function hasUpperCase(str) {
 
 
 function getPaths(path) {
-	var paths = path.split('/')
-	paths.pop()
+	var paths = path.split('/');
+	paths.pop();
 	return paths;
 }
 

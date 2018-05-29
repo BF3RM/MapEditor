@@ -1,8 +1,7 @@
 class UI {
 
 	constructor() {
-		this.RegisterEvents()
-		this.Initialize()
+		this.Initialize();
 		this.dialogs = this.InitializeDialogs()
 	}
 
@@ -11,12 +10,11 @@ class UI {
 		$("#menubar").menu({
 			position: {
 				at: "left bottom"
-			},
-			items: "> :not(.ui-widget-seperator)"
+			}
 		});
 
 		$('#worldView').selectmenu({
-			change: this.worldViewChanged
+			change: UI.worldViewChanged
 		});
 
 		$('#tools').find('input').checkboxradio({
@@ -25,7 +23,7 @@ class UI {
 
 		$('#worldSpace').find('input').checkboxradio({
 			icon: false
-		}).on("change", this.worldChanged);
+		}).on("change", UI.worldChanged);
 
 
 		$('.scrollbar-outer').scrollbar();
@@ -36,7 +34,7 @@ class UI {
 				minHeight: 200,
 				minWidth: 200,
 				containment: "#page",
-				alsoResize: $(this).find('.scroll-wrapper'),
+				alsoResize: $(this).find('.scroll-wrapper')
 			});
 
 			$(this).draggable({
@@ -48,22 +46,22 @@ class UI {
 
 	}
 
-	RegisterEvents() {
-		function toolsChanged(e) {
-			SetGizmoMode(e.target.id);
-		}
-
-		function worldChanged(e) {
-			SetWorldSpace(e.target.id);
-		}
-
-		function worldViewChanged(e, ui) {
-			SendEvent('DispatchEventLocal', 'MapEditor:SetViewmode', ui.item.value)
-		}
+	static toolsChanged(e) {
+		SetGizmoMode(e.target.id);
+		console.log("kek")
 	}
 
+	static worldChanged(e) {
+		SetWorldSpace(e.target.id);
+	}
+
+	static worldViewChanged(e, ui) {
+		SendEvent('DispatchEventLocal', 'MapEditor:SetViewmode', ui.item.value)
+	}
+
+
 	InitializeDialogs() {
-		let dialogs = {}
+		let dialogs = {};
 		dialogs["variation"] = $("#variation-dialog").dialog({
 			autoOpen: false,
 			height: "auto",

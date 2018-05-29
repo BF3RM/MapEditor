@@ -1,38 +1,39 @@
 class Editor {
-	constructor(renderer) {
-		self.renderer = renderer
-		self.blueprints = blueprints
-		self.instances = instances
-		self.debug = debug;
+	constructor() {
+		this.blueprints = {};
+		this.debug = false;
 
-		self.blueprints = {}
-		self.safeInstances = {}
+		this.confirmedBlueprints = {};
 	}
 
 	Initialize() {
 
 	}
 
-	RegisterInstances(instances) {
+	SendEvent(type, name, parameter) {
 
-		Object.keys(JSON.parse(instances)).forEach(function(key, index) {
-			var blueprint = blueprintArray[key];
-			self.blueprints[key] = new Blueprint(blueprint.partitionGuid,blueprint.instanceGuid,blueprint.name,blueprint.variations);
+		if (self.debug) {
+			console.log(name + " = " + parameter);
+			return;
+		}
+		WebUI.Call(type, name, parameter)
+	}
+
+	RegisterInstances(p_Instances) {
+
+		Object.keys(JSON.parse(p_Instances)).forEach(function (key) {
+			let blueprint = blueprintArray[key];
+			this.blueprints[key] = new Blueprint(blueprint.partitionGuid, blueprint.instanceGuid, blueprint.name, blueprint.variations);
 		});
 
 
 		$('#treeView').find('.content').append(new TreeView(blueprints).tree);
 	}
 
-	PrepareInstanceSpawn(instance) {
-		if (instance.variations.length == null) {
-			// There are no variations, let's set it to -1 so the engine will know we're missing it.
-			variations = [-1]
-		}
+	static SpawnBlueprint(instance, variation) {
+		console.log(instance.partitionGuid + " | " + instance.instanceGuid + " | "  + variation);
+		//this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid + ":" + p_Variation)
 	}
 
-	get BlueprintByGuid(guid) {
-		return self.blueprints[guid]
-	}
 
 }

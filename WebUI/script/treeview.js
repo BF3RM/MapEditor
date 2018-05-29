@@ -1,11 +1,11 @@
 class TreeView {
 	constructor(instances) {
-		this.data = this.ParseStructure(instances)
+		this.data = this.ParseStructure(instances);
 		this.tree = document.createElement("div");
 		this.Initialize()
 	}
 	Initialize() {
-		this.InitializeTree()
+		this.InitializeTree();
 		this.RegisterEvents()
 	}
 
@@ -25,7 +25,7 @@ class TreeView {
 			var path = instance.name;
 			var paths = getPaths(path);
 			var parentPath = data;
-			var fileName = getFilename(path)
+			var fileName = getFilename(path);
 			paths.forEach(function(subPath) {
 				var parentIndex = parentPath.children.find(x => x.text.toLowerCase() === subPath.toLowerCase());
 				if (parentIndex === undefined) {
@@ -33,10 +33,10 @@ class TreeView {
 						"type": "folder",
 						"text": subPath,
 						"children": []
-					})
+					});
 					parentPath = parentPath.children[a - 1];
 				} else {
-					parentPath = parentIndex
+					parentPath = parentIndex;
 					// Sometimes the object is referenced lowercase. If we have a string that has uppercase letters, we can assume it's correct.
 					// Replace lowercase paths with the actual case.
 					if (hasUpperCase(subPath) && hasLowerCase(parentPath.text)) {
@@ -96,7 +96,7 @@ class TreeView {
 			if (data.node == null) {
 				return
 			}
-			var id = data.node.original.id
+			var id = data.node.original.id;
 			if (id != null) {
 				PrepareInstanceSpawn(id);
 			}
