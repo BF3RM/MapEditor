@@ -118,7 +118,7 @@
 				</button>
 				<textarea id="CurrentState" onclick="this.focus();this.select();" readonly="readonly"></textarea>
 			</div>
-			<div id="treeview" class="window">
+			<div id="treeView" class="window">
 				<div class="header">
 					<h1>Blueprints</h1>
 					<div id="windowControls">
@@ -129,7 +129,6 @@
 				<button onclick="$('#jstree').jstree('open_all');">Expand</button>
 				<button onclick="$('#jstree').jstree('close_all');">Collapse</button>
 				<div class="content scrollbar-outer">
-					<div id="jstree"></div>
 				</div>
 			</div>
 			<div id="inspector" class="window" style="display: none">
@@ -197,13 +196,17 @@
 
 
 		<script src="script/libs/three.min.js"></script>
+
+		<script src="script/types.js"></script>
+		<script src="script/utils.js"></script>
+
 		<script src="script/TransformControls.js"></script>
 		<script src="script/webgl.js"></script>
 		
         <script src="script/treeview.js"></script>
         <script src="script/controls.js"></script>
-		<script src="script/script.js"></script>
 		<script src="script/ui.js"></script>
+		<script src="script/script.js"></script>
 		
 		<script>
 			$(document).ready(function () {
