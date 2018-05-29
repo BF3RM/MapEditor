@@ -88,7 +88,7 @@ function InitTables() {
 			selectedEntityID = id;
 
 			// This will make sure we get the correct gizmo mode if the previous mode was "select".
-			renderer.SetGizmoMode(renderer.control.getMode());
+			renderer.SetGizmoMode(control.control.getMode());
 
 			$(".selectedItem").removeClass("selectedItem");
 

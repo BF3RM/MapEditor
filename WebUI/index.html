@@ -202,6 +202,7 @@
 
     <script src="script/TransformControls.js"></script>
     <script src="script/webgl.js"></script>
+    <script src="script/VEXT.js"></script>
 
     <script src="script/treeview.js"></script>
     <script src="script/controls.js"></script>
@@ -212,6 +213,7 @@
     <script>
 
             let debug = false;
+            var vext = new VEXTInterface();
             if(window.location.href.indexOf("webui") === -1) {
                 debug = true;
             }

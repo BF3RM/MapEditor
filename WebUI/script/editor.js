@@ -2,6 +2,8 @@ class Editor {
 	constructor(debug) {
 
 		this.ui = new UI();
+		this.renderer = new WebGL();
+
 		this.blueprints = {};
 		this.debug = debug;
 		this.blueprintTree = {};
@@ -10,9 +12,10 @@ class Editor {
 		this.spawnedEntities = {};
 
 		this.selectedEntity = null;
-
 		this.confirmInstance = null;
 
+		this.history = {};
+		this.currentHistoryStep = 0;
 		this.Initialize();
 	}
 
@@ -28,37 +31,7 @@ class Editor {
 		document.head.appendChild(imported);
 	}
 
-	SendEvent(type, name, parameter) {
 
-		if (this.debug) {
-			console.log(name + " = " + parameter);
-			return;
-		}
-		WebUI.Call(type, name, parameter)
-	}
-
-	RegisterInstances(p_Instances) {
-		console.log(this.blueprints);
-		let blueprints = JSON.parse(p_Instances);
-		for (var key in blueprints) {
-			this.blueprints[key] = new Blueprint(blueprints[key].partitionGuid, blueprints[key].instanceGuid, blueprints[key].name, blueprints[key].variations);
-		};
-		// Move this?
-		this.blueprintTree = new TreeView(this.blueprints);
-		$('#treeView').find('.content').append(this.blueprintTree.tree);
-		this.blueprintTree.Initialize();
-	}
-
-	static SpawnBlueprint(instance, variation) {
-		console.log(instance.partitionGuid + " | " + instance.instanceGuid + " | "  + variation);
-		//this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', p_PartitionGuid + ":" + p_InstanceGuid + ":" + p_Variation)
-	}
-
-	OnSpawnedEntity(id, blueprintGuid, matrixString) {
-		//entityTable.row.add([p_ID, data.name]).draw();
-		//TODO: Check if this instance actually exists.
-		this.spawnedEntities[id] = new GameObject(id, "Blueprint", new LinearTransform().setMatrix(matrixString), this.blueprints[blueprintGuid]);
-	}
 
 	ClearSpawnedEntities() {
 		this.spawnedEntities.clear();
@@ -91,7 +64,9 @@ class Editor {
 			this.SpawnInstance(instance, variations[0]);
 		}
 	}
-
+	SelectEntityById(id) {
+		this.selectedEntity = this.spawnedEntities[id];
+	}
 	ConfirmInstanceSpawn() {
 		this.SpawnInstance(this.confirmInstance);
 		this.confirmedBlueprints[this.confirmInstance.instanceGuid] = true;
@@ -101,5 +76,30 @@ class Editor {
 		console.log(instance);
 		this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
+	/*
 
+		Events
+
+	 */
+
+	OnRegisterInstances(p_Instances) {
+		let blueprints = JSON.parse(p_Instances);
+		for (var key in blueprints) {
+			this.blueprints[key] = new Blueprint(blueprints[key].partitionGuid, blueprints[key].instanceGuid, blueprints[key].name, blueprints[key].variations);
+		};
+		// Move this?
+		this.blueprintTree = new TreeView(this.blueprints);
+		$('#treeView').find('.content').append(this.blueprintTree.tree);
+		this.blueprintTree.Initialize();
+	}
+
+	OnSpawnedEntity(id, blueprintGuid, matrixString) {
+		//entityTable.row.add([p_ID, data.name]).draw();
+		//TODO: Check if this instance actually exists.
+		this.spawnedEntities[id] = new GameObject(id, "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
+	}
+
+	OnRemoveEntity(id) {
+		//Remove entity from the list.
+	}
 }

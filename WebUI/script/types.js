@@ -36,23 +36,25 @@ class LinearTransform {
 		return [this.left.x, this.left.y, this.left.z, this.up.x, this.up.y, this.up.z, this.forward.x, this.forward.y, this.forward.z, this.trans.x, this.trans.y, this.trans.z];
 	}
 
-	setMatrix(matrixString) {
-		//TODO split!
-		this.left.x = matrix[0];
-		this.left.y = matrix[1];
-		this.left.z = matrix[2];
+	setMatrixFromString(matrixString) {
+		let matrix = matrixString.split(",");
+		this.left = new Vec3(
+			matrix[0],
+			matrix[1],
+			matrix[2]);
 		
-		this.up.x = matrix[3];
-		this.up.y = matrix[4];
-		this.up.z = matrix[5];
-		
-		this.forward.x = matrix[6];
-		this.forward.y = matrix[7];
-		this.forward.z = matrix[8];
+		this.up = new Vec3(matrix[3],
+			matrix[4],
+			matrix[5]);
 
-		this.trans.x = matrix[9];
-		this.trans.y = matrix[10];
-		this.trans.z = matrix[11];
+		this.forward = new Vec3(matrix[6],
+			matrix[7],
+			matrix[8]);
+
+		this.trans = new Vec3(matrix[9],
+			matrix[10],
+			matrix[11]);
+		return this;
 	}
 }
 

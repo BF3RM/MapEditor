@@ -14,7 +14,8 @@ class WebGL {
 	}
 	Initialize() {
 		this.renderer = new THREE.WebGLRenderer({
-			alpha: true
+			alpha: true,
+			antialias: true
 		});
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -173,11 +174,12 @@ class WebGL {
 		//We should get the matrix and apply it to the mesh, not the other way around.
 
 		let matrix = this.mesh.matrixWorld.toArray().toString();
-		let args = selectedEntityID + "," + matrix;
+		let args = editor.selectedEntity.id + "," + matrix;
 		console.log(args);
 
 		//entityArray[selectedEntityID].matrix = matrix;
-		SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+		//TODO: Move this
+		vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
 	}
 
 	UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz) {
