@@ -3,7 +3,7 @@ var json = '{"B9E3B4B8-062A-1DA8-E13D-8D7095F2A610":{"typeName":"ObjectBlueprint
 editor.OnRegisterInstances(json);
 editor.renderer.SetGizmoAt(1, 0, 0, 0, 1, 0, 0, 0, 1, 550, 115, 261);
 editor.renderer.ShowGizmo();
-vext.SpawnedEntity(1, "F17C9834-6CE0-D963-6911-926921A3FF24", "1,0,0,0,1,0,0,0,1,549,115,261");
-vext.SpawnedEntity(2, "F7518E81-80E7-36F5-44C5-110C4F3ABE94", "1,0,0,0,1,0,0,0,1,548,115,261");
-vext.SpawnedEntity(3, "31185055-81DD-A2F8-03FF-E0A6AAF960EC", "1,0,0,0,1,0,0,0,1,548,115,261");
+vext.SpawnedEntity(1, "F17C9834-6CE0-D963-6911-926921A3FF24", "1,0,0,0,1,0,0,0,1,537,119,329");
+vext.SpawnedEntity(2, "F7518E81-80E7-36F5-44C5-110C4F3ABE94", "1,0,0,0,1,0,0,0,1,540,119,329");
+vext.SpawnedEntity(3, "31185055-81DD-A2F8-03FF-E0A6AAF960EC", "1,0,0,0,1,0,0,0,1,545,119,329");
 editor.SelectEntityById(1);

@@ -25,7 +25,7 @@ class WebGL {
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
 		this.camera.position.set(538, 120, 330);
 		this.scene = new THREE.Scene();
-		this.CreateGizmo(507.140625, 115.149216, 261.648438);
+		this.CreateGizmo(537, 119, 329);
 	}
 
 	RegisterEvents() {
@@ -51,13 +51,8 @@ class WebGL {
 		}
 
 
-		let texture = new THREE.TextureLoader().load('textures/crate.gif', this.render);
-		texture.mapping = THREE.UVMapping;
-		texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-		let geometry = new THREE.BoxBufferGeometry(0.1, 0.1, 0.1);
-		let material = new THREE.MeshLambertMaterial({
-			map: texture
-		});
+		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
 		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
 		this.control.setSpace("local");
 		this.control.addEventListener('change', this._onControlChanged);

@@ -49,11 +49,11 @@ class UI {
 	static toolsChanged(e) {
 		console.log("kek")
 
-		renderer.SetGizmoMode(e.target.id);
+		editor.renderer.SetGizmoMode(e.target.id);
 	}
 
 	static worldChanged(e) {
-		SetWorldSpace(e.target.id);
+		editor.renderer.SetWorldSpace(e.target.id);
 	}
 
 	static worldViewChanged(e, ui) {
