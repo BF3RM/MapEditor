@@ -34,7 +34,7 @@
 					<li><div>Menu</div>
 						<ul>
 							<li><div onclick="$('#inspector').toggle()">Inspector</div></li>
-							<li class="ui-widget-seperator">___</li>
+							<li class="ui-widget-seperator"></li>
 							<li><div>Objects</div></li>
 							<li><div>Emitters</div></li>
 							<li><div>Lights</div></li>
@@ -96,40 +96,6 @@
 
 			<div id="webgl">
 			</div>
-			<div id="menu">
-				<div id="table2">
-					<ol class='example'>
-						<li>First</li>
-						<li>Second</li>
-						<li>Third</li>
-						<li>
-							Group
-							<ol class="test">
-								<li>test</li>
-							</ol>
-						</li>
-
-					</ol>
-					<table id="entity_list" class="display">
-					<thead>
-						<tr>
-							<th>Object ID</th>
-							<th>Name</th>
-						</tr>
-					</thead>
-					<tbody>
-
-					</tbody>
-					</table>
-				</div>
-				<button onClick="DeleteSelectedEntity()">
-					Delete selected entity
-				</button>
-				<button onClick="Serialize()">
-					Serialize entities
-				</button>
-				<textarea id="CurrentState" onclick="this.focus();this.select();" readonly="readonly"></textarea>
-			</div>
 			<div id="hierarchy" class="window">
 				<div class="header">
 					<h1>hierarchy</h1>
@@ -144,7 +110,6 @@
                 </div>
 				<div class="content scrollbar-outer">
 					<ol class="spawnedEntities">
-                        <li class="group expanded"><i>SomeGroup</i><ul><li>GroupItem</li><li class="group collapsed"><i>SomeGroup</i><ul><li>GroupItem</li></ul></li></ul></li>
 					</ol>
 				</div>
 			</div>
@@ -222,7 +187,6 @@
 
     <script src="script/libs/jquery-3.1.1.min.js"></script>
     <script src="script/libs/jquery-ui.min.js"></script>
-    <script src="script/libs/jquery.dataTables.min.js"></script>
     <script src="script/libs/jquery.scrollbar.min.js"></script>
 	<script src="script/libs/jstree.min.js"></script>
 	<script src="script/libs/jquery-sortable.js"></script>

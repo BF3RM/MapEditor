@@ -172,9 +172,6 @@ li.ui-widget-seperator {
     display: flex;
 }
 
-.content li {
-    width: fit-content;
-}
 .content ol ul {
     padding-left: 30px;
 }

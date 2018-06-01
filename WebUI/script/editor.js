@@ -80,9 +80,12 @@ class Editor {
 		console.log(instance);
 		this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
+	TrackEntity(id, gameObject) {
+		this.spawnedEntities[id] = gameObject;
+	}
 
 	CreatedEntity(id, gameObject) {
-		this.spawnedEntities[id] = gameObject;
+		this.TrackEntity(id, gameObject);
 	}
 
 	/*
@@ -107,7 +110,7 @@ class Editor {
 		//TODO: Check if this instance actually exists.
 		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
 		this.ui.OnEntitySpawned(gameObject);
-		this.spawnedEntities[id] = gameObject;
+		this.TrackEntity(id, gameObject);
 
 		this.SelectEntityById(id);
 	}
