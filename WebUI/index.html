@@ -98,6 +98,18 @@
 			</div>
 			<div id="menu">
 				<div id="table2">
+					<ol class='example'>
+						<li>First</li>
+						<li>Second</li>
+						<li>Third</li>
+						<li>
+							Group
+							<ol class="test">
+								<li>test</li>
+							</ol>
+						</li>
+
+					</ol>
 					<table id="entity_list" class="display">
 					<thead>
 						<tr>
@@ -118,23 +130,38 @@
 				</button>
 				<textarea id="CurrentState" onclick="this.focus();this.select();" readonly="readonly"></textarea>
 			</div>
-			<div id="treeView" class="window">
+			<div id="hierarchy" class="window">
 				<div class="header">
-					<h1>Blueprints</h1>
-					<div id="windowControls">
+					<h1>hierarchy</h1>
+					<div class="windowControls">
 						<button>X</button>
 					</div>
 				</div>
-				<input class="search-input form-control"></input>
-				<button onclick="$('#jstree').jstree('open_all');">Expand</button>
-				<button onclick="$('#jstree').jstree('close_all');">Collapse</button>
+				<div class="content scrollbar-outer">
+					<ol class="spawnedEntities">
+						<li>SomeGroup<ul><li>GroupItem</li><li>SomeGroup<ul><li>GroupItem</li></ul></li></ul></li>
+					</ol>
+				</div>
+			</div>
+			<div id="treeView" class="window">
+				<div class="header">
+					<h1>Blueprints</h1>
+					<div class="windowControls">
+						<button>X</button>
+					</div>
+				</div>
+				<div class="contentControls">
+					<input class="search-input form-control"></input>
+					<button onclick="$('#jstree').jstree('open_all');">Expand</button>
+					<button onclick="$('#jstree').jstree('close_all');">Collapse</button>
+				</div>
 				<div class="content scrollbar-outer">
 				</div>
 			</div>
 			<div id="inspector" class="window" style="display: none">
 				<div class="header">
 					<h1>Inspector</h1>
-					<div id="windowControls">
+					<div class="windowControls">
 						<button>X</button>
 					</div>
 				</div>
@@ -192,7 +219,8 @@
     <script src="script/libs/jquery-ui.min.js"></script>
     <script src="script/libs/jquery.dataTables.min.js"></script>
     <script src="script/libs/jquery.scrollbar.min.js"></script>
-    <script src="script/libs/jstree.min.js"></script>
+	<script src="script/libs/jstree.min.js"></script>
+	<script src="script/libs/jquery-sortable.js"></script>
 
 
     <script src="script/libs/three.min.js"></script>

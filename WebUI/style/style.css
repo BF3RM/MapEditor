@@ -152,25 +152,32 @@ li.ui-widget-seperator {
 }
 
 .window {
-	width: 25%;
-    height: 25%;
+	width: 300px;
+    height: 500px;
 	background-color: #fff;
     max-height: 90%;
     position: absolute;
+    overflow: hidden;
+    display: flex; /* important */
+    flex-direction: column; /* important */
 }
-
-.window .content {
-    max-height: calc(100% - 60px);
+.content {
+    height: inherit;
 }
 .window .header {
     background-color: #D94C42;
-    padding: 5px;
     font-weight: bold;
     color: #fff;
-    display: flex;
     justify-content: space-between;
+    display: flex;
 }
 
+.content li {
+    width: fit-content;
+}
+.content ol ul {
+    padding-left: 10px;
+}
 .transform input {
     width: calc(33.33% - 30px);
     margin: 2px;
@@ -199,4 +206,22 @@ canvas {
 .window {
     z-index: 100;
 }
-        
+
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+ol.example li.placeholder {
+    position: relative;
+    /** More li styles **/
+}
+ol.example li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}

@@ -28,27 +28,33 @@ class UI {
 
 		$('.scrollbar-outer').scrollbar();
 
+		$('.spawnedEntities').sortable({
+            itemSelector: 'li',
+            placeholder: '<li class="placeholder"/>',
+            nested: true,
+			distance:10,
+			onDrag:  function ($item, position, _super, event) {
+                $item.css(position)
+                $(".placeholder").height($($item[0]).height());
+            }
+		});
+
 		$('.window').each(function() {
 			$(this).resizable({
 				handles: "n, e, s, w, ne, se, sw, nw",
 				minHeight: 200,
 				minWidth: 200,
-				containment: "#page",
-				alsoResize: $(this).find('.scroll-wrapper')
+				containment: "#page"
 			});
 
 			$(this).draggable({
 				handle: $(this).find('.header'),
 				containment: "#page"
 			})
-
 		});
-
 	}
 
 	static toolsChanged(e) {
-		console.log("kek")
-
 		editor.renderer.SetGizmoMode(e.target.id);
 	}
 
@@ -81,10 +87,21 @@ class UI {
 
 		return dialogs;
 	}
+	/*
 
+		Events
+
+	 */
 	OnConfirmInstanceSpawn() {
 		editor.ConfirmInstanceSpawn();
 		$(this).dialog("close");
+	}
+
+	OnEntitySpawned(gameObject) {
+		let entry = $(document.createElement("li"));
+		entry.attr("entityId", gameObject.id);
+		entry.text(getFilename(gameObject.instance.name));
+		$('.spawnedEntities').append(entry);
 	}
 
 

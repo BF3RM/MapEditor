@@ -97,6 +97,7 @@ class Editor {
 		//entityTable.row.add([p_ID, data.name]).draw();
 		//TODO: Check if this instance actually exists.
 		this.spawnedEntities[id] = new GameObject(id, "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
+		this.ui.OnEntitySpawned(this.spawnedEntities[id]);
 	}
 
 	OnRemoveEntity(id) {
