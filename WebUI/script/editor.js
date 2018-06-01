@@ -11,6 +11,8 @@ class Editor {
 		this.confirmedBlueprints = {};
 		this.spawnedEntities = {};
 
+		this.serializedEntities = {};
+
 		this.selectedEntity = null;
 		this.confirmInstance = null;
 
@@ -36,6 +38,7 @@ class Editor {
 	ClearSpawnedEntities() {
 		this.spawnedEntities.clear();
 	}
+
 	DeleteSelectedEntity() {
 		//TODO: Maybe a message that confirms the deletion?
 		let id = this.selectedEntity.id;
@@ -65,6 +68,7 @@ class Editor {
 		}
 	}
 	SelectEntityById(id) {
+		this.ui.OnSelectEntity(this.spawnedEntities[id]);
 		this.selectedEntity = this.spawnedEntities[id];
 	}
 	ConfirmInstanceSpawn() {
@@ -76,6 +80,11 @@ class Editor {
 		console.log(instance);
 		this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
+
+	CreatedEntity(id, gameObject) {
+		this.spawnedEntities[id] = gameObject;
+	}
+
 	/*
 
 		Events
@@ -96,8 +105,11 @@ class Editor {
 	OnSpawnedEntity(id, blueprintGuid, matrixString) {
 		//entityTable.row.add([p_ID, data.name]).draw();
 		//TODO: Check if this instance actually exists.
-		this.spawnedEntities[id] = new GameObject(id, "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
-		this.ui.OnEntitySpawned(this.spawnedEntities[id]);
+		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
+		this.ui.OnEntitySpawned(gameObject);
+		this.spawnedEntities[id] = gameObject;
+
+		this.SelectEntityById(id);
 	}
 
 	OnRemoveEntity(id) {

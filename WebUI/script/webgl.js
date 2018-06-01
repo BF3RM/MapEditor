@@ -188,4 +188,5 @@ class WebGL {
 		this.camera.setRotationFromMatrix(m);
 		this.Render();
 	}
+
 }

@@ -1,12 +1,19 @@
 class GameObject {
-	constructor(id, type, transform, instance) {
+	constructor(id, name, type, transform, instance) {
 		this.id = id;
+		this.name = name;
 		this.type = type;
 		this.transform = transform;
 		this.instance = instance;
 	}
 }
 
+class Group extends GameObject{
+	constructor(id, name, children) {
+		super(id, name, "group");
+		this.children = children;
+	}
+}
 class Vec3 {
 	constructor(x,y,z) {
 		this.x = x;

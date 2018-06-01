@@ -176,7 +176,7 @@ li.ui-widget-seperator {
     width: fit-content;
 }
 .content ol ul {
-    padding-left: 10px;
+    padding-left: 30px;
 }
 .transform input {
     width: calc(33.33% - 30px);
@@ -210,18 +210,65 @@ canvas {
 body.dragging, body.dragging * {
     cursor: move !important;
 }
-
-.dragged {
+li.placeholder {
+    /* border: 1px solid #000; */
+    width: 100%;
+    border-bottom: 2px solid #68b9ff;
     position: absolute;
+}
+.dragged {
+    /*position: absolute;*/
     opacity: 0.5;
     z-index: 2000;
 }
 
-ol.example li.placeholder {
+ol.content li.placeholder {
     position: relative;
+    border: 1px solid #000000;
     /** More li styles **/
 }
-ol.example li.placeholder:before {
+ol.content li.placeholder:before {
     position: absolute;
     /** Define arrowhead **/
+}
+
+li.group.expanded i:before {
+    content: "⯆";
+    opacity: 0.4;
+}
+
+li.group.collapsed i:before {
+    content: "⯈";
+    opacity: 0.4;
+}
+
+li.group.expanded i:active:before {
+    opacity: 1;
+}
+
+ul li > li.placeholder:first-of-type {
+    border-bottom: none;
+}
+li.dropHighLighted li.placeholder {
+    border-bottom: none;
+}
+li.dropHighLighted > .title:first-of-type{
+    border: 1px solid #68b9ff;
+    background-color: #68b9ff3b;
+    border-radius: 5px;
+    margin: -1px;
+}
+
+.group .title {
+    display: flex;
+}
+
+li.group.selected > .title{
+    width: 100%;
+    background-color: #68b9ff3b;
+}
+
+li.entity.selected {
+    width: 100%;
+    background-color: #68b9ff3b;
 }
