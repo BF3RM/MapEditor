@@ -40,11 +40,13 @@ class PowWindow {
         windowControls.append("<button>X</button>");
         this.windowControls = windowControls;
 
+        if(this.element.controls != null) {
+            let controls = this.element.controls;
+            controls.addClass("controls");
+            dom.append(controls);
+            this.controls = controls;
+        }
 
-        let controls = this.element.controls;
-        controls.addClass("controls");
-        dom.append(controls);
-        this.controls = controls;
 
         let content = $(document.createElement("div"));
         dom.append(content);

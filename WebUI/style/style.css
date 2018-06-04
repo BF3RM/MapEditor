@@ -186,8 +186,11 @@ li.ui-widget-seperator {
     padding-bottom: 10px;
 }
 
-#inspector .name input {
+#inspector input {
     width: calc(100% - 5px);
+}
+.Transform, .Rotation, .Scale {
+    display: flex;
 }
 canvas {
     position: absolute;
