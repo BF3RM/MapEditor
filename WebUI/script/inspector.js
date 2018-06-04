@@ -1,7 +1,21 @@
 class Inspector {
- 	constructor(id, name, type) {
- 		this.id = id;
-	    this.name = name;
+ 	constructor(gameObject) {
+ 		this.gameObject = gameObject;
+ 		this.Initialize();
+ 		this.dom = CreateDom();
+ 	}
+	CreateDom () {
+ 		let content = 
+	}
+ 	Initialize() {
+
+	}
+
+	SelectGameObject(gameObject) {
+ 		this.gameObject = gameObject;
+	}
+	UpdateInspector() {
+
 	}
 }
 

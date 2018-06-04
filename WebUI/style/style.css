@@ -156,10 +156,11 @@ li.ui-widget-seperator {
     height: 500px;
 	background-color: #fff;
     max-height: 90%;
-    position: absolute;
+    position: absolute!important;
     overflow: hidden;
     display: flex; /* important */
     flex-direction: column; /* important */
+    border: 1px solid #a0a0a0;
 }
 .content {
     height: inherit;

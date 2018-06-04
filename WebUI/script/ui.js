@@ -2,10 +2,14 @@ class UI {
 
 	constructor() {
 		this.Initialize();
-		this.dialogs = this.InitializeDialogs()
+		this.dialogs = this.InitializeDialogs();
 
-		this.dropHighLighted = null;
-		this.entries = {};
+
+		this.hierarchy = new Hierarchy();
+        this.treeView =  new TreeView();
+        this.windows = {};
+
+        this.InitializeWindows();
 	}
 
 	// Maybe this isn't the way it's supposed to be done...
@@ -31,50 +35,19 @@ class UI {
 
 		$('.scrollbar-outer').scrollbar();
 
-		$('.spawnedEntities').sortable({
-            itemSelector: 'li',
-            placeholder: '<li class="placeholder"/>',
-            nested: true,
-			distance:10,
-			onDrag:  function ($item, position, _super, event) {
-                //$item.css(position)
-                //$(".placeholder").height($($item[0]).height());
+	}
 
-            },
-			isValidTarget: function ($item, container) {
-					if($(container.el.children().first()).hasClass("placeholder")) {
-						this.highLighted = $(container.el).parent();
-						this.highLighted.addClass("dropHighLighted");
+	InitializeWindows() {
+        let page = $('#page');
+		this.windows = {
+			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
+            'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
+		};
 
-						console.log(container)
-					} else {
-						if(this.highLighted != null) {
-							this.highLighted.removeClass("dropHighLighted");
-						}
-					}
+        $.each(this.windows, function() {
+			page.append(this.dom);
+        });
 
-					return true
-				},
-			onDrop: function ($item, container, _super, event) {
-				$item.removeClass(container.group.options.draggedClass).removeAttr("style")
-				$("body").removeClass(container.group.options.bodyClass)
-				$(container.el).parent().removeClass("dropHighLighted")
-			}
-		});
-
-		$('.window').each(function() {
-			$(this).resizable({
-				handles: "n, e, s, w, ne, se, sw, nw",
-				minHeight: 200,
-				minWidth: 200,
-				containment: "#page"
-			});
-
-			$(this).draggable({
-				handle: $(this).find('.header'),
-				containment: "#page"
-			})
-		});
 	}
 
 	static toolsChanged(e) {
@@ -112,78 +85,6 @@ class UI {
 
 	/*
 
-		Functions
-
-	 */
-	CreateGroup(id = GenerateGuid(), name = "New Group") {
-		let groupEntity = new Group(id, name);
-
-		let group = $(document.createElement("li"));
-		group.attr("entityId", id);
-		group.attr("entityType", "group");
-		group.addClass("group expanded");
-
-		let title = $(document.createElement("div"));
-		title.addClass("title");
-
-		let expander = $(document.createElement("i"));
-		title.append(expander);
-
-		let groupName = $(document.createElement("div"));
-		groupName.addClass("groupTitle");
-		groupName.text(name);
-		title.append(groupName);
-		group.append(title);
-
-		let groupContent = $(document.createElement("ul"));
-		group.append(groupContent);
-
-		groupEntity.instance = group;
-		this.entries[id] = group;
-		editor.CreatedEntity(id, groupEntity);
-
-		$(expander).on('click', function () {
-			$(groupContent).toggle();
-
-			let parent = $(group.parent());
-			if(group.hasClass("expanded")) {
-				$(group).removeClass("expanded");
-				$(group).addClass("collapsed");
-			} else {
-				$(group).removeClass("collapsed");
-				$(group).addClass("expanded");
-			}
-		});
-
-		$(title).on('click', function () {
-			editor.SelectEntityById(id)
-		});
-
-		if(editor.selectedEntity != null) {
-			this.entries[editor.selectedEntity.id].after(group);
-		} else {
-			$('.spawnedEntities').append(group);
-		}
-		editor.SelectEntityById(id);
-	}
-
-	static CollapseGroup(group) {
-		$(group).toggle()
-
-		let parent = $(item.parent());
-		if(parent.hasClass("expanded")) {
-			$(item.parent()).removeClass("expanded");
-			$(item.parent()).addClass("collapsed");
-		} else {
-			$(item.parent()).removeClass("collapsed");
-			$(item.parent()).addClass("expanded");
-		}
-	}
-
-
-
-	/*
-
 		Events
 
 	 */
@@ -193,38 +94,7 @@ class UI {
 		$(this).dialog("close");
 	}
 
-	OnEntitySpawned(gameObject) {
-		let entry = $(document.createElement("li"));
-		entry.attr("entityId", gameObject.id);
-		entry.text(gameObject.name);
-		entry.addClass("entity");
-		$(entry).on('click', function() {
-			editor.SelectEntityById(gameObject.id)
-		});
-		$('.spawnedEntities').append(entry);
-		this.entries[gameObject.id] = entry;
-	}
 
-	OnSelectEntity(gameObject) {
-		console.log(gameObject)
-		if(editor.selectedEntity == gameObject) {
-			console.log("Tried to select myself...")
-			return;
-		}
-		this.OnDeselectEntry(editor.selectedEntity);
-		let entry = this.entries[gameObject.id];
-		entry.addClass("selected")
-	}
-
-
-	OnDeselectEntry(gameObject) {
-		if(gameObject == null) {
-			console.log("Tried to deselect nothing.");
-			return false;
-		}
-		let entry = this.entries[gameObject.id];
-		entry.removeClass("selected");
-	}
 
 
 

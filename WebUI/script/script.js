@@ -59,7 +59,8 @@ function RegisterInstances(p_Instances) {
 		var blueprint = blueprintArray[key];
 		blueprints[key] = new Blueprint(blueprint.partitionGuid, blueprint.instanceGuid, blueprint.name, blueprint.variations);
 	});
-	$('#treeView').find('.content').append(new TreeView(blueprints).tree);
+	//TODO: Move this?
+	$('#treeView').find('.content').append(new TreeView(blueprints).dom);
 }
 
 

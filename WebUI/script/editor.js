@@ -6,7 +6,6 @@ class Editor {
 
 		this.blueprints = {};
 		this.debug = debug;
-		this.blueprintTree = {};
 
 		this.confirmedBlueprints = {};
 		this.spawnedEntities = {};
@@ -68,7 +67,7 @@ class Editor {
 		}
 	}
 	SelectEntityById(id) {
-		this.ui.OnSelectEntity(this.spawnedEntities[id]);
+		this.ui.hierarchy.OnSelectEntity(this.spawnedEntities[id]);
 		this.selectedEntity = this.spawnedEntities[id];
 	}
 	ConfirmInstanceSpawn() {
@@ -99,17 +98,18 @@ class Editor {
 		for (var key in blueprints) {
 			this.blueprints[key] = new Blueprint(blueprints[key].partitionGuid, blueprints[key].instanceGuid, blueprints[key].name, blueprints[key].variations);
 		};
+		this.ui.treeView.LoadData(this.blueprints);
 		// Move this?
-		this.blueprintTree = new TreeView(this.blueprints);
-		$('#treeView').find('.content').append(this.blueprintTree.tree);
-		this.blueprintTree.Initialize();
+		/*this.blueprintTree = new TreeView(this.blueprints);
+		this.ui.treeView.content.append(this.blueprintTree.dom);
+		this.blueprintTree.Initialize();*/
 	}
 
 	OnSpawnedEntity(id, blueprintGuid, matrixString) {
 		//entityTable.row.add([p_ID, data.name]).draw();
 		//TODO: Check if this instance actually exists.
 		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
-		this.ui.OnEntitySpawned(gameObject);
+		this.ui.hierarchy.OnEntitySpawned(gameObject);
 		this.TrackEntity(id, gameObject);
 
 		this.SelectEntityById(id);

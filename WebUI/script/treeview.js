@@ -1,14 +1,12 @@
 class TreeView {
-	constructor(instances) {
-		this.data = this.ParseStructure(instances);
-		this.tree = document.createElement("div");
-	}
-	Initialize() {
-		this.InitializeTree();
-		this.RegisterEvents()
+	constructor() {
+		this.data = null;
+		this.dom = $(document.createElement("div"));
+		this.controls = this.CreateControls();
+		this.tree = null;
 	}
 
-	ParseStructure(table) {
+	LoadData(table) {
 		let data = {
 			"type": "folder",
 			"text": "Venice",
@@ -19,16 +17,16 @@ class TreeView {
 			"children": []
 		};
 		//TODO: Make sure this works after the new blueprint shit.
-		for (var key in table) {
-			var instance = table[key];
-			var path = instance.name;
-			var paths = getPaths(path);
-			var parentPath = data;
-			var fileName = getFilename(path);
+		for (let key in table) {
+            let instance = table[key];
+            let path = instance.name;
+            let paths = getPaths(path);
+            let parentPath = data;
+            let fileName = getFilename(path);
 			paths.forEach(function(subPath) {
-				var parentIndex = parentPath.children.find(x => x.text.toLowerCase() === subPath.toLowerCase());
+                let parentIndex = parentPath.children.find(x => x.text.toLowerCase() === subPath.toLowerCase());
 				if (parentIndex === undefined) {
-					var a = parentPath.children.push({
+                    let a = parentPath.children.push({
 						"type": "folder",
 						"text": subPath,
 						"children": []
@@ -49,11 +47,13 @@ class TreeView {
 				"id": key
 			})
 		}
-		return data
+		this.data = data;
+        this.InitializeTree();
+        this.RegisterEvents();
 	}
 
 	InitializeTree() {
-		$(this.tree).jstree({
+		this.tree = $(this.dom).jstree({
 			"types": {
 				"folder": {
 					"icon": "jstree-folder"
@@ -68,8 +68,8 @@ class TreeView {
 				"show_only_matches": true
 			},
 			"sort": function(a, b) {
-				var a1 = this.get_node(a);
-				var b1 = this.get_node(b);
+				let a1 = this.get_node(a);
+				let b1 = this.get_node(b);
 				if (a1.icon == b1.icon) {
 					return (a1.text.toLowerCase() > b1.text.toLowerCase()) ? 1 : -1;
 				} else {
@@ -82,24 +82,34 @@ class TreeView {
 		});
 	}
 	RegisterEvents() {
-		$(this.tree).find(".search-input").keyup(function() {
-			var searchString = $(this).val();
+		this.controls.find(".search-input").keyup(function() {
+			let searchString = $(this).val();
 			delay(function() {
 				console.log(searchString);
-				$(this.tree).jstree('search', searchString);
+				editor.ui.treeView.tree.jstree('search', searchString);
 			}, 500);
 
 		});
 
-		$(this.tree).on('changed.jstree', function(e, data) {
+		$(this.dom).on('changed.jstree', function(e, data) {
 			if (data.node == null) {
 				return
 			}
-			var id = data.node.original.id;
+			let id = data.node.original.id;
 			if (id != null) {
 				editor.PrepareInstanceSpawn(id);
 			}
 		})
+	}
+	CreateControls() {
+		let controls = $(document.createElement("div"));
+		controls.class = "contentControls";
+
+		let search = $(document.createElement("input"));
+		search.addClass("search-input form-control");
+		controls.append(search);
+
+		return controls;
 	}
 }
 

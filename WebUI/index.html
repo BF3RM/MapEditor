@@ -93,41 +93,6 @@
 			</div>
 		</div>
 		<div id="page">
-
-			<div id="webgl">
-			</div>
-			<div id="hierarchy" class="window">
-				<div class="header">
-					<h1>hierarchy</h1>
-					<div class="windowControls">
-						<button>X</button>
-					</div>
-				</div>
-                <div class="contentControls">
-                    <input class="search-input form-control"></input>
-                    <button onclick="editor.ui.CreateGroup()">+</button>
-                    <button onclick='vext.SpawnedEntity(GenerateGuid(), "31185055-81DD-A2F8-03FF-E0A6AAF960EC", "1,0,0,0,1,0,0,0,1,545,119,329");'>+</button>
-                </div>
-				<div class="content scrollbar-outer">
-					<ol class="spawnedEntities">
-					</ol>
-				</div>
-			</div>
-			<div id="treeView" class="window" style="display:none">
-				<div class="header">
-					<h1>Blueprints</h1>
-					<div class="windowControls">
-						<button>X</button>
-					</div>
-				</div>
-				<div class="contentControls">
-					<input class="search-input form-control"></input>
-					<button onclick="$('#jstree').jstree('open_all');">Expand</button>
-					<button onclick="$('#jstree').jstree('close_all');">Collapse</button>
-				</div>
-				<div class="content scrollbar-outer">
-				</div>
-			</div>
 			<div id="inspector" class="window" style="display: none">
 				<div class="header">
 					<h1>Inspector</h1>
@@ -203,6 +168,8 @@
 
     <script src="script/treeview.js"></script>
     <script src="script/controls.js"></script>
+	<script src="script/PowWindow.js"></script>
+	<script src="script/hierarchy.js"></script>
     <script src="script/ui.js"></script>
     <!--<script src="script/script.js"></script>-->
     <script src="script/editor.js"></script>
