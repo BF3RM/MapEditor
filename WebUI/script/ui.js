@@ -13,6 +13,7 @@ class UI {
         this.InitializeWindows();
 	}
 
+
 	// Maybe this isn't the way it's supposed to be done...
 	Initialize() {
 		$("#menubar").menu({

@@ -1,4 +1,8 @@
 class PowWindow {
+    //TODO: z-index focus on title click.
+    //Better resize-controls (They are a little small atm)
+    //Make it beautiful
+    
     constructor(id, title, element, height = 400, width = 300) {
         this.id = id;
         this.title = title;

@@ -67,6 +67,7 @@ class Hierarchy {
         this.OnDeselectEntry(editor.selectedEntity);
         let entry = this.entries[gameObject.id];
         entry.addClass("selected")
+        editor.ui.inspector.UpdateInspector(gameObject);
     }
 
 

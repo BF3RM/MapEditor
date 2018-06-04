@@ -1,11 +1,15 @@
 class Inspector {
- 	constructor(gameObject) {
-        this.gameObject = gameObject;
+ 	constructor() {
+        this.gameObject = null;
         this.dom = null;
         this.transform = null;
+        this.name = null;
         this.Initialize();
 
     }
+
+    //TODO: OnUpdate events, transform shit
+
 
     Initialize () {
  		let content = $(document.createElement("div"));
@@ -27,6 +31,7 @@ class Inspector {
         	"type": "text",
 			"value": "name"
 		});
+		this.name = nameInput;
 
 		let transformControl = $(document.createElement("div"));
 		content.append(transformControl);
@@ -66,6 +71,11 @@ class Inspector {
 
 	UpdateTransform(linearTransform) {
 		//TODO this
+	}
+
+	UpdateInspector(gameObject) {
+ 		this.name[0].value = gameObject.name;
+
 	}
 }
 
