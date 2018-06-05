@@ -153,7 +153,7 @@ class WebGL {
 	}
 
 	static onMouseDown(e) {
-		$('#page').find('canvas').css("z-index", 1)
+		$('#page').find('canvas').css("z-index", Number.MAX_SAFE_INTEGER)
 	}
 
 	onWindowResize() {
