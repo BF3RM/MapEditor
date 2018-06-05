@@ -205,7 +205,6 @@ canvas {
 }
 
 .window {
-    z-index: 100;
 }
 
 body.dragging, body.dragging * {

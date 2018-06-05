@@ -2,18 +2,21 @@ class PowWindow {
     //TODO: z-index focus on title click.
     //Better resize-controls (They are a little small atm)
     //Make it beautiful
-    
-    constructor(id, title, element, height = 400, width = 300) {
+
+    constructor(id, title, element, hidden = false, height = 400, width = 300) {
         this.id = id;
         this.title = title;
+        this.element = element;
+        this.hidden = hidden;
+        this.height = height;
+        this.width = width;
+
         this.controls = null;
         this.header = null;
         this.windowControls = null;
         this.content = null;
-        this.element = element;
 
-        this.height = height;
-        this.width = width;
+
 
         this.dom = null;
         this.Initialize();
@@ -25,13 +28,17 @@ class PowWindow {
         dom.attr('id', this.id);
         dom.css({
             "height": this.height,
-            "width": this.width,
+            "width": this.width
         });
+        if(this.hidden == true) {
+            dom.css("display", "none");
+        }
 
         let header = $(document.createElement("div"));
         dom.append(header);
         header.addClass("header");
         this.header = header;
+        dom.on('mousedown', this.onTitleClick);
 
         let title = $(document.createElement("h1"));
         header.append(title);
@@ -77,5 +84,11 @@ class PowWindow {
         this.dom = dom;
         this.content.append(this.element.dom);
 
+    }
+
+    onTitleClick(e) {
+        console.log(editor.ui.windowZ);
+        editor.ui.windowZ++;
+        $(this).css("z-index", editor.ui.windowZ);
     }
 }
