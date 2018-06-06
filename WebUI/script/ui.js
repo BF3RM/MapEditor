@@ -44,7 +44,7 @@ class UI {
         let page = $('#page');
 		this.windows = {
 			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
-            'treeView': new PowWindow("treeView", "Blueprints", this.treeView, true),
+            'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
             'inspector': new PowWindow("inspector", "Inspector", this.inspector),
 		};
 

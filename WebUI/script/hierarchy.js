@@ -3,7 +3,8 @@ class Hierarchy {
         this.dom = null;
         this.entries = {};
         this.dropHighLighted = null;
-        this.controls = this.CreateControls();
+        this.topControls = this.CreateTopControls();
+        this.subControls = this.CreateSubControls();
         this.Initialize();
     }
 
@@ -145,7 +146,7 @@ class Hierarchy {
         }
     }
 
-    CreateControls() {
+    CreateTopControls() {
         let controls = $(document.createElement("div"));
         controls.class = "contentControls";
 
@@ -155,6 +156,14 @@ class Hierarchy {
 
         controls.append("<button onclick=\"editor.ui.hierarchy.CreateGroup()\">+</button>\n" +
             "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,545,119,329\");'>+</button>");
+        return controls;
+    }
+
+    CreateSubControls() {
+        let controls = $(document.createElement("div"));
+
+        controls.append("<button onclick=\"editor.ui.hierarchy.CreateGroup()\">New Group</button>\n" +
+            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,545,119,329\");'>Add Instance</button>");
         return controls;
     }
 }

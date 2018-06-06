@@ -2,7 +2,7 @@ class TreeView {
 	constructor() {
 		this.data = null;
 		this.dom = $(document.createElement("div"));
-		this.controls = this.CreateControls();
+		this.topControls = this.CreateControls();
 		this.tree = null;
 	}
 
@@ -82,7 +82,7 @@ class TreeView {
 		});
 	}
 	RegisterEvents() {
-		this.controls.find(".search-input").keyup(function() {
+		this.topControls.find(".search-input").keyup(function() {
 			let searchString = $(this).val();
 			delay(function() {
 				console.log(searchString);

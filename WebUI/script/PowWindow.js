@@ -11,7 +11,8 @@ class PowWindow {
         this.height = height;
         this.width = width;
 
-        this.controls = null;
+        this.topControls = null;
+        this.subControls = null;
         this.header = null;
         this.windowControls = null;
         this.content = null;
@@ -51,11 +52,11 @@ class PowWindow {
         windowControls.append("<button>X</button>");
         this.windowControls = windowControls;
 
-        if(this.element.controls != null) {
-            let controls = this.element.controls;
-            controls.addClass("controls");
-            dom.append(controls);
-            this.controls = controls;
+        if(this.element.topControls != null) {
+            let topControls = this.element.topControls;
+            topControls.addClass("topControls");
+            dom.append(topControls);
+            this.topControls = topControls;
         }
 
 
@@ -83,6 +84,13 @@ class PowWindow {
 
         this.dom = dom;
         this.content.append(this.element.dom);
+
+        if(this.element.subControls != null) {
+            let subControls = this.element.subControls;
+            subControls.addClass("subControls");
+            dom.append(subControls);
+            this.subControls = subControls;
+        }
 
     }
 
