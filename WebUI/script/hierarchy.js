@@ -60,7 +60,6 @@ class Hierarchy {
     }
 
     OnSelectEntity(gameObject) {
-        console.log(gameObject)
         if(editor.selectedEntity == gameObject) {
             console.log("Tried to select myself...");
             return;
@@ -79,6 +78,7 @@ class Hierarchy {
         }
         let entry = this.entries[gameObject.id];
         entry.removeClass("selected");
+        editor.OnDeselectEntity(gameObject);
     }
 
     CreateGroup(id = GenerateGuid(), name = "New Group") {

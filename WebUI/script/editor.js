@@ -3,6 +3,7 @@ class Editor {
 
 		this.ui = new UI();
 		this.renderer = new WebGL();
+		this.vext = new VEXTInterface();
 
 		this.blueprints = {};
 		this.debug = debug;
@@ -21,15 +22,16 @@ class Editor {
 	}
 
 	Initialize() {
-		if(this.debug) {
+		if(this.debug == true) {
 			$('body').css({
 				"background": 'url(\"img/bf3bg.png\"',
 				'background-size': 'cover'
 			});
+			var imported = document.createElement('script');
+			imported.src = 'script/debugData.js';
+			document.head.appendChild(imported);
 		}
-		var imported = document.createElement('script');
-		imported.src = 'script/debugData.js';
-		document.head.appendChild(imported);
+
 	}
 
 
@@ -42,7 +44,7 @@ class Editor {
 		//TODO: Maybe a message that confirms the deletion?
 		let id = this.selectedEntity.id;
 		this.selectedEntity = null;
-		SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', id)
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', id)
 	}
 
 	PrepareInstanceSpawn(p_InstanceGuid) {
@@ -69,6 +71,7 @@ class Editor {
 	SelectEntityById(id) {
 		this.ui.hierarchy.OnSelectEntity(this.spawnedEntities[id]);
 		this.selectedEntity = this.spawnedEntities[id];
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', id);
 	}
 	ConfirmInstanceSpawn() {
 		this.SpawnInstance(this.confirmInstance);
@@ -77,7 +80,7 @@ class Editor {
 
 	SpawnInstance(instance, variation = 0) {
 		console.log(instance);
-		this.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
 	TrackEntity(id, gameObject) {
 		this.spawnedEntities[id] = gameObject;
@@ -99,10 +102,6 @@ class Editor {
 			this.blueprints[key] = new Blueprint(blueprints[key].partitionGuid, blueprints[key].instanceGuid, blueprints[key].name, blueprints[key].variations);
 		};
 		this.ui.treeView.LoadData(this.blueprints);
-		// Move this?
-		/*this.blueprintTree = new TreeView(this.blueprints);
-		this.ui.treeView.content.append(this.blueprintTree.dom);
-		this.blueprintTree.Initialize();*/
 	}
 
 	OnSpawnedEntity(id, blueprintGuid, matrixString) {
@@ -117,5 +116,9 @@ class Editor {
 
 	OnRemoveEntity(id) {
 		//Remove entity from the list.
+	}
+
+	OnDeselectEntity(gameObject) {
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
 	}
 }

@@ -19,8 +19,8 @@ class VEXTInterface {
 	HideGizmo() {
 		editor.renderer.HideGizmo();
 	}
-	HideGizmo() {
-		editor.renderer.HhowGizmo();
+	ShowGizmo() {
+		editor.renderer.ShowGizmo();
 	}
 
 	SpawnedEntity(id, blueprintGuid, matrixString) {

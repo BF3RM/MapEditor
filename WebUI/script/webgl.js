@@ -14,8 +14,7 @@ class WebGL {
 	}
 	Initialize() {
 		this.renderer = new THREE.WebGLRenderer({
-			alpha: true,
-			antialias: true
+			alpha: true
 		});
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);

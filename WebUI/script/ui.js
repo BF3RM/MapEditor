@@ -45,7 +45,7 @@ class UI {
 		this.windows = {
 			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
             'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
-            'inspector': new PowWindow("inspector", "Inspector", this.inspector),
+            'inspector': new PowWindow("inspector", "Inspector", this.inspector, false),
 		};
 
         $.each(this.windows, function() {

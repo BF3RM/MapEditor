@@ -3,11 +3,11 @@ class PowWindow {
     //Better resize-controls (They are a little small atm)
     //Make it beautiful
 
-    constructor(id, title, element, hidden = false, height = 400, width = 300) {
+    constructor(id, title, element, visible = true, height = 400, width = 300) {
         this.id = id;
         this.title = title;
         this.element = element;
-        this.hidden = hidden;
+        this.visible = visible;
         this.height = height;
         this.width = width;
 
@@ -31,7 +31,7 @@ class PowWindow {
             "height": this.height,
             "width": this.width
         });
-        if(this.hidden == true) {
+        if(this.visible == false) {
             dom.css("display", "none");
         }
 
@@ -95,7 +95,6 @@ class PowWindow {
     }
 
     onTitleClick(e) {
-        console.log(editor.ui.windowZ);
         editor.ui.windowZ++;
         $(this).css("z-index", editor.ui.windowZ);
     }

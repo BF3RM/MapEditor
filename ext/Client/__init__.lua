@@ -63,8 +63,8 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	local up = s_Transform.up
 	local forward = s_Transform.forward
 
-	WebUI:ExecuteJS(string.format('UpdateCameraPos(%s, %s, %s);', pos.x, pos.y, pos.z))
-	WebUI:ExecuteJS(string.format('UpdateCameraAngle(%s, %s, %s,%s, %s, %s,%s, %s, %s);', left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z))
+	WebUI:ExecuteJS(string.format('editor.renderer.UpdateCameraPos(%s, %s, %s);', pos.x, pos.y, pos.z))
+	WebUI:ExecuteJS(string.format('editor.renderer.UpdateCameraAngle(%s, %s, %s,%s, %s, %s,%s, %s, %s);', left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z))
 end
 
 function MapEditorClient:OnLoaded()
@@ -84,7 +84,7 @@ function MapEditorClient:OnEngineMessage(p_Message)
 		print("MessageType.ClientLevelFinalizedMessage")
 		Shared:FillVariations()
 	
-		WebUI:ExecuteJS(string.format("RegisterInstances('%s')", json.encode(Shared.m_Blueprints)))
+		WebUI:ExecuteJS(string.format("editor.OnRegisterInstances('%s')", json.encode(Shared.m_Blueprints)))
 		self:LoadJSONEntities() --Might be better to call this after a bit, so we are sure that all the blueprints are stored in js
 	end
 end
@@ -251,14 +251,14 @@ function MapEditorClient:OnSelectEntity(p_ID)
 		local pos = entity.transform.trans
 
 		-- TODO: send rotation too and apply it if gizmo is on local state
-		WebUI:ExecuteJS(string.format('SetGizmoAt(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);', 
+		WebUI:ExecuteJS(string.format('editor.renderer.SetGizmoAt(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
 			left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
 
 	end
 end
 
 function MapEditorClient:OnDeselectEntity(p_ID)
-	WebUI:ExecuteJS("HideGizmo()")
+	WebUI:ExecuteJS("editor.renderer.HideGizmo()")
 	self.selectedEntityID = -1
 end
 
@@ -342,7 +342,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 	local s_MatrixString = string.format('%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,1', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
-	WebUI:ExecuteJS(string.format('OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
+	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
 end
 
 function MapEditorClient:LoadJSONEntities() 
