@@ -51,7 +51,7 @@ class WebGL {
 		}
 
 
-		var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 );
+		var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 1, 1, 1 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
 		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
 		this.control.setSpace("local");
