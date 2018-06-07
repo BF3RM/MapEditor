@@ -76,12 +76,12 @@ class Variation {
 
 class Camera {
 	constructor(transform, fov) {
-		self.transform = transform;
-		self.fov = fov;
+		this.transform = transform;
+		this.fov = fov;
 	}
 
 	SetFov(fov) {
-		self.fov = fov
+		this.fov = fov
 		//Update the three stuff
 	}
 

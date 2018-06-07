@@ -223,14 +223,14 @@ function MapEditorClient:OnDeleteEntity(p_ID)
 	end
 
 	self.spawnedEntities[p_ID] = nil
-	WebUI:ExecuteJS("RemoveEntityFromList("..p_ID..")")
+	WebUI:ExecuteJS("editor.OnRemoveEntity("..p_ID..")")
 
 end
 
 function MapEditorClient:OnSelectEntity(p_ID) 
 	
 	if self.selectedEntityID < 0 then
-		WebUI:ExecuteJS("ShowGizmo()")
+		WebUI:ExecuteJS("editor.renderer.ShowGizmo()")
 	end
 
 	self.selectedEntityID = tonumber(p_ID)

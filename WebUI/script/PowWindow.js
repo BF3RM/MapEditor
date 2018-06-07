@@ -49,7 +49,18 @@ class PowWindow {
         let windowControls = $(document.createElement("div"));
         header.append(windowControls);
         windowControls.addClass("windowControls");
-        windowControls.append("<button>X</button>");
+
+        let btn = $(document.createElement("BUTTON"));
+        let t = document.createTextNode("X");
+        btn.append(t);
+        btn.click({id: this.id}, cool_function);
+
+        function cool_function(event){
+            console.log(event.data.id)
+            // $("#" + event.data.id).toggle();
+        }
+
+        windowControls.append(btn);
         this.windowControls = windowControls;
 
         if(this.element.topControls != null) {
