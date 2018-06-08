@@ -55,11 +55,11 @@ class UI {
 	}
 
 	static toolsChanged(e) {
-		editor.renderer.SetGizmoMode(e.target.id);
+		editor.webGL.SetGizmoMode(e.target.id);
 	}
 
 	static worldChanged(e) {
-		editor.renderer.SetWorldSpace(e.target.id);
+		editor.webGL.SetWorldSpace(e.target.id);
 	}
 
 	static worldViewChanged(e, ui) {

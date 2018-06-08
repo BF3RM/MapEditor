@@ -17,10 +17,10 @@ class VEXTInterface {
 	}
 
 	HideGizmo() {
-		editor.renderer.HideGizmo();
+		editor.webGL.HideGizmo();
 	}
 	ShowGizmo() {
-		editor.renderer.ShowGizmo();
+		editor.webGL.ShowGizmo();
 	}
 
 	SpawnedEntity(id, blueprintGuid, matrixString) {

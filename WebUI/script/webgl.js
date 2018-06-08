@@ -8,6 +8,7 @@ class WebGL {
 		this.mesh = null;
 
 		this._onControlChanged = this.onControlChanged.bind(this);
+		this._onWindowResize = this.onWindowResize.bind(this);
 		this.Initialize();
 		this.RegisterEvents();
 
@@ -42,14 +43,14 @@ class WebGL {
 					alert('You have a strange Mouse!');
 			}
 		});
-		window.addEventListener('resize', this.onWindowResize, false);
+		window.addEventListener('resize',this.onWindowResize, false);
 	}
 
 	CreateGizmo(x, y, z) {
 		if (this.control != null) {
 			console.log("Gizmo already exist")
+			return
 		}
-
 
 		var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 1, 1, 1 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
@@ -157,10 +158,12 @@ class WebGL {
 	}
 
 	onWindowResize() {
-		this.camera.aspect = window.innerWidth / window.innerHeight;
-		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.render();
+		let webGL = this.editor.webGL;
+
+		webGL.camera.aspect = window.innerWidth / window.innerHeight;
+		webGL.camera.updateProjectionMatrix();
+		webGL.renderer.setSize(window.innerWidth, window.innerHeight);
+		webGL.Render();
 	}
 
 	onControlChanged() {

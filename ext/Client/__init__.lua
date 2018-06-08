@@ -63,8 +63,8 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	local up = s_Transform.up
 	local forward = s_Transform.forward
 
-	WebUI:ExecuteJS(string.format('editor.renderer.UpdateCameraPos(%s, %s, %s);', pos.x, pos.y, pos.z))
-	WebUI:ExecuteJS(string.format('editor.renderer.UpdateCameraAngle(%s, %s, %s,%s, %s, %s,%s, %s, %s);', left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z))
+	WebUI:ExecuteJS(string.format('editor.webGL.UpdateCameraPos(%s, %s, %s);', pos.x, pos.y, pos.z))
+	WebUI:ExecuteJS(string.format('editor.webGL.UpdateCameraAngle(%s, %s, %s,%s, %s, %s,%s, %s, %s);', left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z))
 end
 
 function MapEditorClient:OnLoaded()
@@ -230,7 +230,7 @@ end
 function MapEditorClient:OnSelectEntity(p_ID) 
 	
 	if self.selectedEntityID < 0 then
-		WebUI:ExecuteJS("editor.renderer.ShowGizmo()")
+		WebUI:ExecuteJS("editor.webGL.ShowGizmo()")
 	end
 
 	self.selectedEntityID = tonumber(p_ID)
@@ -251,14 +251,14 @@ function MapEditorClient:OnSelectEntity(p_ID)
 		local pos = entity.transform.trans
 
 		-- TODO: send rotation too and apply it if gizmo is on local state
-		WebUI:ExecuteJS(string.format('editor.renderer.SetGizmoAt(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+		WebUI:ExecuteJS(string.format('editor.webGL.SetGizmoAt(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
 			left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
 
 	end
 end
 
 function MapEditorClient:OnDeselectEntity(p_ID)
-	WebUI:ExecuteJS("editor.renderer.HideGizmo()")
+	WebUI:ExecuteJS("editor.webGL.HideGizmo()")
 	self.selectedEntityID = -1
 end
 
