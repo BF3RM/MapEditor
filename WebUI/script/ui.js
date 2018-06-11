@@ -63,7 +63,7 @@ class UI {
 	}
 
 	static worldViewChanged(e, ui) {
-		SendEvent('DispatchEventLocal', 'MapEditor:SetViewmode', ui.item.value)
+		editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:SetViewmode', ui.item.value)
 	}
 
 	InitializeDialogs() {

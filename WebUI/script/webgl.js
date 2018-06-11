@@ -7,10 +7,14 @@ class WebGL {
 		this.texture = null;
 		this.mesh = null;
 
+		this.worldSpace = "local";
+		this.gridSnap = false;
+
 		this._onControlChanged = this.onControlChanged.bind(this);
 		this._onWindowResize = this.onWindowResize.bind(this);
 		this.Initialize();
 		this.RegisterEvents();
+
 
 	}
 	Initialize() {
@@ -27,6 +31,7 @@ class WebGL {
 		this.camera.position.set(538, 120, 330);
 		this.scene = new THREE.Scene();
 		this.CreateGizmo(537, 119, 329);
+		this.SetFov(90);
 	}
 
 	RegisterEvents() {
@@ -143,10 +148,38 @@ class WebGL {
 			radio[0].checked = true;
 			$('#worldSpace').find('input').button("refresh");
 			console.log("Changed worldspace to " + p_Space);
+			this.worldSpace = p_Space;
 		} else {
 			console.error("Tried to set an invalid world space")
 		}
+	}
 
+	ToggleWorldSpace() {
+		if(this.worldSpace == "local") {
+			this.SetWorldSpace("world")
+		} else {
+			this.SetWorldSpace("local")
+		}
+	}
+
+	EnableGridSnap() {
+		this.gridSnap = true;
+		this.control.setTranslationSnap( 1 );
+		this.control.setRotationSnap( THREE.Math.degToRad( 15 ) )
+	}
+
+	DisableGridSnap() {
+		this.gridSnap = false;
+		this.control.translationSnap = null;
+		this.control.rotationSnap = null;
+	}
+
+	ToggleGridSnap() {
+		if(this.gridSnap) {
+			this.DisableGridSnap();
+		} else {
+			this.EnableGridSnap();
+		}
 	}
 
 	static onMouseUp(e) {

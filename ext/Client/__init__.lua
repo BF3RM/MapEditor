@@ -1,20 +1,21 @@
 class 'MapEditorClient'
 local Shared = require '__shared/MapEditorShared'
 local JSONentities = require '__shared/JSONentities'
---local Freecam = require 'freecam'
+local Freecam = require 'Freecam'
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
 	self:RegisterVars()
 	self:RegisterEvents()
 	Shared:__init()
+    Freecam:__init()
 end
 
 function MapEditorClient:RegisterVars()
 	self.spawnEntity = nil
 	self.spawnedEntities = {}
 	self.selectedEntityID = -1
-	self.isFreecam = true
+	self.isFreecam = false
 	self.raycastTransform = nil
 
 	self.castDistance = 100
@@ -165,12 +166,16 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		WebUI:BringToFront()
 		WebUI:EnableMouse()
 		WebUI:Show()
+        self.isFreecam = true;
+        Freecam:Enable();
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
 		--WebUI:BringToFront()
 		WebUI:DisableMouse()
 		-- WebUI:Hide()
+
+        Freecam:Disable();
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
@@ -189,13 +194,16 @@ end
 function MapEditorClient:OnEnableKeyboard() 
 	WebUI:EnableKeyboard()
 end
+
 function MapEditorClient:OnDisableKeyboard() 
 	WebUI:DisableKeyboard()
 end
+
 function MapEditorClient:OnEnableFreecam()
 	WebUI:DisableKeyboard()
 	WebUI:DisableMouse()
 end
+
 function MapEditorClient:OnSetViewmode(p_ViewMode)
 	local p_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
 	if p_WorldRenderSettings ~= nil then
@@ -290,7 +298,6 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 					s_Position
 				)
 			s_Entity.transform = s_Transform
-			print(tostring(s_Transform))
 		else
 			print("entity was null")
 		end

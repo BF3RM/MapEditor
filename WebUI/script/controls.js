@@ -28,14 +28,17 @@ $(document).keydown(function(e) {
 		return;
 	}
 	keysdown[e.which] = true;
+	if(e.which == 81) { // Q
+		editor.webGL.SetGizmoMode("select")
+	}
 	if(e.which == 87) { // W
-
+		editor.webGL.SetGizmoMode("translate")
 	}
 	if(e.which == 69) { // E
-
+		editor.webGL.SetGizmoMode("rotate")
 	}
 	if(e.which == 82) { // R
-
+		editor.webGL.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
 
@@ -46,9 +49,18 @@ $(document).keydown(function(e) {
 	if(e.which == 112) { // F1
 
 	}
+	if(e.which == 17) { // CTRL
+		editor.webGL.EnableGridSnap()
+	}
+	if(e.which == 88) { // X
+		editor.webGL.ToggleWorldSpace();
+	}
 });
 
 $(document).keyup(function(e){
 	// Remove this key from the map
 	delete keysdown[e.which];
+	if(e.which == 17) { // CTRL
+		editor.webGL.DisableGridSnap()
+	}
 });
