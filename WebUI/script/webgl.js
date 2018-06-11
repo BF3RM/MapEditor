@@ -164,7 +164,7 @@ class WebGL {
 
 	EnableGridSnap() {
 		this.gridSnap = true;
-		this.control.setTranslationSnap( 1 );
+		this.control.setTranslationSnap( 0.5 );
 		this.control.setRotationSnap( THREE.Math.degToRad( 15 ) )
 	}
 

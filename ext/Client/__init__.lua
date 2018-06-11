@@ -139,7 +139,10 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		print("Spawning: " .. self.spawnEntity.instance.name)
 
 		local params = EntityCreationParams()
-		params.transform = self.raycastTransform
+        local s_SpawnTransform = LinearTransform()
+        s_SpawnTransform.trans = self.raycastTransform.trans
+
+		params.transform = s_SpawnTransform
 		params.variationNameHash = self.spawnEntity.variation
 
 		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(self.spawnEntity.instance, params)
@@ -157,7 +160,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		
 		
 
-		self:RegisterEntity(self.spawnEntity.blueprintID, prefabEntities, self.raycastTransform)
+		self:RegisterEntity(self.spawnEntity.blueprintID, prefabEntities, s_SpawnTransform)
 		self.spawnEntity = nil
 
 	end
