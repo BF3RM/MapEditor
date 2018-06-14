@@ -38,11 +38,10 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:SetViewmode', self, self.OnSetViewmode)
 
 	-- Controls
-	Events:Subscribe('MapEditor:EnableKeyboard', self, self.OnEnableKeyboard)
-	Events:Subscribe('MapEditor:DisableKeyboard', self, self.OnDisableKeyboard)
+	-- Events:Subscribe('MapEditor:EnableKeyboard', self, self.OnEnableKeyboard)
+	-- Events:Subscribe('MapEditor:DisableKeyboard', self, self.OnDisableKeyboard)
 
 	Events:Subscribe('MapEditor:EnableFreecam', self, self.OnEnableFreecam)
-
 
 	--NetEvents
 	NetEvents:Subscribe('MapEditor:RoundReset', self, self.OnRoundReset)
@@ -157,9 +156,6 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 			entity:Init(Realm.Realm_Client, true)
 		end
 
-		
-		
-
 		self:RegisterEntity(self.spawnEntity.blueprintID, prefabEntities, s_SpawnTransform)
 		self.spawnEntity = nil
 
@@ -177,8 +173,8 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		--WebUI:BringToFront()
 		WebUI:DisableMouse()
 		-- WebUI:Hide()
-
         Freecam:Disable();
+        self.isFreecam = false;
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
@@ -194,13 +190,13 @@ end
 
 ----------- WebUI functions----------------
 
-function MapEditorClient:OnEnableKeyboard() 
-	WebUI:EnableKeyboard()
-end
+-- function MapEditorClient:OnEnableKeyboard() 
+-- 	WebUI:EnableKeyboard()
+-- end
 
-function MapEditorClient:OnDisableKeyboard() 
-	WebUI:DisableKeyboard()
-end
+-- function MapEditorClient:OnDisableKeyboard() 
+-- 	WebUI:DisableKeyboard()
+-- end
 
 function MapEditorClient:OnEnableFreecam()
 	WebUI:DisableKeyboard()
