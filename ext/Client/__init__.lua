@@ -392,7 +392,11 @@ function MapEditorClient:LoadJSONEntities()
 		
 		-- print("Spawning!")
 
-		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(s_Instance, s_Transform, true)
+		local params = EntityCreationParams()
+		params.transform = s_Transform
+		params.variationNameHash = 0
+
+		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(s_Instance, params)
 		print("Spawned!")
 
 		if(prefabEntities == nil) then
