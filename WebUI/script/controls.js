@@ -1,22 +1,22 @@
-function EnableKeyboard() {
-	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableKeyboard')
-}
+// function EnableKeyboard() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableKeyboard')
+// }
 
-function DisableKeyboard() {
-	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
-}
+// function DisableKeyboard() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
+// }
 
 function EnableFreecam() {
 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
 }
 
-function DisableFreeView() {
-	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableFreeview')
-}
+// function DisableFreeView() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableFreeview')
+// }
 
-function ToggleFreeView() {
-	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:ToggleFreeview')
-}
+// function ToggleFreeView() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:ToggleFreeview')
+// }
 
 
 var keysdown = {};
