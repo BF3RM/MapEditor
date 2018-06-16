@@ -5,7 +5,6 @@ class WebGL {
 		this.renderer = null;
 		this.control = null;
 		this.texture = null;
-		this.mesh = null;
 
 		this.worldSpace = "local";
 		this.gridSnap = false;
@@ -30,7 +29,7 @@ class WebGL {
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
 		this.camera.position.set(538, 120, 330);
 		this.scene = new THREE.Scene();
-		this.CreateGizmo(537, 119, 329);
+		this.CreateGizmo();
 		this.SetFov(90);
 	}
 
@@ -51,56 +50,75 @@ class WebGL {
 		window.addEventListener('resize',this.onWindowResize, false);
 	}
 
-	CreateGizmo(x, y, z) {
+	CreateGizmo() {
 		if (this.control != null) {
 			console.log("Gizmo already exist")
 			return
 		}
 
-		var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 1, 1, 1 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
 		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
 		this.control.setSpace("local");
 		this.control.addEventListener('change', this._onControlChanged);
 		this.control.addEventListener('mouseUp', WebGL.onMouseUp, false);
 		this.control.addEventListener('mouseDown', WebGL.onMouseDown, false);
 
-		this.mesh = new THREE.Mesh(geometry, material);
-		this.scene.add(this.mesh);
-
-		this.control.attach(this.mesh);
-		this.scene.add(this.control);
-
-		this.mesh.position.set(x, y, z);
+		this.scene.add(this.control);		
 
 		this.HideGizmo();
 
 		this.Render();
 	}
 
-	SetGizmoAt(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
-		let m = new THREE.Matrix4();
+	CreateObject(transform){
+		let geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 1, 1, 1 );
+		let material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
+		let mesh = new THREE.Mesh(geometry, material);
+		
+		this.scene.add(mesh);
 
-		m.set(lx, ux, fx, 0,
-			ly, uy, fy, 0,
-			lz, uz, fz, 0,
-			0, 0, 0, 0);
+		let matrix = new THREE.Matrix4();
+		matrix.set(
+			transform.left.x, transform.up.x, transform.forward.x, 0,
+			transform.left.y, transform.up.y, transform.forward.y, 0,
+			transform.left.z, transform.up.z, transform.forward.z, 0,
+			0, 0, 0, 1);
+		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		mesh.setRotationFromMatrix(matrix);
 
-		this.mesh.scale.set(1, 1, 1);
-		this.mesh.setRotationFromMatrix(m);
-		this.mesh.position.set(x, y, z);
+		this.control.attach(mesh);
+		this.Render();
+
+		return mesh;
+	}
+
+	UpdateObject(mesh, transform) {
+		console.log(transform.trans);
+		let matrix = new THREE.Matrix4();
+		matrix.set(
+			transform.left.x, transform.up.x, transform.forward.x, 0,
+			transform.left.y, transform.up.y, transform.forward.y, 0,
+			transform.left.z, transform.up.z, transform.forward.z, 0,
+			0, 0, 0, 1);
+		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		mesh.setRotationFromMatrix(matrix);
+
+		this.Render();
+	}
+
+	AttachGizmoTo(mesh){
+		this.control.attach(mesh);
 		this.Render();
 	}
 
 	HideGizmo() {
 		this.control.visible = false;
-		this.mesh.visible = false;
+		// this.mesh.visible = false;
 		this.Render();
 	}
 
 	ShowGizmo() {
 		this.control.visible = true;
-		this.mesh.visible = true;
+		// this.mesh.visible = true;
 
 		this.Render();
 	}
@@ -200,11 +218,12 @@ class WebGL {
 	}
 
 	onControlChanged() {
-		this.Render();
-		//TODO: Invert this method.
-		//We should get the matrix and apply it to the mesh, not the other way around.
-
-		let matrix = this.mesh.matrixWorld.toArray().toString();
+		// The gizmo updates the mesh matrix, so we send it to lua.
+		
+		if (editor.selectedEntity == null) {
+			return;
+		}
+		let matrix = editor.selectedEntity.webObject.matrixWorld.toArray().toString();
 		let args = editor.selectedEntity.id + "," + matrix;
 		console.log(args);
 

@@ -1,10 +1,11 @@
 class GameObject {
-	constructor(id, name, type, transform, instance) {
+	constructor(id, name, type, transform, instance, webObject) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.transform = transform;
 		this.instance = instance;
+		this.webObject = webObject;
 	}
 }
 
@@ -46,21 +47,24 @@ class LinearTransform {
 	setMatrixFromString(matrixString) {
 		let matrix = matrixString.split(",");
 		this.left = new Vec3(
-			matrix[0],
-			matrix[1],
-			matrix[2]);
+			Number(matrix[0]),
+			Number(matrix[1]),
+			Number(matrix[2]));
 		
-		this.up = new Vec3(matrix[3],
-			matrix[4],
-			matrix[5]);
+		this.up = new Vec3(
+			Number(matrix[3]),
+			Number(matrix[4]),
+			Number(matrix[5]));
 
-		this.forward = new Vec3(matrix[6],
-			matrix[7],
-			matrix[8]);
+		this.forward = new Vec3(
+			Number(matrix[6]),
+			Number(matrix[7]),
+			Number(matrix[8]));
 
-		this.trans = new Vec3(matrix[9],
-			matrix[10],
-			matrix[11]);
+		this.trans = new Vec3(
+			Number(matrix[9]),
+			Number(matrix[10]),
+			Number(matrix[11]));
 		return this;
 	}
 }

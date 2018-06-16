@@ -68,6 +68,10 @@ class Editor {
 			this.SpawnInstance(instance, variations[0]);
 		}
 	}
+	UpdateSelectedObject(matrixString){
+		this.webGL.UpdateObject(this.selectedEntity.webObject, new LinearTransform().setMatrixFromString(matrixString));
+		this.webGL.AttachGizmoTo(this.selectedEntity.webObject);
+	}
 	SelectEntityById(id) {
 		this.ui.hierarchy.OnSelectEntity(this.spawnedEntities[id]);
 		this.selectedEntity = this.spawnedEntities[id];
@@ -107,11 +111,13 @@ class Editor {
 	OnSpawnedEntity(id, blueprintGuid, matrixString) {
 		//entityTable.row.add([p_ID, data.name]).draw();
 		//TODO: Check if this instance actually exists.
-		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", new LinearTransform().setMatrixFromString(matrixString), this.blueprints[blueprintGuid]);
+		let transform = new LinearTransform().setMatrixFromString(matrixString);
+		let webGameObject = this.webGL.CreateObject(transform);
+		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, this.blueprints[blueprintGuid], webGameObject);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 		this.TrackEntity(id, gameObject);
 
-		this.SelectEntityById(id);
+		this.SelectEntityById(id); // This causes that we send the new id to the client and it sends back the object position to update it in web, unnecesary?
 	}
 
 	OnRemoveEntity(id) {

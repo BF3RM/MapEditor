@@ -250,6 +250,7 @@ function MapEditorClient:OnSelectEntity(p_ID)
 
 	local entity = SpatialEntity(entities[1])
 
+	-- Update the selected object position, might have changed due to physics
 	if entity ~= nil then
 		local left = entity.transform.left
 		local up = entity.transform.up
@@ -257,10 +258,10 @@ function MapEditorClient:OnSelectEntity(p_ID)
 
 		local pos = entity.transform.trans
 
-		-- TODO: send rotation too and apply it if gizmo is on local state
-		WebUI:ExecuteJS(string.format('editor.webGL.SetGizmoAt(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
-			left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
+		local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
+		left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z, pos.x, pos.y, pos.z )
 
+		WebUI:ExecuteJS(string.format('editor.UpdateSelectedObject(\"%s\");', s_MatrixString))
 	end
 end
 
@@ -344,8 +345,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 	local s_Forward = p_EntityTransform.forward
 	local s_Pos = p_EntityTransform.trans
 
-	-- The WebUI canvas requires a Vec4
-	local s_MatrixString = string.format('%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,0,%s,%s,%s,1', 
+	local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
 	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
