@@ -1,17 +1,17 @@
 class GameObject {
-	constructor(id, name, type, transform, instance, webObject) {
+	constructor(id, name, type, transform, webObject, instance) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.transform = transform;
-		this.instance = instance;
 		this.webObject = webObject;
+		this.instance = instance;
 	}
 }
 
 class Group extends GameObject{
-	constructor(id, name, children) {
-		super(id, name, "group");
+	constructor(id, name, webObject, children) {
+		super(id, name, "group", new LinearTransform(), webObject);
 		this.children = children;
 	}
 }
@@ -34,6 +34,12 @@ class Blueprint {
 
 class LinearTransform {
 	constructor(left, up, forward, trans) {
+		if(!arguments.length) {
+			left = new Vec3(1, 0, 0);
+			up = new Vec3(0, 1, 0);
+			forward = new Vec3(0, 0, 1);
+			trans = new Vec3(0, 0, 0);
+		}
 		this.left = left;
 		this.up = up;
 		this.forward = forward;

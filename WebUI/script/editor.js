@@ -75,6 +75,7 @@ class Editor {
 	SelectEntityById(id) {
 		this.ui.hierarchy.OnSelectEntity(this.spawnedEntities[id]);
 		this.selectedEntity = this.spawnedEntities[id];
+		this.webGL.AttachGizmoTo(this.selectedEntity.webObject);
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', id);
 	}
 	ConfirmInstanceSpawn() {
@@ -113,7 +114,7 @@ class Editor {
 		//TODO: Check if this instance actually exists.
 		let transform = new LinearTransform().setMatrixFromString(matrixString);
 		let webGameObject = this.webGL.CreateObject(transform);
-		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, this.blueprints[blueprintGuid], webGameObject);
+		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid]);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 		this.TrackEntity(id, gameObject);
 

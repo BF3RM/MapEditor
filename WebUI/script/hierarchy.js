@@ -40,9 +40,17 @@ class Hierarchy {
                 return true
             },
             onDrop: function ($item, container, _super, event) {
+
                 $item.removeClass(container.group.options.draggedClass).removeAttr("style")
                 $("body").removeClass(container.group.options.bodyClass)
                 $(container.el).parent().removeClass("dropHighLighted")
+                // console.log("----");
+                // console.log($item);
+                // console.log($item);
+
+                // let a = $item.parents();
+                // console.log(a[1]);
+                // console.log(a[0].attr("entityId"));
             }
         });
     }
@@ -52,6 +60,7 @@ class Hierarchy {
         entry.attr("entityId", gameObject.id);
         entry.text(gameObject.name);
         entry.addClass("entity");
+
         $(entry).on('click', function() {
             editor.SelectEntityById(gameObject.id)
         });
@@ -82,7 +91,8 @@ class Hierarchy {
     }
 
     CreateGroup(id = GenerateGuid(), name = "New Group") {
-        let groupEntity = new Group(id, name);
+        let webObject = editor.webGL.CreateGroup();
+        let groupEntity = new Group(id, name, webObject);
 
         let group = $(document.createElement("li"));
         group.attr("entityId", id);

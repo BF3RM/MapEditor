@@ -27,7 +27,8 @@ class WebGL {
 
 
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
-		this.camera.position.set(538, 120, 330);
+		this.camera.position.set(10, 10, 10);
+		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
 		this.CreateGizmo();
 		this.SetFov(90);
@@ -69,6 +70,15 @@ class WebGL {
 		this.Render();
 	}
 
+	CreateGroup(){
+		console.log("creatin group");
+		let mesh = new THREE.Group();
+
+		this.scene.add(mesh);
+		this.Render();
+		return mesh;
+	}
+
 	CreateObject(transform){
 		let geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 1, 1, 1 );
 		let material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
@@ -92,7 +102,7 @@ class WebGL {
 	}
 
 	UpdateObject(mesh, transform) {
-		console.log(transform.trans);
+		// console.log(transform.trans);
 		let matrix = new THREE.Matrix4();
 		matrix.set(
 			transform.left.x, transform.up.x, transform.forward.x, 0,
@@ -230,6 +240,8 @@ class WebGL {
 		//entityArray[selectedEntityID].matrix = matrix;
 		//TODO: Move this
 		vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+
+		editor.webGL.Render();
 	}
 
 	UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz) {
