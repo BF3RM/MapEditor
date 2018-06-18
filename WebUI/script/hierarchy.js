@@ -41,16 +41,15 @@ class Hierarchy {
             },
             onDrop: function ($item, container, _super, event) {
 
-                $item.removeClass(container.group.options.draggedClass).removeAttr("style")
-                $("body").removeClass(container.group.options.bodyClass)
-                $(container.el).parent().removeClass("dropHighLighted")
-                // console.log("----");
-                // console.log($item);
-                // console.log($item);
+                $item.removeClass(container.group.options.draggedClass).removeAttr("style");
+                $("body").removeClass(container.group.options.bodyClass);
+                $(container.el).parent().removeClass("dropHighLighted");
+                 console.log("----");
+                 console.log($item);
+                 console.log($item.attr("entityId"));
 
-                // let a = $item.parents();
-                // console.log(a[1]);
-                // console.log(a[0].attr("entityId"));
+                 let a = $item.parents();
+                 console.log(a[1]);
             }
         });
     }
@@ -114,7 +113,6 @@ class Hierarchy {
         let groupContent = $(document.createElement("ul"));
         group.append(groupContent);
 
-        groupEntity.instance = group;
         this.entries[id] = group;
         editor.CreatedEntity(id, groupEntity);
 
@@ -165,7 +163,7 @@ class Hierarchy {
         controls.append(search);
 
         controls.append("<button onclick=\"editor.ui.hierarchy.CreateGroup()\">+</button>\n" +
-            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,545,119,329\");'>+</button>");
+            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>+</button>");
         return controls;
     }
 
@@ -173,7 +171,7 @@ class Hierarchy {
         let controls = $(document.createElement("div"));
 
         controls.append("<button onclick=\"editor.ui.hierarchy.CreateGroup()\">New Group</button>\n" +
-            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,545,119,329\");'>Add Instance</button>");
+            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>Add Instance</button>");
         return controls;
     }
 }

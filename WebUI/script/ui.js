@@ -1,6 +1,6 @@
 class UI {
 
-	constructor() {
+	constructor(debug) {
 		this.Initialize();
 		this.dialogs = this.InitializeDialogs();
 
@@ -8,8 +8,10 @@ class UI {
 		this.hierarchy = new Hierarchy();
         this.treeView =  new TreeView();
         this.inspector = new Inspector();
+		this.debugWindow = new DebugWindow();
         this.windows = {};
         this.windowZ = 1;
+		this.debug = debug;
 
         this.InitializeWindows();
 	}
@@ -47,6 +49,10 @@ class UI {
             'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
             'inspector': new PowWindow("inspector", "Inspector", this.inspector, false),
 		};
+
+		if(this.debug === true) {
+			this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
+		}
 
         $.each(this.windows, function() {
 			page.append(this.dom);
@@ -87,6 +93,11 @@ class UI {
 		return dialogs;
 	}
 
+	UpdateUI(){
+		if(this.debug) {
+			this.windows['debug'].element.Update();
+		}
+	}
 	/*
 
 		Events
@@ -97,6 +108,8 @@ class UI {
 		editor.ConfirmInstanceSpawn();
 		$(this).dialog("close");
 	}
+
+
 
 
 

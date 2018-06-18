@@ -1,7 +1,7 @@
 class Editor {
 	constructor(debug) {
 
-		this.ui = new UI();
+		this.ui = new UI(debug);
 		this.webGL = new WebGL();
 		this.vext = new VEXTInterface();
 
