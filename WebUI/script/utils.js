@@ -34,3 +34,22 @@ function GenerateGuid() {
 	};
 	return ("ed170120"+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
+
+Math.clamp = function (value, min, max) {
+
+    if (value < min) {
+        return min;
+    }
+    else if (value > max) {
+        return max;
+    }
+
+    return value;
+};
+
+
+Math.lerp = function (value1, value2, amount) {
+    amount = amount < 0 ? 0 : amount;
+    amount = amount > 1 ? 1 : amount;
+    return (1 - amount) * value1 + amount * value2;
+};

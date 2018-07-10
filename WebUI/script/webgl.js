@@ -80,8 +80,12 @@ class WebGL {
 	}
 
 	CreateObject(transform){
-		let geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1, 1, 1, 1 );
-		let material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: true } );
+		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
+		let material = new THREE.MeshBasicMaterial( {
+			color: 0xff0000,
+			visible: true ,
+            wireframe: true
+		} );
 		let mesh = new THREE.Mesh(geometry, material);
 		
 		this.scene.add(mesh);
@@ -233,14 +237,8 @@ class WebGL {
 		if (editor.selectedEntity == null) {
 			return;
 		}
-		let matrix = editor.selectedEntity.webObject.matrixWorld.toArray().toString();
-		let args = editor.selectedEntity.id + "," + matrix;
-		console.log(args);
 
-		//entityArray[selectedEntityID].matrix = matrix;
-		//TODO: Move this
-		vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
-
+        editor.selectedEntity.OnMove();
 		editor.webGL.Render();
 	}
 

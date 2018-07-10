@@ -7,6 +7,23 @@ class GameObject {
 		this.webObject = webObject;
 		this.instance = instance;
 	}
+
+	OnMove() {
+		let matrix = this.webObject.matrixWorld.toArray().toString();
+        let args = this.id + "," + matrix;
+        console.log(args);
+        vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+        editor.ui.inspector.UpdateInspector(this);
+	}
+
+	OnSelected() {
+        console.log("Selected")
+	}
+
+	onDeleted() {
+        console.log("Deleted")
+    }
+
 }
 
 class Group extends GameObject{

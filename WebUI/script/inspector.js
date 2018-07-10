@@ -1,6 +1,5 @@
 class Inspector {
  	constructor() {
-        this.gameObject = null;
         this.dom = null;
         this.transform = null;
         this.name = null;
@@ -34,12 +33,13 @@ class Inspector {
 		this.name = nameInput;
 
 		let transformControl = $(document.createElement("div"));
+		transformControl.addClass("transform");
 		content.append(transformControl);
 		this.transform = {};
 
 
-		let controls = ["Transform", "Rotation", "Scale"];
-		let xyz = ["X","Y","Z"];
+        let controls = ["position", "rotation", "scale"];
+        let xyz = ["x","y","z"];
 		let transform = this.transform;
 		$.each(controls, function (index, con) {
             transformControl.append("<h2>" + con + "</h2>");
@@ -61,6 +61,7 @@ class Inspector {
 					"value": "0"
                 });
                 controller.append(inp);
+                inp.on('change', this.UpdateTransform);
                 transform[con][val] = inp;
 
                 //TODO: Link the values directly somehow?
@@ -74,8 +75,30 @@ class Inspector {
 	}
 
 	UpdateInspector(gameObject) {
+ 		if(gameObject == null) {
+ 			console.log("Tried to update the inspector with an invalid gameobject?")
+			return
+		}
+ 		console.log(gameObject)
  		this.name[0].value = gameObject.name;
 
+        let controls = ["position", "rotation", "scale"];
+        let xyz = ["x","y","z"];
+        let transform = this.transform;
+        $.each(controls, function (index, con) {
+        	let control = gameObject.webObject[con];
+        	if(con == controls[1]) {
+				control = new THREE.Euler().setFromQuaternion( gameObject.webObject.quaternion, "XYZ" );
+			}
+			console.log(control);
+            $.each(xyz, function(index2, val) {
+                if(con == controls[1]) {
+                    transform[con][val][0].value = Math.round( ( control[val]*180/Math.PI ) * -1 * 1000) / 1000;
+                } else {
+                    transform[con][val][0].value = Math.round( control[val] * 1000) / 1000;
+				}
+            });
+		});
 	}
 }
 
