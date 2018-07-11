@@ -171,6 +171,7 @@ li.ui-widget-seperator {
     color: #fff;
     justify-content: space-between;
     display: flex;
+    padding: 3px;
 }
 
 .content ol ul {
@@ -205,6 +206,9 @@ canvas {
 }
 
 .window {
+}
+.window .content {
+    margin: 2px;
 }
 
 body.dragging, body.dragging * {

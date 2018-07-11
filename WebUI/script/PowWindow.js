@@ -106,4 +106,18 @@ class PowWindow {
         editor.ui.windowZ++;
         $(this).css("z-index", editor.ui.windowZ);
     }
+
+    Show() {
+        editor.ui.windowZ++;
+        this.dom.css("z-index", editor.ui.windowZ);
+        this.dom.show();
+    }
+    Hide() {
+        this.dom.hide();
+    }
+    Toggle() {
+        editor.ui.windowZ++;
+        this.dom.css("z-index", editor.ui.windowZ);
+        this.dom.toggle();
+    }
 }
