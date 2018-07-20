@@ -41,6 +41,7 @@ class Inspector {
         let controls = ["position", "rotation", "scale"];
         let xyz = ["x","y","z"];
 		let transform = this.transform;
+		let inspector = this;
 		$.each(controls, function (index, con) {
             transformControl.append("<h2>" + con + "</h2>");
             let controller = $(document.createElement("div"));
@@ -61,8 +62,12 @@ class Inspector {
 					"value": "0"
                 });
                 controller.append(inp);
-                inp.on('change', this.UpdateTransform);
                 transform[con][val] = inp;
+                inp.on('change', function(e) {
+                    inspector.SetTransform(con, val, $(this).val());
+				});
+
+                inp.on('mousedown', handleMouse);
 
                 //TODO: Link the values directly somehow?
             })
@@ -70,13 +75,22 @@ class Inspector {
 		this.dom = content;
 	}
 
-	UpdateTransform(linearTransform) {
-		//TODO this
-	}
+    SetTransform(type, key, value) {
+		// TODO: The displayed rotation is technically correct, it just doesn't display the way I want it to. Make sure the rotation displays in an unoptimal way.
+       if(type == "rotation") {
+       		let eulerRot = new THREE.Euler( this.transform.rotation.x.val() * THREE.Math.DEG2RAD, this.transform.rotation.y.val() * THREE.Math.DEG2RAD, this.transform.rotation.z.val() * THREE.Math.DEG2RAD);
+       		console.log(eulerRot);
 
+			editor.selectedEntity.webObject.rotation.copy(eulerRot);
+        } else {
+           editor.selectedEntity.webObject[type][key] = value;
+       }
+        editor.webGL.Render();
+        editor.selectedEntity.OnMove(true);
+    }
 	UpdateInspector(gameObject) {
  		if(gameObject == null) {
- 			console.log("Tried to update the inspector with an invalid gameobject?")
+ 			console.log("Tried to update the inspector with an invalid gameobject?");
 			return
 		}
  		console.log(gameObject)
@@ -87,13 +101,10 @@ class Inspector {
         let transform = this.transform;
         $.each(controls, function (index, con) {
         	let control = gameObject.webObject[con];
-        	if(con == controls[1]) {
-				control = new THREE.Euler().setFromQuaternion( gameObject.webObject.quaternion, "XYZ" );
-			}
-			console.log(control);
             $.each(xyz, function(index2, val) {
+            	//If we're modifying Rotation. Using the controls key for redundancy
                 if(con == controls[1]) {
-                    transform[con][val][0].value = Math.round( ( control[val]*180/Math.PI ) * -1 * 1000) / 1000;
+                    transform[con][val][0].value = control[val] * THREE.Math.RAD2DEG
                 } else {
                     transform[con][val][0].value = Math.round( control[val] * 1000) / 1000;
 				}

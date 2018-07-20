@@ -27,6 +27,7 @@ $(document).keydown(function(e) {
 	if (keysdown[e.which]) {
 		return;
 	}
+		console.log($(document.activeElement))
 	keysdown[e.which] = true;
 	if(e.which == 81) { // Q
 		editor.webGL.SetGizmoMode("select")
