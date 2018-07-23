@@ -271,8 +271,8 @@ function Freecam:UpdateThirdPerson(p_Delta)
     end
 
     -- Calculate rotations.
-    local s_RotateX = -(10.0 * self.m_RotateX * self.m_SimTickCount)
-    local s_RotateY = -(10.0 * self.m_RotateY * self.m_SimTickCount)
+    local s_RotateX = -(50.0 * self.m_RotateX * self.m_SimTickCount)
+    local s_RotateY = -(50.0 * self.m_RotateY * self.m_SimTickCount)
 
     local s_Transform = self.cameraData.transform
 
@@ -283,12 +283,12 @@ function Freecam:UpdateThirdPerson(p_Delta)
     self.m_ThirdPersonRotY = self.m_ThirdPersonRotY + s_RotateX
 
     -- Limit angles so we don't start doing circles around the world.
-    if self.m_ThirdPersonRotY > -0.1 then
-        self.m_ThirdPersonRotY = -0.1
+    if self.m_ThirdPersonRotY > -1 then
+        self.m_ThirdPersonRotY = -1
     end
 
-    if self.m_ThirdPersonRotY < -3 then
-        self.m_ThirdPersonRotY = -3
+    if self.m_ThirdPersonRotY < -30 then
+        self.m_ThirdPersonRotY = -30
     end
 
     local cosfi = math.cos(self.m_ThirdPersonRotX)

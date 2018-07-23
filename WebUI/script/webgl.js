@@ -105,6 +105,14 @@ class WebGL {
 		return mesh;
 	}
 
+	DeleteObject(mesh){
+		this.scene.remove( mesh );
+		this.control.detach(mesh);
+		this.Render();
+		// delete mesh;
+	}
+
+
 	UpdateObject(mesh, transform) {
 		// console.log(transform.trans);
 		let matrix = new THREE.Matrix4();

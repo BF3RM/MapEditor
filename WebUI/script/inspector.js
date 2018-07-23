@@ -37,6 +37,14 @@ class Inspector {
 		content.append(transformControl);
 		this.transform = {};
 
+        let deleteButton = $(document.createElement("button"));
+        deleteButton.addClass("deleteButton");
+        deleteButton.text("Delete");
+        deleteButton.click(function(){
+            editor.ui.dialogs["deleteEntity"].dialog("open");
+        });
+        content.append(deleteButton);
+
 
         let controls = ["position", "rotation", "scale"];
         let xyz = ["x","y","z"];

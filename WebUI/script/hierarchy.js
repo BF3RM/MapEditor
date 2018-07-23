@@ -78,6 +78,17 @@ class Hierarchy {
         editor.ui.inspector.UpdateInspector(gameObject);
     }
 
+    OnDeleteEntry(gameObject){
+        // $('.spawnedEntities').find("#");
+        let entry = this.entries[gameObject.id];
+
+        if (entry == null){
+            console.error("Tried to delete a null entry");
+        }
+        
+        $('.spawnedEntities').find(entry).remove();
+    }
+
 
     OnDeselectEntry(gameObject) {
         if(gameObject == null) {
@@ -86,7 +97,7 @@ class Hierarchy {
         }
         let entry = this.entries[gameObject.id];
         entry.removeClass("selected");
-        editor.OnDeselectEntity(gameObject);
+        // editor.OnDeselectEntity(gameObject);
     }
 
     CreateGroup(id = GenerateGuid(), name = "New Group") {

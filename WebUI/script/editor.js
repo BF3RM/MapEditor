@@ -41,7 +41,26 @@ class Editor {
 	}
 
 	DeleteSelectedEntity() {
-		//TODO: Maybe a message that confirms the deletion?
+
+		if (this.selectedEntity == null) {
+			console.error("Tried to delete a null entity")
+			return;
+		}
+
+		//Unselect the entity
+		this.OnDeselectEntity(this.selectedEntity);
+
+		// Delete the entity on the hierarchy 
+		this.ui.hierarchy.OnDeleteEntry(this.selectedEntity);
+
+		// Delete webGL objcect associated with the entity
+		this.webGL.DeleteObject(this.selectedEntity.webObject);
+
+		// Delete the entity gameObject
+		delete this.spawnedEntities[this.selectedEntity.id];
+
+
+		// Delete the entity on VU
 		let id = this.selectedEntity.id;
 		this.selectedEntity = null;
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', id)
@@ -85,7 +104,7 @@ class Editor {
 
 	SpawnInstance(instance, variation = 0) {
 		console.log(instance);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
 	TrackEntity(id, gameObject) {
 		this.spawnedEntities[id] = gameObject;
@@ -118,7 +137,7 @@ class Editor {
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 		this.TrackEntity(id, gameObject);
 
-		this.SelectEntityById(id); // This causes that we send the new id to the client and it sends back the object position to update it in web, unnecesary?
+		this.SelectEntityById(id);
 	}
 
 	OnRemoveEntity(id) {
@@ -126,6 +145,9 @@ class Editor {
 	}
 
 	OnDeselectEntity(gameObject) {
+		//Unselect it on the hierarchy
+
+		this.ui.hierarchy.OnDeselectEntry(gameObject)
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
 	}
 }

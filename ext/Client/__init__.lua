@@ -1,20 +1,23 @@
 class 'MapEditorClient'
+
 local Shared = require '__shared/MapEditorShared'
 local JSONentities = require '__shared/JSONentities'
 local Freecam = require 'Freecam'
+local json = require "__shared/json"
+
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
 	self:RegisterVars()
 	self:RegisterEvents()
 	Shared:__init()
-    Freecam:__init()
+	Freecam:__init()
 end
 
 function MapEditorClient:RegisterVars()
 	self.spawnEntity = nil
 	self.spawnedEntities = {}
-	self.selectedEntityID = -1
+	self.selectedEntityID = ""
 	self.isFreecam = false
 	self.raycastTransform = nil
 
@@ -52,7 +55,7 @@ end
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	-- TODO: Move this to controls
 
-	if self.selectedEntityID < 0 then
+	if self.selectedEntityID == "" then
 		return
 	end
 
@@ -74,7 +77,7 @@ end
 
 function MapEditorClient:OnRoundReset()
 	self.spawnedEntities = {}
-	self.selectedEntityID = -1
+	self.selectedEntityID = ""
 	WebUI:ExecuteJS('OnRoundReset()')
 end
 
@@ -132,31 +135,15 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	end
 
 	-- This also crashes if we do it outside of Update.
-
 	if(self.spawnEntity ~= nil and self.raycastTransform ~= nil) then
 
-		print("Spawning: " .. self.spawnEntity.instance.name)
+		local s_SpawnTransform = LinearTransform()
+		s_SpawnTransform.trans = self.raycastTransform.trans
 
-		local params = EntityCreationParams()
-        local s_SpawnTransform = LinearTransform()
-        s_SpawnTransform.trans = self.raycastTransform.trans
 
-		params.transform = s_SpawnTransform
-		params.variationNameHash = self.spawnEntity.variation
+		Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', self.spawnEntity.entityID, Guid(self.spawnEntity.partitionGuid), Guid(self.spawnEntity.instanceGuid), tostring(s_SpawnTransform), self.spawnEntity.variation)
 
-		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(self.spawnEntity.instance, params)
-		print("Spawned!")
-
-		if(prefabEntities == nil) then
-			print("Unable to spawn shit.")
-		end
-
-		for i, entity in ipairs(prefabEntities) do
-			print(i)
-			entity:Init(Realm.Realm_Client, true)
-		end
-
-		self:RegisterEntity(self.spawnEntity.blueprintID, prefabEntities, s_SpawnTransform)
+		self:RegisterEntity(self.spawnEntity.blueprintID, self.spawnEntity.entityID, s_SpawnTransform)
 		self.spawnEntity = nil
 
 	end
@@ -165,16 +152,16 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		WebUI:BringToFront()
 		WebUI:EnableMouse()
 		WebUI:Show()
-        self.isFreecam = true;
-        Freecam:Enable();
+		self.isFreecam = true;
+		Freecam:Enable();
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
 		--WebUI:BringToFront()
 		WebUI:DisableMouse()
 		-- WebUI:Hide()
-        Freecam:Disable();
-        self.isFreecam = false;
+		Freecam:Disable();
+		self.isFreecam = false;
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
@@ -190,13 +177,6 @@ end
 
 ----------- WebUI functions----------------
 
--- function MapEditorClient:OnEnableKeyboard() 
--- 	WebUI:EnableKeyboard()
--- end
-
--- function MapEditorClient:OnDisableKeyboard() 
--- 	WebUI:DisableKeyboard()
--- end
 
 function MapEditorClient:OnEnableFreecam()
 	WebUI:DisableKeyboard()
@@ -218,16 +198,7 @@ function MapEditorClient:OnDeleteEntity(p_ID)
 		error("Trying to delete an entity that's not selected. Parameter: "..p_ID..", selected ID: ".. self.selectedEntityID)
 	end
 
-	local s_Entities = self.spawnedEntities[p_ID]
-
-	for _, l_Entity in ipairs(s_Entities) do
-		-- local s_Entity = SpatialEntity(l_Entity)
-
-		-- if s_Entity ~= nil then
-			-- l_Entity:Destroy()
-			l_Entity = nil
-		-- end
-	end
+	Events:Dispatch('BlueprintManager:DeleteBlueprintFromClient', p_ID)
 
 	self.spawnedEntities[p_ID] = nil
 	WebUI:ExecuteJS("editor.OnRemoveEntity("..p_ID..")")
@@ -235,39 +206,16 @@ function MapEditorClient:OnDeleteEntity(p_ID)
 end
 
 function MapEditorClient:OnSelectEntity(p_ID) 
-	
-	if self.selectedEntityID < 0 then
+	if self.selectedEntityID == "" then
 		WebUI:ExecuteJS("editor.webGL.ShowGizmo()")
 	end
 
-	self.selectedEntityID = tonumber(p_ID)
-
-	local entities = self.spawnedEntities[self.selectedEntityID]
-
-	if entities == nil then
-		return
-	end
-
-	local entity = SpatialEntity(entities[1])
-
-	-- Update the selected object position, might have changed due to physics
-	if entity ~= nil then
-		local left = entity.transform.left
-		local up = entity.transform.up
-		local forward = entity.transform.forward
-
-		local pos = entity.transform.trans
-
-		local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
-		left.x, left.y, left.z,up.x, up.y, up.z,forward.x, forward.y, forward.z, pos.x, pos.y, pos.z )
-
-		WebUI:ExecuteJS(string.format('editor.UpdateSelectedObject(\"%s\");', s_MatrixString))
-	end
+	self.selectedEntityID = p_ID
 end
 
 function MapEditorClient:OnDeselectEntity(p_ID)
 	WebUI:ExecuteJS("editor.webGL.HideGizmo()")
-	self.selectedEntityID = -1
+	self.selectedEntityID = ""
 end
 
 function MapEditorClient:OnSetEntityMatrix(p_Args) 
@@ -275,70 +223,47 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 
 	local p_ArgsArray = split(p_Args, ",")
 
-	if tonumber(p_ArgsArray[1]) ~= self.selectedEntityID then
+	if p_ArgsArray[1] ~= self.selectedEntityID then
 		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
 	end
 
-	local s_Entities = self.spawnedEntities[tonumber(p_ArgsArray[1])]
+	local s_Left 		= Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
+	local s_Up 			= Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
+	local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
+	local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
+	-- print( s_Position )
+	local s_Transform = LinearTransform(
+			s_Left,
+			s_Up,
+			s_Forward,
+			s_Position
+		)
 
-	for _, l_Entity in ipairs(s_Entities) do
-		local s_Entity = SpatialEntity(l_Entity)
-
-		if s_Entity ~= nil then
-			-- print("moving")
-			local s_Left 		= Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
-			local s_Up 			= Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
-			local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
-			local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
-			-- print( s_Position )
-			local s_Transform = LinearTransform(
-					s_Left,
-					s_Up,
-					s_Forward,
-					s_Position
-				)
-			s_Entity.transform = s_Transform
-		else
-			print("entity was null")
-		end
-	end
+	Events:Dispatch('BlueprintManager:MoveBlueprintFromClient', p_ArgsArray[1], tostring(s_Transform))
 end
 
 function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
 	-- print("---------------------")
 	print(p_ParamsCombined)
 	local s_Parameters = split(p_ParamsCombined, ":")
-	local s_PartitionGuid = s_Parameters[1]
-	local s_InstanceGuid = s_Parameters[2]
-	local s_Variation = s_Parameters[3]
-	if(s_Variation == "-1") then
+	local s_EntityID = s_Parameters[1]
+	local s_PartitionGuid = s_Parameters[2]
+	local s_InstanceGuid = s_Parameters[3]
+	local s_Variation = s_Parameters[4]
+
+	if s_Variation == "-1" then
 		print("Variation not passed! Defaulting to 0")
 		s_Variation = 0
 	end
-
-	local s_Instance = ResourceManager:FindInstanceByGUID(Guid(s_PartitionGuid), Guid(s_InstanceGuid))
-
-	if(s_Instance == nil) then
-		print("Attempted to spawn an instance that doesn't exist: " .. s_PartitionGuid .. " | " .. s_InstanceGuid)
-		return
-	end
-	
 	-- This entity will be spawned in Update. We can't create entities outside it. (Or maybe because it's started from an event?)
-	self.spawnEntity = {blueprintID = s_InstanceGuid, instance = _G[s_Instance.typeInfo.name](s_Instance), variation = s_Variation}
+	self.spawnEntity = {blueprintID = s_InstanceGuid, entityID = s_EntityID, partitionGuid = s_PartitionGuid, instanceGuid = s_InstanceGuid, variation = s_Variation}
 	
 end
 
 --------------- Class functions ---------------
 
-function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTransform) 
-	if p_EntityArray == nil or #p_EntityArray == 0 then
-		return
-	end
-
-	-- TODO: Make the WebUI calculate the ID instead.
-
-	local s_ID = #self.spawnedEntities + 1
-	table.insert(self.spawnedEntities, p_EntityArray)
+function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTransform) 
+	self.spawnedEntities[p_EntityID] = true
 
 	local s_Left = p_EntityTransform.left
 	local s_Up = p_EntityTransform.up
@@ -348,7 +273,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityArray, p_EntityTr
 	local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
-	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity(%s, \"%s\", \"%s\")', s_ID, p_BlueprintID, s_MatrixString))
+	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\")', p_EntityID, p_BlueprintID, s_MatrixString))
 end
 
 function MapEditorClient:LoadJSONEntities() 

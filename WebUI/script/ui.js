@@ -6,14 +6,18 @@ class UI {
 
 
 		this.hierarchy = new Hierarchy();
-        this.treeView =  new TreeView();
-        this.inspector = new Inspector();
-		this.debugWindow = new DebugWindow();
-        this.windows = {};
-        this.windowZ = 1;
+		this.treeView =  new TreeView();
+		this.inspector = new Inspector();
+		
+		if (debug==true) {
+			this.debugWindow = new DebugWindow();
+		}
+		
+		this.windows = {};
+		this.windowZ = 1;
 		this.debug = debug;
 
-        this.InitializeWindows();
+		this.InitializeWindows();
 	}
 
 
@@ -90,6 +94,22 @@ class UI {
 			}
 		});
 
+		dialogs["deleteEntity"] = $("#delete-entity-dialog").dialog({
+			autoOpen: false,
+			height: "auto",
+			width: "auto",
+			modal: true,
+			buttons: {
+				"Yes": this.OnConfirmDeleteEntity,
+				"No": function() {
+					dialogs["deleteEntity"].dialog("close");
+				}
+			},
+			close: function() {
+				dialogs["deleteEntity"].dialog("close");
+			}
+		});
+
 		return dialogs;
 	}
 
@@ -110,7 +130,10 @@ class UI {
 	}
 
 
-
+	OnConfirmDeleteEntity() {
+		editor.DeleteSelectedEntity();
+		$(this).dialog("close");
+	}
 
 
 

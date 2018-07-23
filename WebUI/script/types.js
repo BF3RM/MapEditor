@@ -10,19 +10,21 @@ class GameObject {
 
 	OnMove() {
 		let matrix = this.webObject.matrixWorld.toArray().toString();
-        let args = this.id + "," + matrix;
-        console.log(args);
-        vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
-        editor.ui.inspector.UpdateInspector(this);
+		let args = this.id + "," + matrix;
+		console.log(args);
+		vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+		editor.ui.inspector.UpdateInspector(this);
+
+		// this.transform = newTransform
 	}
 
 	OnSelected() {
-        console.log("Selected")
+		console.log("Selected")
 	}
 
 	onDeleted() {
-        console.log("Deleted")
-    }
+		console.log("Deleted")
+	}
 
 }
 
