@@ -8,14 +8,14 @@ class GameObject {
 		this.instance = instance;
 	}
 
-	OnMove() {
+	OnMove(noUpdateInspector) {
 		let matrix = this.webObject.matrixWorld.toArray().toString();
 		let args = this.id + "," + matrix;
 		console.log(args);
 		vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
-		editor.ui.inspector.UpdateInspector(this);
-
-		// this.transform = newTransform
+		if(!noUpdateInspector) {
+			editor.ui.inspector.UpdateInspector(this);
+		}
 	}
 
 	OnSelected() {

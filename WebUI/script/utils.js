@@ -53,3 +53,12 @@ Math.lerp = function (value1, value2, amount) {
     amount = amount > 1 ? 1 : amount;
     return (1 - amount) * value1 + amount * value2;
 };
+
+// *-1 for right handedness
+function FromEuler(value) {
+    return ((value/180)*Math.PI ) * -1
+}
+
+function ToEuler(value) {
+    return ((value*180)/Math.PI ) * -1
+}
