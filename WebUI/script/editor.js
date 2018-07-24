@@ -34,8 +34,6 @@ class Editor {
 
 	}
 
-
-
 	ClearSpawnedEntities() {
 		this.spawnedEntities.clear();
 	}

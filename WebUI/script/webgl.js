@@ -27,7 +27,7 @@ class WebGL {
 
 
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
-		this.camera.position.set(10, 10, 10);
+		this.camera.position.set(30, 30, 30);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
 		this.CreateGizmo();
@@ -72,12 +72,41 @@ class WebGL {
 
 	CreateGroup(){
 		console.log("creatin group");
-		let mesh = new THREE.Group();
+
+		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
+		let material = new THREE.MeshBasicMaterial( {
+			color: 0xff0000,
+			visible: true ,
+            wireframe: true
+		} );
+		let mesh = new THREE.Mesh(geometry, material);
 
 		this.scene.add(mesh);
 		this.Render();
 		return mesh;
 	}
+
+	AddToGroup(groupObject, gameObject){
+
+		// don't do anything if the target group it the object group already
+		if (gameObject.parent === groupObject){
+			return;
+		}
+
+		// remove child from parent and add it to scene
+		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
+
+		// remove child from scene and add it to parent
+		THREE.SceneUtils.attach( gameObject, this.scene, groupObject );
+
+		this.Render();
+	}
+	RemoveFromGroup(gameObject){
+		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
+		
+		this.Render();
+	}
+
 
 	CreateObject(transform){
 		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );

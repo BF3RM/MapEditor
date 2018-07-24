@@ -54,7 +54,7 @@ class UI {
             'inspector': new PowWindow("inspector", "Inspector", this.inspector),
 		};
 
-		if(this.debug === false) {
+		if(this.debug === true) {
 			this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
 		}
 
@@ -201,4 +201,3 @@ function processScaler(event) {
         mouse.xOld = event.clientX;
     }
 };
->>>>>>> ab26484d9222dc8a134e776f02f73c6290932643

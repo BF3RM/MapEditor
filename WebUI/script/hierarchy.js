@@ -44,12 +44,21 @@ class Hierarchy {
                 $item.removeClass(container.group.options.draggedClass).removeAttr("style");
                 $("body").removeClass(container.group.options.bodyClass);
                 $(container.el).parent().removeClass("dropHighLighted");
-                 console.log("----");
-                 console.log($item);
-                 console.log($item.attr("entityId"));
 
-                 let a = $item.parents();
-                 console.log(a[1]);
+                let itemID = $item.attr("entityId");
+                let gameObject = editor.spawnedEntities[itemID];
+
+                let containerID = $(container.el).parent().attr("entityId");
+                let groupObject = editor.spawnedEntities[containerID];
+
+                if (groupObject == null) {
+                    editor.webGL.RemoveFromGroup(gameObject.webObject);
+                }else{
+                    groupObject.webObject.matrixWorld;
+                    editor.webGL.AddToGroup(groupObject.webObject, gameObject.webObject);
+                }
+
+
             }
         });
     }
@@ -102,7 +111,7 @@ class Hierarchy {
 
     CreateGroup(id = GenerateGuid(), name = "New Group") {
         let webObject = editor.webGL.CreateGroup();
-        let groupEntity = new Group(id, name, webObject);
+        let groupEntity = new Group(id, name, webObject, {});
 
         let group = $(document.createElement("li"));
         group.attr("entityId", id);
@@ -150,6 +159,7 @@ class Hierarchy {
             $('.spawnedEntities').append(group);
         }
         editor.SelectEntityById(id);
+        return groupEntity;
     }
 
     static CollapseGroup(group) {
