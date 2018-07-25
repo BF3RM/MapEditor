@@ -58,8 +58,14 @@ class UI {
 			this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
 		}
 
+		let offset = 30;
         $.each(this.windows, function() {
-			page.append(this.dom);
+            page.append(this.dom);
+            this.dom.css({
+                "top": offset + "px",
+                "left": offset + "px"
+            });
+            offset += 30;
         });
 
 	}
