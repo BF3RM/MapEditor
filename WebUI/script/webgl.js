@@ -138,8 +138,11 @@ class WebGL {
 	}
 
 	DeleteObject(mesh){
-		this.scene.remove( mesh );
+		// this.scene.remove( mesh );
+		THREE.SceneUtils.detach( mesh, mesh.parent, this.scene );
 		this.control.detach(mesh);
+		this.scene.remove( mesh );
+		
 		this.Render();
 		// delete mesh;
 	}

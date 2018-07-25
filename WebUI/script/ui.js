@@ -129,6 +129,16 @@ class UI {
 		$(this).dialog("close");
 	}
 
+	OnConfirmDeleteEntity() {
+		if (editor.selectedEntity == null) {
+			console.error("Tried to delete a null entity")
+		}else{
+			editor.selectedEntity.Delete();
+		}
+		
+		$(this).dialog("close");
+	}
+
 }
 
 /*

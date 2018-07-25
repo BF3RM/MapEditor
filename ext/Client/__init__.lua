@@ -201,7 +201,7 @@ function MapEditorClient:OnDeleteEntity(p_ID)
 	Events:Dispatch('BlueprintManager:DeleteBlueprintFromClient', p_ID)
 
 	self.spawnedEntities[p_ID] = nil
-	WebUI:ExecuteJS("editor.OnRemoveEntity("..p_ID..")")
+	-- WebUI:ExecuteJS("editor.OnRemoveEntity("..p_ID..")")
 
 end
 

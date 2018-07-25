@@ -42,8 +42,48 @@ class GameObject {
 		console.log("Selected")
 	}
 
-	onDeleted() {
+	OnDeleted() {
 		console.log("Deleted")
+	}
+
+	Delete() {
+		// Deselect this entity 
+		editor.OnDeselectEntity(this);
+
+
+		if (this.children != null) {
+
+			for (var key in this.children) {
+				this.children[key].Delete();
+			}
+		}
+
+		else{
+
+
+			// Delete the entity on VU
+			editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', this.id)
+		}
+
+		// Remove the parent's reference
+		if (this.parent != null) {
+			delete this.parent.children[this.id];
+		}
+		
+
+		// Delete webGL objects associated with the entity
+		editor.webGL.DeleteObject(this.webObject);
+
+		// Remove the entity on reference arrays
+		delete editor.spawnedEntities[this.id];
+		if (editor.rootEntities[this.id] != null) {
+			delete editor.rootEntities[this.id];
+		}
+
+		// Delete the entity on the hierarchy 
+		editor.ui.hierarchy.OnDeleteEntry(this);
+
+
 	}
 
 }

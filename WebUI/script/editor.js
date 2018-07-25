@@ -55,7 +55,7 @@ class Editor {
 		// Delete the entity on the hierarchy 
 		this.ui.hierarchy.OnDeleteEntry(this.selectedEntity);
 
-		// Delete webGL objcect associated with the entity
+		// Delete webGL objects associated with the entity
 		this.webGL.DeleteObject(this.selectedEntity.webObject);
 
 		// Delete the entity gameObject
@@ -147,8 +147,11 @@ class Editor {
 	}
 
 	OnDeselectEntity(gameObject) {
+		if (gameObject !== editor.selectedEntity) {
+			return;
+		}
 		//Unselect it on the hierarchy
-
+		this.selectedEntity = null;
 		this.ui.hierarchy.OnDeselectEntry(gameObject)
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
 	}
