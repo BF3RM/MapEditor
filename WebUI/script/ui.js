@@ -110,6 +110,22 @@ class UI {
 			}
 		});
 
+		dialogs["saving"] = $("#saving-dialog").dialog({
+			autoOpen: false,
+			height: "auto",
+			width: "auto",
+			modal: true,
+			buttons: {
+				Close: function() {
+					dialogs["saving"].dialog("close");
+				}
+			},
+			close: function() {
+				dialogs["saving"].dialog("close");
+			}
+		});
+
+
 		return dialogs;
 	}
 
@@ -123,6 +139,26 @@ class UI {
 		Events
 
 	 */
+
+ 	OpenSaveDialog() {
+ 		let jsonString = JSON.stringify(
+ 			editor.rootEntities, function( key, value) {
+				if( key == 'parent' || key == 'webObject') {
+					return null;
+				}
+				else {
+					return value;
+				}
+			},
+			"\t"
+			);
+
+ 		$("#savingTextArea").text(jsonString);
+ 		console.log(jsonString);
+ 		editor.ui.dialogs["saving"].dialog("open");
+		
+	}
+
 
 	OnConfirmInstanceSpawn() {
 		editor.ConfirmInstanceSpawn();

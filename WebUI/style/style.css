@@ -276,3 +276,8 @@ li.entity.selected {
     width: 100%;
     background-color: #68b9ff3b;
 }
+
+#savingTextArea{
+    width: 50vw;
+    height: 50vh;
+}
