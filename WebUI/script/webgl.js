@@ -10,6 +10,7 @@ class WebGL {
 		this.gridSnap = false;
 
 		this._onControlChanged = this.onControlChanged.bind(this);
+		this._onObjectChanged = this.onObjectChanged.bind(this);
 		this._onWindowResize = this.onWindowResize.bind(this);
 		this.Initialize();
 		this.RegisterEvents();
@@ -62,6 +63,7 @@ class WebGL {
 		this.control.addEventListener('change', this._onControlChanged);
 		this.control.addEventListener('mouseUp', WebGL.onMouseUp, false);
 		this.control.addEventListener('mouseDown', WebGL.onMouseDown, false);
+		this.control.addEventListener('objectChange', this._onObjectChanged);
 
 		this.scene.add(this.control);		
 
@@ -77,7 +79,7 @@ class WebGL {
 		let material = new THREE.MeshBasicMaterial( {
 			color: 0xff0000,
 			visible: true ,
-            wireframe: true
+			wireframe: true
 		} );
 		let mesh = new THREE.Mesh(geometry, material);
 
@@ -102,6 +104,7 @@ class WebGL {
 		this.Render();
 	}
 	RemoveFromGroup(gameObject){
+		// remove child from parent and add it to scene
 		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
 		
 		this.Render();
@@ -113,7 +116,7 @@ class WebGL {
 		let material = new THREE.MeshBasicMaterial( {
 			color: 0xff0000,
 			visible: true ,
-            wireframe: true
+			wireframe: true
 		} );
 		let mesh = new THREE.Mesh(geometry, material);
 		
@@ -269,14 +272,16 @@ class WebGL {
 	}
 
 	onControlChanged() {
-		// The gizmo updates the mesh matrix, so we send it to lua.
-		
+		editor.webGL.Render();
+	}
+
+	onObjectChanged() {
 		if (editor.selectedEntity == null) {
 			return;
 		}
 
-        editor.selectedEntity.OnMove();
-		editor.webGL.Render();
+		editor.selectedEntity.OnMove(false);
+		// editor.webGL.Render();
 	}
 
 	UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz) {

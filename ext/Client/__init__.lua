@@ -194,9 +194,9 @@ function MapEditorClient:OnSetViewmode(p_ViewMode)
 end
 
 function MapEditorClient:OnDeleteEntity(p_ID)
-	if p_ID ~= self.selectedEntityID then 
-		error("Trying to delete an entity that's not selected. Parameter: "..p_ID..", selected ID: ".. self.selectedEntityID)
-	end
+	-- if p_ID ~= self.selectedEntityID then 
+	-- 	error("Trying to delete an entity that's not selected. Parameter: "..p_ID..", selected ID: ".. self.selectedEntityID)
+	-- end
 
 	Events:Dispatch('BlueprintManager:DeleteBlueprintFromClient', p_ID)
 
@@ -220,12 +220,21 @@ end
 
 function MapEditorClient:OnSetEntityMatrix(p_Args) 
 	-- print("OnSetEntityMatrix "..p_Args)
+	if p_Args == nil then
+		print("p_Args nil 1!!!!!!!!!!1!!!!!!!")
+		return
+	end
 
 	local p_ArgsArray = split(p_Args, ",")
 
-	if p_ArgsArray[1] ~= self.selectedEntityID then
-		error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
+	if p_ArgsArray == nil then
+		print("p_ArgsArray nil 1!!!!!!!!!!1!!!!!!!")
+		return
 	end
+
+	-- if p_ArgsArray[1] ~= self.selectedEntityID then
+	-- 	error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
+	-- end
 
 	local s_Left 		= Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
 	local s_Up 			= Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
@@ -270,10 +279,10 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTrans
 	local s_Forward = p_EntityTransform.forward
 	local s_Pos = p_EntityTransform.trans
 
-	local s_MatrixString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
+	local s_LinearTransformString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
-	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\")', p_EntityID, p_BlueprintID, s_MatrixString))
+	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\")', p_EntityID, p_BlueprintID, s_LinearTransformString))
 end
 
 function MapEditorClient:LoadJSONEntities() 

@@ -52,13 +52,10 @@ class Hierarchy {
                 let groupObject = editor.spawnedEntities[containerID];
 
                 if (groupObject == null) {
-                    editor.webGL.RemoveFromGroup(gameObject.webObject);
+                    gameObject.parent.OnRemoveChild(gameObject);
                 }else{
-                    groupObject.webObject.matrixWorld;
-                    editor.webGL.AddToGroup(groupObject.webObject, gameObject.webObject);
+                    groupObject.OnAddChild(gameObject);
                 }
-
-
             }
         });
     }
@@ -111,7 +108,7 @@ class Hierarchy {
 
     CreateGroup(id = GenerateGuid(), name = "New Group") {
         let webObject = editor.webGL.CreateGroup();
-        let groupEntity = new Group(id, name, webObject, {});
+        let groupEntity = new Group(id, name, webObject, {}, null);
 
         let group = $(document.createElement("li"));
         group.attr("entityId", id);

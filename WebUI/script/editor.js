@@ -9,7 +9,12 @@ class Editor {
 		this.debug = debug;
 
 		this.confirmedBlueprints = {};
+
+		// All entities, for an easy way to get them
 		this.spawnedEntities = {};
+
+		// Entities that are at the hierarchy root
+		this.rootEntities = {};
 
 		this.serializedEntities = {};
 
@@ -31,7 +36,6 @@ class Editor {
 			imported.src = 'script/debugData.js';
 			document.head.appendChild(imported);
 		}
-
 	}
 
 	ClearSpawnedEntities() {
@@ -85,8 +89,8 @@ class Editor {
 			this.SpawnInstance(instance, variations[0]);
 		}
 	}
-	UpdateSelectedObject(matrixString){
-		this.webGL.UpdateObject(this.selectedEntity.webObject, new LinearTransform().setMatrixFromString(matrixString));
+	UpdateSelectedObject(linearTransformString){
+		this.webGL.UpdateObject(this.selectedEntity.webObject, new LinearTransform().setFromString(linearTransformString));
 		this.webGL.AttachGizmoTo(this.selectedEntity.webObject);
 	}
 	SelectEntityById(id) {
@@ -126,12 +130,12 @@ class Editor {
 		this.ui.treeView.LoadData(this.blueprints);
 	}
 
-	OnSpawnedEntity(id, blueprintGuid, matrixString) {
+	OnSpawnedEntity(id, blueprintGuid, linearTransformString) {
 		//entityTable.row.add([p_ID, data.name]).draw();
 		//TODO: Check if this instance actually exists.
-		let transform = new LinearTransform().setMatrixFromString(matrixString);
+		let transform = new LinearTransform().setFromString(linearTransformString);
 		let webGameObject = this.webGL.CreateObject(transform);
-		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid]);
+		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid], null);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 		this.TrackEntity(id, gameObject);
 

@@ -21,7 +21,17 @@ class DebugWindow {
 			console.log("Unable to find editor")
 			return;
 		}
-		this.dom.html(renderjson(JSON.parse(JSON.stringify(editor.spawnedEntities))));
+		this.dom.html(renderjson(JSON.parse(
+			JSON.stringify(editor.rootEntities, function( key, value) {
+				if( key == 'parent') {
+					return null;
+				}
+				else {
+					return value;
+				}
+			}
+			))));
+
 	}
 
 	CreateTopControls() {
