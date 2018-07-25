@@ -144,24 +144,32 @@ class UI {
 
 		Events
 
-	 */
+	*/
 
- 	OpenSaveDialog() {
- 		let jsonString = JSON.stringify(
- 			editor.rootEntities, function( key, value) {
-				if( key == 'parent' || key == 'webObject') {
+	OpenSaveDialog() {
+		let jsonString = JSON.stringify(
+			editor.rootEntities, function( key, value) {
+				if(  key == 'webObject') {
 					return null;
 				}
-				else {
+				else if(key == 'parent'){
+					if (value != null) {
+						return value.id;
+
+					}
+					else{
+						return null;
+					}
+				}else{
 					return value;
 				}
 			},
 			"\t"
 			);
 
- 		$("#savingTextArea").text(jsonString);
- 		console.log(jsonString);
- 		editor.ui.dialogs["saving"].dialog("open");
+		$("#savingTextArea").text(jsonString);
+
+		editor.ui.dialogs["saving"].dialog("open");
 		
 	}
 

@@ -51,6 +51,12 @@ class Hierarchy {
                 let containerID = $(container.el).parent().attr("entityId");
                 let groupObject = editor.spawnedEntities[containerID];
 
+                // console.log($item);
+                // console.log(container);
+                // console.log(editor.ui.hierarchy.entries[gameObject.id]);
+                // let a = editor.ui.hierarchy.entries[groupObject.id];
+                // console.log($(a.children()[1]));
+
                 if (groupObject == null) {
                     gameObject.parent.OnRemoveChild(gameObject);
                 }else{
@@ -60,6 +66,12 @@ class Hierarchy {
         });
     }
 
+    MoveElementsInHierarchy(groupObject, gameObject){
+        let groupEntry = this.entries[groupObject.id];
+        let entry = this.entries[gameObject.id];
+        entry.appendTo(groupEntry[0].children[1]);
+        groupObject.OnAddChild(gameObject);
+    }
     OnEntitySpawned(gameObject) {
         let entry = $(document.createElement("li"));
         entry.attr("entityId", gameObject.id);
@@ -106,12 +118,9 @@ class Hierarchy {
         // editor.OnDeselectEntity(gameObject);
     }
 
-    CreateGroup(id = GenerateGuid(), name = "New Group") {
-        let webObject = editor.webGL.CreateGroup();
-        let groupEntity = new Group(id, name, webObject, {}, null);
-
+    CreateGroup(groupObject) {
         let group = $(document.createElement("li"));
-        group.attr("entityId", id);
+        group.attr("entityId", groupObject.id);
         group.attr("entityType", "group");
         group.addClass("group expanded");
 
@@ -123,15 +132,14 @@ class Hierarchy {
 
         let groupName = $(document.createElement("div"));
         groupName.addClass("groupTitle");
-        groupName.text(name);
+        groupName.text(groupObject.name);
         title.append(groupName);
         group.append(title);
 
         let groupContent = $(document.createElement("ul"));
         group.append(groupContent);
 
-        this.entries[id] = group;
-        editor.CreatedEntity(id, groupEntity);
+        this.entries[groupObject.id] = group;
 
         $(expander).on('click', function () {
             $(groupContent).toggle();
@@ -147,7 +155,7 @@ class Hierarchy {
         });
 
         $(title).on('click', function () {
-            editor.SelectEntityById(id)
+            editor.SelectEntityById(groupObject.id)
         });
 
         if(editor.selectedEntity != null) {
@@ -155,8 +163,7 @@ class Hierarchy {
         } else {
             $('.spawnedEntities').append(group);
         }
-        editor.SelectEntityById(id);
-        return groupEntity;
+        return groupObject;
     }
 
     static CollapseGroup(group) {
@@ -180,7 +187,7 @@ class Hierarchy {
         search.addClass("search-input form-control");
         controls.append(search);
 
-        controls.append("<button onclick=\"editor.ui.hierarchy.CreateGroup()\">+</button>\n" +
+        controls.append("<button onclick=\"editor.OnCreateGroup()\">+</button>\n" +
             "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>+</button>");
         return controls;
     }
@@ -188,7 +195,7 @@ class Hierarchy {
     CreateSubControls() {
         let controls = $(document.createElement("div"));
 
-        controls.append("<button onclick=\"editor.ui.hierarchy.CreateGroup()\">New Group</button>\n" +
+        controls.append("<button onclick=\"editor.OnCreateGroup()\">New Group</button>\n" +
             "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>Add Instance</button>");
         return controls;
     }

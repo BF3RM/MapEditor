@@ -23,10 +23,14 @@ class DebugWindow {
 		}
 		this.dom.html(renderjson(JSON.parse(
 			JSON.stringify(editor.rootEntities, function( key, value) {
-				if( key == 'parent') {
-					return null;
-				}
-				else {
+				if(key == 'parent'){
+					if (value != null) {
+						return value.id;
+					}
+					else{
+						return null;
+					}
+				}else{
 					return value;
 				}
 			}

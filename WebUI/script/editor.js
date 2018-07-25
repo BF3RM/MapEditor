@@ -130,15 +130,55 @@ class Editor {
 		this.ui.treeView.LoadData(this.blueprints);
 	}
 
-	OnSpawnedEntity(id, blueprintGuid, linearTransformString) {
-		//entityTable.row.add([p_ID, data.name]).draw();
-		//TODO: Check if this instance actually exists.
+	OnSpawnedEntity(id, blueprintGuid, linearTransformString, parentId) {
+		if (id == null || id == "nil") {
+			id = GenerateGuid();
+		}
+		console.log("OnSpawnedEntity - id: "+id);
+		if (this.blueprints[blueprintGuid] == null) {
+			console.error("Couldn't find a blueprint with id: "+ blueprintGuid)
+			return;
+		}
+
 		let transform = new LinearTransform().setFromString(linearTransformString);
 		let webGameObject = this.webGL.CreateObject(transform);
 		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid], null);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
-		this.TrackEntity(id, gameObject);
 
+		
+		if (parentId != null && parentId != "nil") {
+			this.ui.hierarchy.MoveElementsInHierarchy(this.spawnedEntities[parentId], gameObject)
+		}
+
+		this.TrackEntity(id, gameObject);
+		this.SelectEntityById(id);
+	}
+
+	OnCreateGroup(id, name, linearTransformString, parentId){
+		console.log("OnCreateGroup - id: "+id);
+		if (name == null) {
+			name = "New Group";
+		}
+
+		let transform = null;
+		if (linearTransformString == null){
+			transform = new LinearTransform();
+		}else{
+			transform = new LinearTransform().setFromString(linearTransformString);
+		}
+		// console.log(transform);
+		if (id == null || id == "nil") {
+			id = GenerateGuid();
+		}
+		let webObject = editor.webGL.CreateGroup(transform);
+		let groupObject = new Group(id, name, webObject, transform, null, {} );
+		this.ui.hierarchy.CreateGroup(groupObject);
+
+		if (parentId != null && parentId != "nil") {
+			this.ui.hierarchy.MoveElementsInHierarchy(this.spawnedEntities[parentId], groupObject)
+		}
+
+		this.TrackEntity(id, groupObject);
 		this.SelectEntityById(id);
 	}
 

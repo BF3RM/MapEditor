@@ -141,7 +141,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 		s_SpawnTransform.trans = self.raycastTransform.trans
 
 
-		Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', self.spawnEntity.entityID, Guid(self.spawnEntity.partitionGuid), Guid(self.spawnEntity.instanceGuid), tostring(s_SpawnTransform), self.spawnEntity.variation)
+		-- Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', self.spawnEntity.entityID, Guid(self.spawnEntity.partitionGuid), Guid(self.spawnEntity.instanceGuid), tostring(s_SpawnTransform), self.spawnEntity.variation)
 
 		self:RegisterEntity(self.spawnEntity.blueprintID, self.spawnEntity.entityID, s_SpawnTransform)
 		self.spawnEntity = nil
@@ -221,14 +221,14 @@ end
 function MapEditorClient:OnSetEntityMatrix(p_Args) 
 	-- print("OnSetEntityMatrix "..p_Args)
 	if p_Args == nil then
-		print("p_Args nil 1!!!!!!!!!!1!!!!!!!")
+		print("p_Args is nil")
 		return
 	end
 
 	local p_ArgsArray = split(p_Args, ",")
 
 	if p_ArgsArray == nil then
-		print("p_ArgsArray nil 1!!!!!!!!!!1!!!!!!!")
+		print("p_ArgsArray is nil")
 		return
 	end
 
@@ -252,15 +252,14 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 end
 
 function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
-	-- print("---------------------")
 	print(p_ParamsCombined)
 	local s_Parameters = split(p_ParamsCombined, ":")
 	local s_EntityID = s_Parameters[1]
 	local s_PartitionGuid = s_Parameters[2]
 	local s_InstanceGuid = s_Parameters[3]
-	local s_Variation = s_Parameters[4]
+	local s_Variation = tonumber(s_Parameters[4])
 
-	if s_Variation == "-1" then
+	if s_Variation == -1 then
 		print("Variation not passed! Defaulting to 0")
 		s_Variation = 0
 	end
@@ -271,7 +270,7 @@ end
 
 --------------- Class functions ---------------
 
-function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTransform) 
+function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTransform, p_ParentID) 
 	self.spawnedEntities[p_EntityID] = true
 
 	local s_Left = p_EntityTransform.left
@@ -282,7 +281,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTrans
 	local s_LinearTransformString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
-	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\")', p_EntityID, p_BlueprintID, s_LinearTransformString))
+	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\", \"%s\")', p_EntityID, p_BlueprintID, s_LinearTransformString, tostring(p_ParentID)))
 end
 
 function MapEditorClient:LoadJSONEntities() 
@@ -293,57 +292,59 @@ function MapEditorClient:LoadJSONEntities()
 
 	print("Found JSON table, applying..")
 
-	local entitiesArray = json.decode(JSONentities)
+-- print(JSONentities)
+	local entitiesTable = json.decode(JSONentities)
+-- print(entitiesTable)
+	if entitiesTable == '' then
+		print("JSON string is empty")
+		return
+	end
 
-	if entitiesArray == nil then
+	if entitiesTable == nil then
 		print("JSON string is not valid")
 		return
 	end
 
+	self:ParseSavedEntities(entitiesTable)
 
+	
+end
 
-	-- print(entitiesArray)
+function MapEditorClient:ParseSavedEntities(p_Entities)
+	for k, entityInfo in pairs(p_Entities) do
 
-	for k, entityInfo in ipairs(entitiesArray) do
-		local s_Instance = ResourceManager:FindInstanceByGUID(Guid(entityInfo.partitionGuid), Guid(entityInfo.instanceGuid))
+		if entityInfo.type == "Blueprint" then
+			local s_LinearTransform = LinearTransform(
+				Vec3(entityInfo.transform.left.x, entityInfo.transform.left.y, entityInfo.transform.left.z),
+				Vec3(entityInfo.transform.up.x, entityInfo.transform.up.y, entityInfo.transform.up.z),
+				Vec3(entityInfo.transform.forward.x, entityInfo.transform.forward.y, entityInfo.transform.forward.z),
+				Vec3(entityInfo.transform.trans.x, entityInfo.transform.trans.y, entityInfo.transform.trans.z))
+			
+			Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', entityInfo.id, Guid(entityInfo.instance.partitionGuid), Guid(entityInfo.instance.instanceGuid), tostring(s_LinearTransform), 0 )
+			
+			print(tostring(entityInfo.parent))
+			self:RegisterEntity(entityInfo.instance.instanceGuid, entityInfo.id, s_LinearTransform, entityInfo.parent)
 
-		if(s_Instance == nil) then
-			print("Attempted to spawn an instance that doesn't exist: " .. entityInfo.partitionGuid .. " | " .. entityInfo.instanceGuid)
-			goto continue
+		elseif entityInfo.type == "group" then
+			local s_Left = entityInfo.transform.left
+			local s_Up = entityInfo.transform.up
+			local s_Forward = entityInfo.transform.forward
+			local s_Pos = entityInfo.transform.trans
+
+			local s_LinearTransformString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
+				s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
+
+			WebUI:ExecuteJS(string.format("editor.OnCreateGroup('%s','%s','%s', '%s')", entityInfo.id, entityInfo.name, s_LinearTransformString, tostring(entityInfo.parent)))
+
+			self:ParseSavedEntities(entityInfo.children)
+
+			-- print("group")
 		end
-
-		local m = split(entityInfo.matrix, ",")
-
-		for i,v in ipairs(m) do
-			m[i] = tonumber(v)
-		end
-
-		local s_Transform = LinearTransform(Vec3(m[1],m[2],m[3]),Vec3(m[5],m[6],m[7]),Vec3(m[9],m[10],m[11]),Vec3(m[13],m[14],m[15]))
-		
-		-- print("Spawning!")
-
-		local params = EntityCreationParams()
-		params.transform = s_Transform
-		params.variationNameHash = 0
-
-		local prefabEntities = EntityManager:CreateClientEntitiesFromBlueprint(s_Instance, params)
-		print("Spawned!")
-
-		if(prefabEntities == nil) then
-			print("Unable to spawn shit.")
-		end
-
-		for i, entity in ipairs(prefabEntities) do
-			entity:Init(Realm.Realm_Client, true)
-		end
-
-		self:RegisterEntity(entityInfo.instanceGuid, prefabEntities, s_Transform)
-		
 
 		::continue::
 	end
-end
 
+end
 
 function split(pString, pPattern)
 	local Table = {}  -- NOTE: use {n = 0} in Lua-5.0

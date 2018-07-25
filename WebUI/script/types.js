@@ -11,6 +11,9 @@ class GameObject {
 		if (this.parent == null) {
 			editor.rootEntities[this.id] = this;
 		}
+		else{
+			parent.children[this.id] = this;
+		}
 	}
 
 	OnMove(noUpdateInspector) {
@@ -89,8 +92,10 @@ class GameObject {
 }
 
 class Group extends GameObject{
-	constructor(id, name, webObject, children, parent) {
-		super(id, name, "group", new LinearTransform(), webObject, parent);
+	constructor(id, name, webObject, transform, parent, children) {
+
+		//id, name, type, transform, webObject, instance, parent
+		super(id, name, "group", transform, webObject, null, parent);
 		this.children = children;
 	}
 

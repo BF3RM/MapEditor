@@ -72,7 +72,7 @@ class WebGL {
 		this.Render();
 	}
 
-	CreateGroup(){
+	CreateGroup(transform){
 		console.log("creatin group");
 
 		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
@@ -84,6 +84,16 @@ class WebGL {
 		let mesh = new THREE.Mesh(geometry, material);
 
 		this.scene.add(mesh);
+
+		let matrix = new THREE.Matrix4();
+		matrix.set(
+			transform.left.x, transform.up.x, transform.forward.x, 0,
+			transform.left.y, transform.up.y, transform.forward.y, 0,
+			transform.left.z, transform.up.z, transform.forward.z, 0,
+			0, 0, 0, 1);
+		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		mesh.setRotationFromMatrix(matrix);
+
 		this.Render();
 		return mesh;
 	}
@@ -131,7 +141,6 @@ class WebGL {
 		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
 		mesh.setRotationFromMatrix(matrix);
 
-		this.control.attach(mesh);
 		this.Render();
 
 		return mesh;
