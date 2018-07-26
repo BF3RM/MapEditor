@@ -130,7 +130,7 @@ class Editor {
 		this.ui.treeView.LoadData(this.blueprints);
 	}
 
-	OnSpawnedEntity(id, blueprintGuid, linearTransformString, parentId) {
+	OnSpawnedEntity(id, blueprintGuid, linearTransformString, variation, parentId) {
 		if (id == null || id == "nil") {
 			id = GenerateGuid();
 		}
@@ -142,7 +142,7 @@ class Editor {
 
 		let transform = new LinearTransform().setFromString(linearTransformString);
 		let webGameObject = this.webGL.CreateObject(transform);
-		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid], null);
+		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid], variation, null);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 
 		

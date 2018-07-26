@@ -143,7 +143,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 
 		Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', self.spawnEntity.entityID, Guid(self.spawnEntity.partitionGuid), Guid(self.spawnEntity.instanceGuid), tostring(s_SpawnTransform), self.spawnEntity.variation)
 
-		self:RegisterEntity(self.spawnEntity.blueprintID, self.spawnEntity.entityID, s_SpawnTransform)
+		self:RegisterEntity(self.spawnEntity.blueprintID, self.spawnEntity.entityID, s_SpawnTransform, self.spawnEntity.variation)
 		self.spawnEntity = nil
 
 	end
@@ -270,7 +270,7 @@ end
 
 --------------- Class functions ---------------
 
-function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTransform, p_ParentID) 
+function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTransform, p_Variation, p_ParentID) 
 	self.spawnedEntities[p_EntityID] = true
 
 	local s_Left = p_EntityTransform.left
@@ -281,7 +281,7 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTrans
 	local s_LinearTransformString = string.format('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', 
 		s_Left.x, s_Left.y, s_Left.z, s_Up.x, s_Up.y, s_Up.z, s_Forward.x, s_Forward.y, s_Forward.z, s_Pos.x, s_Pos.y, s_Pos.z )
 
-	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\", \"%s\")', p_EntityID, p_BlueprintID, s_LinearTransformString, tostring(p_ParentID)))
+	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\", %s, \"%s\")', p_EntityID, p_BlueprintID, s_LinearTransformString, p_Variation, tostring(p_ParentID)))
 end
 
 function MapEditorClient:LoadJSONEntities() 
@@ -322,8 +322,11 @@ function MapEditorClient:ParseSavedEntities(p_Entities)
 			
 			Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', entityInfo.id, Guid(entityInfo.instance.partitionGuid), Guid(entityInfo.instance.instanceGuid), tostring(s_LinearTransform), 0 )
 			
-			print(tostring(entityInfo.parent))
-			self:RegisterEntity(entityInfo.instance.instanceGuid, entityInfo.id, s_LinearTransform, entityInfo.parent)
+			if entityInfo.variation == nil then
+				entityInfo.variation = 0
+			end
+
+			self:RegisterEntity(entityInfo.instance.instanceGuid, entityInfo.id, s_LinearTransform, entityInfo.variation, entityInfo.parent)
 
 		elseif entityInfo.type == "group" then
 			local s_Left = entityInfo.transform.left

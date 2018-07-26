@@ -1,5 +1,5 @@
 class GameObject {
-	constructor(id, name, type, transform, webObject, instance, parent) {
+	constructor(id, name, type, transform, webObject, instance, variation, parent) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
@@ -7,6 +7,7 @@ class GameObject {
 		this.webObject = webObject;
 		this.instance = instance;
 		this.parent = parent;
+		this.variation = variation;
 
 		if (this.parent == null) {
 			editor.rootEntities[this.id] = this;
@@ -94,8 +95,8 @@ class GameObject {
 class Group extends GameObject{
 	constructor(id, name, webObject, transform, parent, children) {
 
-		//id, name, type, transform, webObject, instance, parent
-		super(id, name, "group", transform, webObject, null, parent);
+		//id, name, type, transform, webObject, instance, variation, parent
+		super(id, name, "group", transform, webObject, null, null, parent);
 		this.children = children;
 	}
 

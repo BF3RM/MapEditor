@@ -167,7 +167,7 @@ class UI {
 			"\t"
 			);
 
-		$("#savingTextArea").text(jsonString);
+		$("#savingTextArea").text("return [[\n"+jsonString+"\n]]");
 
 		editor.ui.dialogs["saving"].dialog("open");
 		

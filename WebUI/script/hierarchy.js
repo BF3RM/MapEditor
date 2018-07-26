@@ -51,14 +51,10 @@ class Hierarchy {
                 let containerID = $(container.el).parent().attr("entityId");
                 let groupObject = editor.spawnedEntities[containerID];
 
-                // console.log($item);
-                // console.log(container);
-                // console.log(editor.ui.hierarchy.entries[gameObject.id]);
-                // let a = editor.ui.hierarchy.entries[groupObject.id];
-                // console.log($(a.children()[1]));
-
                 if (groupObject == null) {
-                    gameObject.parent.OnRemoveChild(gameObject);
+                    if (gameObject.parent != null) {
+                        gameObject.parent.OnRemoveChild(gameObject);
+                    }
                 }else{
                     groupObject.OnAddChild(gameObject);
                 }
@@ -67,6 +63,10 @@ class Hierarchy {
     }
 
     MoveElementsInHierarchy(groupObject, gameObject){
+        if (groupObject.type !== "group") {
+            console.error("groupObject is not of type group");
+            return;
+        }
         let groupEntry = this.entries[groupObject.id];
         let entry = this.entries[gameObject.id];
         entry.appendTo(groupEntry[0].children[1]);
