@@ -18,7 +18,7 @@ function Freecam:__init()
     self.m_SimTickCount = 0
     self.m_InverseTick = 0.0
     self.m_SpeedMultiplier = 1.0
-    self.m_RotationSpeedMultiplier = 10.0
+    self.m_RotationSpeedMultiplier = 200
     self.m_Sprint = false
 
     self.m_CameraDistance = 1.0
@@ -35,9 +35,9 @@ end
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
     if (self.camera ~= nil) then
 
-        self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * self.m_RotationSpeedMultiplier
-        self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * self.m_RotationSpeedMultiplier
-        self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll] * self.m_RotationSpeedMultiplier
+        self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+        self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+        --self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
     end
 end
 
