@@ -192,12 +192,14 @@ class Editor {
 		if(this.spawnedEntities[id] == null){
 			return;
 		}
-		this.spawnedEntities[id].webObject.position.x = x;
-		this.spawnedEntities[id].webObject.position.y = y;
-		this.spawnedEntities[id].webObject.position.z = z;
-		this.webGL.Render();
+		this.spawnedEntities[id].Move(x, y, z);
 
-		this.spawnedEntities[id].OnMove(false);
+		// this.spawnedEntities[id].webObject.position.x = x;
+		// this.spawnedEntities[id].webObject.position.y = y;
+		// this.spawnedEntities[id].webObject.position.z = z;
+		// this.webGL.Render();
+
+		// this.spawnedEntities[id].OnMove(false);
 	}
 
 }
