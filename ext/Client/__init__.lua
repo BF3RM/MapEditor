@@ -20,6 +20,7 @@ function MapEditorClient:RegisterVars()
 	self.selectedEntityID = ""
 	self.isFreecam = false
 	self.raycastTransform = nil
+	self.pendingMoveWithRaycast = nil
 
 	self.castDistance = 100
 	self.fallbackDistance = 5
@@ -39,6 +40,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:SetEntityMatrix', self, self.OnSetEntityMatrix)
 	Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
 	Events:Subscribe('MapEditor:SetViewmode', self, self.OnSetViewmode)
+	Events:Subscribe('MapEditor:MoveObjectWithRaycast', self, self.OnMoveObjectWithRaycast)
 
 	-- Controls
 	-- Events:Subscribe('MapEditor:EnableKeyboard', self, self.OnEnableKeyboard)
@@ -148,6 +150,10 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 
 	end
 
+	if self.pendingMoveWithRaycast ~= nil then
+		self:MoveWithRaycast()
+	end
+
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
 		WebUI:BringToFront()
 		WebUI:EnableMouse()
@@ -182,6 +188,26 @@ function MapEditorClient:OnEnableFreecam()
 	WebUI:DisableKeyboard()
 	WebUI:DisableMouse()
 end
+
+function MapEditorClient:OnMoveObjectWithRaycast(p_Args)
+	if p_Args == nil then
+		print("p_Args is nil")
+		return
+	end
+
+	local p_ArgsArray = split(p_Args, ",")
+
+	if p_ArgsArray == nil then
+		print("p_ArgsArray is nil")
+		return
+	end
+
+	local s_Id = p_ArgsArray[1]
+	local s_RaycastDirection = Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
+
+	self.pendingMoveWithRaycast = {id = s_Id, raycastDirection = s_RaycastDirection}
+end
+
 
 function MapEditorClient:OnSetViewmode(p_ViewMode)
 	local p_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
@@ -269,6 +295,42 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 end
 
 --------------- Class functions ---------------
+
+function MapEditorClient:MoveWithRaycast() 
+	if self.pendingMoveWithRaycast == nil then
+		return
+	end
+
+	local s_Transform = ClientUtils:GetCameraTransform()
+
+	if s_Transform.trans == Vec3(0,0,0) then
+		self.pendingMoveWithRaycast = nil
+		return
+	end
+
+	local s_CastPosition = Vec3(s_Transform.trans.x + (self.pendingMoveWithRaycast.raycastDirection.x*self.castDistance),
+								s_Transform.trans.y + (self.pendingMoveWithRaycast.raycastDirection.y*self.castDistance),
+								s_Transform.trans.z + (self.pendingMoveWithRaycast.raycastDirection.z*self.castDistance))
+
+	local s_Raycast = RaycastManager:Raycast(s_Transform.trans, s_CastPosition, 2)
+
+	local s_Transform = LinearTransform(
+		Vec3(1,0,0),
+		Vec3(0,1,0),
+		Vec3(0,0,1),
+		s_Transform.trans
+	)
+
+	if s_Raycast ~= nil then
+		print("MoveWithRaycast: raycast succeeded")
+		WebUI:ExecuteJS(string.format('editor.OnMoveEntityWithRaycast( \"%s\", %s, %s, %s)', self.pendingMoveWithRaycast.id, s_Raycast.position.x, s_Raycast.position.y, s_Raycast.position.z ))
+	else
+		print("MoveWithRaycast: raycast failed")
+	end
+
+	self.pendingMoveWithRaycast = nil
+end
+
 
 function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTransform, p_Variation, p_ParentID) 
 	self.spawnedEntities[p_EntityID] = true

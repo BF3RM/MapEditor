@@ -42,32 +42,6 @@ class Editor {
 		this.spawnedEntities.clear();
 	}
 
-	DeleteSelectedEntity() {
-
-		if (this.selectedEntity == null) {
-			console.error("Tried to delete a null entity")
-			return;
-		}
-
-		//Unselect the entity
-		this.OnDeselectEntity(this.selectedEntity);
-
-		// Delete the entity on the hierarchy 
-		this.ui.hierarchy.OnDeleteEntry(this.selectedEntity);
-
-		// Delete webGL objects associated with the entity
-		this.webGL.DeleteObject(this.selectedEntity.webObject);
-
-		// Delete the entity gameObject
-		delete this.spawnedEntities[this.selectedEntity.id];
-
-
-		// Delete the entity on VU
-		let id = this.selectedEntity.id;
-		this.selectedEntity = null;
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', id)
-	}
-
 	PrepareInstanceSpawn(p_InstanceGuid) {
 		let instance = this.blueprints[p_InstanceGuid];
 		let variations = instance.variations;
@@ -116,6 +90,24 @@ class Editor {
 		this.TrackEntity(id, gameObject);
 	}
 
+	RequestMoveObjectWithRaycast(mouseVec2){
+		let raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( mouseVec2, this.webGL.camera );
+		let direction = raycaster.ray.direction;
+		editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:MoveObjectWithRaycast', this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z);
+	}
+
+	SelectParent(){
+		if (this.selectedEntity == null) {
+			return;
+		}
+
+		if (this.selectedEntity.parent == null) {
+			return;
+		}
+
+		this.SelectEntityById(this.selectedEntity.parent.id);
+	}
 	/*
 
 		Events
@@ -195,4 +187,17 @@ class Editor {
 		this.ui.hierarchy.OnDeselectEntry(gameObject)
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
 	}
+
+	OnMoveEntityWithRaycast(id, x, y, z){
+		if(this.spawnedEntities[id] == null){
+			return;
+		}
+		this.spawnedEntities[id].webObject.position.x = x;
+		this.spawnedEntities[id].webObject.position.y = y;
+		this.spawnedEntities[id].webObject.position.z = z;
+		this.webGL.Render();
+
+		this.spawnedEntities[id].OnMove(false);
+	}
+
 }

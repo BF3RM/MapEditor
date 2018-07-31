@@ -5,7 +5,7 @@
 // function DisableKeyboard() {
 // 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
 // }
-
+		
 function EnableFreecam() {
 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
 }
@@ -20,7 +20,7 @@ function EnableFreecam() {
 
 
 var keysdown = {};
-
+var mousePos = {};
 
 $(document).keydown(function(e) {
 
@@ -42,7 +42,7 @@ $(document).keydown(function(e) {
 		editor.webGL.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
-
+		editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 	}
 	if(e.which == 70) { // R
 
@@ -50,11 +50,17 @@ $(document).keydown(function(e) {
 	if(e.which == 112) { // F1
 
 	}
+	if(e.which == 80) { // P
+		editor.SelectParent();
+	}
 	if(e.which == 17) { // CTRL
 		editor.webGL.EnableGridSnap()
 	}
 	if(e.which == 88) { // X
 		editor.webGL.ToggleWorldSpace();
+	}
+	if(e.which == 46) { // DEL
+		editor.ui.dialogs["deleteEntity"].dialog("open");
 	}
 });
 
@@ -64,4 +70,12 @@ $(document).keyup(function(e){
 	if(e.which == 17) { // CTRL
 		editor.webGL.DisableGridSnap()
 	}
+});
+
+document.addEventListener('mousemove', function (e) {
+	// mousePos.x = (e.pageX / ($(document).width() / 2)) - 1 ;
+	// mousePos.y = (e.pageY/ ($(document).height() / 2)) - 1 ;
+
+	mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 });

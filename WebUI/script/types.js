@@ -54,7 +54,7 @@ class GameObject {
 		// Deselect this entity 
 		editor.OnDeselectEntity(this);
 
-
+		// Delete its children
 		if (this.children != null) {
 
 			for (var key in this.children) {
@@ -63,8 +63,6 @@ class GameObject {
 		}
 
 		else{
-
-
 			// Delete the entity on VU
 			editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', this.id)
 		}
@@ -73,7 +71,6 @@ class GameObject {
 		if (this.parent != null) {
 			delete this.parent.children[this.id];
 		}
-		
 
 		// Delete webGL objects associated with the entity
 		editor.webGL.DeleteObject(this.webObject);
@@ -101,6 +98,13 @@ class Group extends GameObject{
 	}
 
 	OnAddChild(child){
+		// This moves the object too for some reason
+		// if (this.children.length == null && this.transform.trans.x == 0) {
+		// 	// Doesn't have children, set the group transform to the children's
+		// 	this.webObject.position.set(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z);
+		// 	this.transform = child.transform;
+		// }
+		
 		// Update parent
 		child.parent = this;
 		delete editor.rootEntities[child.id];
