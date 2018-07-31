@@ -34,9 +34,9 @@ end
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
     if (self.camera ~= nil) then
 
-        self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw]
-        self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch]
-        self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll]
+        self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * 10
+        self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * 10
+        self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll] * 10
     end
 end
 
@@ -118,6 +118,8 @@ function Freecam:OnUpdateInput(p_Delta)
         return
     end
 
+
+
     -- Update the controls.
     self:UpdateCameraControls(p_Delta)
 
@@ -128,6 +130,18 @@ function Freecam:OnUpdateInput(p_Delta)
         self:UpdateThirdPerson(p_Delta)
     end
 
+    if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
+        print("RESETING CAMERAAAAAAAAAAAA")
+        self.cameraData.transform.left = Vec3(1,0,0)
+        self.cameraData.transform.up = Vec3(0,1,0)
+        self.cameraData.transform.forward = Vec3(0,0,1)
+        self.yaw = 0.0
+        self.pitch = 0.0
+        self.roll = 0.0
+        self.m_CameraDistance = 1.0
+        self.m_ThirdPersonRotX = 0.0
+        self.m_ThirdPersonRotY = 0.0
+    end
     -- Reset movement.
     self.m_RotateX = 0.0
     self.m_RotateY = 0.0
@@ -136,6 +150,8 @@ function Freecam:OnUpdateInput(p_Delta)
     self.m_MoveZ = 0.0
     self.m_SimTickCount = 0
     self.m_InverseTick = 0.0
+
+
 end
 
 function Freecam:UpdateCameraControls(p_Delta)
@@ -154,7 +170,9 @@ function Freecam:UpdateCameraControls(p_Delta)
         s_MoveY = -1.0
     end
 
+    if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
 
+    end
     self.m_MoveX = self.m_MoveX + s_MoveX
     self.m_MoveY = self.m_MoveY + s_MoveY
     self.m_MoveZ = self.m_MoveZ + s_MoveZ
