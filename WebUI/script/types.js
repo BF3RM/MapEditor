@@ -99,11 +99,16 @@ class Group extends GameObject{
 
 	OnAddChild(child){
 		// This moves the object too for some reason
-		// if (this.children.length == null && this.transform.trans.x == 0) {
-		// 	// Doesn't have children, set the group transform to the children's
-		// 	this.webObject.position.set(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z);
-		// 	this.transform = child.transform;
-		// }
+		if (this.children.length == null && this.transform.trans.x == 0) {
+			// Doesn't have children, set the group transform to the children's
+			// this.webObject.position.set(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z);
+			this.webObject.position.x = child.webObject.position.x;
+			this.webObject.position.y = child.webObject.position.y;
+			this.webObject.position.z = child.webObject.position.z;
+			this.transform = child.transform;
+			editor.webGL.Render();
+
+		}
 		
 		// Update parent
 		child.parent = this;
