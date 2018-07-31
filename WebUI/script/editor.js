@@ -47,14 +47,14 @@ class Editor {
 		let variations = instance.variations;
 
 		//Check if we have any variations for the object
-		if (variations.length == null) {
+		if (variations.length == 0) {
 			// There are no variations, let's set it to -1 so the engine will know we're missing it.
 			//TODO: Add variation shit here.
 			instance.variations = [-1]
 		}
 
-		//Check if we've previously spawned this object.
-		if (this.confirmedBlueprints[p_InstanceGuid] == null) {
+		//Check if the variation is unkown and we've previously spawned this object.
+		if (variations[0] == -1 && this.confirmedBlueprints[p_InstanceGuid] == null) {
 			this.confirmInstance = instance;
 			console.log("Unknown variation!");
 			// Bring up warning dialog.
