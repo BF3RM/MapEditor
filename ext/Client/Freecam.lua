@@ -18,6 +18,7 @@ function Freecam:__init()
     self.m_SimTickCount = 0
     self.m_InverseTick = 0.0
     self.m_SpeedMultiplier = 1.0
+    self.m_RotationSpeedMultiplier = 10.0
     self.m_Sprint = false
 
     self.m_CameraDistance = 1.0
@@ -34,9 +35,9 @@ end
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
     if (self.camera ~= nil) then
 
-        self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * 10
-        self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * 10
-        self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll] * 10
+        self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * self.m_RotationSpeedMultiplier
+        self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * self.m_RotationSpeedMultiplier
+        self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll] * self.m_RotationSpeedMultiplier
     end
 end
 
@@ -131,7 +132,7 @@ function Freecam:OnUpdateInput(p_Delta)
     end
 
     if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
-        print("RESETING CAMERAAAAAAAAAAAA")
+        print("Reseting camera")
         self.cameraData.transform.left = Vec3(1,0,0)
         self.cameraData.transform.up = Vec3(0,1,0)
         self.cameraData.transform.forward = Vec3(0,0,1)
@@ -168,6 +169,16 @@ function Freecam:UpdateCameraControls(p_Delta)
         s_MoveY = 1.0
     elseif InputManager:IsKeyDown(InputDeviceKeys.IDK_Q) then
         s_MoveY = -1.0
+    end
+
+    if InputManager:WentKeyDown(InputDeviceKeys.IDK_PageDown) then
+        self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier + 1
+        print(self.m_RotationSpeedMultiplier)
+    elseif InputManager:WentKeyDown(InputDeviceKeys.IDK_PageUp ) then
+        if self.m_RotationSpeedMultiplier > 1 then
+            self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier - 1
+        end
+        print(self.m_RotationSpeedMultiplier)
     end
 
     if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
