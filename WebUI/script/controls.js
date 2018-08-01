@@ -54,6 +54,9 @@ $(document).keydown(function(e) {
 	if(e.which == 80) { // P
 		editor.SelectParent();
 	}
+	if(e.which == 79) { // O
+		editor.selectedEntity.Clone();
+	}
 	if(e.which == 17) { // CTRL
 		editor.webGL.EnableGridSnap()
 	}
@@ -71,4 +74,9 @@ $(document).keyup(function(e){
 	if(e.which == 17) { // CTRL
 		editor.webGL.DisableGridSnap()
 	}
+});
+
+document.addEventListener('mousemove', function (e) {
+	mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 });

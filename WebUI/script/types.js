@@ -18,12 +18,8 @@ class GameObject {
 	}
 
 	Move(x, y, z){
-		this.webObject.position.x = x;
-		this.webObject.position.y = y;
-		this.webObject.position.z = z;
-		editor.webGL.Render();
-
-		this.OnMove(true);
+		editor.webGL.MoveObject(this.webObject, x, y, z);
+		this.OnMove(false);
 	}
 
 	OnMove(noUpdateInspector) {
@@ -96,6 +92,38 @@ class GameObject {
 
 	}
 
+	Clone(newParent){
+
+		if( newParent == null){
+			newParent = this.parent;
+		}
+
+		if( this.type == "group" ){
+			let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, newParent);
+
+			if (this.children != null) {
+
+				for (var key in this.children) {
+					this.children[key].Clone(clone);
+				}
+			}
+
+			// Move it inside the parent
+			if(newParent != null){
+				editor.ui.hierarchy.MoveElementsInHierarchy(newParent, clone);
+			}
+		}
+		else if( this.type == "Blueprint"){
+
+			let parentId = "";
+			if(newParent != null){
+				parentId = newParent.id;
+			}
+			let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getMatrix().toString()+ ":" + parentId;
+			console.log(args);
+			vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', args);
+		}
+	}
 }
 
 class Group extends GameObject{
@@ -109,14 +137,8 @@ class Group extends GameObject{
 	OnAddChild(child){
 		// This moves the object too for some reason
 		if (this.children.length == null && this.transform.trans.x == 0) {
-			// Doesn't have children, set the group transform to the children's
-			// this.webObject.position.set(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z);
 			this.Move(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z)
-			// this.webObject.position.x = child.webObject.position.x;
-			// this.webObject.position.y = child.webObject.position.y;
-			// this.webObject.position.z = child.webObject.position.z;
 			this.transform = child.transform;
-			// editor.webGL.Render();
 
 		}
 		

@@ -34,6 +34,7 @@ function MapEditorClient:RegisterEvents()
 	self.m_EngineUpdateEvent = Events:Subscribe("Engine:Update", self, self.OnUpdate)
 
 	--WebUI events
+	Events:Subscribe('MapEditor:SpawnInstanceWithRaycast', self, self.OnSpawnInstanceWithRaycast)
 	Events:Subscribe('MapEditor:SpawnInstance', self, self.OnSpawnInstance)
 	Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
 	Events:Subscribe('MapEditor:DeselectEntity', self, self.OnDeselectEntity)
@@ -277,7 +278,7 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 	Events:Dispatch('BlueprintManager:MoveBlueprintFromClient', p_ArgsArray[1], tostring(s_Transform))
 end
 
-function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
+function MapEditorClient:OnSpawnInstanceWithRaycast(p_ParamsCombined) 
 	print(p_ParamsCombined)
 	local s_Parameters = split(p_ParamsCombined, ":")
 	local s_EntityID = s_Parameters[1]
@@ -293,6 +294,33 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 	self.spawnEntity = {blueprintID = s_InstanceGuid, entityID = s_EntityID, partitionGuid = s_PartitionGuid, instanceGuid = s_InstanceGuid, variation = s_Variation}
 	
 end
+
+function MapEditorClient:OnSpawnInstance(p_ParamsCombined) 
+	-- print(p_ParamsCombined)
+	local s_Parameters = split(p_ParamsCombined, ":")
+	local s_EntityID = s_Parameters[1]
+	local s_PartitionGuid = s_Parameters[2]
+	local s_InstanceGuid = s_Parameters[3]
+	local s_Variation = tonumber(s_Parameters[4])
+	local s_TransformString = s_Parameters[5]
+	local s_ParentID = s_Parameters[6]
+
+	if s_Variation == -1 or s_Variation == nil then
+		print("Variation not passed! Defaulting to 0")
+		s_Variation = 0
+	end
+	local a = split(s_TransformString, ",")
+	local s_Transform = LinearTransform(
+			Vec3(tonumber(a[1]),tonumber(a[2]),tonumber(a[3])),
+			Vec3(tonumber(a[4]),tonumber(a[5]),tonumber(a[6])),
+			Vec3(tonumber(a[7]),tonumber(a[8]),tonumber(a[9])),
+			Vec3(tonumber(a[10]),tonumber(a[11]),tonumber(a[12]))
+		)
+
+	Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', s_EntityID, Guid(s_PartitionGuid), Guid(s_InstanceGuid), s_TransformString, s_Variation )
+	self:RegisterEntity(s_InstanceGuid, s_EntityID, s_Transform, s_Variation, s_ParentID)
+end
+
 
 --------------- Class functions ---------------
 
@@ -381,12 +409,12 @@ function MapEditorClient:ParseSavedEntities(p_Entities)
 				Vec3(entityInfo.transform.up.x, entityInfo.transform.up.y, entityInfo.transform.up.z),
 				Vec3(entityInfo.transform.forward.x, entityInfo.transform.forward.y, entityInfo.transform.forward.z),
 				Vec3(entityInfo.transform.trans.x, entityInfo.transform.trans.y, entityInfo.transform.trans.z))
-			
-			Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', entityInfo.id, Guid(entityInfo.instance.partitionGuid), Guid(entityInfo.instance.instanceGuid), tostring(s_LinearTransform), 0 )
-			
 			if entityInfo.variation == nil then
 				entityInfo.variation = 0
 			end
+			Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', entityInfo.id, Guid(entityInfo.instance.partitionGuid), Guid(entityInfo.instance.instanceGuid), tostring(s_LinearTransform), entityInfo.variation )
+			
+
 
 			self:RegisterEntity(entityInfo.instance.instanceGuid, entityInfo.id, s_LinearTransform, entityInfo.variation, entityInfo.parent)
 

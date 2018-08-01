@@ -53,7 +53,7 @@ class Editor {
 			// Bring up warning dialog.
 			this.ui.dialogs["variation"].dialog("open");
 		} else {
-			this.SpawnInstance(instance, variations[0]);
+			this.SpawnInstanceWithRaycast(instance, variations[0]);
 		}
 	}
 	UpdateSelectedObject(linearTransformString){
@@ -68,13 +68,13 @@ class Editor {
 		}
 	}
 	ConfirmInstanceSpawn() {
-		this.SpawnInstance(this.confirmInstance);
+		this.SpawnInstanceWithRaycast(this.confirmInstance);
 		this.confirmedBlueprints[this.confirmInstance.instanceGuid] = true;
 	}
 
-	SpawnInstance(instance, variation = -1) {
+	SpawnInstanceWithRaycast(instance, variation = -1) {
 		console.log(instance);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstanceWithRaycast', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
 	TrackEntity(id, gameObject) {
 		this.spawnedEntities[id] = gameObject;
@@ -127,17 +127,23 @@ class Editor {
 		}
 
 		let transform = new LinearTransform().setFromString(linearTransformString);
-		let webGameObject = this.webGL.CreateObject(transform);
-		let gameObject =  new GameObject(id, getFilename(this.blueprints[blueprintGuid].name), "Blueprint", transform, webGameObject, this.blueprints[blueprintGuid], variation, null);
+
+		this.SpawnEntity(id, getFilename(this.blueprints[blueprintGuid].name), transform, this.blueprints[blueprintGuid], variation, this.spawnedEntities[parentId]);
+	}
+
+	SpawnEntity(id, name, transform, instance, variation, parent){
+		let webObject = this.webGL.CreateObject(transform);
+		let gameObject = new GameObject(id, name, "Blueprint", transform, webObject, instance, variation, null);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 
-		
-		if (parentId != null && parentId != "nil") {
-			this.ui.hierarchy.MoveElementsInHierarchy(this.spawnedEntities[parentId], gameObject)
+		if(parent != null){
+			this.ui.hierarchy.MoveElementsInHierarchy(parent, gameObject)
 		}
 
 		this.TrackEntity(id, gameObject);
 		this.SelectEntityById(id);
+
+		return gameObject;
 	}
 
 	OnCreateGroup(id, name, linearTransformString, parentId){
@@ -152,20 +158,27 @@ class Editor {
 		}else{
 			transform = new LinearTransform().setFromString(linearTransformString);
 		}
-		// console.log(transform);
+
 		if (id == null || id == "nil") {
 			id = GenerateGuid();
 		}
-		let webObject = editor.webGL.CreateGroup(transform);
-		let groupObject = new Group(id, name, webObject, transform, null, {} );
+
+		this.CreateGroup(id, name, transform, this.spawnedEntities[parentId]);
+	}
+
+	CreateGroup(id, name, transform, parent){
+		let webObject = this.webGL.CreateGroup(transform);
+		let groupObject = new Group(id, name, webObject, transform, parent, {} );
 		this.ui.hierarchy.CreateGroup(groupObject);
 
-		if (parentId != null && parentId != "nil") {
-			this.ui.hierarchy.MoveElementsInHierarchy(this.spawnedEntities[parentId], groupObject)
+		if(parent != null){
+			this.ui.hierarchy.MoveElementsInHierarchy(parent, groupObject)
 		}
 
 		this.TrackEntity(id, groupObject);
 		this.SelectEntityById(id);
+
+		return groupObject;
 	}
 
 	OnRemoveEntity(id) {
@@ -208,12 +221,6 @@ class Editor {
 		}
 		this.spawnedEntities[id].Move(x, y, z);
 
-		// this.spawnedEntities[id].webObject.position.x = x;
-		// this.spawnedEntities[id].webObject.position.y = y;
-		// this.spawnedEntities[id].webObject.position.z = z;
-		// this.webGL.Render();
-
-		// this.spawnedEntities[id].OnMove(false);
 	}
 
 }
