@@ -20,14 +20,15 @@ function EnableFreecam() {
 
 
 var keysdown = {};
-var mousePos = {};
 
 $(document).keydown(function(e) {
 
 	if (keysdown[e.which]) {
 		return;
 	}
-		console.log($(document.activeElement))
+	if($(document.activeElement)[0].tagName == "INPUT") {
+		return;
+	}
 	keysdown[e.which] = true;
 	if(e.which == 81) { // Q
 		editor.webGL.SetGizmoMode("select")
@@ -42,7 +43,7 @@ $(document).keydown(function(e) {
 		editor.webGL.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
-		editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
+		
 	}
 	if(e.which == 70) { // R
 
@@ -70,12 +71,4 @@ $(document).keyup(function(e){
 	if(e.which == 17) { // CTRL
 		editor.webGL.DisableGridSnap()
 	}
-});
-
-document.addEventListener('mousemove', function (e) {
-	// mousePos.x = (e.pageX / ($(document).width() / 2)) - 1 ;
-	// mousePos.y = (e.pageY/ ($(document).height() / 2)) - 1 ;
-
-	mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-	mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 });

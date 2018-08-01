@@ -207,6 +207,7 @@ let mouse = {
 };
 
 // Mouse up and movement events will be document-level
+document.addEventListener('mousedown', handleMouse);
 document.addEventListener('mouseup', handleMouse);
 document.addEventListener('mousemove', processScaler);
 

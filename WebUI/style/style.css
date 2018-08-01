@@ -197,6 +197,7 @@ canvas {
     position: absolute;
     left: 0;
     top: 0;
+    pointer-events: auto;
 }
 #page div {
 	z-index: 1;
