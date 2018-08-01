@@ -85,15 +85,13 @@ class Hierarchy {
         this.entries[gameObject.id] = entry;
     }
 
-    OnSelectEntity(gameObject) {
+    onSelectEntity(gameObject) {
         if(editor.selectedEntity == gameObject) {
             console.log("Tried to select myself...");
             return;
         }
-        this.OnDeselectEntry(editor.selectedEntity);
         let entry = this.entries[gameObject.id];
         entry.addClass("selected")
-        editor.ui.inspector.UpdateInspector(gameObject);
     }
 
     OnDeleteEntry(gameObject){
@@ -108,7 +106,7 @@ class Hierarchy {
     }
 
 
-    OnDeselectEntry(gameObject) {
+    onDeselectEntry(gameObject) {
         if(gameObject == null) {
             console.log("Tried to deselect nothing.");
             return false;

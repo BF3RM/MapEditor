@@ -90,7 +90,7 @@ class UI {
 			width: "auto",
 			modal: true,
 			buttons: {
-				"Spawn object!": this.OnConfirmInstanceSpawn,
+				"Spawn object!": this.onConfirmInstanceSpawn,
 				Cancel: function() {
 					dialogs["variation"].dialog("close");
 				}
@@ -106,7 +106,7 @@ class UI {
 			width: "auto",
 			modal: true,
 			buttons: {
-				"Yes": this.OnConfirmDeleteEntity,
+				"Yes": this.onConfirmDeleteEntity,
 				"No": function() {
 					dialogs["deleteEntity"].dialog("close");
 				}
@@ -173,13 +173,24 @@ class UI {
 		
 	}
 
+	onSelectEntity(gameObject) {
+		this.hierarchy.onSelectEntity(gameObject);
+		this.inspector.UpdateInspector(gameObject);
+		this.inspector.ShowContent()
 
-	OnConfirmInstanceSpawn() {
+	}
+	onDeselectEntity(gameObject) {
+		this.hierarchy.onDeselectEntry(gameObject)
+		this.inspector.HideContent()
+
+	}
+
+	onConfirmInstanceSpawn() {
 		editor.ConfirmInstanceSpawn();
 		$(this).dialog("close");
 	}
 
-	OnConfirmDeleteEntity() {
+	onConfirmDeleteEntity() {
 		if (editor.selectedEntity == null) {
 			console.error("Tried to delete a null entity")
 		}else{
@@ -207,7 +218,7 @@ let mouse = {
 };
 
 // Mouse up and movement events will be document-level
-document.addEventListener('mousedown', handleMouse);
+//document.addEventListener('mousedown', handleMouse);
 document.addEventListener('mouseup', handleMouse);
 document.addEventListener('mousemove', processScaler);
 

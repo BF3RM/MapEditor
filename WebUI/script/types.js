@@ -61,7 +61,7 @@ class GameObject {
 
 	Delete() {
 		// Deselect this entity 
-		editor.OnDeselectEntity(this);
+		editor.DeselectEntity(this);
 
 		// Delete its children
 		if (this.children != null) {

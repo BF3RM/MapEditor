@@ -96,12 +96,12 @@ class Inspector {
         editor.webGL.Render();
         editor.selectedEntity.OnMove(true);
     }
+
 	UpdateInspector(gameObject) {
  		if(gameObject == null) {
  			console.log("Tried to update the inspector with an invalid gameobject?");
 			return
 		}
- 		console.log(gameObject)
  		this.name[0].value = gameObject.name;
 
         let controls = ["position", "rotation", "scale"];
@@ -119,5 +119,12 @@ class Inspector {
             });
 		});
 	}
+
+    HideContent() {
+        this.dom.hide()
+    }
+    ShowContent() {
+        this.dom.show()
+    }
 }
 

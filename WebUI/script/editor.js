@@ -46,15 +46,8 @@ class Editor {
 		let instance = this.blueprints[p_InstanceGuid];
 		let variations = instance.variations;
 
-		//Check if we have any variations for the object
-		if (variations.length == 0) {
-			// There are no variations, let's set it to -1 so the engine will know we're missing it.
-			//TODO: Add variation shit here.
-			instance.variations = [-1]
-		}
-
 		//Check if the variation is unkown and we've previously spawned this object.
-		if (variations[0] == -1 && this.confirmedBlueprints[p_InstanceGuid] == null) {
+		if (variations.length == null && this.confirmedBlueprints[p_InstanceGuid] == null) {
 			this.confirmInstance = instance;
 			console.log("Unknown variation!");
 			// Bring up warning dialog.
@@ -68,17 +61,18 @@ class Editor {
 		this.webGL.AttachGizmoTo(this.selectedEntity.webObject);
 	}
 	SelectEntityById(id) {
-		this.ui.hierarchy.OnSelectEntity(this.spawnedEntities[id]);
-		this.selectedEntity = this.spawnedEntities[id];
-		this.webGL.AttachGizmoTo(this.selectedEntity.webObject);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', id);
+		if(this.spawnedEntities[id] == null) {
+			console.error("Tried to select an entity that does not exist.")
+		} else {
+			this.SelectEntity(this.spawnedEntities[id])
+		}
 	}
 	ConfirmInstanceSpawn() {
 		this.SpawnInstance(this.confirmInstance);
 		this.confirmedBlueprints[this.confirmInstance.instanceGuid] = true;
 	}
 
-	SpawnInstance(instance, variation = 0) {
+	SpawnInstance(instance, variation = -1) {
 		console.log(instance);
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
@@ -177,15 +171,35 @@ class Editor {
 	OnRemoveEntity(id) {
 		//Remove entity from the list.
 	}
+	SelectEntity(gameObject) {
+		// Deselect the current one
+		this.DeselectEntity(this.selectedEntity);
 
-	OnDeselectEntity(gameObject) {
-		if (gameObject !== editor.selectedEntity) {
+		// Trigger selected on the different classes
+		this.webGL.AttachGizmoTo(gameObject.webObject);
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', gameObject.id);
+        this.ui.onSelectEntity(gameObject);
+		this.selectedEntity = gameObject;
+
+	}
+
+	DeselectEntity(gameObject) {
+		// The current requested entity is not selected.
+		if (gameObject == null || gameObject !== editor.selectedEntity) {
 			return;
 		}
-		//Unselect it on the hierarchy
-		this.selectedEntity = null;
-		this.ui.hierarchy.OnDeselectEntry(gameObject)
+
+		this.ui.onDeselectEntity(gameObject);
 		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
+		this.selectedEntity = null;
+	}
+
+	DeleteEntity(gameObject) {
+		if(gameObject == null) {
+			return
+		}
+
+		gameObject.Delete()
 	}
 
 	OnMoveEntityWithRaycast(id, x, y, z){

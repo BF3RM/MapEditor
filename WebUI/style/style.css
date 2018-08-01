@@ -282,3 +282,7 @@ li.entity.selected {
     width: 50vw;
     height: 50vh;
 }
+
+ol.spawnedEntities {
+    height: 100%;
+}

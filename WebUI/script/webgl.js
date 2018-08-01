@@ -57,13 +57,13 @@ class WebGL {
 		});
 		window.addEventListener('resize',this.onWindowResize, false);
 
-		this.renderer.domElement.addEventListener('mousemove',this._onMouseMove, false);
-		this.renderer.domElement.addEventListener('mouseup', this._onMouseUp, false);
-		this.renderer.domElement.addEventListener('mousedown', this._onMouseDown, false);
+		this.renderer.domElement.addEventListener('mousemove',this._onMouseMove);
+		this.renderer.domElement.addEventListener('mouseup', this._onMouseUp);
+		this.renderer.domElement.addEventListener('mousedown', this._onMouseDown);
 		
 		this.control.addEventListener('change', this._onControlChanged);
-		this.control.addEventListener('mouseUp', WebGL.onControlMouseUp, false);
-		this.control.addEventListener('mouseDown', WebGL.onControlMouseDown, false);
+		this.control.addEventListener('mouseUp', WebGL.onControlMouseUp);
+		this.control.addEventListener('mouseDown', WebGL.onControlMouseDown);
 		this.control.addEventListener('objectChange', this._onObjectChanged);
 	}
 
