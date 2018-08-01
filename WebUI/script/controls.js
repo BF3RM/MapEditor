@@ -54,7 +54,7 @@ $(document).keydown(function(e) {
 	if(e.which == 80) { // P
 		editor.SelectParent();
 	}
-	if(e.which == 79) { // O
+	if( keysdown[17] && e.which == 68) { // CTRL + D
 		editor.selectedEntity.Clone();
 	}
 	if(e.which == 17) { // CTRL
