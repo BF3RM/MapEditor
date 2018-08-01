@@ -43,10 +43,10 @@ $(document).keydown(function(e) {
 		editor.webGL.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
-		editor.selectedEntity.Clone(editor.selectedEntity.parent);
+		// editor.selectedEntity.Clone(editor.selectedEntity.parent);
 	}
 	if(e.which == 71) { // G
-		editor.selectedEntity.Clone();
+		// editor.selectedEntity.Clone();
 	}
 	if(e.which == 112) { // F1
 

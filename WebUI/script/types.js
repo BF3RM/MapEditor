@@ -4,6 +4,7 @@ class GameObject {
 		this.name = name;
 		this.type = type;
 		this.transform = transform;
+		this.initialTransform = transform;
 		this.webObject = webObject;
 		this.instance = instance;
 		this.parent = parent;
@@ -43,7 +44,7 @@ class GameObject {
 
 		}
 		else{
-			vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+			editor.vext.SendEvent(this.id, 'MapEditor:SetEntityMatrix', args);
 		}
 	}
 
@@ -56,7 +57,7 @@ class GameObject {
 	}
 
 	Delete() {
-		// Deselect this entity 
+		// Deselect this entity
 		editor.DeselectEntity(this);
 
 		// Delete its children
@@ -69,7 +70,7 @@ class GameObject {
 
 		else{
 			// Delete the entity on VU
-			editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', this.id)
+			editor.vext.SendEvent(this.id, 'MapEditor:DeleteEntity', this.id)
 		}
 
 		// Remove the parent's reference
@@ -86,7 +87,7 @@ class GameObject {
 			delete editor.rootEntities[this.id];
 		}
 
-		// Delete the entity on the hierarchy 
+		// Delete the entity on the hierarchy
 		editor.ui.hierarchy.OnDeleteEntry(this);
 
 
@@ -119,7 +120,7 @@ class GameObject {
 			}
 			let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getMatrix().toString()+ ":" + parentId;
 			console.log(args);
-			vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', args);
+			editor.vext.SendEvent(this.id, 'MapEditor:SpawnInstance', args);
 		}
 	}
 }
@@ -165,12 +166,20 @@ class Group extends GameObject{
 		delete this.children[child.id];
 		editor.webGL.RemoveFromGroup(child.webObject);
 	}
+
+	Clone() {
+		return new Group(this.id, this.name, this.type, this.transform, this.parent, this.children)
+	}
 }
 class Vec3 {
 	constructor(x,y,z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	Clone() {
+		return new Vec3(this.x, this.y, this.z)
 	}
 }
 
@@ -208,7 +217,7 @@ class LinearTransform {
 			Number(matrix[0]),
 			Number(matrix[1]),
 			Number(matrix[2]));
-		
+
 		this.up = new Vec3(
 			Number(matrix[3]),
 			Number(matrix[4]),
@@ -232,7 +241,7 @@ class LinearTransform {
 			matrixArray[0],
 			matrixArray[1],
 			matrixArray[2]);
-		
+
 		this.up = new Vec3(
 			matrixArray[4],
 			matrixArray[5],
@@ -248,6 +257,9 @@ class LinearTransform {
 			matrixArray[13],
 			matrixArray[14]);
 		return this;
+	}
+	Clone() {
+		return new LinearTransform(this.left, this.up, this.forward, this.trans)
 	}
 }
 
@@ -274,5 +286,39 @@ class Camera {
 	SetTransform(transform) {
 		this.transform = transform
 		//Update the three stuff
+	}
+}
+
+class VextEvents {
+	constructor() {
+		this.sortedEvents = [];
+		this.events = [];
+	}
+
+	AddEvent(index, id, key, value) {
+		var message =  new VextMessage(index, id, key, value);
+		if(this.events[id] == null) {
+			this.events[id] = [];
+		}
+		this.events[id][key] = message;
+	}
+
+	Sort() {
+		for( let id in this.events) {
+			for( let type in this.events[id]) {
+				let message = this.events[id][type];
+				this.sortedEvents[message.index] = this.events[id][type];
+			}
+		}
+	}
+
+}
+
+class VextMessage {
+	constructor(index, id, key, value) {
+		this.index = index;
+		this.id = id;
+		this.key = key;
+		this.value = value;
 	}
 }
