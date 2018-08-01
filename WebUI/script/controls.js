@@ -75,8 +75,3 @@ $(document).keyup(function(e){
 		editor.webGL.DisableGridSnap()
 	}
 });
-
-document.addEventListener('mousemove', function (e) {
-	mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-	mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-});

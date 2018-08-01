@@ -1,15 +1,46 @@
 class VEXTInterface {
-	constructor(){
+	constructor() {
+		this.vextEvents = new VextEvents();
+		this.messages = 0;
+		setInterval(function() {
+			editor.vext.SendEvents();
+		}, 33);
 
-	};
+	}
 
-	SendEvent(type, name, parameter) {
-
+	SendEvent(id, key, value) {
 		if (editor.debug) {
-			console.log(name + " = " + parameter);
+			//console.log(key + " = " + value);
+		}
+
+		this.vextEvents.AddEvent(this.messages, id, key, value);
+		this.messages++;
+	}
+
+	DirectSend(name, parameter) {
+		if(editor.debug) {
 			return;
 		}
-		WebUI.Call(type, name, parameter)
+		WebUI.Call('DispatchEventLocal', name, parameter);
+	}
+
+	SendEvents() {
+
+		if(this.vextEvents === undefined || this.vextEvents.length == 0) {
+			return;
+		}
+		this.vextEvents.Sort();
+		for (let index in this.vextEvents.sortedEvents) {
+
+
+			if(editor.debug) {
+				console.log(this.vextEvents.sortedEvents[index].key, this.vextEvents.sortedEvents[index].value)
+			} else {
+				WebUI.Call('DispatchEventLocal',this.vextEvents.sortedEvents[index].key, this.vextEvents.sortedEvents[index].value);
+			}
+
+		}
+		this.vextEvents = new VextEvents();
 	}
 
 	RegisterInstances(json) {

@@ -47,7 +47,7 @@ class Editor {
 		let variations = instance.variations;
 
 		//Check if the variation is unkown and we've previously spawned this object.
-		if (variations.length == null && this.confirmedBlueprints[p_InstanceGuid] == null) {
+		if ((variations.length == null || variations.length == 0) && this.confirmedBlueprints[p_InstanceGuid] == null) {
 			this.confirmInstance = instance;
 			console.log("Unknown variation!");
 			// Bring up warning dialog.
@@ -74,7 +74,7 @@ class Editor {
 
 	SpawnInstanceWithRaycast(instance, variation = -1) {
 		console.log(instance);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstanceWithRaycast', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
+		this.vext.SendEvent(instance.instanceGuid, 'MapEditor:SpawnInstanceWithRaycast', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
 	TrackEntity(id, gameObject) {
 		this.spawnedEntities[id] = gameObject;
@@ -88,7 +88,7 @@ class Editor {
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera( mouseVec2, this.webGL.camera );
 		let direction = raycaster.ray.direction;
-		editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:MoveObjectWithRaycast', this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z);
+		editor.vext.SendEvent(this.selectedEntity.id, 'MapEditor:MoveObjectWithRaycast', this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z);
 	}
 
 	SelectParent(){
@@ -190,7 +190,7 @@ class Editor {
 
 		// Trigger selected on the different classes
 		this.webGL.AttachGizmoTo(gameObject.webObject);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', gameObject.id);
+		this.vext.SendEvent(gameObject.id, 'MapEditor:SelectEntity', gameObject.id);
         this.ui.onSelectEntity(gameObject);
 		this.selectedEntity = gameObject;
 
@@ -203,7 +203,7 @@ class Editor {
 		}
 
 		this.ui.onDeselectEntity(gameObject);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
+		this.vext.SendEvent(gameObject.id, 'MapEditor:UnselectEntity', gameObject.id)
 		this.selectedEntity = null;
 	}
 

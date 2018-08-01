@@ -350,7 +350,6 @@ function MapEditorClient:MoveWithRaycast()
 	)
 
 	if s_Raycast ~= nil then
-		print("MoveWithRaycast: raycast succeeded")
 		WebUI:ExecuteJS(string.format('editor.OnMoveEntityWithRaycast( \"%s\", %s, %s, %s)', self.pendingMoveWithRaycast.id, s_Raycast.position.x, s_Raycast.position.y, s_Raycast.position.z ))
 	else
 		print("MoveWithRaycast: raycast failed")
