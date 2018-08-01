@@ -3,15 +3,27 @@ A realtime map editor for Venice Unleashed
 
 Controls:
 
-- F2 to enable mouse
-- F3 to disable mouse
-- Q to translate
-- W to rotate
-- E to scale
+F1 to enable freecam.
 
-First list are the blueprints (click on it an an object will spawn where you are looking)
+Once in freecam, hold right click and:
 
-Second list are the spawned objects, click on it to select it and see its controls.
-Spawning some object crash the client so be careful
+- F2 to disable freecam and take control of your character again
+- WASD to move camera
+- Mouse to rotate camera
+- Q to move down
+- E to move up
+- Shift to move camera faster
+- Scrollwheel to change camera speed
+- Page up/down to change rotation speed
 
-To save the changes click on serialize button and copy the stuff on the text box, and to load it paste that text on JSONentities.lua
+In freecam, without holding right click:
+
+- F to place object where the mouse is at (screen to world)
+- Q to hide gizmo
+- W to change gizmo mode to translate
+- E to change gizmo mode to rotate 
+- R to change gizmo mode to scale 
+- X to toggle world/local coordinates
+- F3 to reset the camera
+- P to select parent
+- O to clone selected entity
