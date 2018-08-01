@@ -1,44 +1,48 @@
-function EnableKeyboard() {
-	SendEvent('DispatchEventLocal', 'MapEditor:EnableKeyboard')
-}
+// function EnableKeyboard() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableKeyboard')
+// }
 
-function DisableKeyboard() {
-	SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
-}
-
+// function DisableKeyboard() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
+// }
+		
 function EnableFreecam() {
-	SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
+	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
 }
 
-function DisableFreeView() {
-	SendEvent('DispatchEventLocal', 'MapEditor:DisableFreeview')
-}
+// function DisableFreeView() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableFreeview')
+// }
 
-function ToggleFreeView() {
-	SendEvent('DispatchEventLocal', 'MapEditor:ToggleFreeview')
-}
+// function ToggleFreeView() {
+// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:ToggleFreeview')
+// }
 
 
 var keysdown = {};
-
+var mousePos = {};
 
 $(document).keydown(function(e) {
 
 	if (keysdown[e.which]) {
 		return;
 	}
+		console.log($(document.activeElement))
 	keysdown[e.which] = true;
+	if(e.which == 81) { // Q
+		editor.webGL.SetGizmoMode("select")
+	}
 	if(e.which == 87) { // W
-
+		editor.webGL.SetGizmoMode("translate")
 	}
 	if(e.which == 69) { // E
-
+		editor.webGL.SetGizmoMode("rotate")
 	}
 	if(e.which == 82) { // R
-
+		editor.webGL.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
-
+		editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 	}
 	if(e.which == 70) { // R
 
@@ -46,9 +50,32 @@ $(document).keydown(function(e) {
 	if(e.which == 112) { // F1
 
 	}
+	if(e.which == 80) { // P
+		editor.SelectParent();
+	}
+	if(e.which == 17) { // CTRL
+		editor.webGL.EnableGridSnap()
+	}
+	if(e.which == 88) { // X
+		editor.webGL.ToggleWorldSpace();
+	}
+	if(e.which == 46) { // DEL
+		editor.ui.dialogs["deleteEntity"].dialog("open");
+	}
 });
 
 $(document).keyup(function(e){
 	// Remove this key from the map
 	delete keysdown[e.which];
+	if(e.which == 17) { // CTRL
+		editor.webGL.DisableGridSnap()
+	}
+});
+
+document.addEventListener('mousemove', function (e) {
+	// mousePos.x = (e.pageX / ($(document).width() / 2)) - 1 ;
+	// mousePos.y = (e.pageY/ ($(document).height() / 2)) - 1 ;
+
+	mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+	mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 });

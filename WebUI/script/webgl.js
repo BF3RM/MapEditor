@@ -1,191 +1,311 @@
-var camera, scene, renderer, control, grid, texture, mesh;
+class WebGL {
+	constructor() {
+		this.camera = null;
+		this.scene = null;
+		this.renderer = null;
+		this.control = null;
+		this.texture = null;
 
-init();
+		this.worldSpace = "local";
+		this.gridSnap = false;
 
-render();
-
-function init() {
-	renderer = new THREE.WebGLRenderer({
-		alpha: true
-	});
-
-	renderer.setPixelRatio(window.devicePixelRatio);
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	$('#page').append(renderer.domElement);
-
-    $('canvas').mousedown(function(event) {
-        switch (event.which) {
-            case 1: // Left mouse
-                break;
-            case 2:// middle mouse
-                break;
-            case 3: // right mouse
-                EnableFreecam();
-                break;
-            default:
-                alert('You have a strange Mouse!');
-        }
-    });
-
-	camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
-	camera.position.set(538, 120, 330);
-
-	scene = new THREE.Scene();
-
-	window.addEventListener('resize', onWindowResize, false);
-
-	CreateGizmo(507.140625, 115.149216, 261.648438);
-}
+		this._onControlChanged = this.onControlChanged.bind(this);
+		this._onObjectChanged = this.onObjectChanged.bind(this);
+		this._onWindowResize = this.onWindowResize.bind(this);
+		this.Initialize();
+		this.RegisterEvents();
 
 
-function CreateGizmo(x, y, z) {
-	if (grid != null) {
-		console.log("Gizmo already exist")
+	}
+	Initialize() {
+		this.renderer = new THREE.WebGLRenderer({
+			alpha: true,
+			antialias: true
+		});
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		$('#page').append(this.renderer.domElement);
+
+
+		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
+		this.camera.position.set(30, 30, 30);
+		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+		this.scene = new THREE.Scene();
+		this.CreateGizmo();
+		this.SetFov(90);
+	}
+
+	RegisterEvents() {
+		$(this.renderer.domElement).mousedown(function(event) {
+			switch (event.which) {
+				case 1: // Left mouse
+					break;
+				case 2:// middle mouse
+					break;
+				case 3: // right mouse
+					EnableFreecam();
+					break;
+				default:
+					alert('You have a strange Mouse!');
+			}
+		});
+		window.addEventListener('resize',this.onWindowResize, false);
+	}
+
+	CreateGizmo() {
+		if (this.control != null) {
+			console.log("Gizmo already exist")
+			return
+		}
+
+		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
+		this.control.setSpace("local");
+		this.control.addEventListener('change', this._onControlChanged);
+		this.control.addEventListener('mouseUp', WebGL.onMouseUp, false);
+		this.control.addEventListener('mouseDown', WebGL.onMouseDown, false);
+		this.control.addEventListener('objectChange', this._onObjectChanged);
+
+		this.scene.add(this.control);		
+
+		this.HideGizmo();
+
+		this.Render();
+	}
+
+	CreateGroup(transform){
+		console.log("creatin group");
+
+		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
+		let material = new THREE.MeshBasicMaterial( {
+			color: 0xff0000,
+			visible: true ,
+			wireframe: true
+		} );
+		let mesh = new THREE.Mesh(geometry, material);
+
+		this.scene.add(mesh);
+
+		let matrix = new THREE.Matrix4();
+		matrix.set(
+			transform.left.x, transform.up.x, transform.forward.x, 0,
+			transform.left.y, transform.up.y, transform.forward.y, 0,
+			transform.left.z, transform.up.z, transform.forward.z, 0,
+			0, 0, 0, 1);
+		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		mesh.setRotationFromMatrix(matrix);
+
+		this.Render();
+		return mesh;
+	}
+
+	AddToGroup(groupObject, gameObject){
+
+		// don't do anything if the target group it the object group already
+		if (gameObject.parent === groupObject){
+			return;
+		}
+
+		// remove child from parent and add it to scene
+		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
+
+		// remove child from scene and add it to parent
+		THREE.SceneUtils.attach( gameObject, this.scene, groupObject );
+
+		this.Render();
+	}
+	RemoveFromGroup(gameObject){
+		// remove child from parent and add it to scene
+		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
+		
+		this.Render();
 	}
 
 
-	texture = new THREE.TextureLoader().load('textures/crate.gif', render);
-	texture.mapping = THREE.UVMapping;
-	texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-	var geometry = new THREE.BoxBufferGeometry(0.1, 0.1, 0.1);
-	var material = new THREE.MeshLambertMaterial({
-		map: texture
-	});
-	control = new THREE.TransformControls(camera, renderer.domElement);
-	control.setSpace("local");
-	control.addEventListener('change', onControlChanged);
-	control.addEventListener('mouseUp', onMouseUp, false);
-	control.addEventListener('mouseDown', onMouseDown, false);
+	CreateObject(transform){
+		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
+		let material = new THREE.MeshBasicMaterial( {
+			color: 0xff0000,
+			visible: true ,
+			wireframe: true
+		} );
+		let mesh = new THREE.Mesh(geometry, material);
+		
+		this.scene.add(mesh);
 
-	mesh = new THREE.Mesh(geometry, material);
-	scene.add(mesh);
+		let matrix = new THREE.Matrix4();
+		matrix.set(
+			transform.left.x, transform.up.x, transform.forward.x, 0,
+			transform.left.y, transform.up.y, transform.forward.y, 0,
+			transform.left.z, transform.up.z, transform.forward.z, 0,
+			0, 0, 0, 1);
+		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		mesh.setRotationFromMatrix(matrix);
 
-	control.attach(mesh);
-	scene.add(control);
+		this.Render();
 
-	mesh.position.set(x, y, z);
-
-	HideGizmo();
-
-	render();
-}
-
-function SetGizmoAt(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
-	let m = new THREE.Matrix4();
-
-	m.set(lx, ux, fx, 0,
-		ly, uy, fy, 0,
-		lz, uz, fz, 0,
-		0, 0, 0, 0);
-
-	mesh.scale.set(1, 1, 1);
-	mesh.setRotationFromMatrix(m);
-	mesh.position.set(x, y, z);
-	render();
-}
-
-function HideGizmo() {
-	control.visible = false;
-	mesh.visible = false;
-
-	render();
-}
-
-function ShowGizmo() {
-	control.visible = true;
-	mesh.visible = true;
-
-	render();
-}
-
-function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	render();
-}
-
-function render() {
-	if (control == null) {
-		return
-	}
-	control.update();
-	renderer.render(scene, camera);
-}
-
-function onControlChanged() {
-	if (selectedEntityID < 0) {
-		return;
-	}
-	render();
-
-	//TODO: Invert this method.
-	//We should get the matrix and apply it to the mesh, not the other way around.
-
-	let matrix = mesh.matrixWorld.toArray().toString();
-	let args = selectedEntityID + "," + matrix;
-	console.log(args);
-
-	entityArray[selectedEntityID].matrix = matrix;
-	SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
-}
-
-function UpdateCameraPos(x, y, z) {
-	camera.position.set(x, y, z);
-	camera.position.set(x, y, z);
-	// render();
-}
-
-function UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz) {
-	let m = new THREE.Matrix4();
-
-	m.set(lx, ux, fx, 0,
-		ly, uy, fy, 0,
-		lz, uz, fz, 0,
-		0, 0, 0, 0);
-
-
-	camera.setRotationFromMatrix(m);
-	render();
-}
-
-function SetFov(p_Fov) {
-	camera.fov = p_Fov;
-	camera.updateProjectionMatrix();
-}
-
-function SetGizmoMode(p_Mode) {
-	var radio = $('#tools #' + p_Mode);
-	radio[0].checked = true;
-	$('#tools').find('input').button("refresh");
-
-	if (p_Mode === "select") {
-		HideGizmo();
-		return
+		return mesh;
 	}
 
-	if (control.visible === false) {
-		ShowGizmo();
+	DeleteObject(mesh){
+		// this.scene.remove( mesh );
+		THREE.SceneUtils.detach( mesh, mesh.parent, this.scene );
+		this.control.detach(mesh);
+		this.scene.remove( mesh );
+		
+		this.Render();
+		// delete mesh;
 	}
-	control.setMode(p_Mode);
-}
 
-function SetWorldSpace(p_Space) {
-	if (p_Space === "local" || p_Space === "world") {
-		control.setSpace(p_Space);
-		var radio = $('#worldSpace #' + p_Space);
+
+	UpdateObject(mesh, transform) {
+		// console.log(transform.trans);
+		let matrix = new THREE.Matrix4();
+		matrix.set(
+			transform.left.x, transform.up.x, transform.forward.x, 0,
+			transform.left.y, transform.up.y, transform.forward.y, 0,
+			transform.left.z, transform.up.z, transform.forward.z, 0,
+			0, 0, 0, 1);
+		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		mesh.setRotationFromMatrix(matrix);
+
+		this.Render();
+	}
+
+	AttachGizmoTo(mesh){
+		this.control.attach(mesh);
+		this.Render();
+	}
+
+	HideGizmo() {
+		this.control.visible = false;
+		// this.mesh.visible = false;
+		this.Render();
+	}
+
+	ShowGizmo() {
+		this.control.visible = true;
+		// this.mesh.visible = true;
+
+		this.Render();
+	}
+
+	Render() {
+		if (this.control == null) {
+			return
+		}
+		this.control.update();
+		this.renderer.render(this.scene, this.camera);
+	}
+
+	UpdateCameraPos(x, y, z) {
+		this.camera.position.set(x, y, z);
+		this.camera.position.set(x, y, z);
+		this.Render();
+	}
+
+	SetFov(p_Fov) {
+		this.camera.fov = p_Fov;
+		this.camera.updateProjectionMatrix();
+	}
+
+	SetGizmoMode(p_Mode) {
+		let radio = $('#tools #' + p_Mode);
 		radio[0].checked = true;
-		$('#worldSpace').find('input').button("refresh");
-	} else {
-		console.error("Tried to set an invalid world space")
+		$('#tools').find('input').button("refresh");
+
+		if (p_Mode === "select") {
+			this.HideGizmo();
+			return
+		}
+
+		if (this.control.visible === false) {
+			this.ShowGizmo();
+		}
+		this.control.setMode(p_Mode);
+		console.log("Changed gizmo mode to " + p_Mode)
 	}
 
-}
+	SetWorldSpace(p_Space) {
+		if (p_Space === "local" || p_Space === "world") {
+			this.control.setSpace(p_Space);
+			var radio = $('#worldSpace #' + p_Space);
+			radio[0].checked = true;
+			$('#worldSpace').find('input').button("refresh");
+			console.log("Changed worldspace to " + p_Space);
+			this.worldSpace = p_Space;
+		} else {
+			console.error("Tried to set an invalid world space")
+		}
+	}
 
-function onMouseUp(e) {
-	$('#page').find('canvas').css("z-index", 0)
-}
+	ToggleWorldSpace() {
+		if(this.worldSpace == "local") {
+			this.SetWorldSpace("world")
+		} else {
+			this.SetWorldSpace("local")
+		}
+	}
 
-function onMouseDown(e) {
-	$('#page').find('canvas').css("z-index", 1)
+	EnableGridSnap() {
+		this.gridSnap = true;
+		this.control.setTranslationSnap( 0.5 );
+		this.control.setRotationSnap( THREE.Math.degToRad( 15 ) )
+	}
+
+	DisableGridSnap() {
+		this.gridSnap = false;
+		this.control.translationSnap = null;
+		this.control.rotationSnap = null;
+	}
+
+	ToggleGridSnap() {
+		if(this.gridSnap) {
+			this.DisableGridSnap();
+		} else {
+			this.EnableGridSnap();
+		}
+	}
+
+	static onMouseUp(e) {
+		$('#page').find('canvas').css("z-index", 0)
+	}
+
+	static onMouseDown(e) {
+		$('#page').find('canvas').css("z-index", Number.MAX_SAFE_INTEGER)
+	}
+
+	onWindowResize() {
+		let webGL = this.editor.webGL;
+
+		webGL.camera.aspect = window.innerWidth / window.innerHeight;
+		webGL.camera.updateProjectionMatrix();
+		webGL.renderer.setSize(window.innerWidth, window.innerHeight);
+		webGL.Render();
+	}
+
+	onControlChanged() {
+		editor.webGL.Render();
+	}
+
+	onObjectChanged() {
+		if (editor.selectedEntity == null) {
+			return;
+		}
+
+		editor.selectedEntity.OnMove(false);
+		// editor.webGL.Render();
+	}
+
+	UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz) {
+		let m = new THREE.Matrix4();
+
+		m.set(lx, ux, fx, 0,
+			ly, uy, fy, 0,
+			lz, uz, fz, 0,
+			0, 0, 0, 0);
+
+		this.camera.setRotationFromMatrix(m);
+		this.Render();
+	}
+
 }

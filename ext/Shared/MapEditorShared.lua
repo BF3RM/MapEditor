@@ -42,7 +42,9 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 		-- Catch all blueprints
 		if(l_Instance.typeInfo.name == "ObjectBlueprint" or 
 			l_Instance.typeInfo.name == "PrefabBlueprint" or
-			l_Instance.typeInfo.name == "SpatialPrefabBlueprint" ) then
+			l_Instance.typeInfo.name == "SpatialPrefabBlueprint" or
+			l_Instance.typeInfo.name == "EffectBlueprint" or
+			l_Instance.typeInfo.name == "VehicleBlueprint") then
 
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
 			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))

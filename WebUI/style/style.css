@@ -15,7 +15,7 @@ html, body, #fullheight {
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	height: 100%;
+	height: calc( 100% - 30px );
 	overflow: hidden;
 	font-family: sans-serif;
 }
@@ -152,25 +152,31 @@ li.ui-widget-seperator {
 }
 
 .window {
-	width: 25%;
-    height: 25%;
+	width: 300px;
+    height: 500px;
 	background-color: #fff;
     max-height: 90%;
-    position: absolute;
+    position: absolute!important;
+    overflow: hidden;
+    display: flex; /* important */
+    flex-direction: column; /* important */
+    border: 1px solid #a0a0a0;
 }
-
-.window .content {
-    max-height: calc(100% - 60px);
+.content {
+    height: inherit;
 }
 .window .header {
     background-color: #D94C42;
-    padding: 5px;
     font-weight: bold;
     color: #fff;
-    display: flex;
     justify-content: space-between;
+    display: flex;
+    padding: 3px;
 }
 
+.content ol ul {
+    padding-left: 30px;
+}
 .transform input {
     width: calc(33.33% - 30px);
     margin: 2px;
@@ -181,8 +187,11 @@ li.ui-widget-seperator {
     padding-bottom: 10px;
 }
 
-#inspector .name input {
+#inspector input {
     width: calc(100% - 5px);
+}
+.position, .rotation, .scale {
+    display: flex;
 }
 canvas {
     position: absolute;
@@ -197,6 +206,78 @@ canvas {
 }
 
 .window {
-    z-index: 100;
 }
-        
+.window .content {
+    margin: 2px;
+}
+
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+li.placeholder {
+    /* border: 1px solid #000; */
+    width: 100%;
+    border-bottom: 2px solid #68b9ff;
+    position: absolute;
+}
+.dragged {
+    /*position: absolute;*/
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+ol.content li.placeholder {
+    position: relative;
+    border: 1px solid #000000;
+    /** More li styles **/
+}
+ol.content li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}
+
+li.group.expanded i:before {
+    content: "⯆";
+    opacity: 0.4;
+}
+
+li.group.collapsed i:before {
+    content: "⯈";
+    opacity: 0.4;
+}
+
+li.group.expanded i:active:before {
+    opacity: 1;
+}
+
+ul li > li.placeholder:first-of-type {
+    border-bottom: none;
+}
+li.dropHighLighted li.placeholder {
+    border-bottom: none;
+}
+li.dropHighLighted > .title:first-of-type{
+    border: 1px solid #68b9ff;
+    background-color: #68b9ff3b;
+    border-radius: 5px;
+    margin: -1px;
+}
+
+.group .title {
+    display: flex;
+}
+
+li.group.selected > .title{
+    width: 100%;
+    background-color: #68b9ff3b;
+}
+
+li.entity.selected {
+    width: 100%;
+    background-color: #68b9ff3b;
+}
+
+#savingTextArea{
+    width: 50vw;
+    height: 50vh;
+}
