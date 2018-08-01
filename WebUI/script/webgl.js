@@ -146,18 +146,28 @@ class WebGL {
 		return mesh;
 	}
 
-	DeleteObject(mesh){
-		// this.scene.remove( mesh );
-		THREE.SceneUtils.detach( mesh, mesh.parent, this.scene );
-		this.control.detach(mesh);
-		this.scene.remove( mesh );
+	MoveObject(webObject, x, y, z){
+		if(webObject == null){
+			return;
+		}
+
+		webObject.position.x = x;
+		webObject.position.y = y;
+		webObject.position.z = z;
+
+		this.Render();
+	}
+
+	DeleteObject(webObject){
+		THREE.SceneUtils.detach( webObject, webObject.parent, this.scene );
+		this.control.detach(webObject);
+		this.scene.remove( webObject );
 		
 		this.Render();
-		// delete mesh;
 	}
 
 
-	UpdateObject(mesh, transform) {
+	UpdateObject(webObject, transform) {
 		// console.log(transform.trans);
 		let matrix = new THREE.Matrix4();
 		matrix.set(
@@ -165,14 +175,14 @@ class WebGL {
 			transform.left.y, transform.up.y, transform.forward.y, 0,
 			transform.left.z, transform.up.z, transform.forward.z, 0,
 			0, 0, 0, 1);
-		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
-		mesh.setRotationFromMatrix(matrix);
+		webObject.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+		webObject.setRotationFromMatrix(matrix);
 
 		this.Render();
 	}
 
-	AttachGizmoTo(mesh){
-		this.control.attach(mesh);
+	AttachGizmoTo(webObject){
+		this.control.attach(webObject);
 		this.Render();
 	}
 
