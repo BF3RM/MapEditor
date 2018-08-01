@@ -12,10 +12,15 @@ class WebGL {
 		this._onControlChanged = this.onControlChanged.bind(this);
 		this._onObjectChanged = this.onObjectChanged.bind(this);
 		this._onWindowResize = this.onWindowResize.bind(this);
+
+		this._onMouseMove = this.onMouseMove.bind(this);
+		this._onMouseDown = this.onMouseDown.bind(this);
+		this._onMouseUp = this.onMouseUp.bind(this);
+
 		this.Initialize();
 		this.RegisterEvents();
 
-
+		this.raycastPlacing = false;
 	}
 	Initialize() {
 		this.renderer = new THREE.WebGLRenderer({
@@ -33,6 +38,7 @@ class WebGL {
 		this.scene = new THREE.Scene();
 		this.CreateGizmo();
 		this.SetFov(90);
+
 	}
 
 	RegisterEvents() {
@@ -50,6 +56,15 @@ class WebGL {
 			}
 		});
 		window.addEventListener('resize',this.onWindowResize, false);
+
+		this.renderer.domElement.addEventListener('mousemove',this._onMouseMove, false);
+		this.renderer.domElement.addEventListener('mouseup', this._onMouseUp, false);
+		this.renderer.domElement.addEventListener('mousedown', this._onMouseDown, false);
+		
+		this.control.addEventListener('change', this._onControlChanged);
+		this.control.addEventListener('mouseUp', WebGL.onControlMouseUp, false);
+		this.control.addEventListener('mouseDown', WebGL.onControlMouseDown, false);
+		this.control.addEventListener('objectChange', this._onObjectChanged);
 	}
 
 	CreateGizmo() {
@@ -60,10 +75,6 @@ class WebGL {
 
 		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
 		this.control.setSpace("local");
-		this.control.addEventListener('change', this._onControlChanged);
-		this.control.addEventListener('mouseUp', WebGL.onMouseUp, false);
-		this.control.addEventListener('mouseDown', WebGL.onMouseDown, false);
-		this.control.addEventListener('objectChange', this._onObjectChanged);
 
 		this.scene.add(this.control);		
 
@@ -203,7 +214,6 @@ class WebGL {
 		if (this.control == null) {
 			return
 		}
-		this.control.update();
 		this.renderer.render(this.scene, this.camera);
 	}
 
@@ -275,13 +285,45 @@ class WebGL {
 			this.EnableGridSnap();
 		}
 	}
+	onMouseUp(e) {
+		if(e.which == 1 && editor.webGL.raycastPlacing) {
+			editor.webGL.ShowGizmo();
+			editor.webGL.raycastPlacing = false;
+			$('#page').find('canvas').css("z-index", 0)
+		} 
+	}
+	onMouseDown(e) {
 
-	static onMouseUp(e) {
-		$('#page').find('canvas').css("z-index", 0)
 	}
 
-	static onMouseDown(e) {
+	onMouseMove(e) {
+		let mousePos = []
+		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+		if(editor.webGL.raycastPlacing) {
+			editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
+		}
+	}
+	static onControlMouseUp(e) {
+		if(editor.webGL.raycastPlacing == false) {
+			$('#page').find('canvas').css("z-index", 0)
+		}
+	}
+
+	static onControlMouseDown(e) {
 		$('#page').find('canvas').css("z-index", Number.MAX_SAFE_INTEGER)
+
+		if( keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
+
+			let event = document.createEvent("HTMLEvents");
+			event.initEvent("mouseup", true, true); // The custom event that will be created
+			editor.webGL.raycastPlacing = true;
+			editor.webGL.renderer.domElement.dispatchEvent(event);
+			editor.webGL.HideGizmo();
+			
+		}
+
 	}
 
 	onWindowResize() {
@@ -295,9 +337,10 @@ class WebGL {
 
 	onControlChanged() {
 		editor.webGL.Render();
+
 	}
 
-	onObjectChanged() {
+	onObjectChanged(e) {
 		if (editor.selectedEntity == null) {
 			return;
 		}
