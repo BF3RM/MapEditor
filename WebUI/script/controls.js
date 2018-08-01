@@ -29,6 +29,7 @@ $(document).keydown(function(e) {
 	if($(document.activeElement)[0].tagName == "INPUT") {
 		return;
 	}
+	console.log(e.which);
 	keysdown[e.which] = true;
 	if(e.which == 81) { // Q
 		editor.webGL.SetGizmoMode("select")
@@ -56,6 +57,12 @@ $(document).keydown(function(e) {
 	}
 	if( keysdown[17] && e.which == 68) { // CTRL + D
 		editor.selectedEntity.Clone();
+	}
+
+	if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
+		editor.redo()
+	} else if( keysdown[17] && e.which == 90) { // CTRL + z
+		editor.undo()
 	}
 	if(e.which == 17) { // CTRL
 		editor.webGL.EnableGridSnap()

@@ -4,6 +4,7 @@ class GameObject {
 		this.name = name;
 		this.type = type;
 		this.transform = transform;
+		this.initialTransform = transform;
 		this.webObject = webObject;
 		this.instance = instance;
 		this.parent = parent;
@@ -161,12 +162,20 @@ class Group extends GameObject{
 		editor.webGL.RemoveFromGroup(child.webObject);
 		// this.children.remove(child.id);
 	}
+
+	Clone() {
+		return new Group(this.id, this.name, this.type, this.transform, this.parent, this.children)
+	}
 }
 class Vec3 {
 	constructor(x,y,z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	Clone() {
+		return new Vec3(this.x, this.y, this.z)
 	}
 }
 
@@ -244,6 +253,9 @@ class LinearTransform {
 			matrixArray[13],
 			matrixArray[14]);
 		return this;
+	}
+	Clone() {
+		return new LinearTransform(this.left, this.up, this.forward, this.trans)
 	}
 }
 
