@@ -156,12 +156,7 @@ class Hierarchy {
             editor.SelectEntityById(groupObject.id)
         });
 
-        if(editor.selectedEntity != null) {
-            this.entries[editor.selectedEntity.id].after(group);
-        } else {
-            $('.spawnedEntities').append(group);
-        }
-        return groupObject;
+        $('.spawnedEntities').append(group);
     }
 
     static CollapseGroup(group) {

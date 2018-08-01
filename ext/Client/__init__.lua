@@ -191,6 +191,7 @@ function MapEditorClient:OnEnableFreecam()
 end
 
 function MapEditorClient:OnMoveObjectWithRaycast(p_Args)
+	print(p_Args)
 	if p_Args == nil then
 		print("p_Args is nil")
 		return
@@ -246,7 +247,7 @@ function MapEditorClient:OnDeselectEntity(p_ID)
 end
 
 function MapEditorClient:OnSetEntityMatrix(p_Args) 
-	-- print("OnSetEntityMatrix "..p_Args)
+	print("OnSetEntityMatrix "..p_Args)
 	if p_Args == nil then
 		print("p_Args is nil")
 		return
@@ -274,7 +275,7 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 			s_Forward,
 			s_Position
 		)
-
+	print(p_ArgsArray[1])
 	Events:Dispatch('BlueprintManager:MoveBlueprintFromClient', p_ArgsArray[1], tostring(s_Transform))
 end
 

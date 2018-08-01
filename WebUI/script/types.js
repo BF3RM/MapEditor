@@ -94,13 +94,11 @@ class GameObject {
 
 	Clone(newParent){
 
-		if( newParent == null){
-			newParent = this.parent;
-		}
-
 		if( this.type == "group" ){
-			let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, newParent);
-
+			console.log("group with id "+ this.id);
+			
+			//Parent has to be null to avid circular referencing, we update it after cloning its children
+			let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, null); 
 			if (this.children != null) {
 
 				for (var key in this.children) {
@@ -135,11 +133,17 @@ class Group extends GameObject{
 	}
 
 	OnAddChild(child){
-		// This moves the object too for some reason
+		
+		// Move group to first child's position
 		if (this.children.length == null && this.transform.trans.x == 0) {
 			this.Move(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z)
 			this.transform = child.transform;
 
+		}
+
+		// Remove child from its parent
+		if(child.parent!= null){
+			child.parent.OnRemoveChild(child);
 		}
 		
 		// Update parent
@@ -153,13 +157,13 @@ class Group extends GameObject{
 	}
 
 	OnRemoveChild(child){
-		// Update parent
+		// Update child parent
 		child.parent = null;
 		editor.rootEntities[child.id] = child;
 
+		// Remove child from group
 		delete this.children[child.id];
 		editor.webGL.RemoveFromGroup(child.webObject);
-		// this.children.remove(child.id);
 	}
 }
 class Vec3 {

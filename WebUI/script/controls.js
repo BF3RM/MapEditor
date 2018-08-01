@@ -43,10 +43,10 @@ $(document).keydown(function(e) {
 		editor.webGL.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
-		
+		editor.selectedEntity.Clone(editor.selectedEntity.parent);
 	}
-	if(e.which == 70) { // R
-
+	if(e.which == 71) { // G
+		editor.selectedEntity.Clone();
 	}
 	if(e.which == 112) { // F1
 
@@ -54,8 +54,17 @@ $(document).keydown(function(e) {
 	if(e.which == 80) { // P
 		editor.SelectParent();
 	}
-	if( keysdown[17] && e.which == 68) { // CTRL + D
-		editor.selectedEntity.Clone();
+	if( keysdown[17] && e.which == 68) { // CTRL + D 
+		editor.selectedEntity.Clone(editor.selectedEntity.parent); //Clone on orginal entity's parent
+	}
+	if( keysdown[17] && e.which == 67) { // CTRL + C 
+		editor.copiedEntity = editor.selectedEntity; // Copy entity
+	}
+	if( keysdown[17] && e.which == 86) { // CTRL + V
+		editor.Paste(); // Paste entity
+	}
+	if( keysdown[17] && keysdown[16] && e.which == 68) { // CTRL + SHIFT + D
+		editor.selectedEntity.Clone(); //Clone on root
 	}
 	if(e.which == 17) { // CTRL
 		editor.webGL.EnableGridSnap()
@@ -74,9 +83,4 @@ $(document).keyup(function(e){
 	if(e.which == 17) { // CTRL
 		editor.webGL.DisableGridSnap()
 	}
-});
-
-document.addEventListener('mousemove', function (e) {
-	mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-	mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 });

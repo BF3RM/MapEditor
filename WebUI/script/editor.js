@@ -24,6 +24,7 @@ class Editor {
 		this.history = {};
 		this.currentHistoryStep = 0;
 		this.Initialize();
+		this.copiedEntity = null;
 	}
 
 	Initialize() {
@@ -85,10 +86,16 @@ class Editor {
 	}
 
 	RequestMoveObjectWithRaycast(mouseVec2){
+		if (this.selectedEntity == null) {
+			console.log("No entity selected, cannot move with raycast");
+			return;
+		}
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera( mouseVec2, this.webGL.camera );
 		let direction = raycaster.ray.direction;
-		editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:MoveObjectWithRaycast', this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z);
+		let args = this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z;
+		console.log(args);
+		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:MoveObjectWithRaycast', args) ;
 	}
 
 	SelectParent(){
@@ -101,6 +108,32 @@ class Editor {
 		}
 
 		this.SelectEntityById(this.selectedEntity.parent.id);
+	}
+
+	Paste(){
+		if(editor.copiedEntity == null){
+			// console.log("copied entity is null");
+			return;
+		}
+		let p = null;
+		if (editor.selectedEntity != null) {
+			
+			if(editor.selectedEntity.type == "group"){
+				// console.log("selected entity is group");
+				p = editor.selectedEntity;
+			}
+
+			else if(editor.selectedEntity.type == "Blueprint"){
+				// console.log("selected entity is Blueprint");
+				p = editor.selectedEntity.parent;
+			}
+		}
+		// Make sure we dont run into a loop, this only happens if you try to paste a group inside itself
+		// if (editor.copiedEntity == p){
+		// 	p = p.parent;
+		// }
+		editor.copiedEntity.Clone(p);		
+
 	}
 	/*
 

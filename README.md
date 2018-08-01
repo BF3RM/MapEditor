@@ -18,6 +18,7 @@ Once in freecam, hold right click and:
 
 In freecam, without holding right click:
 
+- CTRL while moving gizmo to snap to grid
 - F to place object where the mouse is at (screen to world)
 - Q to hide gizmo
 - W to change gizmo mode to translate
@@ -26,4 +27,7 @@ In freecam, without holding right click:
 - X to toggle world/local coordinates
 - F3 to reset the camera
 - P to select parent
-- O to clone selected entity
+- CTRL+D to clone selected entity to the same directory
+- CTRL+SHIFT+D to clone selected entity to the root directory
+- CTRL+C to copy selected entity
+- CTRL+V to paste saved entity to the selected group 
