@@ -94,34 +94,13 @@ class GameObject {
 	}
 
 	Clone(newParent){
-
-		if( this.type == "group" ){
-			console.log("group with id "+ this.id);
-			
-			//Parent has to be null to avid circular referencing, we update it after cloning its children
-			let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, null); 
-			if (this.children != null) {
-
-				for (var key in this.children) {
-					this.children[key].Clone(clone);
-				}
-			}
-
-			// Move it inside the parent
-			if(newParent != null){
-				editor.ui.hierarchy.MoveElementsInHierarchy(newParent, clone);
-			}
+		let parentId = "";
+		if(newParent != null){
+			parentId = newParent.id;
 		}
-		else if( this.type == "Blueprint"){
-
-			let parentId = "";
-			if(newParent != null){
-				parentId = newParent.id;
-			}
-			let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getMatrix().toString()+ ":" + parentId;
-			console.log(args);
-			editor.vext.SendEvent(this.id, 'MapEditor:SpawnInstance', args);
-		}
+		let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getMatrix().toString()+ ":" + parentId;
+		console.log(args);
+		editor.vext.SendEvent(this.id, 'MapEditor:SpawnInstance', args);
 	}
 }
 
@@ -167,9 +146,23 @@ class Group extends GameObject{
 		editor.webGL.RemoveFromGroup(child.webObject);
 	}
 
-	Clone() {
-		return new Group(this.id, this.name, this.type, this.transform, this.parent, this.children)
-	}
+	Clone(newParent) {
+		console.log("group with id "+ this.id);
+		
+		//Parent has to be null to avid circular referencing, we update it after cloning its children
+		let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, null); 
+		if (this.children != null) {
+
+			for (var key in this.children) {
+				this.children[key].Clone(clone);
+			}
+		}
+
+		// Move it inside the parent
+		if(newParent != null){
+			editor.ui.hierarchy.MoveElementsInHierarchy(newParent, clone);
+		}
+	}	
 }
 class Vec3 {
 	constructor(x,y,z) {
