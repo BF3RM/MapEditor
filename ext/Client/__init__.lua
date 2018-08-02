@@ -191,6 +191,7 @@ function MapEditorClient:OnEnableFreecam()
 end
 
 function MapEditorClient:OnMoveObjectWithRaycast(p_Args)
+	print(p_Args)
 	if p_Args == nil then
 		print("p_Args is nil")
 		return
@@ -246,7 +247,7 @@ function MapEditorClient:OnDeselectEntity(p_ID)
 end
 
 function MapEditorClient:OnSetEntityMatrix(p_Args) 
-	-- print("OnSetEntityMatrix "..p_Args)
+	print("OnSetEntityMatrix "..p_Args)
 	if p_Args == nil then
 		print("p_Args is nil")
 		return
@@ -274,7 +275,7 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 			s_Forward,
 			s_Position
 		)
-
+	print(p_ArgsArray[1])
 	Events:Dispatch('BlueprintManager:MoveBlueprintFromClient', p_ArgsArray[1], tostring(s_Transform))
 end
 
@@ -350,7 +351,6 @@ function MapEditorClient:MoveWithRaycast()
 	)
 
 	if s_Raycast ~= nil then
-		print("MoveWithRaycast: raycast succeeded")
 		WebUI:ExecuteJS(string.format('editor.OnMoveEntityWithRaycast( \"%s\", %s, %s, %s)', self.pendingMoveWithRaycast.id, s_Raycast.position.x, s_Raycast.position.y, s_Raycast.position.z ))
 	else
 		print("MoveWithRaycast: raycast failed")

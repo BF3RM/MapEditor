@@ -44,7 +44,7 @@ class GameObject {
 
 		}
 		else{
-			vext.SendEvent('DispatchEventLocal', 'MapEditor:SetEntityMatrix', args);
+			editor.vext.SendEvent(this.id, 'MapEditor:SetEntityMatrix', args);
 		}
 	}
 
@@ -57,7 +57,7 @@ class GameObject {
 	}
 
 	Delete() {
-		// Deselect this entity 
+		// Deselect this entity
 		editor.DeselectEntity(this);
 
 		// Delete its children
@@ -70,7 +70,7 @@ class GameObject {
 
 		else{
 			// Delete the entity on VU
-			editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DeleteEntity', this.id)
+			editor.vext.SendEvent(this.id, 'MapEditor:DeleteEntity', this.id)
 		}
 
 		// Remove the parent's reference
@@ -87,7 +87,7 @@ class GameObject {
 			delete editor.rootEntities[this.id];
 		}
 
-		// Delete the entity on the hierarchy 
+		// Delete the entity on the hierarchy
 		editor.ui.hierarchy.OnDeleteEntry(this);
 
 
@@ -95,13 +95,11 @@ class GameObject {
 
 	Clone(newParent){
 
-		if( newParent == null){
-			newParent = this.parent;
-		}
-
 		if( this.type == "group" ){
-			let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, newParent);
-
+			console.log("group with id "+ this.id);
+			
+			//Parent has to be null to avid circular referencing, we update it after cloning its children
+			let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, null); 
 			if (this.children != null) {
 
 				for (var key in this.children) {
@@ -122,7 +120,7 @@ class GameObject {
 			}
 			let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getMatrix().toString()+ ":" + parentId;
 			console.log(args);
-			vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstance', args);
+			editor.vext.SendEvent(this.id, 'MapEditor:SpawnInstance', args);
 		}
 	}
 }
@@ -136,11 +134,17 @@ class Group extends GameObject{
 	}
 
 	OnAddChild(child){
-		// This moves the object too for some reason
+		
+		// Move group to first child's position
 		if (this.children.length == null && this.transform.trans.x == 0) {
 			this.Move(child.webObject.position.x, child.webObject.position.y, child.webObject.position.z)
 			this.transform = child.transform;
 
+		}
+
+		// Remove child from its parent
+		if(child.parent!= null){
+			child.parent.OnRemoveChild(child);
 		}
 		
 		// Update parent
@@ -154,13 +158,17 @@ class Group extends GameObject{
 	}
 
 	OnRemoveChild(child){
-		// Update parent
+		// Update child parent
 		child.parent = null;
 		editor.rootEntities[child.id] = child;
 
+		// Remove child from group
 		delete this.children[child.id];
 		editor.webGL.RemoveFromGroup(child.webObject);
-		// this.children.remove(child.id);
+	}
+
+	Clone() {
+		return new Group(this.id, this.name, this.type, this.transform, this.parent, this.children)
 	}
 
 	Clone() {
@@ -213,7 +221,7 @@ class LinearTransform {
 			Number(matrix[0]),
 			Number(matrix[1]),
 			Number(matrix[2]));
-		
+
 		this.up = new Vec3(
 			Number(matrix[3]),
 			Number(matrix[4]),
@@ -237,7 +245,7 @@ class LinearTransform {
 			matrixArray[0],
 			matrixArray[1],
 			matrixArray[2]);
-		
+
 		this.up = new Vec3(
 			matrixArray[4],
 			matrixArray[5],
@@ -282,5 +290,39 @@ class Camera {
 	SetTransform(transform) {
 		this.transform = transform
 		//Update the three stuff
+	}
+}
+
+class VextEvents {
+	constructor() {
+		this.sortedEvents = [];
+		this.events = [];
+	}
+
+	AddEvent(index, id, key, value) {
+		var message =  new VextMessage(index, id, key, value);
+		if(this.events[id] == null) {
+			this.events[id] = [];
+		}
+		this.events[id][key] = message;
+	}
+
+	Sort() {
+		for( let id in this.events) {
+			for( let type in this.events[id]) {
+				let message = this.events[id][type];
+				this.sortedEvents[message.index] = this.events[id][type];
+			}
+		}
+	}
+
+}
+
+class VextMessage {
+	constructor(index, id, key, value) {
+		this.index = index;
+		this.id = id;
+		this.key = key;
+		this.value = value;
 	}
 }

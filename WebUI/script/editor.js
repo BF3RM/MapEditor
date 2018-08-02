@@ -24,6 +24,7 @@ class Editor {
 		this.history = new History( this);
 
 		this.Initialize();
+		this.copiedEntity = null;
 	}
 
 	Initialize() {
@@ -47,7 +48,7 @@ class Editor {
 		let variations = instance.variations;
 
 		//Check if the variation is unkown and we've previously spawned this object.
-		if (variations.length == null && this.confirmedBlueprints[p_InstanceGuid] == null) {
+		if ((variations.length == null || variations.length == 0) && this.confirmedBlueprints[p_InstanceGuid] == null) {
 			this.confirmInstance = instance;
 			console.log("Unknown variation!");
 			// Bring up warning dialog.
@@ -74,7 +75,7 @@ class Editor {
 
 	SpawnInstanceWithRaycast(instance, variation = -1) {
 		console.log(instance);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SpawnInstanceWithRaycast', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
+		this.vext.SendEvent(instance.instanceGuid, 'MapEditor:SpawnInstanceWithRaycast', GenerateGuid() + ":" + instance.partitionGuid + ":" + instance.instanceGuid + ":" + variation)
 	}
 	TrackEntity(id, gameObject) {
 		this.spawnedEntities[id] = gameObject;
@@ -85,10 +86,16 @@ class Editor {
 	}
 
 	RequestMoveObjectWithRaycast(mouseVec2){
+		if (this.selectedEntity == null) {
+			console.log("No entity selected, cannot move with raycast");
+			return;
+		}
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera( mouseVec2, this.webGL.camera );
 		let direction = raycaster.ray.direction;
-		editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:MoveObjectWithRaycast', this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z);
+
+		let args = this.selectedEntity.id +","+ direction.x +","+ direction.y +","+ direction.z;
+		this.vext.SendEvent(this.selectedEntity.id, 'MapEditor:MoveObjectWithRaycast', args);
 	}
 
 	SelectParent(){
@@ -101,6 +108,32 @@ class Editor {
 		}
 
 		this.SelectEntityById(this.selectedEntity.parent.id);
+	}
+
+	Paste(){
+		if(editor.copiedEntity == null){
+			// console.log("copied entity is null");
+			return;
+		}
+		let p = null;
+		if (editor.selectedEntity != null) {
+			
+			if(editor.selectedEntity.type == "group"){
+				// console.log("selected entity is group");
+				p = editor.selectedEntity;
+			}
+
+			else if(editor.selectedEntity.type == "Blueprint"){
+				// console.log("selected entity is Blueprint");
+				p = editor.selectedEntity.parent;
+			}
+		}
+		// Make sure we dont run into a loop, this only happens if you try to paste a group inside itself
+		// if (editor.copiedEntity == p){
+		// 	p = p.parent;
+		// }
+		editor.copiedEntity.Clone(p);		
+
 	}
 	/*
 
@@ -190,7 +223,7 @@ class Editor {
 
 		// Trigger selected on the different classes
 		this.webGL.AttachGizmoTo(gameObject.webObject);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:SelectEntity', gameObject.id);
+		this.vext.SendEvent(gameObject.id, 'MapEditor:SelectEntity', gameObject.id);
         this.ui.onSelectEntity(gameObject);
 		this.selectedEntity = gameObject;
 
@@ -203,7 +236,7 @@ class Editor {
 		}
 
 		this.ui.onDeselectEntity(gameObject);
-		this.vext.SendEvent('DispatchEventLocal', 'MapEditor:UnselectEntity', gameObject.id)
+		this.vext.SendEvent(gameObject.id, 'MapEditor:UnselectEntity', gameObject.id)
 		this.selectedEntity = null;
 	}
 
