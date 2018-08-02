@@ -24,7 +24,13 @@ class GameObject {
 	}
 
 	OnMove(noUpdateInspector) {
-		let matrix = this.webObject.matrixWorld.toArray().toString();
+		let matrix = this.webObject.matrixWorld.toArray();
+		matrix[12] = matrix[12].toFixed(4);
+		matrix[13] = matrix[13].toFixed(4);
+		matrix[14] = matrix[14].toFixed(4);
+		
+
+		matrix = matrix.toString();
 		if(matrix.includes("NaN")) {
 			this.webObject.matrixWorld.SetEntityMatrix(this.transform.getMatrix);
 			return

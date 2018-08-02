@@ -103,7 +103,7 @@ class Inspector {
 
 			editor.selectedEntity.webObject.rotation.copy(eulerRot);
 		} else {
-		   editor.selectedEntity.webObject[type][key] = value;
+		   editor.selectedEntity.webObject[type][key] = Number(value);
 		}
 		editor.webGL.Render();
 		editor.selectedEntity.OnMove(true);
@@ -137,8 +137,7 @@ class Inspector {
 				if(con == controls[1]) {
 					transform[con][val][0].value = control[val] * THREE.Math.RAD2DEG
 				} else {
-					console.log(control[val]);
-					transform[con][val][0].value = Math.round( control[val] * 1000) / 1000;
+					transform[con][val][0].value =control[val].toFixed(3)
 				}
 			});
 		});
