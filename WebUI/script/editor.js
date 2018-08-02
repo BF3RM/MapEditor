@@ -21,8 +21,8 @@ class Editor {
 		this.selectedEntity = null;
 		this.confirmInstance = null;
 
-		this.history = {};
-		this.currentHistoryStep = 0;
+		this.history = new History( this);
+
 		this.Initialize();
 		this.copiedEntity = null;
 	}
@@ -254,6 +254,28 @@ class Editor {
 		}
 		this.spawnedEntities[id].Move(x, y, z);
 
+	}
+
+	execute( cmd, optionalName ) {
+
+		this.history.execute( cmd, optionalName );
+		this.webGL.Render();
+	}
+
+	undo() {
+
+		this.history.undo();
+		this.webGL.Render();
+	}
+
+	redo() {
+
+		this.history.redo();
+		this.webGL.Render();
+	}
+
+	HistoryTest () {
+		this.execute( new SetPositionCommand( this.spawnedEntities[1].webObject, this.spawnedEntities[2].webObject.position ) );
 	}
 
 }

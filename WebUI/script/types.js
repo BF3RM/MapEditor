@@ -25,6 +25,10 @@ class GameObject {
 
 	OnMove(noUpdateInspector) {
 		let matrix = this.webObject.matrixWorld.toArray().toString();
+		if(matrix.includes("NaN")) {
+			this.webObject.matrixWorld.SetEntityMatrix(this.transform.getMatrix);
+			return
+		}
 		let args = this.id + "," + matrix;
 
 		let linearTransform = new LinearTransform().setFromMatrix(this.webObject.matrixWorld);
@@ -162,7 +166,7 @@ class Group extends GameObject{
 		if(newParent != null){
 			editor.ui.hierarchy.MoveElementsInHierarchy(newParent, clone);
 		}
-	}	
+	}
 }
 class Vec3 {
 	constructor(x,y,z) {

@@ -8,6 +8,9 @@
 		
 function EnableFreecam() {
 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
+
+	// Hack to make sure we don't navigate the windows while in freecam.
+	document.activeElement.blur()
 }
 
 // function DisableFreeView() {
@@ -29,6 +32,7 @@ $(document).keydown(function(e) {
 	if($(document.activeElement)[0].tagName == "INPUT") {
 		return;
 	}
+	console.log(e.which);
 	keysdown[e.which] = true;
 	if(e.which == 81) { // Q
 		editor.webGL.SetGizmoMode("select")
@@ -65,6 +69,12 @@ $(document).keydown(function(e) {
 	}
 	if( keysdown[17] && keysdown[16] && e.which == 68) { // CTRL + SHIFT + D
 		editor.selectedEntity.Clone(); //Clone on root
+	}
+
+	if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
+		editor.redo()
+	} else if( keysdown[17] && e.which == 90) { // CTRL + z
+		editor.undo()
 	}
 	if(e.which == 17) { // CTRL
 		editor.webGL.EnableGridSnap()
