@@ -8,6 +8,9 @@
 		
 function EnableFreecam() {
 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
+
+	// Hack to make sure we don't navigate the windows while in freecam.
+	document.activeElement.blur()
 }
 
 // function DisableFreeView() {

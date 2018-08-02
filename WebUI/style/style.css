@@ -286,3 +286,27 @@ li.entity.selected {
 ol.spawnedEntities {
     height: 100%;
 }
+
+#inspector .invalid {
+    background-color: #e87373;
+}
+
+#inspector .transform label {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    background-color: #e6e6e6;
+}
+#inspector .transform h2 {
+    font-variant-caps: small-caps;
+    opacity: 0.3;
+}
+div#objectInspector {
+    margin: 5px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+
+    /* display: none; <- Crashes Chrome on hover */
+}
