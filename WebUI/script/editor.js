@@ -112,27 +112,21 @@ class Editor {
 
 	Paste(){
 		if(editor.copiedEntity == null){
-			// console.log("copied entity is null");
 			return;
 		}
-		let p = null;
+		let parent = null;
 		if (editor.selectedEntity != null) {
 			
 			if(editor.selectedEntity.type == "group"){
-				// console.log("selected entity is group");
-				p = editor.selectedEntity;
+				parent = editor.selectedEntity;
 			}
 
 			else if(editor.selectedEntity.type == "Blueprint"){
-				// console.log("selected entity is Blueprint");
-				p = editor.selectedEntity.parent;
+				parent = editor.selectedEntity.parent;
 			}
 		}
-		// Make sure we dont run into a loop, this only happens if you try to paste a group inside itself
-		// if (editor.copiedEntity == p){
-		// 	p = p.parent;
-		// }
-		editor.copiedEntity.Clone(p);		
+
+		editor.copiedEntity.Clone(parent);		
 
 	}
 	/*

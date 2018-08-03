@@ -109,24 +109,24 @@ class WebGL {
 		return mesh;
 	}
 
-	AddToGroup(groupObject, gameObject){
+	AddToGroup(groupObject, webObject){
 
 		// don't do anything if the target group it the object group already
-		if (gameObject.parent === groupObject){
+		if (webObject.parent === groupObject){
 			return;
 		}
 
 		// remove child from parent and add it to scene
-		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
+		THREE.SceneUtils.detach( webObject, webObject.parent, this.scene );
 
 		// remove child from scene and add it to parent
-		THREE.SceneUtils.attach( gameObject, this.scene, groupObject );
+		THREE.SceneUtils.attach( webObject, this.scene, groupObject );
 
 		this.Render();
 	}
-	RemoveFromGroup(gameObject){
+	RemoveFromGroup(webObject){
 		// remove child from parent and add it to scene
-		THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
+		THREE.SceneUtils.detach( webObject, webObject.parent, this.scene );
 		
 		this.Render();
 	}
@@ -160,11 +160,20 @@ class WebGL {
 	MoveObject(webObject, x, y, z){
 		if(webObject == null){
 			return;
-		}
+		}		
 
-		webObject.position.x = x;
-		webObject.position.y = y;
-		webObject.position.z = z;
+		
+		// As the position is local, we have to detach the object from its parent first
+		let parent = webObject.parent;
+		// remove child from parent and add it to scene
+		THREE.SceneUtils.detach( webObject, parent, this.scene );
+
+		webObject.position.set(x,y,z);
+
+		this.Render();
+
+		// remove child from scene and add it to parent
+		THREE.SceneUtils.attach( webObject, this.scene, parent );
 
 		this.Render();
 	}
