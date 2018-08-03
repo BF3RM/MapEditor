@@ -253,29 +253,15 @@ function MapEditorClient:OnSetEntityMatrix(p_Args)
 		return
 	end
 
-	local p_ArgsArray = split(p_Args, ",")
+	local p_ArgsArray = split(p_Args, ":")
 
 	if p_ArgsArray == nil then
 		print("p_ArgsArray is nil")
 		return
 	end
 
-	-- if p_ArgsArray[1] ~= self.selectedEntityID then
-	-- 	error("Moved entity that isn't selected. Parameter: "..tonumber(p_ArgsArray[1])..", selected ID: ".. self.selectedEntityID)
-	-- end
-
-	local s_Left 		= Vec3( tonumber(p_ArgsArray[2]), tonumber(p_ArgsArray[3]), tonumber(p_ArgsArray[4]) )
-	local s_Up 			= Vec3( tonumber(p_ArgsArray[6]), tonumber(p_ArgsArray[7]), tonumber(p_ArgsArray[8]) )
-	local s_Forward  = Vec3( tonumber(p_ArgsArray[10]), tonumber(p_ArgsArray[11]), tonumber(p_ArgsArray[12]) )
-	local s_Position = Vec3( tonumber(p_ArgsArray[14]), tonumber(p_ArgsArray[15]), tonumber(p_ArgsArray[16]) )
-	-- print( s_Position )
-	local s_Transform = LinearTransform(
-			s_Left,
-			s_Up,
-			s_Forward,
-			s_Position
-		)
-	print(p_ArgsArray[1])
+	local s_Transform = StringToLinearTransform(p_ArgsArray[2])
+	
 	Events:Dispatch('BlueprintManager:MoveBlueprintFromClient', p_ArgsArray[1], tostring(s_Transform))
 end
 
@@ -310,13 +296,7 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 		print("Variation not passed! Defaulting to 0")
 		s_Variation = 0
 	end
-	local a = split(s_TransformString, ",")
-	local s_Transform = LinearTransform(
-			Vec3(tonumber(a[1]),tonumber(a[2]),tonumber(a[3])),
-			Vec3(tonumber(a[4]),tonumber(a[5]),tonumber(a[6])),
-			Vec3(tonumber(a[7]),tonumber(a[8]),tonumber(a[9])),
-			Vec3(tonumber(a[10]),tonumber(a[11]),tonumber(a[12]))
-		)
+	local s_Transform = StringToLinearTransform(s_TransformString)
 
 	Events:Dispatch('BlueprintManager:SpawnBlueprintFromClient', s_EntityID, Guid(s_PartitionGuid), Guid(s_InstanceGuid), s_TransformString, s_Variation )
 	self:RegisterEntity(s_InstanceGuid, s_EntityID, s_Transform, s_Variation, s_ParentID)
@@ -437,6 +417,16 @@ function MapEditorClient:ParseSavedEntities(p_Entities)
 		::continue::
 	end
 
+end
+
+function StringToLinearTransform(p_String)
+	local a = split(p_String, ",")
+	return LinearTransform(
+			Vec3(tonumber(a[1]),tonumber(a[2]),tonumber(a[3])),
+			Vec3(tonumber(a[4]),tonumber(a[5]),tonumber(a[6])),
+			Vec3(tonumber(a[7]),tonumber(a[8]),tonumber(a[9])),
+			Vec3(tonumber(a[10]),tonumber(a[11]),tonumber(a[12]))
+		)
 end
 
 function split(pString, pPattern)

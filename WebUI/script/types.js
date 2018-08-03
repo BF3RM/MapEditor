@@ -32,13 +32,11 @@ class GameObject {
 
 		matrix = matrix.toString();
 		if(matrix.includes("NaN")) {
-			this.webObject.matrixWorld.SetEntityMatrix(this.transform.getMatrix);
+			this.webObject.matrixWorld.SetEntityMatrix(this.transform.getAsArray);
 			return
 		}
-		let args = this.id + "," + matrix;
-
 		let linearTransform = new LinearTransform().setFromMatrix(this.webObject.matrixWorld);
-
+		let args = this.id + ":" + linearTransform.getAsArray().toString();
 		this.transform = linearTransform;
 
 		if(!noUpdateInspector) {
@@ -108,7 +106,7 @@ class GameObject {
 		if(newParent != null){
 			parentId = newParent.id;
 		}
-		let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getMatrix().toString()+ ":" + parentId;
+		let args = GenerateGuid() + ":" + this.instance.partitionGuid+ ":" + this.instance.instanceGuid+ ":" + this.variation + ":" + this.transform.getAsArray().toString()+ ":" + parentId;
 		console.log(args);
 		editor.vext.SendEvent(this.id, 'MapEditor:SpawnInstance', args);
 	}
@@ -210,7 +208,7 @@ class LinearTransform {
 		return this;
 	}
 
-	getMatrix() {
+	getAsArray() {
 		return [this.left.x, this.left.y, this.left.z, this.up.x, this.up.y, this.up.z, this.forward.x, this.forward.y, this.forward.z, this.trans.x, this.trans.y, this.trans.z];
 	}
 
