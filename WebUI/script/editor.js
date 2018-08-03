@@ -159,6 +159,11 @@ class Editor {
 	}
 
 	SpawnEntity(id, name, transform, instance, variation, parent){
+		if(this.spawnedEntities[id] != null){
+			console.log("An entity with this ID already exists");
+			return;
+		}
+
 		let webObject = this.webGL.CreateObject(transform);
 		let gameObject = new GameObject(id, name, "Blueprint", transform, webObject, instance, variation, null);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
@@ -194,6 +199,10 @@ class Editor {
 	}
 
 	CreateGroup(id, name, transform, parent){
+		if(this.spawnedEntities[id] != null){
+			console.log("A group with this ID already exists");
+			return;
+		}
 		let webObject = this.webGL.CreateGroup(transform);
 		let groupObject = new Group(id, name, webObject, transform, parent, {} );
 		this.ui.hierarchy.CreateGroup(groupObject);

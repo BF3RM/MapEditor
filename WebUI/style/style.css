@@ -278,7 +278,11 @@ li.entity.selected {
     background-color: #68b9ff3b;
 }
 
-#savingTextArea{
+#saveProjectTextArea{
+    width: 50vw;
+    height: 50vh;
+}
+#loadProjectTextArea{
     width: 50vw;
     height: 50vh;
 }

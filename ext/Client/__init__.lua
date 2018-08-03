@@ -42,6 +42,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:DeleteEntity', self, self.OnDeleteEntity)
 	Events:Subscribe('MapEditor:SetViewmode', self, self.OnSetViewmode)
 	Events:Subscribe('MapEditor:MoveObjectWithRaycast', self, self.OnMoveObjectWithRaycast)
+	Events:Subscribe('MapEditor:LoadProject', self, self.OnLoadProject)
 
 	-- Controls
 	-- Events:Subscribe('MapEditor:EnableKeyboard', self, self.OnEnableKeyboard)
@@ -91,7 +92,7 @@ function MapEditorClient:OnEngineMessage(p_Message)
 		Shared:FillVariations()
 	
 		WebUI:ExecuteJS(string.format("editor.OnRegisterInstances('%s')", json.encode(Shared.m_Blueprints)))
-		self:LoadJSONEntities() --Might be better to call this after a bit, so we are sure that all the blueprints are stored in js
+		self:LoadJSONEntities(JSONentities) --Might be better to call this after a bit, so we are sure that all the blueprints are stored in js
 	end
 end
 
@@ -302,6 +303,9 @@ function MapEditorClient:OnSpawnInstance(p_ParamsCombined)
 	self:RegisterEntity(s_InstanceGuid, s_EntityID, s_Transform, s_Variation, s_ParentID)
 end
 
+function MapEditorClient:OnLoadProject(p_JSONstring) 
+	self:LoadJSONEntities(p_JSONstring)
+end
 
 --------------- Class functions ---------------
 
@@ -354,16 +358,16 @@ function MapEditorClient:RegisterEntity(p_BlueprintID, p_EntityID, p_EntityTrans
 	WebUI:ExecuteJS(string.format('editor.OnSpawnedEntity( \"%s\", \"%s\", \"%s\", %s, \"%s\")', p_EntityID, p_BlueprintID, s_LinearTransformString, p_Variation, tostring(p_ParentID)))
 end
 
-function MapEditorClient:LoadJSONEntities() 
-	if JSONentities == nil or JSONentities == true then
+function MapEditorClient:LoadJSONEntities(p_JSONstring) 
+	if p_JSONstring == nil or p_JSONstring == true then
 		print("No entities saved in JSON")
 		return
 	end
 
 	print("Found JSON table, applying..")
 
--- print(JSONentities)
-	local entitiesTable = json.decode(JSONentities)
+-- print(p_JSONstring)
+	local entitiesTable = json.decode(p_JSONstring)
 -- print(entitiesTable)
 	if entitiesTable == '' then
 		print("JSON string is empty")
@@ -376,7 +380,6 @@ function MapEditorClient:LoadJSONEntities()
 	end
 
 	self:ParseSavedEntities(entitiesTable)
-
 	
 end
 

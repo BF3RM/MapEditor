@@ -19,10 +19,10 @@
 				<ul id="menubar">
 					<li><div>File</div>
 						<ul>
-							<li><div>New Project</div></li>
+							<li><div onclick="editor.ui.OpenClearDialog()">New Project</div></li>
 							<li><div onclick="editor.ui.OpenSaveDialog()">Save</div></li>
-							<li><div>Load</div></li>
-							<li><div>Reset</div></li>
+							<li><div onclick="editor.ui.OpenLoadDialog()">Load</div></li>
+							<li><div onclick="editor.ui.OpenReloadDialog()">Reset collision</div></li>
 						</ul>
 					</li>
 					<li><div>Edit</div>
@@ -99,20 +99,35 @@
 		</div>
 		<div id="dialogs">
 			<div id="variation-dialog" title="Unknown variation!">
-			  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span></p>
-			  <p>This object does not have a variation!</p>
-			  <br>
-			  <br>
-			  <p><b>There's a high chance it will crash your client.</b></p>
-			  <p>Are you sure you want to spawn this object?</p>
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span></p>
+				<p>This object does not have a variation!</p>
+				<br>
+				<br>
+				<p><b>There's a high chance it will crash your client.</b></p>
+				<p>Are you sure you want to spawn this object?</p>
 			</div>
 
 			<div id="delete-entity-dialog" title="Delete object">
-					<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span></p>
-					<p>Are you sure you want to delete this object? This will delete its children objects too.</p>
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span></p>
+				<p>Are you sure you want to delete this object? This will delete its children objects too.</p>
 			</div>
-			<div id="saving-dialog" title="Save">
-				<textarea id="savingTextArea" onclick="this.focus();this.select();" readonly="readonly"></textarea>
+			<div id="save-project-dialog" title="Save">
+				<textarea id="saveProjectTextArea" onclick="this.focus();this.select();" readonly="readonly"></textarea>
+			</div>
+			<div id="load-project-dialog" title="Load">
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span></p>
+				<p>Are you sure you want to load another project? This will clear the current project, all its progress will be lost.</p>
+				<br>
+				<br>
+				<p>Paste the new project here:</p>
+				<textarea id="loadProjectTextArea" onclick="this.focus();"></textarea>
+			</div>
+			<div id="clear-dialog" title="New Project">
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span></p>
+				<p>Are you sure you want to clear the current project? All progress not saved will be lost.</p>
+			</div>
+			<div id="reload-dialog" title="Reload Project">
+				<p>This will reload the current project, reseting collision</p>
 			</div>
 		</div>
 	</body>

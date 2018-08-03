@@ -116,18 +116,68 @@ class UI {
 			}
 		});
 
-		dialogs["saving"] = $("#saving-dialog").dialog({
+		dialogs["saveProject"] = $("#save-project-dialog").dialog({
 			autoOpen: false,
 			height: "auto",
 			width: "auto",
 			modal: true,
 			buttons: {
 				Close: function() {
-					dialogs["saving"].dialog("close");
+					dialogs["saveProject"].dialog("close");
 				}
 			},
 			close: function() {
-				dialogs["saving"].dialog("close");
+				dialogs["saveProject"].dialog("close");
+			}
+		});
+
+		dialogs["loadProject"] = $("#load-project-dialog").dialog({
+			autoOpen: false,
+			height: "auto",
+			width: "auto",
+			modal: true,
+			buttons: {
+				"Load": this.onConfirmLoadProject,
+				Cancel: function() {
+					dialogs["loadProject"].dialog("close");
+				}
+			},
+			close: function() {
+				dialogs["loadProject"].dialog("close");
+			}
+		});
+
+		dialogs["reloadProject"] = $("#reload-dialog").dialog({
+			autoOpen: false,
+			height: "auto",
+			width: "auto",
+			modal: true,
+			buttons: {
+				"Reset": this.onConfirmReloadProject,
+				Cancel: function() {
+					dialogs["reloadProject"].dialog("close");
+				}
+			},
+			close: function() {
+				dialogs["reloadProject"].dialog("close");
+			}
+		});
+
+		
+
+		dialogs["clearProject"] = $("#clear-dialog").dialog({
+			autoOpen: false,
+			height: "auto",
+			width: "auto",
+			modal: true,
+			buttons: {
+				"Yes": this.onConfirmClearProject,
+				"No": function() {
+					dialogs["clearProject"].dialog("close");
+				}
+			},
+			close: function() {
+				dialogs["clearProject"].dialog("close");
 			}
 		});
 
@@ -145,6 +195,18 @@ class UI {
 		Events
 
 	*/
+
+	OpenReloadDialog(){
+		editor.ui.dialogs["reloadProject"].dialog("open");
+	}
+
+	OpenLoadDialog(){
+		editor.ui.dialogs["loadProject"].dialog("open");
+	}
+
+	OpenClearDialog(){
+		editor.ui.dialogs["clearProject"].dialog("open");
+	}
 
 	OpenSaveDialog() {
 		let jsonString = JSON.stringify(
@@ -167,10 +229,66 @@ class UI {
 			"\t"
 			);
 
-		$("#savingTextArea").text("return [[\n"+jsonString+"\n]]");
+		$("#saveProjectTextArea").text(jsonString);
 
-		editor.ui.dialogs["saving"].dialog("open");
+		editor.ui.dialogs["saveProject"].dialog("open");
 		
+	}
+
+	onConfirmReloadProject(){
+		let jsonString = JSON.stringify(
+			editor.rootEntities, function( key, value) {
+				if(  key == 'webObject') {
+					return null;
+				}
+				else if(key == 'parent'){
+					if (value != null) {
+						return value.id;
+
+					}
+					else{
+						return null;
+					}
+				}else{
+					return value;
+				}
+			},
+			"\t"
+		);
+
+		for (var key in editor.rootEntities) {
+			editor.rootEntities[key].Delete();
+		}
+
+		editor.vext.SendEvent('MapEditor:LoadProject', 'MapEditor:LoadProject', jsonString)
+		
+		$(this).dialog("close");
+	}
+
+	onConfirmLoadProject(){
+		//Clear current project
+		for (var key in editor.rootEntities) {
+			console.log(key);
+			editor.rootEntities[key].Delete();
+		}
+
+		let text = $("#loadProjectTextArea").val();
+		console.log(text);
+
+		//send new project to vext
+		editor.vext.SendEvent('MapEditor:LoadProject', 'MapEditor:LoadProject', text)
+
+
+		$(this).dialog("close");
+	}
+
+	onConfirmClearProject(){
+		for (var key in editor.rootEntities) {
+			console.log(key);
+			editor.rootEntities[key].Delete();
+		}
+
+		$(this).dialog("close");
 	}
 
 	onSelectEntity(gameObject) {
