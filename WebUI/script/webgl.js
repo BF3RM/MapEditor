@@ -17,6 +17,13 @@ class WebGL {
 		this._onMouseDown = this.onMouseDown.bind(this);
 		this._onMouseUp = this.onMouseUp.bind(this);
 
+		this.onDownPosition = new THREE.Vector2();
+		this.onUpPosition = new THREE.Vector2();
+		this.onDoubleClickPosition = new THREE.Vector2();
+
+		this.raycaster = new THREE.Raycaster();
+		this.mouse = new THREE.Vector2();
+
 		this.Initialize();
 		this.RegisterEvents();
 
@@ -93,7 +100,6 @@ class WebGL {
 			wireframe: true
 		} );
 		let mesh = new THREE.Mesh(geometry, material);
-
 		this.scene.add(mesh);
 
 		let matrix = new THREE.Matrix4();
@@ -132,7 +138,7 @@ class WebGL {
 	}
 
 
-	CreateObject(transform){
+	CreateObject(transform, id){
 		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
 		let material = new THREE.MeshBasicMaterial( {
 			color: 0xff0000,
@@ -140,7 +146,8 @@ class WebGL {
 			wireframe: true
 		} );
 		let mesh = new THREE.Mesh(geometry, material);
-		
+		mesh.uuid = id
+
 		this.scene.add(mesh);
 
 		let matrix = new THREE.Matrix4();
@@ -300,11 +307,66 @@ class WebGL {
 			editor.webGL.raycastPlacing = false;
 			$('#page').find('canvas').css("z-index", 0)
 		} 
+		var array = this.getMousePosition( this.renderer.domElement, event.clientX, event.clientY );
+		this.onUpPosition.fromArray( array );
 	}
 	onMouseDown(e) {
+		var array = this.getMousePosition( this.renderer.domElement, event.clientX, event.clientY );
+		this.onDownPosition.fromArray( array );
+		this.OnClick();
+	}
+
+	getMousePosition( dom, x, y ) {
+
+		var rect = dom.getBoundingClientRect();
+		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
 
 	}
 
+	getIntersects( point, objects ) {
+
+		this.mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+		this.raycaster.setFromCamera( this.mouse, this.camera );
+
+		return this.raycaster.intersectObjects( this.scene.children );
+
+	}
+	OnClick() {
+
+		if ( this.onDownPosition.distanceTo( this.onUpPosition ) === 0 ) {
+
+			var intersects = this.getIntersects( this.onUpPosition, this.scene.children );
+
+			if ( intersects.length > 0 ) {
+
+				var object = intersects[ 0 ].object;
+
+				if ( object.userData.object !== undefined ) {
+
+					// helper
+
+					editor.select( object.userData.object );
+
+				} else {
+					editor.SelectEntityById( object.uuid );
+
+				}
+
+			} else {
+
+				editor.DeselectEntity(editor.selectedEntity)
+			}
+		}
+
+	}
+
+	onDeselect() {
+		this.HideGizmo();
+	}
+	onSelect() {
+		this.ShowGizmo();
+	}
 	onMouseMove(e) {
 		let mousePos = []
 		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;

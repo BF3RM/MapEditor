@@ -164,7 +164,7 @@ class Editor {
 			return;
 		}
 
-		let webObject = this.webGL.CreateObject(transform);
+		let webObject = this.webGL.CreateObject(transform, id);
 		let gameObject = new GameObject(id, name, "Blueprint", transform, webObject, instance, variation, null);
 		this.ui.hierarchy.OnEntitySpawned(gameObject);
 
@@ -228,6 +228,8 @@ class Editor {
 		this.webGL.AttachGizmoTo(gameObject.webObject);
 		this.vext.SendEvent(gameObject.id, 'MapEditor:SelectEntity', gameObject.id);
         this.ui.onSelectEntity(gameObject);
+		this.webGL.onSelect();
+
 		this.selectedEntity = gameObject;
 
 	}
@@ -240,6 +242,7 @@ class Editor {
 
 		this.ui.onDeselectEntity(gameObject);
 		this.vext.SendEvent(gameObject.id, 'MapEditor:UnselectEntity', gameObject.id)
+		this.webGL.onDeselect();
 		this.selectedEntity = null;
 	}
 
