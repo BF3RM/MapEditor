@@ -4,6 +4,7 @@ class Editor {
 		this.ui = new UI(debug);
 		this.webGL = new WebGL();
 		this.vext = new VEXTInterface();
+        this.history = new History( this);
 
 		this.blueprints = {};
 		this.debug = debug;
@@ -21,7 +22,6 @@ class Editor {
 		this.selectedEntity = null;
 		this.confirmInstance = null;
 
-		this.history = new History( this);
 
 		this.Initialize();
 		this.copiedEntity = null;
@@ -256,7 +256,6 @@ class Editor {
 			return;
 		}
 		this.spawnedEntities[id].Move(x, y, z);
-
 	}
 
 	execute( cmd, optionalName ) {
