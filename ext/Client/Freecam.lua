@@ -51,10 +51,10 @@ function Freecam:Create()
     end
     s_Entity:Init(Realm.Realm_Client, true);
 
-    local s_Spatial = SpatialEntity(s_Entity)
+
     self.cameraData.transform = ClientUtils:GetCameraTransform()
     self.cameraData.fov = 90
-    self.camera = s_Spatial
+    self.camera = s_Entity
 end
 
 function Freecam:TakeControl()
