@@ -6,6 +6,30 @@ class Editor {
 		this.vext = new VEXTInterface();
         this.history = new History( this);
 
+        // Signals
+        let Signal = signals.Signal;
+        this.signals = {
+
+            // Object actions
+            objectMoveStarted: new Signal(),
+            objectMoved: new Signal(),
+            objectMoveEnded: new Signal(),
+
+            objectSelected: new Signal(),
+            objectDeselected: new Signal(),
+            objectFocused: new Signal(),
+
+            objectAdded: new Signal(),
+            objectChanged: new Signal(),
+            objectRemoved: new Signal(),
+
+            modalShowed: new Signal(),
+            modalClosed: new Signal(),
+            modalConfirmed: new Signal(),
+
+        };
+
+        // Internal properties
 		this.blueprints = {};
 		this.debug = debug;
 
@@ -116,7 +140,7 @@ class Editor {
 		}
 		let parent = null;
 		if (editor.selectedEntity != null) {
-			
+
 			if(editor.selectedEntity.type == "group"){
 				parent = editor.selectedEntity;
 			}
@@ -126,7 +150,7 @@ class Editor {
 			}
 		}
 
-		editor.copiedEntity.Clone(parent);		
+		editor.copiedEntity.Clone(parent);
 
 	}
 	/*
