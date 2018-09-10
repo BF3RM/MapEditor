@@ -1,10 +1,13 @@
 class Editor {
 	constructor(debug) {
+		this.debug = debug;
 
 		this.ui = new UI(debug);
 		this.webGL = new WebGL();
 		this.vext = new VEXTInterface();
-        this.history = new History( this);
+        this.history = new History(this);
+        this.blueprintManager = new BlueprintManager();
+		this.entityFactory = new EntityFactory();
 
         // Signals
         let Signal = signals.Signal;
@@ -29,9 +32,14 @@ class Editor {
 
         };
 
+        /*
+
+            TODO: Update these variables
+
+         */
+
         // Internal properties
 		this.blueprints = {};
-		this.debug = debug;
 
 		this.confirmedBlueprints = {};
 
@@ -44,7 +52,7 @@ class Editor {
 		this.serializedEntities = {};
 
 		this.selectedEntity = null;
-		this.confirmInstance = null;
+		this.confimCommand = null;
 
 
 		this.Initialize();
@@ -52,35 +60,66 @@ class Editor {
 	}
 
 	Initialize() {
-		if(this.debug == true) {
+		if(this.debug === true) {
 			$('body').css({
 				"background": 'url(\"img/bf3bg.png\"',
 				'background-size': 'cover'
 			});
-			var imported = document.createElement('script');
+			let imported = document.createElement('script');
 			imported.src = 'script/debugData.js';
 			document.head.appendChild(imported);
 		}
 	}
 
+	/*
+
+		Editor functions
+
+	 */
+
+	PrepareInstanceSpawn(p_InstanceGuid) {
+		let blueprint = this.blueprints[p_InstanceGuid];
+		let variations = blueprint.variations;
+
+		//Check if the variation is unkown and we've previously spawned this object.
+		if(!blueprint.isValid()) {
+			this.confirmCommand = new ConfirmAction(blueprint, "variation");
+			// Bring up warning dialog.
+			this.ui.dialogs["variation"].dialog("open");
+		} else {
+			this.SpawnInstanceWithRaycast(blueprint, variations[0]);
+		}
+	}
+
+
+
+	execute( cmd, optionalName ) {
+		this.history.execute( cmd, optionalName );
+		this.webGL.Render();
+	}
+
+	undo() {
+
+		this.history.undo();
+		this.webGL.Render();
+	}
+
+	redo() {
+
+		this.history.redo();
+		this.webGL.Render();
+	}
+
+	/*
+
+		To be updated
+
+	 */
 	ClearSpawnedEntities() {
 		this.spawnedEntities.clear();
 	}
 
-	PrepareInstanceSpawn(p_InstanceGuid) {
-		let instance = this.blueprints[p_InstanceGuid];
-		let variations = instance.variations;
 
-		//Check if the variation is unkown and we've previously spawned this object.
-		if ((variations.length == null || variations.length == 0) && this.confirmedBlueprints[p_InstanceGuid] == null) {
-			this.confirmInstance = instance;
-			console.log("Unknown variation!");
-			// Bring up warning dialog.
-			this.ui.dialogs["variation"].dialog("open");
-		} else {
-			this.SpawnInstanceWithRaycast(instance, variations[0]);
-		}
-	}
 	UpdateSelectedObject(linearTransformString){
 		this.webGL.UpdateObject(this.selectedEntity.webObject, new LinearTransform().setFromString(linearTransformString));
 		this.webGL.AttachGizmoTo(this.selectedEntity.webObject);
@@ -282,23 +321,6 @@ class Editor {
 		this.spawnedEntities[id].Move(x, y, z);
 	}
 
-	execute( cmd, optionalName ) {
-
-		this.history.execute( cmd, optionalName );
-		this.webGL.Render();
-	}
-
-	undo() {
-
-		this.history.undo();
-		this.webGL.Render();
-	}
-
-	redo() {
-
-		this.history.redo();
-		this.webGL.Render();
-	}
 
 	HistoryTest () {
 		this.execute( new SetPositionCommand( this.spawnedEntities[1].webObject, this.spawnedEntities[2].webObject.position ) );
