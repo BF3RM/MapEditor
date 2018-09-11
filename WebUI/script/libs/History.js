@@ -5,180 +5,271 @@
 
 History = function ( editor ) {
 
-	this.editor = editor;
-	this.undos = [];
-	this.redos = [];
-	this.lastCmdTime = new Date();
-	this.idCounter = 0;
+    this.editor = editor;
+    this.undos = [];
+    this.redos = [];
+    this.lastCmdTime = new Date();
+    this.idCounter = 0;
 
-	this.historyDisabled = false;
-	this.config = editor.config;
+    this.historyDisabled = false;
+    this.config = editor.config;
 
-	//Set editor-reference in Command
+    //Set editor-reference in Command
 
-	Command( editor );
+    Command( editor );
+
+    // signals
+
+    var scope = this;
+
 
 };
 
 History.prototype = {
 
-	execute: function ( cmd, optionalName ) {
+    execute: function ( cmd, optionalName ) {
 
-		var lastCmd = this.undos[ this.undos.length - 1 ];
-		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
+        var lastCmd = this.undos[ this.undos.length - 1 ];
+        var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
 
-		var isUpdatableCmd = lastCmd &&
-			lastCmd.updatable &&
-			cmd.updatable &&
-			lastCmd.object === cmd.object &&
-			lastCmd.type === cmd.type &&
-			lastCmd.script === cmd.script &&
-			lastCmd.attributeName === cmd.attributeName;
+        var isUpdatableCmd = lastCmd &&
+            lastCmd.updatable &&
+            cmd.updatable &&
+            lastCmd.object === cmd.object &&
+            lastCmd.type === cmd.type &&
+            lastCmd.script === cmd.script &&
+            lastCmd.attributeName === cmd.attributeName;
+		if ( isUpdatableCmd && timeDifference < 500 ) {
 
-		if ( isUpdatableCmd && cmd.type === "SetScriptValueCommand" ) {
+            lastCmd.update( cmd );
+            cmd = lastCmd;
 
-			// When the cmd.type is "SetScriptValueCommand" the timeDifference is ignored
+        } else {
 
-			lastCmd.update( cmd );
-			cmd = lastCmd;
+            // the command is not updatable and is added as a new part of the history
 
-		} else if ( isUpdatableCmd && timeDifference < 500 ) {
+            this.undos.push( cmd );
+            cmd.id = ++ this.idCounter;
 
-			lastCmd.update( cmd );
-			cmd = lastCmd;
+        }
+        cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
+        cmd.execute();
+        cmd.inMemory = true;
 
-		} else {
 
-			// the command is not updatable and is added as a new part of the history
+        this.lastCmdTime = new Date();
 
-			this.undos.push( cmd );
-			cmd.id = ++ this.idCounter;
+        // clearing all the redo-commands
 
-		}
-		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
-		cmd.execute();
-		cmd.inMemory = true;
+        this.redos = [];
+        this.editor.signals.historyChanged.dispatch( cmd );
 
-		this.lastCmdTime = new Date();
+    },
 
-		// clearing all the redo-commands
+    undo: function () {
 
-		this.redos = [];
+        var cmd = undefined;
 
-	},
+        if ( this.undos.length > 0 ) {
 
-	undo: function () {
+            cmd = this.undos.pop();
 
-		if ( this.historyDisabled ) {
+            if ( cmd.inMemory === false ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
-			return;
+                cmd.fromJSON( cmd.json );
 
-		}
+            }
 
-		var cmd = undefined;
+        }
 
-		if ( this.undos.length > 0 ) {
+        if ( cmd !== undefined ) {
 
-			cmd = this.undos.pop();
+            cmd.undo();
+            this.redos.push( cmd );
+            this.editor.signals.historyChanged.dispatch( cmd );
 
-			if ( cmd.inMemory === false ) {
+        }
 
-				cmd.fromJSON( cmd.json );
+        return cmd;
 
-			}
+    },
 
-		}
+    redo: function () {
 
-		if ( cmd !== undefined ) {
+        var cmd = undefined;
 
-			cmd.undo();
-			this.redos.push( cmd );
+        if ( this.redos.length > 0 ) {
 
-		}
+            cmd = this.redos.pop();
 
-		return cmd;
+            if ( cmd.inMemory === false ) {
 
-	},
+                cmd.fromJSON( cmd.json );
 
-	redo: function () {
+            }
 
-		if ( this.historyDisabled ) {
+        }
 
-			alert( "Undo/Redo disabled while scene is playing." );
-			return;
+        if ( cmd !== undefined ) {
 
-		}
+            cmd.execute();
+            this.undos.push( cmd );
+            this.editor.signals.historyChanged.dispatch( cmd );
 
-		var cmd = undefined;
+        }
 
-		if ( this.redos.length > 0 ) {
+        return cmd;
 
-			cmd = this.redos.pop();
+    },
 
-			if ( cmd.inMemory === false ) {
+    toJSON: function () {
 
-				cmd.fromJSON( cmd.json );
+        var history = {};
+        history.undos = [];
+        history.redos = [];
 
-			}
+        // Append Undos to History
 
-		}
+        for ( var i = 0 ; i < this.undos.length; i ++ ) {
 
-		if ( cmd !== undefined ) {
+            if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
 
-			cmd.execute();
-			this.undos.push( cmd );
+                history.undos.push( this.undos[ i ].json );
 
-		}
+            }
 
-		return cmd;
+        }
 
-	},
+        // Append Redos to History
 
-	clear: function () {
+        for ( var i = 0 ; i < this.redos.length; i ++ ) {
 
-		this.undos = [];
-		this.redos = [];
-		this.idCounter = 0;
+            if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
 
+                history.redos.push( this.redos[ i ].json );
 
-	},
+            }
 
-	goToState: function ( id ) {
+        }
 
-		if ( this.historyDisabled ) {
+        return history;
 
-			alert( "Undo/Redo disabled while scene is playing." );
-			return;
+    },
 
-		}
+    fromJSON: function ( json ) {
 
+        if ( json === undefined ) return;
 
-		var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
+        for ( var i = 0; i < json.undos.length; i ++ ) {
 
-		if ( cmd === undefined || id > cmd.id ) {
+            var cmdJSON = json.undos[ i ];
+            var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+            cmd.json = cmdJSON;
+            cmd.id = cmdJSON.id;
+            cmd.name = cmdJSON.name;
+            this.undos.push( cmd );
+            this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
-			cmd = this.redo();
-			while ( cmd !== undefined && id > cmd.id ) {
+        }
 
-				cmd = this.redo();
+        for ( var i = 0; i < json.redos.length; i ++ ) {
 
-			}
+            var cmdJSON = json.redos[ i ];
+            var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+            cmd.json = cmdJSON;
+            cmd.id = cmdJSON.id;
+            cmd.name = cmdJSON.name;
+            this.redos.push( cmd );
+            this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
-		} else {
+        }
 
-			while ( true ) {
+        // Select the last executed undo-command
+        this.editor.signals.historyChanged.dispatch( this.undos[ this.undos.length - 1 ] );
 
-				cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
+    },
 
-				if ( cmd === undefined || id === cmd.id ) break;
+    clear: function () {
 
-				this.undo();
+        this.undos = [];
+        this.redos = [];
+        this.idCounter = 0;
 
-			}
+        this.editor.signals.historyChanged.dispatch();
 
-		}
+    },
 
-	}
+    goToState: function ( id ) {
+
+        if ( this.historyDisabled ) {
+
+            alert( "Undo/Redo disabled while scene is playing." );
+            return;
+
+        }
+
+        this.editor.signals.historyChanged.active = false;
+
+        var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
+
+        if ( cmd === undefined || id > cmd.id ) {
+
+            cmd = this.redo();
+            while ( cmd !== undefined && id > cmd.id ) {
+
+                cmd = this.redo();
+
+            }
+
+        } else {
+
+            while ( true ) {
+
+                cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
+
+                if ( cmd === undefined || id === cmd.id ) break;
+
+                this.undo();
+
+            }
+
+        }
+
+        this.editor.signals.historyChanged.active = true;
+
+        this.editor.signals.historyChanged.dispatch( cmd );
+
+    },
+
+    enableSerialization: function ( id ) {
+
+        /**
+         * because there might be commands in this.undos and this.redos
+         * which have not been serialized with .toJSON() we go back
+         * to the oldest command and redo one command after the other
+         * while also calling .toJSON() on them.
+         */
+
+        this.goToState( - 1 );
+
+        this.editor.signals.historyChanged.active = false;
+
+        var cmd = this.redo();
+        while ( cmd !== undefined ) {
+
+            if ( ! cmd.hasOwnProperty( "json" ) ) {
+
+                cmd.json = cmd.toJSON();
+
+            }
+            cmd = this.redo();
+
+        }
+
+        this.editor.signals.historyChanged.active = true;
+
+        this.goToState( id );
+
+    }
 
 };

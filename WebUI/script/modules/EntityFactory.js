@@ -8,12 +8,7 @@
 class EntityFactory {
 	constructor() {
 		this.gameObjects = {}; // Spawned gameObjects
-		this.sceneGameObjects = {}; // GameObjects with hierarchy.
 	}
 
-	/*
 
-
-
-	 */
 }

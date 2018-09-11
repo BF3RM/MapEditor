@@ -6,6 +6,7 @@ class Hierarchy {
         this.topControls = this.CreateTopControls();
         this.subControls = this.CreateSubControls();
         this.Initialize();
+
     }
 
 

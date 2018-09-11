@@ -33,3 +33,6 @@ In freecam, without holding right click:
 - CTRL+SHIFT+D to clone selected entity to the root directory
 - CTRL+C to copy selected entity
 - CTRL+V to paste saved entity to the selected group 
+
+# Disclamer
+This project is heavily inspired by (Three.js)[https://threejs.org/], which provides the foundation for

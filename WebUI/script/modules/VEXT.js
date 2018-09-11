@@ -2,9 +2,9 @@ class VEXTInterface {
 	constructor() {
 		this.vextEvents = new VextEvents();
 		this.messages = 0;
-		setInterval(function() {
-			editor.vext.SendEvents();
-		}, 33);
+		//setInterval(function() {
+		//	editor.vext.SendEvents();
+		//}, 33);
 
 	}
 

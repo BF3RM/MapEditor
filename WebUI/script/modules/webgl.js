@@ -92,6 +92,7 @@ class WebGL {
 			visible: true ,
 			wireframe: true
 		} );
+		// THREE.group?
 		let mesh = new THREE.Mesh(geometry, material);
 
 		this.scene.add(mesh);

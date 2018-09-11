@@ -4,9 +4,12 @@ class TreeView {
 		this.dom = $(document.createElement("div"));
 		this.topControls = this.CreateControls();
 		this.tree = null;
-	}
+        events.blueprintsRegistered.add(this.LoadData.bind(this))
+    }
 
 	LoadData(table) {
+		let scope = this;
+
 		let data = {
 			"type": "folder",
 			"text": "Venice",
@@ -47,13 +50,14 @@ class TreeView {
 				"id": key
 			})
 		}
-		this.data = data;
-        this.InitializeTree();
-        this.RegisterEvents();
+        scope.data = data;
+        scope.InitializeTree();
+        scope.RegisterEvents();
 	}
 
 	InitializeTree() {
-		this.tree = $(this.dom).jstree({
+		let scope = this;
+        scope.tree = $(scope.dom).jstree({
 			"types": {
 				"folder": {
 					"icon": "jstree-folder"
@@ -82,22 +86,23 @@ class TreeView {
 		});
 	}
 	RegisterEvents() {
-		this.topControls.find(".search-input").keyup(function() {
+		let scope = this;
+        scope.topControls.find(".search-input").keyup(function() {
 			let searchString = $(this).val();
 			delay(function() {
 				console.log(searchString);
-				editor.ui.treeView.tree.jstree('search', searchString);
+				scope.tree.jstree('search', searchString);
 			}, 500);
 
 		});
 
-		$(this.dom).on('changed.jstree', function(e, data) {
+		$(scope.dom).on('changed.jstree', function(e, data) {
 			if (data.node == null) {
 				return
 			}
 			let id = data.node.original.id;
 			if (id != null) {
-				editor.PrepareInstanceSpawn(id);
+				events.blueprintSpawnRequested.dispatch(id);
 			}
 		})
 	}
