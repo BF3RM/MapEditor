@@ -7,10 +7,15 @@ class Logger {
         this.logLevel = logLevel;
     }
 
-    static LogError(message) {
+    LogError(message) {
         console.error(message)
     }
     Log(level, message) {
+        if(typeof (level) != "number") {
+            this.LogError("Log statement is missing level. Consider fixing that.");
+            console.log(level);
+            return false;
+        }
         if(level <= this.logLevel) {
             console.log(message)
         }

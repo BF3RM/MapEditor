@@ -8,12 +8,11 @@ class Blueprint {
         this.verified = false;
     }
 
-    isValid () {
+    isVariationValid () {
 	    if (!this.verified  && (this.variations.length == null || this.variations.length === 0)) {
 	    	this.verified = false;
 		    return false;
 	    } else {
-	    	this.verified = true;
 	    	return true;
 	    }
     }

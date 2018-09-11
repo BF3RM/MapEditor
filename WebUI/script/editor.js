@@ -1,8 +1,5 @@
 class Editor {
 	constructor(debug) {
-        // Signals
-
-
 
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
@@ -16,7 +13,9 @@ class Editor {
 
         this.selected = null;
 		this.Initialize();
-	}
+        events.blueprintSpawnRequested.add(this.onBlueprintSpawnRequested.bind(this));
+
+    }
 
 	Initialize() {
 	    // Adds the chrome background and debug window
@@ -33,11 +32,27 @@ class Editor {
 	/*
 
 
+
 	*/
 
-    static error(message) {
-        console.log(message);
-    }
+    onBlueprintSpawnRequested(blueprint) {
+		let scope = this;
+    	if(blueprint == null) {
+            scope.logger.LogError("Tried to spawn a nonexistent blueprint");
+			return false;
+		}
+		if(!blueprint.isVariationValid()) {
+            scope.logger.Log(LOGLEVEL.DEBUG, "Blueprint does not have a valid variation. Requesting user input.");
+			// Show variation
+			return false;
+		}
+		// Request validation from Lua here.
+
+		//Spawn blueprint
+		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
+
+
+	}
     /*
 
         History

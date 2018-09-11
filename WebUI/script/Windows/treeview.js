@@ -102,7 +102,8 @@ class TreeView {
 			}
 			let id = data.node.original.id;
 			if (id != null) {
-				events.blueprintSpawnRequested.dispatch(id);
+				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
+				events.blueprintSpawnRequested.dispatch(blueprint);
 			}
 		})
 	}
