@@ -60,4 +60,12 @@ class VEXTInterface {
 	RemoveEntity(id) {
 		editor.OnRemoveEntity(id);
 	}
+
+	SpawnGameObject(gameObject) {
+		console.log(JSON.stringify(gameObject))
+	}
+
+	DestroyGameObject(gameObject) {
+		
+	}
 }

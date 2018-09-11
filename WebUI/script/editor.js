@@ -12,6 +12,7 @@ class Editor {
 
 
         this.selected = null;
+        this.raycastTransform = new LinearTransform();
 		this.Initialize();
         events.blueprintSpawnRequested.add(this.onBlueprintSpawnRequested.bind(this));
 
@@ -50,8 +51,9 @@ class Editor {
 
 		//Spawn blueprint
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
+		let gameObject = new GameObject(GenerateGuid(), blueprint.name, blueprint.type, editor.raycastTransform, blueprint, blueprint.variations[0], false, null);
 
-
+		scope.execute(new SpawnGameObjectCommand(gameObject));
 	}
     /*
 

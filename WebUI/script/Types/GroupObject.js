@@ -1,7 +1,7 @@
 class GroupObject extends GameObject{
     constructor(id, name, webObject, transform, parent, children) {
 
-        //id, name, type, transform, webObject, instance, variation, parent
+        //guid, name, type, transform, webObject, instance, variation, parent
         super(id, name, "group", transform, webObject, null, null, parent);
         this.children = children;
     }
@@ -41,7 +41,7 @@ class GroupObject extends GameObject{
     }
 
     Clone(newParent) {
-        console.log("group with id "+ this.id);
+        console.log("group with guid "+ this.guid);
 
         //Parent has to be null to avid circular referencing, we update it after cloning its children
         let clone = editor.CreateGroup(GenerateGuid(), this.name, this.transform, null);
