@@ -53,7 +53,7 @@ class Editor {
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
 		let gameObject = new GameObject(GenerateGuid(), blueprint.name, blueprint.type, editor.raycastTransform, blueprint, blueprint.variations[0], false, null);
 
-		scope.execute(new SpawnGameObjectCommand(gameObject));
+		scope.execute(new SpawnReferenceObjectCommand(gameObject));
 	}
     /*
 

@@ -1,8 +1,8 @@
 class GameObject {
-    constructor(guid, name, type, transform, object, parent, entityCreationParams) {
+    constructor(guid, name, typeName, transform, object, parent, entityCreationParams) {
         this.guid = guid;
         this.name = name;
-        this.type = type;
+        this.typeName = typeName;
         this.transform = transform;
         this.object = object;
 	    this.parent = parent;

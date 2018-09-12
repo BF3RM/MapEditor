@@ -1,20 +1,15 @@
 class Blueprint {
-    constructor(partitionGuid, instanceGuid, name, variations) {
+    constructor(partitionGuid, instanceGuid, typeName, name, variations) {
         this.partitionGuid = partitionGuid;
         this.instanceGuid = instanceGuid;
-        this.type = type;
+        this.typeName = typeName;
         this.name = name;
         this.variations = variations;
-        this.verified = false;
+        this.verified = this.isVariationValid();
     }
 
     isVariationValid () {
-	    if (!this.verified  && (this.variations.length == null || this.variations.length === 0)) {
-	    	this.verified = false;
-		    return false;
-	    } else {
-	    	return true;
-	    }
+	    return !(this.variations === undefined || this.variations.length == null || this.variations.length === 0);
     }
 
     fromObject(object) {
@@ -23,7 +18,7 @@ class Blueprint {
         } else {
             this.partitionGuid = object.partitionGuid;
             this.instanceGuid = object.instanceGuid;
-            this.type = object.type;
+            this.typeName = object.typeName;
             this.name = object.name;
             this.variations = object.variations;
             return this;
