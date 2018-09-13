@@ -36,13 +36,20 @@ class Editor {
 
 	*/
 
-    onBlueprintSpawnRequested(blueprint) {
+    onBlueprintSpawnRequested(blueprint, transform, variation) {
 		let scope = this;
     	if(blueprint == null) {
             scope.logger.LogError("Tried to spawn a nonexistent blueprint");
 			return false;
 		}
-		if(!blueprint.isVariationValid()) {
+		if(transform == undefined) {
+			transform = scope.raycastTransform;
+		}
+		if(variation == undefined) {
+			variation = blueprint.getDefaultVariation();
+		}
+
+		if(!blueprint.isVariationValid(variation)) {
             scope.logger.Log(LOGLEVEL.DEBUG, "Blueprint does not have a valid variation. Requesting user input.");
 			// Show variation
 			return false;
@@ -51,9 +58,8 @@ class Editor {
 
 		//Spawn blueprint
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let gameObject = new GameObject(GenerateGuid(), blueprint.name, blueprint.type, editor.raycastTransform, blueprint, blueprint.variations[0], false, null);
 
-		scope.execute(new SpawnReferenceObjectCommand(gameObject));
+		scope.execute(new SpawnReferenceObjectCommand(blueprint.getReference(), transform, variation));
 	}
     /*
 

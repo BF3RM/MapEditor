@@ -1,16 +1,18 @@
-const SpawnReferenceObjectCommand = function (blueprint) {
+const SpawnReferenceObjectCommand = function (reference, transform, variation) {
 
 	Command.call(this);
 
 	this.type = 'SpawnReferenceObjectCommand';
 	this.name = 'Spawn ReferenceObject';
 
-	if (blueprint === undefined) {
+	if (reference === undefined) {
 		editor.logger.Log(LOGLEVEL.DEBUG, "Tried to spawn nothing");
 		return;
 	}
 	this.command = {
-		"SpawnReferenceObject": blueprint
+		"reference": reference,
+		"transform": transform,
+		"variation": variation
 	}
 };
 

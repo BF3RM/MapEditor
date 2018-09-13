@@ -5,16 +5,34 @@ class Blueprint {
         this.typeName = typeName;
         this.name = name;
         this.variations = variations;
-        this.verified = this.isVariationValid();
     }
 
-    isVariationValid () {
+	getDefaultVariation() {
+		let scope = this;
+		if(scope.isVariationValid()) {
+			return this.variations[0];
+		} else {
+			return 0;
+		}
+	}
+
+    hasVariation () {
 	    return !(this.variations === undefined || this.variations.length == null || this.variations.length === 0);
+    }
+    isVariationValid(variation) {
+        let scope = this;
+        return (scope.hasVariation() && scope.getVariation(variation) !== undefined);
+
+    }
+
+    getVariation(hash) {
+        let scope = this;
+        return scope.variations[hash];
     }
 
     fromObject(object) {
         if(object.partitionGuid === null || object.instanceGuid === null || object.name === null ) {
-            Editor.error("Failed to register blueprint from object: " + object);
+            editor.error("Failed to register blueprint from object: " + object);
         } else {
             this.partitionGuid = object.partitionGuid;
             this.instanceGuid = object.instanceGuid;
@@ -24,4 +42,14 @@ class Blueprint {
             return this;
         }
     }
+
+    getReference() {
+        let scope = this;
+	    return {
+	        "partitionGuid": scope.partitionGuid,
+	        "instanceGuid": scope.instanceGuid,
+	        "name": scope.name
+        };
+    }
+
 }

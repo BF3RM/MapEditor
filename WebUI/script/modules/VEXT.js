@@ -7,19 +7,14 @@ class VEXTInterface {
 	ShowGizmo() {
 		editor.webGL.ShowGizmo();
 	}
-
-	SpawnGameObject(gameObject) {
-		console.log(JSON.stringify(gameObject))
+	SpawnReferenceObject(object) {
+		console.log(object)
+	}
+	SendCommand(command) {
 		if(editor.debug) {
-
+			this.debugHandle(command);
+		} else {
+			console.log(JSON.stringify(command));
 		}
-	}
-
-	DestroyGameObject(gameObject) {
-
-	}
-
-	onSpawnGameObject(gameObjectString) {
-
 	}
 }
