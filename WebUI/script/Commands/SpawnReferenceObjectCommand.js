@@ -9,7 +9,7 @@ const SpawnReferenceObjectCommand = function (reference, transform, variation) {
 		editor.logger.Log(LOGLEVEL.DEBUG, "Tried to spawn nothing");
 		return;
 	}
-	this.command = {
+	this.parameters = {
 		"reference": reference,
 		"transform": transform,
 		"variation": variation
@@ -20,12 +20,12 @@ const SpawnReferenceObjectCommand = function (reference, transform, variation) {
 SpawnReferenceObjectCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SpawnReferenceObject(this.command)
+		editor.vext.SendCommands(this.type, this.parameters)
 	},
 
 	undo: function () {
 
-		editor.vext.DestroyGameObject( this.command );
+		editor.vext.SendCommands(this.type, this.parameters );
 	},
 };
 
