@@ -86,7 +86,7 @@ History.prototype = {
 
             cmd.undo();
             this.redos.push( cmd );
-            this.editor.signals.historyChanged.dispatch( cmd );
+            events.historyChanged.dispatch( cmd );
 
         }
 

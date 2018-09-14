@@ -11,4 +11,11 @@ class EntityFactory {
 	}
 
 
+	getGameObjectByGuid(guid) {
+		let go = this.gameObjects[guid];
+		if( go === undefined) {
+			editor.logger.LogError("Tried to access a null GameObject" + guid);
+		}
+		return go;
+	}
 }

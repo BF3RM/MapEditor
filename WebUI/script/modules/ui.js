@@ -49,13 +49,15 @@ class UI {
 	InitializeWindows() {
         let page = $('#page');
 		this.windows = {
-			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
-            'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
             'inspector': new PowWindow("inspector", "Inspector", this.inspector),
+			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
+			'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
+
+
 		};
 
 		if(this.debug === true) {
-			this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
+			//this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
 		}
 
 		let offset = 30;

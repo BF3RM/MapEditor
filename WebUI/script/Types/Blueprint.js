@@ -45,11 +45,7 @@ class Blueprint {
 
     getReference() {
         let scope = this;
-	    return {
-	        "partitionGuid": scope.partitionGuid,
-	        "instanceGuid": scope.instanceGuid,
-	        "name": scope.name
-        };
+	    return new ReferenceObject(scope.typeName, scope.name, scope.partitionGuid, scope.instanceGuid);
     }
 
 }

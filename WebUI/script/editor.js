@@ -30,9 +30,19 @@ class Editor {
 			document.head.appendChild(imported);
 		}
 	}
+
 	/*
 
+		General usage
 
+	 */
+
+	getGameObjectByGuid(guid) {
+		return this.entityFactory.getGameObjectByGuid(guid);
+	}
+	/*
+
+		Events
 
 	*/
 
@@ -58,8 +68,8 @@ class Editor {
 
 		//Spawn blueprint
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-
-		scope.execute(new SpawnReferenceObjectCommand(blueprint.getReference(), transform, variation));
+	    let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation);
+		scope.execute(new SpawnReferenceObjectCommand(GenerateGuid(), parameters, editor.raycastTransform));
 	}
     /*
 

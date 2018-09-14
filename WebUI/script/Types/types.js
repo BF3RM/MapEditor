@@ -39,7 +39,13 @@ class VextEvents {
 	}
 
 }
-
+class VextCommand {
+	constructor(guid, type, parameters) {
+		this.guid = guid;
+		this.type = type;
+		this.parameters = parameters;
+	}
+}
 class VextMessage {
 	constructor(index, id, key, value) {
 		this.index = index;
@@ -54,3 +60,20 @@ var LOGLEVEL = {
     DEBUG: 1,
     VERBOSE: 2
 };
+
+
+class ReferenceObject {
+	constructor(typeName, name,  partitionGuid, instanceGuid) {
+		this.typeName = typeName;
+		this.name = name;
+		this.partitionGuid = partitionGuid;
+		this.instanceGuid = instanceGuid;
+	}
+}
+
+class ReferenceObjectParameters {
+	constructor(reference, variation) {
+		this.reference = reference;
+		this.variation = variation;
+	}
+}

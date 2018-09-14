@@ -1,12 +1,17 @@
 class GameObject {
-    constructor(guid, name, typeName, transform, object, parent, entityCreationParams) {
+    constructor(guid, name, typeName, transform, object, parent, parameters) {
         this.guid = guid;
         this.name = name;
-        this.typeName = typeName;
         this.transform = transform;
-        this.object = object;
+	    this.parameters = parameters;
 	    this.parent = parent;
-	    this.entityCreationParams = entityCreationParams;
+    }
+
+    Clone(guid) {
+    	if(guid === undefined) {
+    		guid = GenerateGuid();
+	    }
+	    return new GameObject(guid, this.name, this.transform, this.parameters, this.parent);
     }
 }
 

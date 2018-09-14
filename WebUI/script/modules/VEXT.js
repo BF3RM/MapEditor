@@ -1,4 +1,9 @@
 class VEXTInterface {
+	constructor() {
+		this.commandQueue = [];
+		this.commands = {}
+		this.commands['SpawnReferenceObjectCommand'] = this.OnSpawnReferenceObject
+	}
 
 
 	/*
@@ -18,9 +23,9 @@ class VEXTInterface {
 
 	 */
 	
-	SendCommands(command) {
+	SendCommand(command) {
 		if(editor.debug) {
-			this.debugHandle(command);
+			this.debugHandle(command)
 		} else {
 			console.log(JSON.stringify(command));
 		}
@@ -29,4 +34,14 @@ class VEXTInterface {
 	ReceiveCommands(command) {
 		console.log(JSON.parse(command));
 	}
+
+	debugHandle(command) {
+		console.log(command)
+		this.commands[command.type](command);
+	}
+
+	OnSpawnReferenceObject(command) {
+		console.log(command);
+	}
 }
+
