@@ -62,7 +62,7 @@ History.prototype = {
         // clearing all the redo-commands
 
         this.redos = [];
-        events.historyChanged.dispatch( cmd );
+        signals.historyChanged.dispatch( cmd );
 
     },
 
@@ -86,7 +86,7 @@ History.prototype = {
 
             cmd.undo();
             this.redos.push( cmd );
-            events.historyChanged.dispatch( cmd );
+            signals.historyChanged.dispatch( cmd );
 
         }
 
@@ -114,7 +114,7 @@ History.prototype = {
 
             cmd.execute();
             this.undos.push( cmd );
-            events.historyChanged.dispatch( cmd );
+            signals.historyChanged.dispatch( cmd );
 
         }
 

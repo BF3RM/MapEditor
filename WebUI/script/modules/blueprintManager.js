@@ -20,7 +20,7 @@ class BlueprintManager {
 		for(let key in blueprints) {
 			scope.RegisterBlueprint(key, blueprints[key]);
 		}
-		events.blueprintsRegistered.dispatch(editor.blueprintManager.blueprints);
+		signals.blueprintsRegistered.dispatch(editor.blueprintManager.blueprints);
 	}
 
 	getBlueprintByGuid(instanceGuid) {

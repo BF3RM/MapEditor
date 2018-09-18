@@ -1,5 +1,5 @@
 let Signal = signals.Signal;
-var events = {
+var signals = {
 
     // Object actions
     blueprintSpawnRequested: new Signal(),

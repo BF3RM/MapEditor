@@ -14,7 +14,7 @@ class Editor {
         this.selected = null;
         this.raycastTransform = new LinearTransform();
 		this.Initialize();
-        events.blueprintSpawnRequested.add(this.onBlueprintSpawnRequested.bind(this));
+        signals.blueprintSpawnRequested.add(this.onBlueprintSpawnRequested.bind(this));
 
     }
 

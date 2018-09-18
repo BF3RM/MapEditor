@@ -4,7 +4,7 @@ class TreeView {
 		this.dom = $(document.createElement("div"));
 		this.topControls = this.CreateControls();
 		this.tree = null;
-        events.blueprintsRegistered.add(this.LoadData.bind(this))
+        signals.blueprintsRegistered.add(this.LoadData.bind(this))
     }
 
 	LoadData(table) {
@@ -103,7 +103,7 @@ class TreeView {
 			let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
-				events.blueprintSpawnRequested.dispatch(blueprint);
+				signals.blueprintSpawnRequested.dispatch(blueprint);
 			}
 		})
 	}
