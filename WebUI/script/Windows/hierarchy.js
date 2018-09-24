@@ -184,7 +184,6 @@ class Hierarchy {
     }
 
     onDestroyedBlueprint(command) {
-        console.log("shi")
         this.DestroyGroup(command.guid)
     }
 }

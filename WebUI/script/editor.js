@@ -16,7 +16,7 @@ class Editor {
 
          */
         this.playerName = null;
-        this.selected = null;
+        this.selected = [];
         this.raycastTransform = new LinearTransform();
 
 
@@ -78,10 +78,10 @@ class Editor {
             scope.logger.LogError("Tried to spawn a nonexistent blueprint");
 			return false;
 		}
-		if(transform == undefined) {
+		if(transform === undefined) {
 			transform = scope.raycastTransform;
 		}
-		if(variation == undefined) {
+		if(variation === undefined) {
 			variation = blueprint.getDefaultVariation();
 		}
 
@@ -102,10 +102,20 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let webobject = this.webGL.CreateGroup(command.transform);
-		if(command.sender == this.playerName) {
-			this.webGL.AttachGizmoTo(webobject);
+		if(command.sender === this.playerName) {
+			this.Select(command.guid)
 		}
 	}
+
+	Select(guid) {
+    	//TODO: Support multiple shit
+    	if($.inArray(guid, this.selected) !== -1) {
+    		console.log("Selected the same item");
+			return;
+    	}
+		this.vext.SendCommand(new VextCommand(guid, "SelectEntity"))
+		//this.selected.push(this.getGameObjectByGuid(guid));
+    }
     /*
 
         History

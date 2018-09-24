@@ -5,6 +5,7 @@ class VEXTInterface {
 		this.commands = {};
 		this.commands["SpawnedBlueprint"] = signals.spawnedBlueprint.dispatch;
 		this.commands["DestroyedBlueprint"] = signals.destroyedBlueprint.dispatch;
+        this.commands["SelectedEntity"] = signals.selectedEntity.dispatch;
 	}
 
 

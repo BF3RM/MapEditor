@@ -9,6 +9,7 @@ class VEXTemulator {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
+        this.commands['SelectEntity'] = this.SelectEntity;
 	}
 
 
@@ -53,6 +54,15 @@ class VEXTemulator {
 			"type": "DestroyedBlueprint",
 			"guid": command.guid
 		};
+		editor.vext.HandleResponse(response);
+	}
+
+	SelectEntity(command) {
+		//TODO: Support multiple selections
+		let response = {
+			"type": "SelectedEntity",
+			"guid": command.guid
+		}
 		editor.vext.HandleResponse(response);
 	}
 
