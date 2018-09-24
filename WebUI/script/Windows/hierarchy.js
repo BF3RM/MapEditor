@@ -9,6 +9,7 @@ class Hierarchy {
 
 
 	    signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+	    signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 
     }
 
@@ -150,9 +151,29 @@ class Hierarchy {
 		if(this.entries[parent] == undefined) {
 			this.dom.append(entry.dom);
 		} else {
+			this.entries[parent].children[entry.guid] = entry;
 			this.entries[parent].content.append(entry.dom);
 		}
 	}
+
+	DestroyGroup(guid) {
+        if(this.entries[guid] === undefined) {
+            editor.logger.LogError("Failed to destroy group: " + guid);
+            return;
+        }
+        // Delete the children from the array
+        for(let child in this.entries[guid].children) {
+            delete this.entries[child];
+        }
+        // remove the dom
+		this.entries[guid].dom.remove();
+        // delete the blueprint form the array
+        delete this.entries[guid];
+	}
+
+    DestroyEntity(guid) {
+
+    }
     onSpawnedBlueprint(command) {
 	   this.CreateGroup(command.guid, command.name, command.parent);
 	   let scope = this;
@@ -160,6 +181,11 @@ class Hierarchy {
 	       let child = command.children[key];
 		   scope.CreateEntity(child.guid, child.type, command.guid);
 	   }
+    }
+
+    onDestroyedBlueprint(command) {
+        console.log("shi")
+        this.DestroyGroup(command.guid)
     }
 }
 
@@ -172,6 +198,7 @@ class HierarchyEntry {
 	    this.title = null;
         this.expander = null;
         this.content = null;
+        this.children = {};
         this.groupTitle = null;
 
         this.dom = null;

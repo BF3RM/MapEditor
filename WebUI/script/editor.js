@@ -101,8 +101,10 @@ class Editor {
 	}
 
 	onSpawnedBlueprint(command) {
-		let webobject = this.webGL.CreateObject(command.transform)
-		this.webGL.AttachGizmoTo(webobject)
+		let webobject = this.webGL.CreateGroup(command.transform);
+		if(command.sender == this.playerName) {
+			this.webGL.AttachGizmoTo(webobject);
+		}
 	}
     /*
 
