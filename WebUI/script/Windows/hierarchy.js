@@ -7,6 +7,9 @@ class Hierarchy {
         this.subControls = this.CreateSubControls();
         this.Initialize();
 
+
+	    signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+
     }
 
 
@@ -63,16 +66,7 @@ class Hierarchy {
         });
     }
 
-    MoveElementsInHierarchy(groupObject, gameObject){
-        if (groupObject.type !== "group") {
-            console.error("groupObject is not of type group");
-            return;
-        }
-        let groupEntry = this.entries[groupObject.id];
-        let entry = this.entries[gameObject.id];
-        entry.appendTo(groupEntry[0].children[1]);
-        groupObject.OnAddChild(gameObject);
-    }
+
     OnEntitySpawned(gameObject) {
         let entry = $(document.createElement("li"));
         entry.attr("entityId", gameObject.id);
@@ -117,9 +111,9 @@ class Hierarchy {
         // editor.OnDeselectEntity(gameObject);
     }
 
-    CreateGroup(groupObject) {
+    CreateGroup(guid, name) {
         let group = $(document.createElement("li"));
-        group.attr("entityId", groupObject.id);
+        group.attr("entityId", guid);
         group.attr("entityType", "group");
         group.addClass("group expanded");
 
@@ -131,14 +125,14 @@ class Hierarchy {
 
         let groupName = $(document.createElement("div"));
         groupName.addClass("groupTitle");
-        groupName.text(groupObject.name);
+        groupName.text(name);
         title.append(groupName);
         group.append(title);
 
         let groupContent = $(document.createElement("ul"));
         group.append(groupContent);
 
-        this.entries[groupObject.id] = group;
+        this.entries[guid] = group;
 
         $(expander).on('click', function () {
             $(groupContent).toggle();
@@ -154,10 +148,11 @@ class Hierarchy {
         });
 
         $(title).on('click', function () {
-            editor.SelectEntityById(groupObject.id)
+            editor.SelectEntityById(guid)
         });
 
         $('.spawnedEntities').append(group);
+        return group;
     }
 
     static CollapseGroup(group) {
@@ -192,5 +187,15 @@ class Hierarchy {
         controls.append("<button onclick=\"editor.OnCreateGroup()\">New Group</button>\n" +
             "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>Add Instance</button>");
         return controls;
+    }
+
+    onSpawnedBlueprint(command) {
+        let group = this.CreateGroup(command.guid, command.name);
+
+	    let entry = $(document.createElement("li"));
+	    entry.text("shit fuck");
+	    entry.addClass("entity");
+
+	    group.append(entry);
     }
 }

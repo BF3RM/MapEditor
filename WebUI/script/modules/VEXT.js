@@ -1,8 +1,10 @@
 class VEXTInterface {
 	constructor() {
+		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
-		this.commands = {}
-		this.commands['SpawnReferenceObjectCommand'] = this.OnSpawnReferenceObject
+		this.commands = {};
+		this.commands["SpawnedBlueprint"] = signals.spawnedBlueprint.dispatch;
+		this.commands["DestroyedBlueprint"] = signals.destroyedBlueprint.dispatch;
 	}
 
 
@@ -24,24 +26,27 @@ class VEXTInterface {
 	 */
 	
 	SendCommand(command) {
+		command.sender = editor.playerName;
 		if(editor.debug) {
-			this.debugHandle(command)
+			console.log(command);
+			this.emulator.commands[command.type](command);
 		} else {
 			console.log(JSON.stringify(command));
 		}
 	}
 
-	ReceiveCommands(command) {
-		console.log(JSON.parse(command));
-	}
-
-	debugHandle(command) {
-		console.log(command)
+	HandleResponse(command) {
+		if(this.commands[command.type] === undefined) {
+			editor.logger.LogError("Failed to call a null signal: " + command.type);
+			return;
+		}
+		console.log(command);
 		this.commands[command.type](command);
+
 	}
 
 	OnSpawnReferenceObject(command) {
-		console.log(command);
+
 	}
 }
 

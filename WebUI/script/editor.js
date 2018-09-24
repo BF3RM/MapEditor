@@ -10,11 +10,19 @@ class Editor {
         this.blueprintManager = new BlueprintManager();
         this.entityFactory = new EntityFactory();
 
+        /*
 
+            Internal variables
+
+         */
+        this.playerName = null;
         this.selected = null;
         this.raycastTransform = new LinearTransform();
+
+
 		this.Initialize();
-        signals.blueprintSpawnRequested.add(this.onBlueprintSpawnRequested.bind(this));
+        signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
+		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 
     }
 
@@ -28,9 +36,22 @@ class Editor {
 			let imported = document.createElement('script');
 			imported.src = 'script/debugData.js';
 			document.head.appendChild(imported);
+			this.playerName = "LocalPlayer";
 		}
 	}
+	/*
 
+		Internal shit
+
+	 */
+
+	setPlayerName(name) {
+		if(name === undefined) {
+			this.logger.LogError("Failed to set player name");
+		} else {
+			this.playerName = name;
+		}
+	}
 	/*
 
 		General usage
@@ -68,8 +89,14 @@ class Editor {
 
 		//Spawn blueprint
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-	    let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation);
-		scope.execute(new SpawnReferenceObjectCommand(GenerateGuid(), parameters, editor.raycastTransform));
+	    let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation, blueprint.name, transform);
+
+
+		scope.execute(new SpawnBlueprintCommand(GenerateGuid(), parameters));
+	}
+
+	onSpawnedBlueprint(command) {
+
 	}
     /*
 

@@ -1,9 +1,9 @@
-const SpawnReferenceObjectCommand = function (guid, parameters, transform) {
+const SpawnBlueprintCommand = function (guid, parameters) {
 
 	Command.call(this);
 
-	this.type = 'SpawnReferenceObjectCommand';
-	this.name = 'Spawn ReferenceObject';
+	this.type = 'SpawnBlueprintCommand';
+	this.name = 'Spawn Blueprint';
 	this.guid = guid;
 
 	if (parameters === undefined) {
@@ -11,18 +11,17 @@ const SpawnReferenceObjectCommand = function (guid, parameters, transform) {
 		return;
 	}
 	this.parameters = parameters;
-	this.transform = transform;
 };
 
 
-SpawnReferenceObjectCommand.prototype = {
+SpawnBlueprintCommand.prototype = {
 
 	execute: function () {
 		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.parameters, this.transform))
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "DestroyReferenceObjectCommand"))
+		editor.vext.SendCommand(new VextCommand(this.guid, "DestroyBlueprintCommand"))
 	},
 };
 

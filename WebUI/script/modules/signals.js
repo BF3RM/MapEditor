@@ -2,7 +2,10 @@ let Signal = signals.Signal;
 var signals = {
 
     // Object actions
-    blueprintSpawnRequested: new Signal(),
+    spawnBlueprintRequested: new Signal(),
+
+    spawnedBlueprint: new Signal(),
+	destroyedBlueprint: new Signal(),
 
     objectMoveStarted: new Signal(),
     objectMoved: new Signal(),

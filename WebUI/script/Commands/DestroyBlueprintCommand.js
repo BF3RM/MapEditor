@@ -1,9 +1,9 @@
-const DestroyReferenceObjectCommand = function (guid) {
+const DestroyBlueprintCommand = function (guid) {
 
 	Command.call(this);
 
-	this.type = 'DestroyReferenceObjectCommand';
-	this.name = 'Destroy ReferenceObject';
+	this.type = 'DestroyBlueprintCommand';
+	this.name = 'Destroy Blueprint';
 	this.guid = guid;
 
 	this.gameObject = editor.getGameObjectByGuid(guid);
@@ -16,14 +16,14 @@ const DestroyReferenceObjectCommand = function (guid) {
 };
 
 
-DestroyReferenceObjectCommand.prototype = {
+DestroyBlueprintCommand.prototype = {
 
 	execute: function () {
 		editor.vext.SendCommand(new VextCommand(this.guid, this.type))
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnReferenceObjectCommand", this.gameObject.parameters, this.gameObject.transform))
+		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnBlueprintCommand", this.gameObject.parameters, this.gameObject.transform))
 	},
 };
 

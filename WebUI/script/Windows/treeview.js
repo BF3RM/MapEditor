@@ -103,7 +103,7 @@ class TreeView {
 			let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
-				signals.blueprintSpawnRequested.dispatch(blueprint);
+				signals.spawnBlueprintRequested.dispatch(blueprint);
 			}
 		})
 	}
