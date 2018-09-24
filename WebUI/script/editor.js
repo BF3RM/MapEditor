@@ -122,6 +122,10 @@ class Editor {
     }
 
     onSelectedEntity(command) {
+    	if(this.webobjects[command.guid] === undefined) {
+    		this.logger.LogError("Failed to select gameobject: " + command.guid);
+			return;
+		}
 		this.selected = command.guid;
 		//TODO: make this not ugly.
 		console.log("selected go")

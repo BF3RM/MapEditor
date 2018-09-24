@@ -69,7 +69,7 @@ class Hierarchy {
     }
 
     onSelectedEntity(command) {
-        if(command === undefined) {
+        if(command === undefined || editor.webobjects[command.guid] === undefined) {
             return
         }
         this.onDeselectEntry(editor.selected);
@@ -91,7 +91,6 @@ class Hierarchy {
 
     onDeselectEntry(guid) {
         if(guid == null) {
-            console.log("Tried to deselect nothing.");
             return false;
         }
         let entry = this.entries[guid];
