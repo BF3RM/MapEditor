@@ -16,13 +16,17 @@ class Editor {
 
          */
         this.playerName = null;
-        this.selected = [];
+        this.selected = null;
         this.raycastTransform = new LinearTransform();
+
+        this.webobjects = {};
+        this.gameObjects = {};
 
 
 		this.Initialize();
         signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 
     }
 
@@ -62,9 +66,6 @@ class Editor {
 		return this.entityFactory.getGameObjectByGuid(guid);
 	}
 
-	selectGameObjectByGuid(guid) {
-
-	}
 	/*
 
 		Events
@@ -102,7 +103,10 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let webobject = this.webGL.CreateGroup(command.transform);
-		if(command.sender === this.playerName) {
+        this.webobjects[command.guid] = webobject;
+        console.log("GO spawned")
+
+        if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
 	}
@@ -116,6 +120,14 @@ class Editor {
 		this.vext.SendCommand(new VextCommand(guid, "SelectEntity"))
 		//this.selected.push(this.getGameObjectByGuid(guid));
     }
+
+    onSelectedEntity(command) {
+		this.selected = command.guid;
+		//TODO: make this not ugly.
+		console.log("selected go")
+		console.log(this.webobjects[command.guid]);
+		this.webGL.AttachGizmoTo(this.webobjects[command.guid]);
+	}
     /*
 
         History

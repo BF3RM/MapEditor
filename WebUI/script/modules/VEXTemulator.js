@@ -61,7 +61,8 @@ class VEXTemulator {
 		//TODO: Support multiple selections
 		let response = {
 			"type": "SelectedEntity",
-			"guid": command.guid
+			"guid": command.guid,
+			"aabb": "notimplemented"
 		}
 		editor.vext.HandleResponse(response);
 	}

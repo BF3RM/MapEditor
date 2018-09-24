@@ -8,6 +8,8 @@ var signals = {
 	destroyedBlueprint: new Signal(),
 
     selectedEntity: new Signal(),
+    deselectedEntity: new Signal(),
+
 
     objectMoveStarted: new Signal(),
     objectMoved: new Signal(),

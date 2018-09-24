@@ -10,6 +10,7 @@ class Hierarchy {
 
 	    signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 	    signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+        signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 
     }
 
@@ -67,18 +68,18 @@ class Hierarchy {
         });
     }
 
-    onSelectEntity(gameObject) {
-        if(editor.selectedEntity == gameObject) {
-            console.log("Tried to select myself...");
-            return;
+    onSelectedEntity(command) {
+        if(command === undefined) {
+            return
         }
-        let entry = this.entries[gameObject.id];
-        entry.addClass("selected")
+        this.onDeselectEntry(editor.selected);
+        let entry = this.entries[command.guid];
+        entry.dom.addClass("selected");
     }
 
-    OnDeleteEntry(gameObject){
+    OnDeleteEntry(guid){
         // $('.spawnedEntities').find("#");
-        let entry = this.entries[gameObject.id];
+        let entry = this.entries[guid];
 
         if (entry == null){
             console.error("Tried to delete a null entry");
@@ -88,13 +89,13 @@ class Hierarchy {
     }
 
 
-    onDeselectEntry(gameObject) {
-        if(gameObject == null) {
+    onDeselectEntry(guid) {
+        if(guid == null) {
             console.log("Tried to deselect nothing.");
             return false;
         }
-        let entry = this.entries[gameObject.id];
-        entry.removeClass("selected");
+        let entry = this.entries[guid];
+        entry.dom.removeClass("selected");
         // editor.OnDeselectEntity(gameObject);
     }
 
@@ -248,7 +249,7 @@ class HierarchyEntry {
 	    }
 
 	    $(scope.title).on('click', function () {
-		    editor.selectGameObjectByGuid(scope.guid)
+		    editor.Select(scope.guid)
 	    });
 
 

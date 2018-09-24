@@ -93,7 +93,7 @@ class WebGL {
 			wireframe: true
 		} );
 		// THREE.group?
-		let mesh = new THREE.Group(geometry, material);
+		let mesh = new THREE.Mesh(geometry, material);
 
 		this.scene.add(mesh);
 
