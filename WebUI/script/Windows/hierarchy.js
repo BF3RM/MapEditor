@@ -23,7 +23,7 @@ class Hierarchy {
             itemSelector: 'li',
             placeholder: '<li class="placeholder"/>',
             nested: true,
-            distance:10,
+            distance:50,
             onDrag:  function ($item, position, _super, event) {
                 //$item.css(position)
                 //$(".placeholder").height($($item[0]).height());
@@ -66,20 +66,6 @@ class Hierarchy {
         });
     }
 
-
-    OnEntitySpawned(gameObject) {
-        let entry = $(document.createElement("li"));
-        entry.attr("entityId", gameObject.id);
-        entry.text(gameObject.name);
-        entry.addClass("entity");
-
-        $(entry).on('click', function() {
-            editor.SelectEntityById(gameObject.id)
-        });
-        $('.spawnedEntities').append(entry);
-        this.entries[gameObject.id] = entry;
-    }
-
     onSelectEntity(gameObject) {
         if(editor.selectedEntity == gameObject) {
             console.log("Tried to select myself...");
@@ -111,49 +97,7 @@ class Hierarchy {
         // editor.OnDeselectEntity(gameObject);
     }
 
-    CreateGroup(guid, name) {
-        let group = $(document.createElement("li"));
-        group.attr("entityId", guid);
-        group.attr("entityType", "group");
-        group.addClass("group expanded");
 
-        let title = $(document.createElement("div"));
-        title.addClass("title");
-
-        let expander = $(document.createElement("i"));
-        title.append(expander);
-
-        let groupName = $(document.createElement("div"));
-        groupName.addClass("groupTitle");
-        groupName.text(name);
-        title.append(groupName);
-        group.append(title);
-
-        let groupContent = $(document.createElement("ul"));
-        group.append(groupContent);
-
-        this.entries[guid] = group;
-
-        $(expander).on('click', function () {
-            $(groupContent).toggle();
-
-            let parent = $(group.parent());
-            if(group.hasClass("expanded")) {
-                $(group).removeClass("expanded");
-                $(group).addClass("collapsed");
-            } else {
-                $(group).removeClass("collapsed");
-                $(group).addClass("expanded");
-            }
-        });
-
-        $(title).on('click', function () {
-            editor.SelectEntityById(guid)
-        });
-
-        $('.spawnedEntities').append(group);
-        return group;
-    }
 
     static CollapseGroup(group) {
         $(group).toggle()
@@ -189,13 +133,98 @@ class Hierarchy {
         return controls;
     }
 
+    CreateGroup(guid, name, parent) {
+        let entry = new HierarchyEntry(guid, name, "Group");
+	    this.entries[guid] = entry;
+
+	    if(this.entries[parent] == undefined) {
+		    this.dom.append(entry.dom);
+	    } else {
+		    this.entries[parent].dom.append(entry.dom);
+	    }
+    }
+	CreateEntity(guid, name, parent) {
+		let entry = new HierarchyEntry(guid, name, "Entity");
+		this.entries[guid] = entry;
+
+		if(this.entries[parent] == undefined) {
+			this.dom.append(entry.dom);
+		} else {
+			this.entries[parent].content.append(entry.dom);
+		}
+	}
     onSpawnedBlueprint(command) {
-        let group = this.CreateGroup(command.guid, command.name);
+	   this.CreateGroup(command.guid, command.name, command.parent);
+	   let scope = this;
+	   for(let key in command.children) {
+	       let child = command.children[key];
+		   scope.CreateEntity(child.guid, child.type, command.guid);
+	   }
+    }
+}
 
-	    let entry = $(document.createElement("li"));
-	    entry.text("shit fuck");
-	    entry.addClass("entity");
+class HierarchyEntry {
+    constructor(guid, name, type) {
+        this.guid = guid;
+        this.name = name;
+        this.type = type;
 
-	    group.append(entry);
+	    this.title = null;
+        this.expander = null;
+        this.content = null;
+        this.groupTitle = null;
+
+        this.dom = null;
+
+        this.Initialize()
+    }
+
+    Initialize() {
+        let scope = this;
+	    scope.dom = $(document.createElement("li"));
+	    scope.dom.attr("entityId", scope.guid);
+	    scope.dom.attr("entityType", scope.type);
+	    scope.title = $(document.createElement("div"));
+	    scope.title.addClass("title");
+	    scope.dom.append(scope.title);
+
+	    if(scope.type == "Group") {
+		    scope.dom.addClass("group collapsed");
+
+
+		    scope.expander = $(document.createElement("i"));
+		    scope.title.append(scope.expander);
+
+		    scope.groupTitle = $(document.createElement("div"));
+		    scope.groupTitle.addClass("groupTitle");
+		    scope.groupTitle.text(scope.name);
+		    scope.title.append(scope.groupTitle);
+
+		    scope.content = $(document.createElement("ul"));
+		    scope.content.attr("style", "display: none");
+            if(scope.type == "Group") {
+                $(scope.expander).on('click', function () {
+                    $(scope.content).toggle();
+
+                    if ($(scope.dom).hasClass("expanded")) {
+                        $(scope.dom).removeClass("expanded");
+                        $(scope.dom).addClass("collapsed");
+                    } else {
+                        $(scope.dom).removeClass("collapsed");
+                        $(scope.dom).addClass("expanded");
+                    }
+                });
+            }
+		    scope.dom.append(scope.content);
+	    } else {
+		    scope.title.text(scope.name);
+		    scope.dom.addClass("entity");
+	    }
+
+	    $(scope.title).on('click', function () {
+		    editor.selectGameObjectByGuid(scope.guid)
+	    });
+
+
     }
 }

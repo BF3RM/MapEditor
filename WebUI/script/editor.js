@@ -61,11 +61,16 @@ class Editor {
 	getGameObjectByGuid(guid) {
 		return this.entityFactory.getGameObjectByGuid(guid);
 	}
+
+	selectGameObjectByGuid(guid) {
+
+	}
 	/*
 
 		Events
 
 	*/
+
 
     onBlueprintSpawnRequested(blueprint, transform, variation) {
 		let scope = this;
@@ -96,7 +101,8 @@ class Editor {
 	}
 
 	onSpawnedBlueprint(command) {
-
+		let webobject = this.webGL.CreateObject(command.transform)
+		this.webGL.AttachGizmoTo(webobject)
 	}
     /*
 
