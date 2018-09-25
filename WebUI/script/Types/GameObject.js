@@ -1,17 +1,17 @@
 class GameObject {
-    constructor(guid, name, typeName, transform, object, parent, parameters) {
+    constructor(guid, name, transform, parent, children) {
         this.guid = guid;
         this.name = name;
         this.transform = transform;
-	    this.parameters = parameters;
 	    this.parent = parent;
+	    this.children = children;
     }
 
     Clone(guid) {
     	if(guid === undefined) {
     		guid = GenerateGuid();
 	    }
-	    return new GameObject(guid, this.name, this.transform, this.parameters, this.parent);
+	    return new GameObject(guid, this.name, this.transform, this.parent, this.children);
     }
 }
 

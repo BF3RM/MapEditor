@@ -109,11 +109,12 @@ class Editor {
 	onSpawnedBlueprint(command) {
 		let webobject = this.webGL.CreateGroup(command.transform);
         this.webobjects[command.guid] = webobject;
-        console.log("GO spawned")
-
+        console.log("GO spawned");
+        this.gameObjects[command.guid] = new GameObject(command.guid, command.name, command.transform, command.parent, command.children);
         if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
+
 	}
 
 	Select(guid) {
