@@ -26,6 +26,7 @@ class Editor {
 		this.Initialize();
         signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 
     }
@@ -99,6 +100,10 @@ class Editor {
 
 
 		scope.execute(new SpawnBlueprintCommand(GenerateGuid(), parameters));
+	}
+
+	onDestroyedBlueprint(command) {
+    	this.webGL.DeleteObject(this.webobjects[command.guid]);
 	}
 
 	onSpawnedBlueprint(command) {

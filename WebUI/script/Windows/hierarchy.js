@@ -90,7 +90,7 @@ class Hierarchy {
 
 
     onDeselectEntry(guid) {
-        if(guid == null) {
+        if(guid === undefined || this.entries[guid] === undefined) {
             return false;
         }
         let entry = this.entries[guid];
