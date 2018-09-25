@@ -64,7 +64,7 @@ class Editor {
 	 */
 
 	getGameObjectByGuid(guid) {
-		return this.entityFactory.getGameObjectByGuid(guid);
+		return this.gameObjects[guid];
 	}
 
 	/*
