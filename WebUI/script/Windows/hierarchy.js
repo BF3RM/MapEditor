@@ -192,7 +192,6 @@ class Hierarchy {
         if(command === undefined || editor.webobjects[command.guid] === undefined) {
             return
         }
-        this.onDeselectEntry(editor.selected);
         let entry = this.entries[command.guid];
         entry.groupTitle.text(command.name);
     }
