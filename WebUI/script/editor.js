@@ -28,6 +28,7 @@ class Editor {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.setObjectName.add(this.onSetObjectName.bind(this));
 
     }
 
@@ -72,6 +73,14 @@ class Editor {
 		Events
 
 	*/
+
+	onSetObjectName(command) {
+		this.gameObject = editor.getGameObjectByGuid(command.guid);
+		if(this.gameObject === undefined) {
+			return;
+		}
+		this.gameObject.name = command.name;
+    }
 
 
     onBlueprintSpawnRequested(blueprint, transform, variation) {
@@ -139,6 +148,7 @@ class Editor {
 		console.log(this.webobjects[command.guid]);
 		this.webGL.AttachGizmoTo(this.webobjects[command.guid]);
 	}
+	
     /*
 
         History

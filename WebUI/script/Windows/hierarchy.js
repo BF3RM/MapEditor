@@ -11,6 +11,7 @@ class Hierarchy {
 	    signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 	    signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
         signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+        signals.setObjectName.add(this.onSetObjectName.bind(this));
 
     }
 
@@ -185,6 +186,15 @@ class Hierarchy {
 
     onDestroyedBlueprint(command) {
         this.DestroyGroup(command.guid)
+    }
+
+    onSetObjectName(command) {
+        if(command === undefined || editor.webobjects[command.guid] === undefined) {
+            return
+        }
+        this.onDeselectEntry(editor.selected);
+        let entry = this.entries[command.guid];
+        entry.groupTitle.text(command.name);
     }
 }
 
