@@ -64,7 +64,7 @@ class Editor {
 	 */
 
 	getGameObjectByGuid(guid) {
-		return this.entityFactory.getGameObjectByGuid(guid);
+		return this.gameObjects[guid];
 	}
 
 	/*
@@ -104,16 +104,18 @@ class Editor {
 
 	onDestroyedBlueprint(command) {
     	this.webGL.DeleteObject(this.webobjects[command.guid]);
+		delete this.gameObjects[command.guid];
 	}
 
 	onSpawnedBlueprint(command) {
 		let webobject = this.webGL.CreateGroup(command.transform);
         this.webobjects[command.guid] = webobject;
-        console.log("GO spawned")
-
+        console.log("GO spawned");
+        this.gameObjects[command.guid] = new GameObject(command.guid, command.name, command.transform, command.parent, command.children);
         if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
+
 	}
 
 	Select(guid) {
