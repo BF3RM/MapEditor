@@ -24,7 +24,6 @@ class VEXTemulator {
 			"sender": command.sender,
 			"type": "SpawnedBlueprint",
 			"name": command.parameters.name,
-			"transform": command.parameters.transform,
 			"children": {
 				1: {
 					"type": "StaticModelEntity",
@@ -44,7 +43,8 @@ class VEXTemulator {
 					"entityId": GenerateGuid(),
 					"localTransform": new LinearTransform(),
 				}
-			}
+			},
+			"parameters": command.parameters
 		};
 		editor.vext.HandleResponse(response);
 	}
