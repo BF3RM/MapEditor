@@ -34,6 +34,7 @@ class VEXTInterface {
 			this.emulator.commands[command.type](command);
 		} else {
 			console.log(JSON.stringify(command));
+			WebUI.Call('DispatchEventLocal', 'Editor:SpawnBlueprint', JSON.stringify(command));
 		}
 	}
 

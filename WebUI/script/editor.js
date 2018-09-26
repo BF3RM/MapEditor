@@ -85,6 +85,7 @@ class Editor {
 
 
     onBlueprintSpawnRequested(blueprint, transform, variation) {
+    
 		let scope = this;
     	if(blueprint == null) {
             scope.logger.LogError("Tried to spawn a nonexistent blueprint");
@@ -102,12 +103,10 @@ class Editor {
 			// Show variation
 			return false;
 		}
-		// Request validation from Lua here.
 
 		//Spawn blueprint
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-	    let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation, blueprint.name, transform);
-
+		let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation, blueprint.name, transform);
 
 		scope.execute(new SpawnBlueprintCommand(GenerateGuid(), parameters));
 	}
