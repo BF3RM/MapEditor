@@ -156,11 +156,12 @@ class Inspector {
 	}
 
 	onSelectedEntity(command) {
-		this.gameObject = editor.getGameObjectByGuid(command.guid);
-		if(this.gameObject === undefined) {
+		let gameObject = editor.getGameObjectByGuid(command.guid);
+		if(gameObject === undefined) {
+			editor.logger.LogError("Tried to set the name of a null entry. " + command.guid);
 			return;
 		}
-		this.name[0].value = this.gameObject.name;
+		this.name[0].value = gameObject.name;
 	}
 }
 
