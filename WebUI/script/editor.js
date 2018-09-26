@@ -104,18 +104,11 @@ class Editor {
 			return false;
 		}
 
-
 		//Spawn blueprint
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
 		let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation, blueprint.name, transform);
 
-		// Send info to Lua
-		let newGuid = GenerateGuid();
-
-		// console.log(newGuid +":"+ parameters.toString());
-		// WebUI.Call('DispatchEventLocal', 'Editor:SpawnBlueprint', newGuid + parameters);
-
-		scope.execute(new SpawnBlueprintCommand(newGuid, parameters));
+		scope.execute(new SpawnBlueprintCommand(GenerateGuid(), parameters));
 	}
 
 	onDestroyedBlueprint(command) {

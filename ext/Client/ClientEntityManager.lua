@@ -15,6 +15,4 @@ function ClientEntityManager:RegisterEvents()
 
 end
 
-
 return ClientEntityManager()
-

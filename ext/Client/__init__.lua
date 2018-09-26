@@ -1,6 +1,7 @@
 class 'MapEditorClient'
 
 local m_Freecam = require "Freecam"
+local m_Editor = require "Editor"
 local m_UIManager = require "UIManager"
 local m_InstanceParser = require "__shared/InstanceParser"
 
@@ -22,6 +23,8 @@ function MapEditorClient:RegisterEvents()
 	self.m_EngineUpdateEvent = Events:Subscribe('Engine:Update', self, self.OnUpdate)
 	self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
+	-- WebUI events
+	Events:Subscribe('Editor:SpawnBlueprint', self, self.OnSpawnBlueprint)
 end
 
 ----------- Game functions----------------
@@ -35,12 +38,7 @@ function MapEditorClient:OnLoaded()
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
-	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
-		print("MessageType.ClientLevelFinalizedMessage")
-		m_InstanceParser:FillVariations()
-
-		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
-	end
+	m_Editor:OnEngineMessage(p_Message) 
 end
 
 function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
@@ -50,6 +48,12 @@ end
 function MapEditorClient:OnUpdateInput(p_Delta)
 	m_Freecam:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
+end
+
+----------- WebUI functions----------------
+
+function MapEditorClient:OnSpawnBlueprint(p_JSONparams)
+	m_Editor:OnSpawnBlueprint(p_JSONparams)
 end
 
 return MapEditorClient()

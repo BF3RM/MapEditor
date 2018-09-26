@@ -9,7 +9,7 @@ function Freecam:__init()
 end
 
 function Freecam:RegisterVars()
-	self.mode = CameraMode.FreeCam
+	self.mode = CameraMode.FirstPerson
 
 	self.camera = nil
 	self.cameraData = CameraEntityData()
