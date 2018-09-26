@@ -24,6 +24,8 @@ var signals = {
     objectChanged: new Signal(),
     objectRemoved: new Signal(),
 
+    setObjectName: new Signal(),
+
     modalShowed: new Signal(),
     modalClosed: new Signal(),
     modalConfirmed: new Signal(),
