@@ -17,7 +17,7 @@ const SpawnBlueprintCommand = function (guid, parameters) {
 SpawnBlueprintCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.parameters, this.transform))
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.parameters))
 	},
 
 	undo: function () {

@@ -5,6 +5,7 @@ class Inspector {
 		this.name = null;
 		this.Initialize();
 
+		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 	}
 
 	//TODO: OnUpdate events, transform shit
@@ -31,6 +32,10 @@ class Inspector {
 			"value": "name"
 		});
 		this.name = nameInput;
+
+		$(nameInput).on('change',function(){
+			editor.execute(new SetObjectNameCommand(editor.selected, this.value));
+		});
 
 		let transformControl = $(document.createElement("div"));
 		transformControl.addClass("transform");
@@ -148,6 +153,15 @@ class Inspector {
 	}
 	ShowContent() {
 		this.dom.show()
+	}
+
+	onSelectedEntity(command) {
+		let gameObject = editor.getGameObjectByGuid(command.guid);
+		if(gameObject === undefined) {
+			editor.logger.LogError("Tried to set the name of a null entry. " + command.guid);
+			return;
+		}
+		this.name[0].value = gameObject.name;
 	}
 }
 

@@ -28,6 +28,7 @@ class Editor {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.setObjectName.add(this.onSetObjectName.bind(this));
 
     }
 
@@ -73,6 +74,15 @@ class Editor {
 
 	*/
 
+	onSetObjectName(command) {
+		let gameObject = this.getGameObjectByGuid(command.guid);
+		if(gameObject === undefined) {
+			this.logger.LogError("Tried to set the name of a null object: " + command.guid);
+			return;
+		}
+		gameObject.name = command.name;
+    }
+
 
     onBlueprintSpawnRequested(blueprint, transform, variation) {
     
@@ -114,10 +124,10 @@ class Editor {
 	}
 
 	onSpawnedBlueprint(command) {
-		let webobject = this.webGL.CreateGroup(command.transform);
+		let webobject = this.webGL.CreateGroup(command.parameters.transform);
         this.webobjects[command.guid] = webobject;
         console.log("GO spawned");
-        this.gameObjects[command.guid] = new GameObject(command.guid, command.name, command.transform, command.parent, command.children);
+        this.gameObjects[command.guid] = new GameObject(command.guid, command.name, command.parameters.transform, command.parent, command.children);
         if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
@@ -141,10 +151,9 @@ class Editor {
 		}
 		this.selected = command.guid;
 		//TODO: make this not ugly.
-		console.log("selected go")
-		console.log(this.webobjects[command.guid]);
 		this.webGL.AttachGizmoTo(this.webobjects[command.guid]);
 	}
+	
     /*
 
         History

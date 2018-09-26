@@ -9,7 +9,8 @@ class VEXTemulator {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
-        this.commands['SelectEntity'] = this.SelectEntity;
+		this.commands['SelectEntity'] = this.SelectEntity;
+		this.commands['SetObjectNameCommand'] = this.SetObjectName;
 	}
 
 
@@ -23,7 +24,6 @@ class VEXTemulator {
 			"sender": command.sender,
 			"type": "SpawnedBlueprint",
 			"name": command.parameters.name,
-			"transform": command.parameters.transform,
 			"children": {
 				1: {
 					"type": "StaticModelEntity",
@@ -43,7 +43,8 @@ class VEXTemulator {
 					"entityId": GenerateGuid(),
 					"localTransform": new LinearTransform(),
 				}
-			}
+			},
+			"parameters": command.parameters
 		};
 		editor.vext.HandleResponse(response);
 	}
@@ -64,6 +65,16 @@ class VEXTemulator {
 			"guid": command.guid,
 			"aabb": "notimplemented"
 		}
+		editor.vext.HandleResponse(response);
+	}
+
+	SetObjectName(command) {
+		
+		let response = {
+			"type": "SetObjectName",
+			"guid": command.guid,
+			"name": command.parameters
+		};
 		editor.vext.HandleResponse(response);
 	}
 
