@@ -50,7 +50,7 @@ class Inspector {
 		});
 		content.append(deleteButton);
 
-
+		
 		let controls = ["position", "rotation", "scale"];
 		let xyz = ["x","y","z"];
 		let transform = this.transform;
@@ -162,6 +162,7 @@ class Inspector {
 			return;
 		}
 		this.name[0].value = gameObject.name;
+		console.log('instanceGuid: ' + gameObject.parameters.reference.instanceGuid);
 	}
 }
 
