@@ -1,35 +1,33 @@
 class 'MapEditorServer'
 
-local Shared = require '__shared/MapEditorShared'
-
 function MapEditorServer:__init()
 	print("Initializing MapEditorServer")
 	self:RegisterVars()
 	self:RegisterEvents()
-	Shared:__init()
 end
-
 
 function MapEditorServer:RegisterVars()
 end
 
-
 function MapEditorServer:RegisterEvents()
-	self.m_EngineMessageEvent = Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
-	self.m_OnRoundReset = Events:Subscribe("Server:RoundReset", self, self.OnRoundReset)
+	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
+	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
 end
 
-function MapEditorServer:OnRoundReset()
-	NetEvents:BroadcastLocal('MapEditor:RoundReset')
+function MapEditorServer:OnEnableInputRestriction(p_Player)
+	self:SetInputRestriction(p_Player, false)
 end
 
-function MapEditorServer:OnEngineMessage(p_Message) 
+function MapEditorServer:OnDisableInputRestriction(p_Player)
+	self:SetInputRestriction(p_Player, true)
+end
 
-	if p_Message.type == MessageType.ClientConnectedMessage or
-		p_Message.type == MessageType.ServerLevelLoadedMessage then 
+function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
+	for i=0, 65 do
+		p_Player:EnableInput(i, p_Enabled)
 	end
 end
 
 
-g_MapEditorServer = MapEditorServer()
 
+return MapEditorServer()
