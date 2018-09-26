@@ -6,8 +6,6 @@ const SetObjectNameCommand = function (guid, name) {
     this.guid = guid;
 
 
-    this.gameObject = editor.getGameObjectByGuid(guid);
-
     if (name === undefined) {
 		editor.logger.LogError("Missing is name");
 		return;
@@ -15,10 +13,10 @@ const SetObjectNameCommand = function (guid, name) {
         this.name = name;
     }
 
-	if(this.gameObject === undefined) {
+	if(editor.getGameObjectByGuid(guid) === undefined) {
 		editor.logger.LogError("Attempted to set name for null GameObject");
 	} else {
-        this.oldname = this.gameObject.name;
+        this.oldname = editor.getGameObjectByGuid(guid).name;
 	}
 };
 

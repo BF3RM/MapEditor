@@ -70,7 +70,7 @@ class Hierarchy {
     }
 
     onSelectedEntity(command) {
-        if(command === undefined || editor.webobjects[command.guid] === undefined) {
+        if(command === undefined || editor.gameObjects[command.guid] === undefined) {
             return
         }
         this.onDeselectEntry(editor.selected);
