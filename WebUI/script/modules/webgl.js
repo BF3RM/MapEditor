@@ -49,7 +49,7 @@ class WebGL {
 				case 2:// middle mouse
 					break;
 				case 3: // right mouse
-					EnableFreecam();
+					EnableFreecamMovement();
 					break;
 				default:
 					alert('You have a strange Mouse!');
@@ -227,12 +227,6 @@ class WebGL {
 		this.renderer.render(this.scene, this.camera);
 	}
 
-	UpdateCameraPos(x, y, z) {
-		this.camera.position.set(x, y, z);
-		this.camera.position.set(x, y, z);
-		this.Render();
-	}
-
 	SetFov(p_Fov) {
 		this.camera.fov = p_Fov;
 		this.camera.updateProjectionMatrix();
@@ -359,7 +353,7 @@ class WebGL {
 		// editor.webGL.Render();
 	}
 
-	UpdateCameraAngle(lx, ly, lz, ux, uy, uz, fx, fy, fz) {
+	UpdateCameraTransform(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
 		let m = new THREE.Matrix4();
 
 		m.set(lx, ux, fx, 0,
@@ -368,6 +362,8 @@ class WebGL {
 			0, 0, 0, 0);
 
 		this.camera.setRotationFromMatrix(m);
+		this.camera.position.set(x, y, z);
+
 		this.Render();
 	}
 

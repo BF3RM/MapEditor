@@ -24,12 +24,15 @@ function MapEditorClient:RegisterEvents()
 	self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
 	-- WebUI events
-	Events:Subscribe('Editor:SpawnBlueprint', self, self.OnSpawnBlueprint)
+	Events:Subscribe('MapEditor:SpawnBlueprintCommand', self, self.OnSpawnBlueprint)
+	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
+	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
 end
 
 ----------- Game functions----------------
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
+	m_Editor:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorClient:OnLoaded()
@@ -54,6 +57,14 @@ end
 
 function MapEditorClient:OnSpawnBlueprint(p_JSONparams)
 	m_Editor:OnSpawnBlueprint(p_JSONparams)
+end
+
+function MapEditorClient:OnEnableFreecamMovement()
+	m_UIManager:OnEnableFreecamMovement()
+end
+
+function MapEditorClient:OnDisableFreecam()
+	m_UIManager:OnDisableFreecam()
 end
 
 return MapEditorClient()

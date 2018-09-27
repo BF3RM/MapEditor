@@ -68,6 +68,10 @@ class Editor {
 		return this.gameObjects[guid];
 	}
 
+	UpdateRaycastPosition(x, y, z){
+		this.raycastTransform.trans = new Vec3(x, y, z);
+	}
+
 	/*
 
 		Events
@@ -105,10 +109,11 @@ class Editor {
 		}
 
 		//Spawn blueprint
+		let guid = GenerateGuid()
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let parameters = new ReferenceObjectParameters(blueprint.getReference(), variation, blueprint.name, transform);
+		let parameters = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.name, transform);
 
-		scope.execute(new SpawnBlueprintCommand(GenerateGuid(), parameters));
+		scope.execute(new SpawnBlueprintCommand(guid, parameters));
 	}
 
 	onDestroyedBlueprint(command) {

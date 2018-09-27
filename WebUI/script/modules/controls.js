@@ -6,8 +6,8 @@
 // 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
 // }
 		
-function EnableFreecam() {
-	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableFreecam')
+function EnableFreecamMovement() {
+	editor.vext.SendEvent('EnableFreecamMovement')
 
 	// Hack to make sure we don't navigate the windows while in freecam.
 	document.activeElement.blur()
@@ -84,6 +84,9 @@ $(document).keydown(function(e) {
 	}
 	if(e.which == 46) { // DEL
 		editor.ui.dialogs["deleteEntity"].dialog("open");
+	}
+	if(e.which == 112) { // F1
+		editor.vext.SendEvent('DisableFreecam');
 	}
 });
 

@@ -1,6 +1,10 @@
 class 'Editor'
 
-local m_ClientEntityManager = "ClientEntityManager"
+local m_ClientEntityManager = require "ClientEntityManager"
+local m_InstanceParser = require "__shared/InstanceParser"
+
+local MAX_CAST_DISTANCE = 1000
+local FALLBACK_DISTANCE = 1000
 
 function Editor:__init()
 	print("Initializing Editor")
@@ -9,7 +13,7 @@ function Editor:__init()
 end
 
 function Editor:RegisterVars()
-
+	self.m_PendingRaycast = false
 end
 
 function Editor:RegisterEvents()
@@ -25,8 +29,82 @@ function Editor:OnEngineMessage(p_Message)
 	end
 end
 
+function Editor:OnUpdate(p_Delta, p_SimulationDelta)
+	self:UpdateCameraTransform()
+
+	self:Raycast()
+end
+
 function Editor:OnSpawnBlueprint(p_JSONparams)
-	local table = self:DecodeParams(json.decode(p_JSONparams))
+	local s_Params = self:DecodeParams(json.decode(p_JSONparams))
+
+	print(s_Params)
+
+	m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
+end
+
+function Editor:Raycast()
+	if not self.m_PendingRaycast then
+		return
+	end
+
+	local s_Transform = ClientUtils:GetCameraTransform()
+
+	if s_Transform.trans == Vec3(0,0,0) then -- Camera is below the ground. Creating an entity here would be useless.
+		
+		return
+	end
+
+	-- The freecam transform is inverted. Invert it back
+
+	local s_CameraForward = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
+
+	local s_CastPosition = Vec3(s_Transform.trans.x + (s_CameraForward.x * MAX_CAST_DISTANCE),
+								s_Transform.trans.y + (s_CameraForward.y * MAX_CAST_DISTANCE),
+								s_Transform.trans.z + (s_CameraForward.z * MAX_CAST_DISTANCE))
+
+	local s_Raycast = RaycastManager:Raycast(s_Transform.trans, s_CastPosition, 2)
+
+	-- local s_Transform = LinearTransform(
+	-- 	Vec3(1,0,0),
+	-- 	Vec3(0,1,0),
+	-- 	Vec3(0,0,1),
+	-- 	s_Transform.trans
+	-- )
+
+	::continue::
+
+	if s_Raycast ~= nil then
+		s_Transform.trans = s_Raycast.position
+	else
+
+		-- Raycast didn't hit anything. Spawn it in front of the player instead.
+		s_Transform.trans = Vec3(s_Transform.trans.x + (s_CameraForward.x * FALLBACK_DISTANCE),
+							s_Transform.trans.y + (s_CameraForward.y * FALLBACK_DISTANCE),
+							s_Transform.trans.z + (s_CameraForward.z * FALLBACK_DISTANCE))
+	end
+
+	WebUI:ExecuteJS(string.format('editor.UpdateRaycastPosition(%s, %s, %s)', 
+		s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
+
+	self.m_PendingRaycast = false
+end
+
+function Editor:UpdateCameraTransform()
+	local s_Transform = ClientUtils:GetCameraTransform()
+	local pos = s_Transform.trans
+
+	local left = s_Transform.left
+	local up = s_Transform.up
+	local forward = s_Transform.forward
+
+	WebUI:ExecuteJS(string.format('editor.webGL.UpdateCameraTransform(%s, %s, %s, %s, %s, %s,%s, %s, %s);', 
+		left.x, left.y, left.z, up.x, up.y, up.z, forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
+
+end
+
+function Editor:SetPendingRaycast()
+	self.m_PendingRaycast = true
 end
 
 function Editor:DecodeParams(p_Table)

@@ -33,8 +33,8 @@ class VEXTInterface {
 			console.log(command);
 			this.emulator.commands[command.type](command);
 		} else {
-			console.log(JSON.stringify(command));
-			WebUI.Call('DispatchEventLocal', 'Editor:SpawnBlueprint', JSON.stringify(command));
+			console.log(command);
+			WebUI.Call('DispatchEventLocal', 'MapEditor:' + command.type, JSON.stringify(command.parameters));
 		}
 	}
 
@@ -49,7 +49,19 @@ class VEXTInterface {
 	}
 
 	OnSpawnReferenceObject(command) {
+		
+	}
 
+	SendEvent(eventName, JSONparams){
+		if(editor.debug) {
+			console.log(eventName);
+			if (JSONparams != null){
+				console.log(JSONparams);
+			}
+		} else {
+			console.log('MapEditor:' + eventName);
+			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSONparams);
+		}
 	}
 }
 
