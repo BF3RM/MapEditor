@@ -19,7 +19,7 @@ class Editor {
         this.selected = null;
         this.raycastTransform = new LinearTransform();
 
-        this.webobjects = {};
+        //this.webobjects = {};
         this.gameObjects = {};
 
 
@@ -30,6 +30,14 @@ class Editor {
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 
+
+		this.lastUpdateTime = 0;
+		this.deltaTime = 1.0/30.0;
+
+		this._renderLoop = this.renderLoop.bind(this);
+		this.renderLoop(); // first call to init loop using the requestAnimationFrame
+
+		
     }
 
 	Initialize() {
@@ -78,6 +86,35 @@ class Editor {
 
 	*/
 
+
+	renderLoop()
+	{
+
+		//GameObject update
+		if( this.lastUpdateTime == 0 || 
+			this.lastUpdateTime + (this.deltaTime*1000.0) <= Date.now())
+		{
+			this.lastUpdateTime = Date.now();
+
+			for ( var key in this.gameObjects )
+			{
+				var object = this.gameObjects[key];
+
+				if (object.update != undefined)
+					object.update( this.deltaTime );
+
+			}
+		}
+			
+	
+		//Gameobject render
+		this.webGL.Render( );
+	
+
+		//Render loop
+		window.requestAnimationFrame( this._renderLoop );
+	}
+
 	onSetObjectName(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
@@ -117,16 +154,22 @@ class Editor {
 	}
 
 	onDestroyedBlueprint(command) {
-    	this.webGL.DeleteObject(this.webobjects[command.guid]);
+    	this.webGL.DeleteObject(this.gameObjects[command.guid]);
 		delete this.gameObjects[command.guid];
 	}
 
 	onSpawnedBlueprint(command) {
-		let webobject = this.webGL.CreateGroup(command.parameters.transform);
-        this.webobjects[command.guid] = webobject;
+		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
+        //this.webobjects[command.guid] = webobject;
         console.log("GO spawned");
-        this.gameObjects[command.guid] = new GameObject(command.guid, command.name, command.parameters.transform, command.parent, command.children, command.parameters);
-        if(command.sender === this.playerName) {
+        var gameObject = new GameObject(command.guid, command.name, command.parameters.transform, command.parent, command.children, command.parameters);
+		
+		this.webGL.AddObject(gameObject);
+		
+
+		this.gameObjects[command.guid] = gameObject;
+
+		if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
 
@@ -143,13 +186,13 @@ class Editor {
     }
 
     onSelectedEntity(command) {
-    	if(this.webobjects[command.guid] === undefined) {
+    	if(this.gameObjects[command.guid] === undefined) {
     		this.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
 		this.selected = command.guid;
 		//TODO: make this not ugly.
-		this.webGL.AttachGizmoTo(this.webobjects[command.guid]);
+		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
 	}
 	
     /*

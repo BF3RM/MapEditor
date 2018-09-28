@@ -80,7 +80,7 @@ class WebGL {
 
 		this.HideGizmo();
 
-		this.Render();
+		//this.Render();
 	}
 
 	CreateGroup(transform){
@@ -106,7 +106,7 @@ class WebGL {
 		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
 		mesh.setRotationFromMatrix(matrix);
 
-		this.Render();
+		//this.Render();
 		return mesh;
 	}
 
@@ -123,13 +123,13 @@ class WebGL {
 		// remove child from scene and add it to parent
 		THREE.SceneUtils.attach( webObject, this.scene, groupObject );
 
-		this.Render();
+		//this.Render();
 	}
 	RemoveFromGroup(webObject){
 		// remove child from parent and add it to scene
 		THREE.SceneUtils.detach( webObject, webObject.parent, this.scene );
 		
-		this.Render();
+		//this.Render();
 	}
 
 
@@ -153,9 +153,17 @@ class WebGL {
 		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
 		mesh.setRotationFromMatrix(matrix);
 
-		this.Render();
+		//this.Render();
 
 		return mesh;
+	}
+
+	AddObject(object)
+	{
+		if (object.renderInit != undefined)
+			object.renderInit();
+
+		this.scene.add(object);
 	}
 
 	MoveObject(webObject, x, y, z){
@@ -171,12 +179,12 @@ class WebGL {
 
 		webObject.position.set(x,y,z);
 
-		this.Render();
+		//this.Render();
 
 		// remove child from scene and add it to parent
 		THREE.SceneUtils.attach( webObject, this.scene, parent );
 
-		this.Render();
+		//this.Render();
 	}
 
 	DeleteObject(webObject){
@@ -184,10 +192,10 @@ class WebGL {
 		this.control.detach(webObject);
 		this.scene.remove( webObject );
 		
-		this.Render();
+		//this.Render();
 	}
 
-
+/*
 	UpdateObject(webObject, transform) {
 		// console.log(transform.trans);
 		let matrix = new THREE.Matrix4();
@@ -199,25 +207,25 @@ class WebGL {
 		webObject.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
 		webObject.setRotationFromMatrix(matrix);
 
-		this.Render();
-	}
+		//this.Render();
+	}*/
 
 	AttachGizmoTo(webObject){
 		this.control.attach(webObject);
-		this.Render();
+		//this.Render();
 	}
 
 	HideGizmo() {
 		this.control.visible = false;
 		// this.mesh.visible = false;
-		this.Render();
+		//this.Render();
 	}
 
 	ShowGizmo() {
 		this.control.visible = true;
 		// this.mesh.visible = true;
 
-		this.Render();
+		//this.Render();
 	}
 
 	Render() {
@@ -364,7 +372,7 @@ class WebGL {
 		this.camera.setRotationFromMatrix(m);
 		this.camera.position.set(x, y, z);
 
-		this.Render();
+		//this.Render();
 	}
 
 }
