@@ -44,7 +44,7 @@ end
 
 function Freecam:Create()
     print("function Freecam:Create()")
-    local s_Entity = EntityManager:CreateClientEntity(self.cameraData, LinearTransform())
+    local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
     if s_Entity == nil then
         print("Could not spawn camera")
         return
