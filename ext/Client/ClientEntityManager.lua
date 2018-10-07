@@ -24,7 +24,7 @@ function ClientEntityManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceG
 
 	if self.m_SpawnedEntities[p_Guid] ~= nil then
 		print('Object with id ' .. p_Guid .. ' already existed as a spawned entity!')
-		return
+		return false
 	end
 
 	p_Variation = p_Variation or 0
@@ -33,7 +33,7 @@ function ClientEntityManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceG
 
 	if s_Blueprint == nil then
 		error('Couldn\'t find the specified instance')
-		return
+		return false
 	end
 	
 	local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
@@ -46,12 +46,18 @@ function ClientEntityManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceG
 
 	local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 
+	if #s_ObjectEntities == 0 then
+		return false
+	end
+
 	for i, entity in pairs(s_ObjectEntities) do
 		entity:Init(Realm.Realm_Client, true)
 		entity:FireEvent("Start")
 	end
 	
 	self.m_SpawnedEntities[p_Guid] = s_ObjectEntities
+
+	return true
 end
 
 return ClientEntityManager()

@@ -26,8 +26,17 @@ function Editor:OnEngineMessage(p_Message)
 		m_InstanceParser:FillVariations()
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
+		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+
+		if s_LocalPlayer == nil then
+			error("Local player is nil")
+			return
+		end
+
+		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
 end
+
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:UpdateCameraTransform()
@@ -38,9 +47,21 @@ end
 function Editor:OnSpawnBlueprint(p_JSONparams)
 	local s_Params = self:DecodeParams(json.decode(p_JSONparams))
 
-	print(s_Params)
+	local s_SpawningSuccessful = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
-	m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
+	if s_SpawningSuccessful then
+		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+		local s_Response = {
+			guid = s_Params.guid,
+			sender = s_LocalPlayer.name,
+			name = s_Params.name,
+			children = {},
+			['type'] = 'SpawnedBlueprint', 
+			parameters = s_Params
+		}
+
+		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
+	end
 end
 
 function Editor:Raycast()
@@ -98,7 +119,7 @@ function Editor:UpdateCameraTransform()
 	local up = s_Transform.up
 	local forward = s_Transform.forward
 
-	WebUI:ExecuteJS(string.format('editor.webGL.UpdateCameraTransform(%s, %s, %s, %s, %s, %s,%s, %s, %s);', 
+	WebUI:ExecuteJS(string.format('editor.webGL.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);', 
 		left.x, left.y, left.z, up.x, up.y, up.z, forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
 
 end
