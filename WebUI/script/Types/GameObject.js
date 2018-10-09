@@ -33,21 +33,21 @@ class GameObject extends THREE.Object3D
 
 	updateTransform()
 	{
-		this.mesh.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-
 		let matrix = new THREE.Matrix4();
 		matrix.set(
 			this.transform.left.x, this.transform.up.x, this.transform.forward.x, 0,
 			this.transform.left.y, this.transform.up.y, this.transform.forward.y, 0,
 			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
-			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
+			0, 0, 0, 1);
 
-		this.mesh.setRotationFromMatrix(matrix);
+		this.setRotationFromMatrix(matrix);
+
+		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
 	}
 
 	update( deltaTime )
 	{
-		this.updateTransform( );
+		//this.updateTransform( );
 	}
 	
 
