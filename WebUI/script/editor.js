@@ -162,7 +162,7 @@ class Editor {
 		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
         //this.webobjects[command.guid] = webobject;
         console.log("GO spawned");
-        var gameObject = new GameObject(command.guid, command.name, command.parameters.transform, command.parent, command.children, command.parameters);
+        var gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, command.children, command.parameters);
 		
 		this.webGL.AddObject(gameObject);
 		

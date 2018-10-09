@@ -1,7 +1,7 @@
 class 'Editor'
 
 local m_ClientEntityManager = require "ClientEntityManager"
-local m_InstanceParser = require "__shared/InstanceParser"
+local m_InstanceParser = require "InstanceParser"
 
 local MAX_CAST_DISTANCE = 1000
 local FALLBACK_DISTANCE = 1000
@@ -46,6 +46,7 @@ end
 
 function Editor:OnSpawnBlueprint(p_JSONparams)
 	local s_Params = self:DecodeParams(json.decode(p_JSONparams))
+	print(s_Params)
 
 	local s_SpawningSuccessful = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
@@ -55,10 +56,11 @@ function Editor:OnSpawnBlueprint(p_JSONparams)
 			guid = s_Params.guid,
 			sender = s_LocalPlayer.name,
 			name = s_Params.name,
-			children = {},
 			['type'] = 'SpawnedBlueprint', 
-			parameters = s_Params
+			parameters = self:EncodeParams(s_Params)
 		}
+		print(s_Response)
+		print(json.encode(s_Response))
 
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
 	end
@@ -93,7 +95,6 @@ function Editor:Raycast()
 	-- 	s_Transform.trans
 	-- )
 
-	::continue::
 
 	if s_Raycast ~= nil then
 		s_Transform.trans = s_Raycast.position
@@ -149,4 +150,17 @@ function Editor:DecodeParams(p_Table)
 	return p_Table
 end
 
+function Editor:EncodeParams(p_Table)
+	for s_Key, s_Value in pairs(p_Table) do
+		if s_Key == 'transform' then		
+			p_Table[s_Key] = tostring(s_Value)
+
+		elseif type(s_Value) == "table" then
+			self:EncodeParams(s_Value)
+		end
+
+	end
+
+	return p_Table
+end
 return Editor()

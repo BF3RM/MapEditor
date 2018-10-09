@@ -59,7 +59,7 @@ function UIManager:OnDisableFreecam()
 end
 
 function UIManager:EnableFreecam()
-	-- NetEvents:SendLocal('EnableInputRestriction')
+	NetEvents:SendLocal('EnableInputRestriction')
 
 	m_Freecam:Enable()
 
@@ -71,7 +71,7 @@ function UIManager:EnableFreecam()
 end
 
 function UIManager:DisableFreecam()
-	-- NetEvents:SendLocal('DisableInputRestriction')
+	NetEvents:SendLocal('DisableInputRestriction')
 	m_Freecam:Disable()
 	--WebUI:BringToFront()
 	-- WebUI:Hide()

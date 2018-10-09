@@ -3,7 +3,7 @@ class 'MapEditorClient'
 local m_Freecam = require "Freecam"
 local m_Editor = require "Editor"
 local m_UIManager = require "UIManager"
-local m_InstanceParser = require "__shared/InstanceParser"
+local m_InstanceParser = require "InstanceParser"
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
@@ -21,7 +21,10 @@ function MapEditorClient:RegisterEvents()
 	self.m_ExtensionLoadedEvent = Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
 	self.m_EngineMessageEvent = Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	self.m_EngineUpdateEvent = Events:Subscribe('Engine:Update', self, self.OnUpdate)
-	self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
+    self.m_PartitionLoadedEvent = Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+
+
+    self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
 	-- WebUI events
 	Events:Subscribe('MapEditor:SpawnBlueprintCommand', self, self.OnSpawnBlueprint)
@@ -38,6 +41,9 @@ end
 function MapEditorClient:OnLoaded()
 	WebUI:Init()
 	WebUI:Show()
+end
+function MapEditorClient:OnPartitionLoaded(p_Partition)
+    m_InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 

@@ -38,7 +38,13 @@ class VEXTInterface {
 		}
 	}
 
-	HandleResponse(command) {
+	HandleResponse(commandRaw) {
+		let command = null;
+		if (typeof(commandRaw) === "object") {
+			command = commandRaw;
+		} else {
+			command = JSON.parse(commandRaw);
+		}
 		if(this.commands[command.type] === undefined) {
 			editor.logger.LogError("Failed to call a null signal: " + command.type);
 			return;

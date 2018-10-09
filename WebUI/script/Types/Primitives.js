@@ -31,6 +31,8 @@ class LinearTransform {
     }
 
     setFromString(matrixString) {
+    	matrixString = matrixString.replace(/[(]/g,"");
+	    matrixString = matrixString.replace(/[)]/g,", ");
         let matrix = matrixString.split(",");
         this.left = new Vec3(
             Number(matrix[0]),
