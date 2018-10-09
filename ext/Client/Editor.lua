@@ -43,6 +43,7 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 
 	self:Raycast()
 end
+
 function Editor:OnSelectEntity(p_JSONparams)
     print(p_JSONparams)
     local s_Params = self:DecodeParams(json.decode(p_JSONparams))
@@ -54,6 +55,7 @@ function Editor:OnSelectEntity(p_JSONparams)
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
     end
 end
+
 function Editor:OnSpawnBlueprint(p_JSONparams)
 	local s_Command = self:DecodeParams(json.decode(p_JSONparams))
     local s_Params = s_Command.parameters

@@ -9,7 +9,7 @@ class Blueprint {
 
 	getDefaultVariation() {
 		let scope = this;
-		if(scope.isVariationValid()) {
+		if(scope.hasVariation()) {
 			return this.variations[0];
 		} else {
 			return 0;
@@ -22,12 +22,13 @@ class Blueprint {
     isVariationValid(variation) {
         let scope = this;
         return (scope.hasVariation() && scope.getVariation(variation) !== undefined);
-
+		// Always returns 0
     }
 
     getVariation(hash) {
         let scope = this;
         return scope.variations[hash];
+        /tsk tsk tsk
     }
 
     fromObject(object) {
