@@ -28,6 +28,7 @@ function MapEditorClient:RegisterEvents()
 
 	-- WebUI events
 	Events:Subscribe('MapEditor:SpawnBlueprintCommand', self, self.OnSpawnBlueprint)
+    Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
 end
@@ -72,5 +73,7 @@ end
 function MapEditorClient:OnDisableFreecam()
 	m_UIManager:OnDisableFreecam()
 end
-
+function MapEditorClient:OnSelectEntity(p_JSONparams)
+    m_Editor:OnSelectEntity(p_JSONparams)
+end
 return MapEditorClient()

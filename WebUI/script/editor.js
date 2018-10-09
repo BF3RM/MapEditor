@@ -191,7 +191,9 @@ class Editor {
 			return;
 		}
 		this.selected = command.guid;
+
 		//TODO: make this not ugly.
+	    this.gameObjects[command.guid].update();
 		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
 	}
 	

@@ -43,11 +43,20 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 
 	self:Raycast()
 end
-
+function Editor:OnSelectEntity(p_JSONparams)
+    print(p_JSONparams)
+    local s_Params = self:DecodeParams(json.decode(p_JSONparams))
+    if ( m_ClientEntityManager:GetEntityByGuid(s_Params.guid) ~= nil) then
+        local s_Response = {
+            guid = s_Params.guid,
+            ['type'] = 'SelectedEntity'
+        }
+        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
+    end
+end
 function Editor:OnSpawnBlueprint(p_JSONparams)
-	local s_Params = self:DecodeParams(json.decode(p_JSONparams))
-	print(s_Params)
-
+	local s_Command = self:DecodeParams(json.decode(p_JSONparams))
+    local s_Params = s_Command.parameters
 	local s_SpawningSuccessful = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
 	if s_SpawningSuccessful then

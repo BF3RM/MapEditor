@@ -15,6 +15,9 @@ function ClientEntityManager:RegisterEvents()
 
 end
 
+function ClientEntityManager:GetEntityByGuid(p_Guid)
+    return self.m_SpawnedEntities[p_Guid];
+end
 function ClientEntityManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p_LinearTransform, p_Variation)
 	if p_PartitionGuid == nil or
 		 p_InstanceGuid == nil or

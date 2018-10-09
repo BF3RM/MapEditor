@@ -40,7 +40,7 @@ class GameObject extends THREE.Object3D
 			this.transform.left.x, this.transform.up.x, this.transform.forward.x, 0,
 			this.transform.left.y, this.transform.up.y, this.transform.forward.y, 0,
 			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
-			0, 0, 0, 1);
+			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
 
 		this.mesh.setRotationFromMatrix(matrix);
 	}

@@ -18,7 +18,7 @@ class VEXTemulator {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
-
+		command.parameters.transform = "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),";
 		let response = {
 			"guid": command.guid,
 			"sender": command.sender,
@@ -29,19 +29,19 @@ class VEXTemulator {
 					"type": "StaticModelEntity",
 					"guid": GenerateGuid(),
 					"entityId": GenerateGuid(),
-					"localTransform": new LinearTransform(),
+					"localTransform": "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),",
 				},
 				2: {
 					"type": "EffectEntity",
 					"guid": GenerateGuid(),
 					"entityId": GenerateGuid(),
-					"localTransform": new LinearTransform(),
+					"localTransform": "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),",
 				},
 				3: {
 					"type": "EffectEntity",
 					"guid": GenerateGuid(),
 					"entityId": GenerateGuid(),
-					"localTransform": new LinearTransform(),
+					"localTransform": "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),",
 				}
 			},
 			"parameters": command.parameters
