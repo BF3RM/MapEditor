@@ -9,8 +9,25 @@ class Vec3 {
     Clone() {
         return new Vec3(this.x, this.y, this.z)
     }
+
+    fromObject(object) {
+        this.x = Number(object.x);
+	    this.y = Number(object.y);
+	    this.z = Number(object.z);
+	    return this;
+    }
 }
 
+/**
+ * @return {boolean}
+ */
+function Vec3Equals(vecA, vecB) {
+    return(vecA.x === vecB.x && vecA.y === vecB.y && vecA.z === vecB.z);
+}
+
+function MatrixEquals(a, b) {
+
+}
 class LinearTransform {
     constructor(left, up, forward, trans) {
         if(!arguments.length) {
@@ -26,10 +43,15 @@ class LinearTransform {
         return this;
     }
 
-    getAsArray() {
-        return [this.left.x, this.left.y, this.left.z, this.up.x, this.up.y, this.up.z, this.forward.x, this.forward.y, this.forward.z, this.trans.x, this.trans.y, this.trans.z];
+    toMatrix() {
+        return [this.left.x, this.left.y, this.left.z, 0,this.up.x, this.up.y, this.up.z, 0, this.forward.x, this.forward.y, this.forward.z, 0, this.trans.x, this.trans.y, this.trans.z, 1];
     }
-
+	toString() {
+		return "(" + this.left.x + ", " + this.left.y  + ", " + this.left.z + ")" +
+			"(" + this.up.x + ", " + this.up.y  + ", " + this.up.z + ")" +
+			"(" + this.forward.x + ", " + this.forward.y  + ", " + this.forward.z + ")" +
+			"(" + this.trans.x + ", " + this.trans.y  + ", " + this.trans.z + ")";
+	}
     setFromString(matrixString) {
     	matrixString = matrixString.replace(/[(]/g,"");
 	    matrixString = matrixString.replace(/[)]/g,", ");
@@ -82,6 +104,7 @@ class LinearTransform {
     Clone() {
         return new LinearTransform(this.left, this.up, this.forward, this.trans)
     }
+
 }
 
 class Variation {

@@ -1,3 +1,4 @@
+
 class GameObject extends THREE.Object3D
 {
 	constructor(guid, name, transform, parent, children, parameters) 
@@ -10,8 +11,12 @@ class GameObject extends THREE.Object3D
 	    this.objectParent = parent;
 		this.objectChildren = children;
 		this.parameters = parameters;
+
 	}
 	
+	hasMoved() {
+		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
+	}
 
 	renderInit()
 	{
@@ -49,6 +54,15 @@ class GameObject extends THREE.Object3D
 	{
 		//this.updateTransform( );
 	}
+
+	setTransform(linearTransform) {
+		this.transform = linearTransform;
+		this.onSetTransform(linearTransform);
+	}
+
+	onSetTransform(linearTransform) {
+		this.matrixWorld.Set
+	}
 	
 
     Clone(guid) {
@@ -57,6 +71,29 @@ class GameObject extends THREE.Object3D
 	    }
 	    return new GameObject(guid, this.name, this.transform, this.objectParent, this.objectChildren, this.parameters);
     }
+
+    onMoveStart() {
+		console.log("move start")
+        // TODO: Validate that the object exists
+	}
+
+	onMove() {
+		let scope = this;
+		if(!scope.hasMoved()) {
+			return;
+		}
+		// Send move message to client
+	}
+    onMoveEnd() {
+	    let scope = this;
+	    if(!scope.hasMoved()) {
+		    return; // No position change
+	    }
+	    let command = new SetTransformCommand(this.guid, new LinearTransform().setFromMatrix(scope.matrixWorld), scope.transform)
+	    editor.execute(command);
+		// Send move command to server
+    }
+
 }
 
 class EntityCreationParams {

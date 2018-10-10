@@ -7,6 +7,7 @@ class VEXTInterface {
 		this.commands["DestroyedBlueprint"] = signals.destroyedBlueprint.dispatch;
 		this.commands["SelectedEntity"] = signals.selectedEntity.dispatch;
 		this.commands['SetObjectName'] = signals.setObjectName.dispatch;
+		this.commands['SetTransform'] = signals.setTransform.dispatch;
 	}
 
 
@@ -40,17 +41,28 @@ class VEXTInterface {
 
 	HandleResponse(commandRaw) {
 		let command = null;
+		let emulator = false;
 		if (typeof(commandRaw) === "object") {
 			command = commandRaw;
+			emulator = true;
 		} else {
 			command = JSON.parse(commandRaw);
 		}
+		console.log(command);
+
 		if(this.commands[command.type] === undefined) {
 			editor.logger.LogError("Failed to call a null signal: " + command.type);
 			return;
 		}
-		console.log(command);
-		this.commands[command.type](command);
+		if(emulator) {
+			let scope = this;
+			// delay to simulate transmission time and execution order
+			setTimeout(async function() {
+				scope.commands[command.type](command)
+			}, 10);
+		} else {
+			this.commands[command.type](command);
+		}
 
 	}
 

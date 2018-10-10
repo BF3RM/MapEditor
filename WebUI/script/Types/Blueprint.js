@@ -28,7 +28,7 @@ class Blueprint {
     getVariation(hash) {
         let scope = this;
         return scope.variations[hash];
-        /tsk tsk tsk
+        //tsk tsk tsk
     }
 
     fromObject(object) {

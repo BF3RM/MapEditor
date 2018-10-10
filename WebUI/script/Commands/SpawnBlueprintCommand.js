@@ -21,7 +21,7 @@ SpawnBlueprintCommand.prototype = {
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "DestroyBlueprintCommand"))
+		editor.vext.SendCommand(new VextCommand(this.guid, "DestroyBlueprintCommand", this.parameters))
 	},
 };
 

@@ -9,7 +9,7 @@ class WebGL {
 		this.worldSpace = "local";
 		this.gridSnap = false;
 
-		this._onControlChanged = this.onControlChanged.bind(this);
+		this._onControlChanged = WebGL.onControlChanged.bind(this);
 		this._onObjectChanged = this.onObjectChanged.bind(this);
 		this._onWindowResize = this.onWindowResize.bind(this);
 
@@ -69,7 +69,7 @@ class WebGL {
 
 	CreateGizmo() {
 		if (this.control != null) {
-			console.log("Gizmo already exist")
+			console.log("Gizmo already exist");
 			return
 		}
 
@@ -317,13 +317,10 @@ class WebGL {
 			editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 	}
-	static onControlMouseUp(e) {
-		if(editor.webGL.raycastPlacing == false) {
-			$('#page').find('canvas').css("z-index", 0)
-		}
-	}
-
 	static onControlMouseDown(e) {
+		//Stop moving
+		editor.selected.onMoveStart();
+
 		$('#page').find('canvas').css("z-index", Number.MAX_SAFE_INTEGER)
 
 		if( keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
@@ -333,10 +330,27 @@ class WebGL {
 			editor.webGL.raycastPlacing = true;
 			editor.webGL.renderer.domElement.dispatchEvent(event);
 			editor.webGL.HideGizmo();
-			
 		}
 
 	}
+	static onControlChanged() {
+		//moving
+		editor.selected.onMove();
+		editor.webGL.Render();
+
+	}
+
+	static onControlMouseUp(e) {
+		if(editor.webGL.raycastPlacing == false) {
+			$('#page').find('canvas').css("z-index", 0)
+		}
+		editor.selected.onMoveEnd();
+		//Stop Moving
+	}
+
+
+
+
 
 	onWindowResize() {
 		let webGL = this.editor.webGL;
@@ -347,10 +361,7 @@ class WebGL {
 		webGL.Render();
 	}
 
-	onControlChanged() {
-		editor.webGL.Render();
 
-	}
 
 	onObjectChanged(e) {
 		if (editor.selectedEntity == null) {

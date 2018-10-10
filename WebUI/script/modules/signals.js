@@ -10,6 +10,8 @@ var signals = {
     selectedEntity: new Signal(),
     deselectedEntity: new Signal(),
 
+    setTransform: new Signal(),
+
 
     objectMoveStarted: new Signal(),
     objectMoved: new Signal(),

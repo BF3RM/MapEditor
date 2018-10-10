@@ -1,6 +1,13 @@
 class Editor {
 	constructor(debug) {
 
+		// Events that the editor should execute first
+		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
+		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+		signals.setObjectName.add(this.onSetObjectName.bind(this));
+		signals.setTransform.add(this.onSetTransform.bind(this));
+
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
 		this.ui = new UI(debug);
@@ -10,13 +17,16 @@ class Editor {
         this.blueprintManager = new BlueprintManager();
         this.entityFactory = new EntityFactory();
 
-        /*
+        // Events that the editor should execute last
+		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 
-            Internal variables
+		/*
 
-         */
+			Internal variables
+
+		 */
         this.playerName = null;
-        this.selected = null;
+        this.selected = [];
         this.raycastTransform = new LinearTransform();
 
         //this.webobjects = {};
@@ -24,11 +34,6 @@ class Editor {
 
 
 		this.Initialize();
-        signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
-		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
-		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
-		signals.setObjectName.add(this.onSetObjectName.bind(this));
 
 
 		this.lastUpdateTime = 0;
@@ -112,7 +117,8 @@ class Editor {
 	
 
 		//Render loop
-		window.requestAnimationFrame( this._renderLoop );
+		// Disabled for now
+		//window.requestAnimationFrame( this._renderLoop );
 	}
 
 	onSetObjectName(command) {
@@ -122,7 +128,16 @@ class Editor {
 			return;
 		}
 		gameObject.name = command.name;
-    }
+	}
+
+	onSetTransform (command) {
+		let gameObject = this.getGameObjectByGuid(command.guid);
+		if(gameObject === undefined) {
+			this.logger.LogError("Tried to set the transform of a null object: " + command.guid);
+			return;
+		}
+		gameObject.setTransform(new LinearTransform().setFromString(command.transform))
+	}
 
 
     onBlueprintSpawnRequested(blueprint, transform, variation) {
@@ -172,7 +187,6 @@ class Editor {
 		if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
-
 	}
 
 	Select(guid) {
@@ -186,15 +200,21 @@ class Editor {
     }
 
     onSelectedEntity(command) {
-    	if(this.gameObjects[command.guid] === undefined) {
-    		this.logger.LogError("Failed to select gameobject: " + command.guid);
+    	let scope = this;
+		if(scope.gameObjects[command.guid] === undefined) {
+			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
-		this.selected = command.guid;
+	    scope.selected = scope.gameObjects[command.guid];
 
 		//TODO: make this not ugly.
 	    this.gameObjects[command.guid].update();
 		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
+	}
+
+	onSelectedEntities(command) {
+		let scope = this;
+
 	}
 	
     /*

@@ -11,6 +11,7 @@ class VEXTemulator {
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
 		this.commands['SelectEntity'] = this.SelectEntity;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
+		this.commands['SetTransformCommand'] = this.SetTransform;
 	}
 
 
@@ -47,6 +48,16 @@ class VEXTemulator {
 			"parameters": command.parameters
 		};
 		editor.vext.HandleResponse(response);
+	}
+
+	SetTransform(command) {
+		let response = {
+			"type": "SetTransform",
+			"guid": command.guid,
+			"transform": command.parameters.toString()
+		}
+		editor.vext.HandleResponse(response);
+
 	}
 
 	DestroyBlueprint(command) {

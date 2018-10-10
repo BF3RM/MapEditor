@@ -53,10 +53,10 @@ class Hierarchy {
                 $(container.el).parent().removeClass("dropHighLighted");
 
                 let itemID = $item.attr("entityId");
-                let gameObject = editor.spawnedEntities[itemID];
+                let gameObject = editor.gameObjects[itemID];
 
                 let containerID = $(container.el).parent().attr("entityId");
-                let groupObject = editor.spawnedEntities[containerID];
+                let groupObject = editor.gameObjects[containerID];
 
                 if (groupObject == null) {
                     if (gameObject.parent != null) {
@@ -69,12 +69,15 @@ class Hierarchy {
         });
     }
 
-    onSelectedEntity(command) {
-        if(command === undefined || editor.gameObjects[command.guid] === undefined) {
-            return
+    onSelectedEntity(gameObject) {
+	    if(gameObject === undefined) {
+	        editor.logger.LogError("Failed to select unknown gameobject");
+	        return;
         }
-        this.onDeselectEntry(editor.selected);
-        let entry = this.entries[command.guid];
+        if(editor.selected != null) {
+	        this.onDeselectEntry(editor.selected);
+        }
+        let entry = this.entries[gameObject.guid];
         entry.dom.addClass("selected");
     }
 
@@ -90,11 +93,16 @@ class Hierarchy {
     }
 
 
-    onDeselectEntry(guid) {
-        if(guid === undefined || this.entries[guid] === undefined) {
-            return false;
+    onDeselectEntry(gameObject) {
+	    if(gameObject == null) {
+		    editor.logger.Log(LOGLEVEL.DEBUG, "Failed to deselect unknown gameobject");
+	        return false;
+	    }
+        if(this.entries[gameObject.guid] === undefined) {
+	        editor.logger.Log(LOGLEVEL.DEBUG, "Tried to deselect an entry which doesn't exist.");
+	        return false;
         }
-        let entry = this.entries[guid];
+        let entry = this.entries[gameObject.guid];
         entry.dom.removeClass("selected");
         // editor.OnDeselectEntity(gameObject);
     }
@@ -176,6 +184,7 @@ class Hierarchy {
 
     }
     onSpawnedBlueprint(command) {
+    	console.log("Created group")
 	   this.CreateGroup(command.guid, command.name, command.parent);
 	   let scope = this;
 	   for(let key in command.children) {
