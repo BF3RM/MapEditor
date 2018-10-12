@@ -189,6 +189,7 @@ class Editor {
 	onDestroyedBlueprint(command) {
     	this.webGL.DeleteObject(this.gameObjects[command.guid]);
 		delete this.gameObjects[command.guid];
+		// TODO: Update renderer
 	}
 
 	onSpawnedBlueprint(command) {

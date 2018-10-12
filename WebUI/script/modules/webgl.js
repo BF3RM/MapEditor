@@ -368,7 +368,6 @@ class WebGL {
 			return;
 		}
 
-		editor.selectedEntity.OnMove(false);
 		// editor.webGL.Render();
 	}
 

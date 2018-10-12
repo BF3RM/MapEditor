@@ -18,6 +18,7 @@ class GameObject extends THREE.Object3D
 		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
 	}
 
+
 	renderInit()
 	{
 		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
@@ -59,12 +60,14 @@ class GameObject extends THREE.Object3D
 
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
+		this.parameters.transform = linearTransform;
 		this.updateTransform();
 		signals.objectChanged.dispatch(this)
 
 	}
 	setName(name) {
 		this.name = name;
+		this.parameters.name = name;
 		signals.objectChanged.dispatch(this);
 	}
 

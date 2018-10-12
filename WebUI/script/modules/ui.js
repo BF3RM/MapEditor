@@ -311,10 +311,10 @@ class UI {
 	}
 
 	onConfirmDeleteEntity() {
-		if (editor.selectedEntity == null) {
+		if (editor.selected == null) {
 			console.error("Tried to delete a null entity")
 		}else{
-			editor.selectedEntity.Delete();
+			editor.execute(new DestroyBlueprintCommand(editor.selected.guid));
 		}
 		
 		$(this).dialog("close");
