@@ -58,6 +58,24 @@ class Editor {
 			this.playerName = "LocalPlayer";
 		}
 	}
+
+	toJson() {
+		let scope = this;
+		let result = {};
+		for (let k in scope.gameObjects){
+			if (scope.gameObjects.hasOwnProperty(k)) {
+				let gameObject = this.gameObjects[k];
+				result[k] = {
+					guid: gameObject.guid,
+					name: gameObject.name,
+					transform: gameObject.transform,
+					parameters: gameObject.parameters
+				};
+			}
+		}
+		console.log(result);
+		console.log(JSON.stringify(result, null, 2));
+	}
 	/*
 
 		Internal shit
@@ -127,7 +145,7 @@ class Editor {
 			this.logger.LogError("Tried to set the name of a null object: " + command.guid);
 			return;
 		}
-		gameObject.name = command.name;
+		gameObject.setName(command.name);
 	}
 
 	onSetTransform (command) {

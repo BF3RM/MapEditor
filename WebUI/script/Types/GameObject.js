@@ -48,6 +48,8 @@ class GameObject extends THREE.Object3D
 		this.setRotationFromMatrix(matrix);
 
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
+		editor.webGL.Render();
+
 	}
 
 	update( deltaTime )
@@ -59,9 +61,14 @@ class GameObject extends THREE.Object3D
 		this.transform = linearTransform;
 		this.onSetTransform(linearTransform);
 	}
+	setName(name) {
+		this.name = name;
+		signals.objectChanged.dispatch(this);
+	}
 
 	onSetTransform(linearTransform) {
-		this.matrixWorld.Set
+		this.transform = linearTransform;
+		this.updateTransform();
 	}
 	
 

@@ -72,9 +72,11 @@ $(document).keydown(function(e) {
 	}
 
 	if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
-		editor.redo()
+		editor.redo();
+		return false;
 	} else if( keysdown[17] && e.which == 90) { // CTRL + z
-		editor.undo()
+		editor.undo();
+		return false;
 	}
 	if(e.which == 17) { // CTRL
 		editor.webGL.EnableGridSnap()
