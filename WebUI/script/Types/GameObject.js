@@ -82,6 +82,7 @@ class GameObject extends THREE.Object3D
 		if(!scope.hasMoved()) {
 			return;
 		}
+		signals.objectChanged.dispatch(this)
 		// Send move message to client
 	}
     onMoveEnd() {
@@ -91,7 +92,9 @@ class GameObject extends THREE.Object3D
 	    }
 	    let command = new SetTransformCommand(this.guid, new LinearTransform().setFromMatrix(scope.matrixWorld), scope.transform)
 	    editor.execute(command);
-		// Send move command to server
+	    signals.objectChanged.dispatch(this)
+
+	    // Send move command to server
     }
 
 }

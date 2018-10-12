@@ -6,6 +6,7 @@ class Inspector {
 		this.Initialize();
 
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.objectChanged.add(this.onObjectChanged.bind(this));
 	}
 
 	//TODO: OnUpdate events, transform shit
@@ -83,6 +84,10 @@ class Inspector {
 				inp.on('input', function(e) {
 					inspector.SetTransform(con, val, $(this).val());
 				});
+				inp.on('change', function(e) {
+					inspector.SetTransform(con, val, $(this).val(), true);
+				});
+
 
 				label.on('mousedown', handleMouse);
 
@@ -92,7 +97,7 @@ class Inspector {
 		this.dom = content;
 	}
 
-	SetTransform(type, key, value) {
+	SetTransform(type, key, value, final = false) {
 		// TODO: The displayed rotation is technically correct, it just doesn't display the way I want it to. Make sure the rotation displays in an unoptimal way.
 		if(isNaN(value) || value == "") {
 			console.log("shitballs")
@@ -106,12 +111,16 @@ class Inspector {
 				let eulerRot = new THREE.Euler( this.transform.rotation.x.val() * THREE.Math.DEG2RAD, this.transform.rotation.y.val() * THREE.Math.DEG2RAD, this.transform.rotation.z.val() * THREE.Math.DEG2RAD);
 				console.log(eulerRot);
 
-			editor.selectedEntity.webObject.rotation.copy(eulerRot);
+			editor.selected.rotation.copy(eulerRot);
 		} else {
-		   editor.selectedEntity.webObject[type][key] = Number(value);
+		   editor.selected[type][key] = Number(value);
 		}
 		editor.webGL.Render();
-		editor.selectedEntity.OnMove(true);
+		editor.selected.onMove();
+
+		if(final) {
+			editor.selected.onMoveEnd();
+		}
 	}
 
 	UpdateInspector(gameObject) {
@@ -125,7 +134,7 @@ class Inspector {
 		let xyz = ["x","y","z"];
 		let transform = this.transform;
 		$.each(controls, function (index, con) {
-			let control = gameObject.webObject[con];
+			let control = gameObject[con];
 			$.each(xyz, function(index2, val) {
 
 
@@ -140,7 +149,7 @@ class Inspector {
 
 				//If we're modifying Rotation. Using the controls key for redundancy
 				if(con == controls[1]) {
-					transform[con][val][0].value = control[val] * THREE.Math.RAD2DEG
+					transform[con][val][0].value = (control[val] * THREE.Math.RAD2DEG).toFixed(3);
 				} else {
 					transform[con][val][0].value =control[val].toFixed(3)
 				}
@@ -163,6 +172,10 @@ class Inspector {
 		}
 		this.name[0].value = gameObject.name;
 		console.log('instanceGuid: ' + gameObject.parameters.reference.instanceGuid);
+	}
+
+	onObjectChanged(go) {
+		this.UpdateInspector(go);
 	}
 }
 

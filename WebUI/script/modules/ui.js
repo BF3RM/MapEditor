@@ -365,6 +365,7 @@ function handleMouse(event) {
   }
   else if (event.type == "mouseup") {
     mouse.down = false;
+    $(inputEl).trigger('change');
     $('#page').find('canvas').css("z-index", 0);
 
   }
