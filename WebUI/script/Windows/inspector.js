@@ -170,8 +170,7 @@ class Inspector {
 			editor.logger.LogError("Tried to set the name of a null entry. " + command.guid);
 			return;
 		}
-		this.name[0].value = gameObject.name;
-		console.log('instanceGuid: ' + gameObject.parameters.reference.instanceGuid);
+		this.UpdateInspector(gameObject);
 	}
 
 	onObjectChanged(go) {

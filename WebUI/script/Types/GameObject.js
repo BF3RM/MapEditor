@@ -59,18 +59,14 @@ class GameObject extends THREE.Object3D
 
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
-		this.onSetTransform(linearTransform);
+		this.updateTransform();
+		signals.objectChanged.dispatch(this)
+
 	}
 	setName(name) {
 		this.name = name;
 		signals.objectChanged.dispatch(this);
 	}
-
-	onSetTransform(linearTransform) {
-		this.transform = linearTransform;
-		this.updateTransform();
-	}
-	
 
     Clone(guid) {
     	if(guid === undefined) {
