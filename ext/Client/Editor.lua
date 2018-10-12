@@ -91,16 +91,13 @@ function Editor:OnSpawnBlueprint(p_JSONparams)
     for k,l_Entity in ipairs(s_SpawnResult) do
         local s_Data = l_Entity.data
         local s_Entity = SpatialEntity(l_Entity)
-        print(l_Entity.typeInfo.name)
-        print(tostring(s_Data.instanceGuid))
-        print( s_Data.typeInfo.name)
 
         s_Response.children[#s_Response.children + 1 ] = {
             type = l_Entity.typeInfo.name,
             aabb = {
                 min = tostring(s_Entity.aabb.min),
                 max = tostring(s_Entity.aabb.max),
-                trans = tostring(s_Entity.aabbTransform)
+                trans = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform))
             },
             reference = {
 
@@ -199,6 +196,18 @@ end
 
 function Editor:SetPendingRaycast()
 	self.m_PendingRaycast = true
+end
+
+function ToLocal(a,b)
+
+    local LT = LinearTransform()
+    LT.left = a.left
+    LT.up = a.up
+    LT.forward = a.forward
+    LT.trans.x = a.trans.x - b.trans.x -- attempt to index a nil value (field 'trans')
+    LT.trans.y = a.trans.y - b.trans.y
+    LT.trans.z = a.trans.z - b.trans.z
+    return LT
 end
 
 function Editor:DecodeParams(p_Table)
