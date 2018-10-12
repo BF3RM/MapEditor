@@ -198,7 +198,7 @@ class Hierarchy {
     }
 
     onSetObjectName(command) {
-        if(command === undefined || editor.webobjects[command.guid] === undefined) {
+        if(command === undefined || editor.gameObjects[command.guid] === undefined) {
             return
         }
         let entry = this.entries[command.guid];

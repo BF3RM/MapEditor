@@ -35,7 +35,7 @@ class Inspector {
 		this.name = nameInput;
 
 		$(nameInput).on('change',function(){
-			editor.execute(new SetObjectNameCommand(editor.selected, this.value));
+			editor.execute(new SetObjectNameCommand(editor.selected.guid, this.value));
 		});
 
 		let transformControl = $(document.createElement("div"));
