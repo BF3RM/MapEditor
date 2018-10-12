@@ -27,23 +27,18 @@ class VEXTemulator {
 			"name": command.parameters.name,
 			"children": {
 				1: {
-					"type": "StaticModelEntity",
-					"guid": GenerateGuid(),
-					"entityId": GenerateGuid(),
-					"localTransform": "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),",
+					"type": "ClientStaticModelEntity",
+					"uniqueID": GenerateGuid(),
+					"aabb": {
+						"max": "(0.325000, 0.500000, 0.025000)",
+						"min": "(-0.325000, -0.500000, -0.025000)",
+						"trans": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (-142.846619, 57.860794, -170.079514)"
+					},
+					"reference": {
+						"type": "StaticModelEntityData",
+						"instanceGuid": "E424EBD2-6677-11E0-8501-BA28C3073B32"
+					}
 				},
-				2: {
-					"type": "EffectEntity",
-					"guid": GenerateGuid(),
-					"entityId": GenerateGuid(),
-					"localTransform": "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),",
-				},
-				3: {
-					"type": "EffectEntity",
-					"guid": GenerateGuid(),
-					"entityId": GenerateGuid(),
-					"localTransform": "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),",
-				}
 			},
 			"parameters": command.parameters
 		};
@@ -54,7 +49,7 @@ class VEXTemulator {
 		let response = {
 			"type": "SetTransform",
 			"guid": command.guid,
-			"transform": command.parameters.toString()
+			"transform": command.parameters.transform.toString()
 		}
 		editor.vext.HandleResponse(response);
 

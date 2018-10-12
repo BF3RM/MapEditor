@@ -192,13 +192,27 @@ class Editor {
 	}
 
 	onSpawnedBlueprint(command) {
+		let scope = this;
 		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
         //this.webobjects[command.guid] = webobject;
         console.log("GO spawned");
-        var gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, command.children, command.parameters);
-		
+        let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, command.children, command.parameters);
+
 		this.webGL.AddObject(gameObject);
-		
+		for (let key in command.children) {
+			let child = command.children[key];
+			// UniqueID is fucking broken. this won't work online, boi.
+			let childGO = new GameObject(child.uniqueID, child.type, new LinearTransform(), gameObject, null, child.reference);
+			let aabb = new AABBHelper( new THREE.Box3(
+				new Vec3().fromString(child.aabb.min),
+				new Vec3().fromString(child.aabb.max),
+					0x00FF00));
+			childGO.add(aabb);
+			gameObject.add(childGO);
+
+		}
+
+
 
 		this.gameObjects[command.guid] = gameObject;
 

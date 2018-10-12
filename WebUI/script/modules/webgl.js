@@ -164,6 +164,7 @@ class WebGL {
 			object.renderInit();
 
 		this.scene.add(object);
+
 	}
 
 	MoveObject(webObject, x, y, z){
@@ -382,7 +383,7 @@ class WebGL {
 		this.camera.setRotationFromMatrix(m);
 		this.camera.position.set(x, y, z);
 
-		//this.Render();
+		this.Render();
 	}
 
 }

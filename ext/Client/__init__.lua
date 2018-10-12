@@ -28,6 +28,7 @@ function MapEditorClient:RegisterEvents()
 
 	-- WebUI events
 	Events:Subscribe('MapEditor:SpawnBlueprintCommand', self, self.OnSpawnBlueprint)
+    Events:Subscribe('MapEditor:SetTransformCommand', self, self.OnSetTransform)
     Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
@@ -60,11 +61,23 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
 
------------ WebUI functions----------------
+
+
+----------- Editor functions----------------
+
 
 function MapEditorClient:OnSpawnBlueprint(p_JSONparams)
 	m_Editor:OnSpawnBlueprint(p_JSONparams)
 end
+function MapEditorClient:OnSetTransform(p_JSONparams)
+    m_Editor:OnSetTransform(p_JSONparams)
+end
+function MapEditorClient:OnSelectEntity(p_JSONparams)
+    m_Editor:OnSelectEntity(p_JSONparams)
+end
+
+----------- WebUI functions----------------
+
 
 function MapEditorClient:OnEnableFreecamMovement()
 	m_UIManager:OnEnableFreecamMovement()
@@ -73,7 +86,5 @@ end
 function MapEditorClient:OnDisableFreecam()
 	m_UIManager:OnDisableFreecam()
 end
-function MapEditorClient:OnSelectEntity(p_JSONparams)
-    m_Editor:OnSelectEntity(p_JSONparams)
-end
+
 return MapEditorClient()

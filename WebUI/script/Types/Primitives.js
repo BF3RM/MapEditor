@@ -1,9 +1,7 @@
 
-class Vec3 {
+class Vec3 extends THREE.Vector3{
     constructor(x,y,z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+	    super(x,y,z);
     }
 
     Clone() {
@@ -16,6 +14,15 @@ class Vec3 {
 	    this.z = Number(object.z);
 	    return this;
     }
+	fromString(matrixString) {
+		matrixString = matrixString.replace(/[(]/g,"");
+		matrixString = matrixString.replace(/[)]/g,", ");
+		let matrix = matrixString.split(",");
+		this.x = Number(matrix[0]);
+		this.y = Number(matrix[1]);
+		this.z = Number(matrix[1]);
+		return this;
+	}
 }
 
 /**

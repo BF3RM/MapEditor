@@ -10,7 +10,7 @@
  * @constructor
  */
 
-var SetTransformCommand = function (guid, newPosition, oldPosition ) {
+var SetTransformCommand = function (guid, newTransform, oldTransform ) {
 
     Command.call( this );
 
@@ -19,9 +19,8 @@ var SetTransformCommand = function (guid, newPosition, oldPosition ) {
 
     this.guid = guid;
 
-    this.newPosition = newPosition;
-	this.oldPosition = oldPosition;
-
+    this.newTransform = newTransform;
+	this.oldTransform = oldTransform;
 
 };
 
@@ -29,10 +28,16 @@ var SetTransformCommand = function (guid, newPosition, oldPosition ) {
 SetTransformCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.newPosition))
+		let s_Parameters = {
+			'transform': this.newTransform
+		};
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_Parameters))
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.oldPosition))
+		let s_Parameters = {
+			'transform': this.oldTransform
+		};
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_Parameters))
 	},
 };

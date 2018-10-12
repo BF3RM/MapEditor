@@ -46,6 +46,7 @@ class VEXTInterface {
 			command = commandRaw;
 			emulator = true;
 		} else {
+			editor.logger.Log(LOGLEVEL.VERBOSE, commandRaw);
 			command = JSON.parse(commandRaw);
 		}
 		console.log(command);

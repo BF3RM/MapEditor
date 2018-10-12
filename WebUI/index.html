@@ -5,13 +5,18 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<title>MapEditor</title>
 
+        <!--
+            Style
+        -->
 		<link rel="stylesheet" href="style/jquery-ui.min.css">
 		<link rel="stylesheet" href="style/style.css">
 		<link rel="stylesheet" href="style/reset.css">
 		<link rel="stylesheet" href="style/jquery.dataTables.min.css">
 		<link rel="stylesheet" href="style/jstree.min.css">
 		<link rel="stylesheet" href="style/jquery.scrollbar.css">
-
+        <!--
+            Libs
+        -->
 		<script src="script/libs/jquery-3.1.1.min.js"></script>
 		<script src="script/libs/jquery-ui.min.js"></script>
 		<script src="script/libs/jquery.scrollbar.min.js"></script>
@@ -27,22 +32,37 @@
 
 		<script src="script/libs/History.js"></script>
 		<script src="script/libs/Command.js"></script>
+        <!--
+            Commands
+        -->
 
+        <script src="script/Commands/SetTransformCommand.js"></script>
+        <script src="script/Commands/SpawnBlueprintCommand.js"></script>
+        <script src="script/Commands/DestroyBlueprintCommand.js"></script>
+        <script src="script/Commands/SetObjectNameCommand.js"></script>
+        <!--
+            Messages
+        -->
 
-		<script src="script/modules/signals.js"></script>
-
-		<script src="script/Commands/SetTransformCommand.js"></script>
-		<script src="script/Commands/SpawnBlueprintCommand.js"></script>
-		<script src="script/Commands/DestroyBlueprintCommand.js"></script>
-		<script src="script/Commands/SetObjectNameCommand.js"></script>
-
+        <!--
+            Types
+        -->
 
 		<script src="script/Types/types.js"></script>
 		<script src="script/Types/Blueprint.js"></script>
 		<script src="script/Types/GameObject.js"></script>
 		<script src="script/Types/Primitives.js"></script>
+        <script src="script/Types/AABBHelper.js"></script>
+        <!--
+            Main
+        -->
+        <script src="script/editor.js"></script>
 
+        <!--
+            Modules
+        -->
 
+        <script src="script/modules/signals.js"></script>
 		<script src="script/modules/logger.js"></script>
 		<script src="script/modules/utils.js"></script>
 		<script src="script/modules/webgl.js"></script>
@@ -53,13 +73,16 @@
 		<script src="script/modules/EntityFactory.js"></script>
 		<script src="script/modules/controls.js"></script>
 		<script src="script/modules/ui.js"></script>
-		<script src="script/editor.js"></script>
+
+
+        <!--
+            Windows
+        -->
 
 		<script src="script/Windows/treeview.js"></script>
 		<script src="script/Windows/inspector.js"></script>
 		<script src="script/Windows/debugWindow.js"></script>
 		<script src="script/Windows/hierarchy.js"></script>
-
 
 	</head>
 	<body>

@@ -59,22 +59,83 @@ end
 function Editor:OnSpawnBlueprint(p_JSONparams)
 	local s_Command = self:DecodeParams(json.decode(p_JSONparams))
     local s_Params = s_Command.parameters
-	local s_SpawningSuccessful = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
+    local s_SpawnResult = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
-	if s_SpawningSuccessful then
-		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
-		local s_Response = {
-			guid = s_Params.guid,
-			sender = s_LocalPlayer.name,
-			name = s_Params.name,
-			['type'] = 'SpawnedBlueprint', 
-			parameters = self:EncodeParams(s_Params)
-		}
-		print(s_Response)
-		print(json.encode(s_Response))
+    if(s_SpawnResult == false) then
+        -- Send error to webui
+        print("Failed to spawn blueprint. ")
+        print(s_Command)
+        return false
+    end
+    print("spawned!")
+    -- TODO: add children
+    for k,l_Entity in ipairs(s_SpawnResult) do
+        local s_Data = l_Entity.data
+        print(l_Entity.typeInfo.name)
+        --print(l_Entity.uniqueID)
+        print(tostring(s_Data.instanceGuid))
+        print( s_Data.typeInfo.name)
+        print("Thats all folks")
+    end
 
-		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
-	end
+    print("spawning")
+    local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+    local s_Response = {
+        guid = s_Params.guid,
+        sender = s_LocalPlayer.name,
+        name = s_Params.name,
+        ['type'] = 'SpawnedBlueprint',
+        parameters = self:EncodeParams(s_Params),
+        children = {}
+    }
+    for k,l_Entity in ipairs(s_SpawnResult) do
+        local s_Data = l_Entity.data
+        local s_Entity = SpatialEntity(l_Entity)
+        print(l_Entity.typeInfo.name)
+        print(tostring(s_Data.instanceGuid))
+        print( s_Data.typeInfo.name)
+
+        s_Response.children[#s_Response.children + 1 ] = {
+            type = l_Entity.typeInfo.name,
+            aabb = {
+                min = tostring(s_Entity.aabb.min),
+                max = tostring(s_Entity.aabb.max),
+                trans = tostring(s_Entity.aabbTransform)
+            },
+            reference = {
+
+                instanceGuid = tostring(s_Data.instanceGuid),
+                --partitionGuid = tostring(s_Data.instanceGuid),
+                type = s_Data.typeInfo.name
+                -- transform?
+            }
+        }
+        print("Thats all folks")
+    end
+    print(s_Response)
+    print(json.encode(s_Response))
+    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
+
+end
+
+function Editor:OnSetTransform(p_JSONparams)
+    local s_Command = self:DecodeParams(json.decode(p_JSONparams))
+    print(s_Command)
+    local s_Result = m_ClientEntityManager:SetTransform(s_Command.guid, s_Command.parameters.transform)
+
+    if(s_Result == false) then
+        -- Notify WebUI of failed
+        print("failed")
+        return false
+    end
+
+    local s_Response = {
+        type = "SetTransform",
+        guid = s_Command.guid,
+        transform = s_Command.parameters.transform
+    }
+
+    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
 end
 
 function Editor:Raycast()
@@ -149,7 +210,7 @@ function Editor:DecodeParams(p_Table)
 				Vec3(s_Value.forward.x, s_Value.forward.y, s_Value.forward.z),
 				Vec3(s_Value.trans.x, s_Value.trans.y, s_Value.trans.z))
 				
-
+            print("converted lineartransform")
 			p_Table[s_Key] = s_LinearTransform
 
 		elseif type(s_Value) == "table" then
