@@ -211,7 +211,7 @@ class UI {
 	}
 
 	OpenSaveDialog() {
-		let jsonString = JSON.stringify(
+		/*let jsonString = JSON.stringify(
 			editor.rootEntities, function( key, value) {
 				if(  key == 'webObject') {
 					return null;
@@ -230,8 +230,8 @@ class UI {
 			},
 			"\t"
 			);
-
-		$("#saveProjectTextArea").text(jsonString);
+		*/
+		$("#saveProjectTextArea").text(editor.toJson());
 
 		editor.ui.dialogs["saveProject"].dialog("open");
 		

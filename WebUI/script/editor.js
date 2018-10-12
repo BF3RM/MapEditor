@@ -73,8 +73,7 @@ class Editor {
 				};
 			}
 		}
-		console.log(result);
-		console.log(JSON.stringify(result, null, 2));
+		return JSON.stringify(result, null, 2);
 	}
 	/*
 

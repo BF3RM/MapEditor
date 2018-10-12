@@ -203,7 +203,7 @@ canvas {
 	z-index: 1;
 }
 #toolbar div {
-    z-index: 9;
+    z-index: 2147483647;
 }
 
 .window {
