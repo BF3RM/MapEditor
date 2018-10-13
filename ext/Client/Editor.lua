@@ -17,6 +17,7 @@ function Editor:RegisterVars()
 
     self.m_Commands = {
         SpawnBlueprintCommand = self.SpawnBlueprint,
+        DestroyBlueprintCommand = self.DestroyBlueprint,
         SetTransformCommand = self.SetTransform,
         SelectEntityCommand = self.SelectEntity
     }
@@ -73,7 +74,6 @@ end
 
 --]]
 function Editor:SpawnBlueprint(p_Command)
-    print(p_Command)
     local s_Params = p_Command.parameters
     local s_SpawnResult = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
@@ -120,6 +120,28 @@ function Editor:SpawnBlueprint(p_Command)
     return s_Response
 end
 
+function Editor:DestroyBlueprint(p_Command)
+    local s_Entities = m_ClientEntityManager:GetEntityByGuid(p_Command.guid)
+    if(#s_Entities == 0 or s_Entities == false) then
+        print("Failed to get entities")
+        return false
+    end
+    for i, entity in pairs(s_Entities) do
+        if entity ~= nil then
+            print(entity.typeInfo.name)
+            print("destroying")
+            entity:Destroy()
+            print("destroyed")
+        end
+    end
+
+    local s_Response = {
+        type = "DestroyedBlueprint",
+        guid =  s_Command.guid
+    }
+
+    return s_Response
+end
 
 
 function Editor:SelectEntity(p_Command)

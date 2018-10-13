@@ -9,6 +9,7 @@ function Freecam:__init()
 end
 
 function Freecam:RegisterVars()
+    self.m_Freecam = false
 	self.mode = CameraMode.FirstPerson
 
 	self.camera = nil
@@ -36,7 +37,7 @@ function Freecam:RegisterVars()
 end
 
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-	if (self.camera ~= nil) then
+	if (self.camera ~= nil and self.m_Freecam == true) then
 
 		self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 		self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
@@ -86,6 +87,7 @@ function Freecam:Enable()
 	end
 	self.mode = CameraMode.FreeCam
 	self:TakeControl()
+    self.m_Freecam = true
 end
 
 function Freecam:Disable()
@@ -93,6 +95,7 @@ function Freecam:Disable()
 	self.lastTransform = self.cameraData.transform
 	self.mode = CameraMode.FirstPerson
 	self:ReleaseControl()
+    self.m_Freecam = false
 end
 
 function Freecam:RotateX(p_Transform, p_Vector)
