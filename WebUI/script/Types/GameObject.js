@@ -21,6 +21,7 @@ class GameObject extends THREE.Object3D
 
 	renderInit()
 	{
+		/*
 		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
 		let material = new THREE.MeshBasicMaterial( 
 		{
@@ -31,10 +32,10 @@ class GameObject extends THREE.Object3D
 
 
 		this.mesh = new THREE.Mesh(geometry, material);
-		
-		this.updateTransform();
-
 		this.add(this.mesh);
+
+		*/
+		this.updateTransform();
 	}
 
 	updateTransform()

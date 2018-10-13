@@ -14,6 +14,12 @@ end
 
 function Editor:RegisterVars()
 	self.m_PendingRaycast = false
+
+    self.m_Commands = {
+        SpawnBlueprintCommand = self.SpawnBlueprint,
+        SetTransformCommand = self.SetTransform,
+        SelectEntityCommand = self.SelectEntity
+    }
 end
 
 function Editor:RegisterEvents()
@@ -44,21 +50,31 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:Raycast()
 end
 
-function Editor:OnSelectEntity(p_JSONparams)
-    print(p_JSONparams)
-    local s_Params = self:DecodeParams(json.decode(p_JSONparams))
-    if ( m_ClientEntityManager:GetEntityByGuid(s_Params.guid) ~= nil) then
-        local s_Response = {
-            guid = s_Params.guid,
-            ['type'] = 'SelectedEntity'
-        }
-        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
+function Editor:OnReceiveCommand(p_Command)
+    local s_Command = self:DecodeParams(json.decode(p_Command))
+    print(s_Command)
+    local s_Function = self.m_Commands[s_Command.type]
+    if(s_Function == nil) then
+        print("Attempted to call a nil function: " .. s_Command.type)
+        return false
     end
+    local s_Response = s_Function(self, s_Command)
+    if(s_Response == false) then
+        -- TODO: Handle errors
+        print("error")
+        return
+    end
+    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
 end
 
-function Editor:OnSpawnBlueprint(p_JSONparams)
-	local s_Command = self:DecodeParams(json.decode(p_JSONparams))
-    local s_Params = s_Command.parameters
+--[[
+
+    Functions
+
+--]]
+function Editor:SpawnBlueprint(p_Command)
+    print(p_Command)
+    local s_Params = p_Command.parameters
     local s_SpawnResult = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
     if(s_SpawnResult == false) then
@@ -74,10 +90,7 @@ function Editor:OnSpawnBlueprint(p_JSONparams)
     for k,l_Entity in ipairs(s_SpawnResult) do
         local s_Data = l_Entity.data
         local s_Entity = SpatialEntity(l_Entity)
-        print("initial: " .. tostring(s_Params.transform))
-        print("aabb   : " .. tostring(s_Entity.aabbTransform))
-        print("min: " .. tostring(s_Entity.aabb.min))
-        print("aabb   : " .. tostring(s_Entity.aabb.max))
+
         s_Children[#s_Children + 1 ] = {
             type = l_Entity.typeInfo.name,
             aabb = {
@@ -93,27 +106,36 @@ function Editor:OnSpawnBlueprint(p_JSONparams)
                 -- transform?
             }
         }
-        print("Thats all folks")
     end
+
     local s_Response = {
         guid = s_Params.guid,
         sender = s_LocalPlayer.name,
         name = s_Params.name,
         ['type'] = 'SpawnedBlueprint',
-        parameters = self:EncodeParams(s_Params),
+        parameters = s_Params,
         children = s_Children
     }
 
-    print(s_Response)
-    print(json.encode(s_Response))
-    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
-
+    return s_Response
 end
 
-function Editor:OnSetTransform(p_JSONparams)
-    local s_Command = self:DecodeParams(json.decode(p_JSONparams))
-    print(s_Command)
-    local s_Result = m_ClientEntityManager:SetTransform(s_Command.guid, s_Command.parameters.transform)
+
+
+function Editor:SelectEntity(p_Command)
+
+    if ( m_ClientEntityManager:GetEntityByGuid(p_Command.guid) == nil) then
+        return false
+    end
+    local s_Response = {
+        guid = p_Command.guid,
+        ['type'] = 'SelectedEntity'
+    }
+   return s_Response
+end
+
+function Editor:SetTransform(p_Command)
+    local s_Result = m_ClientEntityManager:SetTransform(p_Command.guid, p_Command.parameters.transform)
 
     if(s_Result == false) then
         -- Notify WebUI of failed
@@ -123,11 +145,27 @@ function Editor:OnSetTransform(p_JSONparams)
 
     local s_Response = {
         type = "SetTransform",
-        guid = s_Command.guid,
-        transform = s_Command.parameters.transform
+        guid = p_Command.guid,
+        transform = p_Command.parameters.transform
     }
-    print(s_Response)
-    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
+    return s_Response
+end
+
+
+
+--[[
+
+
+
+--]]
+
+function Editor:Error(p_Message, p_Command)
+    local s_Response = {
+        type = "Error",
+        message = p_Message,
+        command = p_Command
+    }
+    return s_Response
 end
 
 function Editor:Raycast()

@@ -27,9 +27,8 @@ function MapEditorClient:RegisterEvents()
     self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
 	-- WebUI events
-	Events:Subscribe('MapEditor:SpawnBlueprintCommand', self, self.OnSpawnBlueprint)
-    Events:Subscribe('MapEditor:SetTransformCommand', self, self.OnSetTransform)
-    Events:Subscribe('MapEditor:SelectEntity', self, self.OnSelectEntity)
+    Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
+
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
 end
@@ -65,15 +64,8 @@ end
 
 ----------- Editor functions----------------
 
-
-function MapEditorClient:OnSpawnBlueprint(p_JSONparams)
-	m_Editor:OnSpawnBlueprint(p_JSONparams)
-end
-function MapEditorClient:OnSetTransform(p_JSONparams)
-    m_Editor:OnSetTransform(p_JSONparams)
-end
-function MapEditorClient:OnSelectEntity(p_JSONparams)
-    m_Editor:OnSelectEntity(p_JSONparams)
+function MapEditorClient:OnReceiveCommand(p_Command)
+    m_Editor:OnReceiveCommand(p_Command)
 end
 
 ----------- WebUI functions----------------

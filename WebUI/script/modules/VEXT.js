@@ -35,7 +35,7 @@ class VEXTInterface {
 			this.emulator.commands[command.type](command);
 		} else {
 			console.log(command);
-			WebUI.Call('DispatchEventLocal', 'MapEditor:' + command.type, JSON.stringify(command));
+			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveCommand', JSON.stringify(command));
 		}
 	}
 

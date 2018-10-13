@@ -146,13 +146,13 @@ class Hierarchy {
     CreateGroup(guid, name, parent) {
         let entry = new HierarchyEntry(guid, name, "Group");
 	    this.entries[guid] = entry;
-
 	    if(this.entries[parent] == undefined) {
 		    this.dom.append(entry.dom);
 	    } else {
 		    this.entries[parent].dom.append(entry.dom);
 	    }
     }
+    // GUID is missing for child elements. Pow, PLS fix.
 	CreateEntity(guid, name, parent) {
 		let entry = new HierarchyEntry(guid, name, "Entity");
 		this.entries[guid] = entry;

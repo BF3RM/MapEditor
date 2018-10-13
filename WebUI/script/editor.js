@@ -206,7 +206,7 @@ class Editor {
 			let aabb = new AABBHelper( new THREE.Box3(
 				new Vec3().fromString(child.aabb.min),
 				new Vec3().fromString(child.aabb.max),
-					0x00FF00));
+				0xFF0000));
 			childGO.add(aabb);
 			gameObject.add(childGO);
 
@@ -227,7 +227,7 @@ class Editor {
     		console.log("Selected the same item");
 			return;
     	}
-		this.vext.SendCommand(new VextCommand(guid, "SelectEntity"))
+		this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand"))
 		//this.selected.push(this.getGameObjectByGuid(guid));
     }
 
