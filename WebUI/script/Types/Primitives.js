@@ -20,7 +20,7 @@ class Vec3 extends THREE.Vector3{
 		let matrix = matrixString.split(",");
 		this.x = Number(matrix[0]);
 		this.y = Number(matrix[1]);
-		this.z = Number(matrix[1]);
+		this.z = Number(matrix[2]);
 		return this;
 	}
 }

@@ -67,32 +67,18 @@ function Editor:OnSpawnBlueprint(p_JSONparams)
         print(s_Command)
         return false
     end
-    print("spawned!")
-    -- TODO: add children
-    for k,l_Entity in ipairs(s_SpawnResult) do
-        local s_Data = l_Entity.data
-        print(l_Entity.typeInfo.name)
-        --print(l_Entity.uniqueID)
-        print(tostring(s_Data.instanceGuid))
-        print( s_Data.typeInfo.name)
-        print("Thats all folks")
-    end
 
-    print("spawning")
     local s_LocalPlayer = PlayerManager:GetLocalPlayer()
-    local s_Response = {
-        guid = s_Params.guid,
-        sender = s_LocalPlayer.name,
-        name = s_Params.name,
-        ['type'] = 'SpawnedBlueprint',
-        parameters = self:EncodeParams(s_Params),
-        children = {}
-    }
+
+    local s_Children = {}
     for k,l_Entity in ipairs(s_SpawnResult) do
         local s_Data = l_Entity.data
         local s_Entity = SpatialEntity(l_Entity)
-
-        s_Response.children[#s_Response.children + 1 ] = {
+        print("initial: " .. tostring(s_Params.transform))
+        print("aabb   : " .. tostring(s_Entity.aabbTransform))
+        print("min: " .. tostring(s_Entity.aabb.min))
+        print("aabb   : " .. tostring(s_Entity.aabb.max))
+        s_Children[#s_Children + 1 ] = {
             type = l_Entity.typeInfo.name,
             aabb = {
                 min = tostring(s_Entity.aabb.min),
@@ -109,6 +95,15 @@ function Editor:OnSpawnBlueprint(p_JSONparams)
         }
         print("Thats all folks")
     end
+    local s_Response = {
+        guid = s_Params.guid,
+        sender = s_LocalPlayer.name,
+        name = s_Params.name,
+        ['type'] = 'SpawnedBlueprint',
+        parameters = self:EncodeParams(s_Params),
+        children = s_Children
+    }
+
     print(s_Response)
     print(json.encode(s_Response))
     WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
@@ -131,8 +126,8 @@ function Editor:OnSetTransform(p_JSONparams)
         guid = s_Command.guid,
         transform = s_Command.parameters.transform
     }
-
-    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Response)))
+    print(s_Response)
+    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
 end
 
 function Editor:Raycast()
@@ -199,7 +194,8 @@ function Editor:SetPendingRaycast()
 end
 
 function ToLocal(a,b)
-
+    print(a.trans.x)
+    print(b.trans.x)
     local LT = LinearTransform()
     LT.left = a.left
     LT.up = a.up
