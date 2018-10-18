@@ -2,12 +2,18 @@ class VEXTInterface {
 	constructor() {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
-		this.commands = {};
-		this.commands["SpawnedBlueprint"] = signals.spawnedBlueprint.dispatch;
-		this.commands["DestroyedBlueprint"] = signals.destroyedBlueprint.dispatch;
-		this.commands["SelectedEntity"] = signals.selectedEntity.dispatch;
-		this.commands['SetObjectName'] = signals.setObjectName.dispatch;
-		this.commands['SetTransform'] = signals.setTransform.dispatch;
+		this.commands = {
+			"SpawnedBlueprint":     signals.spawnedBlueprint.dispatch,
+			"DestroyedBlueprint":   signals.destroyedBlueprint.dispatch,
+			"SelectedEntity":       signals.selectedEntity.dispatch,
+			'SetObjectName':        signals.setObjectName.dispatch,
+			'SetTransform':         signals.setTransform.dispatch,
+		}
+
+		this.messages = {
+			'SetCameraTransformMessage': signals.setCameraTransform.dispatch,
+			'SetRaycastTransformMessage': signals.setRaycastPosition.dispatch
+		}
 	}
 
 
@@ -90,6 +96,11 @@ class VEXTInterface {
 			console.log(message);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(message));
 		}
+	}
+
+	HandleMessage(message) {
+		console.log(message);
+
 	}
 }
 

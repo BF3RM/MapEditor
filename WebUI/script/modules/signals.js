@@ -28,6 +28,9 @@ var signals = {
 
     setObjectName: new Signal(),
 
+    setCameraTransform: new Signal(),
+	setRaycastPosition: new Signal(),
+
     modalShowed: new Signal(),
     modalClosed: new Signal(),
     modalConfirmed: new Signal(),

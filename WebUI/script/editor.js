@@ -1,14 +1,18 @@
 class Editor {
 	constructor(debug) {
 
-		// Events that the editor should execute first
+		// Commands
 		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
 
+		//Messages
+
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
+		signals.setCameraTransform.add(this.onSetCameraTransform.bind(this));
+		signals.setRaycastPosition.add(this.onSetRaycastPosition.bind(this));
 
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
@@ -118,13 +122,6 @@ class Editor {
 		this.pendingMessages[guid] = message;
 	}
 
-	/*
-
-		Events
-
-	*/
-
-
 	renderLoop()
 	{
 		let scope = this;
@@ -168,6 +165,12 @@ class Editor {
 			window.requestAnimationFrame( this._renderLoop );
 		}
 	}
+
+	/*
+
+		Commands
+
+	*/
 
 	onSetObjectName(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
@@ -282,7 +285,19 @@ class Editor {
 		let scope = this;
 
 	}
-	
+
+	/*
+
+		Messages
+
+	 */
+
+	onSetCameraTransform(transform) {
+
+	}
+	onSetRaycastPosition(position) {
+
+	}
     /*
 
         History
