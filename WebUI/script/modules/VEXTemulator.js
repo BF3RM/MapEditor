@@ -9,7 +9,7 @@ class VEXTemulator {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
-		this.commands['SelectEntity'] = this.SelectEntity;
+		this.commands['SelectEntityCommand'] = this.SelectEntity;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
 		this.commands['SetTransformCommand'] = this.SetTransform;
 	}
@@ -28,7 +28,7 @@ class VEXTemulator {
 			"children": {
 				1: {
 					"type": "ClientStaticModelEntity",
-					"uniqueID": GenerateGuid(),
+					"guid": GenerateGuid(),
 					"aabb": {
 						"max": "(1.628162, 3.593760, 2.490781)",
 						"min": "(-1.888471, -0.057315, -2.555373)",
