@@ -37,6 +37,21 @@ class GameObject extends THREE.Object3D
 		*/
 		this.updateTransform();
 	}
+	
+	getChanges() {
+		let scope = this;
+		let changes = {};
+		// Add more realtime-updates here.
+		if(scope.hasMoved()) {
+			changes["transform"] = new MoveObjectMessage(scope.guid,  new LinearTransform().setFromMatrix(scope.matrixWorld));
+		}
+
+		if(Object.keys(changes).length === 0) {
+			return false;
+		}
+		return changes
+
+	}
 
 	updateTransform()
 	{

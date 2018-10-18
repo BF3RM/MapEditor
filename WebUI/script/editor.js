@@ -8,6 +8,8 @@ class Editor {
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
 
+		signals.objectChanged.add(this.onObjectChanged.bind(this));
+
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
 		this.ui = new UI(debug);
@@ -28,8 +30,11 @@ class Editor {
         this.playerName = null;
         this.selected = [];
         this.raycastTransform = new LinearTransform();
+        this.s2wTransform = new LinearTransform();
 
-        //this.webobjects = {};
+        this.isUpdating = false;
+        this.pendingMessages = {};
+
         this.gameObjects = {};
 
 
@@ -88,6 +93,13 @@ class Editor {
 			this.playerName = name;
 		}
 	}
+
+	setUpdating(value) {
+		editor.isUpdating = value;
+		if(value) {
+			this.renderLoop()
+		}
+	}
 	/*
 
 		General usage
@@ -102,6 +114,10 @@ class Editor {
 		this.raycastTransform.trans = new Vec3(x, y, z);
 	}
 
+	addPending(guid, message) {
+		this.pendingMessages[guid] = message;
+	}
+
 	/*
 
 		Events
@@ -111,14 +127,19 @@ class Editor {
 
 	renderLoop()
 	{
-
+		let scope = this;
 		//GameObject update
-		if( this.lastUpdateTime == 0 || 
-			this.lastUpdateTime + (this.deltaTime*1000.0) <= Date.now())
-		{
-			this.lastUpdateTime = Date.now();
 
-			for ( var key in this.gameObjects )
+		//This var is checked twice because we might have stopped the rendering during the last update.
+		if(this.isUpdating === false) {
+			return;
+		}
+		if ( scope.lastUpdateTime === 0 ||
+			scope.lastUpdateTime + (scope.deltaTime*1000.0) <= Date.now())
+		{
+			scope.lastUpdateTime = Date.now();
+
+			/*for ( var key in this.gameObjects )
 			{
 				var object = this.gameObjects[key];
 
@@ -126,16 +147,26 @@ class Editor {
 					object.update( this.deltaTime );
 
 			}
+			*/
+			for(let guid in scope.pendingMessages) {
+				let changes = scope.pendingMessages[guid].getChanges();
+				if(!changes) {
+					continue;
+				}
+				for(let changeKey in changes) {
+					let change = changes[changeKey];
+					scope.vext.SendMessage(change);
+				}
+				delete scope.pendingMessages[guid];
+			}
 		}
-			
-	
-		//Gameobject render
-		this.webGL.Render( );
-	
 
-		//Render loop
-		// Disabled for now
-		//window.requestAnimationFrame( this._renderLoop );
+		//Gameobject render
+		//this.webGL.Render( );
+
+		if(this.isUpdating) {
+			window.requestAnimationFrame( this._renderLoop );
+		}
 	}
 
 	onSetObjectName(command) {
@@ -219,6 +250,9 @@ class Editor {
 		if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
+	}
+	onObjectChanged(object) {
+		this.addPending(object.guid, object);
 	}
 
 	Select(guid) {

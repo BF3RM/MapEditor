@@ -323,6 +323,7 @@ class WebGL {
 		editor.selected.onMoveStart();
 
 		$('#page').find('canvas').css("z-index", Number.MAX_SAFE_INTEGER)
+		editor.setUpdating(true);
 
 		if( keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
 
@@ -345,6 +346,7 @@ class WebGL {
 		if(editor.webGL.raycastPlacing == false) {
 			$('#page').find('canvas').css("z-index", 0)
 		}
+		editor.setUpdating(false);
 		editor.selected.onMoveEnd();
 		//Stop Moving
 	}

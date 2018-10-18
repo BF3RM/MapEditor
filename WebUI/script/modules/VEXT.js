@@ -82,5 +82,14 @@ class VEXTInterface {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSONparams);
 		}
 	}
+
+	SendMessage(message){
+		if(editor.debug) {
+			console.log(message);
+		} else {
+			console.log(message);
+			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(message));
+		}
+	}
 }
 
