@@ -87,6 +87,11 @@ class GameObject extends THREE.Object3D
 		signals.objectChanged.dispatch(this);
 	}
 
+	setVariation(key) {
+		this.parameters.variation = key;
+		signals.objectChanged.dispatch(this);
+	}
+
     Clone(guid) {
     	if(guid === undefined) {
     		guid = GenerateGuid();

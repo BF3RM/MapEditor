@@ -8,6 +8,7 @@ class VEXTInterface {
 			"SelectedEntity":       signals.selectedEntity.dispatch,
 			'SetObjectName':        signals.setObjectName.dispatch,
 			'SetTransform':         signals.setTransform.dispatch,
+			'SetVariation':         signals.setVariation.dispatch,
 		}
 
 		this.messages = {

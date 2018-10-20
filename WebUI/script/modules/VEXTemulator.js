@@ -12,6 +12,7 @@ class VEXTemulator {
 		this.commands['SelectEntityCommand'] = this.SelectEntity;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
 		this.commands['SetTransformCommand'] = this.SetTransform;
+		this.commands['SetVariationCommand'] = this.SetVariation;
 	}
 
 
@@ -80,6 +81,16 @@ class VEXTemulator {
 			"type": "SetObjectName",
 			"guid": command.guid,
 			"name": command.parameters
+		};
+		editor.vext.HandleResponse(response);
+	}
+
+	SetVariation(command) {
+		
+		let response = {
+			"type": "SetVariation",
+			"guid": command.guid,
+			"key": command.parameters
 		};
 		editor.vext.HandleResponse(response);
 	}

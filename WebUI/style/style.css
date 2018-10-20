@@ -314,3 +314,9 @@ input::-webkit-inner-spin-button {
 
     /* display: none; <- Crashes Chrome on hover */
 }
+
+#inspector select {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 100%;
+}

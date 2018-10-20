@@ -7,6 +7,7 @@ class Editor {
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
+		signals.setVariation.add(this.onSetVariation.bind(this));
 
 		//Messages
 
@@ -188,6 +189,15 @@ class Editor {
 			return;
 		}
 		gameObject.setTransform(new LinearTransform().setFromString(command.transform))
+	}
+
+	onSetVariation(command) {
+		let gameObject = this.getGameObjectByGuid(command.guid);
+		if(gameObject === undefined) {
+			this.logger.LogError("Tried to set the variation of a null object: " + command.guid);
+			return;
+		}
+		gameObject.setVariation(command.key);
 	}
 
 
