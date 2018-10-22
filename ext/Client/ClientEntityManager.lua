@@ -72,11 +72,9 @@ function ClientEntityManager:SetTransform(p_Guid, p_LinearTransform)
         print('Object with id ' .. p_Guid .. ' does not exist')
         return false
     end
-    print("Moving")
-    print(p_LinearTransform)
     for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
         if(l_Entity == nil) then
-            print("destroyed")
+            print("Entity is nil?")
             return false
         end
 
@@ -86,18 +84,14 @@ function ClientEntityManager:SetTransform(p_Guid, p_LinearTransform)
         end
 
         local s_Entity = SpatialEntity(l_Entity)
-        print("casted entity")
 
         if s_Entity ~= nil then
-            print("setting transform")
             s_Entity.transform = LinearTransform(p_LinearTransform)
-            print("sat transform")
         else
             print("entity is nil??")
         end
         ::continue::
     end
-    print("done moving")
     return true
 end
 

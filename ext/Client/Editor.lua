@@ -22,6 +22,9 @@ function Editor:RegisterVars()
         SetTransformCommand = self.SetTransform,
         SelectEntityCommand = self.SelectEntity
     }
+    self.m_Messages = {
+        MoveObjectMessage = self.MoveObject
+    }
 end
 
 function Editor:RegisterEvents()
@@ -55,7 +58,6 @@ end
 
 function Editor:OnReceiveCommand(p_Command)
     local s_Command = self:DecodeParams(json.decode(p_Command))
-    print(s_Command)
     local s_Function = self.m_Commands[s_Command.type]
     if(s_Function == nil) then
         print("Attempted to call a nil function: " .. s_Command.type)
@@ -70,9 +72,26 @@ function Editor:OnReceiveCommand(p_Command)
     WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
 end
 
+function Editor:OnReceiveMessage(p_Message)
+    local s_Message = self:DecodeParams(json.decode(p_Message))
+
+    local s_Function = self.m_Messages[s_Message.type]
+    if(s_Function == nil) then
+        print("Attempted to call a nil function: " .. s_Message.type)
+        return false
+    end
+
+    local s_Response = s_Function(self, s_Message)
+    if(s_Response == false) then
+        -- TODO: Handle errors
+        print("error")
+        return
+    end
+    -- Messages don't respond
+end
 --[[
 
-    Functions
+    Commands
 
 --]]
 function Editor:SpawnBlueprint(p_Command)
@@ -180,7 +199,23 @@ end
 
 --[[
 
+    Messages
 
+--]]
+
+function Editor:MoveObject(p_Message)
+    local s_Result = m_ClientEntityManager:SetTransform(p_Message.guid, p_Message.transform)
+
+    if(s_Result == false) then
+        -- Notify WebUI of failed
+        print("failed")
+        return false
+    end
+end
+
+--[[
+
+    Shit
 
 --]]
 
@@ -257,8 +292,6 @@ function Editor:SetPendingRaycast()
 end
 
 function ToLocal(a,b)
-    print(a.trans.x)
-    print(b.trans.x)
     local LT = LinearTransform()
     LT.left = a.left
     LT.up = a.up
@@ -278,7 +311,6 @@ function Editor:DecodeParams(p_Table)
 				Vec3(s_Value.forward.x, s_Value.forward.y, s_Value.forward.z),
 				Vec3(s_Value.trans.x, s_Value.trans.y, s_Value.trans.z))
 				
-            print("converted lineartransform")
 			p_Table[s_Key] = s_LinearTransform
 
 		elseif type(s_Value) == "table" then
