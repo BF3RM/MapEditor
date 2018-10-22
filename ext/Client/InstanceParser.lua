@@ -20,6 +20,13 @@ function InstanceParser:RegisterVars()
 end
 
 
+function InstanceParser:Clear()
+    self.m_Blueprints:clear()
+    self.m_Meshes:clear()
+    self.m_Variations:clear()
+    self.m_MeshVariationDatabases:clear()
+end
+
 function InstanceParser:RegisterEvents()
 end
 

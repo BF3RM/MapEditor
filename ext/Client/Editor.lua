@@ -50,6 +50,16 @@ function Editor:OnEngineMessage(p_Message)
 end
 
 
+
+
+function Editor:OnLevelDestroy()
+    m_ClientEntityManager:Clear()
+    m_InstanceParser:Clear()
+
+end
+
+
+
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:UpdateCameraTransform()
 

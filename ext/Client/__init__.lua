@@ -23,6 +23,7 @@ function MapEditorClient:RegisterEvents()
 	self.m_EngineUpdateEvent = Events:Subscribe('Engine:Update', self, self.OnUpdate)
     self.m_PartitionLoadedEvent = Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
+    self.m_EngineUpdateEvent = Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
     self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
@@ -32,6 +33,8 @@ function MapEditorClient:RegisterEvents()
 
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
+
+
 end
 
 ----------- Game functions----------------
@@ -59,6 +62,10 @@ end
 function MapEditorClient:OnUpdateInput(p_Delta)
 	m_Freecam:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
+end
+function MapEditorClient:OnLevelDestroy()
+    print("Destroy!")
+    m_Editor:OnLevelDestroy()
 end
 
 ----------- Editor functions----------------
