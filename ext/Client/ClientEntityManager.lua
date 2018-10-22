@@ -1,5 +1,6 @@
 class 'ClientEntityManager'
 
+local m_Util = require "__shared/Util"
 
 function ClientEntityManager:__init()
 	print("Initializing ClientEntityManager")
@@ -74,9 +75,16 @@ function ClientEntityManager:SetTransform(p_Guid, p_LinearTransform)
     print("Moving")
     print(p_LinearTransform)
     for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
+        if(l_Entity == nil) then
+            print("destroyed")
+            return false
+        end
 
-        print(i)
-        print(l_Entity.typeInfo.name)
+        if(not m_Util:isSpatial(l_Entity.typeInfo)) then
+            print("not spatial")
+            goto continue
+        end
+
         local s_Entity = SpatialEntity(l_Entity)
         print("casted entity")
 
@@ -87,6 +95,7 @@ function ClientEntityManager:SetTransform(p_Guid, p_LinearTransform)
         else
             print("entity is nil??")
         end
+        ::continue::
     end
     print("done moving")
     return true

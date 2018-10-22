@@ -60,8 +60,6 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
 
-
-
 ----------- Editor functions----------------
 
 function MapEditorClient:OnReceiveCommand(p_Command)

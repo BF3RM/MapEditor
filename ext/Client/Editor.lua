@@ -3,6 +3,7 @@ class 'Editor'
 local m_ClientEntityManager = require "ClientEntityManager"
 local m_InstanceParser = require "InstanceParser"
 
+
 local MAX_CAST_DISTANCE = 1000
 local FALLBACK_DISTANCE = 1000
 
@@ -29,10 +30,11 @@ end
 
 function Editor:OnEngineMessage(p_Message) 
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
-		print("MessageType.ClientLevelFinalizedMessage")
 		m_InstanceParser:FillVariations()
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
+    end
+    if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
 		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
 		if s_LocalPlayer == nil then
@@ -92,6 +94,7 @@ function Editor:SpawnBlueprint(p_Command)
         local s_Entity = SpatialEntity(l_Entity)
 
         s_Children[#s_Children + 1 ] = {
+            guid = s_Entity.uniqueID,
             type = l_Entity.typeInfo.name,
             aabb = {
                 min = tostring(s_Entity.aabb.min),
