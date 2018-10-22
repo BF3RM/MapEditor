@@ -27,6 +27,10 @@ var signals = {
     objectRemoved: new Signal(),
 
     setObjectName: new Signal(),
+    setVariation: new Signal(),
+
+    setCameraTransform: new Signal(),
+	setRaycastPosition: new Signal(),
 
     modalShowed: new Signal(),
     modalClosed: new Signal(),

@@ -43,6 +43,26 @@ class Inspector {
 		content.append(transformControl);
 		this.transform = {};
 
+		let variationControl = $(document.createElement("div"));
+		content.append(variationControl);
+		variationControl.addClass("variation");
+
+		let variationLabel = $(document.createElement("label"));
+		variationControl.append(variationLabel);
+		variationLabel.attr("for", "objectVariation");
+		variationLabel.text("Variation");
+
+		let variationSelect = $(document.createElement("select"));
+		variationControl.append(variationSelect);
+		variationSelect.attr({
+			"id": "objectVariation"
+		});
+		variationSelect.prop("disabled", true);
+
+		$(variationSelect).on('change',function(){
+			editor.execute(new SetVariationCommand(editor.selected.guid, this.value));
+		});
+
 		let deleteButton = $(document.createElement("button"));
 		deleteButton.addClass("deleteButton");
 		deleteButton.text("Delete");
@@ -130,6 +150,26 @@ class Inspector {
 		}
 		this.name[0].value = gameObject.name;
 
+		let variationSelect = $(document.getElementById("objectVariation"));
+		let blueprint =  editor.blueprintManager.getBlueprintByGuid(gameObject.parameters.reference.instanceGuid);
+		if(blueprint.variations[0] === 0){
+			variationSelect.prop("disabled", true);
+			variationSelect.empty();
+			editor.logger.LogError("Blueprint Variations not available");
+		}else{
+			console.log(blueprint.variations);
+			variationSelect.prop("disabled", false);
+			variationSelect.empty();
+
+			for(var i = 0; i < blueprint.variations.length; i++){
+				var newOption = new Option(blueprint.variations[i], blueprint.variations[i]);
+				variationSelect.append(newOption);
+			}
+		}
+
+		let curVariation = gameObject.parameters.variation;
+		variationSelect.find("option[value=" + curVariation  + "]").attr("selected",true);
+
 		let controls = ["position", "rotation", "scale"];
 		let xyz = ["x","y","z"];
 		let transform = this.transform;
@@ -167,6 +207,9 @@ class Inspector {
 	onSelectedEntity(command) {
 		let gameObject = editor.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
+			let variationSelect = $(document.getElementById("objectVariation"));
+			variationSelect.prop("disabled", true);
+			variationSelect.empty();
 			editor.logger.LogError("Tried to set the name of a null entry. " + command.guid);
 			return;
 		}

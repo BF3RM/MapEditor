@@ -1,12 +1,19 @@
 class Editor {
 	constructor(debug) {
 
-		// Events that the editor should execute first
+		// Commands
 		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
+		signals.setVariation.add(this.onSetVariation.bind(this));
+
+		//Messages
+
+		signals.objectChanged.add(this.onObjectChanged.bind(this));
+		signals.setCameraTransform.add(this.onSetCameraTransform.bind(this));
+		signals.setRaycastPosition.add(this.onSetRaycastPosition.bind(this));
 
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
@@ -28,8 +35,11 @@ class Editor {
         this.playerName = null;
         this.selected = [];
         this.raycastTransform = new LinearTransform();
+        this.s2wTransform = new LinearTransform();
 
-        //this.webobjects = {};
+        this.isUpdating = false;
+        this.pendingMessages = {};
+
         this.gameObjects = {};
 
 
@@ -88,6 +98,13 @@ class Editor {
 			this.playerName = name;
 		}
 	}
+
+	setUpdating(value) {
+		editor.isUpdating = value;
+		if(value) {
+			this.renderLoop()
+		}
+	}
 	/*
 
 		General usage
@@ -102,23 +119,25 @@ class Editor {
 		this.raycastTransform.trans = new Vec3(x, y, z);
 	}
 
-	/*
-
-		Events
-
-	*/
-
+	addPending(guid, message) {
+		this.pendingMessages[guid] = message;
+	}
 
 	renderLoop()
 	{
-
+		let scope = this;
 		//GameObject update
-		if( this.lastUpdateTime == 0 || 
-			this.lastUpdateTime + (this.deltaTime*1000.0) <= Date.now())
-		{
-			this.lastUpdateTime = Date.now();
 
-			for ( var key in this.gameObjects )
+		//This var is checked twice because we might have stopped the rendering during the last update.
+		if(this.isUpdating === false) {
+			return;
+		}
+		if ( scope.lastUpdateTime === 0 ||
+			scope.lastUpdateTime + (scope.deltaTime*1000.0) <= Date.now())
+		{
+			scope.lastUpdateTime = Date.now();
+
+			/*for ( var key in this.gameObjects )
 			{
 				var object = this.gameObjects[key];
 
@@ -126,17 +145,33 @@ class Editor {
 					object.update( this.deltaTime );
 
 			}
+			*/
+			for(let guid in scope.pendingMessages) {
+				let changes = scope.pendingMessages[guid].getChanges();
+				if(!changes) {
+					continue;
+				}
+				for(let changeKey in changes) {
+					let change = changes[changeKey];
+					scope.vext.SendMessage(change);
+				}
+				delete scope.pendingMessages[guid];
+			}
 		}
-			
-	
-		//Gameobject render
-		this.webGL.Render( );
-	
 
-		//Render loop
-		// Disabled for now
-		//window.requestAnimationFrame( this._renderLoop );
+		//Gameobject render
+		//this.webGL.Render( );
+
+		if(this.isUpdating) {
+			window.requestAnimationFrame( this._renderLoop );
+		}
 	}
+
+	/*
+
+		Commands
+
+	*/
 
 	onSetObjectName(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
@@ -154,6 +189,15 @@ class Editor {
 			return;
 		}
 		gameObject.setTransform(new LinearTransform().setFromString(command.transform))
+	}
+
+	onSetVariation(command) {
+		let gameObject = this.getGameObjectByGuid(command.guid);
+		if(gameObject === undefined) {
+			this.logger.LogError("Tried to set the variation of a null object: " + command.guid);
+			return;
+		}
+		gameObject.setVariation(command.key);
 	}
 
 
@@ -220,6 +264,9 @@ class Editor {
 			this.Select(command.guid)
 		}
 	}
+	onObjectChanged(object) {
+		this.addPending(object.guid, object);
+	}
 
 	Select(guid) {
     	//TODO: Support multiple shit
@@ -248,7 +295,19 @@ class Editor {
 		let scope = this;
 
 	}
-	
+
+	/*
+
+		Messages
+
+	 */
+
+	onSetCameraTransform(transform) {
+
+	}
+	onSetRaycastPosition(position) {
+
+	}
     /*
 
         History

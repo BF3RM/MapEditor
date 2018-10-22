@@ -21,7 +21,7 @@ class Blueprint {
     }
     isVariationValid(variation) {
         let scope = this;
-        return (scope.hasVariation() && scope.getVariation(variation) !== undefined);
+        return (scope.hasVariation() /* && scope.getVariation(variation) !== undefined */);
 		// Always returns 0
     }
 
