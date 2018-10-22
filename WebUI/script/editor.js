@@ -280,14 +280,15 @@ class Editor {
 
     onSelectedEntity(command) {
     	let scope = this;
-		if(scope.gameObjects[command.guid] === undefined) {
+    	let gameObject = cope.gameObjects[command.guid];
+		if(gameObject === undefined) {
 			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
-	    scope.selected = scope.gameObjects[command.guid];
+	    scope.selected = gameObject;
 
 		//TODO: make this not ugly.
-	    this.gameObjects[command.guid].update();
+	    gameObject.onSelected();
 		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
 	}
 

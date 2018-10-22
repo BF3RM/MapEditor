@@ -124,6 +124,13 @@ class GameObject extends THREE.Object3D
 	    // Send move command to server
     }
 
+    onSelected() {
+
+    }
+    onDeselected() {
+
+    }
+
 }
 
 class EntityCreationParams {
