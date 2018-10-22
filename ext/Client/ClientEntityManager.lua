@@ -1,7 +1,5 @@
 class 'ClientEntityManager'
 
-local m_Util = require "__shared/Util"
-
 function ClientEntityManager:__init()
 	print("Initializing ClientEntityManager")
 	self:RegisterVars()
@@ -78,7 +76,7 @@ function ClientEntityManager:SetTransform(p_Guid, p_LinearTransform)
             return false
         end
 
-        if(not m_Util:isSpatial(l_Entity.typeInfo)) then
+        if(not l_Entity:Is("SpatialEntity"))then
             print("not spatial")
             goto continue
         end
