@@ -35,4 +35,4 @@ In freecam, without holding right click:
 - CTRL+V to paste saved entity to the selected group 
 
 # Disclamer
-This project is heavily inspired by (Three.js)[https://threejs.org/], which provides the foundation for
+This project is using [Three.js](https://threejs.org/) as the rendering foundation.
