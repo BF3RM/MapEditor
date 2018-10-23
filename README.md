@@ -1,9 +1,7 @@
 # Vext-MapEditor
 A realtime map editor for Venice Unleashed
 
-**Note: you need to load BlueprintManager too in order to use this mod. https://github.com/Powback/BlueprintManager**
-
-Controls:
+## Controls:
 
 F1 to enable freecam.
 
