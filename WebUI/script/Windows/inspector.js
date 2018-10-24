@@ -3,10 +3,17 @@ class Inspector {
 		this.dom = null;
 		this.transform = null;
 		this.name = null;
+		this.variation = null;
 		this.Initialize();
 
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
+
+		this.updates = {
+			"transform": this.UpdateTransform.bind(this),
+			"name": this.UpdateName.bind(this),
+			"variation": this.UpdateVariation.bind(this),
+		}
 	}
 
 	//TODO: OnUpdate events, transform shit
@@ -52,14 +59,14 @@ class Inspector {
 		variationLabel.attr("for", "objectVariation");
 		variationLabel.text("Variation");
 
-		let variationSelect = $(document.createElement("select"));
-		variationControl.append(variationSelect);
-		variationSelect.attr({
+		this.variation = $(document.createElement("select"));
+		variationControl.append(this.variation);
+		this.variation.attr({
 			"id": "objectVariation"
 		});
-		variationSelect.prop("disabled", true);
+		this.variation.prop("disabled", true);
 
-		$(variationSelect).on('change',function(){
+		this.variation.on('change',function(){
 			editor.execute(new SetVariationCommand(editor.selected.guid, this.value));
 		});
 
@@ -148,54 +155,12 @@ class Inspector {
 			console.log("Tried to update the inspector with an invalid gameobject?");
 			return
 		}
-		this.name[0].value = gameObject.name;
-
-		let variationSelect = $(document.getElementById("objectVariation"));
-		let blueprint =  editor.blueprintManager.getBlueprintByGuid(gameObject.parameters.reference.instanceGuid);
-		if(blueprint.variations[0] === 0){
-			variationSelect.prop("disabled", true);
-			variationSelect.empty();
-			editor.logger.LogError("Blueprint Variations not available");
-		}else{
-			console.log(blueprint.variations);
-			variationSelect.prop("disabled", false);
-			variationSelect.empty();
-
-			for(var i = 0; i < blueprint.variations.length; i++){
-				var newOption = new Option(blueprint.variations[i], blueprint.variations[i]);
-				variationSelect.append(newOption);
-			}
-		}
-
-		let curVariation = gameObject.parameters.variation;
-		variationSelect.find("option[value=" + curVariation  + "]").attr("selected",true);
-
-		let controls = ["position", "rotation", "scale"];
-		let xyz = ["x","y","z"];
-		let transform = this.transform;
-		$.each(controls, function (index, con) {
-			let control = gameObject[con];
-			$.each(xyz, function(index2, val) {
-
-
-				if(isNaN(control[val])) {
-					transform[con][val].addClass("invalid")
-					return
-				}
-				if(transform[con][val].hasClass("invalid")) {
-					transform[con][val].removeClass("invalid")
-				}
-
-
-				//If we're modifying Rotation. Using the controls key for redundancy
-				if(con == controls[1]) {
-					transform[con][val][0].value = (control[val] * THREE.Math.RAD2DEG).toFixed(3);
-				} else {
-					transform[con][val][0].value =control[val].toFixed(3)
-				}
-			});
-		});
+		this.UpdateName(gameObject, gameObject.name);
+		this.UpdateTransform(gameObject, gameObject.transform);
+		this.UpdateVariation(gameObject, gameObject.parameters.variation);
 	}
+
+
 
 	HideContent() {
 		this.dom.hide()
@@ -216,8 +181,62 @@ class Inspector {
 		this.UpdateInspector(gameObject);
 	}
 
-	onObjectChanged(go) {
-		this.UpdateInspector(go);
+	onObjectChanged(go, key, value) {
+		if(this.updates[key] !== undefined) {
+			this.updates[key](go, value);
+		} else {
+			this.UpdateInspector(go);
+		}
+	}
+
+	UpdateTransform(go, linearTransform) {
+		let controls = ["position", "rotation", "scale"];
+		let xyz = ["x","y","z"];
+		let transform = this.transform;
+		$.each(controls, function (index, con) {
+			let control = go[con];
+			$.each(xyz, function(index2, val) {
+
+
+				if(isNaN(control[val])) {
+					transform[con][val].addClass("invalid")
+					return
+				}
+				if(transform[con][val].hasClass("invalid")) {
+					transform[con][val].removeClass("invalid")
+				}
+
+
+				//If we're modifying Rotation. Using the controls key for redundancy
+				if(con === controls[1]) {
+					transform[con][val][0].value = (control[val] * THREE.Math.RAD2DEG).toFixed(3);
+				} else {
+					transform[con][val][0].value =control[val].toFixed(3)
+				}
+			});
+		});
+	}
+	UpdateName(go, name) {
+		this.name[0].value = name;
+	}
+	UpdateVariation(go, variation) {
+		// We're refreshing the whole thing. Might as well, right?
+		let blueprint =  editor.blueprintManager.getBlueprintByGuid(go.parameters.reference.instanceGuid);
+		if(!blueprint.hasVariation()){
+			this.variation.prop("disabled", true);
+			this.variation.empty();
+			editor.logger.LogError("Blueprint Variations not available");
+		}else{
+			console.log(blueprint.variations);
+			this.variation.prop("disabled", false);
+			this.variation.empty();
+
+			for(let key in blueprint.variations) {
+				let newOption = new Option(blueprint.variations[key], key);
+				this.variation.append(newOption);
+			}
+		}
+		this.variation.find("option[value=" + variation  + "]").attr("selected",true);
 	}
 }
 

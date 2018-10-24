@@ -78,18 +78,18 @@ class GameObject extends THREE.Object3D
 		this.transform = linearTransform;
 		this.parameters.transform = linearTransform;
 		this.updateTransform();
-		signals.objectChanged.dispatch(this)
+		signals.objectChanged.dispatch(this, "transform", linearTransform)
 
 	}
 	setName(name) {
 		this.name = name;
 		this.parameters.name = name;
-		signals.objectChanged.dispatch(this);
+		signals.objectChanged.dispatch(this, "name", name);
 	}
 
 	setVariation(key) {
 		this.parameters.variation = key;
-		signals.objectChanged.dispatch(this);
+		signals.objectChanged.dispatch(this, "variation", key);
 	}
 
     Clone(guid) {
@@ -109,7 +109,8 @@ class GameObject extends THREE.Object3D
 		if(!scope.hasMoved()) {
 			return;
 		}
-		signals.objectChanged.dispatch(this)
+		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+		signals.objectChanged.dispatch(this, "transform", transform)
 		// Send move message to client
 	}
     onMoveEnd() {
@@ -117,9 +118,10 @@ class GameObject extends THREE.Object3D
 	    if(!scope.hasMoved()) {
 		    return; // No position change
 	    }
-	    let command = new SetTransformCommand(this.guid, new LinearTransform().setFromMatrix(scope.matrixWorld), scope.transform)
+	    let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+	    let command = new SetTransformCommand(this.guid, transform, scope.transform);
 	    editor.execute(command);
-	    signals.objectChanged.dispatch(this)
+	    signals.objectChanged.dispatch(this, "transform", transform)
 
 	    // Send move command to server
     }

@@ -17,7 +17,7 @@ class Blueprint {
 	}
 
     hasVariation () {
-	    return !(this.variations === undefined || this.variations.length == null || this.variations.length === 0);
+	    return !(this.variations === undefined || Object.keys(this.variations).length == null || Object.keys(this.variations).length === 0);
     }
     isVariationValid(variation) {
         let scope = this;

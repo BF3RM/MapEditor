@@ -280,7 +280,7 @@ class Editor {
 
     onSelectedEntity(command) {
     	let scope = this;
-    	let gameObject = cope.gameObjects[command.guid];
+    	let gameObject = scope.gameObjects[command.guid];
 		if(gameObject === undefined) {
 			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
