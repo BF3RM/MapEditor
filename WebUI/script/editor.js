@@ -14,7 +14,9 @@ class Editor {
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
 		signals.setCameraTransform.add(this.onSetCameraTransform.bind(this));
 		signals.setRaycastPosition.add(this.onSetRaycastPosition.bind(this));
-		signals.SetPlayerName.add(this.onSetPlayerName.bind(this));
+		signals.setPlayerName.add(this.onSetPlayerName.bind(this));
+		signals.setScreenToWorldPosition.add(this.onSetScreenToWorldPosition.bind(this));
+		signals.setUpdateRateMessage.add(this.onSetUpdateRateMessage.bind(this));
 
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
@@ -310,10 +312,16 @@ class Editor {
 	onSetRaycastPosition(position) {
 
 	}
-
 	onSetPlayerName(name){
-		
+
 	}
+	onSetScreenToWorldPosition(position){
+
+	}
+	onSetUpdateRateMessage(value){
+
+	}
+
     /*
 
         History

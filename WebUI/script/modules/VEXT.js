@@ -12,9 +12,11 @@ class VEXTInterface {
 		}
 
 		this.messages = {
-			'SetCameraTransformMessage':  signals.setCameraTransform.dispatch,
-			'SetRaycastTransformMessage': signals.setRaycastPosition.dispatch,
-			'SetPlayerNameMessage':       signals.SetPlayerName.dispatch
+			'SetCameraTransformMessage':			signals.setCameraTransform.dispatch,
+			'SetRaycastTransformMessage':			signals.setRaycastPosition.dispatch,
+			'SetPlayerNameMessage':       			signals.setPlayerName.dispatch,
+			'SetScreenToWorldPositionMessage':		signals.setScreenToWorldPosition.dispatch,
+			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch,
 		}
 	}
 
