@@ -30,7 +30,8 @@ var signals = {
     setVariation: new Signal(),
 
     setCameraTransform: new Signal(),
-	setRaycastPosition: new Signal(),
+    setRaycastPosition: new Signal(),
+    SetPlayerName: new Signal(),
 
     modalShowed: new Signal(),
     modalClosed: new Signal(),
