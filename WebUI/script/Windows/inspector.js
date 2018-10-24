@@ -134,10 +134,9 @@ class Inspector {
 		if(this.transform[type][key].hasClass("invalid")) {
 			this.transform[type][key].removeClass("invalid")
 		}
+		// Rotation needs to be converted first.
 		if(type == "rotation") {
-				let eulerRot = new THREE.Euler( this.transform.rotation.x.val() * THREE.Math.DEG2RAD, this.transform.rotation.y.val() * THREE.Math.DEG2RAD, this.transform.rotation.z.val() * THREE.Math.DEG2RAD);
-				console.log(eulerRot);
-
+			let eulerRot = new THREE.Euler( this.transform.rotation.x.val() * THREE.Math.DEG2RAD, this.transform.rotation.y.val() * THREE.Math.DEG2RAD, this.transform.rotation.z.val() * THREE.Math.DEG2RAD);
 			editor.selected.rotation.copy(eulerRot);
 		} else {
 		   editor.selected[type][key] = Number(value);
@@ -145,7 +144,10 @@ class Inspector {
 		editor.webGL.Render();
 		editor.selected.onMove();
 
-		if(final) {
+		if(!final) {
+			editor.setUpdating(true);
+		} else {
+			editor.setUpdating(false);
 			editor.selected.onMoveEnd();
 		}
 	}
