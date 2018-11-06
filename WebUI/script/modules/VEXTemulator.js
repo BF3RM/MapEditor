@@ -20,7 +20,7 @@ class VEXTemulator {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
-		command.parameters.transform = "(1.000000, 0.000000, 0.000000)(0.000000, 1.000000, 0.000000)(0.000000, 0.000000, 1.000000)(0.000000, 0.000000, 0.000000),";
+		command.parameters.transform = command.parameters.transform.toString();
 		let response = {
 			"guid": command.guid,
 			"sender": command.sender,

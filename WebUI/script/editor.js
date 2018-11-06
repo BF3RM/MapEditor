@@ -19,7 +19,7 @@ class Editor {
 		signals.setUpdateRateMessage.add(this.onSetUpdateRateMessage.bind(this));
 
 		this.debug = debug;
-        this.logger = new Logger(LOGLEVEL.VERBOSE);
+        this.logger = new Logger(LOGLEVEL.NONE);
 		this.ui = new UI(debug);
 		this.webGL = new WebGL();
 		this.vext = new VEXTInterface();
@@ -242,7 +242,6 @@ class Editor {
 		let scope = this;
 		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
         //this.webobjects[command.guid] = webobject;
-        console.log("GO spawned");
         let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, command.children, command.parameters);
 
 		this.webGL.AddObject(gameObject);
@@ -263,10 +262,11 @@ class Editor {
 
 		this.gameObjects[command.guid] = gameObject;
 
-		if(command.sender === this.playerName) {
-			this.Select(command.guid)
-		}
+	//	if(command.sender === this.playerName) {
+	//		this.Select(command.guid)
+	//	}
 	}
+
 	onObjectChanged(object) {
 		this.addPending(object.guid, object);
 	}

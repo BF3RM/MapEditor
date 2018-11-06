@@ -41,7 +41,7 @@ class VEXTInterface {
 	SendCommand(command) {
 		command.sender = editor.playerName;
 		if(editor.debug) {
-			console.log(command);
+			editor.logger.Log(LOGLEVEL.VERBOSE, command);
 			this.emulator.commands[command.type](command);
 		} else {
 			console.log(command);
@@ -59,7 +59,7 @@ class VEXTInterface {
 			editor.logger.Log(LOGLEVEL.VERBOSE, commandRaw);
 			command = JSON.parse(commandRaw);
 		}
-		console.log(command);
+		editor.logger.Log(LOGLEVEL.VERBOSE, command);
 
 		if(this.commands[command.type] === undefined) {
 			editor.logger.LogError("Failed to call a null signal: " + command.type);
@@ -68,9 +68,7 @@ class VEXTInterface {
 		if(emulator) {
 			let scope = this;
 			// delay to simulate transmission time and execution order
-			setTimeout(async function() {
 				scope.commands[command.type](command)
-			}, 10);
 		} else {
 			this.commands[command.type](command);
 		}
@@ -95,7 +93,7 @@ class VEXTInterface {
 
 	SendMessage(message){
 		if(editor.debug) {
-			console.log(message);
+			editor.logger.Log(LOGLEVEL.VERBOSE, message);
 		} else {
 			console.log(message);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(message));
