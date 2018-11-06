@@ -1,274 +1,131 @@
 class Hierarchy {
-    constructor() {
-        this.dom = null;
-        this.entries = {};
-        this.dropHighLighted = null;
-        this.topControls = this.CreateTopControls();
-        this.subControls = this.CreateSubControls();
-        this.Initialize();
+	constructor() {
+		this.data = {
+			"id": "root",
+			"text": "root",
+			"icon": "",
+			"data": {
+				"position": 0,
+				"parent": null
+			},
+			"state": {
+				"opened": true,
+				"disabled": true,
+				"selected": false
+			},
+			"children": [],
+			"liAttributes": null,
+			"aAttributes": null
+		};
 
+		this.entries = [];
+		this.entries["root"] = this.data;
 
-	    signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
-	    signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-        signals.selectedEntity.add(this.onSelectedEntity.bind(this));
-        signals.setObjectName.add(this.onSetObjectName.bind(this));
+		this.dom = this.CreateDom();
+		this.topControls = this.CreateTopControls();
+		this.subControls = this.CreateSubControls();
+		this.Initialize();
 
-    }
-
-
-
-    Initialize() {
-        this.dom = $(document.createElement("ol"));
-        this.dom.addClass("spawnedEntities");
-
-
-        this.dom.sortable({
-            itemSelector: 'li',
-            placeholder: '<li class="placeholder"/>',
-            nested: true,
-            distance:50,
-            onDrag:  function ($item, position, _super, event) {
-                //$item.css(position)
-                //$(".placeholder").height($($item[0]).height());
-
-            },
-            isValidTarget: function ($item, container) {
-                if($(container.el.children().first()).hasClass("placeholder")) {
-                    this.highLighted = $(container.el).parent();
-                    this.highLighted.addClass("dropHighLighted");
-
-                    console.log(container)
-                } else {
-                    if(this.highLighted != null) {
-                        this.highLighted.removeClass("dropHighLighted");
-                    }
-                }
-
-                return true
-            },
-            onDrop: function ($item, container, _super, event) {
-
-                $item.removeClass(container.group.options.draggedClass).removeAttr("style");
-                $("body").removeClass(container.group.options.bodyClass);
-                $(container.el).parent().removeClass("dropHighLighted");
-
-                let itemID = $item.attr("entityId");
-                let gameObject = editor.gameObjects[itemID];
-
-                let containerID = $(container.el).parent().attr("entityId");
-                let groupObject = editor.gameObjects[containerID];
-
-                if (groupObject == null) {
-                    if (gameObject.parent != null) {
-                        gameObject.parent.OnRemoveChild(gameObject);
-                    }
-                }else{
-                    groupObject.OnAddChild(gameObject);
-                }
-            }
-        });
-    }
-
-    onSelectedEntity(gameObject) {
-	    if(gameObject === undefined) {
-	        editor.logger.LogError("Failed to select unknown gameobject");
-	        return;
-        }
-        if(editor.selected != null) {
-	        this.onDeselectEntry(editor.selected);
-        }
-        let entry = this.entries[gameObject.guid];
-        entry.dom.addClass("selected");
-    }
-
-    OnDeleteEntry(guid){
-        // $('.spawnedEntities').find("#");
-        let entry = this.entries[guid];
-
-        if (entry == null){
-            console.error("Tried to delete a null entry");
-        }
-        
-        $('.spawnedEntities').find(entry).remove();
-    }
-
-
-    onDeselectEntry(gameObject) {
-	    if(gameObject == null) {
-		    editor.logger.Log(LOGLEVEL.DEBUG, "Failed to deselect unknown gameobject");
-	        return false;
-	    }
-        if(this.entries[gameObject.guid] === undefined) {
-	        editor.logger.Log(LOGLEVEL.DEBUG, "Tried to deselect an entry which doesn't exist.");
-	        return false;
-        }
-        let entry = this.entries[gameObject.guid];
-        entry.dom.removeClass("selected");
-        // editor.OnDeselectEntity(gameObject);
-    }
-
-
-
-    static CollapseGroup(group) {
-        $(group).toggle()
-
-        let parent = $(item.parent());
-        if(parent.hasClass("expanded")) {
-            $(item.parent()).removeClass("expanded");
-            $(item.parent()).addClass("collapsed");
-        } else {
-            $(item.parent()).removeClass("collapsed");
-            $(item.parent()).addClass("expanded");
-        }
-    }
-
-    CreateTopControls() {
-        let controls = $(document.createElement("div"));
-        controls.class = "contentControls";
-
-        let search = $(document.createElement("input"));
-        search.addClass("search-input form-control");
-        controls.append(search);
-
-        controls.append("<button onclick=\"editor.OnCreateGroup()\">+</button>\n" +
-            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>+</button>");
-        return controls;
-    }
-
-    CreateSubControls() {
-        let controls = $(document.createElement("div"));
-
-        controls.append("<button onclick=\"editor.OnCreateGroup()\">New Group</button>\n" +
-            "                    <button onclick='vext.SpawnedEntity(GenerateGuid(), \"31185055-81DD-A2F8-03FF-E0A6AAF960EC\", \"1,0,0,0,1,0,0,0,1,0,0,0\");'>Add Instance</button>");
-        return controls;
-    }
-
-    CreateGroup(guid, name, parent) {
-        let entry = new HierarchyEntry(guid, name, "Group");
-	    this.entries[guid] = entry;
-	    if(this.entries[parent] == undefined) {
-		    this.dom.append(entry.dom);
-	    } else {
-		    this.entries[parent].dom.append(entry.dom);
-	    }
-    }
-    // GUID is missing for child elements. Pow, PLS fix.
-	CreateEntity(guid, name, parent) {
-		let entry = new HierarchyEntry(guid, name, "Entity");
-		this.entries[guid] = entry;
-
-		if(this.entries[parent] == undefined) {
-			this.dom.append(entry.dom);
-		} else {
-			this.entries[parent].children[entry.guid] = entry;
-			this.entries[parent].content.append(entry.dom);
-		}
+		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+		/*signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.setObjectName.add(this.onSetObjectName.bind(this));
+*/
 	}
 
-	DestroyGroup(guid) {
-        if(this.entries[guid] === undefined) {
-            editor.logger.LogError("Failed to destroy group: " + guid);
-            return;
-        }
-        // Delete the children from the array
-        for(let child in this.entries[guid].children) {
-            delete this.entries[child];
-        }
-        // remove the dom
-		this.entries[guid].dom.remove();
-        // delete the blueprint form the array
-        delete this.entries[guid];
+	onSpawnedBlueprint(command) {
+		let scope = this;
+		let parent = command.parent;
+//		scope.dom.jstree(true).create_node("root", new HierarchyEntry(command.guid, command.name, command.type), "last");
+		let entry = new HierarchyEntry(command.guid, command.name, command.type, scope.data.children.length, "root");
+		scope.entries[command.guid] = entry;
+		scope.data.children[scope.data.children.length] = entry;
+
+		scope.dom.jstree(true).refresh();
 	}
 
-    DestroyEntity(guid) {
+	onDestroyedBlueprint(command) {
 
-    }
-    onSpawnedBlueprint(command) {
-    	console.log("Created group")
-	   this.CreateGroup(command.guid, command.name, command.parent);
-	   let scope = this;
-	   for(let key in command.children) {
-	       let child = command.children[key];
-		   scope.CreateEntity(child.guid, child.type, command.guid);
-	   }
-    }
+	}
 
-    onDestroyedBlueprint(command) {
-        this.DestroyGroup(command.guid)
-    }
 
-    onSetObjectName(command) {
-        if(command === undefined || editor.gameObjects[command.guid] === undefined) {
-            return
-        }
-        let entry = this.entries[command.guid];
-        entry.groupTitle.text(command.name);
-    }
+	Initialize() {
+
+		// TODO: Implement node refresh logic here somewhere;
+	}
+
+	CreateDom() {
+		let scope = this;
+		let dom = $(document.createElement("div"));
+		dom.jstree({
+			'core': {
+				'data': this.data,
+				"check_callback" : true
+			},
+			"search": {
+
+				"case_insensitive": true,
+				"show_only_matches" : true
+
+
+			},
+			"plugins": ["search", "dnd"]
+		});
+		// Set data twice so we can update the scope data directly. :shrug:
+		dom.jstree(true).settings.core.data = scope.data;
+		dom.bind(
+			"select_node.jstree", function(evt, data){
+				editor.Select(data.node.id);
+			});
+		dom.bind("move_node.jstree", function (e, data) {
+			scope.onMoved(data);
+		});
+
+		return dom;
+	}
+
+	CreateTopControls() {
+		let scope = this;
+		let dom = $(document.createElement("div"));
+		let searchInput = $(document.createElement("input"));
+		dom.append(searchInput);
+
+		var to = false;
+		searchInput.keyup(function () {
+			if(to) { clearTimeout(to); }
+			to = setTimeout(function () {
+				var v = searchInput.val();
+				scope.dom.jstree(true).search(v);
+			}, 250);
+		});
+
+
+		return dom;
+	}
+	CreateSubControls() {
+		let dom = $(document.createElement("div"));
+		return dom;
+	}
+
+
+	onMoved(nodeData) {
+		// TODO: update data with the changes
+	}
 }
 
 class HierarchyEntry {
-    constructor(guid, name, type) {
-        this.guid = guid;
-        this.name = name;
-        this.type = type;
-
-	    this.title = null;
-        this.expander = null;
-        this.content = null;
-        this.children = {};
-        this.groupTitle = null;
-
-        this.dom = null;
-
-        this.Initialize()
-    }
-
-    Initialize() {
-        let scope = this;
-	    scope.dom = $(document.createElement("li"));
-	    scope.dom.attr("entityId", scope.guid);
-	    scope.dom.attr("entityType", scope.type);
-	    scope.title = $(document.createElement("div"));
-	    scope.title.addClass("title");
-	    scope.dom.append(scope.title);
-
-	    if(scope.type == "Group") {
-		    scope.dom.addClass("group collapsed");
-
-
-		    scope.expander = $(document.createElement("i"));
-		    scope.title.append(scope.expander);
-
-		    scope.groupTitle = $(document.createElement("div"));
-		    scope.groupTitle.addClass("groupTitle");
-		    scope.groupTitle.text(scope.name);
-		    scope.title.append(scope.groupTitle);
-
-		    scope.content = $(document.createElement("ul"));
-		    scope.content.attr("style", "display: none");
-            if(scope.type == "Group") {
-                $(scope.expander).on('click', function () {
-                    $(scope.content).toggle();
-
-                    if ($(scope.dom).hasClass("expanded")) {
-                        $(scope.dom).removeClass("expanded");
-                        $(scope.dom).addClass("collapsed");
-                    } else {
-                        $(scope.dom).removeClass("collapsed");
-                        $(scope.dom).addClass("expanded");
-                    }
-                });
-            }
-		    scope.dom.append(scope.content);
-	    } else {
-		    scope.title.text(scope.name);
-		    scope.dom.addClass("entity");
-	    }
-
-	    $(scope.title).on('click', function () {
-		    editor.Select(scope.guid)
-	    });
-
-
-    }
+	constructor(guid, name, type, position, parent) {
+		this.id = guid;
+		this.text = name;
+		this.icon = type;
+		this.data = {};
+		this.data.position = position;
+		this.data.parent = parent;
+		this.state = {
+			"opened": false,
+			"disabled": false,
+			"selected": false
+		};
+		this.children = [];
+	};
 }
