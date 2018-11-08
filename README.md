@@ -3,6 +3,13 @@ A realtime map editor for Venice Unleashed
 
 **Note: you need to load BlueprintManager too in order to use this mod. https://github.com/Powback/BlueprintManager**
 
+# Branches:
+- history_implementation
+    - Major refactoring
+- vanilla
+    - Testing different vanilla modification implementations
+    
+    
 Controls:
 
 F1 to enable freecam.
