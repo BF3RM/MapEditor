@@ -831,7 +831,87 @@ lm.utils.copy( lm.LayoutManager.prototype, {
 	 * @returns {lm.controls.BrowserPopout}
 	 */
 	createPopout: function( configOrContentItem, dimensions, parentId, indexInParent ) {
-		console.log("bitch");
+		var config = configOrContentItem,
+			isItem = configOrContentItem instanceof lm.items.AbstractContentItem,
+			self = this,
+			windowLeft,
+			windowTop,
+			offset,
+			parent,
+			child,
+			browserPopout;
+
+		parentId = parentId || null;
+
+		if( isItem ) {
+			config = this.toConfig( configOrContentItem ).content;
+			parentId = lm.utils.getUniqueId();
+
+			/**
+			 * If the item is the only component within a stack or for some
+			 * other reason the only child of its parent the parent will be destroyed
+			 * when the child is removed.
+			 *
+			 * In order to support this we move up the tree until we find something
+			 * that will remain after the item is being popped out
+			 */
+			parent = configOrContentItem.parent;
+			child = configOrContentItem;
+			while( parent.contentItems.length === 1 && !parent.isRoot ) {
+				parent = parent.parent;
+				child = child.parent;
+			}
+
+			parent.addId( parentId );
+			if( isNaN( indexInParent ) ) {
+				indexInParent = lm.utils.indexOf( child, parent.contentItems );
+			}
+		} else {
+			if( !( config instanceof Array ) ) {
+				config = [ config ];
+			}
+		}
+
+
+		if( !dimensions && isItem ) {
+			windowLeft = window.screenX || window.screenLeft;
+			windowTop = window.screenY || window.screenTop;
+			offset = configOrContentItem.element.offset();
+
+			dimensions = {
+				left: windowLeft + offset.left,
+				top: windowTop + offset.top,
+				width: configOrContentItem.element.width(),
+				height: configOrContentItem.element.height()
+			};
+		}
+
+		if( !dimensions && !isItem ) {
+			dimensions = {
+				left: window.screenX || window.screenLeft + 20,
+				top: window.screenY || window.screenTop + 20,
+				width: 500,
+				height: 309
+			};
+		}
+
+		if( isItem ) {
+			configOrContentItem.remove();
+		}
+
+		browserPopout = new lm.controls.BrowserPopout( config, dimensions, parentId, indexInParent, this );
+
+		browserPopout.on( 'initialised', function() {
+			self.emit( 'windowOpened', browserPopout );
+		} );
+
+		browserPopout.on( 'closed', function() {
+			self._$reconcilePopoutWindows();
+		} );
+
+		this.openPopouts.push( browserPopout );
+
+		return browserPopout;
 	},
 
 	/**

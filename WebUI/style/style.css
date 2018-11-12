@@ -320,3 +320,34 @@ input::-webkit-inner-spin-button {
     margin-bottom: 5px;
     width: 100%;
 }
+
+#GoldenLayoutContainer {
+    height: 100%;
+    width: 100%;
+}
+
+.lm_goldenlayout {
+    background: transparent!important;
+}
+
+.lm_header {
+    background-color: #000;
+}
+
+#GoldenLayoutContainer {
+    pointer-events: none;
+}
+
+.lm_item .lm_stack, .lm_splitter {
+    pointer-events: auto;
+}
+
+.viewPort {
+    background: none!important;
+    pointer-events: none;
+}
+
+.viewPort * {
+    background: none!important;
+    pointer-events: none;
+}

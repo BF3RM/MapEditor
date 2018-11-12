@@ -17,6 +17,7 @@ class UI {
 		this.windowZ = 1;
 		this.debug = debug;
 
+		this.layout = null;
 		this.InitializeWindows();
 	}
 
@@ -48,14 +49,92 @@ class UI {
 
 	InitializeWindows() {
         let page = $('#page');
-		this.windows = {
+		/*this.windows = {
             'inspector': new PowWindow("inspector", "Inspector", this.inspector),
 			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
 			'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
 
 
+		};*/
+
+		let config = {
+			settings:{
+				hasHeaders: true,
+				constrainDragToContainer: true,
+				reorderEnabled: true,
+				selectionEnabled: false,
+				popoutWholeStack: false,
+				blockedPopoutsThrowError: true,
+				closePopoutsOnUnload: true,
+				showPopoutIcon: false,
+				showMaximiseIcon: true,
+				showCloseIcon: true
+			},
+			dimensions: {
+				borderWidth: 5,
+				minItemHeight: 10,
+				minItemWidth: 10,
+				headerHeight: 20,
+				dragProxyWidth: 300,
+				dragProxyHeight: 200
+			},
+			labels: {
+				close: 'close',
+				maximise: 'maximise',
+				minimise: 'minimise',
+				popout: 'open in new window'
+			},
+			content: [{
+				type: 'row',
+				content:[{
+					type: 'column',
+					content:[{
+						type: 'row',
+						width: 10,
+						content:[
+							{
+								type: 'column',
+								content: [{
+									type: 'component',
+									componentName: 'example',
+									title: "Hierarchy",
+								},{
+									type: 'component',
+									componentName: 'example',
+									title: "Inspector",
+								}
+							]
+					},
+						{
+							type: 'component',
+							componentName: 'ViewPortComponent',
+							width: 90,
+							isClosable: false,
+							reorderEnabled: false,
+							title:"ViewPort",
+							header : {
+								show: false
+							},
+							id: "renderView"
+						}]
+					},{
+						type: 'component',
+						componentName: 'example',
+						title: "Data Browser",
+						height: 20
+					}]
+				}]
+			}]
 		};
 
+		this.layout = new GoldenLayout( config, "#GoldenLayoutContainer" );
+
+
+		this.layout.registerComponent( 'example', function( container, state ){
+			container.getElement().html( '<h2>' + state.text + '</h2>');
+		}), this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
+
+		this.layout.init();
 		if(this.debug === true) {
 			//this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
 		}
