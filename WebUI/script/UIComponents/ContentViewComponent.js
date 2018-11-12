@@ -4,7 +4,4 @@ var ContentViewComponent = function( container, state ) {
 	this.element = new ContentView();
 
 	this._container.getElement().html(this.element.dom);
-	this._container.getElement().parents().attr('id', 'inspector');
-
-
 };

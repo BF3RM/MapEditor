@@ -83,7 +83,11 @@ class TreeView {
 				}
 			},
 			'core': {
-				'data': [this.data]
+				'data': [this.data],
+				"themes": {
+					"dots": false,
+					"icons": true
+				},
 			}
 		});
 	}
