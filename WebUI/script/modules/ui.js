@@ -5,9 +5,6 @@ class UI {
 		this.dialogs = this.InitializeDialogs();
 
 
-		this.hierarchy = new Hierarchy();
-		this.treeView =  new TreeView();
-		this.inspector = new Inspector();
 		
 		if (debug==true) {
 			this.debugWindow = new DebugWindow();
@@ -19,6 +16,7 @@ class UI {
 
 		this.layout = null;
 		this.InitializeWindows();
+
 	}
 
 
@@ -96,11 +94,11 @@ class UI {
 								type: 'column',
 								content: [{
 									type: 'component',
-									componentName: 'example',
+									componentName: 'HierarchyComponent',
 									title: "Hierarchy",
 								},{
 									type: 'component',
-									componentName: 'example',
+									componentName: 'InspectorComponent',
 									title: "Inspector",
 								}
 							]
@@ -108,7 +106,7 @@ class UI {
 						{
 							type: 'component',
 							componentName: 'ViewPortComponent',
-							width: 90,
+							width: 85,
 							isClosable: false,
 							reorderEnabled: false,
 							title:"ViewPort",
@@ -119,7 +117,7 @@ class UI {
 						}]
 					},{
 						type: 'component',
-						componentName: 'example',
+						componentName: 'TreeViewComponent',
 						title: "Data Browser",
 						height: 20
 					}]
@@ -132,7 +130,12 @@ class UI {
 
 		this.layout.registerComponent( 'example', function( container, state ){
 			container.getElement().html( '<h2>' + state.text + '</h2>');
-		}), this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
+		});
+
+		this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
+		this.layout.registerComponent( 'HierarchyComponent', HierarchyComponent);
+		this.layout.registerComponent( 'InspectorComponent', InspectorComponent);
+		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
 
 		this.layout.init();
 		if(this.debug === true) {
