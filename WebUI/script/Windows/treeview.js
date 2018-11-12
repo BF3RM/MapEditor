@@ -55,6 +55,7 @@ class TreeView {
         scope.data = data;
         scope.InitializeTree();
         scope.RegisterEvents();
+        signals.folderSelected.dispatch(data.content);
 	}
 
 	InitializeTree() {
