@@ -2,6 +2,8 @@ let Signal = signals.Signal;
 var signals = {
 
     // Object actions
+	windowResized: new Signal(),
+
     spawnBlueprintRequested: new Signal(),
 
     spawnedBlueprint: new Signal(),

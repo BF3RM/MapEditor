@@ -341,3 +341,6 @@ class Editor {
 		this.history.redo();
 	}
 }
+window.addEventListener('resize', function () {
+	signals.windowResized.dispatch()
+});
