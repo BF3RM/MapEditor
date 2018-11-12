@@ -331,7 +331,7 @@ input::-webkit-inner-spin-button {
 }
 
 .lm_header {
-    background-color: #000;
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 #GoldenLayoutContainer {
@@ -358,11 +358,15 @@ input::-webkit-inner-spin-button {
 
 .lm_content {
     overflow: scroll!important;
-    color: #555;
+    color: #999;
 }
 
 .lm_header .lm_tab.lm_active {
     border-bottom: none;
     box-shadow: none!important;
     padding-bottom: 3px;
+}
+
+.lm_content {
+    background: rgba(34, 34, 34, 0.8);
 }
