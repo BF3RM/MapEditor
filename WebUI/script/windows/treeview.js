@@ -55,6 +55,7 @@ class TreeView {
         scope.data = data;
         scope.InitializeTree();
         scope.RegisterEvents();
+        signals.folderSelected.dispatch(data.content);
 	}
 
 	InitializeTree() {
@@ -83,7 +84,11 @@ class TreeView {
 				}
 			},
 			'core': {
-				'data': [this.data]
+				'data': [this.data],
+				"themes": {
+					"dots": false,
+					"icons": true
+				},
 			}
 		});
 	}
@@ -104,10 +109,8 @@ class TreeView {
 			}
 			console.log(data.node);
 			let folderContent = data.node.original.content;
-			if(folderContent.length !== 0) {
-				console.log(folderContent);
-				signals.folderSelected.dispatch(folderContent);
-			}
+			console.log(folderContent);
+			signals.folderSelected.dispatch(folderContent);
 			/*let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
@@ -128,4 +131,11 @@ class TreeView {
 	}
 }
 
+var TreeViewComponent = function( container, state ) {
+	this._container = container;
+	this._state = state;
+	this.element = new TreeView();
 
+	this._container.getElement().html(this.element.dom);
+
+};

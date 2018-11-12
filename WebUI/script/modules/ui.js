@@ -17,6 +17,8 @@ class UI {
 		this.layout = null;
 		this.InitializeWindows();
 
+		signals.windowResized.add(this.onResize.bind(this));
+
 	}
 
 
@@ -410,6 +412,10 @@ class UI {
 		$(this).dialog("close");
 	}
 
+
+	onResize() {
+		this.layout.updateSize();
+	}
 }
 
 /*

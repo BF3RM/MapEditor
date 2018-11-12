@@ -20,8 +20,8 @@ class ContentView {
 		this.directory.html("");
 		this.directory.append(`
 			<tr>
-				<th>name</th>
-				<th>type</th>
+				<th><b>Name</b></th>
+				<th><b>Type</b></th>
 			</tr>
 		`);
 		for(let i = 0; i < content.length; i++) {
@@ -42,3 +42,10 @@ class ContentView {
 		}
 	}
 }
+var ContentViewComponent = function( container, state ) {
+	this._container = container;
+	this._state = state;
+	this.element = new ContentView();
+
+	this._container.getElement().html(this.element.dom);
+};
