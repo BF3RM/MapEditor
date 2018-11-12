@@ -109,10 +109,8 @@ class TreeView {
 			}
 			console.log(data.node);
 			let folderContent = data.node.original.content;
-			if(folderContent.length !== 0) {
-				console.log(folderContent);
-				signals.folderSelected.dispatch(folderContent);
-			}
+			console.log(folderContent);
+			signals.folderSelected.dispatch(folderContent);
 			/*let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
