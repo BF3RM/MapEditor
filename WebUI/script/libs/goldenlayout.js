@@ -899,16 +899,6 @@ lm.utils.copy( lm.LayoutManager.prototype, {
 			configOrContentItem.remove();
 		}
 
-		browserPopout = new lm.controls.BrowserPopout( config, dimensions, parentId, indexInParent, this );
-
-		browserPopout.on( 'initialised', function() {
-			self.emit( 'windowOpened', browserPopout );
-		} );
-
-		browserPopout.on( 'closed', function() {
-			self._$reconcilePopoutWindows();
-		} );
-
 		this.openPopouts.push( browserPopout );
 
 		return browserPopout;

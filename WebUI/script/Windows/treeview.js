@@ -17,7 +17,8 @@ class TreeView {
 				"opened": true,
 				"selected": true,
 			},
-			"children": []
+			"children": [],
+			"content": []
 		};
 		//TODO: Make sure this works after the new blueprint shit.
 		for (let key in table) {
@@ -32,7 +33,8 @@ class TreeView {
                     let a = parentPath.children.push({
 						"type": "folder",
 						"text": subPath,
-						"children": []
+						"children": [],
+	                    "content": []
 					});
 					parentPath = parentPath.children[a - 1];
 				} else {
@@ -44,7 +46,7 @@ class TreeView {
 					}
 				}
 			});
-			parentPath.children.push({
+			parentPath.content.push({
 				"type": "file",
 				"text": fileName,
 				"id": key
@@ -100,11 +102,18 @@ class TreeView {
 			if (data.node == null) {
 				return
 			}
-			let id = data.node.original.id;
+			console.log(data.node);
+			let folderContent = data.node.original.content;
+			if(folderContent.length !== 0) {
+				console.log(folderContent);
+				signals.folderSelected.dispatch(folderContent);
+			}
+			/*let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
 				signals.spawnBlueprintRequested.dispatch(blueprint);
 			}
+			*/
 		})
 	}
 	CreateControls() {

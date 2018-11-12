@@ -11,7 +11,7 @@ var signals = {
     deselectedEntity: new Signal(),
 
     setTransform: new Signal(),
-
+    folderSelected: new Signal(),
 
     objectMoveStarted: new Signal(),
     objectMoved: new Signal(),

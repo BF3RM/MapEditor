@@ -55,8 +55,9 @@ class UI {
 
 		};*/
 
-		let config = {
-			settings:{
+		let config;
+		config = {
+			settings: {
 				hasHeaders: true,
 				constrainDragToContainer: true,
 				reorderEnabled: true,
@@ -64,7 +65,7 @@ class UI {
 				popoutWholeStack: false,
 				blockedPopoutsThrowError: true,
 				closePopoutsOnUnload: true,
-				showPopoutIcon: false,
+				showPopoutIcon: true,
 				showMaximiseIcon: true,
 				showCloseIcon: true
 			},
@@ -84,43 +85,49 @@ class UI {
 			},
 			content: [{
 				type: 'row',
-				content:[{
+				content: [{
 					type: 'column',
-					content:[{
+					content: [{
 						type: 'row',
 						width: 10,
-						content:[
-							{
-								type: 'column',
-								content: [{
-									type: 'component',
-									componentName: 'HierarchyComponent',
-									title: "Hierarchy",
-								},{
-									type: 'component',
-									componentName: 'InspectorComponent',
-									title: "Inspector",
-								}
-							]
-					},
-						{
-							type: 'component',
-							componentName: 'ViewPortComponent',
-							width: 85,
-							isClosable: false,
-							reorderEnabled: false,
-							title:"ViewPort",
-							header : {
-								show: false
+						content: [{
+							type: 'column',
+							content: [{
+								type: 'component',
+								componentName: 'HierarchyComponent',
+								title: "Hierarchy",
+							}, {
+								type: 'component',
+								componentName: 'InspectorComponent',
+								title: "Inspector",
+							},{
+								type: 'component',
+								componentName: 'TreeViewComponent',
+								title: "Data Browser",
+								height: 20,
+								width: 20
 							},
-							id: "renderView"
-						}]
-					},{
-						type: 'component',
-						componentName: 'TreeViewComponent',
-						title: "Data Browser",
-						height: 20
-					}]
+								{
+									type: 'component',
+									componentName: 'ContentViewComponent',
+									title: "Data",
+									height: 20
+								}]
+						},
+							{
+								type: 'component',
+								componentName: 'ViewPortComponent',
+								width: 85,
+								isClosable: false,
+								reorderEnabled: false,
+								title: "ViewPort",
+								header: {
+									show: false
+								},
+								id: "renderView"
+							}
+						]
+					}					]
 				}]
 			}]
 		};
@@ -136,6 +143,7 @@ class UI {
 		this.layout.registerComponent( 'HierarchyComponent', HierarchyComponent);
 		this.layout.registerComponent( 'InspectorComponent', InspectorComponent);
 		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
+		this.layout.registerComponent( 'ContentViewComponent', ContentViewComponent);
 
 		this.layout.init();
 		if(this.debug === true) {

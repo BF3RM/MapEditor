@@ -370,3 +370,9 @@ input::-webkit-inner-spin-button {
 .lm_content {
     background: rgba(34, 34, 34, 0.8);
 }
+
+th, td {
+    text-align: left;
+    padding-left: 10px;
+}
+
