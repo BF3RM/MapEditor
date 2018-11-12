@@ -109,6 +109,8 @@ class Hierarchy {
 
 
 	onMoved(nodeData) {
+		let scope = this;
+//		scope.data =
 		// TODO: update data with the changes
 	}
 }

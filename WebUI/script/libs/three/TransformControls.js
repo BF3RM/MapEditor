@@ -610,9 +610,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 THREE.TransformControls.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-  constructor: THREE.TransformControls,
+	constructor: THREE.TransformControls,
 
-  isTransformControls: true
+	isTransformControls: true
 
 } );
 
