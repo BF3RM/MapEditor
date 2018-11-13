@@ -27,6 +27,9 @@ function MapEditorClient:RegisterEvents()
 
     self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
+    self.m_EngineUpdateEvent = Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
+
+
 	-- WebUI events
     Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
     Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
@@ -62,6 +65,9 @@ end
 function MapEditorClient:OnUpdateInput(p_Delta)
 	m_Freecam:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
+end
+function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
+    m_Editor:OnUpdatePass(p_Delta, p_Pass)
 end
 function MapEditorClient:OnLevelDestroy()
     print("Destroy!")

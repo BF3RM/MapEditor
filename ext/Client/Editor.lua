@@ -25,6 +25,8 @@ function Editor:RegisterVars()
     self.m_Messages = {
         MoveObjectMessage = self.MoveObject
     }
+
+    self.m_Queue = {};
 end
 
 function Editor:RegisterEvents()
@@ -65,6 +67,20 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 
 	self:Raycast()
 end
+function Editor:OnUpdatePass(p_Delta, p_Pass)
+    if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
+        return
+    end
+
+    for k,l_Command in ipairs(self.m_Queue) do
+        l_Command.queued = true
+        print("Executing command delayed: " .. l_Command.type)
+        self:OnReceiveCommand(json.encode(l_Command))
+    end
+    if(#self.m_Queue > 0) then
+        self.m_Queue = {}
+    end
+end
 
 function Editor:OnReceiveCommand(p_Command)
     local s_Command = self:DecodeParams(json.decode(p_Command))
@@ -77,6 +93,10 @@ function Editor:OnReceiveCommand(p_Command)
     if(s_Response == false) then
         -- TODO: Handle errors
         print("error")
+        return
+    end
+    if(s_Response == "queued") then
+        print("Queued command")
         return
     end
     WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
@@ -152,7 +172,15 @@ function Editor:SpawnBlueprint(p_Command)
     return s_Response
 end
 
-function Editor:DestroyEntity(p_Command)
+function Editor:DestroyBlueprint(p_Command)
+
+    --TODO: not hack this
+    if(p_Command.queued == nil) then
+        table.insert(self.m_Queue, p_Command)
+        return "queued";
+    end
+
+
 
     local s_Result = m_ClientEntityManager:DestroyEntity(p_Command.guid)
 
@@ -161,7 +189,7 @@ function Editor:DestroyEntity(p_Command)
     end
     local s_Response = {
         type = "DestroyedBlueprint",
-        guid =  s_Command.guid
+        guid =  p_Command.guid
     }
 
     return s_Response
@@ -325,8 +353,11 @@ function Editor:DecodeParams(p_Table)
 end
 
 function Editor:EncodeParams(p_Table)
+    if(p_Table == nil) then
+        error("Passed a nil table?!")
+    end
 	for s_Key, s_Value in pairs(p_Table) do
-		if s_Key == 'transform' then		
+		if s_Key == 'transform' then
 			p_Table[s_Key] = tostring(s_Value)
 
 		elseif type(s_Value) == "table" then

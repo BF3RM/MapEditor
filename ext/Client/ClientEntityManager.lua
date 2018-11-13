@@ -14,10 +14,15 @@ function ClientEntityManager:RegisterEvents()
 
 end
 function ClientEntityManager:GetEntityByGuid(p_Guid)
-    return self.m_SpawnedEntities[p_Guid]
+    if(self.m_SpawnedEntities[p_Guid] ~= nil) then
+        return self.m_SpawnedEntities[p_Guid]
+
+    else
+       return false
+    end
 end
 function ClientEntityManager:Clear()
-    self.m_SpawnedEntities:Clear()
+    self.m_SpawnedEntities:clear()
 end
 
 
@@ -73,7 +78,7 @@ function ClientEntityManager:DestroyEntity(p_Guid)
 
     local s_Entities = self:GetEntityByGuid(p_Guid)
 
-    if(#s_Entities == 0 or s_Entities == false) then
+    if(s_Entities == false or #s_Entities == 0) then
         print("Failed to get entities")
         return false
     end
