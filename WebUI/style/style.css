@@ -76,9 +76,10 @@ li {
 	top: 0;
 	width: 100%;
 	height: 30px;
-	background-color: #000;
+	background-color: rgba(34, 34, 34, 0.8);
     display: flex;
     justify-content: space-between;
+    border-bottom: 2px solid black;
 }
 div#worldSpace {
     margin-left: 10px;
@@ -119,7 +120,7 @@ button#playButton {
     line-height: 21px;
     margin-left: 10px;
 }
-#menubar.ui-menu { list-style:none; padding: 2px; margin: 0; display:block; outline: none; }
+#menubar.ui-menu { list-style:none; padding: 2px; margin: 0; display:block; outline: none; background-color: rgba(34, 34, 34, 0.8); color: #999; }
 #menubar.ui-menu .ui-menu { margin-top: -3px; position: absolute; display: grid;}
 #menubar.ui-menu .ui-menu-item {
     display: inline-block;
@@ -378,4 +379,44 @@ th, td {
 
 b {
     font-weight: bold;
+}
+
+/*toolbar*/
+
+.ui-widget-content {
+    /*border: 0;*/
+    background-color: rgba(34, 34, 34, 0.8);
+    color: #999;
+}
+
+.ui-widget.ui-widget-content {
+    border: 0;
+    background-color: 0;
+}
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited, a.ui-button, a:link.ui-button, a:visited.ui-button, .ui-button {
+    color: #999;
+    text-decoration: none;
+    background-color: rgba(34, 34, 34, 0.8);
+    border: 0;
+    margin: 0;
+    border-radius: 0;
+}
+.ui-button:hover,  {
+    color: #999;
+    text-decoration: none;
+    background-color: rgba(140, 140, 140, 0.8);
+    border: 0;
+    margin: 0;
+    border-radius: 0;
+}
+
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+    border: 1px solid #003eff;
+    background-color: #007fff;
+    font-weight: normal;
+    color: #fff;
+    border-radius: 0;
+    border: 0;
+    margin: 0;
 }
