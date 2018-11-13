@@ -22,7 +22,7 @@ function ClientEntityManager:GetEntityByGuid(p_Guid)
     end
 end
 function ClientEntityManager:Clear()
-    self.m_SpawnedEntities:clear()
+    self.m_SpawnedEntities = {}
 end
 
 
