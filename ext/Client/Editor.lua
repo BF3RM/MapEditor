@@ -4,8 +4,8 @@ local m_ClientEntityManager = require "ClientEntityManager"
 local m_InstanceParser = require "InstanceParser"
 
 
-local MAX_CAST_DISTANCE = 1000
-local FALLBACK_DISTANCE = 1000
+local MAX_CAST_DISTANCE = 10000
+local FALLBACK_DISTANCE = 10000
 
 function Editor:__init()
 	print("Initializing Editor")
@@ -152,21 +152,13 @@ function Editor:SpawnBlueprint(p_Command)
     return s_Response
 end
 
-function Editor:DestroyBlueprint(p_Command)
-    local s_Entities = m_ClientEntityManager:GetEntityByGuid(p_Command.guid)
-    if(#s_Entities == 0 or s_Entities == false) then
-        print("Failed to get entities")
-        return false
-    end
-    for i, entity in pairs(s_Entities) do
-        if entity ~= nil then
-            print(entity.typeInfo.name)
-            print("destroying")
-            entity:Destroy()
-            print("destroyed")
-        end
-    end
+function Editor:DestroyEntity(p_Command)
 
+    local s_Result = m_ClientEntityManager:DestroyEntity(p_Command.guid)
+
+    if(s_Result == false) then
+        print("Failed to destroy entity: " .. p_Command.guid)
+    end
     local s_Response = {
         type = "DestroyedBlueprint",
         guid =  s_Command.guid

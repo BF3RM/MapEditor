@@ -67,8 +67,10 @@ class VEXTInterface {
 		}
 		if(emulator) {
 			let scope = this;
-			// delay to simulate transmission time and execution order
+			// delay to simulate tick increase.
+			setTimeout(async function() {
 				scope.commands[command.type](command)
+			}, 1);
 		} else {
 			this.commands[command.type](command);
 		}

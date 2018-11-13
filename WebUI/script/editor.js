@@ -36,7 +36,7 @@ class Editor {
 
 		 */
         this.playerName = null;
-        this.selected = [];
+        this.selected = null;
         this.raycastTransform = new LinearTransform();
         this.s2wTransform = new LinearTransform();
 
@@ -259,12 +259,13 @@ class Editor {
 		}
 
 
+		gameObject.visible = false;
 
 		this.gameObjects[command.guid] = gameObject;
 
-	//	if(command.sender === this.playerName) {
-	//		this.Select(command.guid)
-	//	}
+		if(command.sender === this.playerName) {
+			this.Select(command.guid)
+		}
 	}
 
 	onObjectChanged(object) {
@@ -273,7 +274,7 @@ class Editor {
 
 	Select(guid) {
     	//TODO: Support multiple shit
-    	if($.inArray(guid, this.selected) !== -1) {
+		if((this.selected != null && this.selected.guid == guid) || $.inArray(guid, this.selected) !== -1) {
     		console.log("Selected the same item");
 			return;
     	}
@@ -288,6 +289,9 @@ class Editor {
 			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
+		if(scope.selected !== null)
+		    scope.selected.onDeselected();
+
 	    scope.selected = gameObject;
 
 		//TODO: make this not ugly.

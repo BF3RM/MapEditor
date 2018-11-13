@@ -17,7 +17,7 @@ function ClientEntityManager:GetEntityByGuid(p_Guid)
     return self.m_SpawnedEntities[p_Guid]
 end
 function ClientEntityManager:Clear()
-    self.m_SpawnedEntities:clear()
+    self.m_SpawnedEntities:Clear()
 end
 
 
@@ -67,6 +67,28 @@ function ClientEntityManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceG
 	self.m_SpawnedEntities[p_Guid] = s_ObjectEntities
 
 	return s_ObjectEntities
+end
+
+function ClientEntityManager:DestroyEntity(p_Guid)
+
+    local s_Entities = self:GetEntityByGuid(p_Guid)
+
+    if(#s_Entities == 0 or s_Entities == false) then
+        print("Failed to get entities")
+        return false
+    end
+
+    self.m_SpawnedEntities[p_Guid] = nil;
+
+    for i, entity in pairs(s_Entities) do
+        if entity ~= nil then
+            print(entity.typeInfo.name)
+            print("destroying")
+            entity:Destroy()
+            print("destroyed")
+        end
+    end
+    return true
 end
 
 function ClientEntityManager:SetTransform(p_Guid, p_LinearTransform)

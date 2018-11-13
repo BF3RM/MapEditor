@@ -127,10 +127,10 @@ class GameObject extends THREE.Object3D
     }
 
     onSelected() {
-
+	    this.visible = true;
     }
     onDeselected() {
-
+		this.visible = false;
     }
 
 }

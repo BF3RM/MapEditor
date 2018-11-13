@@ -21,6 +21,8 @@ class Hierarchy {
 		this.entries = [];
 		this.entries["root"] = this.data;
 
+		this.selected = this.entries["root"];
+
 		this.dom = this.CreateDom();
 		this.topControls = this.CreateTopControls();
 		this.subControls = this.CreateSubControls();
@@ -28,8 +30,8 @@ class Hierarchy {
 
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		/*signals.selectedEntity.add(this.onSelectedEntity.bind(this));
-		signals.setObjectName.add(this.onSetObjectName.bind(this));
+		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		/*signals.setObjectName.add(this.onSetObjectName.bind(this));
 */
 	}
 
@@ -41,7 +43,12 @@ class Hierarchy {
 		scope.entries[command.guid] = entry;
 		scope.data.children[scope.data.children.length] = entry;
 
-		scope.dom.jstree(true).refresh();
+		scope.dom.jstree(true).create_node('#' ,  entry, "last", function(){
+		});
+	}
+
+	getEntry(guid) {
+		return this.entries[guid];
 	}
 
 	onDestroyedBlueprint(command) {
@@ -59,23 +66,22 @@ class Hierarchy {
 		let dom = $(document.createElement("div"));
 		dom.jstree({
 			'core': {
-				'data': this.data,
-				"check_callback" : true
+				data: this.data,
+				check_callback : true
 			},
-			"search": {
-
-				"case_insensitive": true,
-				"show_only_matches" : true
-
-
+			search: {
+				case_insensitive: true,
+				show_only_matches : true
 			},
-			"plugins": ["search", "dnd"]
+			plugins: ["search", "dnd"]
 		});
 		// Set data twice so we can update the scope data directly. :shrug:
 		dom.jstree(true).settings.core.data = scope.data;
 		dom.bind(
 			"select_node.jstree", function(evt, data){
-				editor.Select(data.node.id);
+				if(scope.selected.id !== data.node.id) {
+					editor.Select(data.node.id);
+				}
 			});
 		dom.bind("move_node.jstree", function (e, data) {
 			scope.onMoved(data);
@@ -112,6 +118,13 @@ class Hierarchy {
 		let scope = this;
 //		scope.data =
 		// TODO: update data with the changes
+	}
+
+	onSelectedEntity(command) {
+
+		this.dom.jstree('deselect_node', this.selected);
+		this.dom.jstree('select_node', command.guid);
+		this.selected = this.getEntry(command.guid);
 	}
 }
 
