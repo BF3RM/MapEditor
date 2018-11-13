@@ -87,52 +87,53 @@ class UI {
 			},
 			content: [{
 				type: 'row',
+				width: 10,
 				content: [{
 					type: 'column',
 					content: [{
-						type: 'row',
-						width: 10,
+						type: 'component',
+						componentName: 'InspectorComponent',
+						title: "Inspector",
+						height: 25
+					},
+						{
+							type: 'component',
+							componentName: 'HierarchyComponent',
+							title: "Hierarchy",
+						}
+					]
+				},
+					{
+						type: 'component',
+						componentName: 'ViewPortComponent',
+						width: 75,
+						isClosable: false,
+						reorderEnabled: false,
+						title: "ViewPort",
+						header: {
+							show: false
+						},
+						id: "renderView"
+					}, {
+						type: 'column',
 						content: [{
-							type: 'column',
-							content: [{
-								type: 'component',
-								componentName: 'HierarchyComponent',
-								title: "Hierarchy",
-							}, {
-								type: 'component',
-								componentName: 'InspectorComponent',
-								title: "Inspector",
-							},{
-								type: 'component',
-								componentName: 'TreeViewComponent',
-								title: "Data Browser",
-								height: 20,
-								width: 20
-							},
-								{
-									type: 'component',
-									componentName: 'ContentViewComponent',
-									title: "Data",
-									height: 20
-								}]
+							type: 'component',
+							componentName: 'TreeViewComponent',
+							title: "Data Browser",
 						},
 							{
 								type: 'component',
-								componentName: 'ViewPortComponent',
-								width: 85,
-								isClosable: false,
-								reorderEnabled: false,
-								title: "ViewPort",
-								header: {
-									show: false
-								},
-								id: "renderView"
+								componentName: 'ContentViewComponent',
+								title: "Data",
+								height: 30
 							}
 						]
-					}					]
-				}]
+					}
+
+				]
 			}]
 		};
+
 
 		this.layout = new GoldenLayout( config, "#GoldenLayoutContainer" );
 
