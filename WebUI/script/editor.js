@@ -295,6 +295,8 @@ class Editor {
 	    scope.selected = gameObject;
 
 		//TODO: make this not ugly.
+
+		//UnUglify()
 	    gameObject.onSelected();
 		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
 	}

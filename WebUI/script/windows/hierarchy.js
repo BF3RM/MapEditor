@@ -42,9 +42,9 @@ class Hierarchy {
 		let entry = new HierarchyEntry(command.guid, command.name, command.type, scope.data.children.length, "root");
 		scope.entries[command.guid] = entry;
 		scope.data.children[scope.data.children.length] = entry;
-
 		scope.dom.jstree(true).create_node('#' ,  entry, "last", function(){
 		});
+
 	}
 
 	getEntry(guid) {
@@ -52,7 +52,16 @@ class Hierarchy {
 	}
 
 	onDestroyedBlueprint(command) {
+		let scope = this;
+		let parent = command.parent;
 
+		//TODO: remove parent's reference in parent.children once groups are implemented
+
+		let node = scope.dom.jstree(true).get_node(command.guid);
+		if (node !== null || node != undefined){
+			scope.dom.jstree(true).delete_node(node);
+		}
+		
 	}
 
 
