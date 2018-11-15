@@ -61,34 +61,34 @@ class TreeView {
 	InitializeTree() {
 		let scope = this;
         scope.tree = $(scope.dom).jstree({
-			"types": {
-				"folder": {
-					"icon": "jstree-folder"
-				},
-				"file": {
-					"icon": "jstree-file"
-				}
-			},
-			"plugins": ["types", "sort", "json_data", "search"],
-			"search": {
-				"case_insensitive": true,
-				"show_only_matches": true
-			},
-			"sort": function(a, b) {
-				let a1 = this.get_node(a);
-				let b1 = this.get_node(b);
-				if (a1.icon == b1.icon) {
-					return (a1.text.toLowerCase() > b1.text.toLowerCase()) ? 1 : -1;
-				} else {
-					return (a1.icon < b1.icon) ? 1 : -1;
-				}
-			},
-			'core': {
-				'data': [this.data],
-				"themes": {
-					"dots": false,
-					"icons": true
-				},
+	        types: {
+		        folder: {
+			        icon: 'jstree-folder'
+		        },
+		        file: {
+			        icon: 'jstree-file'
+		        }
+	        },
+	        plugins: ["types", "sort", "json_data", "search"],
+	        search: {
+		        case_insensitive: true,
+		        show_only_matches: true
+	        },
+	        sort: function(a, b) {
+		        let a1 = this.get_node(a);
+		        let b1 = this.get_node(b);
+		        if (a1.icon == b1.icon) {
+			        return (a1.text.toLowerCase() > b1.text.toLowerCase()) ? 1 : -1;
+		        } else {
+			        return (a1.icon < b1.icon) ? 1 : -1;
+		        }
+	        },
+	        core: {
+		        data: [this.data],
+		        themes: {
+			        dots: false,
+			        icons: true
+		        },
 			}
 		});
 	}
