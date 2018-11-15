@@ -102,7 +102,9 @@ class Hierarchy {
 	CreateTopControls() {
 		let scope = this;
 		let dom = $(document.createElement("div"));
+		dom.addClass("contentControls");
 		let searchInput = $(document.createElement("input"));
+		searchInput.attr("placeholder", "Search");
 		dom.append(searchInput);
 
 		var to = false;
@@ -159,6 +161,7 @@ var HierarchyComponent = function( container, state ) {
 	this._state = state;
 	this.element = new Hierarchy();
 
-	this._container.getElement().html(this.element.dom);
+	this._container.getElement().append(this.element.topControls);
+	this._container.getElement().append(this.element.dom);
 
 };

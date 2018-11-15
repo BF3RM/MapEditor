@@ -21,8 +21,8 @@ class Editor {
 
 		this.debug = debug;
         this.logger = new Logger(LOGLEVEL.VERBOSE);
-		this.ui = new UI(debug);
 		this.webGL = new WebGL();
+		this.ui = new UI(debug);
 		this.vext = new VEXTInterface();
         this.history = new History(this);
         this.blueprintManager = new BlueprintManager();

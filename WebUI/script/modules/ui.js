@@ -140,7 +140,9 @@ class UI {
 			}]
 		};
 
-
+		let dom = $(document.createElement("div"));
+		dom.attr('id', "GoldenLayoutContainer");
+		page.append(dom);
 		this.layout = new GoldenLayout( config, "#GoldenLayoutContainer" );
 
 
@@ -156,19 +158,7 @@ class UI {
 		this.layout.registerComponent( 'HistoryComponent', HistoryComponent);
 
 		this.layout.init();
-		if(this.debug === true) {
-			//this.windows['debug'] = new PowWindow("debug", "Debug", this.debugWindow);
-		}
 
-		let offset = 30;
-        $.each(this.windows, function() {
-            page.append(this.dom);
-            this.dom.css({
-                "top": offset + "px",
-                "left": offset + "px"
-            });
-            offset += 30;
-        });
 
 	}
 
@@ -456,7 +446,6 @@ function isFloat(n){
 function handleMouse(event) {
   // Mouse down, we want to set the target input, set the down flag and initial position
   if (event.type == "mousedown") {
-    $('#page').find('canvas').css("z-index", -1);
 
     // Get the input element sibling to the clicked label
     inputEl = event.target.nextElementSibling;
@@ -470,7 +459,6 @@ function handleMouse(event) {
   else if (event.type == "mouseup") {
     mouse.down = false;
     $(inputEl).trigger('change');
-    $('#page').find('canvas').css("z-index", 0);
 
   }
 }

@@ -200,9 +200,7 @@ canvas {
     top: 0;
     pointer-events: auto;
 }
-#page div {
-	z-index: 1;
-}
+
 #toolbar div {
     z-index: 2147483647;
 }
@@ -372,6 +370,7 @@ input::-webkit-inner-spin-button {
     background: rgba(34, 34, 34, 0.8);
 }
 
+
 th, td {
     text-align: left;
     padding-left: 10px;
@@ -427,4 +426,15 @@ b {
 
 ul.historyWindow li:nth-child(odd) {
     background-color: #0000001a;
+}
+
+.contentControls input {
+    width: 100%;
+}
+
+input {
+    background-color: #292a2a;
+    border: none;
+    padding: 5px;
+    color: #858585;
 }

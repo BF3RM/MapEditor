@@ -121,10 +121,11 @@ class TreeView {
 	}
 	CreateControls() {
 		let controls = $(document.createElement("div"));
-		controls.class = "contentControls";
+		controls.addClass("contentControls");
 
 		let search = $(document.createElement("input"));
 		search.addClass("search-input form-control");
+		search.attr("placeholder", "Search");
 		controls.append(search);
 
 		return controls;
@@ -136,6 +137,7 @@ var TreeViewComponent = function( container, state ) {
 	this._state = state;
 	this.element = new TreeView();
 
-	this._container.getElement().html(this.element.dom);
+	this._container.getElement().append(this.element.topControls);
+	this._container.getElement().append(this.element.dom);
 
 };
