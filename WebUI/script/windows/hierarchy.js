@@ -74,7 +74,7 @@ class Hierarchy {
 		let scope = this;
 		let dom = $(document.createElement("div"));
 		dom.jstree({
-			'core': {
+			core: {
 				data: this.data,
 				check_callback : true
 			},
