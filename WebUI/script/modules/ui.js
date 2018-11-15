@@ -67,9 +67,9 @@ class UI {
 				popoutWholeStack: false,
 				blockedPopoutsThrowError: true,
 				closePopoutsOnUnload: true,
-				showPopoutIcon: true,
-				showMaximiseIcon: true,
-				showCloseIcon: true
+				showPopoutIcon: false,
+				showMaximiseIcon: false,
+				showCloseIcon: false
 			},
 			dimensions: {
 				borderWidth: 5,
@@ -96,16 +96,19 @@ class UI {
 						content: [{
 							type: 'component',
 							componentName: 'InspectorComponent',
+							isClosable: false,
 							title: "Inspector",
 						},{
 							type: 'component',
 							componentName: 'HistoryComponent',
+							isClosable: false,
 							title: "History",
 						}]
 					},
 					{
 						type: 'component',
 						componentName: 'HierarchyComponent',
+						isClosable: false,
 						title: "Hierarchy",
 					}]
 				},
@@ -126,16 +129,19 @@ class UI {
 							{
 								type: 'component',
 								componentName: 'FavoritesComponent',
+								isClosable: false,
 								title: "Favorites",
 								height: 10,
 							}, {
 							type: 'component',
 							componentName: 'TreeViewComponent',
+							isClosable: false,
 							title: "Data Explorer",
 						},
 							{
 								type: 'component',
 								componentName: 'ContentViewComponent',
+								isClosable: false,
 								title: "Data",
 								height: 30
 							}
