@@ -193,6 +193,7 @@ class Editor {
 			return;
 		}
 		gameObject.setTransform(new LinearTransform().setFromString(command.transform))
+		this.webGL.Render();
 	}
 
 	onSetVariation(command) {
@@ -337,10 +338,9 @@ class Editor {
      */
 	onHistoryChanged(cmd) {
 		let scope = this;
-		if(cmd.currentlySelected != undefined) {
+		if(cmd.currentlySelected !== undefined && scope.selected !== cmd.currentlySelected) {
 			scope.Select(cmd.currentlySelected.guid);
 		}
-		this.webGL.Render();
 	}
 
 	execute( cmd, optionalName ) {

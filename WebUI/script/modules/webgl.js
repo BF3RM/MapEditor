@@ -230,9 +230,6 @@ class WebGL {
 	}
 
 	Render() {
-		if (this.control == null) {
-			return
-		}
 		this.renderer.render(this.scene, this.camera);
 	}
 
