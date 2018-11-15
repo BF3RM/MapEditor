@@ -130,6 +130,8 @@ class Hierarchy {
 		let scope = this;
 //		scope.data =
 		// TODO: update data with the changes
+		let child = editor.getGameObjectByGuid(nodeData.node.id);
+		let parent = editor.getGameObjectByGuid(nodeData.parent);
 	}
 
 	onSelectedEntity(command) {
