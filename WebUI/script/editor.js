@@ -340,6 +340,7 @@ class Editor {
 		if(cmd.currentlySelected != undefined) {
 			scope.Select(cmd.currentlySelected.guid);
 		}
+		this.webGL.Render();
 	}
 
 	execute( cmd, optionalName ) {
