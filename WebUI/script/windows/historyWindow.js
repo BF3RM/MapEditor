@@ -12,6 +12,7 @@ class HistoryWindow {
 	CreateDom() {
 		let scope = this;
 		let dom = $(document.createElement("ul"));
+		dom.addClass("historyWindow");
 
 		return dom;
 	}

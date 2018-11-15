@@ -111,7 +111,7 @@ class UI {
 					{
 						type: 'component',
 						componentName: 'ViewPortComponent',
-						width: 75,
+						width: 70,
 						isClosable: false,
 						reorderEnabled: false,
 						title: "ViewPort",

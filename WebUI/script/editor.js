@@ -338,7 +338,7 @@ class Editor {
      */
 	onHistoryChanged(cmd) {
 		let scope = this;
-		if(cmd.currentlySelected !== undefined && scope.selected !== cmd.currentlySelected) {
+		if(cmd.currentlySelected !== null && scope.selected !== cmd.currentlySelected) {
 			scope.Select(cmd.currentlySelected.guid);
 		}
 	}

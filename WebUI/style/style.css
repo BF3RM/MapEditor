@@ -422,5 +422,9 @@ b {
 }
 
 .redo {
-    color: #6f6f6f;
+    opacity: 0.7;
+}
+
+ul.historyWindow li:nth-child(odd) {
+    background-color: #0000001a;
 }
