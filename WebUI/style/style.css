@@ -89,13 +89,14 @@ div#tools {
 }
 #tools label {
     padding: 0;
-    height: 25px;
-    width: 25px;
+    padding-top: 5px;
 }
 #worldSpace label {
     padding: 0;
-    height: 25px;
-    width: 50px;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-left: 5px;
+    padding-top: 5px;
 }
 
 #toolbarLeft, #toolbarCenter, #toolbarRight {
@@ -403,7 +404,7 @@ b {
 .ui-button:hover, .ui-button.ui-state-active:hover  {
     color: #999;
     text-decoration: none;
-    background-color: rgba(140, 140, 140, 0.8);
+    background-color: #5f5f5f;
     border: 0;
     margin: 0;
     border-radius: 0;
@@ -412,7 +413,7 @@ b {
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active {
     border: 1px solid #003eff;
-    background-color: #007fff;
+    background-color: #5f5f5f;
     font-weight: normal;
     color: #fff;
     border-radius: 0;
@@ -437,4 +438,27 @@ input {
     border: none;
     padding: 5px;
     color: #858585;
+}
+label i{
+    padding: 12px;
+    background: #b9b9b9;
+    -webkit-mask-position-y: 12px;
+}
+.selectIcon{
+    -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
+}
+.translateIcon {
+    -webkit-mask: url(../icons/editor/cursor-move.svg) no-repeat center;
+}
+.rotateIcon {
+    -webkit-mask: url(../icons/editor/rotate-3d.svg) no-repeat center;
+}
+.scaleIcon {
+    -webkit-mask: url(../icons/editor/arrow-expand.svg) no-repeat center;
+}
+.globeIcon {
+    -webkit-mask: url(../icons/editor/earth.svg) no-repeat center;
+}
+.cubeIcon {
+    -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
 }
