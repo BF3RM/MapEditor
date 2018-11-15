@@ -122,10 +122,16 @@ class UI {
 						id: "renderView"
 					}, {
 						type: 'column',
-						content: [{
+						content: [
+							{
+								type: 'component',
+								componentName: 'FavoritesComponent',
+								title: "Favorites",
+								height: 10,
+							}, {
 							type: 'component',
 							componentName: 'TreeViewComponent',
-							title: "Data Browser",
+							title: "Data Explorer",
 						},
 							{
 								type: 'component',
@@ -156,6 +162,7 @@ class UI {
 		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
 		this.layout.registerComponent( 'ContentViewComponent', ContentViewComponent);
 		this.layout.registerComponent( 'HistoryComponent', HistoryComponent);
+		this.layout.registerComponent( 'FavoritesComponent', FavoritesComponent);
 
 		this.layout.init();
 

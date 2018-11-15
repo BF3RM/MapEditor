@@ -1,9 +1,9 @@
-class ContentView {
+class Favorites {
 	constructor() {
 		this.dom = null;
 		this.directory = null;
 
-		signals.folderSelected.add(this.onFolderSelected.bind(this));
+		signals.favoritesChanged.add(this.onFavoritesChanged.bind(this));
 		this.Initialize();
 	}
 
@@ -16,7 +16,7 @@ class ContentView {
 		this.dom.append(this.directory);
 	}
 
-	onFolderSelected(content) {
+	onFavoritesChanged() {
 		this.directory.html("");
 		this.directory.append(`
 			<tr>
@@ -25,8 +25,8 @@ class ContentView {
 				<th><b>Type</b></th>
 			</tr>
 		`);
-		for(let i = 0; i < content.length; i++) {
-			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
+		for(let i = 0; i < editor.favorites.length; i++) {
+			let blueprint = editor.favorites[i];
 			console.log(blueprint);
 			let entry = $(document.createElement("tr"));
 			let icon = $(document.createElement("i"));
@@ -37,25 +37,20 @@ class ContentView {
 			entry.append(type);
 			icon.addClass("jstree-icon");
 			icon.addClass(blueprint.typeName);
-			name.html(content[i].text);
+			name.html(editor.favorites[i].getName());
 			type.html(blueprint.typeName);
 
 			entry.on('click', function(e, data) {
 				signals.spawnBlueprintRequested.dispatch(blueprint);
 			});
-
-			entry.on('contextmenu', function(e) {
-				editor.favorites.push(blueprint);
-				signals.favoritesChanged.dispatch();
-			});
 			this.directory.append(entry);
 		}
 	}
 }
-var ContentViewComponent = function( container, state ) {
+var FavoritesComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
-	this.element = new ContentView();
+	this.element = new Favorites();
 
 	this._container.getElement().html(this.element.dom);
 };

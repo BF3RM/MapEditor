@@ -45,6 +45,7 @@ class Editor {
         this.pendingMessages = {};
 
         this.gameObjects = {};
+        this.favorites = [];
 
 
 		this.Initialize();
