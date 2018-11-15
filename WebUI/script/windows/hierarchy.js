@@ -42,7 +42,7 @@ class Hierarchy {
 		let entry = new HierarchyEntry(command.guid, command.name, command.type, scope.data.children.length, "root");
 		scope.entries[command.guid] = entry;
 		scope.data.children[scope.data.children.length] = entry;
-		scope.dom.jstree(true).create_node('#' ,  entry, "last", function(){
+		scope.dom.jstree(true).create_node('root' ,  entry, "last", function(){
 		});
 
 	}
