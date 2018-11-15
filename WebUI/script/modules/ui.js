@@ -92,6 +92,11 @@ class UI {
 					type: 'column',
 					content: [{
 						type: 'component',
+						componentName: 'HistoryComponent',
+						title: "History",
+						height: 25
+					}, {
+						type: 'component',
 						componentName: 'InspectorComponent',
 						title: "Inspector",
 						height: 25
@@ -147,6 +152,7 @@ class UI {
 		this.layout.registerComponent( 'InspectorComponent', InspectorComponent);
 		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
 		this.layout.registerComponent( 'ContentViewComponent', ContentViewComponent);
+		this.layout.registerComponent( 'HistoryComponent', HistoryComponent);
 
 		this.layout.init();
 		if(this.debug === true) {

@@ -17,9 +17,10 @@ class Editor {
 		signals.setPlayerName.add(this.onSetPlayerName.bind(this));
 		signals.setScreenToWorldPosition.add(this.onSetScreenToWorldPosition.bind(this));
 		signals.setUpdateRateMessage.add(this.onSetUpdateRateMessage.bind(this));
+		signals.historyChanged.add(this.onHistoryChanged.bind(this));
 
 		this.debug = debug;
-        this.logger = new Logger(LOGLEVEL.NONE);
+        this.logger = new Logger(LOGLEVEL.VERBOSE);
 		this.ui = new UI(debug);
 		this.webGL = new WebGL();
 		this.vext = new VEXTInterface();
@@ -227,7 +228,7 @@ class Editor {
 		//Spawn blueprint
 		let guid = GenerateGuid()
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let parameters = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.name, transform);
+		let parameters = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.getName(), transform);
 
 		scope.execute(new SpawnBlueprintCommand(guid, parameters));
 	}
@@ -271,6 +272,7 @@ class Editor {
 	onObjectChanged(object) {
 		this.addPending(object.guid, object);
 	}
+
 
 	Select(guid) {
     	//TODO: Support multiple shit
@@ -333,17 +335,22 @@ class Editor {
         History
 
      */
+	onHistoryChanged(cmd) {
+		let scope = this;
+		if(cmd.currentlySelected != undefined) {
+			scope.Select(cmd.currentlySelected.guid);
+		}
+	}
+
 	execute( cmd, optionalName ) {
 		this.history.execute( cmd, optionalName );
 	}
 
 	undo() {
-
 		this.history.undo();
 	}
 
 	redo() {
-
 		this.history.redo();
 	}
 }

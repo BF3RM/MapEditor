@@ -50,4 +50,9 @@ class Blueprint {
 	    return new ReferenceObject(scope.typeName, scope.name, scope.partitionGuid, scope.instanceGuid);
     }
 
+	// Changes Some/Path/BlueprintName into just BlueprintName
+    getName() {
+    	return this.name.substring(this.name.lastIndexOf('/')+1);
+    }
+
 }

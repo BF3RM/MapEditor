@@ -3,7 +3,7 @@ const SpawnBlueprintCommand = function (guid, parameters) {
 	Command.call(this);
 
 	this.type = 'SpawnBlueprintCommand';
-	this.name = 'Spawn Blueprint';
+	this.name = 'Spawn Blueprint: ' + parameters.name;
 	this.guid = guid;
 
 	if (parameters === undefined) {

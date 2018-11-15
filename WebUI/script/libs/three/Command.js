@@ -24,5 +24,5 @@ var Command = function ( editorRef ) {
 	}
 	this.editor = Command.editor;
 
-
+	this.currentlySelected = this.editor.selected;
 };

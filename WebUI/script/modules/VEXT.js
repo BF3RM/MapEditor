@@ -41,6 +41,7 @@ class VEXTInterface {
 	SendCommand(command) {
 		command.sender = editor.playerName;
 		if(editor.debug) {
+			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
 			editor.logger.Log(LOGLEVEL.VERBOSE, command);
 			this.emulator.commands[command.type](command);
 		} else {
@@ -59,6 +60,7 @@ class VEXTInterface {
 			editor.logger.Log(LOGLEVEL.VERBOSE, commandRaw);
 			command = JSON.parse(commandRaw);
 		}
+		editor.logger.Log(LOGLEVEL.VERBOSE, "IN: ");
 		editor.logger.Log(LOGLEVEL.VERBOSE, command);
 
 		if(this.commands[command.type] === undefined) {
