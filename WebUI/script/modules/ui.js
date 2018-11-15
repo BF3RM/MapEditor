@@ -91,22 +91,23 @@ class UI {
 				content: [{
 					type: 'column',
 					content: [{
-						type: 'component',
-						componentName: 'HistoryComponent',
-						title: "History",
-						height: 25
-					}, {
-						type: 'component',
-						componentName: 'InspectorComponent',
-						title: "Inspector",
-						height: 25
-					},
-						{
+						type:'stack',
+						height: 25,
+						content: [{
 							type: 'component',
-							componentName: 'HierarchyComponent',
-							title: "Hierarchy",
-						}
-					]
+							componentName: 'InspectorComponent',
+							title: "Inspector",
+						},{
+							type: 'component',
+							componentName: 'HistoryComponent',
+							title: "History",
+						}]
+					},
+					{
+						type: 'component',
+						componentName: 'HierarchyComponent',
+						title: "Hierarchy",
+					}]
 				},
 					{
 						type: 'component',
