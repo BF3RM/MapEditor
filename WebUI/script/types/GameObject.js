@@ -63,6 +63,7 @@ class GameObject extends THREE.Object3D
 			0, 0, 0, 1);
 
 		this.setRotationFromMatrix(matrix);
+		this.scale.setFromMatrixScale(matrix);
 
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
 		//editor.webGL.Render();
