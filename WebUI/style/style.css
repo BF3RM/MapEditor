@@ -374,7 +374,8 @@ input::-webkit-inner-spin-button {
 
 th, td {
     text-align: left;
-    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: middle;
 }
 
 b {
@@ -461,4 +462,19 @@ label i{
 }
 .cubeIcon {
     -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
+}
+
+.jstree-icon.ObjectBlueprint {
+    -webkit-mask: url(../icons/types/file-document-box-outline.svg) no-repeat center;
+    background-color: #9c9898;
+}
+
+.jstree-icon.SpatialPrefabBlueprint {
+    -webkit-mask: url(../icons/types/file-document-box-multiple-outline.svg) no-repeat center;
+    background-color: #9c9898;
+}
+
+tr i {
+    height: 24px;
+    width: 24px;
 }

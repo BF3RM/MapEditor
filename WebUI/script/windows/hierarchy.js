@@ -82,7 +82,8 @@ class Hierarchy {
 				case_insensitive: true,
 				show_only_matches : true
 			},
-			plugins: ["search", "dnd"]
+
+			plugins: ["search", "dnd", "types"]
 		});
 		// Set data twice so we can update the scope data directly. :shrug:
 		dom.jstree(true).settings.core.data = scope.data;
@@ -143,7 +144,7 @@ class HierarchyEntry {
 	constructor(guid, name, type, position, parent) {
 		this.id = guid;
 		this.text = name;
-		this.icon = "icons/" + type + ".png";
+		this.icon = type;
 		this.data = {};
 		this.data.position = position;
 		this.data.parent = parent;

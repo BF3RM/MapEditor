@@ -20,6 +20,7 @@ class ContentView {
 		this.directory.html("");
 		this.directory.append(`
 			<tr>
+				<th></th>
 				<th><b>Name</b></th>
 				<th><b>Type</b></th>
 			</tr>
@@ -28,10 +29,14 @@ class ContentView {
 			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
 			console.log(blueprint);
 			let entry = $(document.createElement("tr"));
+			let icon = $(document.createElement("i"));
 			let name = $(document.createElement("td"));
 			let type = $(document.createElement("td"));
+			entry.append(icon);
 			entry.append(name);
 			entry.append(type);
+			icon.addClass("jstree-icon");
+			icon.addClass(blueprint.typeName);
 			name.html(content[i].text);
 			type.html(blueprint.typeName);
 

@@ -219,15 +219,16 @@ class Editor {
 		if(variation === undefined) {
 			variation = blueprint.getDefaultVariation();
 		}
-
+		/*
 		if(!blueprint.isVariationValid(variation)) {
             scope.logger.Log(LOGLEVEL.DEBUG, "Blueprint does not have a valid variation. Requesting user input.");
 			// Show variation
 			return false;
 		}
+		*/
 
 		//Spawn blueprint
-		let guid = GenerateGuid()
+		let guid = GenerateGuid();
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
 		let parameters = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.getName(), transform);
 
