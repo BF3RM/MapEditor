@@ -30,10 +30,11 @@ class VEXTemulator {
 				1: {
 					"type": "ClientStaticModelEntity",
 					"guid": GenerateGuid(),
+					"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
 					"aabb": {
 						"max": "(1.628162, 3.593760, 2.490781)",
 						"min": "(-1.888471, -0.057315, -2.555373)",
-						"trans": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (-142.846619, 57.860794, -170.079514)"
+						"trans": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)"
 					},
 					"reference": {
 						"type": "StaticModelEntityData",
@@ -43,6 +44,23 @@ class VEXTemulator {
 			},
 			"parameters": command.parameters
 		};
+
+		if(command.parameters.reference.typeName == "SpatialPrefabBlueprint") {
+			response.children[2] = {
+				"type": "ClientStaticModelEntity",
+					"guid": GenerateGuid(),
+					"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,3,0)",
+					"aabb": {
+						"max": "(1, 3, 2)",
+						"min": "(-1, -0, -2)",
+						"trans": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)"
+				},
+				"reference": {
+					"type": "StaticModelEntityData",
+						"instanceGuid": "E424EBD2-6677-11E0-8501-BA28C3073B32"
+				}
+			};
+		}
 		editor.vext.HandleResponse(response);
 	}
 
@@ -76,7 +94,7 @@ class VEXTemulator {
 	}
 
 	SetObjectName(command) {
-		
+
 		let response = {
 			"type": "SetObjectName",
 			"guid": command.guid,
@@ -86,7 +104,7 @@ class VEXTemulator {
 	}
 
 	SetVariation(command) {
-		
+
 		let response = {
 			"type": "SetVariation",
 			"guid": command.guid,

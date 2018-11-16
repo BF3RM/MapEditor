@@ -246,13 +246,14 @@ class Editor {
 		let scope = this;
 		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
         //this.webobjects[command.guid] = webobject;
-        let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, command.children, command.parameters);
+        let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, null, command.parameters);
 
 		this.webGL.AddObject(gameObject);
+
 		for (let key in command.children) {
 			let child = command.children[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let childGO = new GameObject(child.uniqueID, child.type, new LinearTransform(), gameObject, null, child.reference);
+			let childGO = new GameObject(child.uniqueID, child.type, new LinearTransform().setFromString(child.transform), gameObject, null, child.reference);
 			let aabb = new AABBHelper( new THREE.Box3(
 				new Vec3().fromString(child.aabb.min),
 				new Vec3().fromString(child.aabb.max),
@@ -261,7 +262,6 @@ class Editor {
 			gameObject.add(childGO);
 
 		}
-
 
 		gameObject.visible = false;
 

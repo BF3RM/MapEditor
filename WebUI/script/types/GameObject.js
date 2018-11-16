@@ -12,6 +12,9 @@ class GameObject extends THREE.Object3D
 		this.objectChildren = children;
 		this.parameters = parameters;
 
+		// Update the matrix after initialization.
+		this.updateTransform();
+
 	}
 	
 	hasMoved() {
