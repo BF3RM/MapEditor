@@ -145,7 +145,7 @@ function Editor:SpawnBlueprint(p_Command)
         s_Children[#s_Children + 1 ] = {
             guid = s_Entity.uniqueID,
             type = l_Entity.typeInfo.name,
-            transform = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform))
+            transform = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform)),
             aabb = {
                 min = tostring(s_Entity.aabb.min),
                 max = tostring(s_Entity.aabb.max),
