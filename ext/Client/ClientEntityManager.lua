@@ -63,15 +63,20 @@ function ClientEntityManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceG
         print("Spawning failed")
 		return false
 	end
+    local s_Spatial = {}
 
 	for i, l_Entity in pairs(s_ObjectEntities) do
         l_Entity:Init(Realm.Realm_Client, true)
         l_Entity:FireEvent("Start")
+        if(l_Entity:Is("SpatialEntity")) then
+            table.insert(s_Spatial, SpatialEntity(l_Entity))
+        end
 	end
-	
-	self.m_SpawnedEntities[p_Guid] = s_ObjectEntities
 
-	return s_ObjectEntities
+	
+	self.m_SpawnedEntities[p_Guid] = s_Spatial
+
+	return s_Spatial
 end
 
 function ClientEntityManager:DestroyEntity(p_Guid)
