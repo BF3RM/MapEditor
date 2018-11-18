@@ -24,3 +24,14 @@ Signals are "events" that are dispatched every time an command is executed.
 The editor will receive the signals first, and do the action accordingly.
 Modules can subscribe to these signals, allowing them to update *their* values accordingly.
 
+#Blueprint
+Reference of frostbite's blueprints, which can spawn more than one entity. 
+
+#Prefab
+Reference of frostbite's prefabs, which can spawn more than one blueprint. 
+
+#GameObject
+Three.js Object3D subclass that represents the container of entities that blueprints or prefabs create. The gizmo is attached to these objects and they hold the entity/entities as children. These entities are represented as GameEntities.
+
+#GameEntity
+Three.js Object3D subclass that represent the entities created by a blueprint or prefab. They aren't selectable and they have AABB (Axis Aligned Bounding Box).

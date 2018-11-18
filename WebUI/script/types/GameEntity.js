@@ -1,5 +1,5 @@
 
-class GameObject extends THREE.Object3D
+class GameEntity extends THREE.Object3D
 {
 	constructor(guid, name, transform, parent, children, parameters) 
 	{
@@ -9,11 +9,8 @@ class GameObject extends THREE.Object3D
 		this.name = name;
 		this.transform = transform;
 		this.objectParent = parent;
+		this.objectChildren = children;
 		this.parameters = parameters;
-
-		for (var i = children - 1; i >= 0; i--) {
-			this.add(children[i]);
-		}
 
 		// Update the matrix after initialization.
 		this.updateTransform();
@@ -25,23 +22,9 @@ class GameObject extends THREE.Object3D
 	}
 
 
-
 	renderInit()
 	{
-		/*
-		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
-		let material = new THREE.MeshBasicMaterial( 
-		{
-			color: 0xff0000,
-			visible: true ,
-			wireframe: true
-		} );
 
-
-		this.mesh = new THREE.Mesh(geometry, material);
-		this.add(this.mesh);
-
-		*/
 		this.updateTransform();
 	}
 	
@@ -104,9 +87,7 @@ class GameObject extends THREE.Object3D
 		if(guid === undefined) {
 			guid = GenerateGuid();
 		}
-
-
-		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.parameters);
+		return new GameObject(guid, this.name, this.transform, this.objectParent, this.objectChildren, this.parameters);
 	}
 
 	onMoveStart() {
@@ -143,11 +124,4 @@ class GameObject extends THREE.Object3D
 		this.visible = false;
 	}
 
-}
-
-class EntityCreationParams {
-	constructor(variation, networked) {
-		this.variation = variation;
-		this.networked = networked;
-	}
 }

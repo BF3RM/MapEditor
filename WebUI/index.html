@@ -5,9 +5,9 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<title>MapEditor</title>
 
-        <!--
-            Style
-        -->
+		<!--
+			Style
+		-->
 		<link rel="stylesheet" href="style/jquery-ui.min.css">
 		<link rel="stylesheet" href="style/reset.css">
 		<link rel="stylesheet" href="style/jquery.dataTables.min.css">
@@ -20,9 +20,9 @@
 			Our stylesheet should be loaded last
 		-->
 		<link rel="stylesheet" href="style/style.css">
-        <!--
-            Libs
-        -->
+		<!--
+			Libs
+		-->
 
 		<script src="script/libs/jquery/jquery-3.1.1.min.js"></script>
 		<script src="script/libs/jquery/jquery-ui.min.js"></script>
@@ -43,39 +43,40 @@
 
 		<script src="script/libs/goldenlayout.js"></script>
 
-        <!--
-            Commands
-        -->
+		<!--
+			Commands
+		-->
 
-        <script src="script/commands/SetTransformCommand.js"></script>
-        <script src="script/commands/SpawnBlueprintCommand.js"></script>
-        <script src="script/commands/DestroyBlueprintCommand.js"></script>
+		<script src="script/commands/SetTransformCommand.js"></script>
+		<script src="script/commands/SpawnBlueprintCommand.js"></script>
+		<script src="script/commands/DestroyBlueprintCommand.js"></script>
 		<script src="script/commands/SetObjectNameCommand.js"></script>
 		<script src="script/commands/SetVariationCommand.js"></script>
-        <!--
-            Messages
-        -->
+		<!--
+			Messages
+		-->
 
 		<script src="script/messages/MoveObjectMessage.js"></script>
-        <!--
-            Types
-        -->
+		<!--
+			Types
+		-->
 
 		<script src="script/types/types.js"></script>
 		<script src="script/types/Blueprint.js"></script>
 		<script src="script/types/GameObject.js"></script>
+		<script src="script/types/GameEntity.js"></script>
 		<script src="script/types/Primitives.js"></script>
-        <script src="script/types/AABBHelper.js"></script>
-        <!--
-            Main
-        -->
-        <script src="script/editor.js"></script>
+		<script src="script/types/AABBHelper.js"></script>
+		<!--
+			Main
+		-->
+		<script src="script/editor.js"></script>
 
-        <!--
-            Modules
-        -->
+		<!--
+			Modules
+		-->
 
-        <script src="script/modules/signals.js"></script>
+		<script src="script/modules/signals.js"></script>
 		<script src="script/modules/logger.js"></script>
 		<script src="script/modules/utils.js"></script>
 		<script src="script/modules/webgl.js"></script>
@@ -88,16 +89,16 @@
 		<script src="script/modules/ui.js"></script>
 
 
-        <!--
-            Windows
-        -->
+		<!--
+			Windows
+		-->
 
 		<script src="script/windows/treeview.js"></script>
 		<script src="script/windows/inspector.js"></script>
 		<script src="script/windows/debugWindow.js"></script>
 		<script src="script/windows/hierarchy.js"></script>
 		<script src="script/windows/contentView.js"></script>
-        <script src="script/windows/ViewPortComponent.js"></script>
+		<script src="script/windows/ViewPortComponent.js"></script>
 		<script src="script/windows/historyWindow.js"></script>
 		<script src="script/windows/favorites.js"></script>
 
@@ -147,8 +148,8 @@
 				</div>
 
 				<div id="worldSpace">
-                    <label for="local"><i class="cubeIcon"></i>Local</label>
-                    <input type="radio" name="worldSpace" id="local" checked="">
+					<label for="local"><i class="cubeIcon"></i>Local</label>
+					<input type="radio" name="worldSpace" id="local" checked="">
 					<label for="world"><i class="globeIcon"></i>World</label>
 					<input type="radio" name="worldSpace" id="world">
 
@@ -157,7 +158,7 @@
 			<div id="toolbarCenter">
 			</div>
 			<div id="toolbarRight">
-                <select name="WorldView" id="worldView">
+				<select name="WorldView" id="worldView">
 					<option value="0" selected="selected">Default</option>
 					<option value="1">Raw Linear</option>
 					<option value="2">Raw Linear Alpha</option>
@@ -223,14 +224,14 @@
 		</div>
 	</body>
 
-    <script>
+	<script>
 
-            let debug = false;
-            var vext = new VEXTInterface();
-            if(window.location.href.indexOf("webui") === -1) {
-                debug = true;
-            }
-            var editor = new Editor(debug);
+			let debug = false;
+			var vext = new VEXTInterface();
+			if(window.location.href.indexOf("webui") === -1) {
+				debug = true;
+			}
+			var editor = new Editor(debug);
 
 		</script>
 </html>

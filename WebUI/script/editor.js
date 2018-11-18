@@ -20,15 +20,15 @@ class Editor {
 		signals.historyChanged.add(this.onHistoryChanged.bind(this));
 
 		this.debug = debug;
-        this.logger = new Logger(LOGLEVEL.VERBOSE);
+		this.logger = new Logger(LOGLEVEL.VERBOSE);
 		this.webGL = new WebGL();
 		this.ui = new UI(debug);
 		this.vext = new VEXTInterface();
-        this.history = new History(this);
-        this.blueprintManager = new BlueprintManager();
-        this.entityFactory = new EntityFactory();
+		this.history = new History(this);
+		this.blueprintManager = new BlueprintManager();
+		this.entityFactory = new EntityFactory();
 
-        // Events that the editor should execute last
+		// Events that the editor should execute last
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
 
 		/*
@@ -36,16 +36,16 @@ class Editor {
 			Internal variables
 
 		 */
-        this.playerName = null;
-        this.selected = null;
-        this.raycastTransform = new LinearTransform();
-        this.s2wTransform = new LinearTransform();
+		this.playerName = null;
+		this.selected = null;
+		this.raycastTransform = new LinearTransform();
+		this.s2wTransform = new LinearTransform();
 
-        this.isUpdating = false;
-        this.pendingMessages = {};
+		this.isUpdating = false;
+		this.pendingMessages = {};
 
-        this.gameObjects = {};
-        this.favorites = [];
+		this.gameObjects = {};
+		this.favorites = [];
 
 
 		this.Initialize();
@@ -58,10 +58,10 @@ class Editor {
 		this.renderLoop(); // first call to init loop using the requestAnimationFrame
 
 		
-    }
+	}
 
 	Initialize() {
-	    // Adds the chrome background and debug window
+		// Adds the chrome background and debug window
 		if(this.debug === true) {
 			$('body').css({
 				"background": 'url(\"img/bf3bg.png\"',
@@ -207,11 +207,11 @@ class Editor {
 	}
 
 
-    onBlueprintSpawnRequested(blueprint, transform, variation) {
-    
+	onBlueprintSpawnRequested(blueprint, transform, variation) {
+	
 		let scope = this;
-    	if(blueprint == null) {
-            scope.logger.LogError("Tried to spawn a nonexistent blueprint");
+		if(blueprint == null) {
+			scope.logger.LogError("Tried to spawn a nonexistent blueprint");
 			return false;
 		}
 		if(transform === undefined) {
@@ -222,7 +222,7 @@ class Editor {
 		}
 		/*
 		if(!blueprint.isVariationValid(variation)) {
-            scope.logger.Log(LOGLEVEL.DEBUG, "Blueprint does not have a valid variation. Requesting user input.");
+			scope.logger.Log(LOGLEVEL.DEBUG, "Blueprint does not have a valid variation. Requesting user input.");
 			// Show variation
 			return false;
 		}
@@ -245,21 +245,21 @@ class Editor {
 	onSpawnedBlueprint(command) {
 		let scope = this;
 		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
-        //this.webobjects[command.guid] = webobject;
-        let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, null, command.parameters);
+		//this.webobjects[command.guid] = webobject;
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, null, command.parameters);
 
 		this.webGL.AddObject(gameObject);
 
 		for (let key in command.children) {
-			let child = command.children[key];
+			let entityInfo = command.children[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let childGO = new GameObject(child.uniqueID, child.type, new LinearTransform().setFromString(child.transform), gameObject, null, child.reference);
+			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromString(entityInfo.transform), gameObject, null, entityInfo.reference);
 			let aabb = new AABBHelper( new THREE.Box3(
-				new Vec3().fromString(child.aabb.min),
-				new Vec3().fromString(child.aabb.max),
+				new Vec3().fromString(entityInfo.aabb.min),
+				new Vec3().fromString(entityInfo.aabb.max),
 				0xFF0000));
-			childGO.add(aabb);
-			gameObject.add(childGO);
+			gameEntity.add(aabb);
+			gameObject.add(gameEntity);
 
 		}
 
@@ -278,31 +278,31 @@ class Editor {
 
 
 	Select(guid) {
-    	//TODO: Support multiple shit
+		//TODO: Support multiple shit
 		if((this.selected != null && this.selected.guid == guid) || $.inArray(guid, this.selected) !== -1) {
-    		console.log("Selected the same item");
+			console.log("Selected the same item");
 			return;
-    	}
+		}
 		this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand"))
 		//this.selected.push(this.getGameObjectByGuid(guid));
-    }
+	}
 
-    onSelectedEntity(command) {
-    	let scope = this;
-    	let gameObject = scope.gameObjects[command.guid];
+	onSelectedEntity(command) {
+		let scope = this;
+		let gameObject = scope.gameObjects[command.guid];
 		if(gameObject === undefined) {
 			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
 		if(scope.selected !== null)
-		    scope.selected.onDeselected();
+			scope.selected.onDeselected();
 
-	    scope.selected = gameObject;
+		scope.selected = gameObject;
 
 		//TODO: make this not ugly.
 
 		//UnUglify()
-	    gameObject.onSelected();
+		gameObject.onSelected();
 		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
 	}
 
@@ -333,11 +333,11 @@ class Editor {
 
 	}
 
-    /*
+	/*
 
-        History
+		History
 
-     */
+	 */
 	onHistoryChanged(cmd) {
 		let scope = this;
 		if(cmd.currentlySelected !== null && scope.selected !== cmd.currentlySelected) {
