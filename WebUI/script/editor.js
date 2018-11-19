@@ -254,10 +254,12 @@ class Editor {
 			let entityInfo = command.children[key];
 			// UniqueID is fucking broken. this won't work online, boi.
 			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromString(entityInfo.transform), gameObject, null, entityInfo.reference);
+
 			let aabb = new AABBHelper( new THREE.Box3(
 				new Vec3().fromString(entityInfo.aabb.min),
 				new Vec3().fromString(entityInfo.aabb.max),
 				0xFF0000));
+
 			gameEntity.add(aabb);
 			gameObject.add(gameEntity);
 

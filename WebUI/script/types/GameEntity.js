@@ -1,127 +1,37 @@
 
 class GameEntity extends THREE.Object3D
 {
-	constructor(guid, name, transform, parent, children, parameters) 
+	constructor(guid, typeName, localTransform)
 	{
 		super( );
 
 		this.guid = guid;
-		this.name = name;
-		this.transform = transform;
-		this.objectParent = parent;
-		this.objectChildren = children;
-		this.parameters = parameters;
+		this.typeName = typeName;
+		this.localTransform = localTransform;
+		this.aabb = {
+
+		}
 
 		// Update the matrix after initialization.
 		this.updateTransform();
 
 	}
-	
-	hasMoved() {
-		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
-	}
 
-
-	renderInit()
-	{
-
-		this.updateTransform();
-	}
-	
-	getChanges() {
-		let scope = this;
-		let changes = {};
-		// Add more realtime-updates here.
-		if(scope.hasMoved()) {
-			changes["transform"] = new MoveObjectMessage(scope.guid,  new LinearTransform().setFromMatrix(scope.matrixWorld));
-		}
-
-		if(Object.keys(changes).length === 0) {
-			return false;
-		}
-		return changes
-
-	}
 
 	updateTransform()
 	{
 		let matrix = new THREE.Matrix4();
 		matrix.set(
-			this.transform.left.x, this.transform.up.x, this.transform.forward.x, 0,
-			this.transform.left.y, this.transform.up.y, this.transform.forward.y, 0,
-			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
+			this.localTransform.left.x, this.localTransform.up.x, this.localTransform.forward.x, 0,
+			this.localTransform.left.y, this.localTransform.up.y, this.localTransform.forward.y, 0,
+			this.localTransform.left.z, this.localTransform.up.z, this.localTransform.forward.z, 0,
 			0, 0, 0, 1);
 
 		this.setRotationFromMatrix(matrix);
 		this.scale.setFromMatrixScale(matrix);
 
-		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
+		this.position.set(this.localTransform.trans.x, this.localTransform.trans.y, this.localTransform.trans.z);
 		//editor.webGL.Render();
 
 	}
-
-	update( deltaTime )
-	{
-		//this.updateTransform( );
-	}
-
-	setTransform(linearTransform) {
-		this.transform = linearTransform;
-		this.parameters.transform = linearTransform;
-		this.updateTransform();
-		signals.objectChanged.dispatch(this, "transform", linearTransform)
-
-	}
-	setName(name) {
-		this.name = name;
-		this.parameters.name = name;
-		signals.objectChanged.dispatch(this, "name", name);
-	}
-
-	setVariation(key) {
-		this.parameters.variation = key;
-		signals.objectChanged.dispatch(this, "variation", key);
-	}
-
-	Clone(guid) {
-		if(guid === undefined) {
-			guid = GenerateGuid();
-		}
-		return new GameObject(guid, this.name, this.transform, this.objectParent, this.objectChildren, this.parameters);
-	}
-
-	onMoveStart() {
-		console.log("move start")
-		// TODO: Validate that the object exists
-	}
-
-	onMove() {
-		let scope = this;
-		if(!scope.hasMoved()) {
-			return;
-		}
-		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		signals.objectChanged.dispatch(this, "transform", transform)
-		// Send move message to client
-	}
-	onMoveEnd() {
-		let scope = this;
-		if(!scope.hasMoved()) {
-			return; // No position change
-		}
-		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		let command = new SetTransformCommand(this.guid, transform, scope.transform);
-		editor.execute(command);
-		signals.objectChanged.dispatch(this, "transform", transform)
-
-		// Send move command to server
-	}
-
-	onSelected() {
-		this.visible = true;
-	}
-	onDeselected() {
-		this.visible = false;
-	}
-
 }
