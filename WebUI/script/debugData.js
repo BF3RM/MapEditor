@@ -12,7 +12,7 @@ var json = `
       "1215191320": "SomeVariation: 1215191320"
     }
   },
-  "B1E3B4B8-062A-1DA8-E13D-8D7095F2A610": {
+  "29E3B4B8-062A-1DA8-E13D-8D7095F2A610": {
     "typeName": "SpatialPrefabBlueprint",
     "name": "M16A4KitPickup_prefab",
     "partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
