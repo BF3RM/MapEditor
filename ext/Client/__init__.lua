@@ -21,18 +21,18 @@ function MapEditorClient:RegisterEvents()
 	self.m_ExtensionLoadedEvent = Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
 	self.m_EngineMessageEvent = Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	self.m_EngineUpdateEvent = Events:Subscribe('Engine:Update', self, self.OnUpdate)
-    self.m_PartitionLoadedEvent = Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	self.m_PartitionLoadedEvent = Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
-    self.m_EngineUpdateEvent = Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	self.m_EngineUpdateEvent = Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
-    self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
+	self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
-    self.m_EngineUpdateEvent = Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
+	self.m_EngineUpdateEvent = Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
 
 	-- WebUI events
-    Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
-    Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
+	Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
+	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
@@ -51,7 +51,7 @@ function MapEditorClient:OnLoaded()
 	WebUI:Show()
 end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
-    m_InstanceParser:OnPartitionLoaded(p_Partition)
+	m_InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -67,20 +67,20 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
-    m_Editor:OnUpdatePass(p_Delta, p_Pass)
+	m_Editor:OnUpdatePass(p_Delta, p_Pass)
 end
 function MapEditorClient:OnLevelDestroy()
-    print("Destroy!")
-    m_Editor:OnLevelDestroy()
+	print("Destroy!")
+	m_Editor:OnLevelDestroy()
 end
 
 ----------- Editor functions----------------
 
 function MapEditorClient:OnReceiveCommand(p_Command)
-    m_Editor:OnReceiveCommand(p_Command)
+	m_Editor:OnReceiveCommand(p_Command)
 end
 function MapEditorClient:OnReceiveMessage(p_Message)
-    m_Editor:OnReceiveMessage(p_Message)
+	m_Editor:OnReceiveMessage(p_Message)
 end
 ----------- WebUI functions----------------
 

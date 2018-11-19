@@ -43,25 +43,25 @@ class Group extends THREE.Object3D
 	}
 
 	onSelected() {
-		for (var i = 0; i < this.children.length; i++) {
-			let child = this.children[i];
-			child.selected = true;
-			child.visible = true;
+		for (var i = this.children.length - 1; i >= 0; i--) {
+			this.children[i].Select();
 		}
 		this.selected = true;
 		this.visible = true;
 	}
-	
+
 	onDeselected() {
-		for (var i = 0; i < this.children.length; i++) {
-			let child = this.children[i];
-			child.selected = false;
-			child.visible = false;
-			this.DetachObject(this.children[i]);
-			//reattach children to original parent
+		for (var i = this.children.length - 1; i >= 0; i--) {
+			this.children[i].Deselect();
 		}
 		this.selected = false;
 		this.visible = false;
+	}
+
+	DetachAll(){
+		for (var i = this.children.length - 1; i >= 0; i--) {
+			this.DetachObject(this.children[i]);
+		}
 	}
 
 	DetachObject(gameObject){

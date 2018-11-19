@@ -47,6 +47,8 @@ class Editor {
 
 		this.gameObjects = {};
 		this.favorites = [];
+
+		// Creates selection group and add it to the scene
 		this.selectionGroup = new Group();
 		this.webGL.AddObject(this.selectionGroup);
 
@@ -341,19 +343,38 @@ class Editor {
 			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
-		console.log(scope.selected);
 
-		if(!command.parameters.multiple && scope.selectionGroup.children.length !== 0) {
+		// If the object is already in this group and it's a multiselection we deselect it
+		if (gameObject.parent === scope.selectionGroup && command.parameters.multiple){
+			console.log("Object already selected");
+			this.Deselect(command.guid);
 
-			scope.selectionGroup.Deselect();
+			return;
 		}
 
+		// Special case
+		if (!command.parameters.multiple && 
+				scope.selectionGroup.children.length === 1 && 
+				scope.selectionGroup.children[0].guid == command.guid) {
+			scope.selectionGroup.Deselect();
+			scope.selectionGroup.DetachAll();
+			scope.webGL.Render();
+			return;
+		}
 
-		console.log(scope.selectionGroup);
+		// Clear selection group when there is a single selection
+		if(!command.parameters.multiple && scope.selectionGroup.children.length !== 0) {
+			console.log("clearing group");
+			scope.selectionGroup.Deselect();
+			scope.selectionGroup.DetachAll();
+		}
+		// console.log(scope.selectionGroup);
+
+
 		
 		scope.selectionGroup.AttachObject(gameObject);
 		scope.selectionGroup.Select();
-		// scope.selectionGroup.matrixWorld = gameObject.matrixWorld;
+		// scope.selectionGroup.matrixWorld = gameObject.matrixWorld; //this shit is fucked
 		scope.webGL.AttachGizmoTo(scope.selectionGroup);
 		
 		//TODO: make this not ugly.
@@ -367,10 +388,15 @@ class Editor {
 		let gameObject = scope.gameObjects[command.guid];
 
 		// if (!command.parameters.multiple) {
-			
-		// }
 
-		scope.selectionGroup.Detach(gameObject);
+		// }
+		
+		gameObject.Deselect();
+
+		scope.selectionGroup.DetachObject(gameObject);
+		
+
+		// scope.selectionGroup.Deselect(gameObject);
 		// delete scope.selected[command.guid];
 
 		scope.webGL.Render();

@@ -16,17 +16,17 @@ end
 function Editor:RegisterVars()
 	self.m_PendingRaycast = false
 
-    self.m_Commands = {
-        SpawnBlueprintCommand = self.SpawnBlueprint,
-        DestroyBlueprintCommand = self.DestroyBlueprint,
-        SetTransformCommand = self.SetTransform,
-        SelectGameObjectCommand = self.SelectGameObject
-    }
-    self.m_Messages = {
-        MoveObjectMessage = self.MoveObject
-    }
+	self.m_Commands = {
+		SpawnBlueprintCommand = self.SpawnBlueprint,
+		DestroyBlueprintCommand = self.DestroyBlueprint,
+		SetTransformCommand = self.SetTransform,
+		SelectGameObjectCommand = self.SelectGameObject
+	}
+	self.m_Messages = {
+		MoveObjectMessage = self.MoveObject
+	}
 
-    self.m_Queue = {};
+	self.m_Queue = {};
 end
 
 function Editor:RegisterEvents()
@@ -38,8 +38,8 @@ function Editor:OnEngineMessage(p_Message)
 		m_InstanceParser:FillVariations()
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
-    end
-    if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
+	end
+	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
 		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
 		if s_LocalPlayer == nil then
@@ -55,8 +55,8 @@ end
 
 
 function Editor:OnLevelDestroy()
-    m_ClientEntityManager:Clear()
-    m_InstanceParser:Clear()
+	m_ClientEntityManager:Clear()
+	m_InstanceParser:Clear()
 
 end
 
@@ -68,195 +68,195 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:Raycast()
 end
 function Editor:OnUpdatePass(p_Delta, p_Pass)
-    if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
-        return
-    end
+	if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
+		return
+	end
 
-    for k,l_Command in ipairs(self.m_Queue) do
-        l_Command.queued = true
-        print("Executing command delayed: " .. l_Command.type)
-        self:OnReceiveCommand(json.encode(l_Command))
-    end
-    if(#self.m_Queue > 0) then
-        self.m_Queue = {}
-    end
+	for k,l_Command in ipairs(self.m_Queue) do
+		l_Command.queued = true
+		print("Executing command delayed: " .. l_Command.type)
+		self:OnReceiveCommand(json.encode(l_Command))
+	end
+	if(#self.m_Queue > 0) then
+		self.m_Queue = {}
+	end
 end
 
 function Editor:OnReceiveCommand(p_Command)
-    local s_Command = self:DecodeParams(json.decode(p_Command))
-    local s_Function = self.m_Commands[s_Command.type]
-    if(s_Function == nil) then
-        print("Attempted to call a nil function: " .. s_Command.type)
-        return false
-    end
-    local s_Response = s_Function(self, s_Command)
-    if(s_Response == false) then
-        -- TODO: Handle errors
-        print("error")
-        return
-    end
-    if(s_Response == "queued") then
-        print("Queued command")
-        return
-    end
-    WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
+	local s_Command = self:DecodeParams(json.decode(p_Command))
+	local s_Function = self.m_Commands[s_Command.type]
+	if(s_Function == nil) then
+		print("Attempted to call a nil function: " .. s_Command.type)
+		return false
+	end
+	local s_Response = s_Function(self, s_Command)
+	if(s_Response == false) then
+		-- TODO: Handle errors
+		print("error")
+		return
+	end
+	if(s_Response == "queued") then
+		print("Queued command")
+		return
+	end
+	WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
 end
 
 function Editor:OnReceiveMessage(p_Message)
-    local s_Message = self:DecodeParams(json.decode(p_Message))
+	local s_Message = self:DecodeParams(json.decode(p_Message))
 
-    local s_Function = self.m_Messages[s_Message.type]
-    if(s_Function == nil) then
-        print("Attempted to call a nil function: " .. s_Message.type)
-        return false
-    end
+	local s_Function = self.m_Messages[s_Message.type]
+	if(s_Function == nil) then
+		print("Attempted to call a nil function: " .. s_Message.type)
+		return false
+	end
 
-    local s_Response = s_Function(self, s_Message)
-    if(s_Response == false) then
-        -- TODO: Handle errors
-        print("error")
-        return
-    end
-    -- Messages don't respond
+	local s_Response = s_Function(self, s_Message)
+	if(s_Response == false) then
+		-- TODO: Handle errors
+		print("error")
+		return
+	end
+	-- Messages don't respond
 end
 --[[
 
-    Commands
+	Commands
 
 --]]
 function Editor:SpawnBlueprint(p_Command)
-    local s_Params = p_Command.parameters
-    local s_SpawnResult = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
+	local s_Params = p_Command.parameters
+	local s_SpawnResult = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
 
-    if(s_SpawnResult == false) then
-        -- Send error to webui
-        print("Failed to spawn blueprint. ")
-        print(s_Command)
-        return false
-    end
+	if(s_SpawnResult == false) then
+		-- Send error to webui
+		print("Failed to spawn blueprint. ")
+		print(s_Command)
+		return false
+	end
 
-    local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
-    local s_Children = {}
-    for k,l_Entity in ipairs(s_SpawnResult) do
-        local s_Data = l_Entity.data
-        local s_Entity = SpatialEntity(l_Entity)
+	local s_Children = {}
+	for k,l_Entity in ipairs(s_SpawnResult) do
+		local s_Data = l_Entity.data
+		local s_Entity = SpatialEntity(l_Entity)
 
-        s_Children[#s_Children + 1 ] = {
-            guid = s_Entity.uniqueID,
-            type = l_Entity.typeInfo.name,
-            transform = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform)),
-            aabb = {
-                min = tostring(s_Entity.aabb.min),
-                max = tostring(s_Entity.aabb.max),
-                trans = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform))
-            },
-            reference = {
+		s_Children[#s_Children + 1 ] = {
+			guid = s_Entity.uniqueID,
+			type = l_Entity.typeInfo.name,
+			transform = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform)),
+			aabb = {
+				min = tostring(s_Entity.aabb.min),
+				max = tostring(s_Entity.aabb.max),
+				trans = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform))
+			},
+			reference = {
 
-                instanceGuid = tostring(s_Data.instanceGuid),
-                --partitionGuid = tostring(s_Data.instanceGuid),
-                type = s_Data.typeInfo.name
-                -- transform?
-            }
-        }
-    end
+				instanceGuid = tostring(s_Data.instanceGuid),
+				--partitionGuid = tostring(s_Data.instanceGuid),
+				type = s_Data.typeInfo.name
+				-- transform?
+			}
+		}
+	end
 
-    local s_Response = {
-        guid = s_Params.guid,
-        sender = s_LocalPlayer.name,
-        name = s_Params.name,
-        ['type'] = 'SpawnedBlueprint',
-        parameters = s_Params,
-        children = s_Children
-    }
+	local s_Response = {
+		guid = s_Params.guid,
+		sender = s_LocalPlayer.name,
+		name = s_Params.name,
+		['type'] = 'SpawnedBlueprint',
+		parameters = s_Params,
+		children = s_Children
+	}
 
-    return s_Response
+	return s_Response
 end
 
 function Editor:DestroyBlueprint(p_Command)
 
-    --TODO: not hack this
-    if(p_Command.queued == nil) then
-        table.insert(self.m_Queue, p_Command)
-        return "queued";
-    end
+	--TODO: not hack this
+	if(p_Command.queued == nil) then
+		table.insert(self.m_Queue, p_Command)
+		return "queued";
+	end
 
 
 
-    local s_Result = m_ClientEntityManager:DestroyEntity(p_Command.guid)
+	local s_Result = m_ClientEntityManager:DestroyEntity(p_Command.guid)
 
-    if(s_Result == false) then
-        print("Failed to destroy entity: " .. p_Command.guid)
-    end
-    local s_Response = {
-        type = "DestroyedBlueprint",
-        guid =  p_Command.guid
-    }
+	if(s_Result == false) then
+		print("Failed to destroy entity: " .. p_Command.guid)
+	end
+	local s_Response = {
+		type = "DestroyedBlueprint",
+		guid =  p_Command.guid
+	}
 
-    return s_Response
+	return s_Response
 end
 
 
 function Editor:SelectGameObject(p_Command)
 
-    if ( m_ClientEntityManager:GetEntityByGuid(p_Command.guid) == nil) then
-        return false
-    end
-    local s_Response = {
-        guid = p_Command.guid,
-        ['type'] = 'SelectedGameObject'
-    }
+	if ( m_ClientEntityManager:GetEntityByGuid(p_Command.guid) == nil) then
+		return false
+	end
+	local s_Response = {
+		guid = p_Command.guid,
+		['type'] = 'SelectedGameObject'
+	}
    return s_Response
 end
 
 function Editor:SetTransform(p_Command)
-    local s_Result = m_ClientEntityManager:SetTransform(p_Command.guid, p_Command.parameters.transform)
+	local s_Result = m_ClientEntityManager:SetTransform(p_Command.guid, p_Command.parameters.transform)
 
-    if(s_Result == false) then
-        -- Notify WebUI of failed
-        print("failed")
-        return false
-    end
+	if(s_Result == false) then
+		-- Notify WebUI of failed
+		print("failed")
+		return false
+	end
 
-    local s_Response = {
-        type = "SetTransform",
-        guid = p_Command.guid,
-        transform = p_Command.parameters.transform
-    }
-    return s_Response
+	local s_Response = {
+		type = "SetTransform",
+		guid = p_Command.guid,
+		transform = p_Command.parameters.transform
+	}
+	return s_Response
 end
 
 
 
 --[[
 
-    Messages
+	Messages
 
 --]]
 
 function Editor:MoveObject(p_Message)
-    local s_Result = m_ClientEntityManager:SetTransform(p_Message.guid, p_Message.transform)
+	local s_Result = m_ClientEntityManager:SetTransform(p_Message.guid, p_Message.transform)
 
-    if(s_Result == false) then
-        -- Notify WebUI of failed
-        print("failed")
-        return false
-    end
+	if(s_Result == false) then
+		-- Notify WebUI of failed
+		print("failed")
+		return false
+	end
 end
 
 --[[
 
-    Shit
+	Shit
 
 --]]
 
 function Editor:Error(p_Message, p_Command)
-    local s_Response = {
-        type = "Error",
-        message = p_Message,
-        command = p_Command
-    }
-    return s_Response
+	local s_Response = {
+		type = "Error",
+		message = p_Message,
+		command = p_Command
+	}
+	return s_Response
 end
 
 function Editor:Raycast()
@@ -323,14 +323,14 @@ function Editor:SetPendingRaycast()
 end
 
 function ToLocal(a,b)
-    local LT = LinearTransform()
-    LT.left = a.left
-    LT.up = a.up
-    LT.forward = a.forward
-    LT.trans.x = a.trans.x - b.trans.x -- attempt to index a nil value (field 'trans')
-    LT.trans.y = a.trans.y - b.trans.y
-    LT.trans.z = a.trans.z - b.trans.z
-    return LT
+	local LT = LinearTransform()
+	LT.left = a.left
+	LT.up = a.up
+	LT.forward = a.forward
+	LT.trans.x = a.trans.x - b.trans.x -- attempt to index a nil value (field 'trans')
+	LT.trans.y = a.trans.y - b.trans.y
+	LT.trans.z = a.trans.z - b.trans.z
+	return LT
 end
 
 function Editor:DecodeParams(p_Table)
@@ -354,9 +354,9 @@ function Editor:DecodeParams(p_Table)
 end
 
 function Editor:EncodeParams(p_Table)
-    if(p_Table == nil) then
-        error("Passed a nil table?!")
-    end
+	if(p_Table == nil) then
+		error("Passed a nil table?!")
+	end
 	for s_Key, s_Value in pairs(p_Table) do
 		if s_Key == 'transform' then
 			p_Table[s_Key] = tostring(s_Value)

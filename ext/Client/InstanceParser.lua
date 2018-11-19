@@ -21,10 +21,10 @@ end
 
 
 function InstanceParser:Clear()
-    self.m_Blueprints = {}
-    self.m_Meshes = {}
-    self.m_Variations = {}
-    self.m_MeshVariationDatabases = {}
+	self.m_Blueprints = {}
+	self.m_Meshes = {}
+	self.m_Variations = {}
+	self.m_MeshVariationDatabases = {}
 end
 
 function InstanceParser:RegisterEvents()

@@ -9,7 +9,7 @@ function Freecam:__init()
 end
 
 function Freecam:RegisterVars()
-    self.m_Freecam = false
+	self.m_Freecam = false
 	self.mode = CameraMode.FirstPerson
 
 	self.camera = nil
@@ -87,7 +87,7 @@ function Freecam:Enable()
 	end
 	self.mode = CameraMode.FreeCam
 	self:TakeControl()
-    self.m_Freecam = true
+	self.m_Freecam = true
 end
 
 function Freecam:Disable()
@@ -95,7 +95,7 @@ function Freecam:Disable()
 	self.lastTransform = self.cameraData.transform
 	self.mode = CameraMode.FirstPerson
 	self:ReleaseControl()
-    self.m_Freecam = false
+	self.m_Freecam = false
 end
 
 function Freecam:RotateX(p_Transform, p_Vector)
