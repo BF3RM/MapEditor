@@ -16,7 +16,7 @@ class ContentView {
 		this.dom.append(this.directory);
 	}
 
-	onFolderSelected(content) {
+	onFolderSelected(folderName, content) {
 		this.directory.html("");
 		this.directory.append(`
 			<tr>
@@ -27,7 +27,6 @@ class ContentView {
 		`);
 		for(let i = 0; i < content.length; i++) {
 			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
-			console.log(blueprint);
 			let entry = $(document.createElement("tr"));
 			let icon = $(document.createElement("i"));
 			let name = $(document.createElement("td"));
@@ -37,7 +36,7 @@ class ContentView {
 			entry.append(type);
 			icon.addClass("jstree-icon");
 			icon.addClass(blueprint.typeName);
-			name.html(content[i].text);
+			name.html(blueprint.name.replace(folderName, ''));
 			type.html(blueprint.typeName);
 
 			entry.on('click', function(e, data) {

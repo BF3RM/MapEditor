@@ -5,6 +5,8 @@ class TreeView {
 		this.topControls = this.CreateControls();
 		this.tree = null;
         signals.blueprintsRegistered.add(this.LoadData.bind(this))
+
+		this.nodes = [];
     }
 
 	LoadData(table) {
@@ -55,7 +57,7 @@ class TreeView {
         scope.data = data;
         scope.InitializeTree();
         scope.RegisterEvents();
-        signals.folderSelected.dispatch(data.content);
+        signals.folderSelected.dispatch("/", data.content);
 	}
 
 	InitializeTree() {
@@ -107,10 +109,13 @@ class TreeView {
 			if (data.node == null) {
 				return
 			}
-			console.log(data.node);
 			let folderContent = data.node.original.content;
-			console.log(folderContent);
-			signals.folderSelected.dispatch(folderContent);
+			scope.nodes = [];
+			scope.traverse(data.node);
+
+
+
+			signals.folderSelected.dispatch(scope.getFullPath(data.node), scope.nodes);
 			/*let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
@@ -119,6 +124,36 @@ class TreeView {
 			*/
 		})
 	}
+
+	getFullPath(state) {
+		let ret = "";
+		let scope = this;
+		let node = scope.dom.jstree(true).get_node(state);
+
+		for(let i = 0; i < node.parents.length - 2; i++) {
+			let parentNode = scope.dom.jstree(true).get_node(node.parents[i]);
+			if(parentNode.text !== undefined) {
+				ret = parentNode.text + "/" + ret;
+			}
+		};
+		ret += state.text + "/";
+		return ret;
+	}
+
+	traverse(state) {
+		let scope = this;
+		// Get the actual node
+		let node = scope.dom.jstree(true).get_node(state);
+
+		scope.nodes = scope.nodes.concat(node.original.content);
+		// Attempt to traverse if the node has children
+		if (scope.dom.jstree(true).is_parent(node)) {
+			$.each(node.children, function(index, child) {
+				scope.traverse(child);
+			});
+		}
+	};
+
 	CreateControls() {
 		let controls = $(document.createElement("div"));
 		controls.addClass("contentControls");
