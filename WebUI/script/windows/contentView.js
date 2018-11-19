@@ -48,12 +48,10 @@ class ContentView {
 				//Unfavorite
 				if(icon.hasClass("favorited")) {
 					editor.RemoveFavorite(blueprint);
-					blueprint.SetFavorite(false);
 					icon.removeClass("favorited");
 				} else {
 					//Favorite
 					editor.AddFavorite(blueprint);
-					blueprint.SetFavorite(true);
 					icon.addClass("favorited")
 				}
 				signals.favoritesChanged.dispatch();

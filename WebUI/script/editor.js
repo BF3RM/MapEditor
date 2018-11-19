@@ -62,11 +62,13 @@ class Editor {
 
 	AddFavorite(blueprint) {
 		this.favorites[blueprint.instanceGuid] = blueprint;
+		blueprint.SetFavorite(true);
 		signals.favoriteAdded.dispatch(blueprint);
 		signals.favoritesChanged.dispatch();
 	}
 
 	RemoveFavorite(blueprint) {
+		blueprint.SetFavorite(false);
 		delete this.favorites[blueprint.instanceGuid];
 		signals.favoriteRemoved.dispatch(blueprint);
 		signals.favoritesChanged.dispatch();
