@@ -4,6 +4,7 @@ class WebGL {
 		this.scene = null;
 		this.renderer = null;
 		this.control = null;
+		this.controlContainer = null;
 		this.texture = null;
 
 		this.worldSpace = "local";
@@ -215,6 +216,8 @@ class WebGL {
 		this.control.attach(webObject);
 		//this.Render();
 	}
+
+
 
 	HideGizmo() {
 		this.control.visible = false;
