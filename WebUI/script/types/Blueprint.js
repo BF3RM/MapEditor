@@ -5,6 +5,8 @@ class Blueprint {
         this.typeName = typeName;
         this.name = name;
         this.variations = variations;
+
+        this.favorited = false;
     }
 
 	getDefaultVariation() {
@@ -15,6 +17,14 @@ class Blueprint {
 		} else {
 			return 0;
 		}
+	}
+
+	SetFavorite(favStatus) {
+    	this.favorited = favStatus;
+	}
+
+	ToggleFavorite() {
+    	this.favorited = !this.favorited;
 	}
 
     hasVariation () {

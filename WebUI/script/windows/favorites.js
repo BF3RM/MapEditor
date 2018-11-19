@@ -4,6 +4,8 @@ class Favorites {
 		this.directory = null;
 
 		signals.favoritesChanged.add(this.onFavoritesChanged.bind(this));
+		signals.favoriteAdded.add(this.onFavoriteAdded.bind(this));
+		signals.favoriteRemoved.add(this.onFavoriteRemoved.bind(this));
 		this.Initialize();
 	}
 
@@ -16,18 +18,27 @@ class Favorites {
 		this.dom.append(this.directory);
 	}
 
+	onFavoriteAdded(blueprint) {
+
+	}
+
+	onFavoriteRemoved(blueprint) {
+
+	}
+
 	onFavoritesChanged() {
-		this.directory.html("");
-		this.directory.append(`
+		let scope = this;
+		scope.directory.html("");
+		scope.directory.append(`
 			<tr>
 				<th></th>
 				<th><b>Name</b></th>
 				<th><b>Type</b></th>
 			</tr>
 		`);
-		for(let i = 0; i < editor.favorites.length; i++) {
-			let blueprint = editor.favorites[i];
-			console.log(blueprint);
+		Object.keys(editor.favorites).forEach(function(e) {
+
+			let blueprint = editor.favorites[e];
 			let entry = $(document.createElement("tr"));
 			let icon = $(document.createElement("i"));
 			let name = $(document.createElement("td"));
@@ -35,16 +46,31 @@ class Favorites {
 			entry.append(icon);
 			entry.append(name);
 			entry.append(type);
-			icon.addClass("jstree-icon");
+			icon.addClass("jstree-icon favoritable favorited");
 			icon.addClass(blueprint.typeName);
-			name.html(editor.favorites[i].getName());
+			name.html(blueprint.getName());
 			type.html(blueprint.typeName);
 
-			entry.on('click', function(e, data) {
+			icon.on('click', function(e) {
+				//Unfavorite
+				if(icon.hasClass("favorited")) {
+					editor.RemoveFavorite(blueprint);
+					blueprint.SetFavorite(false);
+					icon.removeClass("favorited");
+				} else {
+					//Favorite
+					editor.AddFavorite(blueprint);
+					blueprint.SetFavorite(false);
+					icon.addClass("favorited")
+				}
+				signals.favoritesChanged.dispatch();
+			});
+
+			name.on('click', function(e, data) {
 				signals.spawnBlueprintRequested.dispatch(blueprint);
 			});
-			this.directory.append(entry);
-		}
+			scope.directory.append(entry);
+		});
 	}
 }
 var FavoritesComponent = function( container, state ) {

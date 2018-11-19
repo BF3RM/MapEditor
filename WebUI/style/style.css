@@ -467,6 +467,14 @@ label i{
 .cubeIcon {
     -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
 }
+.favoritable:hover {
+    -webkit-mask: url(../icons/editor/star.svg) no-repeat center!important;
+}
+
+.favoritable.favorited:hover {
+    -webkit-mask: url(../icons/editor/star-off.svg) no-repeat center!important;
+}
+
 
 .jstree-icon.ObjectBlueprint {
     -webkit-mask: url(../icons/types/file-document-box-outline.svg) no-repeat center;

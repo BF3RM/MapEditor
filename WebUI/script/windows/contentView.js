@@ -34,19 +34,36 @@ class ContentView {
 			entry.append(icon);
 			entry.append(name);
 			entry.append(type);
-			icon.addClass("jstree-icon");
+			icon.addClass("jstree-icon favoritable");
 			icon.addClass(blueprint.typeName);
 			name.html(blueprint.name.replace(folderName, ''));
 			type.html(blueprint.typeName);
 
-			entry.on('click', function(e, data) {
+			icon.on('mouseover', function(e) {
+				console.log(blueprint)
+				if(!blueprint.favorited) {
+					icon.removeClass("favorited");
+				}
+			});
+			icon.on('click', function(e) {
+				//Unfavorite
+				if(icon.hasClass("favorited")) {
+					editor.RemoveFavorite(blueprint);
+					blueprint.SetFavorite(false);
+					icon.removeClass("favorited");
+				} else {
+					//Favorite
+					editor.AddFavorite(blueprint);
+					blueprint.SetFavorite(false);
+					icon.addClass("favorited")
+				}
+				signals.favoritesChanged.dispatch();
+			});
+
+			name.on('click', function(e, data) {
 				signals.spawnBlueprintRequested.dispatch(blueprint);
 			});
 
-			entry.on('contextmenu', function(e) {
-				editor.favorites.push(blueprint);
-				signals.favoritesChanged.dispatch();
-			});
 			this.directory.append(entry);
 		}
 	}

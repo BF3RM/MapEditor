@@ -60,6 +60,18 @@ class Editor {
 		
 	}
 
+	AddFavorite(blueprint) {
+		this.favorites[blueprint.instanceGuid] = blueprint;
+		signals.favoriteAdded.dispatch(blueprint);
+		signals.favoritesChanged.dispatch();
+	}
+
+	RemoveFavorite(blueprint) {
+		delete this.favorites[blueprint.instanceGuid];
+		signals.favoriteRemoved.dispatch(blueprint);
+		signals.favoritesChanged.dispatch();
+	}
+
 	Initialize() {
 		// Adds the chrome background and debug window
 		if(this.debug === true) {

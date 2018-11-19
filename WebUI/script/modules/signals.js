@@ -28,6 +28,8 @@ var signals = {
     objectChanged: new Signal(),
     objectRemoved: new Signal(),
 
+    favoriteAdded: new Signal(),
+	favoriteRemoved: new Signal(),
     favoritesChanged: new Signal(),
 
     setObjectName: new Signal(),

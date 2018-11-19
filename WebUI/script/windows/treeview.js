@@ -74,7 +74,15 @@ class TreeView {
 	        plugins: ["types", "sort", "json_data", "search"],
 	        search: {
 		        case_insensitive: true,
-		        show_only_matches: true
+		        show_only_matches: true,
+		        search_callback: function (searchString, node) {
+			        for(let i = 0; i < node.original.content.length; i++) {
+			        	if(node.original.content[i].text.toLowerCase().indexOf(searchString.toLowerCase()) !== -1) {
+			        		console.log(node.original.content[i].text);
+			        		return true;
+				        }
+			        }
+		        }
 	        },
 	        sort: function(a, b) {
 		        let a1 = this.get_node(a);

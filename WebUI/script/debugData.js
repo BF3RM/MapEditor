@@ -15,8 +15,8 @@ var json = `
   "B1E3B4B8-062A-1DA8-E13D-8D7095F2A610": {
     "typeName": "SpatialPrefabBlueprint",
     "name": "M16A4KitPickup_prefab",
-    "partitionGuid": "625C2806-0CE7-11E0-915B-91EB202EAE87",
-    "instanceGuid": "B9E3B4B8-062A-1DA8-E13D-8D7095F2A610",
+    "partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
+    "instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
     "variations": {
       "3490128360": "SomeVariation: 3490128360",
       "1446624100": "SomeVariation: 1446624100",
