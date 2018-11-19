@@ -31,8 +31,8 @@ class Hierarchy {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
-		/*signals.setObjectName.add(this.onSetObjectName.bind(this));
-*/
+		signals.setObjectName.add(this.onSetObjectName.bind(this));
+
 	}
 
 	onSpawnedBlueprint(command) {
@@ -63,7 +63,14 @@ class Hierarchy {
 		}
 		
 	}
+	onSetObjectName(command) {
+		let scope = this;
+		let node = scope.dom.jstree(true).get_node(command.guid);
+		if (node !== null || node !== undefined){
 
+			scope.dom.jstree(true).rename_node(node, command.name);
+		}
+	}
 
 	Initialize() {
 
