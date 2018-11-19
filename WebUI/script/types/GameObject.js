@@ -145,7 +145,7 @@ class GameObject extends THREE.Object3D
 		this.onSelected();
 	}
 	Deselect() {
-		this.onDeselected();
+		// this.onDeselected();
 	}
 
 	onSelected() {

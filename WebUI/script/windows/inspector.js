@@ -6,7 +6,7 @@ class Inspector {
 		this.variation = null;
 		this.Initialize();
 
-		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
 
 		this.updates = {
@@ -171,7 +171,7 @@ class Inspector {
 		this.dom.show()
 	}
 
-	onSelectedEntity(command) {
+	onSelectedGameObject(command) {
 		let gameObject = editor.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
 			let variationSelect = $(document.getElementById("objectVariation"));

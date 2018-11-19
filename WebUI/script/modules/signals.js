@@ -9,8 +9,8 @@ var signals = {
     spawnedBlueprint: new Signal(),
 	destroyedBlueprint: new Signal(),
 
-    selectedEntity: new Signal(),
-    deselectedEntity: new Signal(),
+    selectedGameObject: new Signal(),
+    deselectedGameObject: new Signal(),
 
     setTransform: new Signal(),
     folderSelected: new Signal(),

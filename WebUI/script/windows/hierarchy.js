@@ -29,8 +29,8 @@ class Hierarchy {
 
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		signals.selectedEntity.add(this.onSelected.bind(this));
-		signals.deselectedEntity.add(this.onDeselected.bind(this));
+		signals.selectedGameObject.add(this.onSelected.bind(this));
+		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 
 

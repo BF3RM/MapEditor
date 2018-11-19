@@ -59,16 +59,16 @@ $(document).keydown(function(e) {
 		editor.SelectParent();
 	}
 	if( keysdown[17] && e.which == 68) { // CTRL + D 
-		editor.selectedEntity.Clone(editor.selectedEntity.parent); //Clone on orginal entity's parent
+		editor.selectedGameObject.Clone(editor.selectedGameObject.parent); //Clone on orginal entity's parent
 	}
 	if( keysdown[17] && e.which == 67) { // CTRL + C 
-		editor.copiedEntity = editor.selectedEntity; // Copy entity
+		editor.copiedEntity = editor.selectedGameObject; // Copy entity
 	}
 	if( keysdown[17] && e.which == 86) { // CTRL + V
 		editor.Paste(); // Paste entity
 	}
 	if( keysdown[17] && keysdown[16] && e.which == 68) { // CTRL + SHIFT + D
-		editor.selectedEntity.Clone(); //Clone on root
+		editor.selectedGameObject.Clone(); //Clone on root
 	}
 
 	if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z

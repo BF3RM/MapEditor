@@ -9,8 +9,8 @@ class VEXTemulator {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
-		this.commands['SelectEntityCommand'] = this.SelectEntity;
-		this.commands['DeselectEntityCommand'] = this.DeselectEntity;
+		this.commands['SelectGameObjectCommand'] = this.SelectEntity;
+		this.commands['DeselectGameObjectCommand'] = this.DeselectEntity;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
 		this.commands['SetTransformCommand'] = this.SetTransform;
 		this.commands['SetVariationCommand'] = this.SetVariation;
@@ -87,7 +87,7 @@ class VEXTemulator {
 	SelectEntity(command) {
 		//TODO: Support multiple selections
 		let response = {
-			"type": "SelectedEntity",
+			"type": "SelectedGameObject",
 			"guid": command.guid,
 			"aabb": "notimplemented",
 			"parameters": command.parameters
@@ -97,7 +97,7 @@ class VEXTemulator {
 	DeselectEntity(command) {
 		//TODO: Support multiple selections
 		let response = {
-			"type": "DeselectedEntity",
+			"type": "DeselectedGameObject",
 			"guid": command.guid,
 			"parameters": command.parameters
 		};

@@ -29,8 +29,8 @@ class Editor {
 		this.entityFactory = new EntityFactory();
 
 		// Events that the editor should execute last
-		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
-		signals.deselectedEntity.add(this.onDeselectedEntity.bind(this));
+		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
+		signals.deselectedGameObject.add(this.onDeselectedGameObject.bind(this));
 
 		/*
 
@@ -47,7 +47,8 @@ class Editor {
 
 		this.gameObjects = {};
 		this.favorites = [];
-
+		this.selectionGroup = new Group();
+		this.webGL.AddObject(this.selectionGroup);
 
 		this.Initialize();
 
@@ -316,9 +317,9 @@ class Editor {
 	Select(guid) {
 
 		if(keysdown[17]) {
-			this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand", {multiple: true}))
+			this.vext.SendCommand(new VextCommand(guid, "SelectGameObjectCommand", {multiple: true}))
 		} else {
-			this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand", {multiple: false}))
+			this.vext.SendCommand(new VextCommand(guid, "SelectGameObjectCommand", {multiple: false}))
 		}
 		//this.selected.push(this.getGameObjectByGuid(guid));
 	}
@@ -326,14 +327,14 @@ class Editor {
 	Deselect(guid) {
 
 		if(keysdown[17]) {
-			this.vext.SendCommand(new VextCommand(guid, "DeselectEntityCommand", {multiple: true}))
+			this.vext.SendCommand(new VextCommand(guid, "DeselectGameObjectCommand", {multiple: true}))
 		} else {
-			this.vext.SendCommand(new VextCommand(guid, "DeselectEntityCommand", {multiple: false}))
+			this.vext.SendCommand(new VextCommand(guid, "DeselectGameObjectCommand", {multiple: false}))
 		}
 		//this.selected.push(this.getGameObjectByGuid(guid));
 	}
 
-	onSelectedEntity(command) {
+	onSelectedGameObject(command) {
 		let scope = this;
 		let gameObject = scope.gameObjects[command.guid];
 		if(gameObject === undefined) {
@@ -342,34 +343,43 @@ class Editor {
 		}
 		console.log(scope.selected);
 
-		if(!command.parameters.multiple && Object.keys(scope.selected).length !== 0) {
-			Object.keys(scope.selected).forEach(function (key) {
-				if(key !== command.guid)
-					scope.Deselect(key);
-			});
+		if(!command.parameters.multiple && scope.selectionGroup.children.length !== 0) {
+
+			scope.selectionGroup.Deselect();
 		}
 
-		scope.selected[gameObject.guid] = gameObject;
-		gameObject.Select();
 
+		console.log(scope.selectionGroup);
+		
+		scope.selectionGroup.AttachObject(gameObject);
+		scope.selectionGroup.Select();
+		// scope.selectionGroup.matrixWorld = gameObject.matrixWorld;
+		scope.webGL.AttachGizmoTo(scope.selectionGroup);
+		
 		//TODO: make this not ugly.
 
-		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
 		scope.webGL.Render();
 
 	}
 
-	onDeselectedEntity(command) {
+	onDeselectedGameObject(command) {
 		let scope = this;
-		scope.selected[command.guid].Deselect();
-		delete scope.selected[command.guid];
+		let gameObject = scope.gameObjects[command.guid];
+
+		// if (!command.parameters.multiple) {
+			
+		// }
+
+		scope.selectionGroup.Detach(gameObject);
+		// delete scope.selected[command.guid];
+
 		scope.webGL.Render();
 	}
 
-	onSelectedEntities(command) {
-		let scope = this;
+	// onSelectedEntities(command) {
+	// 	let scope = this;
 
-	}
+	// }
 
 	/*
 

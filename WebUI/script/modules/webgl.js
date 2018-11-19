@@ -97,16 +97,16 @@ class WebGL {
 		let mesh = new THREE.Mesh(geometry, material);
 
 		this.scene.add(mesh);
-
-		let matrix = new THREE.Matrix4();
-		matrix.set(
-			transform.left.x, transform.up.x, transform.forward.x, 0,
-			transform.left.y, transform.up.y, transform.forward.y, 0,
-			transform.left.z, transform.up.z, transform.forward.z, 0,
-			0, 0, 0, 1);
-		mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
-		mesh.setRotationFromMatrix(matrix);
-
+		if (transform != null) {
+			let matrix = new THREE.Matrix4();
+			matrix.set(
+				transform.left.x, transform.up.x, transform.forward.x, 0,
+				transform.left.y, transform.up.y, transform.forward.y, 0,
+				transform.left.z, transform.up.z, transform.forward.z, 0,
+				0, 0, 0, 1);
+			mesh.position.set(transform.trans.x, transform.trans.y, transform.trans.z);
+			mesh.setRotationFromMatrix(matrix);
+		}
 		//this.Render();
 		return mesh;
 	}
@@ -364,7 +364,7 @@ class WebGL {
 
 
 	onObjectChanged(e) {
-		if (editor.selectedEntity == null) {
+		if (editor.selectedGameObject == null) {
 			return;
 		}
 

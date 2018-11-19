@@ -20,7 +20,7 @@ function Editor:RegisterVars()
         SpawnBlueprintCommand = self.SpawnBlueprint,
         DestroyBlueprintCommand = self.DestroyBlueprint,
         SetTransformCommand = self.SetTransform,
-        SelectEntityCommand = self.SelectEntity
+        SelectGameObjectCommand = self.SelectGameObject
     }
     self.m_Messages = {
         MoveObjectMessage = self.MoveObject
@@ -197,14 +197,14 @@ function Editor:DestroyBlueprint(p_Command)
 end
 
 
-function Editor:SelectEntity(p_Command)
+function Editor:SelectGameObject(p_Command)
 
     if ( m_ClientEntityManager:GetEntityByGuid(p_Command.guid) == nil) then
         return false
     end
     local s_Response = {
         guid = p_Command.guid,
-        ['type'] = 'SelectedEntity'
+        ['type'] = 'SelectedGameObject'
     }
    return s_Response
 end
