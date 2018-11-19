@@ -220,6 +220,25 @@ class Editor {
 		}
 		gameObject.setVariation(command.key);
 	}
+	onControlMoveStart() {
+		let scope = this;
+		Object.keys(scope.selected).forEach(function (key) {
+			scope.selected[key].onMoveStart();
+		});
+	}
+	onControlMove() {
+		let scope = this;
+		Object.keys(scope.selected).forEach(function (key) {
+			scope.selected[key].onMove();
+		});
+	}
+	onControlMoveEnd() {
+		let scope = this;
+		Object.keys(scope.selected).forEach(function (key) {
+			scope.selected[key].onMoveEnd();
+		});
+
+	}
 
 
 	onBlueprintSpawnRequested(blueprint, transform, variation) {
