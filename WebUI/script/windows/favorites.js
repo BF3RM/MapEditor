@@ -38,7 +38,7 @@ class Favorites {
 		`);
 		Object.keys(editor.favorites).forEach(function(key) {
 
-			let entry = editor.favorites[key].CreateEntry(true);
+			let entry = editor.favorites[key].CreateEntry();
 			scope.directory.append(entry);
 		});
 	}

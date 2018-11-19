@@ -19,7 +19,7 @@ class Blueprint {
 		}
 	}
 
-	CreateEntry() {
+	CreateEntry(folderName) {
 		let blueprint = this;
 		let entry = $(document.createElement("tr"));
 		let icon = $(document.createElement("i"));
@@ -33,7 +33,11 @@ class Blueprint {
 			icon.addClass("favorited");
 
 		icon.addClass(blueprint.typeName);
-		name.html(blueprint.getName());
+		if(folderName === undefined) {
+			name.html(blueprint.getName());
+		} else {
+			name.html(blueprint.name.replace(folderName, ''));
+		}
 		type.html(blueprint.typeName);
 		icon.on('mouseover', function(e) {
 			if(!blueprint.favorited) {
