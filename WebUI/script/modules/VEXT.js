@@ -6,6 +6,7 @@ class VEXTInterface {
 			"SpawnedBlueprint":     signals.spawnedBlueprint.dispatch,
 			"DestroyedBlueprint":   signals.destroyedBlueprint.dispatch,
 			"SelectedEntity":       signals.selectedEntity.dispatch,
+			"DeselectedEntity":    signals.deselectedEntity.dispatch,
 			'SetObjectName':        signals.setObjectName.dispatch,
 			'SetTransform':         signals.setTransform.dispatch,
 			'SetVariation':         signals.setVariation.dispatch,

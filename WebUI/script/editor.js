@@ -30,6 +30,7 @@ class Editor {
 
 		// Events that the editor should execute last
 		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.deselectedEntity.add(this.onDeselectedEntity.bind(this));
 
 		/*
 
@@ -37,7 +38,7 @@ class Editor {
 
 		 */
 		this.playerName = null;
-		this.selected = null;
+		this.selected = [];
 		this.raycastTransform = new LinearTransform();
 		this.s2wTransform = new LinearTransform();
 
@@ -294,12 +295,22 @@ class Editor {
 
 
 	Select(guid) {
-		//TODO: Support multiple shit
-		if((this.selected != null && this.selected.guid == guid) || $.inArray(guid, this.selected) !== -1) {
-			console.log("Selected the same item");
-			return;
+
+		if(keysdown[17]) {
+			this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand", {multiple: true}))
+		} else {
+			this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand", {multiple: false}))
 		}
-		this.vext.SendCommand(new VextCommand(guid, "SelectEntityCommand"))
+		//this.selected.push(this.getGameObjectByGuid(guid));
+	}
+
+	Deselect(guid) {
+
+		if(keysdown[17]) {
+			this.vext.SendCommand(new VextCommand(guid, "DeselectEntityCommand", {multiple: true}))
+		} else {
+			this.vext.SendCommand(new VextCommand(guid, "DeselectEntityCommand", {multiple: false}))
+		}
 		//this.selected.push(this.getGameObjectByGuid(guid));
 	}
 
@@ -310,16 +321,30 @@ class Editor {
 			scope.logger.LogError("Failed to select gameobject: " + command.guid);
 			return;
 		}
-		if(scope.selected !== null)
-			scope.selected.onDeselected();
+		console.log(scope.selected);
 
-		scope.selected = gameObject;
+		if(!command.parameters.multiple && Object.keys(scope.selected).length !== 0) {
+			Object.keys(scope.selected).forEach(function (key) {
+				if(key !== command.guid)
+					scope.Deselect(key);
+			});
+		}
+
+		scope.selected[gameObject.guid] = gameObject;
+		gameObject.Select();
 
 		//TODO: make this not ugly.
 
-		//UnUglify()
-		gameObject.onSelected();
 		this.webGL.AttachGizmoTo(this.gameObjects[command.guid]);
+		scope.webGL.Render();
+
+	}
+
+	onDeselectedEntity(command) {
+		let scope = this;
+		scope.selected[command.guid].Deselect();
+		delete scope.selected[command.guid];
+		scope.webGL.Render();
 	}
 
 	onSelectedEntities(command) {

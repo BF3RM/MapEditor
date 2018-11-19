@@ -316,7 +316,7 @@ class WebGL {
 	}
 	static onControlMouseDown(e) {
 		//Stop moving
-		editor.selected.onMoveStart();
+//		editor.selected.onMoveStart();
 
 		editor.setUpdating(true);
 
@@ -332,7 +332,7 @@ class WebGL {
 	}
 	static onControlChanged() {
 		//moving
-		editor.selected.onMove();
+//		editor.selected.onMove();
 		editor.webGL.Render();
 
 	}
@@ -341,7 +341,7 @@ class WebGL {
 		if(editor.webGL.raycastPlacing == false) {
 		}
 		editor.setUpdating(false);
-		editor.selected.onMoveEnd();
+//		editor.selected.onMoveEnd();
 		//Stop Moving
 	}
 

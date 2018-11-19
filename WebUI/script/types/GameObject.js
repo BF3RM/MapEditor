@@ -10,6 +10,7 @@ class GameObject extends THREE.Object3D
 		this.transform = transform;
 		this.objectParent = parent;
 		this.parameters = parameters;
+		this.selected = false;
 
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);
@@ -136,10 +137,19 @@ class GameObject extends THREE.Object3D
 		// Send move command to server
 	}
 
+	Select() {
+		this.onSelected();
+	}
+	Deselect() {
+		this.onDeselected();
+	}
+
 	onSelected() {
+		this.selected = true;
 		this.visible = true;
 	}
 	onDeselected() {
+		this.selected = false;
 		this.visible = false;
 	}
 

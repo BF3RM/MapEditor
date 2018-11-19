@@ -10,6 +10,7 @@ class VEXTemulator {
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
 		this.commands['SelectEntityCommand'] = this.SelectEntity;
+		this.commands['DeselectEntityCommand'] = this.DeselectEntity;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
 		this.commands['SetTransformCommand'] = this.SetTransform;
 		this.commands['SetVariationCommand'] = this.SetVariation;
@@ -88,8 +89,18 @@ class VEXTemulator {
 		let response = {
 			"type": "SelectedEntity",
 			"guid": command.guid,
-			"aabb": "notimplemented"
+			"aabb": "notimplemented",
+			"parameters": command.parameters
 		}
+		editor.vext.HandleResponse(response);
+	}
+	DeselectEntity(command) {
+		//TODO: Support multiple selections
+		let response = {
+			"type": "DeselectedEntity",
+			"guid": command.guid,
+			"parameters": command.parameters
+		};
 		editor.vext.HandleResponse(response);
 	}
 

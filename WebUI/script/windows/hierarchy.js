@@ -21,7 +21,6 @@ class Hierarchy {
 		this.entries = [];
 		this.entries["root"] = this.data;
 
-		this.selected = this.entries["root"];
 
 		this.dom = this.CreateDom();
 		this.topControls = this.CreateTopControls();
@@ -30,8 +29,10 @@ class Hierarchy {
 
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		signals.selectedEntity.add(this.onSelectedEntity.bind(this));
+		signals.selectedEntity.add(this.onSelected.bind(this));
+		signals.deselectedEntity.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
+
 
 	}
 
@@ -90,16 +91,14 @@ class Hierarchy {
 				show_only_matches : true
 			},
 
-			plugins: ["search", "dnd", "types"]
+			plugins: ["search", "dnd", "types", "changed"]
 		});
 		// Set data twice so we can update the scope data directly. :shrug:
 		dom.jstree(true).settings.core.data = scope.data;
-		dom.bind(
-			"select_node.jstree", function(evt, data){
-				if(scope.selected.id !== data.node.id) {
-					editor.Select(data.node.id);
-				}
-			});
+		dom.bind("changed.jstree", function(evt, data) {
+			editor.Select(data.node.id);
+		});
+
 		dom.bind("move_node.jstree", function (e, data) {
 			scope.onMoved(data);
 		});
@@ -141,11 +140,22 @@ class Hierarchy {
 		let parent = editor.getGameObjectByGuid(nodeData.parent);
 	}
 
-	onSelectedEntity(command) {
+	onSelected(command) {
+		let scope = this;
+		let node = scope.dom.jstree(true).get_node(command.guid);
+		console.log(node);
+		scope.selecting = true;
+		this.dom.jstree('select_node', node, true);
+		scope.selecting = false;
+	}
 
-		this.dom.jstree('deselect_node', this.selected);
-		this.dom.jstree('select_node', command.guid);
-		this.selected = this.getEntry(command.guid);
+	onDeselected(command) {
+		let scope = this;
+		let node = scope.dom.jstree(true).get_node(command.guid);
+		console.log(node);
+		scope.selecting = true;
+		this.dom.jstree('deselect_node', node, true);
+		scope.selecting = false;
 	}
 }
 
