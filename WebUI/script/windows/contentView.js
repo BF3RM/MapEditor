@@ -27,40 +27,7 @@ class ContentView {
 		`);
 		for(let i = 0; i < content.length; i++) {
 			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
-			let entry = $(document.createElement("tr"));
-			let icon = $(document.createElement("i"));
-			let name = $(document.createElement("td"));
-			let type = $(document.createElement("td"));
-			entry.append(icon);
-			entry.append(name);
-			entry.append(type);
-			icon.addClass("jstree-icon favoritable");
-			icon.addClass(blueprint.typeName);
-			name.html(blueprint.name.replace(folderName, ''));
-			type.html(blueprint.typeName);
-
-			icon.on('mouseover', function(e) {
-				if(!blueprint.favorited) {
-					icon.removeClass("favorited");
-				}
-			});
-			icon.on('click', function(e) {
-				//Unfavorite
-				if(icon.hasClass("favorited")) {
-					editor.RemoveFavorite(blueprint);
-					icon.removeClass("favorited");
-				} else {
-					//Favorite
-					editor.AddFavorite(blueprint);
-					icon.addClass("favorited")
-				}
-				signals.favoritesChanged.dispatch();
-			});
-
-			name.on('click', function(e, data) {
-				signals.spawnBlueprintRequested.dispatch(blueprint);
-			});
-
+			let entry = blueprint.CreateEntry();
 			this.directory.append(entry);
 		}
 	}

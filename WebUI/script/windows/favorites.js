@@ -36,37 +36,9 @@ class Favorites {
 				<th><b>Type</b></th>
 			</tr>
 		`);
-		Object.keys(editor.favorites).forEach(function(e) {
+		Object.keys(editor.favorites).forEach(function(key) {
 
-			let blueprint = editor.favorites[e];
-			let entry = $(document.createElement("tr"));
-			let icon = $(document.createElement("i"));
-			let name = $(document.createElement("td"));
-			let type = $(document.createElement("td"));
-			entry.append(icon);
-			entry.append(name);
-			entry.append(type);
-			icon.addClass("jstree-icon favoritable favorited");
-			icon.addClass(blueprint.typeName);
-			name.html(blueprint.getName());
-			type.html(blueprint.typeName);
-
-			icon.on('click', function(e) {
-				//Unfavorite
-				if(icon.hasClass("favorited")) {
-					editor.RemoveFavorite(blueprint);
-					icon.removeClass("favorited");
-				} else {
-					//Favorite
-					editor.AddFavorite(blueprint);
-					icon.addClass("favorited")
-				}
-				signals.favoritesChanged.dispatch();
-			});
-
-			name.on('click', function(e, data) {
-				signals.spawnBlueprintRequested.dispatch(blueprint);
-			});
+			let entry = editor.favorites[key].CreateEntry(true);
 			scope.directory.append(entry);
 		});
 	}
