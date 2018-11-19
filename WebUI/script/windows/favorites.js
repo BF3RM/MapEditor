@@ -60,7 +60,7 @@ class Favorites {
 				} else {
 					//Favorite
 					editor.AddFavorite(blueprint);
-					blueprint.SetFavorite(false);
+					blueprint.SetFavorite(true);
 					icon.addClass("favorited")
 				}
 				signals.favoritesChanged.dispatch();

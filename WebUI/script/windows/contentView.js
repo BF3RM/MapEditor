@@ -40,7 +40,6 @@ class ContentView {
 			type.html(blueprint.typeName);
 
 			icon.on('mouseover', function(e) {
-				console.log(blueprint)
 				if(!blueprint.favorited) {
 					icon.removeClass("favorited");
 				}
@@ -54,7 +53,7 @@ class ContentView {
 				} else {
 					//Favorite
 					editor.AddFavorite(blueprint);
-					blueprint.SetFavorite(false);
+					blueprint.SetFavorite(true);
 					icon.addClass("favorited")
 				}
 				signals.favoritesChanged.dispatch();
