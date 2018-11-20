@@ -1,19 +1,17 @@
 
-class Group extends THREE.Object3D
+class Group extends THREE.Group
 {
-	constructor(guid, typeName, localTransform)
+	constructor(guid = GenerateGuid(), name = "New Group", transform = new LinearTransform())
 	{
 		super( );
 
 		this.guid = guid;
-		// this.typeName = typeName;
-		this.transform = new LinearTransform();
-		// this.aabb = {
+		this.name = name
+		this.transform = transform;
 		this.selected = false;
-		// }
 
 		// Update the matrix after initialization.
-		// this.updateTransform();
+		this.updateTransform();
 
 	}
 	hasMoved() {

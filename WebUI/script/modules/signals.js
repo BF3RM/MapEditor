@@ -9,6 +9,10 @@ var signals = {
     spawnedBlueprint: new Signal(),
 	destroyedBlueprint: new Signal(),
 
+    createGroupRequested: new Signal(),
+    createdGroup: new Signal(),
+    destroyedGroup: new Signal(),
+
     selectedGameObject: new Signal(),
     deselectedGameObject: new Signal(),
 

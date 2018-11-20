@@ -52,6 +52,8 @@
 		<script src="script/commands/DestroyBlueprintCommand.js"></script>
 		<script src="script/commands/SetObjectNameCommand.js"></script>
 		<script src="script/commands/SetVariationCommand.js"></script>
+		<script src="script/commands/CreateGroupCommand.js"></script>
+		<script src="script/commands/DestroyGroupCommand.js"></script>
 		<!--
 			Messages
 		-->
@@ -112,6 +114,8 @@
 				<ul id="menubar">
 					<li><div>File</div>
 						<ul>
+							<li><div onclick="signals.createGroupRequested.dispatch()">Add Group</div></li>
+							<li class="ui-widget-seperator"></li>
 							<li><div onclick="editor.ui.OpenClearDialog()">New Project</div></li>
 							<li><div onclick="editor.ui.OpenSaveDialog()">Save</div></li>
 							<li><div onclick="editor.ui.OpenLoadDialog()">Load</div></li>

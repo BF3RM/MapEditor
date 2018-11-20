@@ -3,7 +3,10 @@ class Editor {
 
 		// Commands
 		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
-		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));		
+		signals.createGroupRequested.add(this.onCreateGroupRequested.bind(this));
+		signals.createdGroup.add(this.onCreatedGroup.bind(this));
+		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
@@ -237,6 +240,48 @@ class Editor {
 
 	}
 
+	onCreateGroupRequested(){
+		let transform = new LinearTransform().toString();
+		let parameters = { name: "New Group", transform:  transform};
+		this.execute(new CreateGroupCommand(GenerateGuid(), parameters));
+
+	}
+
+	onCreatedGroup(command){
+		let group = new Group();
+		this.webGL.AddObject(group);
+
+		group.visible = false;
+
+		this.gameObjects[command.guid] = group;
+
+		if(command.sender === this.playerName) {
+			this.Select(command.guid)
+		}
+	}
+
+	onDestroyedGroup(command){
+
+	}
+
+	// CreateGroup(id, name, transform, parent){
+	// 	if(this.spawnedEntities[id] != null){
+	// 		console.log("A group with this ID already exists");
+	// 		return;
+	// 	}
+	// 	let webObject = this.webGL.CreateGroup(transform);
+	// 	let groupObject = new Group(id, name, webObject, transform, parent, {} );
+	// 	this.ui.hierarchy.CreateGroup(groupObject);
+
+	// 	if(parent != null){
+	// 		this.ui.hierarchy.MoveElementsInHierarchy(parent, groupObject)
+	// 	}
+
+	// 	this.TrackEntity(id, groupObject);
+	// 	this.SelectEntityById(id);
+
+	// 	return groupObject;
+	// }
 
 	onBlueprintSpawnRequested(blueprint, transform, variation) {
 	
@@ -380,18 +425,9 @@ class Editor {
 	onDeselectedGameObject(command) {
 		let scope = this;
 		let gameObject = scope.gameObjects[command.guid];
-
-		// if (!command.parameters.multiple) {
-
-		// }
 		
 		gameObject.Deselect();
-
 		scope.selectionGroup.DetachObject(gameObject);
-		
-
-		// scope.selectionGroup.Deselect(gameObject);
-		// delete scope.selected[command.guid];
 
 		scope.webGL.Render();
 	}

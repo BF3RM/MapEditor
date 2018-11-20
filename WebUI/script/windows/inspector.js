@@ -4,9 +4,11 @@ class Inspector {
 		this.transform = null;
 		this.name = null;
 		this.variation = null;
+		this.enabled = false;
 		this.Initialize();
 
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
+		signals.deselectedGameObject.add(this.onDeselectedGameObject.bind(this));
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
 
 		this.updates = {
@@ -178,9 +180,30 @@ class Inspector {
 			variationSelect.prop("disabled", true);
 			variationSelect.empty();
 			editor.logger.LogError("Tried to set the name of a null entry. " + command.guid);
+			this.DisableInspector();
 			return;
 		}
-		this.UpdateInspector(gameObject);
+
+		if (!command.parameters.multiple ){
+			this.UpdateInspector(gameObject);
+		}else{
+			this.DisableInspector();
+		}
+		
+	}
+
+	DisableInspector(){
+		$('#objectInspector').css('opacity', '0.6');
+		//TODO: disable inputs
+	}
+
+	EnableInspector(){
+		$('#objectInspector').css('opacity', '1');
+	}
+
+
+	onDeselectedGameObject(command){
+		//TODO: disable inspector if necessary
 	}
 
 	onObjectChanged(go, key, value) {

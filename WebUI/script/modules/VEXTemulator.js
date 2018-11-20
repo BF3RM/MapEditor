@@ -9,6 +9,8 @@ class VEXTemulator {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
 		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
+		this.commands['CreateGroupCommand'] = this.CreateGroup;
+		this.commands['DestroyGroupCommand'] = this.DestroyGroup;
 		this.commands['SelectGameObjectCommand'] = this.SelectEntity;
 		this.commands['DeselectGameObjectCommand'] = this.DeselectEntity;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
@@ -16,6 +18,20 @@ class VEXTemulator {
 		this.commands['SetVariationCommand'] = this.SetVariation;
 	}
 
+	CreateGroup(command) {
+		let response = {
+			"type": "CreatedGroup",
+			"guid": command.guid,
+			"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
+			"name": command.parameters.name,
+			"sender": command.sender,
+		}
+		editor.vext.HandleResponse(response);
+	}
+	DestroyGroup(command) {
+
+
+	}
 
 	SpawnBlueprint(command) {
 		// Spawn blueprint at coordinate

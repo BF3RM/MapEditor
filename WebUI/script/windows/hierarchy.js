@@ -29,6 +29,8 @@ class Hierarchy {
 
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+		signals.createdGroup.add(this.onCreatedGroup.bind(this));
+		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
 		signals.selectedGameObject.add(this.onSelected.bind(this));
 		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
@@ -39,7 +41,7 @@ class Hierarchy {
 	onSpawnedBlueprint(command) {
 		let scope = this;
 		let parent = command.parent;
-//		scope.dom.jstree(true).create_node("root", new HierarchyEntry(command.guid, command.name, command.type), "last");
+
 		let entry = new HierarchyEntry(command.guid, command.name, command.parameters.reference.typeName, scope.data.children.length, "root");
 		scope.entries[command.guid] = entry;
 		scope.data.children[scope.data.children.length] = entry;
@@ -64,6 +66,23 @@ class Hierarchy {
 		}
 		
 	}
+
+	onCreatedGroup(command) {
+		let scope = this;
+		let parent = command.parent;
+		//		scope.dom.jstree(true).create_node("root", new HierarchyEntry(command.guid, command.name, command.type), "last");
+		let entry = new HierarchyEntry(command.guid, command.name, "", scope.data.children.length, "root");
+		scope.entries[command.guid] = entry;
+		scope.data.children[scope.data.children.length] = entry;
+		scope.dom.jstree(true).create_node('root' ,  entry, "last", function(){
+		});
+
+	}
+
+	onDestroyedGroup(command) {
+
+	}
+
 	onSetObjectName(command) {
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(command.guid);

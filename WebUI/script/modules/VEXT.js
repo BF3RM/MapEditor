@@ -5,6 +5,8 @@ class VEXTInterface {
 		this.commands = {
 			"SpawnedBlueprint":     signals.spawnedBlueprint.dispatch,
 			"DestroyedBlueprint":   signals.destroyedBlueprint.dispatch,
+			"CreatedGroup":     signals.createdGroup.dispatch,
+			"DestroyedGroup":   signals.destroyedGroup.dispatch,
 			"SelectedGameObject":       signals.selectedGameObject.dispatch,
 			"DeselectedGameObject":    signals.deselectedGameObject.dispatch,
 			'SetObjectName':        signals.setObjectName.dispatch,

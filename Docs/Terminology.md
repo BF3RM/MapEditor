@@ -31,7 +31,13 @@ Reference of frostbite's blueprints, which can spawn more than one entity.
 Reference of frostbite's prefabs, which can spawn more than one blueprint. 
 
 #GameObject
-Three.js Object3D subclass that represents the container of entities that blueprints or prefabs create. The gizmo is attached to these objects and they hold the entity/entities as children. These entities are represented as GameEntities.
+Three.js Object3D subclass that represents the container of entities that blueprints or prefabs create. These objects are attached to the selection Group, and they hold the entity/entities as children. These entities are represented as GameEntities.
 
 #GameEntity
-Three.js Object3D subclass that represent the entities created by a blueprint or prefab. They aren't selectable and they have AABB (Axis Aligned Bounding Box).
+Three.js Object3D subclass that represent the entities created by a blueprint or prefab. They aren't selectable, they only move with the GameObject that contains them and they have AABB (Axis Aligned Bounding Box).
+
+#Group
+Three.js Group subclass that can hold multiple GameEntities or other Groups to move them and their children together.
+
+#SelectionGroup
+Group subclass, where only one instance exists with the purpose of adding selected objects to it allowing multiselection. The Gizmo is only attached to this intance.
