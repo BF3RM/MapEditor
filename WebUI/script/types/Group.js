@@ -5,34 +5,66 @@ class Group extends THREE.Object3D
 	{
 		super( );
 
-		// this.guid = guid;
+		this.guid = guid;
 		// this.typeName = typeName;
-		// this.localTransform = localTransform;
+		this.transform = new LinearTransform();
 		// this.aabb = {
-			this.selected = false;
+		this.selected = false;
 		// }
 
 		// Update the matrix after initialization.
 		// this.updateTransform();
 
 	}
-
+	hasMoved() {
+		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
+	}
 
 	updateTransform()
 	{
 		let matrix = new THREE.Matrix4();
 		matrix.set(
-			this.localTransform.left.x, this.localTransform.up.x, this.localTransform.forward.x, 0,
-			this.localTransform.left.y, this.localTransform.up.y, this.localTransform.forward.y, 0,
-			this.localTransform.left.z, this.localTransform.up.z, this.localTransform.forward.z, 0,
-			0, 0, 0, 1);
+			this.transform.left.x, this.transform.up.x, this.transform.forward.x, 0,
+			this.transform.left.y, this.transform.up.y, this.transform.forward.y, 0,
+			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
+			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
 
 		this.setRotationFromMatrix(matrix);
 		this.scale.setFromMatrixScale(matrix);
 
-		this.position.set(this.localTransform.trans.x, this.localTransform.trans.y, this.localTransform.trans.z);
+		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
+
 		//editor.webGL.Render();
 
+	}
+
+	onMoveStart() {
+		console.log("move start");
+		// TODO: Validate that the object exists
+	}
+
+	onMove() {
+		console.log("moving");
+		// let scope = this;
+		// if(!scope.hasMoved()) {
+		// 	return;
+		// }
+		// let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+		// signals.objectChanged.dispatch(this, "transform", transform)
+		// Send move message to client
+	}
+	onMoveEnd() {
+		console.log("move end");
+		// let scope = this;
+		// if(!scope.hasMoved()) {
+		// 	return; // No position change
+		// }
+		// let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+		// let command = new SetTransformCommand(this.guid, transform, scope.transform);
+		// editor.execute(command);
+		// signals.objectChanged.dispatch(this, "transform", transform)
+
+		// Send move command to server
 	}
 
 	Select() {
@@ -94,4 +126,35 @@ class Group extends THREE.Object3D
 		editor.webGL.Render(); // REMOVE
 	}
 
+}
+
+class SelectionGroup extends Group{
+
+	// We move the children but not the group, as it's not synced.
+	onMoveStart() {
+		console.log("move start");
+	}
+
+	onMove() {
+		console.log("moving");
+		let scope = this;
+		if(!scope.hasMoved()) {
+			return;
+		}
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].onMove();
+		}
+	}
+	onMoveEnd() {
+		console.log("move end");
+		let scope = this;
+		if(!scope.hasMoved()) {
+			return; // No position change
+		}
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].onMoveEnd();
+		}
+	}
 }

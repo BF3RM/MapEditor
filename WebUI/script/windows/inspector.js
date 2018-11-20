@@ -137,18 +137,18 @@ class Inspector {
 		// Rotation needs to be converted first.
 		if(type == "rotation") {
 			let eulerRot = new THREE.Euler( this.transform.rotation.x.val() * THREE.Math.DEG2RAD, this.transform.rotation.y.val() * THREE.Math.DEG2RAD, this.transform.rotation.z.val() * THREE.Math.DEG2RAD);
-			editor.selected.rotation.copy(eulerRot);
+			editor.selectionGroup.rotation.copy(eulerRot);
 		} else {
-		   editor.selected[type][key] = Number(value);
+		   // editor.selected[type][key] = Number(value);
 		}
 		editor.webGL.Render();
-		editor.selected.onMove();
+		editor.selectionGroup.onMove();
 
 		if(!final) {
 			editor.setUpdating(true);
 		} else {
 			editor.setUpdating(false);
-			editor.selected.onMoveEnd();
+			editor.selectionGroup.onMoveEnd();
 		}
 	}
 

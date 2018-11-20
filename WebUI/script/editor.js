@@ -38,7 +38,7 @@ class Editor {
 
 		 */
 		this.playerName = null;
-		this.selected = [];
+		// this.selected = [];
 		this.raycastTransform = new LinearTransform();
 		this.s2wTransform = new LinearTransform();
 
@@ -49,7 +49,7 @@ class Editor {
 		this.favorites = [];
 
 		// Creates selection group and add it to the scene
-		this.selectionGroup = new Group();
+		this.selectionGroup = new SelectionGroup();
 		this.webGL.AddObject(this.selectionGroup);
 
 		this.Initialize();
@@ -205,7 +205,7 @@ class Editor {
 		gameObject.setName(command.name);
 	}
 
-	onSetTransform (command) {
+	onSetTransform(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
 			this.logger.LogError("Tried to set the transform of a null object: " + command.guid);
@@ -225,21 +225,15 @@ class Editor {
 	}
 	onControlMoveStart() {
 		let scope = this;
-		Object.keys(scope.selected).forEach(function (key) {
-			scope.selected[key].onMoveStart();
-		});
+		scope.selectionGroup.onMoveStart();
 	}
 	onControlMove() {
 		let scope = this;
-		Object.keys(scope.selected).forEach(function (key) {
-			scope.selected[key].onMove();
-		});
+		scope.selectionGroup.onMove();
 	}
 	onControlMoveEnd() {
 		let scope = this;
-		Object.keys(scope.selected).forEach(function (key) {
-			scope.selected[key].onMoveEnd();
-		});
+		scope.selectionGroup.onMoveEnd();
 
 	}
 
@@ -436,8 +430,18 @@ class Editor {
 	 */
 	onHistoryChanged(cmd) {
 		let scope = this;
-		if(cmd.currentlySelected !== null && scope.selected !== cmd.currentlySelected) {
-			scope.Select(cmd.currentlySelected.guid);
+		if(cmd.currentlySelected !== null && cmd.currentlySelected !== scope.selectionGroup ) {
+			// console.log(cmd);
+			// for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
+			// 	if (scope.selectionGroup.children.length[i] == cmd.currentlySelected){
+			// 		break;
+			// 	}
+			// }
+
+			for (var i = cmd.currentlySelected.length - 1; i >= 0; i--) {
+				scope.Select(cmd.currentlySelected[i].guid);
+			}
+			
 		}
 	}
 

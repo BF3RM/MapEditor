@@ -414,10 +414,14 @@ class UI {
 	}
 
 	onConfirmDeleteEntity() {
-		if (editor.selected == null) {
-			console.error("Tried to delete a null entity")
-		}else{
-			editor.execute(new DestroyBlueprintCommand(editor.selected.guid));
+		// if (editor.selected == null) {
+		// 	console.error("Tried to delete a null entity")
+		// }else{
+		// 	editor.execute(new DestroyBlueprintCommand(editor.selected.guid));
+		// }
+
+		for (var i = editor.selectionGroup.children.length - 1; i >= 0; i--) {
+			editor.execute(new DestroyBlueprintCommand(editor.selectionGroup.children[i].guid));
 		}
 		
 		$(this).dialog("close");
