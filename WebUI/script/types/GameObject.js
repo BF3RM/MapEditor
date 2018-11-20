@@ -70,13 +70,24 @@ class GameObject extends THREE.Object3D
 			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
 			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
 
+		// As the position is local, we have to detach the object from its parent first
+		let parent = this.parent;
+
+		// remove child from parent and add it to scene
+		if (parent !== null){
+			THREE.SceneUtils.detach( this, parent, editor.webGL.scene );
+		}
+
 		this.setRotationFromMatrix(matrix);
-		this.scale.setFromMatrixScale(matrix);
+		// this.scale.setFromMatrixScale(matrix); //This is fucked
+		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
+		editor.webGL.Render();
 
-		this.worldToLocal(this.transform.trans);
-		//this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-
-		//editor.webGL.Render();
+		// remove child from scene and add it to parent
+		if (parent !== null){
+			THREE.SceneUtils.attach( this, editor.webGL.scene, parent );
+		}
+		editor.webGL.Render();
 
 	}
 

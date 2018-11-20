@@ -43,24 +43,24 @@ class Group extends THREE.Group
 
 	onMove() {
 		console.log("moving");
-		// let scope = this;
-		// if(!scope.hasMoved()) {
-		// 	return;
-		// }
-		// let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		// signals.objectChanged.dispatch(this, "transform", transform)
+		let scope = this;
+		if(!scope.hasMoved()) {
+			return;
+		}
+		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+		signals.objectChanged.dispatch(this, "transform", transform)
 		// Send move message to client
 	}
 	onMoveEnd() {
 		console.log("move end");
-		// let scope = this;
-		// if(!scope.hasMoved()) {
-		// 	return; // No position change
-		// }
-		// let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		// let command = new SetTransformCommand(this.guid, transform, scope.transform);
-		// editor.execute(command);
-		// signals.objectChanged.dispatch(this, "transform", transform)
+		let scope = this;
+		if(!scope.hasMoved()) {
+			return; // No position change
+		}
+		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+		let command = new SetTransformCommand(this.guid, transform, scope.transform);
+		editor.execute(command);
+		signals.objectChanged.dispatch(this, "transform", transform)
 
 		// Send move command to server
 	}
