@@ -159,6 +159,7 @@ class Inspector {
 			console.log("Tried to update the inspector with an invalid gameobject?");
 			return
 		}
+		this.EnableInspector();
 		this.UpdateName(gameObject, gameObject.name);
 		this.UpdateTransform(gameObject, gameObject.transform);
 		this.UpdateVariation(gameObject, gameObject.parameters.variation);
