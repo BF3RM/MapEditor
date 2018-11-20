@@ -75,7 +75,7 @@ class Group extends THREE.Object3D
 	}
 
 	onSelected() {
-		for (var i = this.children.length - 1; i >= 0; i--) {
+		for (let i = this.children.length - 1; i >= 0; i--) {
 			this.children[i].Select();
 		}
 		this.selected = true;
@@ -83,8 +83,8 @@ class Group extends THREE.Object3D
 	}
 
 	onDeselected() {
-		for (var i = this.children.length - 1; i >= 0; i--) {
-			this.children[i].Deselect();
+		for (let i = this.children.length - 1; i >= 0; i--) {
+			editor.vext.SendCommand(new VextCommand(this.children[i].guid, "DeselectGameObjectCommand", {multiple: false}));
 		}
 		this.selected = false;
 		this.visible = false;
