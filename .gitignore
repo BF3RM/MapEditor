@@ -1,3 +1,3 @@
-.idea
-WebUI/.idea/workspace.xml
+*.idea
 ui.vuic
+*.DS_STORE
