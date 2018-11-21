@@ -7,8 +7,6 @@ class VEXTInterface {
 			"DestroyedBlueprint":   signals.destroyedBlueprint.dispatch,
 			"CreatedGroup":     signals.createdGroup.dispatch,
 			"DestroyedGroup":   signals.destroyedGroup.dispatch,
-			"SelectedGameObject":       signals.selectedGameObject.dispatch,
-			"DeselectedGameObject":    signals.deselectedGameObject.dispatch,
 			'SetObjectName':        signals.setObjectName.dispatch,
 			'SetTransform':         signals.setTransform.dispatch,
 			'SetVariation':         signals.setVariation.dispatch,
@@ -19,7 +17,9 @@ class VEXTInterface {
 			'SetRaycastTransformMessage':			signals.setRaycastPosition.dispatch,
 			'SetPlayerNameMessage':       			signals.setPlayerName.dispatch,
 			'SetScreenToWorldPositionMessage':		signals.setScreenToWorldPosition.dispatch,
-			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch,
+			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch,			
+			'SelectedGameObject':       signals.selectedGameObject.dispatch,
+			'DeselectedGameObject':    signals.deselectedGameObject.dispatch,
 		}
 	}
 

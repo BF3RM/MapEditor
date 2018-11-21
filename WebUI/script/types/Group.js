@@ -27,11 +27,24 @@ class Group extends THREE.Group
 			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
 			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
 
+		// As the position is local, we have to detach the object from its parent first
+		let parent = this.parent;
+
+		// remove child from parent and add it to scene
+		if (parent !== null){
+			THREE.SceneUtils.detach( this, parent, editor.webGL.scene );
+		}
+
 		this.setRotationFromMatrix(matrix);
-		this.scale.setFromMatrixScale(matrix);
-
+		// this.scale.setFromMatrixScale(matrix); //This is fucked
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
+		editor.webGL.Render();
 
+		// remove child from scene and add it to parent
+		if (parent !== null){
+			THREE.SceneUtils.attach( this, editor.webGL.scene, parent );
+		}
+		editor.webGL.Render();
 		//editor.webGL.Render();
 
 	}
@@ -77,22 +90,16 @@ class Group extends THREE.Group
 			this.children[i].Select();
 		}
 		this.selected = true;
-		this.visible = true;
 	}
 
 	onDeselected() {
 		for (let i = this.children.length - 1; i >= 0; i--) {
-			editor.vext.SendCommand(new VextCommand(this.children[i].guid, "DeselectGameObjectCommand", {multiple: false}));
+			this.children[i].Deselect();
 		}
 		this.selected = false;
-		this.visible = false;
 	}
 
-	DetachAll(){
-		for (var i = this.children.length - 1; i >= 0; i--) {
-			this.DetachObject(this.children[i]);
-		}
-	}
+
 
 	DetachObject(gameObject){
 		if (gameObject.parent != this){
@@ -153,6 +160,12 @@ class SelectionGroup extends Group{
 
 		for (var i = 0; i < this.children.length; i++) {
 			this.children[i].onMoveEnd();
+		}
+	}
+
+	DetachAll(){
+		for (var i = this.children.length - 1; i >= 0; i--) {
+			this.DetachObject(this.children[i]);
 		}
 	}
 }

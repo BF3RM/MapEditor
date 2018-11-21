@@ -120,7 +120,6 @@ class GameObject extends THREE.Object3D
 			guid = GenerateGuid();
 		}
 
-
 		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.parameters);
 	}
 

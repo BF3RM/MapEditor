@@ -356,45 +356,45 @@ class Editor {
 
 
 	Select(guid) {
-
+		
 		if(keysdown[17]) {
-			this.vext.SendCommand(new VextCommand(guid, "SelectGameObjectCommand", {multiple: true}))
+			// signals.selectedGameObject.dispatch;
+			this.onSelectedGameObject(guid, true);
 		} else {
-			this.vext.SendCommand(new VextCommand(guid, "SelectGameObjectCommand", {multiple: false}))
+			// signals.selectedGameObject.dispatch;
+			this.onSelectedGameObject(guid, false);
 		}
-		//this.selected.push(this.getGameObjectByGuid(guid));
 	}
 
 	Deselect(guid) {
 
 		if(keysdown[17]) {
-			this.vext.SendCommand(new VextCommand(guid, "DeselectGameObjectCommand", {multiple: true}))
+			this.onDeselectedGameObject(guid, true);
 		} else {
-			this.vext.SendCommand(new VextCommand(guid, "DeselectGameObjectCommand", {multiple: false}))
+			this.onDeselectedGameObject(guid, false);
 		}
-		//this.selected.push(this.getGameObjectByGuid(guid));
 	}
 
-	onSelectedGameObject(command) {
+	onSelectedGameObject(guid, isMultiSelection) {
 		let scope = this;
-		let gameObject = scope.gameObjects[command.guid];
+		let gameObject = scope.gameObjects[guid];
 		if(gameObject === undefined) {
-			scope.logger.LogError("Failed to select gameobject: " + command.guid);
+			scope.logger.LogError("Failed to select gameobject: " + guid);
 			return;
 		}
 
 		// If the object is already in this group and it's a multiselection we deselect it
-		if (gameObject.parent === scope.selectionGroup && command.parameters.multiple){
+		if (gameObject.parent === scope.selectionGroup && isMultiSelection){
 			console.log("Object already selected");
-			this.Deselect(command.guid);
+			this.Deselect(guid);
 
 			return;
 		}
 
 		// Special case
-		if (!command.parameters.multiple && 
+		if (!isMultiSelection && 
 				scope.selectionGroup.children.length === 1 && 
-				scope.selectionGroup.children[0].guid == command.guid) {
+				scope.selectionGroup.children[0].guid == guid) {
 			scope.selectionGroup.Deselect();
 			scope.selectionGroup.DetachAll();
 			scope.webGL.Render();
@@ -402,15 +402,12 @@ class Editor {
 		}
 
 		// Clear selection group when there is a single selection
-		if(!command.parameters.multiple && scope.selectionGroup.children.length !== 0) {
+		if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
 			console.log("clearing group");
 			scope.selectionGroup.Deselect();
 			scope.selectionGroup.DetachAll();
 		}
-		// console.log(scope.selectionGroup);
 
-
-		
 		scope.selectionGroup.AttachObject(gameObject);
 		scope.selectionGroup.Select();
 		// scope.selectionGroup.matrixWorld = gameObject.matrixWorld; //this shit is fucked
@@ -425,9 +422,9 @@ class Editor {
 	onDeselectedGameObject(command) {
 		let scope = this;
 		let gameObject = scope.gameObjects[command.guid];
-		
-		gameObject.Deselect();
-		scope.selectionGroup.DetachObject(gameObject);
+		console.log(gameObject)
+		// gameObject.Deselect();
+		// scope.selectionGroup.DetachObject(gameObject);
 
 		scope.webGL.Render();
 	}
