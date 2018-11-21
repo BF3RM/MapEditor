@@ -367,12 +367,12 @@ class Editor {
 	}
 
 	Deselect(guid) {
-
-		if(keysdown[17]) {
-			this.onDeselectedGameObject(guid, true);
-		} else {
-			this.onDeselectedGameObject(guid, false);
-		}
+		this.onDeselectedGameObject(guid);
+		// if(keysdown[17]) {
+		// 	this.onDeselectedGameObject(guid, true);
+		// } else {
+		// 	this.onDeselectedGameObject(guid, false);
+		// }
 	}
 
 	onSelectedGameObject(guid, isMultiSelection) {
@@ -386,49 +386,39 @@ class Editor {
 		// If the object is already in this group and it's a multiselection we deselect it
 		if (gameObject.parent === scope.selectionGroup && isMultiSelection){
 			console.log("Object already selected");
-			this.Deselect(guid);
+			scope.Deselect(guid);
 
-			return;
-		}
-
-		// Special case
-		if (!isMultiSelection && 
-				scope.selectionGroup.children.length === 1 && 
-				scope.selectionGroup.children[0].guid == guid) {
-			scope.selectionGroup.Deselect();
-			scope.selectionGroup.DetachAll();
-			scope.webGL.Render();
 			return;
 		}
 
 		// Clear selection group when there is a single selection
 		if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
-			console.log("clearing group");
-			scope.selectionGroup.Deselect();
-			scope.selectionGroup.DetachAll();
+			console.log("Clearing selection group");
+			for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
+				scope.Deselect(scope.selectionGroup.children[i].guid);
+			}
 		}
 
-		console.log(scope.selectionGroup.matrixWorld);
-		scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
-		console.log(scope.selectionGroup.matrixWorld);
-
+		if (scope.selectionGroup.children.length === 0) {
+			scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
+		}
+		
 		scope.selectionGroup.AttachObject(gameObject);
 		scope.selectionGroup.Select();
 
 		scope.webGL.AttachGizmoTo(scope.selectionGroup);
-		
-		//TODO: make this not ugly.
 
 		scope.webGL.Render();
 
 	}
 
-	onDeselectedGameObject(guid, isMultiSelection) {
+	onDeselectedGameObject(guid) {
+						// todo: call signal
 		let scope = this;
 		let gameObject = scope.gameObjects[guid];
+		console.log(guid)
 		console.log(gameObject)
-		// gameObject.Deselect();
-		// scope.selectionGroup.DetachObject(gameObject);
+		scope.selectionGroup.DeselectObject(gameObject);
 
 		scope.webGL.Render();
 	}

@@ -52,7 +52,6 @@ class Group extends THREE.Group
 			THREE.SceneUtils.attach( this, editor.webGL.scene, parent );
 		}
 		editor.webGL.Render();
-		//editor.webGL.Render();
 
 	}
 
@@ -143,10 +142,17 @@ class Group extends THREE.Group
 class SelectionGroup extends Group{
 
 	// We move the children but not the group, as it's not synced.
+
+	/**
+   * @override
+   */
 	onMoveStart() {
 		console.log("move start");
 	}
 
+	/**
+   * @override
+   */
 	onMove() {
 		console.log("moving");
 		let scope = this;
@@ -158,6 +164,10 @@ class SelectionGroup extends Group{
 			this.children[i].onMove();
 		}
 	}
+
+	/**
+   * @override
+   */
 	onMoveEnd() {
 		console.log("move end");
 		let scope = this;
@@ -170,9 +180,10 @@ class SelectionGroup extends Group{
 		}
 	}
 
-	DetachAll(){
-		for (var i = this.children.length - 1; i >= 0; i--) {
-			this.DetachObject(this.children[i]);
+	DeselectObject(gameObject){
+		if (gameObject.parent === this){
+			gameObject.Deselect();
+			super.DetachObject(gameObject);
 		}
 	}
 
