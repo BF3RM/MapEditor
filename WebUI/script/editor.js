@@ -356,7 +356,7 @@ class Editor {
 
 
 	Select(guid) {
-		
+
 		if(keysdown[17]) {
 			// signals.selectedGameObject.dispatch;
 			this.onSelectedGameObject(guid, true);
@@ -408,9 +408,13 @@ class Editor {
 			scope.selectionGroup.DetachAll();
 		}
 
+		console.log(scope.selectionGroup.matrixWorld);
+		scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
+		console.log(scope.selectionGroup.matrixWorld);
+
 		scope.selectionGroup.AttachObject(gameObject);
 		scope.selectionGroup.Select();
-		// scope.selectionGroup.matrixWorld = gameObject.matrixWorld; //this shit is fucked
+
 		scope.webGL.AttachGizmoTo(scope.selectionGroup);
 		
 		//TODO: make this not ugly.
@@ -419,9 +423,9 @@ class Editor {
 
 	}
 
-	onDeselectedGameObject(command) {
+	onDeselectedGameObject(guid, isMultiSelection) {
 		let scope = this;
-		let gameObject = scope.gameObjects[command.guid];
+		let gameObject = scope.gameObjects[guid];
 		console.log(gameObject)
 		// gameObject.Deselect();
 		// scope.selectionGroup.DetachObject(gameObject);

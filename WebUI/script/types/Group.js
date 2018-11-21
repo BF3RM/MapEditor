@@ -18,6 +18,13 @@ class Group extends THREE.Group
 		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
 	}
 
+	setTransform(linearTransform) {
+		this.transform = linearTransform;
+		this.updateTransform();
+		signals.objectChanged.dispatch(this, "transform", linearTransform);
+
+	}
+
 	updateTransform()
 	{
 		let matrix = new THREE.Matrix4();
@@ -167,5 +174,11 @@ class SelectionGroup extends Group{
 		for (var i = this.children.length - 1; i >= 0; i--) {
 			this.DetachObject(this.children[i]);
 		}
+	}
+
+	setTransform(linearTransform) {
+		this.transform = linearTransform;
+		this.updateTransform();
+
 	}
 }
