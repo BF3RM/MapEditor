@@ -18,8 +18,8 @@ class VEXTInterface {
 			'SetPlayerNameMessage':       			signals.setPlayerName.dispatch,
 			'SetScreenToWorldPositionMessage':		signals.setScreenToWorldPosition.dispatch,
 			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch,			
-			'SelectedGameObject':       signals.selectedGameObject.dispatch,
-			'DeselectedGameObject':    signals.deselectedGameObject.dispatch,
+			// 'SelectedGameObject':       signals.selectedGameObject.dispatch,
+			// 'DeselectedGameObject':    signals.deselectedGameObject.dispatch,
 		}
 	}
 

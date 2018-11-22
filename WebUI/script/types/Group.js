@@ -5,7 +5,8 @@ class Group extends THREE.Group
 	{
 		super( );
 
-		this.guid = guid;
+		this.guid = guid
+		this.type = "Group";
 		this.name = name
 		this.transform = transform;
 		this.selected = false;
@@ -53,6 +54,13 @@ class Group extends THREE.Group
 		}
 		editor.webGL.Render();
 
+	}	
+
+	setTransform(linearTransform) {
+		this.transform = linearTransform;
+		this.updateTransform();
+		signals.objectChanged.dispatch(this, "transform", linearTransform);
+
 	}
 
 	onMoveStart() {
@@ -67,7 +75,7 @@ class Group extends THREE.Group
 			return;
 		}
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		signals.objectChanged.dispatch(this, "transform", transform)
+		signals.objectChanged.dispatch(this, "transform", transform);
 		// Send move message to client
 	}
 	onMoveEnd() {
@@ -79,7 +87,7 @@ class Group extends THREE.Group
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 		let command = new SetTransformCommand(this.guid, transform, scope.transform);
 		editor.execute(command);
-		signals.objectChanged.dispatch(this, "transform", transform)
+		signals.objectChanged.dispatch(this, "transform", transform);
 
 		// Send move command to server
 	}
@@ -140,6 +148,9 @@ class Group extends THREE.Group
 }
 
 class SelectionGroup extends Group{
+  constructor(){
+		super(null, "Selection Group")
+	}
 
 	// We move the children but not the group, as it's not synced.
 
@@ -154,12 +165,14 @@ class SelectionGroup extends Group{
    * @override
    */
 	onMove() {
-		console.log("moving");
 		let scope = this;
 		if(!scope.hasMoved()) {
+
 			return;
 		}
+		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
 
+		console.log("moving");
 		for (var i = 0; i < this.children.length; i++) {
 			this.children[i].onMove();
 		}
@@ -169,15 +182,18 @@ class SelectionGroup extends Group{
    * @override
    */
 	onMoveEnd() {
-		console.log("move end");
+
 		let scope = this;
 		if(!scope.hasMoved()) {
 			return; // No position change
 		}
-
+		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+	
+		console.log("move end");
 		for (var i = 0; i < this.children.length; i++) {
 			this.children[i].onMoveEnd();
 		}
+
 	}
 
 	DeselectObject(gameObject){

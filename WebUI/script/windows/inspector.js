@@ -133,15 +133,25 @@ class Inspector {
 			this.transform[type][key].addClass("invalid")
 			return
 		}
+
+		// Don't do anything if theres nothing selected or there are multiple things selected
+		// if (editor.selectionGroup.children.length !== 1) {
+		// 	return;
+		// }
+
 		if(this.transform[type][key].hasClass("invalid")) {
 			this.transform[type][key].removeClass("invalid")
 		}
+		
+		// Note that we aren't changing the world transform to local transform here, bc selection group's parent is always the scene (local == world).
+		// Maybe change this to LinearTransform and call seletionGroup.setTransform()
+
 		// Rotation needs to be converted first.
 		if(type == "rotation") {
 			let eulerRot = new THREE.Euler( this.transform.rotation.x.val() * THREE.Math.DEG2RAD, this.transform.rotation.y.val() * THREE.Math.DEG2RAD, this.transform.rotation.z.val() * THREE.Math.DEG2RAD);
 			editor.selectionGroup.rotation.copy(eulerRot);
-		} else {
-		   // editor.selected[type][key] = Number(value);
+		} else {			
+			editor.selectionGroup[type][key] = Number(value);
 		}
 		editor.webGL.Render();
 		editor.selectionGroup.onMove();
@@ -154,18 +164,31 @@ class Inspector {
 		}
 	}
 
-	UpdateInspector(gameObject) {
-		if(gameObject == null) {
+	UpdateInspector(selectionGroup, isMultipleSelection) {
+
+		if(selectionGroup == null) {
 			console.log("Tried to update the inspector with an invalid gameobject?");
 			return
 		}
-		this.EnableInspector();
-		this.UpdateName(gameObject, gameObject.name);
-		this.UpdateTransform(gameObject, gameObject.transform);
-		this.UpdateVariation(gameObject, gameObject.parameters.variation);
+
+		if (isMultipleSelection) {
+			this.UpdateName(selectionGroup, selectionGroup.name);
+		}else{
+			let gameObject = selectionGroup.children[0];
+			if (gameObject == null){
+				console.error("Selection group has no children");
+				return;
+			}
+			this.UpdateName(gameObject, gameObject.name);
+			if (selectionGroup.type === "GameObject") {
+				this.UpdateVariation(gameObject, gameObject.parameters.variation);
+			}
+			
+		}
+		
+		this.UpdateTransform(selectionGroup, selectionGroup.transform);
+		
 	}
-
-
 
 	HideContent() {
 		this.dom.hide()
@@ -174,57 +197,70 @@ class Inspector {
 		this.dom.show()
 	}
 
-	onSelectedGameObject(command) {
-		let gameObject = editor.getGameObjectByGuid(command.guid);
+	onSelectedGameObject(guid, isMultipleSelection) {
+		let gameObject = editor.getGameObjectByGuid(guid);
 		if(gameObject === undefined) {
 			let variationSelect = $(document.getElementById("objectVariation"));
 			variationSelect.prop("disabled", true);
 			variationSelect.empty();
-			editor.logger.LogError("Tried to set the name of a null entry. " + command.guid);
+			editor.logger.LogError("Tried to set the name of a null entry. " + guid);
 			this.DisableInspector();
 			return;
 		}
 
-		if (!command.parameters.multiple ){
-			this.UpdateInspector(gameObject);
-		}else{
-			this.DisableInspector();
-		}
-		
-	}
-
-	DisableInspector(){
-		$('#objectInspector').css('opacity', '0.6');
-		//TODO: disable inputs
-	}
-
-	EnableInspector(){
-		$('#objectInspector').css('opacity', '1');
+		this.UpdateInspector(editor.selectionGroup, isMultipleSelection)
 	}
 
 
-	onDeselectedGameObject(command){
+	onDeselectedGameObject(guid, isMultipleSelection){
 		//TODO: disable inspector if necessary
 	}
 
 	onObjectChanged(go, key, value) {
-		if(this.updates[key] !== undefined) {
-			this.updates[key](go, value);
-		} else {
-			this.UpdateInspector(go);
+		// Only update the inspector if the moved object is the only object selected
+		if (go === editor.selectionGroup || (editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === go) ){
+			if(this.updates[key] !== undefined) {
+				this.updates[key](editor.selectionGroup, value);
+			} else {
+				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
+			}
 		}
+
+		// if (editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === go){
+		// 	this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
+		// }
+		// if(this.updates[key] !== undefined) {
+		// 	this.updates[key](go, value);
+		// } else {
+		// 	this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
+		// }
 	}
 
-	UpdateTransform(go, linearTransform) {
+	UpdateTransform(gameObject, linearTransform) {
+		
+		//NOTE: commented code is for world tansform, but as the selection group's parent is always the scene, local == world.
+
+		// let position = new THREE.Vector3();
+		// gameObject.getWorldPosition(position);
+
+		// let quat = new THREE.Quaternion();
+		// gameObject.getWorldQuaternion(quat);
+		// let rotation = new THREE.Euler().setFromQuaternion(quat).toVector3();
+
+		// let scale = new THREE.Vector3();
+		// gameObject.getWorldScale(scale);
+
 		let controls = ["position", "rotation", "scale"];
+		// let controlsVal = [position, rotation, scale];
 		let xyz = ["x","y","z"];
 		let transform = this.transform;
 		$.each(controls, function (index, con) {
-			let control = go[con];
+			let control = gameObject[con];
 			$.each(xyz, function(index2, val) {
 
-
+				// if(isNaN(controlsVal[index][val])) {
 				if(isNaN(control[val])) {
+					console.log("dafuq")
 					transform[con][val].addClass("invalid")
 					return
 				}
@@ -232,12 +268,13 @@ class Inspector {
 					transform[con][val].removeClass("invalid")
 				}
 
-
 				//If we're modifying Rotation. Using the controls key for redundancy
 				if(con === controls[1]) {
+					// transform[con][val][0].value = (controlsVal[index][val] * THREE.Math.RAD2DEG).toFixed(3);
 					transform[con][val][0].value = (control[val] * THREE.Math.RAD2DEG).toFixed(3);
 				} else {
-					transform[con][val][0].value =control[val].toFixed(3)
+					// transform[con][val][0].value = controlsVal[index][val].toFixed(3)
+					transform[con][val][0].value = control[val].toFixed(3)
 				}
 			});
 		});

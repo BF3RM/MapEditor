@@ -358,16 +358,17 @@ class Editor {
 	Select(guid) {
 
 		if(keysdown[17]) {
-			// signals.selectedGameObject.dispatch;
-			this.onSelectedGameObject(guid, true);
+			signals.selectedGameObject.dispatch(guid, true);
+			// this.onSelectedGameObject(guid, true);
 		} else {
-			// signals.selectedGameObject.dispatch;
-			this.onSelectedGameObject(guid, false);
+			signals.selectedGameObject.dispatch(guid, false);
+			// this.onSelectedGameObject(guid, false);
 		}
 	}
 
 	Deselect(guid) {
-		this.onDeselectedGameObject(guid);
+		signals.deselectedGameObject.dispatch(guid);
+		// this.onDeselectedGameObject(guid);
 		// if(keysdown[17]) {
 		// 	this.onDeselectedGameObject(guid, true);
 		// } else {
@@ -384,7 +385,7 @@ class Editor {
 		}
 
 		// If the object is already in this group and it's a multiselection we deselect it
-		if (gameObject.parent === scope.selectionGroup && isMultiSelection){
+		if (gameObject.parent === scope.selectionGroup && isMultiSelection && scope.selectionGroup.children.length !== 1){
 			console.log("Object already selected");
 			scope.Deselect(guid);
 

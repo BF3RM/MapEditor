@@ -6,6 +6,7 @@ class GameEntity extends THREE.Object3D
 		super( );
 
 		this.guid = guid;
+		this.type = "GameEntity";
 		this.typeName = typeName;
 		this.transform = transform;
 		this.aabb = {

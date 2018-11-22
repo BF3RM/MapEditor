@@ -159,18 +159,18 @@ class Hierarchy {
 		let parent = editor.getGameObjectByGuid(nodeData.parent);
 	}
 
-	onSelected(command) {
+	onSelected(guid, isMultipleSelection) {
 		let scope = this;
-		let node = scope.dom.jstree(true).get_node(command.guid);
+		let node = scope.dom.jstree(true).get_node(guid);
 		console.log(node);
 		scope.selecting = true;
 		this.dom.jstree('select_node', node, true);
 		scope.selecting = false;
 	}
 
-	onDeselected(command) {
+	onDeselected(guid, isMultipleSelection) {
 		let scope = this;
-		let node = scope.dom.jstree(true).get_node(command.guid);
+		let node = scope.dom.jstree(true).get_node(guid);
 		console.log(node);
 		scope.selecting = true;
 		this.dom.jstree('deselect_node', node, true);

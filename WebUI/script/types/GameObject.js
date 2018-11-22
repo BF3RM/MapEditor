@@ -6,6 +6,7 @@ class GameObject extends THREE.Object3D
 		super( );
 
 		this.guid = guid;
+		this.type = "GameObject";
 		this.name = name;
 		this.transform = transform;
 		this.objectParent = parent;
@@ -101,7 +102,7 @@ class GameObject extends THREE.Object3D
 		this.transform = linearTransform;
 		this.parameters.transform = linearTransform;
 		this.updateTransform();
-		signals.objectChanged.dispatch(this, "transform", linearTransform)
+		signals.objectChanged.dispatch(this, "transform", linearTransform);
 
 	}
 	setName(name) {
@@ -134,7 +135,7 @@ class GameObject extends THREE.Object3D
 			return;
 		}
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		signals.objectChanged.dispatch(this, "transform", transform)
+		signals.objectChanged.dispatch(this, "transform", transform);
 		// Send move message to client
 	}
 	onMoveEnd() {
@@ -145,7 +146,7 @@ class GameObject extends THREE.Object3D
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 		let command = new SetTransformCommand(this.guid, transform, scope.transform);
 		editor.execute(command);
-		signals.objectChanged.dispatch(this, "transform", transform)
+		signals.objectChanged.dispatch(this, "transform", transform);
 
 		// Send move command to server
 	}
