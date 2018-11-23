@@ -31,10 +31,6 @@ class Editor {
 		this.blueprintManager = new BlueprintManager();
 		this.entityFactory = new EntityFactory();
 
-		// Events that the editor should execute last
-		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
-		signals.deselectedGameObject.add(this.onDeselectedGameObject.bind(this));
-
 		/*
 
 			Internal variables
@@ -320,8 +316,6 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		//let webobject = this.webGL.CreateGroup(command.parameters.transform);
-		//this.webobjects[command.guid] = webobject;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, null, command.parameters);
 
 		this.webGL.AddObject(gameObject);
@@ -358,14 +352,15 @@ class Editor {
 	Select(guid) {
 
 		if(keysdown[17]) {
-			signals.selectedGameObject.dispatch(guid, true);
+			this.onSelectedGameObject(guid, true);
 		} else {
-			signals.selectedGameObject.dispatch(guid, false);
+			this.onSelectedGameObject(guid, false);
+
 		}
 	}
 
 	Deselect(guid) {
-		signals.deselectedGameObject.dispatch(guid);
+		this.onDeselectedGameObject(guid);
 	}
 
 	onSelectedGameObject(guid, isMultiSelection) {
@@ -401,6 +396,8 @@ class Editor {
 
 		scope.webGL.AttachGizmoTo(scope.selectionGroup);
 
+		signals.selectedGameObject.dispatch(guid, isMultiSelection);
+
 		scope.webGL.Render();
 
 	}
@@ -411,7 +408,7 @@ class Editor {
 		console.log(guid)
 		console.log(gameObject)
 		scope.selectionGroup.DeselectObject(gameObject);
-
+		signals.deselectedGameObject.dispatch(guid);
 		scope.webGL.Render();
 	}
 

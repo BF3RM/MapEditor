@@ -9,11 +9,11 @@ class Inspector {
 
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselectedGameObject.bind(this));
-		signals.selectionGroupChanged.add(this.onSelectionGroupChanged.bind(this));
-		// signals.objectChanged.add(this.onObjectChanged.bind(this));
+		signals.selectionGroupMoved.add(this.onSelectionGroupMoved.bind(this));
+		signals.objectChanged.add(this.onObjectChanged.bind(this));
 
 		this.updates = {
-			"transform": this.UpdateTransform.bind(this),
+			// "transform": this.UpdateTransform.bind(this),
 			"name": this.UpdateName.bind(this),
 			"variation": this.UpdateVariation.bind(this),
 		}
@@ -45,7 +45,8 @@ class Inspector {
 		this.name = nameInput;
 
 		$(nameInput).on('change',function(){
-			if (editor.selectionGroup.children.length === 0) return;
+			if (editor.selectionGroup.children.length === 0){ return;}
+
 			editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, this.value));
 		});
 
@@ -71,7 +72,9 @@ class Inspector {
 		this.variation.prop("disabled", true);
 
 		this.variation.on('change',function(){
-			if (editor.selectionGroup.children.length === 0) return;
+			if (editor.selectionGroup.children.length === 0){
+				return;
+			}
 			editor.execute(new SetVariationCommand(editor.selectionGroup.children[0].guid, this.value));
 		});
 
@@ -175,9 +178,9 @@ class Inspector {
 		}
 
 		if (isMultipleSelection) {
+			console.log("6");
 			this.UpdateName(selectionGroup, selectionGroup.name);
 		}else{
-			console.log("----------")
 			let gameObject = selectionGroup.children[0];
 			if (gameObject == null){
 				console.error("Selection group has no children");
@@ -220,16 +223,15 @@ class Inspector {
 
 
 	onDeselectedGameObject(guid){
-		//TODO: disable inspector if necessary
-
-		if (editor.selectionGroup.children.length === 1) {
+		// Set name and variation of child if there's only 1 child left
+		if (editor.selectionGroup.children.length == 1) {
 			this.UpdateInspector(editor.selectionGroup, false);
 		}
 	}
 
 	onObjectChanged(go, key, value) {
 		// Only update the inspector if the moved object is the first object selected in selectionGroup (they share the same matrix)
-		if (editor.selectionGroup.children.length !== 0 && editor.selectionGroup.children[0] === go) {
+		if (editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === go) {
 			if(this.updates[key] !== undefined) {
 				this.updates[key](editor.selectionGroup, value);
 			} else {
@@ -238,14 +240,8 @@ class Inspector {
 		}
 	}
 
-	onSelectionGroupChanged(){
-		console.log("---------------")
-		// console.log(a)
-		// if(this.updates[key] !== undefined) {
-		// 	this.updates[key](editor.selectionGroup, value);
-		// } else {
-			this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
-		// }
+	onSelectionGroupMoved(){
+		this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
 	}
 
 	UpdateTransform(gameObject, linearTransform) {
@@ -292,6 +288,7 @@ class Inspector {
 		});
 	}
 	UpdateName(go, name) {
+		console.log("name: "+name)
 		this.name[0].value = name;
 	}
 	UpdateVariation(go, variation) {

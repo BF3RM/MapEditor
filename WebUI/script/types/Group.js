@@ -177,7 +177,7 @@ class SelectionGroup extends Group{
 			scope.children[i].onMove();
 		}
 
-		signals.selectionGroupChanged.dispatch();
+		signals.selectionGroupMoved.dispatch();
 	}
 
 	/**
@@ -196,7 +196,7 @@ class SelectionGroup extends Group{
 			scope.children[i].onMoveEnd();
 		}
 
-		signals.selectionGroupChanged.dispatch();
+		signals.selectionGroupMoved.dispatch();
 	}
 
 	DeselectObject(gameObject){
