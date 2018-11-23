@@ -9,7 +9,8 @@ class Inspector {
 
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselectedGameObject.bind(this));
-		signals.objectChanged.add(this.onObjectChanged.bind(this));
+		signals.selectionGroupChanged.add(this.onSelectionGroupChanged.bind(this));
+		// signals.objectChanged.add(this.onObjectChanged.bind(this));
 
 		this.updates = {
 			"transform": this.UpdateTransform.bind(this),
@@ -44,7 +45,8 @@ class Inspector {
 		this.name = nameInput;
 
 		$(nameInput).on('change',function(){
-			editor.execute(new SetObjectNameCommand(editor.selected.guid, this.value));
+			if (editor.selectionGroup.children.length === 0) return;
+			editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, this.value));
 		});
 
 		let transformControl = $(document.createElement("div"));
@@ -69,7 +71,8 @@ class Inspector {
 		this.variation.prop("disabled", true);
 
 		this.variation.on('change',function(){
-			editor.execute(new SetVariationCommand(editor.selected.guid, this.value));
+			if (editor.selectionGroup.children.length === 0) return;
+			editor.execute(new SetVariationCommand(editor.selectionGroup.children[0].guid, this.value));
 		});
 
 		let deleteButton = $(document.createElement("button"));
@@ -167,18 +170,22 @@ class Inspector {
 	UpdateInspector(selectionGroup, isMultipleSelection) {
 
 		if(selectionGroup == null) {
-			console.log("Tried to update the inspector with an invalid gameobject?");
-			return
+		console.log("Tried to update the inspector and selectionGroup is null?");
+			return;
 		}
 
 		if (isMultipleSelection) {
 			this.UpdateName(selectionGroup, selectionGroup.name);
 		}else{
+			console.log("----------")
 			let gameObject = selectionGroup.children[0];
 			if (gameObject == null){
 				console.error("Selection group has no children");
 				return;
 			}
+						console.log(gameObject)
+						console.log(gameObject.name)
+
 			this.UpdateName(gameObject, gameObject.name);
 			if (selectionGroup.type === "GameObject") {
 				this.UpdateVariation(gameObject, gameObject.parameters.variation);
@@ -212,27 +219,32 @@ class Inspector {
 	}
 
 
-	onDeselectedGameObject(guid, isMultipleSelection){
+	onDeselectedGameObject(guid){
 		//TODO: disable inspector if necessary
+
+		if (editor.selectionGroup.children.length === 1) {
+			this.UpdateInspector(editor.selectionGroup, false);
+		}
 	}
 
 	onObjectChanged(go, key, value) {
-		// Only update the inspector if the moved object is the only object selected
-		if (go === editor.selectionGroup || (editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === go) ){
+		// Only update the inspector if the moved object is the first object selected in selectionGroup (they share the same matrix)
+		if (editor.selectionGroup.children.length !== 0 && editor.selectionGroup.children[0] === go) {
 			if(this.updates[key] !== undefined) {
 				this.updates[key](editor.selectionGroup, value);
 			} else {
 				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
 			}
 		}
+	}
 
-		// if (editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === go){
-		// 	this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
-		// }
+	onSelectionGroupChanged(){
+		console.log("---------------")
+		// console.log(a)
 		// if(this.updates[key] !== undefined) {
-		// 	this.updates[key](go, value);
+		// 	this.updates[key](editor.selectionGroup, value);
 		// } else {
-		// 	this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
+			this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
 		// }
 	}
 

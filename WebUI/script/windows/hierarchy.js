@@ -168,7 +168,8 @@ class Hierarchy {
 		scope.selecting = false;
 	}
 
-	onDeselected(guid, isMultipleSelection) {
+	onDeselected(guid) {
+		console.log(guid)
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
 		console.log(node);

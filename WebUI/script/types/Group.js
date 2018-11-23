@@ -170,12 +170,14 @@ class SelectionGroup extends Group{
 
 			return;
 		}
-		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 
 		console.log("moving");
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].onMove();
+		for (var i = 0; i < scope.children.length; i++) {
+			scope.children[i].onMove();
 		}
+
+		signals.selectionGroupChanged.dispatch();
 	}
 
 	/**
@@ -187,13 +189,14 @@ class SelectionGroup extends Group{
 		if(!scope.hasMoved()) {
 			return; // No position change
 		}
-		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 	
 		console.log("move end");
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].onMoveEnd();
+		for (var i = 0; i < scope.children.length; i++) {
+			scope.children[i].onMoveEnd();
 		}
 
+		signals.selectionGroupChanged.dispatch();
 	}
 
 	DeselectObject(gameObject){

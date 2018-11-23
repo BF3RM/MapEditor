@@ -359,21 +359,13 @@ class Editor {
 
 		if(keysdown[17]) {
 			signals.selectedGameObject.dispatch(guid, true);
-			// this.onSelectedGameObject(guid, true);
 		} else {
 			signals.selectedGameObject.dispatch(guid, false);
-			// this.onSelectedGameObject(guid, false);
 		}
 	}
 
 	Deselect(guid) {
 		signals.deselectedGameObject.dispatch(guid);
-		// this.onDeselectedGameObject(guid);
-		// if(keysdown[17]) {
-		// 	this.onDeselectedGameObject(guid, true);
-		// } else {
-		// 	this.onDeselectedGameObject(guid, false);
-		// }
 	}
 
 	onSelectedGameObject(guid, isMultiSelection) {
@@ -414,7 +406,6 @@ class Editor {
 	}
 
 	onDeselectedGameObject(guid) {
-						// todo: call signal
 		let scope = this;
 		let gameObject = scope.gameObjects[guid];
 		console.log(guid)

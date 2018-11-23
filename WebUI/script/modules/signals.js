@@ -13,6 +13,8 @@ var signals = {
     createdGroup: new Signal(),
     destroyedGroup: new Signal(),
 
+    selectionGroupChanged: new Signal(),
+
     selectedGameObject: new Signal(),
     deselectedGameObject: new Signal(),
 
