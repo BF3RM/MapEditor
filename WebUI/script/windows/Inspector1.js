@@ -178,7 +178,6 @@ class Inspector {
 		}
 
 		if (isMultipleSelection) {
-			console.log("6");
 			this.UpdateName(selectionGroup, selectionGroup.name);
 		}else{
 			let gameObject = selectionGroup.children[0];
@@ -288,7 +287,6 @@ class Inspector {
 		});
 	}
 	UpdateName(go, name) {
-		console.log("name: "+name)
 		this.name[0].value = name;
 	}
 	UpdateVariation(go, variation) {

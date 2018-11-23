@@ -21,6 +21,7 @@ function Editor:RegisterVars()
 		DestroyBlueprintCommand = self.DestroyBlueprint,
 		SetTransformCommand = self.SetTransform,
 		SelectGameObjectCommand = self.SelectGameObject
+		CreateGroupCommand = self.CreateGroup
 	}
 	self.m_Messages = {
 		MoveObjectMessage = self.MoveObject
@@ -206,7 +207,20 @@ function Editor:SelectGameObject(p_Command)
 		guid = p_Command.guid,
 		['type'] = 'SelectedGameObject'
 	}
-   return s_Response
+	return s_Response
+end
+
+function Editor:CreateGroup(p_Command)
+	-- TODO: save the new group
+
+	local s_Response = {
+		guid = p_Command.guid,
+		['type'] = 'CreatedGroup',
+		transform = "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
+		name = p_Command.parameters.name,
+		sender = p_Command.sender,
+	}
+	return s_Response
 end
 
 function Editor:SetTransform(p_Command)

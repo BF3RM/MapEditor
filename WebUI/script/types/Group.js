@@ -64,12 +64,12 @@ class Group extends THREE.Group
 	}
 
 	onMoveStart() {
-		console.log("move start");
+		// console.log("move start");
 		// TODO: Validate that the object exists
 	}
 
 	onMove() {
-		console.log("moving");
+		// console.log("moving");
 		let scope = this;
 		if(!scope.hasMoved()) {
 			return;
@@ -79,7 +79,7 @@ class Group extends THREE.Group
 		// Send move message to client
 	}
 	onMoveEnd() {
-		console.log("move end");
+		// console.log("move end");
 		let scope = this;
 		if(!scope.hasMoved()) {
 			return; // No position change
@@ -158,13 +158,14 @@ class SelectionGroup extends Group{
    * @override
    */
 	onMoveStart() {
-		console.log("move start");
+		// console.log("move start");
 	}
 
 	/**
    * @override
    */
 	onMove() {
+		// console.log("moving");
 		let scope = this;
 		if(!scope.hasMoved()) {
 
@@ -172,7 +173,7 @@ class SelectionGroup extends Group{
 		}
 		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 
-		console.log("moving");
+		
 		for (var i = 0; i < scope.children.length; i++) {
 			scope.children[i].onMove();
 		}
@@ -184,14 +185,14 @@ class SelectionGroup extends Group{
    * @override
    */
 	onMoveEnd() {
-
+		// console.log("move end");
 		let scope = this;
 		if(!scope.hasMoved()) {
 			return; // No position change
 		}
 		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 	
-		console.log("move end");
+		
 		for (var i = 0; i < scope.children.length; i++) {
 			scope.children[i].onMoveEnd();
 		}

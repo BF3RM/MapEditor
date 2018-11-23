@@ -85,7 +85,7 @@ class Editor {
 				'background-size': 'cover'
 			});
 			let imported = document.createElement('script');
-			imported.src = 'script/debugData.js';
+			imported.src = 'script/DebugData.js';
 			document.head.appendChild(imported);
 			this.playerName = "LocalPlayer";
 		}
@@ -366,16 +366,24 @@ class Editor {
 	onSelectedGameObject(guid, isMultiSelection) {
 		let scope = this;
 		let gameObject = scope.gameObjects[guid];
+
 		if(gameObject === undefined) {
 			scope.logger.LogError("Failed to select gameobject: " + guid);
 			return;
 		}
+
+		//Todo 
 
 		// If the object is already in this group and it's a multiselection we deselect it
 		if (gameObject.parent === scope.selectionGroup && isMultiSelection && scope.selectionGroup.children.length !== 1){
 			console.log("Object already selected");
 			scope.Deselect(guid);
 
+			return;
+		}
+
+		// if we are selecting and object already selected (single selection)
+		if (gameObject.parent === scope.selectionGroup && !isMultiSelection && scope.selectionGroup.children.length === 1 && scope.selectionGroup.children[0] === gameObject){
 			return;
 		}
 
