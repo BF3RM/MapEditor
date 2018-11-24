@@ -75,7 +75,7 @@ class Group extends THREE.Group
 			return;
 		}
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		signals.objectChanged.dispatch(this, "transform", transform);
+		// signals.objectChanged.dispatch(this, "transform", transform);
 		// Send move message to client
 	}
 	onMoveEnd() {

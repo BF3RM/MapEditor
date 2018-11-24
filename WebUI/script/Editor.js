@@ -237,20 +237,20 @@ class Editor {
 	}
 
 	onCreateGroupRequested(){
-		let transform = new LinearTransform().toString();
+		let transform = this.raycastTransform;
 		let parameters = { name: "New Group", transform:  transform};
 		this.execute(new CreateGroupCommand(GenerateGuid(), parameters));
 
 	}
 
 	onCreatedGroup(command){
-		let group = new Group();
+		let group = new Group(command.guid, command.name, new LinearTransform().setFromString(command.transform));
+
 		this.webGL.AddObject(group);
 
 		group.visible = false;
 
 		this.gameObjects[command.guid] = group;
-
 		if(command.sender === this.playerName) {
 			this.Select(command.guid)
 		}
@@ -259,25 +259,6 @@ class Editor {
 	onDestroyedGroup(command){
 
 	}
-
-	// CreateGroup(id, name, transform, parent){
-	// 	if(this.spawnedEntities[id] != null){
-	// 		console.log("A group with this ID already exists");
-	// 		return;
-	// 	}
-	// 	let webObject = this.webGL.CreateGroup(transform);
-	// 	let groupObject = new Group(id, name, webObject, transform, parent, {} );
-	// 	this.ui.hierarchy.CreateGroup(groupObject);
-
-	// 	if(parent != null){
-	// 		this.ui.hierarchy.MoveElementsInHierarchy(parent, groupObject)
-	// 	}
-
-	// 	this.TrackEntity(id, groupObject);
-	// 	this.SelectEntityById(id);
-
-	// 	return groupObject;
-	// }
 
 	onBlueprintSpawnRequested(blueprint, transform, variation) {
 	
@@ -382,15 +363,17 @@ class Editor {
 			return;
 		}
 
-		// if we are selecting and object already selected (single selection)
+		// If we are selecting and object already selected (single selection)
 		if (gameObject.parent === scope.selectionGroup && !isMultiSelection && scope.selectionGroup.children.length === 1 && scope.selectionGroup.children[0] === gameObject){
 			return;
 		}
 
-		// Clear selection group when there is a single selection
+		// Clear selection group when it's a single selection
 		if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
 			console.log("Clearing selection group");
 			for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
+				console.log("11111")
+				console.log(scope.selectionGroup.children[i])
 				scope.Deselect(scope.selectionGroup.children[i].guid);
 			}
 		}

@@ -20,7 +20,7 @@ function Editor:RegisterVars()
 		SpawnBlueprintCommand = self.SpawnBlueprint,
 		DestroyBlueprintCommand = self.DestroyBlueprint,
 		SetTransformCommand = self.SetTransform,
-		SelectGameObjectCommand = self.SelectGameObject
+		SelectGameObjectCommand = self.SelectGameObject,
 		CreateGroupCommand = self.CreateGroup
 	}
 	self.m_Messages = {
@@ -216,7 +216,7 @@ function Editor:CreateGroup(p_Command)
 	local s_Response = {
 		guid = p_Command.guid,
 		['type'] = 'CreatedGroup',
-		transform = "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
+		transform = p_Command.parameters.transform,
 		name = p_Command.parameters.name,
 		sender = p_Command.sender,
 	}
