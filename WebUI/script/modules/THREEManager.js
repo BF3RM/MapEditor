@@ -1,4 +1,4 @@
-class WebGL {
+class THREEManager {
 	constructor() {
 		this.camera = null;
 		this.scene = null;
@@ -10,7 +10,7 @@ class WebGL {
 		this.worldSpace = "local";
 		this.gridSnap = false;
 
-		this._onControlChanged = WebGL.onControlChanged.bind(this);
+		this._onControlChanged = THREEManager.onControlChanged.bind(this);
 		this._onObjectChanged = this.onObjectChanged.bind(this);
 		this._onWindowResize = this.onWindowResize.bind(this);
 
@@ -63,8 +63,8 @@ class WebGL {
 		this.renderer.domElement.addEventListener('mousedown', this._onMouseDown);
 		
 		this.control.addEventListener('change', this._onControlChanged);
-		this.control.addEventListener('mouseUp', WebGL.onControlMouseUp);
-		this.control.addEventListener('mouseDown', WebGL.onControlMouseDown);
+		this.control.addEventListener('mouseUp', THREEManager.onControlMouseUp);
+		this.control.addEventListener('mouseDown', THREEManager.onControlMouseDown);
 		this.control.addEventListener('objectChange', this._onObjectChanged);
 	}
 
@@ -299,9 +299,9 @@ class WebGL {
 		}
 	}
 	onMouseUp(e) {
-		if(e.which == 1 && editor.webGL.raycastPlacing) {
-			editor.webGL.ShowGizmo();
-			editor.webGL.raycastPlacing = false;
+		if(e.which == 1 && editor.threeManager.raycastPlacing) {
+			editor.threeManager.ShowGizmo();
+			editor.threeManager.raycastPlacing = false;
 		} 
 	}
 	onMouseDown(e) {
@@ -313,7 +313,7 @@ class WebGL {
 		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-		if(editor.webGL.raycastPlacing) {
+		if(editor.threeManager.raycastPlacing) {
 			editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 	}
@@ -327,21 +327,21 @@ class WebGL {
 
 			let event = document.createEvent("HTMLEvents");
 			event.initEvent("mouseup", true, true); // The custom event that will be created
-			editor.webGL.raycastPlacing = true;
-			editor.webGL.renderer.domElement.dispatchEvent(event);
-			editor.webGL.HideGizmo();
+			editor.threeManager.raycastPlacing = true;
+			editor.threeManager.renderer.domElement.dispatchEvent(event);
+			editor.threeManager.HideGizmo();
 		}
 
 	}
 	static onControlChanged() {
 		//moving
 		editor.onControlMove();
-		editor.webGL.Render();
+		editor.threeManager.Render();
 
 	}
 
 	static onControlMouseUp(e) {
-		if(editor.webGL.raycastPlacing == false) {
+		if(editor.threeManager.raycastPlacing == false) {
 		}
 		editor.setUpdating(false);
 		editor.onControlMoveEnd();
@@ -353,12 +353,12 @@ class WebGL {
 
 
 	onWindowResize() {
-		let webGL = this.editor.webGL;
+		let threeManager = this.editor.threeManager;
 
-		webGL.camera.aspect = window.innerWidth / window.innerHeight;
-		webGL.camera.updateProjectionMatrix();
-		webGL.renderer.setSize(window.innerWidth, window.innerHeight);
-		webGL.Render();
+		threeManager.camera.aspect = window.innerWidth / window.innerHeight;
+		threeManager.camera.updateProjectionMatrix();
+		threeManager.renderer.setSize(window.innerWidth, window.innerHeight);
+		threeManager.Render();
 	}
 
 
@@ -368,7 +368,7 @@ class WebGL {
 			return;
 		}
 
-		// editor.webGL.Render();
+		// editor.threeManager.Render();
 	}
 
 	UpdateCameraTransform(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {

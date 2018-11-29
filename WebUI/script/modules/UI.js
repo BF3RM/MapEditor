@@ -176,11 +176,11 @@ class UI {
 	}
 
 	static toolsChanged(e) {
-		editor.webGL.SetGizmoMode(e.target.id);
+		editor.threeManager.SetGizmoMode(e.target.id);
 	}
 
 	static worldChanged(e) {
-		editor.webGL.SetWorldSpace(e.target.id);
+		editor.threeManager.SetWorldSpace(e.target.id);
 	}
 
 	static worldViewChanged(e, ui) {

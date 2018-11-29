@@ -2667,7 +2667,7 @@ var json = `
   }
 }`;
 editor.blueprintManager.RegisterBlueprints(json);
-editor.webGL.ShowGizmo();
+editor.threeManager.ShowGizmo();
 /*
 vext.SpawnedEntity(1, "F17C9834-6CE0-D963-6911-926921A3FF24", "1,0,0,0,1,0,0,0,1,0, 10, 0");
 vext.SpawnedEntity(2, "F7518E81-80E7-36F5-44C5-110C4F3ABE94", "1,0,0,0,1,0,0,0,1,0, 0, 10");

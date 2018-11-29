@@ -76,19 +76,19 @@ class GameObject extends THREE.Object3D
 
 		// remove child from parent and add it to scene
 		if (parent !== null){
-			THREE.SceneUtils.detach( this, parent, editor.webGL.scene );
+			THREE.SceneUtils.detach( this, parent, editor.threeManager.scene );
 		}
 
 		this.setRotationFromMatrix(matrix);
 		// this.scale.setFromMatrixScale(matrix); //This is fucked
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-		editor.webGL.Render();
+		editor.threeManager.Render();
 
 		// remove child from scene and add it to parent
 		if (parent !== null){
-			THREE.SceneUtils.attach( this, editor.webGL.scene, parent );
+			THREE.SceneUtils.attach( this, editor.threeManager.scene, parent );
 		}
-		editor.webGL.Render();
+		editor.threeManager.Render();
 
 	}
 

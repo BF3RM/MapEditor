@@ -24,7 +24,7 @@ class Editor {
 
 		this.debug = debug;
 		this.logger = new Logger(LOGLEVEL.VERBOSE);
-		this.webGL = new WebGL();
+		this.threeManager = new THREEManager();
 		this.ui = new UI(debug);
 		this.vext = new VEXTInterface();
 		this.history = new History(this);
@@ -49,7 +49,7 @@ class Editor {
 
 		// Creates selection group and add it to the scene
 		this.selectionGroup = new SelectionGroup();
-		this.webGL.AddObject(this.selectionGroup);
+		this.threeManager.AddObject(this.selectionGroup);
 
 		this.Initialize();
 
@@ -182,7 +182,7 @@ class Editor {
 		}
 
 		//Gameobject render
-		//this.webGL.Render( );
+		//this.threeManager.Render( );
 
 		if(this.isUpdating) {
 			window.requestAnimationFrame( this._renderLoop );
@@ -211,7 +211,7 @@ class Editor {
 			return;
 		}
 		gameObject.setTransform(new LinearTransform().setFromString(command.transform))
-		this.webGL.Render();
+		this.threeManager.Render();
 	}
 
 	onSetVariation(command) {
@@ -246,7 +246,7 @@ class Editor {
 	onCreatedGroup(command){
 		let group = new Group(command.guid, command.name, new LinearTransform().setFromString(command.transform));
 
-		this.webGL.AddObject(group);
+		this.threeManager.AddObject(group);
 
 		group.visible = false;
 
@@ -290,16 +290,16 @@ class Editor {
 	}
 
 	onDestroyedBlueprint(command) {
-		this.webGL.DeleteObject(this.gameObjects[command.guid]);
+		this.threeManager.DeleteObject(this.gameObjects[command.guid]);
 		delete this.gameObjects[command.guid];
-		this.webGL.Render();
+		this.threeManager.Render();
 	}
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, null, command.parameters);
 
-		this.webGL.AddObject(gameObject);
+		this.threeManager.AddObject(gameObject);
 
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
@@ -385,11 +385,11 @@ class Editor {
 		scope.selectionGroup.AttachObject(gameObject);
 		scope.selectionGroup.Select();
 
-		scope.webGL.AttachGizmoTo(scope.selectionGroup);
+		scope.threeManager.AttachGizmoTo(scope.selectionGroup);
 
 		signals.selectedGameObject.dispatch(guid, isMultiSelection);
 
-		scope.webGL.Render();
+		scope.threeManager.Render();
 
 	}
 
@@ -400,7 +400,7 @@ class Editor {
 		console.log(gameObject)
 		scope.selectionGroup.DeselectObject(gameObject);
 		signals.deselectedGameObject.dispatch(guid);
-		scope.webGL.Render();
+		scope.threeManager.Render();
 	}
 
 	// onSelectedEntities(command) {

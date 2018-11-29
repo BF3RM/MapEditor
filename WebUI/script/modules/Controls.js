@@ -35,16 +35,16 @@ $(document).keydown(function(e) {
 	console.log(e.which);
 	keysdown[e.which] = true;
 	if(e.which == 81) { // Q
-		editor.webGL.SetGizmoMode("select")
+		editor.threeManager.SetGizmoMode("select")
 	}
 	if(e.which == 87) { // W
-		editor.webGL.SetGizmoMode("translate")
+		editor.threeManager.SetGizmoMode("translate")
 	}
 	if(e.which == 69) { // E
-		editor.webGL.SetGizmoMode("rotate")
+		editor.threeManager.SetGizmoMode("rotate")
 	}
 	if(e.which == 82) { // R
-		editor.webGL.SetGizmoMode("scale")
+		editor.threeManager.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
 
@@ -79,10 +79,10 @@ $(document).keydown(function(e) {
 		return false;
 	}
 	if(e.which == 17) { // CTRL
-		editor.webGL.EnableGridSnap()
+		editor.threeManager.EnableGridSnap()
 	}
 	if(e.which == 88) { // X
-		editor.webGL.ToggleWorldSpace();
+		editor.threeManager.ToggleWorldSpace();
 	}
 	if(e.which == 46) { // DEL
 		editor.ui.dialogs["deleteEntity"].dialog("open");
@@ -96,6 +96,6 @@ $(document).keyup(function(e){
 	// Remove this key from the map
 	delete keysdown[e.which];
 	if(e.which == 17) { // CTRL
-		editor.webGL.DisableGridSnap()
+		editor.threeManager.DisableGridSnap()
 	}
 });

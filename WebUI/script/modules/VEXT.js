@@ -30,10 +30,10 @@ class VEXTInterface {
 
 	 */
 	HideGizmo() {
-		editor.webGL.HideGizmo();
+		editor.threeManager.HideGizmo();
 	}
 	ShowGizmo() {
-		editor.webGL.ShowGizmo();
+		editor.threeManager.ShowGizmo();
 	}
 	/*
 

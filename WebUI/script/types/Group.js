@@ -40,19 +40,19 @@ class Group extends THREE.Group
 
 		// remove child from parent and add it to scene
 		if (parent !== null){
-			THREE.SceneUtils.detach( this, parent, editor.webGL.scene );
+			THREE.SceneUtils.detach( this, parent, editor.threeManager.scene );
 		}
 
 		this.setRotationFromMatrix(matrix);
 		// this.scale.setFromMatrixScale(matrix); //This is fucked
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-		editor.webGL.Render();
+		editor.threeManager.Render();
 
 		// remove child from scene and add it to parent
 		if (parent !== null){
-			THREE.SceneUtils.attach( this, editor.webGL.scene, parent );
+			THREE.SceneUtils.attach( this, editor.threeManager.scene, parent );
 		}
-		editor.webGL.Render();
+		editor.threeManager.Render();
 
 	}	
 
@@ -121,12 +121,12 @@ class Group extends THREE.Group
 		}
 
 		// remove child from parent and add it to scene
-		THREE.SceneUtils.detach( gameObject, this, editor.webGL.scene );
+		THREE.SceneUtils.detach( gameObject, this, editor.threeManager.scene );
 
 		// TODO: Reattach object to its original parent if it has one
 		// gameObject.objectParent.AttachObject(gameObject);
 		
-		editor.webGL.Render(); // REMOVE
+		editor.threeManager.Render(); // REMOVE
 	}
 
 	AttachObject(gameObject){
@@ -137,12 +137,12 @@ class Group extends THREE.Group
 		}
 
 		// remove child from parent and add it to scene
-		THREE.SceneUtils.detach( gameObject, gameObject.parent, editor.webGL.scene );
+		THREE.SceneUtils.detach( gameObject, gameObject.parent, editor.threeManager.scene );
 
 		// remove child from scene and add it to parent
-		THREE.SceneUtils.attach( gameObject, editor.webGL.scene, this );
+		THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, this );
 
-		editor.webGL.Render(); // REMOVE
+		editor.threeManager.Render(); // REMOVE
 	}
 
 }

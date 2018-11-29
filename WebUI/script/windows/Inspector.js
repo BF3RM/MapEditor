@@ -159,7 +159,7 @@ class Inspector {
 		} else {			
 			editor.selectionGroup[type][key] = Number(value);
 		}
-		editor.webGL.Render();
+		editor.threeManager.Render();
 		editor.selectionGroup.onMove();
 
 		if(!final) {
