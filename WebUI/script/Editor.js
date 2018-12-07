@@ -238,13 +238,13 @@ class Editor {
 
 	onCreateGroupRequested(){
 		let transform = this.raycastTransform;
-		let parameters = { name: "New Group", transform:  transform};
+		let parameters = { name: "New Group"};
 		this.execute(new CreateGroupCommand(GenerateGuid(), parameters));
 
 	}
 
 	onCreatedGroup(command){
-		let group = new Group(command.guid, command.name, new LinearTransform().setFromString(command.transform));
+		let group = new Group(command.guid, command.name);
 
 		this.threeManager.AddObject(group);
 

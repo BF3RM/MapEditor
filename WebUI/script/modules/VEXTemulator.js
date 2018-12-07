@@ -20,7 +20,6 @@ class VEXTemulator {
 		let response = {
 			"type": "CreatedGroup",
 			"guid": command.guid,
-			"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
 			"name": command.parameters.name,
 			"sender": command.sender,
 		}
