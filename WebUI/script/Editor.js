@@ -246,14 +246,10 @@ class Editor {
 	onCreatedGroup(command){
 		let group = new Group(command.guid, command.name);
 
-		this.threeManager.AddObject(group);
-
-		group.visible = false;
-
 		this.gameObjects[command.guid] = group;
-		if(command.sender === this.playerName) {
-			this.Select(command.guid)
-		}
+		// if(command.sender === this.playerName) {
+		// 	this.Select(command.guid)
+		// }
 	}
 
 	onDestroyedGroup(command){
@@ -336,7 +332,6 @@ class Editor {
 			this.onSelectedGameObject(guid, true);
 		} else {
 			this.onSelectedGameObject(guid, false);
-
 		}
 	}
 
@@ -352,8 +347,6 @@ class Editor {
 			scope.logger.LogError("Failed to select gameobject: " + guid);
 			return;
 		}
-
-		//Todo 
 
 		// If the object is already in this group and it's a multiselection we deselect it
 		if (gameObject.parent === scope.selectionGroup && isMultiSelection && scope.selectionGroup.children.length !== 1){
@@ -372,17 +365,22 @@ class Editor {
 		if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
 			console.log("Clearing selection group");
 			for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
-				console.log("11111")
-				console.log(scope.selectionGroup.children[i])
 				scope.Deselect(scope.selectionGroup.children[i].guid);
 			}
 		}
 
-		if (scope.selectionGroup.children.length === 0) {
-			scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
+		if (gameObject.type === "GameObject"){
+			if (scope.selectionGroup.children.length === 0) {
+				scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
+			}
+
+			scope.selectionGroup.AttachObject(gameObject);
+
+		}else if (gameObject.type === "Group"){
+			gameObject.Select();
+			//TODO: update inspector with the group name
 		}
 		
-		scope.selectionGroup.AttachObject(gameObject);
 		scope.selectionGroup.Select();
 
 		scope.threeManager.AttachGizmoTo(scope.selectionGroup);

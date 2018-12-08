@@ -103,7 +103,7 @@ class Hierarchy {
 		dom.jstree({
 			core: {
 				data: this.data,
-				check_callback : true
+				check_callback: this.check_callback
 			},
 			search: {
 				case_insensitive: true,
@@ -125,6 +125,7 @@ class Hierarchy {
 		return dom;
 	}
 
+
 	CreateTopControls() {
 		let scope = this;
 		let dom = $(document.createElement("div"));
@@ -145,6 +146,18 @@ class Hierarchy {
 
 		return dom;
 	}
+
+	check_callback(op, node, par, pos, more) {
+		if(op === "move_node" ) {
+			let child = editor.getGameObjectByGuid(node.id);
+			let parent = editor.getGameObjectByGuid(par.id);
+
+			if (child === undefined || parent === undefined || parent.type !== "Group" || child.type === "GameEntity"){
+				return false;
+			}
+		}
+	}
+
 	CreateSubControls() {
 		let dom = $(document.createElement("div"));
 		return dom;
@@ -153,6 +166,8 @@ class Hierarchy {
 
 	onMoved(nodeData) {
 		let scope = this;
+		console.log("-----------")
+		console.log(nodeData)
 //		scope.data =
 		// TODO: update data with the changes
 		let child = editor.getGameObjectByGuid(nodeData.node.id);

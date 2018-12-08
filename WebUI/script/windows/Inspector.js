@@ -173,7 +173,7 @@ class Inspector {
 	UpdateInspector(selectionGroup, isMultipleSelection) {
 
 		if(selectionGroup == null) {
-		console.log("Tried to update the inspector and selectionGroup is null?");
+			console.log("Tried to update the inspector and selectionGroup is null?");
 			return;
 		}
 
@@ -182,11 +182,9 @@ class Inspector {
 		}else{
 			let gameObject = selectionGroup.children[0];
 			if (gameObject == null){
-				console.error("Selection group has no children");
+				// Selection group has no children
 				return;
 			}
-						console.log(gameObject)
-						console.log(gameObject.name)
 
 			this.UpdateName(gameObject, gameObject.name);
 			if (selectionGroup.type === "GameObject") {

@@ -1,5 +1,5 @@
 class Group {
-	constructor(guid = GenerateGuid(), name = "New Group")
+	constructor(guid, name)
 	{
 		this.guid = guid;
 		this.type = "Group";
