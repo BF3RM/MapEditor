@@ -40,7 +40,7 @@ class VEXTInterface {
 		out
 
 	 */
-	
+
 	SendCommand(command) {
 		command.sender = editor.playerName;
 		if(editor.debug) {
@@ -49,7 +49,7 @@ class VEXTInterface {
 			this.emulator.commands[command.type](command);
 		} else {
 			console.log(command);
-			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveCommand', JSON.stringify(command));
+			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(command));
 		}
 	}
 

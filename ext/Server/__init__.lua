@@ -1,17 +1,39 @@
 class 'MapEditorServer'
 
+require "__shared/ObjectManager"
+require "__shared/Backend"
+
+ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
+Backend = Backend(Realm.Realm_ClientAndServer)
+local m_EditorServer = require "EditorServer"
+
 function MapEditorServer:__init()
 	print("Initializing MapEditorServer")
-	self:RegisterVars()
 	self:RegisterEvents()
-end
-
-function MapEditorServer:RegisterVars()
 end
 
 function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
+
+    NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommand)
+
+    Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
+    Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+
+end
+
+function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
+    m_EditorServer:OnUpdatePass(p_Delta, p_Pass)
+end
+
+function MapEditorServer:OnReceiveCommand(p_Player, p_Command)
+    m_EditorServer:OnReceiveCommand(p_Player, p_Command)
+end
+
+function MapEditorServer:OnLevelDestroy()
+    print("Destroy!")
+    Backend:OnLevelDestroy()
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)

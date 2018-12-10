@@ -1,6 +1,6 @@
 class 'Editor'
 
-local m_ClientEntityManager = require "ClientEntityManager"
+
 local m_InstanceParser = require "InstanceParser"
 
 
@@ -10,18 +10,17 @@ local FALLBACK_DISTANCE = 10000
 function Editor:__init()
 	print("Initializing Editor")
 	self:RegisterVars()
-	self:RegisterEvents()
 end
 
 function Editor:RegisterVars()
 	self.m_PendingRaycast = false
 
 	self.m_Commands = {
-		SpawnBlueprintCommand = self.SpawnBlueprint,
-		DestroyBlueprintCommand = self.DestroyBlueprint,
-		SetTransformCommand = self.SetTransform,
-		SelectGameObjectCommand = self.SelectGameObject,
-		CreateGroupCommand = self.CreateGroup
+		SpawnBlueprintCommand = Backend.SpawnBlueprint,
+		DestroyBlueprintCommand = Backend.DestroyBlueprint,
+		SetTransformCommand = Backend.SetTransform,
+		SelectGameObjectCommand = Backend.SelectGameObject,
+		CreateGroupCommand = Backend.CreateGroup
 	}
 	self.m_Messages = {
 		MoveObjectMessage = self.MoveObject
@@ -30,11 +29,8 @@ function Editor:RegisterVars()
 	self.m_Queue = {};
 end
 
-function Editor:RegisterEvents()
 
-end
-
-function Editor:OnEngineMessage(p_Message) 
+function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		m_InstanceParser:FillVariations()
 
@@ -54,36 +50,34 @@ end
 
 
 
-
-function Editor:OnLevelDestroy()
-	m_ClientEntityManager:Clear()
-	m_InstanceParser:Clear()
-
-end
-
-
-
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:UpdateCameraTransform()
-
 	self:Raycast()
 end
-function Editor:OnUpdatePass(p_Delta, p_Pass)
-	if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
-		return
-	end
 
-	for k,l_Command in ipairs(self.m_Queue) do
-		l_Command.queued = true
-		print("Executing command delayed: " .. l_Command.type)
-		self:OnReceiveCommand(json.encode(l_Command))
-	end
-	if(#self.m_Queue > 0) then
-		self.m_Queue = {}
-	end
+
+function Editor:OnSendToServer(p_Command)
+    NetEvents:SendLocal('MapEditorServer:ReceiveCommand', p_Command)
 end
 
+function Editor:OnUpdatePass(p_Delta, p_Pass)
+    if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
+        return
+    end
+
+    for k,l_Command in ipairs(self.m_Queue) do
+        l_Command.queued = true
+        print("Executing command delayed: " .. l_Command.type)
+        self:OnReceiveCommand(json.encode(self:EncodeParams(l_Command)))
+    end
+    if(#self.m_Queue > 0) then
+        self.m_Queue = {}
+    end
+end
+
+
 function Editor:OnReceiveCommand(p_Command)
+    print(p_Command)
 	local s_Command = self:DecodeParams(json.decode(p_Command))
 	local s_Function = self.m_Commands[s_Command.type]
 	if(s_Function == nil) then
@@ -96,10 +90,12 @@ function Editor:OnReceiveCommand(p_Command)
 		print("error")
 		return
 	end
-	if(s_Response == "queued") then
+	if(s_Response == "queue") then
 		print("Queued command")
-		return
+        table.insert(self.m_Queue, s_Command)
+        return
 	end
+
 	WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
 end
 
@@ -120,127 +116,6 @@ function Editor:OnReceiveMessage(p_Message)
 	end
 	-- Messages don't respond
 end
---[[
-
-	Commands
-
---]]
-function Editor:SpawnBlueprint(p_Command)
-	local s_Params = p_Command.parameters
-	local s_SpawnResult = m_ClientEntityManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
-
-	if(s_SpawnResult == false) then
-		-- Send error to webui
-		print("Failed to spawn blueprint. ")
-		print(s_Command)
-		return false
-	end
-
-	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
-
-	local s_Children = {}
-	for k,l_Entity in ipairs(s_SpawnResult) do
-		local s_Data = l_Entity.data
-		local s_Entity = SpatialEntity(l_Entity)
-
-		s_Children[#s_Children + 1 ] = {
-			guid = s_Entity.uniqueID,
-			type = l_Entity.typeInfo.name,
-			transform = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform)),
-			aabb = {
-				min = tostring(s_Entity.aabb.min),
-				max = tostring(s_Entity.aabb.max),
-				trans = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform))
-			},
-			reference = {
-
-				instanceGuid = tostring(s_Data.instanceGuid),
-				--partitionGuid = tostring(s_Data.instanceGuid),
-				type = s_Data.typeInfo.name
-				-- transform?
-			}
-		}
-	end
-
-	local s_Response = {
-		guid = s_Params.guid,
-		sender = s_LocalPlayer.name,
-		name = s_Params.name,
-		['type'] = 'SpawnedBlueprint',
-		parameters = s_Params,
-		children = s_Children
-	}
-
-	return s_Response
-end
-
-function Editor:DestroyBlueprint(p_Command)
-
-	--TODO: not hack this
-	if(p_Command.queued == nil) then
-		table.insert(self.m_Queue, p_Command)
-		return "queued";
-	end
-
-
-
-	local s_Result = m_ClientEntityManager:DestroyEntity(p_Command.guid)
-
-	if(s_Result == false) then
-		print("Failed to destroy entity: " .. p_Command.guid)
-	end
-	local s_Response = {
-		type = "DestroyedBlueprint",
-		guid =  p_Command.guid
-	}
-
-	return s_Response
-end
-
-
-function Editor:SelectGameObject(p_Command)
-
-	if ( m_ClientEntityManager:GetEntityByGuid(p_Command.guid) == nil) then
-		return false
-	end
-	local s_Response = {
-		guid = p_Command.guid,
-		['type'] = 'SelectedGameObject'
-	}
-	return s_Response
-end
-
-function Editor:CreateGroup(p_Command)
-	-- TODO: save the new group
-
-	local s_Response = {
-		guid = p_Command.guid,
-		['type'] = 'CreatedGroup',
-		transform = p_Command.parameters.transform,
-		name = p_Command.parameters.name,
-		sender = p_Command.sender,
-	}
-	return s_Response
-end
-
-function Editor:SetTransform(p_Command)
-	local s_Result = m_ClientEntityManager:SetTransform(p_Command.guid, p_Command.parameters.transform)
-
-	if(s_Result == false) then
-		-- Notify WebUI of failed
-		print("failed")
-		return false
-	end
-
-	local s_Response = {
-		type = "SetTransform",
-		guid = p_Command.guid,
-		transform = p_Command.parameters.transform
-	}
-	return s_Response
-end
-
-
 
 --[[
 
@@ -249,7 +124,7 @@ end
 --]]
 
 function Editor:MoveObject(p_Message)
-	local s_Result = m_ClientEntityManager:SetTransform(p_Message.guid, p_Message.transform)
+	local s_Result = ObjectManager:SetTransform(p_Message.guid, p_Message.transform)
 
 	if(s_Result == false) then
 		-- Notify WebUI of failed
@@ -264,14 +139,6 @@ end
 
 --]]
 
-function Editor:Error(p_Message, p_Command)
-	local s_Response = {
-		type = "Error",
-		message = p_Message,
-		command = p_Command
-	}
-	return s_Response
-end
 
 function Editor:Raycast()
 	if not self.m_PendingRaycast then
@@ -281,7 +148,7 @@ function Editor:Raycast()
 	local s_Transform = ClientUtils:GetCameraTransform()
 
 	if s_Transform.trans == Vec3(0,0,0) then -- Camera is below the ground. Creating an entity here would be useless.
-		
+
 		return
 	end
 
@@ -313,7 +180,7 @@ function Editor:Raycast()
 							s_Transform.trans.z + (s_CameraForward.z * FALLBACK_DISTANCE))
 	end
 
-	WebUI:ExecuteJS(string.format('editor.UpdateRaycastPosition(%s, %s, %s)', 
+	WebUI:ExecuteJS(string.format('editor.UpdateRaycastPosition(%s, %s, %s)',
 		s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
 
 	self.m_PendingRaycast = false
@@ -327,7 +194,7 @@ function Editor:UpdateCameraTransform()
 	local up = s_Transform.up
 	local forward = s_Transform.forward
 
-	WebUI:ExecuteJS(string.format('editor.webGL.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);', 
+	WebUI:ExecuteJS(string.format('editor.threeManager.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
 		left.x, left.y, left.z, up.x, up.y, up.z, forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
 
 end
@@ -355,7 +222,7 @@ function Editor:DecodeParams(p_Table)
 				Vec3(s_Value.up.x, s_Value.up.y, s_Value.up.z),
 				Vec3(s_Value.forward.x, s_Value.forward.y, s_Value.forward.z),
 				Vec3(s_Value.trans.x, s_Value.trans.y, s_Value.trans.z))
-				
+
 			p_Table[s_Key] = s_LinearTransform
 
 		elseif type(s_Value) == "table" then

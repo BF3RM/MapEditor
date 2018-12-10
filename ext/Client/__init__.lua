@@ -1,9 +1,16 @@
 class 'MapEditorClient'
 
+require "__shared/ObjectManager"
+require "__shared/Backend"
+
 local m_Freecam = require "Freecam"
 local m_Editor = require "Editor"
 local m_UIManager = require "UIManager"
 local m_InstanceParser = require "InstanceParser"
+
+ObjectManager = ObjectManager(Realm.Realm_Client)
+Backend = Backend(Realm.Realm_Client)
+
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
@@ -17,20 +24,22 @@ end
 
 function MapEditorClient:RegisterEvents()
 	--Game events
-	self.m_OnUpdateInputEvent = Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
-	self.m_ExtensionLoadedEvent = Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
-	self.m_EngineMessageEvent = Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
-	self.m_EngineUpdateEvent = Events:Subscribe('Engine:Update', self, self.OnUpdate)
-	self.m_PartitionLoadedEvent = Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
+	Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
+	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
+	Events:Subscribe('Engine:Update', self, self.OnUpdate)
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
-	self.m_EngineUpdateEvent = Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
-	self.m_InputPreUpdateHook = Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
+	Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 
-	self.m_EngineUpdateEvent = Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
+	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
 
 	-- WebUI events
+    Events:Subscribe('MapEditor:SendToServer', self, self.OnSendToServer)
+    NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
 	Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 
@@ -67,15 +76,17 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
-	m_Editor:OnUpdatePass(p_Delta, p_Pass)
+    m_Editor:OnUpdatePass(p_Delta, p_Pass)
 end
 function MapEditorClient:OnLevelDestroy()
 	print("Destroy!")
-	m_Editor:OnLevelDestroy()
+    Backend:OnLevelDestroy()
 end
 
 ----------- Editor functions----------------
-
+function MapEditorClient:OnSendToServer(p_Command)
+    m_Editor:OnSendToServer(p_Command)
+end
 function MapEditorClient:OnReceiveCommand(p_Command)
 	m_Editor:OnReceiveCommand(p_Command)
 end
