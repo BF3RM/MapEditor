@@ -78,15 +78,10 @@ class SelectionGroup extends THREE.Group{
 			temp[i] = this.children[i];
 			this.DetachObject(this.children[i]);
 		}
-		let position = new THREE.Vector3();
-		let quaternion = new THREE.Quaternion();
-		let scale = new THREE.Vector3();
-		matrix.decompose(position, quaternion, scale);
 
-		this.setRotationFromQuaternion(quaternion);
-		this.scale.set(scale.x, scale.y, scale.z);
+		this.matrix.decompose( this.position, this.quaternion, this.scale );
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-		
+
 		editor.threeManager.Render();
 
 		for (var i = temp.length - 1; i >= 0; i--) {
