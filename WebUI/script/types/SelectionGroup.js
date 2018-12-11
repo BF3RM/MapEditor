@@ -59,8 +59,6 @@ class SelectionGroup extends THREE.Group{
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
 		this.updateTransform();
-		signals.objectChanged.dispatch(this, "transform", linearTransform);
-
 	}
 
 	updateTransform()
@@ -71,13 +69,14 @@ class SelectionGroup extends THREE.Group{
 			this.transform.left.y, this.transform.up.y, this.transform.forward.y, 0,
 			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
 			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
+		
+		// To move the group without moving the children we have to detach them first
+		let temp = [];
 
-		// As the position is local, we have to detach the object from its parent first
-		let parent = this.parent;
-
-		// remove child from parent and add it to scene
-		if (parent !== null){
-			THREE.SceneUtils.detach( this, parent, editor.threeManager.scene );
+		for (var i = this.children.length - 1; i >= 0; i--) {
+			//TODO: matrix should be calculated here doing the average of all children's positions, maybe
+			temp[i] = this.children[i];
+			this.DetachObject(this.children[i]);
 		}
 
 		this.setRotationFromMatrix(matrix);
@@ -85,13 +84,13 @@ class SelectionGroup extends THREE.Group{
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
 		editor.threeManager.Render();
 
-		// remove child from scene and add it to parent
-		if (parent !== null){
-			THREE.SceneUtils.attach( this, editor.threeManager.scene, parent );
+		for (var i = temp.length - 1; i >= 0; i--) {
+
+			this.AttachObject(temp[i]);
 		}
 		editor.threeManager.Render();
 
-	}	
+	}
 
 	Select() {
 		this.onSelected();
@@ -147,9 +146,4 @@ class SelectionGroup extends THREE.Group{
 		}
 	}
 
-	setTransform(linearTransform) {
-		this.transform = linearTransform;
-		this.updateTransform();
-
-	}
 }
