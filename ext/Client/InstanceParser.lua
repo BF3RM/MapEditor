@@ -12,6 +12,7 @@ function InstanceParser:RegisterVars()
 	self.m_Meshes = {}
 	self.m_Variations = {}
 	self.m_MeshVariationDatabases = {}
+    self.m_StaticModelGroupDatabase = {}
 
 	self.m_IllegalTypes = Set {
 		"DebrisClusterData",
@@ -30,6 +31,8 @@ end
 function InstanceParser:RegisterEvents()
 end
 
+--TODO: Redo this whole fucking thing.
+
 
 function InstanceParser:OnPartitionLoaded(p_Partition)
 	if p_Partition == nil then
@@ -46,11 +49,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 		end
 
 		-- Catch all blueprints
-		if(l_Instance.typeInfo.name == "ObjectBlueprint" or 
-			l_Instance.typeInfo.name == "PrefabBlueprint" or
-			l_Instance.typeInfo.name == "SpatialPrefabBlueprint" or
-			l_Instance.typeInfo.name == "EffectBlueprint" or
-			l_Instance.typeInfo.name == "VehicleBlueprint") then
+		if l_Instance:Is("Blueprint") then
 
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
 			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
@@ -79,7 +78,44 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 		if(l_Instance.typeInfo.name == "MeshVariationDatabase") then
 			local s_Instance = MeshVariationDatabase(l_Instance)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
-		end  
+		end
+
+        if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
+            local s_Instance = StaticModelGroupEntityData(l_Instance)
+            for i,l_Member in ipairs(s_Instance.memberDatas) do
+                local s_Member = StaticModelGroupMemberData(l_Member)
+                if(#s_Member.instanceObjectVariation == 0) then
+                    goto continue2
+                end
+                if(s_Member.memberType.typeInfo.name ~= "StaticModelEntityData") then
+                    print("Add support for this shit!: " .. s_Member.memberType.typeInfo.name)
+                    -- There's no continue in lua...
+                    goto continue2
+                end
+                local s_MemberType = StaticModelEntityData(s_Member.memberType)
+                local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+
+                local s_Variations = {}
+                for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+                    -- Eww
+                    s_Variations[l_Variation] = l_Variation
+                end
+                if(self.m_Variations[s_Mesh] == nil) then
+                    self.m_Variations[s_Mesh] = {}
+                end
+
+                for i3, l_Variation in pairs(s_Variations) do
+                    local s_Variation = {
+                        hash =l_Variation,
+                        name ="fuck"
+                    }
+
+                    table.insert(self.m_Variations[s_Mesh], s_Variation)
+                end
+                ::continue2::
+            end
+
+        end
 
 		::continue::
 	end
@@ -99,21 +135,33 @@ function InstanceParser:FillVariations()
 			local mesh = Asset(l_mvdEntry.mesh)
 			if(self.m_Variations[l_MeshGuid] == nil) then
 				self.m_Variations[l_MeshGuid] = {}
-			end
+            end
+            local s_Hash = l_mvdEntry.variationAssetNameHash
+            local s_Variation = {
+                hash =s_Hash,
+                name ="fuck"
+            }
 
-			table.insert(self.m_Variations[l_MeshGuid], l_mvdEntry.variationAssetNameHash)
+            table.insert(self.m_Variations[l_MeshGuid], s_Variation)
 		end
 	end
 	for k, v in pairs(self.m_Blueprints) do
 		if(self.m_Meshes[v.name:lower() .. "_mesh"] == nil) then
-			print("Missing: " .. v.name .. "_mesh")
+			--print("Missing: " .. v.name .. "_mesh")
 		else
 			local l_MeshGuid = self.m_Meshes[v.name:lower() .. "_mesh"]
 
-			if(self.m_Variations[l_MeshGuid] ~= nil ) then
+            if(self.m_Variations[l_MeshGuid] ~= nil ) then
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
-				print(k)
-			else 
+				local jsonTest = (json.encode(self.m_Variations[l_MeshGuid]))
+                if(jsonTest == nil) then
+                    print("------------------")
+                    print(self.m_Variations[l_MeshGuid])
+                    print("------------------")
+                else
+                    print(self.m_Variations[l_MeshGuid])
+                end
+			else
 				print("No variation for " .. v.name)
 			end
 		end

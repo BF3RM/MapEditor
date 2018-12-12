@@ -12,8 +12,8 @@ class Blueprint {
 	getDefaultVariation() {
 		let scope = this;
 		if(scope.hasVariation()) {
-			let keys = Object.keys(this.variations);
-			return keys[0];
+			return this.variations[1].hash;
+
 		} else {
 			return 0;
 		}
