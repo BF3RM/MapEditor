@@ -126,7 +126,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 
         if s_Entity ~= nil then
             local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
-            s_Entity.transform = ToWorld(s_LocalTransform, LinearTransform(p_LinearTransform))
+            s_Entity.transform = ToWorld(LinearTransform(p_LinearTransform), s_LocalTransform)
             if(p_UpdateCollision) then
                 print("Updating collision")
                 s_Entity:FireEvent("Disable")
@@ -151,15 +151,30 @@ function ToLocal(a,b)
     return LT
 end
 
---This shit is wrong as fuck boi
-function ToWorld(a,b)
+
+function ToWorld(parentWorld, s_local)
     local LT = LinearTransform()
-    LT.left = a.left + b.left
-    LT.up = a.up + b.up
-    LT.forward = a.forward + a.forward
-    LT.trans.x = a.trans.x + b.trans.x
-    LT.trans.y = a.trans.y + b.trans.y
-    LT.trans.z = a.trans.z + b.trans.z
+
+
+    LT.left = Vec3( parentWorld.left.x    * s_local.left.x,  parentWorld.left.y    * s_local.left.x,  parentWorld.left.z    * s_local.left.x )
+            + Vec3( parentWorld.up.x      * s_local.left.y,  parentWorld.up.y      * s_local.left.y,  parentWorld.up.z      * s_local.left.y )
+            + Vec3( parentWorld.forward.x * s_local.left.z,  parentWorld.forward.y * s_local.left.z,  parentWorld.forward.z * s_local.left.z )
+
+    LT.up = Vec3( parentWorld.left.x    * s_local.up.x,  parentWorld.left.y    * s_local.up.x,  parentWorld.left.z    * s_local.up.x )
+            + Vec3( parentWorld.up.x      * s_local.up.y,  parentWorld.up.y      * s_local.up.y,  parentWorld.up.z      * s_local.up.y )
+            + Vec3( parentWorld.forward.x * s_local.up.z,  parentWorld.forward.y * s_local.up.z,  parentWorld.forward.z * s_local.up.z )
+
+    LT.forward = Vec3( parentWorld.left.x    * s_local.forward.x,  parentWorld.left.y    * s_local.forward.x,  parentWorld.left.z    * s_local.forward.x )
+            + Vec3( parentWorld.up.x      * s_local.forward.y,  parentWorld.up.y      * s_local.forward.y,  parentWorld.up.z      * s_local.forward.y )
+            + Vec3( parentWorld.forward.x * s_local.forward.z,  parentWorld.forward.y * s_local.forward.z,  parentWorld.forward.z * s_local.forward.z )
+
+    LT.trans = Vec3( parentWorld.left.x    * s_local.trans.x,  parentWorld.left.y    * s_local.trans.x,  parentWorld.left.z    * s_local.trans.x )
+            + Vec3( parentWorld.up.x      * s_local.trans.y,  parentWorld.up.y      * s_local.trans.y,  parentWorld.up.z      * s_local.trans.y )
+            + Vec3( parentWorld.forward.x * s_local.trans.z,  parentWorld.forward.y * s_local.trans.z,  parentWorld.forward.z * s_local.trans.z )
+
+    LT.trans = LT.trans + parentWorld.trans
+    print(LT.trans)
     return LT
 end
+
 return ObjectManager
