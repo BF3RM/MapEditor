@@ -9,6 +9,7 @@ end
 
 function ObjectManager:RegisterVars()
     self.m_SpawnedEntities = {}
+    self.m_SpawnedOffsets = {}
 end
 
 function ObjectManager:RegisterEvents()
@@ -52,7 +53,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 
     local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
-    print('Blueprint type: ' .. s_Blueprint.typeInfo.name .. ", ID: " .. p_Guid .. ", Instance: " .. tostring(p_InstanceGuid))
+    print('Blueprint type: ' .. s_Blueprint.typeInfo.name .. ", ID: " .. p_Guid .. ", Instance: " .. tostring(p_InstanceGuid) .. ", Variation: " .. p_Variation)
 
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
@@ -65,17 +66,19 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
         return false
     end
     local s_Spatial = {}
-
+    local s_Offsets = {}
     for i, l_Entity in pairs(s_ObjectEntities) do
         l_Entity:Init(self.m_Realm, true)
         l_Entity:FireEvent("Start")
         if(l_Entity:Is("SpatialEntity")) then
             table.insert(s_Spatial, SpatialEntity(l_Entity))
+            s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
         end
     end
 
 
     self.m_SpawnedEntities[p_Guid] = s_Spatial
+    self.m_SpawnedOffsets[p_Guid] = s_Offsets
 
     return s_Spatial
 end
@@ -122,7 +125,8 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
         local s_Entity = SpatialEntity(l_Entity)
 
         if s_Entity ~= nil then
-            s_Entity.transform = LinearTransform(p_LinearTransform)
+            local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
+            s_Entity.transform = ToWorld(s_LocalTransform, LinearTransform(p_LinearTransform))
             if(p_UpdateCollision) then
                 print("Updating collision")
                 s_Entity:FireEvent("Disable")
@@ -136,4 +140,26 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
     return true
 end
 
+function ToLocal(a,b)
+    local LT = LinearTransform()
+    LT.left = a.left
+    LT.up = a.up
+    LT.forward = a.forward
+    LT.trans.x = a.trans.x - b.trans.x
+    LT.trans.y = a.trans.y - b.trans.y
+    LT.trans.z = a.trans.z - b.trans.z
+    return LT
+end
+
+--This shit is wrong as fuck boi
+function ToWorld(a,b)
+    local LT = LinearTransform()
+    LT.left = a.left + b.left
+    LT.up = a.up + b.up
+    LT.forward = a.forward + a.forward
+    LT.trans.x = a.trans.x + b.trans.x
+    LT.trans.y = a.trans.y + b.trans.y
+    LT.trans.z = a.trans.z + b.trans.z
+    return LT
+end
 return ObjectManager
