@@ -32,7 +32,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
     if p_PartitionGuid == nil or
             p_InstanceGuid == nil or
             p_LinearTransform == nil then
-        print('One or more parameters are nil')
+        print('One or more userData are nil')
         return false
     end
 

@@ -40,10 +40,10 @@ class VextEvents {
 
 }
 class VextCommand {
-	constructor(guid, type, parameters) {
+	constructor(guid, type, userData) {
 		this.guid = guid;
 		this.type = type;
-		this.parameters = parameters;
+		this.userData = userData;
 	}
 }
 class VextMessage {

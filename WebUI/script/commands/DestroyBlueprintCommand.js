@@ -23,7 +23,7 @@ DestroyBlueprintCommand.prototype = {
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnBlueprintCommand", this.gameObject.parameters))
+		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnBlueprintCommand", this.gameObject.userData))
 	},
 };
 

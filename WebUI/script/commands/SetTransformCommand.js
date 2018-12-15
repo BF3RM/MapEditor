@@ -28,16 +28,16 @@ var SetTransformCommand = function (guid, newTransform, oldTransform ) {
 SetTransformCommand.prototype = {
 
 	execute: function () {
-		let s_Parameters = {
+		let s_UserData = {
 			'transform': this.newTransform
 		};
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_Parameters))
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_UserData))
 	},
 
 	undo: function () {
-		let s_Parameters = {
+		let s_UserData = {
 			'transform': this.oldTransform
 		};
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_Parameters))
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_UserData))
 	},
 };

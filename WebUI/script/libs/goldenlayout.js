@@ -1950,11 +1950,11 @@ lm.utils.copy( lm.controls.BrowserPopout.prototype, {
 
 		urlParts = document.location.href.split( '?' );
 
-		// URL doesn't contain GET-parameters
+		// URL doesn't contain GET-userData
 		if( urlParts.length === 1 ) {
 			return urlParts[ 0 ] + '?gl-window=' + storageKey;
 
-			// URL contains GET-parameters
+			// URL contains GET-userData
 		} else {
 			return document.location.href + '&gl-window=' + storageKey;
 		}

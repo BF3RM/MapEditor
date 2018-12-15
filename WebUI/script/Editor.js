@@ -101,7 +101,7 @@ class Editor {
 					guid: gameObject.guid,
 					name: gameObject.name,
 					transform: gameObject.transform,
-					parameters: gameObject.parameters
+					userData: gameObject.userData
 				};
 			}
 		}
@@ -243,8 +243,8 @@ class Editor {
 
 	onCreateGroupRequested(){
 		let transform = this.raycastTransform;
-		let parameters = { name: "New Group"};
-		this.execute(new CreateGroupCommand(GenerateGuid(), parameters));
+		let userData = { name: "New Group"};
+		this.execute(new CreateGroupCommand(GenerateGuid(), userData));
 
 	}
 
@@ -285,9 +285,9 @@ class Editor {
 		//Spawn blueprint
 		let guid = GenerateGuid();
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let parameters = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.getName(), transform);
+		let userData = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.getName(), transform);
 
-		scope.execute(new SpawnBlueprintCommand(guid, parameters));
+		scope.execute(new SpawnBlueprintCommand(guid, userData));
 	}
 
 	onDestroyedBlueprint(command) {
@@ -298,7 +298,7 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.parameters.transform), command.parent, null, command.parameters);
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.userData.transform), command.parent, null, command.userData);
 
 		this.threeManager.AddObject(gameObject);
 

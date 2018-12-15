@@ -7,7 +7,7 @@ const SpawnBlueprintCommand = function (guid, parameters) {
 	this.guid = guid;
 
 	if (parameters === undefined) {
-		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn parameters");
+		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
 	this.parameters = parameters;

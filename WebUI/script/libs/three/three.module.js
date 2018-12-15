@@ -4644,7 +4644,7 @@ Object.assign( Vector4.prototype, {
 
 /*
  In options, we can specify:
- * Texture parameters for an auto-generated target texture
+ * Texture userData for an auto-generated target texture
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
 function WebGLRenderTarget( width, height, options ) {
@@ -10170,15 +10170,15 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		/*
 		 // Handle primitives
 
-		 var parameters = this.parameters;
+		 var userData = this.userData;
 
-		 if ( parameters !== undefined ) {
+		 if ( userData !== undefined ) {
 
 		 var values = [];
 
-		 for ( var key in parameters ) {
+		 for ( var key in userData ) {
 
-		 values.push( parameters[ key ] );
+		 values.push( userData[ key ] );
 
 		 }
 
@@ -12119,15 +12119,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		/*
 		 // Handle primitives
 
-		 var parameters = this.parameters;
+		 var userData = this.userData;
 
-		 if ( parameters !== undefined ) {
+		 if ( userData !== undefined ) {
 
 		 var values = [];
 
-		 for ( var key in parameters ) {
+		 for ( var key in userData ) {
 
-		 values.push( parameters[ key ] );
+		 values.push( userData[ key ] );
 
 		 }
 
@@ -12947,7 +12947,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 /**
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  defines: { "label" : "value" },
  *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
  *
@@ -14020,7 +14020,7 @@ Object.assign( Triangle.prototype, {
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
@@ -17437,7 +17437,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		var shaderID = shaderIDs[ material.type ];
 
-		// heuristics to create shader parameters according to lights in the scene
+		// heuristics to create shader userData according to lights in the scene
 		// (not to blow over maxLights budget)
 
 		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
@@ -18295,7 +18295,7 @@ function WebGLRenderStates() {
  * @author bhouston / https://clara.io
  * @author WestLangley / http://github.com/WestLangley
  *
- * parameters = {
+ * userData = {
  *
  *  opacity: <float>,
  *
@@ -18373,7 +18373,7 @@ MeshDepthMaterial.prototype.copy = function ( source ) {
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
- * parameters = {
+ * userData = {
  *
  *  referencePosition: <float>,
  *  nearDistance: <float>,
@@ -23397,7 +23397,7 @@ function WebGLRenderer( parameters ) {
 
 		} else if ( program.code !== code ) {
 
-			// changed glsl or parameters
+			// changed glsl or userData
 			releaseMaterialProgramReference( material );
 
 		} else if ( lightsHash.stateID !== lightsStateHash.stateID ||
@@ -25013,7 +25013,7 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 /**
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  map: new THREE.Texture( <Image> ),
  *  rotation: <float>,
@@ -25802,7 +25802,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  opacity: <float>,
  *
@@ -26208,7 +26208,7 @@ LineLoop.prototype = Object.assign( Object.create( Line.prototype ), {
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
@@ -28871,7 +28871,7 @@ function addContour( vertices, contour ) {
  *
  * Creates extruded geometry from a path shape.
  *
- * parameters = {
+ * userData = {
  *
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
@@ -29695,7 +29695,7 @@ function toJSON( shapes, options, data ) {
  *
  * Text = 3D Text
  *
- * parameters = {
+ * userData = {
  *  font: <THREE.Font>, // font
  *
  *  size: <float>, // size of the text
@@ -29746,7 +29746,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	var shapes = font.generateShapes( text, parameters.size );
 
-	// translate parameters to ExtrudeGeometry API
+	// translate userData to ExtrudeGeometry API
 
 	parameters.depth = parameters.height !== undefined ? parameters.height : 50;
 
@@ -31073,7 +31073,7 @@ var Geometries = /*#__PURE__*/Object.freeze({
 /**
  * @author mrdoob / http://mrdoob.com/
  *
- * parameters = {
+ * userData = {
  *  color: <THREE.Color>
  * }
  */
@@ -31126,7 +31126,7 @@ RawShaderMaterial.prototype.isRawShaderMaterial = true;
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  roughness: <float>,
  *  metalness: <float>,
@@ -31299,7 +31299,7 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
- * parameters = {
+ * userData = {
  *  reflectivity: <float>
  * }
  */
@@ -31345,7 +31345,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  specular: <hex>,
  *  shininess: <float>,
@@ -31508,7 +31508,7 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 /**
  * @author takahirox / http://github.com/takahirox
  *
- * parameters = {
+ * userData = {
  *  gradientMap: new THREE.Texture( <Image> )
  * }
  */
@@ -31546,7 +31546,7 @@ MeshToonMaterial.prototype.copy = function ( source ) {
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
  *
- * parameters = {
+ * userData = {
  *  opacity: <float>,
  *
  *  bumpMap: new THREE.Texture( <Image> ),
@@ -31635,7 +31635,7 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  opacity: <float>,
  *
@@ -31759,7 +31759,7 @@ MeshLambertMaterial.prototype.copy = function ( source ) {
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  opacity: <float>,
  *
@@ -31881,7 +31881,7 @@ MeshMatcapMaterial.prototype.copy = function ( source ) {
 /**
  * @author alteredq / http://alteredqualia.com/
  *
- * parameters = {
+ * userData = {
  *  color: <hex>,
  *  opacity: <float>,
  *

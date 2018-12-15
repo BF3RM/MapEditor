@@ -12,7 +12,7 @@ class Blueprint {
 	getDefaultVariation() {
 		let scope = this;
 		if(scope.hasVariation()) {
-			return this.variations[1].hash;
+			return this.variations[0].hash;
 
 		} else {
 			return 0;

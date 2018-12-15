@@ -188,7 +188,7 @@ class Inspector {
 
 			this.UpdateName(gameObject, gameObject.name);
 			if (selectionGroup.type === "GameObject") {
-				this.UpdateVariation(gameObject, gameObject.parameters.variation);
+				this.UpdateVariation(gameObject, gameObject.userData.variation);
 			}
 			
 		}
@@ -289,7 +289,7 @@ class Inspector {
 	}
 	UpdateVariation(go, variation) {
 		// We're refreshing the whole thing. Might as well, right?
-		let blueprint =  editor.blueprintManager.getBlueprintByGuid(go.parameters.reference.instanceGuid);
+		let blueprint =  editor.blueprintManager.getBlueprintByGuid(go.userData.reference.instanceGuid);
 		if(!blueprint.hasVariation()){
 			this.variation.prop("disabled", true);
 			this.variation.empty();

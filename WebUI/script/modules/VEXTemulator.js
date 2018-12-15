@@ -20,7 +20,7 @@ class VEXTemulator {
 		let response = {
 			"type": "CreatedGroup",
 			"guid": command.guid,
-			"name": command.parameters.name,
+			"name": command.userData.name,
 			"sender": command.sender,
 		}
 		editor.vext.HandleResponse(response);
@@ -34,12 +34,12 @@ class VEXTemulator {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
-		command.parameters.transform = command.parameters.transform.toString();
+		command.userData.transform = command.userData.transform.toString();
 		let response = {
 			"guid": command.guid,
 			"sender": command.sender,
 			"type": "SpawnedBlueprint",
-			"name": command.parameters.name,
+			"name": command.userData.name,
 			"children": {
 				1: {
 					"type": "ClientStaticModelEntity",
@@ -56,10 +56,10 @@ class VEXTemulator {
 					}
 				},
 			},
-			"parameters": command.parameters
+			"userData": command.userData
 		};
 
-		if(command.parameters.reference.typeName == "SpatialPrefabBlueprint") {
+		if(command.userData.reference.typeName == "SpatialPrefabBlueprint") {
 			response.children[2] = {
 				"type": "ClientStaticModelEntity",
 					"guid": GenerateGuid(),
@@ -82,7 +82,7 @@ class VEXTemulator {
 		let response = {
 			"type": "SetTransform",
 			"guid": command.guid,
-			"transform": command.parameters.transform.toString()
+			"transform": command.userData.transform.toString()
 		}
 		editor.vext.HandleResponse(response);
 
@@ -102,7 +102,7 @@ class VEXTemulator {
 		let response = {
 			"type": "SetObjectName",
 			"guid": command.guid,
-			"name": command.parameters
+			"name": command.userData
 		};
 		editor.vext.HandleResponse(response);
 	}
@@ -112,7 +112,7 @@ class VEXTemulator {
 		let response = {
 			"type": "SetVariation",
 			"guid": command.guid,
-			"key": command.parameters
+			"key": command.userData
 		};
 		editor.vext.HandleResponse(response);
 	}

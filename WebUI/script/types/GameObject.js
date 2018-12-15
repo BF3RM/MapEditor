@@ -1,7 +1,7 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, name, transform, parent, children, parameters) 
+	constructor(guid, name, transform, parent, children, userData)
 	{
 		super( );
 
@@ -10,7 +10,7 @@ class GameObject extends THREE.Object3D
 		this.name = name;
 		this.transform = transform;
 		this.objectParent = parent;
-		this.parameters = parameters;
+		this.userData = userData;
 		this.selected = false;
 
 		for (var i = children - 1; i >= 0; i--) {
@@ -100,19 +100,19 @@ class GameObject extends THREE.Object3D
 
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
-		this.parameters.transform = linearTransform;
+		this.userData.transform = linearTransform;
 		this.updateTransform();
 		signals.objectChanged.dispatch(this, "transform", linearTransform);
 
 	}
 	setName(name) {
 		this.name = name;
-		this.parameters.name = name;
+		this.userData.name = name;
 		signals.objectChanged.dispatch(this, "name", name);
 	}
 
 	setVariation(key) {
-		this.parameters.variation = key;
+		this.userData.variation = key;
 		signals.objectChanged.dispatch(this, "variation", key);
 	}
 
@@ -121,7 +121,7 @@ class GameObject extends THREE.Object3D
 			guid = GenerateGuid();
 		}
 
-		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.parameters);
+		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.userData);
 	}
 
 	onMoveStart() {

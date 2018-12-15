@@ -23,13 +23,13 @@ end
 
 
 function Backend:SpawnBlueprint(p_Command)
-    local s_Params = p_Command.parameters
-    local s_SpawnResult = ObjectManager:SpawnBlueprint(s_Params.guid, s_Params.reference.partitionGuid, s_Params.reference.instanceGuid, s_Params.transform, s_Params.variation)
+    local s_UserData = p_Command.userData
+    local s_SpawnResult = ObjectManager:SpawnBlueprint(s_UserData.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
 
     if(s_SpawnResult == false) then
         -- Send error to webui
         print("Failed to spawn blueprint. ")
-        print(s_Command)
+
         return false
     end
 
@@ -41,11 +41,11 @@ function Backend:SpawnBlueprint(p_Command)
         s_Children[#s_Children + 1 ] = {
             guid = s_Entity.uniqueID,
             type = l_Entity.typeInfo.name,
-            transform = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform)),
+            transform = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform)),
             aabb = {
                 min = tostring(s_Entity.aabb.min),
                 max = tostring(s_Entity.aabb.max),
-                trans = tostring(ToLocal(s_Entity.aabbTransform, s_Params.transform))
+                trans = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform))
             },
             reference = {
 
@@ -58,16 +58,17 @@ function Backend:SpawnBlueprint(p_Command)
     end
 
     local s_Response = {
-        guid = s_Params.guid,
+        guid = s_UserData.guid,
         sender = p_Command.sender,
-        name = s_Params.name,
+        name = s_UserData.name,
         ['type'] = 'SpawnedBlueprint',
-        parameters = s_Params,
+        userData = s_UserData,
         children = s_Children
     }
 
     return s_Response
 end
+
 
 function Backend:DestroyBlueprint(p_Command)
 
@@ -108,15 +109,15 @@ function Backend:CreateGroup(p_Command)
     local s_Response = {
         guid = p_Command.guid,
         ['type'] = 'CreatedGroup',
-        transform = p_Command.parameters.transform,
-        name = p_Command.parameters.name,
+        transform = p_Command.userData.transform,
+        name = p_Command.userData.name,
         sender = p_Command.sender,
     }
     return s_Response
 end
 
 function Backend:SetTransform(p_Command)
-    local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command.parameters.transform)
+    local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command.userData.transform)
 
     if(s_Result == false) then
         -- Notify WebUI of failed
@@ -127,7 +128,7 @@ function Backend:SetTransform(p_Command)
     local s_Response = {
         type = "SetTransform",
         guid = p_Command.guid,
-        transform = p_Command.parameters.transform
+        transform = p_Command.userData.transform
     }
     return s_Response
 end
