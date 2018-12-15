@@ -58,18 +58,19 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
     s_Params.variationNameHash = p_Variation
+    s_Params.networked = true
 
     local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
-
+    print("Successfully spawned.")
     if #s_ObjectEntities == 0 then
         print("Spawning failed")
         return false
     end
     local s_Spatial = {}
     local s_Offsets = {}
+
     for i, l_Entity in pairs(s_ObjectEntities) do
         l_Entity:Init(self.m_Realm, true)
-        l_Entity:FireEvent("Start")
         if(l_Entity:Is("SpatialEntity")) then
             s_Spatial[i] = SpatialEntity(l_Entity)
             s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
@@ -112,6 +113,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
         return false
     end
     for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
+        print(l_Entity.typeInfo.name)
         if(l_Entity == nil) then
             print("Entity is nil?")
             return false
@@ -125,11 +127,16 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
         local s_Entity = SpatialEntity(l_Entity)
 
         if s_Entity ~= nil then
-            local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
-            s_Entity.transform = ToWorld(LinearTransform(p_LinearTransform), s_LocalTransform)
-            if(p_UpdateCollision) then
-                s_Entity:FireEvent("Disable")
-                s_Entity:FireEvent("Enable")
+            if(s_Entity.typeInfo.name == "ServerVehicleEntity") then
+                s_Entity.transform = LinearTransform(p_LinearTransform)
+            else
+                local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
+                s_Entity.transform = ToWorld(LinearTransform(p_LinearTransform), s_LocalTransform)
+
+                if(p_UpdateCollision) then
+                    s_Entity:FireEvent("Disable")
+                    s_Entity:FireEvent("Enable")
+                end
             end
         else
             print("entity is nil??")
