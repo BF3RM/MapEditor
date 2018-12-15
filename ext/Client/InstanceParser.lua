@@ -76,19 +76,15 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 
 		-- Catch all variations
 		if(l_Instance.typeInfo.name == "MeshVariationDatabase") then
-            print("MVD")
-
             local s_Instance = MeshVariationDatabase(l_Instance)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
 		end
 
         if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
-            print("SMGED")
             local s_Instance = StaticModelGroupEntityData(l_Instance)
             for i,l_Member in ipairs(s_Instance.memberDatas) do
                 local s_Member = StaticModelGroupMemberData(l_Member)
                 if(#s_Member.instanceObjectVariation > 0) then
-                    print("oh boy")
                     local s_MemberType = StaticModelEntityData(s_Member.memberType)
                     local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
 
@@ -107,8 +103,6 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
                             hash =l_Variation,
                             name ="fuck"
                         }
-                        print("I bet we dont here")
-
                         table.insert(self.m_Variations[s_Mesh], s_Variation)
                     end
                 end
