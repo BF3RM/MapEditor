@@ -51,6 +51,7 @@ end
 
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
+	self:UpdateCameraTransform()
 	self:Raycast()
 end
 
@@ -60,10 +61,6 @@ function Editor:OnSendToServer(p_Command)
 end
 
 function Editor:OnUpdatePass(p_Delta, p_Pass)
-    if(p_Pass == UpdatePass.UpdatePass_PreFrame ) then
-        self:UpdateCameraTransform()
-    end
-
     if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
         return
     end
