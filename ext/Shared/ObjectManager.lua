@@ -18,7 +18,6 @@ end
 function ObjectManager:GetEntityByGuid(p_Guid)
     if(self.m_SpawnedEntities[p_Guid] ~= nil) then
         return self.m_SpawnedEntities[p_Guid]
-
     else
         return false
     end
@@ -89,6 +88,7 @@ function ObjectManager:DestroyEntity(p_Guid)
     local s_Entities = self:GetEntityByGuid(p_Guid)
 
     if(s_Entities == false or #s_Entities == 0) then
+        print(s_Entities)
         print("Failed to get entities")
         return false
     end
@@ -113,7 +113,6 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
         return false
     end
     for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
-        print(l_Entity.typeInfo.name)
         if(l_Entity == nil) then
             print("Entity is nil?")
             return false

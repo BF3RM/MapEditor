@@ -78,7 +78,7 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
     for k,l_Command in ipairs(self.m_Queue) do
         l_Command.queued = true
         print("Executing command delayed: " .. l_Command.type)
-        self:OnReceiveCommand(json.encode(self:EncodeParams(l_Command)))
+        self:OnReceiveCommand(nil, json.encode(self:EncodeParams(l_Command)))
     end
     if(#self.m_Queue > 0) then
         self.m_Queue = {}
@@ -88,6 +88,9 @@ end
 function MergeUserdata(p_Old, p_New)
     if(p_Old == nil) then
         return p_New
+    end
+    if(p_New == nil) then
+        return nil
     end
     for k,v in pairs(p_New) do
         p_Old[k] = v
