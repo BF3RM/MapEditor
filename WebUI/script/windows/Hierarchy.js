@@ -1,5 +1,12 @@
 class Hierarchy {
 	constructor() {
+		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+		signals.createdGroup.add(this.onCreatedGroup.bind(this));
+		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
+		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
+		signals.deselectedGameObject.add(this.onDeselected.bind(this));
+		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		this.data = {
 			"id": "root",
 			"text": "root",
@@ -27,13 +34,7 @@ class Hierarchy {
 		this.subControls = this.CreateSubControls();
 		this.Initialize();
 
-		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
-		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		signals.createdGroup.add(this.onCreatedGroup.bind(this));
-		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
-		signals.selectedGameObject.add(this.onSelected.bind(this));
-		signals.deselectedGameObject.add(this.onDeselected.bind(this));
-		signals.setObjectName.add(this.onSetObjectName.bind(this));
+
 
 
 	}
@@ -47,7 +48,6 @@ class Hierarchy {
 		scope.data.children[scope.data.children.length] = entry;
 		scope.dom.jstree(true).create_node('root' ,  entry, "last", function(){
 		});
-
 	}
 
 	getEntry(guid) {
@@ -166,28 +166,24 @@ class Hierarchy {
 
 	onMoved(nodeData) {
 		let scope = this;
-		console.log("-----------")
-		console.log(nodeData)
 //		scope.data =
 		// TODO: update data with the changes
 		let child = editor.getGameObjectByGuid(nodeData.node.id);
 		let parent = editor.getGameObjectByGuid(nodeData.parent);
 	}
 
-	onSelected(guid, isMultipleSelection) {
+	onSelectedGameObject(guid, isMultipleSelection) {
+
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
-		console.log(node);
 		scope.selecting = true;
 		this.dom.jstree('select_node', node, true);
 		scope.selecting = false;
 	}
 
 	onDeselected(guid) {
-		console.log(guid)
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
-		console.log(node);
 		scope.selecting = true;
 		this.dom.jstree('deselect_node', node, true);
 		scope.selecting = false;

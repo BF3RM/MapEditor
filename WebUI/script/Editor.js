@@ -3,7 +3,7 @@ class Editor {
 
 		// Commands
 		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
-		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));		
+		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.createGroupRequested.add(this.onCreateGroupRequested.bind(this));
 		signals.createdGroup.add(this.onCreatedGroup.bind(this));
 		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
@@ -11,6 +11,7 @@ class Editor {
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
 		signals.setVariation.add(this.onSetVariation.bind(this));
+		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 
 		//Messages
 
@@ -322,7 +323,8 @@ class Editor {
 		this.gameObjects[command.guid] = gameObject;
 
 		if(command.sender === this.playerName) {
-			this.Select(command.guid)
+			// Make selection happen after all signals have been handled
+			setTimeout(function() {scope.Select(command.guid)}, 1);
 		}
 	}
 
@@ -335,9 +337,9 @@ class Editor {
 	Select(guid) {
 
 		if(keysdown[17]) {
-			this.onSelectedGameObject(guid, true);
+			signals.selectedGameObject.dispatch(guid, true);
 		} else {
-			this.onSelectedGameObject(guid, false);
+			signals.selectedGameObject.dispatch(guid, false);
 		}
 	}
 
@@ -388,11 +390,7 @@ class Editor {
 		}
 		
 		scope.selectionGroup.Select();
-
 		scope.threeManager.AttachGizmoTo(scope.selectionGroup);
-
-		signals.selectedGameObject.dispatch(guid, isMultiSelection);
-
 		scope.threeManager.Render();
 
 	}
