@@ -51,7 +51,7 @@ function MapEditorServer:OnDisableInputRestriction(p_Player)
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
-	for i=0, 65 do
+	for i=0, 125 do
 		p_Player:EnableInput(i, p_Enabled)
 	end
 end
