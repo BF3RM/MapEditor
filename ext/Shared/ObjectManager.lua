@@ -140,17 +140,6 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
     return true
 end
 
-function ToLocal(a,b)
-    local LT = LinearTransform()
-    LT.left = a.left
-    LT.up = a.up
-    LT.forward = a.forward
-    LT.trans.x = a.trans.x - b.trans.x
-    LT.trans.y = a.trans.y - b.trans.y
-    LT.trans.z = a.trans.z - b.trans.z
-    return LT
-end
-
 
 function ToWorld(parentWorld, s_local)
     local LT = LinearTransform()
@@ -176,5 +165,6 @@ function ToWorld(parentWorld, s_local)
     print(LT.trans)
     return LT
 end
+
 
 return ObjectManager

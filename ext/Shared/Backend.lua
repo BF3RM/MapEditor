@@ -39,11 +39,11 @@ function Backend:SpawnBlueprint(p_Command)
     for k,l_Entity in ipairs(s_SpawnResult) do
         local s_Data = l_Entity.data
         local s_Entity = SpatialEntity(l_Entity)
-
+        print(s_Entity.transform)
         s_Children[#s_Children + 1 ] = {
             guid = s_Entity.uniqueID,
             type = l_Entity.typeInfo.name,
-            transform = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform)),
+            transform = tostring(ToLocal(s_Entity.transform, s_UserData.transform)),
             aabb = {
                 min = tostring(s_Entity.aabb.min),
                 max = tostring(s_Entity.aabb.max),
@@ -67,6 +67,7 @@ function Backend:SpawnBlueprint(p_Command)
         userData = s_UserData,
         children = s_Children
     }
+    print(s_Response)
     return s_Response
 end
 
@@ -156,14 +157,28 @@ function Backend:Error(p_Message, p_Command)
     return s_Response
 end
 
-function ToLocal(a,b)
+function ToLocal(parentWorld, s_local)
     local LT = LinearTransform()
-    LT.left = a.left
-    LT.up = a.up
-    LT.forward = a.forward
-    LT.trans.x = a.trans.x - b.trans.x -- attempt to index a nil value (field 'trans')
-    LT.trans.y = a.trans.y - b.trans.y
-    LT.trans.z = a.trans.z - b.trans.z
+
+
+    LT.left = Vec3( parentWorld.left.x    / s_local.left.x,  parentWorld.left.y    / s_local.left.x,  parentWorld.left.z    / s_local.left.x )
+            + Vec3( parentWorld.up.x      / s_local.left.y,  parentWorld.up.y      / s_local.left.y,  parentWorld.up.z      / s_local.left.y )
+            + Vec3( parentWorld.forward.x / s_local.left.z,  parentWorld.forward.y / s_local.left.z,  parentWorld.forward.z / s_local.left.z )
+
+    LT.up = Vec3( parentWorld.left.x    / s_local.up.x,  parentWorld.left.y    / s_local.up.x,  parentWorld.left.z    / s_local.up.x )
+            + Vec3( parentWorld.up.x      / s_local.up.y,  parentWorld.up.y      / s_local.up.y,  parentWorld.up.z      / s_local.up.y )
+            + Vec3( parentWorld.forward.x / s_local.up.z,  parentWorld.forward.y / s_local.up.z,  parentWorld.forward.z / s_local.up.z )
+
+    LT.forward = Vec3( parentWorld.left.x    / s_local.forward.x,  parentWorld.left.y    / s_local.forward.x,  parentWorld.left.z    / s_local.forward.x )
+            + Vec3( parentWorld.up.x      / s_local.forward.y,  parentWorld.up.y      / s_local.forward.y,  parentWorld.up.z      / s_local.forward.y )
+            + Vec3( parentWorld.forward.x / s_local.forward.z,  parentWorld.forward.y / s_local.forward.z,  parentWorld.forward.z / s_local.forward.z )
+
+    LT.trans = Vec3( parentWorld.left.x    / s_local.trans.x,  parentWorld.left.y    / s_local.trans.x,  parentWorld.left.z    / s_local.trans.x )
+            + Vec3( parentWorld.up.x      / s_local.trans.y,  parentWorld.up.y      / s_local.trans.y,  parentWorld.up.z      / s_local.trans.y )
+            + Vec3( parentWorld.forward.x / s_local.trans.z,  parentWorld.forward.y / s_local.trans.z,  parentWorld.forward.z / s_local.trans.z )
+
+    LT.trans = LT.trans - parentWorld.trans
+    print(LT.trans)
     return LT
 end
 

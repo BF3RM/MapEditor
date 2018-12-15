@@ -37,9 +37,9 @@ class GameEntity extends THREE.Object3D
 			THREE.SceneUtils.detach( this, parent, editor.threeManager.scene );
 		}
 
-		this.matrix.decompose( this.position, this.quaternion, this.scale );
+		matrix.decompose( this.position, this.quaternion, this.scale );
 		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-		
+
 		editor.threeManager.Render();
 
 		// remove child from scene and add it to parent
