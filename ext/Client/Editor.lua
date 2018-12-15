@@ -110,7 +110,6 @@ end
 
 
 function Editor:OnReceiveCommand(p_Command, raw)
-    print(p_Command)
     local s_Command = p_Command
 
     if(raw == nil) then

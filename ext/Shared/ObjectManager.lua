@@ -128,7 +128,6 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
             local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
             s_Entity.transform = ToWorld(LinearTransform(p_LinearTransform), s_LocalTransform)
             if(p_UpdateCollision) then
-                print("Updating collision")
                 s_Entity:FireEvent("Disable")
                 s_Entity:FireEvent("Enable")
             end
@@ -162,7 +161,6 @@ function ToWorld(parentWorld, s_local)
             + Vec3( parentWorld.forward.x * s_local.trans.z,  parentWorld.forward.y * s_local.trans.z,  parentWorld.forward.z * s_local.trans.z )
 
     LT.trans = LT.trans + parentWorld.trans
-    print(LT.trans)
     return LT
 end
 

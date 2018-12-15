@@ -39,7 +39,6 @@ function Backend:SpawnBlueprint(p_Command)
     for k,l_Entity in ipairs(s_SpawnResult) do
         local s_Data = l_Entity.data
         local s_Entity = SpatialEntity(l_Entity)
-        print(s_Entity.transform)
         s_Children[#s_Children + 1 ] = {
             guid = s_Entity.uniqueID,
             type = l_Entity.typeInfo.name,
@@ -49,13 +48,6 @@ function Backend:SpawnBlueprint(p_Command)
                 max = tostring(s_Entity.aabb.max),
                 trans = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform))
             },
-            reference = {
-
-                instanceGuid = tostring(s_Data.instanceGuid),
-                --partitionGuid = tostring(s_Data.instanceGuid),
-                type = s_Data.typeInfo.name
-                -- transform?
-            }
         }
     end
 
@@ -67,7 +59,6 @@ function Backend:SpawnBlueprint(p_Command)
         userData = s_UserData,
         children = s_Children
     }
-    print(s_Response)
     return s_Response
 end
 
@@ -178,7 +169,6 @@ function ToLocal(parentWorld, s_local)
             + Vec3( parentWorld.forward.x / s_local.trans.z,  parentWorld.forward.y / s_local.trans.z,  parentWorld.forward.z / s_local.trans.z )
 
     LT.trans = LT.trans - parentWorld.trans
-    print(LT.trans)
     return LT
 end
 
