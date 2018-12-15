@@ -71,7 +71,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
         l_Entity:Init(self.m_Realm, true)
         l_Entity:FireEvent("Start")
         if(l_Entity:Is("SpatialEntity")) then
-            table.insert(s_Spatial, SpatialEntity(l_Entity))
+            s_Spatial[i] = SpatialEntity(l_Entity)
             s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
         end
     end
