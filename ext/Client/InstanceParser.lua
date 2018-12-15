@@ -76,45 +76,43 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 
 		-- Catch all variations
 		if(l_Instance.typeInfo.name == "MeshVariationDatabase") then
-			local s_Instance = MeshVariationDatabase(l_Instance)
+            print("MVD")
+
+            local s_Instance = MeshVariationDatabase(l_Instance)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
 		end
 
         if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
+            print("SMGED")
             local s_Instance = StaticModelGroupEntityData(l_Instance)
             for i,l_Member in ipairs(s_Instance.memberDatas) do
                 local s_Member = StaticModelGroupMemberData(l_Member)
-                if(#s_Member.instanceObjectVariation == 0) then
-                    goto continue2
-                end
-                if(s_Member.memberType.typeInfo.name ~= "StaticModelEntityData") then
-                    print("Add support for this shit!: " .. s_Member.memberType.typeInfo.name)
-                    -- There's no continue in lua...
-                    goto continue2
-                end
-                local s_MemberType = StaticModelEntityData(s_Member.memberType)
-                local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+                if(#s_Member.instanceObjectVariation > 0) then
+                    print("oh boy")
+                    local s_MemberType = StaticModelEntityData(s_Member.memberType)
+                    local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
 
-                local s_Variations = {}
-                for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
-                    -- Eww
-                    s_Variations[l_Variation] = l_Variation
-                end
-                if(self.m_Variations[s_Mesh] == nil) then
-                    self.m_Variations[s_Mesh] = {}
-                end
+                    local s_Variations = {}
+                    for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+                        -- Eww
+                        s_Variations[l_Variation] = l_Variation
+                    end
 
-                for i3, l_Variation in pairs(s_Variations) do
-                    local s_Variation = {
-                        hash =l_Variation,
-                        name ="fuck"
-                    }
+                    if(self.m_Variations[s_Mesh] == nil) then
+                        self.m_Variations[s_Mesh] = {}
+                    end
 
-                    table.insert(self.m_Variations[s_Mesh], s_Variation)
+                    for i3, l_Variation in pairs(s_Variations) do
+                        local s_Variation = {
+                            hash =l_Variation,
+                            name ="fuck"
+                        }
+                        print("I bet we dont here")
+
+                        table.insert(self.m_Variations[s_Mesh], s_Variation)
+                    end
                 end
-                ::continue2::
             end
-
         end
 
 		::continue::
@@ -124,7 +122,9 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function InstanceParser:FillVariations()
-	for key, database in pairs(self.m_MeshVariationDatabases) do
+    print("FILL")
+
+    for key, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database
 		for k, v in ipairs(s_Instance.entries) do
 			local l_mvdEntry = MeshVariationDatabaseEntry(v)
