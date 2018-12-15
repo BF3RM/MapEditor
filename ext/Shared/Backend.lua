@@ -6,13 +6,15 @@ local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10000
 
 function Backend:__init(p_Realm)
-    print("Initializing Backend")
+    print("Initializing Backend: " .. tostring(p_Realm))
     self.m_Realm = p_Realm;
     self:RegisterVars()
 end
 
 function Backend:RegisterVars()
-    self.m_Queue = {};
+    self.m_Queue = {}
+    self.m_GameObjects = {}
+    print("Initialized vars")
 end
 
 
@@ -66,6 +68,11 @@ function Backend:SpawnBlueprint(p_Command)
         userData = s_UserData,
         children = s_Children
     }
+    if(self.m_GameObjects == nil) then
+        print("wtf?")
+        self.m_GameObjects = {}
+    end
+    self.m_GameObjects[s_UserData.guid] = s_UserData
 
     return s_Response
 end
@@ -88,19 +95,24 @@ function Backend:DestroyBlueprint(p_Command)
         guid =  p_Command.guid
     }
 
+    self.m_GameObjects[p_Command.guid] = nil
     return s_Response
+
 end
 
 
 function Backend:SelectGameObject(p_Command)
 
     if ( ObjectManager:GetEntityByGuid(p_Command.guid) == nil) then
+        print("Failed to select that gameobject")
         return false
     end
     local s_Response = {
         guid = p_Command.guid,
         ['type'] = 'SelectedGameObject'
     }
+    print("Selected!")
+    print(self.m_GameObjects[p_Command.guid])
     return s_Response
 end
 
@@ -131,6 +143,9 @@ function Backend:SetTransform(p_Command)
         guid = p_Command.guid,
         transform = p_Command.userData.transform
     }
+
+    self.m_GameObjects[p_Command.guid].transform = LinearTransform(p_Command.userData.transform)
+    print(self.m_GameObjects[p_Command.guid])
     return s_Response
 end
 
@@ -196,4 +211,4 @@ function Backend:EncodeParams(p_Table)
 
     return p_Table
 end
-return Backend()
+return Backend

@@ -17,6 +17,12 @@ function EditorServer:RegisterVars()
     }
 
     self.m_Queue = {};
+
+    self.m_Transactions = {}
+end
+
+function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
+    
 end
 
 function EditorServer:OnReceiveCommand(p_Player, p_Command)
@@ -38,6 +44,10 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command)
         return
     end
     print(s_Response)
+
+    table.insert(self.m_Transactions, p_Command.guid) -- Store that this transaction has happened.
+
+
     NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", p_Command)
     print("Sent!")
 

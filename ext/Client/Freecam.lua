@@ -1,5 +1,7 @@
 class 'Freecam'
 
+require "__shared/Enums"
+
 function Freecam:__init()
 	print("function Freecam:__init()")
 
