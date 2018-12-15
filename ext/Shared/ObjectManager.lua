@@ -58,7 +58,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
     s_Params.variationNameHash = p_Variation
-    s_Params.networked = true
+    s_Params.networked = s_ObjectBlueprint.needNetworkId
 
     local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
     print("Successfully spawned.")
