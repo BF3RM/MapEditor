@@ -7,6 +7,7 @@ local FALLBACK_DISTANCE = 10000
 
 function Backend:__init(p_Realm)
     print("Initializing Backend")
+    self.m_Realm = p_Realm;
     self:RegisterVars()
 end
 
@@ -117,7 +118,7 @@ function Backend:CreateGroup(p_Command)
 end
 
 function Backend:SetTransform(p_Command)
-    local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command.userData.transform)
+    local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command.userData.transform, true)
 
     if(s_Result == false) then
         -- Notify WebUI of failed

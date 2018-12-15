@@ -102,7 +102,7 @@ function ObjectManager:DestroyEntity(p_Guid)
     return true
 end
 
-function ObjectManager:SetTransform(p_Guid, p_LinearTransform)
+function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
 
     if self.m_SpawnedEntities[p_Guid] == nil then
         print('Object with id ' .. p_Guid .. ' does not exist')
@@ -123,6 +123,11 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform)
 
         if s_Entity ~= nil then
             s_Entity.transform = LinearTransform(p_LinearTransform)
+            if(p_UpdateCollision) then
+                print("Updating collision")
+                s_Entity:FireEvent("Disable")
+                s_Entity:FireEvent("Enable")
+            end
         else
             print("entity is nil??")
         end

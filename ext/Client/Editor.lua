@@ -124,7 +124,7 @@ end
 --]]
 
 function Editor:MoveObject(p_Message)
-	local s_Result = ObjectManager:SetTransform(p_Message.guid, p_Message.transform)
+	local s_Result = ObjectManager:SetTransform(p_Message.guid, p_Message.transform, false)
 
 	if(s_Result == false) then
 		-- Notify WebUI of failed
