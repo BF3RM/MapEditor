@@ -210,7 +210,7 @@ class Editor {
 			this.logger.LogError("Tried to set the transform of a null object: " + command.guid);
 			return;
 		}
-		gameObject.setTransform(new LinearTransform().setFromString(command.transform));
+		gameObject.setTransform(new LinearTransform().setFromString(command.userData.transform));
 
 		if (this.selectionGroup.children.length === 1 && gameObject === this.selectionGroup.children[0]){
 			this.selectionGroup.setTransform(gameObject.transform);

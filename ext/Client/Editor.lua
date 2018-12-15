@@ -22,11 +22,21 @@ function Editor:RegisterVars()
 		SelectGameObjectCommand = Backend.SelectGameObject,
 		CreateGroupCommand = Backend.CreateGroup
 	}
+
+    self.m_Changes = {
+        reference = "SpawnBlueprintCommand",
+        destroyed = "DestroyBlueprintCommand",
+        transform = "SetTransformCommand",
+    }
+
 	self.m_Messages = {
 		MoveObjectMessage = self.MoveObject
 	}
 
 	self.m_Queue = {};
+
+    self.m_TransactionId = 0
+    self.m_GameObjects = {}
 end
 
 
@@ -43,12 +53,35 @@ function Editor:OnEngineMessage(p_Message)
 			error("Local player is nil")
 			return
 		end
-
+        print("Requesting update")
+        NetEvents:SendLocal("MapEditorServer:RequestUpdate", 1)
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
 end
 
+function Editor:OnReceiveUpdate(p_Update)
 
+    for k,v in pairs(p_Update) do
+        if(self.m_GameObjects[k] == nil) then
+            local s_Command = {
+                type = "SpawnBlueprintCommand",
+                guid = k,
+                userData = p_Update[k]
+            }
+            self:OnReceiveCommand(json.encode(s_Command))
+        else
+            local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
+            -- Hopefully this will never happen. It's hard to test these changes since they require a desync.
+            if(#s_Changes > 0) then
+                print("--------------------------------------------------------------------")
+                print("If you ever see this, please report it on the repo.")
+                print(s_Changes)
+                print("--------------------------------------------------------------------")
+            end
+        end
+
+    end
+end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:UpdateCameraTransform()
@@ -76,9 +109,14 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
 end
 
 
-function Editor:OnReceiveCommand(p_Command)
+function Editor:OnReceiveCommand(p_Command, raw)
     print(p_Command)
-	local s_Command = self:DecodeParams(json.decode(p_Command))
+    local s_Command = p_Command
+
+    if(raw == nil) then
+        s_Command = self:DecodeParams(json.decode(p_Command))
+    end
+
 	local s_Function = self.m_Commands[s_Command.type]
 	if(s_Function == nil) then
 		print("Attempted to call a nil function: " .. s_Command.type)
@@ -95,6 +133,11 @@ function Editor:OnReceiveCommand(p_Command)
         table.insert(self.m_Queue, s_Command)
         return
 	end
+
+    if(s_Response.userData == nil) then
+        print("MISSING USERDATA!")
+    end
+    self.m_GameObjects[s_Command.guid] = MergeUserdata(self.m_GameObjects[s_Command.guid], s_Response.userData)
 
 	WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
 end
@@ -212,6 +255,34 @@ function ToLocal(a,b)
 	LT.trans.y = a.trans.y - b.trans.y
 	LT.trans.z = a.trans.z - b.trans.z
 	return LT
+end
+
+function MergeUserdata(p_Old, p_New)
+    if(p_Old == nil) then
+        return p_New
+    end
+    for k,v in pairs(p_New) do
+        p_Old[k] = v
+    end
+    return p_Old
+end
+
+function GetChanges(p_Old, p_New)
+    local s_Changes = {}
+    for k,v in pairs(p_New) do
+        if(tostring(p_Old[k]) ~= tostring(p_New[k])) then
+            if type(p_Old[k]) == "table" then
+                for k1,v1 in pairs(p_Old[k]) do
+                    if(p_Old[k][k1] ~= p_New[k][k1]) then
+                        table.insert(s_Changes, k)
+                    end
+                end
+            else
+                table.insert(s_Changes, k)
+            end
+        end
+    end
+    return s_Changes
 end
 
 function Editor:DecodeParams(p_Table)

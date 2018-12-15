@@ -19,11 +19,27 @@ function EditorServer:RegisterVars()
     self.m_Queue = {};
 
     self.m_Transactions = {}
+    self.m_GameObjects = {}
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
-    
+
+    local s_TransactionId = p_TransactionId
+    local s_UpdatedGameObjects = {}
+    print("Backend:")
+    print(self.m_GameObjects)
+    while(s_TransactionId <= #self.m_Transactions) do
+        local s_Guid = self.m_Transactions[s_TransactionId]
+        if(s_Guid ~= nil) then
+            s_UpdatedGameObjects[s_Guid] = self.m_GameObjects[s_Guid]
+            s_TransactionId = s_TransactionId + 1
+        else
+            print("shit's nil")
+        end
+    end
+    NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjects)
 end
+
 
 function EditorServer:OnReceiveCommand(p_Player, p_Command)
     local s_Command = self:DecodeParams(json.decode(p_Command))
@@ -43,10 +59,11 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command)
         table.insert(self.m_Queue, s_Command)
         return
     end
-    print(s_Response)
-
-    table.insert(self.m_Transactions, p_Command.guid) -- Store that this transaction has happened.
-
+    if(s_Response.userData == nil) then
+        print("MISSING USERDATA!")
+    end
+    self.m_GameObjects[s_Command.guid] = MergeUserdata(self.m_GameObjects[s_Command.guid], s_Response.userData)
+    table.insert(self.m_Transactions, tostring(s_Command.guid)) -- Store that this transaction has happened.
 
     NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", p_Command)
     print("Sent!")
@@ -68,6 +85,15 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
     end
 end
 
+function MergeUserdata(p_Old, p_New)
+    if(p_Old == nil) then
+        return p_New
+    end
+    for k,v in pairs(p_New) do
+        p_Old[k] = v
+    end
+    return p_Old
+end
 
 function EditorServer:DecodeParams(p_Table)
     for s_Key, s_Value in pairs(p_Table) do

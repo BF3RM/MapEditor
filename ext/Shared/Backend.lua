@@ -13,7 +13,6 @@ end
 
 function Backend:RegisterVars()
     self.m_Queue = {}
-    self.m_GameObjects = {}
     print("Initialized vars")
 end
 
@@ -68,12 +67,6 @@ function Backend:SpawnBlueprint(p_Command)
         userData = s_UserData,
         children = s_Children
     }
-    if(self.m_GameObjects == nil) then
-        print("wtf?")
-        self.m_GameObjects = {}
-    end
-    self.m_GameObjects[s_UserData.guid] = s_UserData
-
     return s_Response
 end
 
@@ -92,10 +85,9 @@ function Backend:DestroyBlueprint(p_Command)
     end
     local s_Response = {
         type = "DestroyedBlueprint",
+        userData = nil,
         guid =  p_Command.guid
     }
-
-    self.m_GameObjects[p_Command.guid] = nil
     return s_Response
 
 end
@@ -112,7 +104,7 @@ function Backend:SelectGameObject(p_Command)
         ['type'] = 'SelectedGameObject'
     }
     print("Selected!")
-    print(self.m_GameObjects[p_Command.guid])
+
     return s_Response
 end
 
@@ -141,11 +133,11 @@ function Backend:SetTransform(p_Command)
     local s_Response = {
         type = "SetTransform",
         guid = p_Command.guid,
-        transform = p_Command.userData.transform
+        userData = {
+            transform = p_Command.userData.transform
+        }
     }
 
-    self.m_GameObjects[p_Command.guid].transform = LinearTransform(p_Command.userData.transform)
-    print(self.m_GameObjects[p_Command.guid])
     return s_Response
 end
 

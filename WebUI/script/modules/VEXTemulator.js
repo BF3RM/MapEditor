@@ -82,8 +82,10 @@ class VEXTemulator {
 		let response = {
 			"type": "SetTransform",
 			"guid": command.guid,
-			"transform": command.userData.transform.toString()
-		}
+			"userData": {
+				"transform": command.userData.transform.toString()
+			}
+		};
 		editor.vext.HandleResponse(response);
 
 	}

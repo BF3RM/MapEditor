@@ -158,8 +158,6 @@ function InstanceParser:FillVariations()
                     print("------------------")
                     print(self.m_Variations[l_MeshGuid])
                     print("------------------")
-                else
-                    print(self.m_Variations[l_MeshGuid])
                 end
 			else
 				print("No variation for " .. v.name)

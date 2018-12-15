@@ -36,10 +36,12 @@ function MapEditorClient:RegisterEvents()
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
+    -- Editor Events
+    NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
+    NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
 
 	-- WebUI events
     Events:Subscribe('MapEditor:SendToServer', self, self.OnSendToServer)
-    NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
 	Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 
@@ -93,6 +95,11 @@ end
 function MapEditorClient:OnReceiveMessage(p_Message)
 	m_Editor:OnReceiveMessage(p_Message)
 end
+
+function MapEditorClient:OnReceiveUpdate(p_Update)
+    m_Editor:OnReceiveUpdate(p_Update)
+end
+
 ----------- WebUI functions----------------
 
 
