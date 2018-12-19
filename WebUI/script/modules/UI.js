@@ -106,11 +106,22 @@ class UI {
 						}]
 					},
 					{
-						type: 'component',
-						componentName: 'HierarchyComponent',
-						isClosable: false,
-						title: "Hierarchy",
-					}]
+						type:'stack',
+//						height: 25,
+						content: [{
+                                type: 'component',
+                                componentName: 'HierarchyComponent',
+                                isClosable: false,
+                                title: "Hierarchy",
+                            },
+                            {
+                                type: 'component',
+                                componentName: 'RenderToolsComponent',
+                                isClosable: false,
+                                title: "RenderTools",
+                            }
+					    ]
+                    }]
 				},
 					{
 						type: 'component',
@@ -164,6 +175,7 @@ class UI {
 
 		this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
 		this.layout.registerComponent( 'HierarchyComponent', HierarchyComponent);
+		this.layout.registerComponent( 'RenderToolsComponent', RenderToolsComponent);
 		this.layout.registerComponent( 'InspectorComponent', InspectorComponent);
 		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
 		this.layout.registerComponent( 'ContentViewComponent', ContentViewComponent);
