@@ -490,3 +490,7 @@ tr i {
     height: 24px;
     width: 24px;
 }
+
+#objectVisualEnvironmentEditor .category-control-group {
+    padding-top: 20px;
+}

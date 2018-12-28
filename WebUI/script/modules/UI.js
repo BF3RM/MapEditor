@@ -116,9 +116,9 @@ class UI {
                             },
                             {
                                 type: 'component',
-                                componentName: 'RenderToolsComponent',
+                                componentName: 'VisualEnvironmentEditorComponent',
                                 isClosable: false,
-                                title: "RenderTools",
+                                title: "VisualEnvironmentEditor",
                             }
 					    ]
                     }]
@@ -175,7 +175,7 @@ class UI {
 
 		this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
 		this.layout.registerComponent( 'HierarchyComponent', HierarchyComponent);
-		this.layout.registerComponent( 'RenderToolsComponent', RenderToolsComponent);
+		this.layout.registerComponent( 'VisualEnvironmentEditorComponent', VisualEnvironmentEditorComponent);
 		this.layout.registerComponent( 'InspectorComponent', InspectorComponent);
 		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
 		this.layout.registerComponent( 'ContentViewComponent', ContentViewComponent);
