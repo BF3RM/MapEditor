@@ -494,3 +494,7 @@ tr i {
 #objectVisualEnvironmentEditor .category-control-group {
     padding-top: 20px;
 }
+
+#objectVisualEnvironmentEditor #objectCategory {
+    width: calc(100% - 5px);
+}
