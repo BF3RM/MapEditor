@@ -1,4 +1,4 @@
-// String.format()
+// String.format(), courtesy of https://journalofasoftwaredev.wordpress.com/2011/10/30/replicating-string-format-in-javascript/
 String.prototype.format = function()
 {
     /*
