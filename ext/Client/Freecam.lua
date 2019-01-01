@@ -41,9 +41,9 @@ end
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 	if (self.camera ~= nil and self.m_Freecam == true) then
 
-		self.yaw   = self.yaw   - p_Cache[InputConceptIdentifiers.ConceptYaw] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		self.pitch = self.pitch - p_Cache[InputConceptIdentifiers.ConceptPitch] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		--self.roll  = self.roll  - p_Cache[InputConceptIdentifiers.ConceptRoll] * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		self.yaw   = self.yaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		self.pitch = self.pitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		--self.roll  = self.roll  - p_Cache:GetLevel([InputConceptIdentifiers.ConceptRoll) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 	end
 end
 
