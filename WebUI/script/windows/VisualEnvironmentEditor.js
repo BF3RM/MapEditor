@@ -33,6 +33,28 @@ class VisualEnvironmentEditor {
 	    let content = $(document.createElement("div"));
 		content.attr("id", "objectVisualEnvironmentEditor");
 
+
+		let opacitySlider = $(document.createElement("div"));
+        opacitySlider.attr({
+            "id": "slider",
+            "data-wjs-element": "box",
+            "step": "0.0001"
+        });
+
+        //Step 1: set up the slider with some options. The valid values for opacity are 0 to 1
+        //Step 2: Bind an event so when you slide the slider and stop, the following function gets called
+        opacitySlider.slider({
+            min: 0.1,
+            max: 1,
+            step: 0.01,
+            value: 1,
+            slide: function(e,ui){
+                $('#objectVisualEnvironmentEditor').css('opacity', ui.value)
+
+            }
+        });
+        content.append(opacitySlider);
+
 		let categoryControl = $(document.createElement("div"));
         categoryControl.addClass("category");
 
@@ -53,7 +75,16 @@ class VisualEnvironmentEditor {
         function GetInfoTabContent(){
             let tabContent = $(document.createElement("div"));
 		    tabContent.attr({"id": "Info"});
-		    tabContent.text("CinematicTools Yo");
+
+		    let placholderText = $(document.createElement("div"));
+            placholderText.text("CinematicTools Yo");
+
+            let fieldTestHolder = $(document.createElement("div"));
+            let sliderField = CreateFloat('p_Class', 'p_Field', 'p_Type', 'p_Value');
+            fieldTestHolder.append(sliderField);
+
+            tabContent.append(placholderText);
+            tabContent.append(fieldTestHolder);
 
 		    return tabContent;
         }
@@ -212,10 +243,11 @@ class VisualEnvironmentEditor {
         content.append(categoryControl);
 
         let categoryControlGroup = $(document.createElement("div"));
+
         categoryControlGroup.addClass("category-control-group");
+        categoryControlGroup.addClass("ui-widget-content");
         let categoryControlGroupText = $(document.createElement("span"));
         UpdateCategoryControlGroup("Info");
-        categoryControlGroupText.addClass("category-control-group");
 		categoryControlGroup.append(categoryControlGroupText);
 		content.append(categoryControlGroup);
 

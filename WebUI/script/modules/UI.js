@@ -110,16 +110,16 @@ class UI {
 //						height: 25,
 						content: [{
                                 type: 'component',
+                                componentName: 'VisualEnvironmentEditorComponent',
+                                isClosable: false,
+                                title: "VisualEnvironmentEditor",
+                            },
+                            {
+                                type: 'component',
                                 componentName: 'HierarchyComponent',
                                 isClosable: false,
                                 title: "Hierarchy",
                             },
-                            {
-                                type: 'component',
-                                componentName: 'VisualEnvironmentEditorComponent',
-                                isClosable: false,
-                                title: "VisualEnvironmentEditor",
-                            }
 					    ]
                     }]
 				},

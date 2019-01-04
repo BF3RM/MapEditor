@@ -498,3 +498,45 @@ tr i {
 #objectVisualEnvironmentEditor #objectCategory {
     width: calc(100% - 5px);
 }
+.ui-tabs .ui-tabs-nav li.ui-tabs-active, .ui-state-focus, .ui-state-hover {
+    background-color: #D94C42;
+    border-color: #bb4037!important;
+    outline: none;
+}
+
+.ui-widget input {
+    width: 100%;
+}
+
+#slider {
+    margin-left: 12px;
+    margin-right:12px;
+}
+
+.ui-widget-header {
+    background: #e9e9e991;
+}
+#content .ValueDisplay {
+    text-align: center;
+}
+.ui-slider {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.ui-slider-handle {
+    opacity: 0.7;
+    height: 13px!important;
+    margin-top: 4px;
+}
+
+#CurrentState {
+    width: 100%;
+    background-color: #d0d0d0;
+    height: calc(100% - 145px);
+    resize: none;
+}
+
+label[type="NotSupported"] {
+    color:#c1c1c1;
+}
