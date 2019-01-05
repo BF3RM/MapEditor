@@ -184,7 +184,8 @@ class UI {
 	}
 
 	static worldViewChanged(e, ui) {
-		editor.vext.SendEvent('MapEditor:SetViewmode', 'MapEditor:SetViewmode', ui.item.value)
+		let message = new SetViewModeMessage(ui.item.value);
+		editor.vext.SendMessage(message);
 	}
 
 	InitializeDialogs() {

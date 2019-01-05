@@ -66,7 +66,6 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command)
     table.insert(self.m_Transactions, tostring(s_Command.guid)) -- Store that this transaction has happened.
 
     NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", p_Command)
-    print("Sent!")
 
 end
 

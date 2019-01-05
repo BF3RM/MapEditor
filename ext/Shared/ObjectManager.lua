@@ -52,7 +52,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 
     local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
-    print('Blueprint type: ' .. s_Blueprint.typeInfo.name .. ", ID: " .. p_Guid .. ", Instance: " .. tostring(p_InstanceGuid) .. ", Variation: " .. p_Variation)
+    print('Spawning blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_Guid .. ", Instance: " .. tostring(p_InstanceGuid) .. ", Variation: " .. p_Variation)
 
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform

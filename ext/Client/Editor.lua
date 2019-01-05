@@ -30,7 +30,8 @@ function Editor:RegisterVars()
     }
 
 	self.m_Messages = {
-		MoveObjectMessage = self.MoveObject
+		MoveObjectMessage = self.MoveObject,
+        SetViewModeMessage = self.SetViewMode
 	}
 
 	self.m_Queue = {};
@@ -174,6 +175,18 @@ function Editor:MoveObject(p_Message)
 		return false
 	end
 end
+
+function Editor:SetViewMode(p_Message)
+    local p_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
+    if p_WorldRenderSettings ~= nil then
+        local s_WorldRenderSettings = WorldRenderSettings(p_WorldRenderSettings)
+        s_WorldRenderSettings.viewMode = p_Message.viewMode
+    else
+        print("Failed to get WorldRenderSettings")
+        -- Notify WebUI
+    end
+end
+
 
 --[[
 
