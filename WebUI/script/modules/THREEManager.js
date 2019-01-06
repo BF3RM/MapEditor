@@ -314,7 +314,7 @@ class THREEManager {
 		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		if(editor.threeManager.raycastPlacing) {
-			editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
+			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 	}
 	static onControlMouseDown(e) {

@@ -103,20 +103,23 @@ class Hierarchy {
 		dom.jstree({
 			core: {
 				data: this.data,
-				check_callback: this.check_callback
+				check_callback: this.check_callback,
+				"multiple" : true
 			},
 			search: {
 				case_insensitive: true,
 				show_only_matches : true
 			},
+			//Disables node selection handled by jstree, allowing selection to be controlled using the selection request.
+			conditionalselect : function (node) {
+				editor.Select(node.id);
+				return false;
+			},
 
-			plugins: ["search", "dnd", "types", "changed"]
+			plugins: ["search", "dnd", "types", "changed", "conditionalselect"]
 		});
 		// Set data twice so we can update the scope data directly. :shrug:
 		dom.jstree(true).settings.core.data = scope.data;
-		dom.bind("changed.jstree", function(evt, data) {
-			editor.Select(data.node.id);
-		});
 
 		dom.bind("move_node.jstree", function (e, data) {
 			scope.onMoved(data);
@@ -173,6 +176,7 @@ class Hierarchy {
 	}
 
 	onSelectedGameObject(guid, isMultipleSelection) {
+		console.log("Selecting: " + guid);
 
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
@@ -182,6 +186,7 @@ class Hierarchy {
 	}
 
 	onDeselected(guid) {
+		console.log("Deselecting: " + guid);
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
 		scope.selecting = true;
@@ -189,6 +194,18 @@ class Hierarchy {
 		scope.selecting = false;
 	}
 }
+// conditional select
+(function ($, undefined) {
+	"use strict";
+	$.jstree.defaults.conditionalselect = function () { return true; };
+	$.jstree.plugins.conditionalselect = function (options, parent) {
+		this.activate_node = function (obj, e) {
+			if(this.settings.conditionalselect.call(this, this.get_node(obj))) {
+				parent.activate_node.call(this, obj, e);
+			}
+		};
+	};
+})(jQuery);
 
 class HierarchyEntry {
 	constructor(guid, name, type, position, parent) {
@@ -216,3 +233,4 @@ var HierarchyComponent = function( container, state ) {
 	this._container.getElement().append(this.element.dom);
 
 };
+
