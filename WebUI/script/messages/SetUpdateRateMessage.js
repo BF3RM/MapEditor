@@ -1,7 +1,6 @@
 class SetUpdateRateMessage {
-	constructor(guid, value) {
+	constructor(value) {
 		this.type = "SetUpdateRateMessage";
-		this.guid = guid;
 		this.value = value;
 	}
 }

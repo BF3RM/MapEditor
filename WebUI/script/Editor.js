@@ -40,7 +40,7 @@ class Editor {
 		this.playerName = null;
 		// this.selected = [];
 		this.raycastTransform = new LinearTransform();
-		this.s2wTransform = new LinearTransform();
+		this.screenToWorldTransform = new LinearTransform();
 
 		this.isUpdating = false;
 		this.pendingMessages = {};
@@ -138,8 +138,12 @@ class Editor {
 		return this.gameObjects[guid];
 	}
 
-	UpdateRaycastPosition(x, y, z){
+	SetRaycastPosition(x, y, z){
 		this.raycastTransform.trans = new Vec3(x, y, z);
+	}
+
+	SetScreenToWorldPosition(x, y, z){
+		this.screenToWorldTransform.trans = new Vec3(x, y, z);
 	}
 
 	addPending(guid, message) {

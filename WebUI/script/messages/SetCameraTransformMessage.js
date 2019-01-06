@@ -1,7 +1,6 @@
 class SetCameraTransformMessage {
-	constructor(guid, transform) {
+	constructor(transform) {
 		this.type = "SetCameraTransformMessage";
-		this.guid = guid;
 		this.transform = transform;
 	}
 }

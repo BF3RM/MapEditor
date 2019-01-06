@@ -24,14 +24,15 @@ class THREEManager {
 		this.raycastPlacing = false;
 	}
 	Initialize() {
-		this.renderer = new THREE.WebGLRenderer({
+		let scope = this;
+
+		scope.renderer = new THREE.WebGLRenderer({
 			alpha: true,
 			antialias: true
 		});
-		this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		$('#page').append(this.renderer.domElement);
-
+		scope.renderer.setPixelRatio(window.devicePixelRatio);
+		scope.renderer.setSize(window.innerWidth, window.innerHeight);
+		$('#page').append(scope.renderer.domElement);
 
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
 		this.camera.position.set(30, 30, 30);
@@ -299,6 +300,7 @@ class THREEManager {
 		}
 	}
 	onMouseUp(e) {
+		console.log(e);
 		if(e.which == 1 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
@@ -309,11 +311,23 @@ class THREEManager {
 	}
 
 	onMouseMove(e) {
-		let mousePos = []
-		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-
+		let scope = this;
 		if(editor.threeManager.raycastPlacing) {
+			let mousePos = [];
+			mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+			mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+			let raycaster = new THREE.Raycaster();
+			raycaster.setFromCamera( mousePos, scope.camera );
+			let direction = raycaster.ray.direction;
+
+
+			let message = new SetScreenToWorldTransformMessage(direction);
+			editor.vext.SendMessage(message);
+			if(editor.screenToWorldTransform.trans !== new Vec3(0,0,0)) {
+				editor.selectionGroup.setTransform(editor.screenToWorldTransform);
+			}
+
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 	}
@@ -324,7 +338,7 @@ class THREEManager {
 		editor.setUpdating(true);
 
 		if( keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
-
+			console.log("ray")
 			let event = document.createEvent("HTMLEvents");
 			event.initEvent("mouseup", true, true); // The custom event that will be created
 			editor.threeManager.raycastPlacing = true;

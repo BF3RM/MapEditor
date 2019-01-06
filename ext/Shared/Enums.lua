@@ -3,3 +3,8 @@ CameraMode = {
 	FreeCam = 2,
 	Orbital = 3,
 }
+
+RaycastType = {
+    Camera = 1,
+    Mouse = 2
+}

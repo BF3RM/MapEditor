@@ -31,7 +31,8 @@ function Editor:RegisterVars()
 
 	self.m_Messages = {
 		MoveObjectMessage = self.MoveObject,
-        SetViewModeMessage = self.SetViewMode
+        SetViewModeMessage = self.SetViewMode,
+        SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition
 	}
 
 	self.m_Queue = {};
@@ -171,7 +172,7 @@ function Editor:MoveObject(p_Message)
 
 	if(s_Result == false) then
 		-- Notify WebUI of failed
-		print("failed")
+		print("Failed to move object")
 		return false
 	end
 end
@@ -183,11 +184,14 @@ function Editor:SetViewMode(p_Message)
         s_WorldRenderSettings.viewMode = p_Message.viewMode
     else
         print("Failed to get WorldRenderSettings")
+        return false;
         -- Notify WebUI
     end
 end
 
-
+function Editor:SetScreenToWorldPosition(p_Message)
+    self:SetPendingRaycast(RaycastType.Mouse, p_Message.direction)
+end
 --[[
 
 	Shit
@@ -201,29 +205,24 @@ function Editor:Raycast()
 	end
 
 	local s_Transform = ClientUtils:GetCameraTransform()
+    local s_Direction = self.m_PendingRaycast.direction
+
+    if(self.m_PendingRaycast.type == RaycastType.Camera) then
+        s_Direction = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
+    end
 
 	if s_Transform.trans == Vec3(0,0,0) then -- Camera is below the ground. Creating an entity here would be useless.
-
 		return
 	end
 
 	-- The freecam transform is inverted. Invert it back
 
-	local s_CameraForward = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
 
-	local s_CastPosition = Vec3(s_Transform.trans.x + (s_CameraForward.x * MAX_CAST_DISTANCE),
-								s_Transform.trans.y + (s_CameraForward.y * MAX_CAST_DISTANCE),
-								s_Transform.trans.z + (s_CameraForward.z * MAX_CAST_DISTANCE))
+	local s_CastPosition = Vec3(s_Transform.trans.x + (s_Direction.x * MAX_CAST_DISTANCE),
+								s_Transform.trans.y + (s_Direction.y * MAX_CAST_DISTANCE),
+								s_Transform.trans.z + (s_Direction.z * MAX_CAST_DISTANCE))
 
 	local s_Raycast = RaycastManager:Raycast(s_Transform.trans, s_CastPosition, 2)
-
-	-- local s_Transform = LinearTransform(
-	-- 	Vec3(1,0,0),
-	-- 	Vec3(0,1,0),
-	-- 	Vec3(0,0,1),
-	-- 	s_Transform.trans
-	-- )
-
 
 	if s_Raycast ~= nil then
 		s_Transform.trans = s_Raycast.position
@@ -234,9 +233,14 @@ function Editor:Raycast()
 							s_Transform.trans.y + (s_CameraForward.y * FALLBACK_DISTANCE),
 							s_Transform.trans.z + (s_CameraForward.z * FALLBACK_DISTANCE))
 	end
-
-	WebUI:ExecuteJS(string.format('editor.UpdateRaycastPosition(%s, %s, %s)',
-		s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
+    if(self.m_PendingRaycast.type == RaycastType.Camera) then
+        WebUI:ExecuteJS(string.format('editor.SetRaycastPosition(%s, %s, %s)',
+                s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
+    end
+    if(self.m_PendingRaycast.type == RaycastType.Mouse) then
+        WebUI:ExecuteJS(string.format('editor.SetScreenToWorldPosition(%s, %s, %s)',
+                s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
+    end
 
 	self.m_PendingRaycast = false
 end
@@ -254,8 +258,11 @@ function Editor:UpdateCameraTransform()
 
 end
 
-function Editor:SetPendingRaycast()
-	self.m_PendingRaycast = true
+function Editor:SetPendingRaycast(p_Type, p_Direction)
+	self.m_PendingRaycast = {
+        type = p_Type,
+        direction = p_Direction
+    }
 end
 
 function ToLocal(a,b)

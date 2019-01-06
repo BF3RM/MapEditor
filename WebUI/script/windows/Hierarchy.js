@@ -169,15 +169,12 @@ class Hierarchy {
 
 	onMoved(nodeData) {
 		let scope = this;
-//		scope.data =
 		// TODO: update data with the changes
 		let child = editor.getGameObjectByGuid(nodeData.node.id);
 		let parent = editor.getGameObjectByGuid(nodeData.parent);
 	}
 
 	onSelectedGameObject(guid, isMultipleSelection) {
-		console.log("Selecting: " + guid);
-
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
 		scope.selecting = true;
@@ -186,7 +183,6 @@ class Hierarchy {
 	}
 
 	onDeselected(guid) {
-		console.log("Deselecting: " + guid);
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
 		scope.selecting = true;

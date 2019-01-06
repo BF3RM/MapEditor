@@ -1,7 +1,6 @@
 class SetPlayerNameMessage {
-	constructor(guid, name) {
+	constructor(name) {
 		this.type = "SetPlayerNameMessage";
-		this.guid = guid;
 		this.name = name;
 	}
 }

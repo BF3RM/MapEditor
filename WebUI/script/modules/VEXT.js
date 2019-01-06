@@ -17,7 +17,7 @@ class VEXTInterface {
 			'SetRaycastTransformMessage':			signals.setRaycastPosition.dispatch,
 			'SetPlayerNameMessage':       			signals.setPlayerName.dispatch,
 			'SetScreenToWorldPositionMessage':		signals.setScreenToWorldPosition.dispatch,
-			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch,			
+			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch
 			// 'SelectedGameObject':       signals.selectedGameObject.dispatch,
 			// 'DeselectedGameObject':    signals.deselectedGameObject.dispatch,
 		}
@@ -79,22 +79,21 @@ class VEXTInterface {
 		} else {
 			this.commands[command.type](command);
 		}
-
 	}
 
 	OnSpawnReferenceObject(command) {
 		
 	}
 
-	SendEvent(eventName, JSONparams){
+	SendEvent(eventName, param){
 		if(editor.debug) {
 			console.log(eventName);
-			if (JSONparams != null){
-				console.log(JSONparams);
+			if (param != null){
+				console.log(param);
 			}
 		} else {
 			console.log('MapEditor:' + eventName);
-			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSONparams);
+			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSON.stringify(param));
 		}
 	}
 
@@ -107,8 +106,33 @@ class VEXTInterface {
 		}
 	}
 
-	HandleMessage(message) {
-		console.log(message);
+	HandleMessage(messageRaw) {
+		let message;
+		let emulator = false;
+		if (typeof(messageRaw) === "object") {
+			message = messageRaw;
+			emulator = true;
+		} else {
+			editor.logger.Log(LOGLEVEL.VERBOSE, messageRaw);
+			message = JSON.parse(messageRaw);
+		}
+
+		editor.logger.Log(LOGLEVEL.VERBOSE, "IN: ");
+		editor.logger.Log(LOGLEVEL.VERBOSE, message);
+
+		if(this.messages[message.type] === undefined) {
+			editor.logger.LogError("Failed to call a null signal: " + message.type);
+			return;
+		}
+		if(emulator) {
+			let scope = this;
+			// delay to simulate tick increase.
+			setTimeout(async function() {
+				scope.messages[message.type](message)
+			}, 1);
+		} else {
+			this.commands[message.type](message);
+		}
 
 	}
 }

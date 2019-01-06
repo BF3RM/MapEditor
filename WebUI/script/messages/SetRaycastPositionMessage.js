@@ -1,7 +1,6 @@
 class SetRaycastPositionMessage {
-	constructor(guid, position) {
+	constructor(position) {
 		this.type = "SetRaycastPositionMessage";
-		this.guid = guid;
 		this.position = position;
 	}
 }
