@@ -72,7 +72,61 @@ class VisualEnvironmentEditor {
 			"value": "category"
 		});
 
-        function GetInfoTabContent(){
+
+		let categoryOptions = ["Info", "Presets"];
+		let supportedCategories = [
+            "CameraParams",
+            "CharacterLighting",
+            "ColorCorrection",
+            "DamageEffect",
+            "Dof",
+            "DynamicAO",
+            "DynamicEnvmap",
+            "Enlighten",
+            "FilmGrain",
+            "Fog",
+            "LensScope",
+            "MotionBlur",
+            "OutdoorLight",
+            "PlanarReflection",
+            "ScreenEffect",
+            "Sky",
+            "SunFlare",
+            "Tonemap",
+            "Vignette",
+            "Wind"
+		];
+
+        // optionLabel will be the category name passed to getControlGroupMap()
+        let optionLabel = null;
+        // Append supportedCategories to categoryOptions
+		categoryOptions.push.apply(categoryOptions, supportedCategories);
+		for(let i = 0; i < categoryOptions.length; i++){
+		    let option = document.createElement("option");
+
+            optionLabel = categoryOptions[i];
+            option.value = optionLabel;
+            if (optionLabel == null){
+                option.value = (i+1).toString();
+                optionLabel = "sample" + option.value;
+		    }
+            option.innerHTML = optionLabel;
+            categorySelect.append(option);
+        }
+        content.append(categoryControl);
+
+        let categoryControlGroup = $(document.createElement("div"));
+
+        categoryControlGroup.addClass("category-control-group");
+        categoryControlGroup.addClass("ui-widget-content");
+        let categoryControlGroupText = $(document.createElement("span"));
+        UpdateCategoryControlGroup("Info");
+		categoryControlGroup.append(categoryControlGroupText);
+		content.append(categoryControlGroup);
+
+		this.category = categorySelect;
+
+		function GetInfoTabContent(){
             let tabContent = $(document.createElement("div"));
 		    tabContent.attr({"id": "Info"});
 
@@ -200,58 +254,6 @@ class VisualEnvironmentEditor {
 		    }
 		    return controlGroupContent;
 		}
-		let categoryOptions = ["Info", "Presets"];
-		let supportedCategories = [
-            "CameraParams",
-            "CharacterLighting",
-            "ColorCorrection",
-            "DamageEffect",
-            "Dof",
-            "DynamicAO",
-            "DynamicEnvmap",
-            "Enlighten",
-            "FilmGrain",
-            "Fog",
-            "LensScope",
-            "MotionBlur",
-            "OutdoorLight",
-            "PlanarReflection",
-            "ScreenEffect",
-            "Sky",
-            "SunFlare",
-            "Tonemap",
-            "Vignette",
-            "Wind"
-		];
-
-        // optionLabel will be the category name passed to getControlGroupMap()
-        let optionLabel = null;
-        // Append supportedCategories to categoryOptions
-		categoryOptions.push.apply(categoryOptions, supportedCategories);
-		for(let i = 0; i < categoryOptions.length; i++){
-		    let option = document.createElement("option");
-
-            optionLabel = categoryOptions[i];
-            option.value = optionLabel;
-            if (optionLabel == null){
-                option.value = (i+1).toString();
-                optionLabel = "sample" + option.value;
-		    }
-            option.innerHTML = optionLabel;
-            categorySelect.append(option);
-        }
-        content.append(categoryControl);
-
-        let categoryControlGroup = $(document.createElement("div"));
-
-        categoryControlGroup.addClass("category-control-group");
-        categoryControlGroup.addClass("ui-widget-content");
-        let categoryControlGroupText = $(document.createElement("span"));
-        UpdateCategoryControlGroup("Info");
-		categoryControlGroup.append(categoryControlGroupText);
-		content.append(categoryControlGroup);
-
-		this.category = categorySelect;
 
 		function UpdateCategoryControlGroup(newCategoryName) {
 		    // Empty the categoryControlGroupText element, and then append the contents of the selected tab to it
