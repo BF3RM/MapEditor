@@ -304,10 +304,14 @@ class THREEManager {
 		if(e.which == 1 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
+			editor.onControlMoveEnd()
 		} 
 	}
 	onMouseDown(e) {
-
+		let scope = this;
+		if (scope.raycastPlacing) {
+			editor.onControlMoveStart();
+		}
 	}
 
 	onMouseMove(e) {
@@ -325,9 +329,13 @@ class THREEManager {
 			let message = new SetScreenToWorldTransformMessage(direction);
 			editor.vext.SendMessage(message);
 			if(editor.screenToWorldTransform.trans !== new Vec3(0,0,0)) {
-				editor.selectionGroup.setTransform(editor.screenToWorldTransform);
-			}
+				editor.setUpdating(true);
+				let trans = editor.screenToWorldTransform.trans;
 
+				editor.selectionGroup.position.set(trans.x, trans.y, trans.z);
+				editor.onControlMove();
+				scope.Render();
+			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 	}
