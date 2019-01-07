@@ -304,7 +304,8 @@ class THREEManager {
 		if(e.which == 1 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
-			editor.onControlMoveEnd()
+			editor.onControlMoveEnd();
+			this.Render();
 		} 
 	}
 	onMouseDown(e) {
