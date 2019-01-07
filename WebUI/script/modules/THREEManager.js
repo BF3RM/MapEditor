@@ -10,18 +10,11 @@ class THREEManager {
 		this.worldSpace = "local";
 		this.gridSnap = false;
 
-		this._onControlChanged = THREEManager.onControlChanged.bind(this);
-		this._onObjectChanged = this.onObjectChanged.bind(this);
-		this._onWindowResize = this.onWindowResize.bind(this);
-
-		this._onMouseMove = this.onMouseMove.bind(this);
-		this._onMouseDown = this.onMouseDown.bind(this);
-		this._onMouseUp = this.onMouseUp.bind(this);
-
 		this.Initialize();
 		this.RegisterEvents();
 
 		this.raycastPlacing = false;
+		this.controlSelected = false;
 	}
 	Initialize() {
 		let scope = this;
@@ -59,14 +52,14 @@ class THREEManager {
 		});
 		window.addEventListener('resize',this.onWindowResize, false);
 
-		this.renderer.domElement.addEventListener('mousemove',this._onMouseMove);
-		this.renderer.domElement.addEventListener('mouseup', this._onMouseUp);
-		this.renderer.domElement.addEventListener('mousedown', this._onMouseDown);
+		this.renderer.domElement.addEventListener('mousemove',this.onMouseMove.bind(this));
+		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 		
-		this.control.addEventListener('change', this._onControlChanged);
-		this.control.addEventListener('mouseUp', THREEManager.onControlMouseUp);
-		this.control.addEventListener('mouseDown', THREEManager.onControlMouseDown);
-		this.control.addEventListener('objectChange', this._onObjectChanged);
+		this.control.addEventListener('change', this.onControlChanged.bind(this));
+		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
+		this.control.addEventListener('mouseDown', this.onControlMouseDown.bind(this));
+		this.control.addEventListener('objectChange', this.onObjectChanged.bind(this));
 	}
 
 	CreateGizmo() {
@@ -300,8 +293,7 @@ class THREEManager {
 		}
 	}
 	onMouseUp(e) {
-		console.log(e);
-		if(e.which == 1 && editor.threeManager.raycastPlacing) {
+		if(e.which === 1 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
 			editor.onControlMoveEnd();
@@ -312,20 +304,19 @@ class THREEManager {
 		let scope = this;
 		if (scope.raycastPlacing) {
 			editor.onControlMoveStart();
+		} else if(this.controlSelected) {
+			console.log("Control selected")
+		} else if(e.which === 1) {
+			let direction = scope.getMouse3D(e);
+			let message = new SelectObject3DMessage(direction);
+			editor.vext.SendMessage(message);
 		}
 	}
 
 	onMouseMove(e) {
 		let scope = this;
 		if(editor.threeManager.raycastPlacing) {
-			let mousePos = [];
-			mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-			mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-
-			let raycaster = new THREE.Raycaster();
-			raycaster.setFromCamera( mousePos, scope.camera );
-			let direction = raycaster.ray.direction;
-
+			let direction = scope.getMouse3D(e);
 
 			let message = new SetScreenToWorldTransformMessage(direction);
 			editor.vext.SendMessage(message);
@@ -340,14 +331,25 @@ class THREEManager {
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 	}
-	static onControlMouseDown(e) {
+
+	getMouse3D(e) {
+		let mousePos = [];
+		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+		let raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( mousePos, this.camera );
+		return raycaster.ray.direction;
+	}
+
+	onControlMouseDown(e) {
 		//Stop moving
+		this.controlSelected = true;
 		editor.onControlMoveStart();
 
 		editor.setUpdating(true);
 
 		if( keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
-			console.log("ray")
 			let event = document.createEvent("HTMLEvents");
 			event.initEvent("mouseup", true, true); // The custom event that will be created
 			editor.threeManager.raycastPlacing = true;
@@ -356,16 +358,15 @@ class THREEManager {
 		}
 
 	}
-	static onControlChanged() {
+	onControlChanged() {
 		//moving
 		editor.onControlMove();
 		editor.threeManager.Render();
 
 	}
 
-	static onControlMouseUp(e) {
-		if(editor.threeManager.raycastPlacing == false) {
-		}
+	onControlMouseUp(e) {
+		this.controlSelected = false;;
 		editor.setUpdating(false);
 		editor.onControlMoveEnd();
 		//Stop Moving

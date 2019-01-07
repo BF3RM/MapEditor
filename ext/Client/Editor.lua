@@ -32,7 +32,8 @@ function Editor:RegisterVars()
 	self.m_Messages = {
 		MoveObjectMessage = self.MoveObject,
         SetViewModeMessage = self.SetViewMode,
-        SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition
+        SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition,
+        SelectObject3DMessage = self.SelectObject3D
 	}
 
 	self.m_Queue = {};
@@ -87,6 +88,7 @@ end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:UpdateCameraTransform()
+    -- Raycast has to be done in update
 	self:Raycast()
 end
 
@@ -192,6 +194,9 @@ end
 function Editor:SetScreenToWorldPosition(p_Message)
     self:SetPendingRaycast(RaycastType.Mouse, p_Message.direction)
 end
+function Editor:SelectObject3D(p_Message, p_Arguments)
+    self:SetPendingRaycast(RaycastType.Select, p_Message.direction)
+end
 --[[
 
 	Shit
@@ -243,7 +248,43 @@ function Editor:Raycast()
                 s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
     end
 
+    -- Type is select, we hit a rigidBody and it's a SpatialEntity
+    if(self.m_PendingRaycast.type == RaycastType.Select and s_Raycast ~= nil and s_Raycast.rigidBody ~= nil and s_Raycast.rigidBody:Is("SpatialEntity")) then
+
+        -- Catch all entities in view. SpatialRaycast is really wide :shrug:
+        local s_Entities = RaycastManager:SpatialRaycast(s_Transform.trans, s_CastPosition, SpatialQueryFlags.AllGrids)
+        -- Store the transform of the collider we hit
+        local s_RigidBodyHitTransform = SpatialEntity(s_Raycast.rigidBody).transform
+
+        if( s_Entities ~= nil and #s_Entities > 0) then
+            for k, v in pairs(s_Entities) do
+                -- Filter the entities to not include physics entities
+                if(v:Is("SpatialEntity") and
+                        not v:Is("StaticPhysicsEntity") and
+                        not v:Is("GroupPhysicsEntity") and
+                        not v:Is("ClientWaterEntity") and
+                        not v:Is("WaterPhysicsEntity") and
+                        not v:Is("ClientSoldierEntity") and
+                        not v:Is("DebrisClusterContainerEntity") and
+                        not v:Is("CharacterPhysicsEntity")
+                ) then
+                    local s_Entity = SpatialEntity(v)
+                    -- Compare the collider's transform to the actual entity's transform
+                    if(s_RigidBodyHitTransform.trans == s_Entity.transform.trans ) then
+                        -- Check if we have that entity's instanceId stored
+                        local s_Guid = ObjectManager:GetGUIDByInstanceID(v.instanceID)
+                        if(s_Guid ~= nil) then
+                            -- Select it
+                            WebUI:ExecuteJS(string.format('editor.Select("%s")', s_Guid))
+                        end
+                    end
+                end
+            end
+        end
+    end
+
 	self.m_PendingRaycast = false
+
 end
 
 function Editor:UpdateCameraTransform()

@@ -10,6 +10,7 @@ end
 function ObjectManager:RegisterVars()
     self.m_SpawnedEntities = {}
     self.m_SpawnedOffsets = {}
+    self.m_EntityInstanceIds = {}
 end
 
 function ObjectManager:RegisterEvents()
@@ -22,8 +23,12 @@ function ObjectManager:GetEntityByGuid(p_Guid)
         return false
     end
 end
+function ObjectManager:GetGUIDByInstanceID(p_InstanceID)
+    return self.m_EntityInstanceIds[p_InstanceID]
+end
+
 function ObjectManager:Clear()
-    self.m_SpawnedEntities = {}
+    self:RegisterVars()
 end
 
 
@@ -73,6 +78,8 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
         if(l_Entity:Is("SpatialEntity")) then
             s_Spatial[i] = SpatialEntity(l_Entity)
             s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
+            -- Allows us to connect the entity to the GUID
+            self.m_EntityInstanceIds[l_Entity.instanceID] = p_Guid
         end
     end
 

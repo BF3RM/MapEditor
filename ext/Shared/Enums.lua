@@ -6,5 +6,6 @@ CameraMode = {
 
 RaycastType = {
     Camera = 1,
-    Mouse = 2
+    Mouse = 2,
+    Select = 3
 }

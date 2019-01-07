@@ -20,7 +20,6 @@ end
 
 function Backend:OnLevelDestroy()
     ObjectManager:Clear()
-
 end
 
 
@@ -43,6 +42,7 @@ function Backend:SpawnBlueprint(p_Command)
             guid = s_Entity.uniqueID,
             type = l_Entity.typeInfo.name,
             transform = tostring(ToLocal(s_Entity.transform, s_UserData.transform)),
+            instanceId = s_Entity.instanceID,
             aabb = {
                 min = tostring(s_Entity.aabb.min),
                 max = tostring(s_Entity.aabb.max),
