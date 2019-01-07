@@ -211,6 +211,7 @@ function Editor:Raycast()
         s_Direction = Vec3(s_Transform.forward.x * -1, s_Transform.forward.y * -1, s_Transform.forward.z * -1)
     end
 
+
 	if s_Transform.trans == Vec3(0,0,0) then -- Camera is below the ground. Creating an entity here would be useless.
 		return
 	end
@@ -229,9 +230,9 @@ function Editor:Raycast()
 	else
 
 		-- Raycast didn't hit anything. Spawn it in front of the player instead.
-		s_Transform.trans = Vec3(s_Transform.trans.x + (s_CameraForward.x * FALLBACK_DISTANCE),
-							s_Transform.trans.y + (s_CameraForward.y * FALLBACK_DISTANCE),
-							s_Transform.trans.z + (s_CameraForward.z * FALLBACK_DISTANCE))
+		s_Transform.trans = Vec3(s_Transform.trans.x + (s_Direction.x * FALLBACK_DISTANCE),
+							s_Transform.trans.y + (s_Direction.y * FALLBACK_DISTANCE),
+							s_Transform.trans.z + (s_Direction.z * FALLBACK_DISTANCE))
 	end
     if(self.m_PendingRaycast.type == RaycastType.Camera) then
         WebUI:ExecuteJS(string.format('editor.SetRaycastPosition(%s, %s, %s)',
