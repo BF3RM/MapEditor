@@ -23,7 +23,7 @@ function ObjectManager:GetEntityByGuid(p_Guid)
         return false
     end
 end
-function ObjectManager:GetGUIDByInstanceID(p_InstanceID)
+function ObjectManager:GetGuidFromInstanceID(p_InstanceID)
     return self.m_EntityInstanceIds[p_InstanceID]
 end
 

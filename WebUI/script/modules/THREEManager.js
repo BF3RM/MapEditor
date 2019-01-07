@@ -349,7 +349,7 @@ class THREEManager {
 
 		editor.setUpdating(true);
 
-		if( keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
+		if(keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
 			let event = document.createEvent("HTMLEvents");
 			event.initEvent("mouseup", true, true); // The custom event that will be created
 			editor.threeManager.raycastPlacing = true;
@@ -366,7 +366,7 @@ class THREEManager {
 	}
 
 	onControlMouseUp(e) {
-		this.controlSelected = false;;
+		this.controlSelected = false;
 		editor.setUpdating(false);
 		editor.onControlMoveEnd();
 		//Stop Moving

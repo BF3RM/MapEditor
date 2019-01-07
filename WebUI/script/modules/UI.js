@@ -317,7 +317,7 @@ class UI {
 	OpenSaveDialog() {
 		/*let jsonString = JSON.stringify(
 			editor.rootEntities, function( key, value) {
-				if(  key == 'webObject') {
+				if(key == 'webObject') {
 					return null;
 				}
 				else if(key == 'parent'){
@@ -344,7 +344,7 @@ class UI {
 	onConfirmReloadProject(){
 		let jsonString = JSON.stringify(
 			editor.rootEntities, function( key, value) {
-				if(  key == 'webObject') {
+				if(key == 'webObject') {
 					return null;
 				}
 				else if(key == 'parent'){

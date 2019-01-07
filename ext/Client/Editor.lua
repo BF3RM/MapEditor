@@ -256,23 +256,23 @@ function Editor:Raycast()
         -- Store the transform of the collider we hit
         local s_RigidBodyHitTransform = SpatialEntity(s_Raycast.rigidBody).transform
 
-        if( s_Entities ~= nil and #s_Entities > 0) then
-            for k, v in pairs(s_Entities) do
+        if(s_Entities ~= nil and #s_Entities > 0) then
+            for k, l_Entity in pairs(s_Entities) do
                 -- Filter the entities to not include physics entities
-                if(v:Is("SpatialEntity") and
-                        not v:Is("StaticPhysicsEntity") and
-                        not v:Is("GroupPhysicsEntity") and
-                        not v:Is("ClientWaterEntity") and
-                        not v:Is("WaterPhysicsEntity") and
-                        not v:Is("ClientSoldierEntity") and
-                        not v:Is("DebrisClusterContainerEntity") and
-                        not v:Is("CharacterPhysicsEntity")
+                if(l_Entity:Is("SpatialEntity") and
+                        not l_Entity:Is("StaticPhysicsEntity") and
+                        not l_Entity:Is("GroupPhysicsEntity") and
+                        not l_Entity:Is("ClientWaterEntity") and
+                        not l_Entity:Is("WaterPhysicsEntity") and
+                        not l_Entity:Is("ClientSoldierEntity") and
+                        not l_Entity:Is("DebrisClusterContainerEntity") and
+                        not l_Entity:Is("CharacterPhysicsEntity")
                 ) then
-                    local s_Entity = SpatialEntity(v)
+                    local s_Entity = SpatialEntity(l_Entity)
                     -- Compare the collider's transform to the actual entity's transform
                     if(s_RigidBodyHitTransform.trans == s_Entity.transform.trans ) then
                         -- Check if we have that entity's instanceId stored
-                        local s_Guid = ObjectManager:GetGUIDByInstanceID(v.instanceID)
+                        local s_Guid = ObjectManager:GetGuidFromInstanceID(s_Entity.instanceID)
                         if(s_Guid ~= nil) then
                             -- Select it
                             WebUI:ExecuteJS(string.format('editor.Select("%s")', s_Guid))
