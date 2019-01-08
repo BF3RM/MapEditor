@@ -10,7 +10,7 @@ const SpawnBlueprintCommand = function (guid, parameters) {
 		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
-	this.parameters = JSON.parse(JSON.stringify(parameters));
+	this.parameters = parameters;
 };
 
 

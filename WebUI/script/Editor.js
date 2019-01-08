@@ -274,7 +274,7 @@ class Editor {
 			return false;
 		}
 		if(transform === undefined) {
-			transform = scope.raycastTransform;
+			transform = scope.raycastTransform.Clone();
 		}
 		if(variation === undefined) {
 			variation = blueprint.getDefaultVariation();
