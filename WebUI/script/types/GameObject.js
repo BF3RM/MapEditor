@@ -12,6 +12,7 @@ class GameObject extends THREE.Object3D
 		this.objectParent = parent;
 		this.userData = userData;
 		this.selected = false;
+		this.visible = false;
 
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);

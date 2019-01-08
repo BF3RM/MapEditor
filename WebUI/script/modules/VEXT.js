@@ -21,9 +21,25 @@ class VEXTInterface {
 			// 'SelectedGameObject':       signals.selectedGameObject.dispatch,
 			// 'DeselectedGameObject':    signals.deselectedGameObject.dispatch,
 		}
+
+		this.paused = false;
+		this.executing = false;
+
+		this.queued = [];
 	}
+	/*
 
+		Internal
 
+	 */
+	Pause() {
+		this.paused = true;
+	}
+	Resume() {
+		this.paused = false;
+		this.SendCommands(this.queued);
+		this.queued = [];
+	}
 	/*
 
 		In
@@ -42,43 +58,56 @@ class VEXTInterface {
 	 */
 
 	SendCommand(command) {
+		let scope = this;
+		// If we're not sending an array of commands, make us send an array of commands.
+
 		command.sender = editor.playerName;
+
+		if(this.paused) {
+			this.queued.push(command)
+		} else {
+			//Sending this individual command as an array of commands
+			this.SendCommands([command]);
+		}
+	}
+
+	SendCommands(commands) {
+		if(commands.length === 0) {
+			return;
+		}
+		let scope = this;
 		if(editor.debug) {
 			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
-			editor.logger.Log(LOGLEVEL.VERBOSE, command);
-			this.emulator.commands[command.type](command);
+			editor.logger.Log(LOGLEVEL.VERBOSE, commands);
+			scope.emulator.Receive(commands);
 		} else {
-			console.log(command);
+			console.log(commands);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(command));
 		}
 	}
 
-	HandleResponse(commandRaw) {
-		let command = null;
-		let emulator = false;
-		if (typeof(commandRaw) === "object") {
-			command = commandRaw;
-			emulator = true;
-		} else {
-			editor.logger.Log(LOGLEVEL.VERBOSE, commandRaw);
-			command = JSON.parse(commandRaw);
-		}
-		editor.logger.Log(LOGLEVEL.VERBOSE, "IN: ");
-		editor.logger.Log(LOGLEVEL.VERBOSE, command);
+	HandleResponse(responsesRaw, emulator) {
+		var t0 = performance.now();
 
-		if(this.commands[command.type] === undefined) {
-			editor.logger.LogError("Failed to call a null signal: " + command.type);
-			return;
-		}
-		if(emulator) {
-			let scope = this;
-			// delay to simulate tick increase.
-			setTimeout(async function() {
-				scope.commands[command.type](command)
-			}, 1);
-		} else {
-			this.commands[command.type](command);
-		}
+		let scope = this;
+		scope.executing = true;
+		let commands = JSON.parse(responsesRaw);
+		let index = 0;
+		commands.forEach(function (command) {
+			if(scope.commands[command.type] === undefined) {
+				editor.logger.LogError("Failed to call a null signal: " + command.type);
+				return;
+			}
+			if(index === commands.length - 1) {
+				scope.executing = false;
+			}
+			scope.commands[command.type](command);
+			index++;
+
+		});
+		console.log("Done executing");
+		var t1 = performance.now();
+		console.log("Execution took " + (t1 - t0) + " milliseconds.");
 	}
 
 	OnSpawnReferenceObject(command) {

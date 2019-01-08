@@ -14,12 +14,19 @@ function Test(count) {
 	if(count === undefined) {
 		count = 1;
 	}
+	let commands = [];
 	for(let i = 0; i < count; i++) {
 		let lt = new LinearTransform();
 		lt.trans = new Vec3(getRandom(30),getRandom(30),getRandom(30));
-		signals.spawnBlueprintRequested.dispatch(randomBlueprint(), lt);
-	}
 
+		let guid = GenerateGuid();
+		let bp = randomBlueprint();
+		let userData = new ReferenceObjectParameters(bp.getReference(), guid, 0, bp.getName(), lt);
+
+		commands.push(new SpawnBlueprintCommand(guid, userData));
+	}
+	let command = new BulkCommand(commands);
+	editor.execute(command);
 	console.log("Done");
 }
 

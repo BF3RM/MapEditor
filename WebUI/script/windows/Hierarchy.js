@@ -34,7 +34,7 @@ class Hierarchy {
 		this.subControls = this.CreateSubControls();
 		this.Initialize();
 
-
+		this.queue = [];
 
 
 	}
@@ -46,8 +46,22 @@ class Hierarchy {
 		let entry = new HierarchyEntry(command.guid, command.name, command.userData.reference.typeName, scope.data.children.length, "root");
 		scope.entries[command.guid] = entry;
 		scope.data.children[scope.data.children.length] = entry;
-		scope.dom.jstree(true).create_node('root' ,  entry, "last", function(){
-		});
+		if(editor.vext.executing) {
+			this.queue.push(entry);
+		} else {
+			var t0 = performance.now();
+			console.log("Drawing");
+			console.log(this.queue.length);
+			if(this.queue.length === 0) {
+				scope.dom.jstree(true).create_node('root' ,  entry, "last");
+			} else {
+				scope.dom.jstree(true).settings.core.data = scope.data;
+				scope.dom.jstree(true).refresh();
+				this.queue = [];
+			}
+			var t1 = performance.now();
+			console.log("Execution took " + (t1 - t0) + " milliseconds.");
+		}
 	}
 
 	getEntry(guid) {

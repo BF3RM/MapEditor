@@ -322,11 +322,9 @@ class Editor {
 
 		}
 
-		gameObject.visible = false;
-
 		this.gameObjects[command.guid] = gameObject;
 
-		if(command.sender === this.playerName) {
+		if(!scope.vext.executing && command.sender === this.playerName) {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(command.guid)}, 1);
 		}
@@ -339,7 +337,7 @@ class Editor {
 
 
 	Select(guid) {
-
+		console.log("select");
 		if(keysdown[17]) {
 			signals.selectedGameObject.dispatch(guid, true);
 		} else {
@@ -375,7 +373,6 @@ class Editor {
 
 		// Clear selection group when it's a single selection
 		if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
-			console.log("Clearing selection group");
 			for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
 				scope.Deselect(scope.selectionGroup.children[i].guid);
 			}
@@ -402,8 +399,6 @@ class Editor {
 	onDeselectedGameObject(guid) {
 		let scope = this;
 		let gameObject = scope.gameObjects[guid];
-		console.log(guid)
-		console.log(gameObject)
 		scope.selectionGroup.DeselectObject(gameObject);
 		signals.deselectedGameObject.dispatch(guid);
 		scope.threeManager.Render();

@@ -227,7 +227,9 @@ class THREEManager {
 	}
 
 	Render() {
-		this.renderer.render(this.scene, this.camera);
+		if(!editor.vext.executing) {
+			this.renderer.render(this.scene, this.camera);
+		}
 	}
 
 	SetFov(p_Fov) {

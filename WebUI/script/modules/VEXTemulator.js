@@ -16,14 +16,25 @@ class VEXTemulator {
 		this.commands['SetVariationCommand'] = this.SetVariation;
 	}
 
+	Receive(commands) {
+		let scope = this;
+		let responses = [];
+		commands.forEach(function(command) {
+			responses.push(scope.commands[command.type](command));
+		});
+		// Delay to simulate tick pass
+		setTimeout(async function() {
+			editor.vext.HandleResponse(JSON.stringify(responses), true);
+		}, 1)
+	}
+
 	CreateGroup(command) {
 		let response = {
 			"type": "CreatedGroup",
 			"guid": command.guid,
 			"name": command.userData.name,
 			"sender": command.sender,
-		}
-		editor.vext.HandleResponse(response);
+		};
 	}
 	DestroyGroup(command) {
 
@@ -75,7 +86,7 @@ class VEXTemulator {
 				}
 			};
 		}
-		editor.vext.HandleResponse(response);
+		return response;
 	}
 
 	SetTransform(command) {
@@ -86,8 +97,7 @@ class VEXTemulator {
 				"transform": command.userData.transform.toString()
 			}
 		};
-		editor.vext.HandleResponse(response);
-
+		return response;
 	}
 
 	DestroyBlueprint(command) {
@@ -96,7 +106,7 @@ class VEXTemulator {
 			"type": "DestroyedBlueprint",
 			"guid": command.guid
 		};
-		editor.vext.HandleResponse(response);
+		return response
 	}
 
 	SetObjectName(command) {
@@ -106,7 +116,7 @@ class VEXTemulator {
 			"guid": command.guid,
 			"name": command.userData
 		};
-		editor.vext.HandleResponse(response);
+		return response
 	}
 
 	SetVariation(command) {
@@ -116,7 +126,7 @@ class VEXTemulator {
 			"guid": command.guid,
 			"key": command.userData
 		};
-		editor.vext.HandleResponse(response);
+		return response
 	}
 
 
