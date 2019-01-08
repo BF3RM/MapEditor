@@ -43,30 +43,32 @@ end
 
 function EditorServer:OnReceiveCommand(p_Player, p_Command)
     local s_Command = self:DecodeParams(json.decode(p_Command))
-    local s_Function = self.m_Commands[s_Command.type]
-    if(s_Function == nil) then
-        print("Attempted to call a nil function: " .. s_Command.type)
-        return false
-    end
-    local s_Response = s_Function(self, s_Command)
-    if(s_Response == false) then
-        -- TODO: Handle errors
-        print("error")
-        return
-    end
-    if(s_Response == "queue") then
-        print("Queued command")
-        table.insert(self.m_Queue, s_Command)
-        return
-    end
-    if(s_Response.userData == nil) then
-        print("MISSING USERDATA!")
-    end
-    self.m_GameObjects[s_Command.guid] = MergeUserdata(self.m_GameObjects[s_Command.guid], s_Response.userData)
-    table.insert(self.m_Transactions, tostring(s_Command.guid)) -- Store that this transaction has happened.
 
-    NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", p_Command)
-
+    local s_Responses = {}
+    for k, l_Command in ipairs(s_Command) do
+        local s_Function = self.m_Commands[l_Command.type]
+        if(s_Function == nil) then
+            print("Attempted to call a nil function: " .. l_Command.type)
+            return false
+        end
+        local s_Response = s_Function(self, l_Command)
+        if(s_Response == false) then
+            -- TODO: Handle errors
+            print("error")
+        elseif(s_Response == "queue") then
+            print("Queued command")
+            table.insert(self.m_Queue, l_Command)
+        elseif(s_Response.userData == nil) then
+            print("MISSING USERDATA!")
+        else
+            self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
+            table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
+            table.insert(s_Responses, s_Response)
+        end
+    end
+    if(#s_Responses > 0) then
+        NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", p_Command)
+    end
 end
 
 function EditorServer:OnUpdatePass(p_Delta, p_Pass)
@@ -77,7 +79,7 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
     for k,l_Command in ipairs(self.m_Queue) do
         l_Command.queued = true
         print("Executing command delayed: " .. l_Command.type)
-        self:OnReceiveCommand(nil, json.encode(self:EncodeParams(l_Command)))
+        self:OnReceiveCommand(nil, json.encode({self:EncodeParams(l_Command)}))
     end
     if(#self.m_Queue > 0) then
         self.m_Queue = {}

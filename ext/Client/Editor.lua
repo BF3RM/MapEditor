@@ -71,7 +71,7 @@ function Editor:OnReceiveUpdate(p_Update)
                 guid = k,
                 userData = p_Update[k]
             }
-            self:OnReceiveCommand(json.encode(s_Command))
+            self:OnReceiveCommand(json.encode({s_Command}))
         else
             local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
             -- Hopefully this will never happen. It's hard to test these changes since they require a desync.
@@ -105,7 +105,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     for k,l_Command in ipairs(self.m_Queue) do
         l_Command.queued = true
         print("Executing command delayed: " .. l_Command.type)
-        self:OnReceiveCommand(json.encode(self:EncodeParams(l_Command)))
+        self:OnReceiveCommand(json.encode({self:EncodeParams(l_Command)}))
     end
     if(#self.m_Queue > 0) then
         self.m_Queue = {}
@@ -116,33 +116,34 @@ end
 function Editor:OnReceiveCommand(p_Command, raw)
     local s_Command = p_Command
 
-    if(raw == nil) then
+    if not raw then
         s_Command = self:DecodeParams(json.decode(p_Command))
     end
 
-	local s_Function = self.m_Commands[s_Command.type]
-	if(s_Function == nil) then
-		print("Attempted to call a nil function: " .. s_Command.type)
-		return false
-	end
-	local s_Response = s_Function(self, s_Command)
-	if(s_Response == false) then
-		-- TODO: Handle errors
-		print("error")
-		return
-	end
-	if(s_Response == "queue") then
-		print("Queued command")
-        table.insert(self.m_Queue, s_Command)
-        return
-	end
-
-    if(s_Response.userData == nil) then
-        print("MISSING USERDATA!")
+    local s_Responses = {}
+    for k, l_Command in ipairs(s_Command) do
+        local s_Function = self.m_Commands[l_Command.type]
+        if(s_Function == nil) then
+            print("Attempted to call a nil function: " .. l_Command.type)
+            return false
+        end
+        local s_Response = s_Function(self, l_Command)
+        if(s_Response == false) then
+            -- TODO: Handle errors
+            print("error")
+        elseif(s_Response == "queue") then
+            print("Queued command")
+            table.insert(self.m_Queue, l_Command)
+        elseif(s_Response.userData == nil) then
+            print("MISSING USERDATA!")
+        else
+            self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
+            table.insert(s_Responses, s_Response)
+        end
     end
-    self.m_GameObjects[s_Command.guid] = MergeUserdata(self.m_GameObjects[s_Command.guid], s_Response.userData)
-
-	WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Response))))
+    if(#s_Responses > 0) then
+        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Responses))))
+    end
 end
 
 function Editor:OnReceiveMessage(p_Message)
