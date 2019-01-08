@@ -63,7 +63,7 @@ function Editor:OnEngineMessage(p_Message)
 end
 
 function Editor:OnReceiveUpdate(p_Update)
-
+    local s_Responses = {}
     for k,v in pairs(p_Update) do
         if(self.m_GameObjects[k] == nil) then
             local s_Command = {
@@ -71,7 +71,7 @@ function Editor:OnReceiveUpdate(p_Update)
                 guid = k,
                 userData = p_Update[k]
             }
-            self:OnReceiveCommand(json.encode({s_Command}))
+            table.insert(s_Responses, s_Command)
         else
             local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
             -- Hopefully this will never happen. It's hard to test these changes since they require a desync.
@@ -84,6 +84,7 @@ function Editor:OnReceiveUpdate(p_Update)
         end
 
     end
+    self:OnReceiveCommand(s_Responses, true)
 end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
@@ -101,15 +102,17 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
         return
     end
-
+    local s_Responses = {}
     for k,l_Command in ipairs(self.m_Queue) do
         l_Command.queued = true
         print("Executing command delayed: " .. l_Command.type)
-        self:OnReceiveCommand(json.encode({self:EncodeParams(l_Command)}))
+        table.insert(l_Command)
     end
+    self:OnReceiveCommand(self:EncodeParams(s_Responses), true)
     if(#self.m_Queue > 0) then
         self.m_Queue = {}
     end
+
 end
 
 

@@ -39,8 +39,12 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
 
-function EditorServer:OnReceiveCommand(p_Player, p_Command)
-    local s_Command = self:DecodeParams(json.decode(p_Command))
+function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw)
+    local s_Command = p_Command
+
+    if not raw then
+        s_Command = self:DecodeParams(json.decode(p_Command))
+    end
 
     local s_Responses = {}
     for k, l_Command in ipairs(s_Command) do
@@ -73,12 +77,14 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
     if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
         return
     end
-
+    local s_Responses = {}
     for k,l_Command in ipairs(self.m_Queue) do
         l_Command.queued = true
         print("Executing command delayed: " .. l_Command.type)
-        self:OnReceiveCommand(nil, json.encode({self:EncodeParams(l_Command)}))
+        table.insert(s_Responses, l_Command)
     end
+    self:OnReceiveCommand(nil, s_Responses, true)
+
     if(#self.m_Queue > 0) then
         self.m_Queue = {}
     end
