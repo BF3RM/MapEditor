@@ -63,12 +63,10 @@ function Backend:SpawnBlueprint(p_Command)
 end
 
 
-function Backend:DestroyBlueprint(p_Command)
-
-	--TODO: not hack this
-	if(p_Command.queued == nil) then
-		return "queue";
-	end
+function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
+    if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
+        return "queue"
+    end
 
 	local s_Result = ObjectManager:DestroyEntity(p_Command.guid)
 
@@ -81,7 +79,6 @@ function Backend:DestroyBlueprint(p_Command)
 		guid =  p_Command.guid
 	}
 	return s_Response
-
 end
 
 

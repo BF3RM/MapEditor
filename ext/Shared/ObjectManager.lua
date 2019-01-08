@@ -104,9 +104,7 @@ function ObjectManager:DestroyEntity(p_Guid)
 	for i, entity in pairs(s_Entities) do
 		if entity ~= nil then
 			print(entity.typeInfo.name)
-			print("destroying")
 			entity:Destroy()
-			print("destroyed")
 		end
 	end
 	return true

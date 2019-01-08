@@ -98,28 +98,9 @@ function Editor:OnSendToServer(p_Command)
 	NetEvents:SendLocal('MapEditorServer:ReceiveCommand', p_Command)
 end
 
-function Editor:OnUpdatePass(p_Delta, p_Pass)
-	if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
-		return
-	end
-	local s_Responses = {}
-	for k,l_Command in ipairs(self.m_Queue) do
-		l_Command.queued = true
-		print("Executing command delayed: " .. l_Command.type)
-		table.insert(l_Command)
-	end
-	self:OnReceiveCommand(EncodeParams(s_Responses), true)
-	if(#self.m_Queue > 0) then
-		self.m_Queue = {}
-	end
-
-end
-
-
-function Editor:OnReceiveCommand(p_Command, raw)
+function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 	local s_Command = p_Command
-
-	if not raw then
+	if p_Raw == nil then
 		s_Command = DecodeParams(json.decode(p_Command))
 	end
 
@@ -130,7 +111,7 @@ function Editor:OnReceiveCommand(p_Command, raw)
 			print("Attempted to call a nil function: " .. l_Command.type)
 			return false
 		end
-		local s_Response = s_Function(self, l_Command)
+		local s_Response = s_Function(self, l_Command, p_UpdatePass)
 		if(s_Response == false) then
 			-- TODO: Handle errors
 			print("error")
@@ -165,6 +146,22 @@ function Editor:OnReceiveMessage(p_Message)
 		return
 	end
 	-- Messages don't respond
+end
+
+function Editor:OnUpdatePass(p_Delta, p_Pass)
+    if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
+        return
+    end
+    local s_Responses = {}
+    for k,l_Command in ipairs(self.m_Queue) do
+        print("Executing command in the correct UpdatePass: " .. l_Command.type)
+        table.insert(s_Responses, l_Command)
+    end
+    self:OnReceiveCommand(s_Responses, true, p_Pass)
+
+    if(#self.m_Queue > 0) then
+        self.m_Queue = {}
+    end
 end
 
 --[[
