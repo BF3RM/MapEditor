@@ -48,9 +48,9 @@ class UI {
 	}
 
 	InitializeWindows() {
-        let page = $('#page');
+		let page = $('#page');
 		/*this.windows = {
-            'inspector': new PowWindow("inspector", "Inspector", this.inspector),
+			'inspector': new PowWindow("inspector", "Inspector", this.inspector),
 			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
 			'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
 
@@ -456,7 +456,7 @@ document.addEventListener('mousemove', processScaler);
 document.addEventListener('mousemove', processScaler);
 
 function isFloat(n){
-    return Number(n) === n && n % 1 !== 0;
+	return Number(n) === n && n % 1 !== 0;
 }
 /*
 * Handle the mouse events via the global mouse object
@@ -465,18 +465,18 @@ function handleMouse(event) {
   // Mouse down, we want to set the target input, set the down flag and initial position
   if (event.type == "mousedown") {
 
-    // Get the input element sibling to the clicked label
-    inputEl = event.target.nextElementSibling;
-    // If the value isn't a valid integer, set it to 0
-    if(!parseFloat(inputEl.value)) {
-      inputEl.value = 0;
-    }
-    mouse.down = true;
-    mouse.xInitial = event.clientX;
+	// Get the input element sibling to the clicked label
+	inputEl = event.target.nextElementSibling;
+	// If the value isn't a valid integer, set it to 0
+	if(!parseFloat(inputEl.value)) {
+	  inputEl.value = 0;
+	}
+	mouse.down = true;
+	mouse.xInitial = event.clientX;
   }
   else if (event.type == "mouseup") {
-    mouse.down = false;
-    $(inputEl).trigger('change');
+	mouse.down = false;
+	$(inputEl).trigger('change');
 
   }
 }
@@ -488,22 +488,22 @@ function handleMouse(event) {
 function processScaler(event) {
   let scale = 0.03
   if (mouse.down) {
-    // If the mouse has moved..
-    if(event.clientX != mouse.xOld) {
-      // Get the difference between the two points scaled
-      var diff = (Math.abs(event.clientX - mouse.xInitial) * scale)
-      // If the cursor is to the right, increment
+	// If the mouse has moved..
+	if(event.clientX != mouse.xOld) {
+	  // Get the difference between the two points scaled
+	  var diff = (Math.abs(event.clientX - mouse.xInitial) * scale)
+	  // If the cursor is to the right, increment
 	  if(event.clientX > mouse.xInitial) {
-        inputEl.value = Math.round((parseFloat(inputEl.value) + diff) * 100.0) / 100.0;;
-      // Otherwise, decrement
-      } else {
-        inputEl.value = Math.round((parseFloat(inputEl.value) - diff) * 100.0) / 100.0;;
-      }
-      $(inputEl).trigger('input');
-      // Reset the initial position to the current, so [in/de]crementing works relative
-      mouse.xInitial = event.clientX;
-    }
-    // Update the old position for the next step calculation
-    mouse.xOld = event.clientX;
+		inputEl.value = Math.round((parseFloat(inputEl.value) + diff) * 100.0) / 100.0;;
+	  // Otherwise, decrement
+	  } else {
+		inputEl.value = Math.round((parseFloat(inputEl.value) - diff) * 100.0) / 100.0;;
+	  }
+	  $(inputEl).trigger('input');
+	  // Reset the initial position to the current, so [in/de]crementing works relative
+	  mouse.xInitial = event.clientX;
+	}
+	// Update the old position for the next step calculation
+	mouse.xOld = event.clientX;
   }
 };

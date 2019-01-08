@@ -4,10 +4,10 @@ class TreeView {
 		this.dom = $(document.createElement("div"));
 		this.topControls = this.CreateControls();
 		this.tree = null;
-        signals.blueprintsRegistered.add(this.LoadData.bind(this))
+		signals.blueprintsRegistered.add(this.LoadData.bind(this))
 
 		this.nodes = [];
-    }
+	}
 
 	LoadData(table) {
 		let scope = this;
@@ -24,19 +24,19 @@ class TreeView {
 		};
 		//TODO: Make sure this works after the new blueprint shit.
 		for (let key in table) {
-            let instance = table[key];
-            let path = instance.name;
-            let paths = getPaths(path);
-            let parentPath = data;
-            let fileName = getFilename(path);
+			let instance = table[key];
+			let path = instance.name;
+			let paths = getPaths(path);
+			let parentPath = data;
+			let fileName = getFilename(path);
 			paths.forEach(function(subPath) {
-                let parentIndex = parentPath.children.find(x => x.text.toLowerCase() === subPath.toLowerCase());
+				let parentIndex = parentPath.children.find(x => x.text.toLowerCase() === subPath.toLowerCase());
 				if (parentIndex === undefined) {
-                    let a = parentPath.children.push({
+					let a = parentPath.children.push({
 						"type": "folder",
 						"text": subPath,
 						"children": [],
-	                    "content": []
+						"content": []
 					});
 					parentPath = parentPath.children[a - 1];
 				} else {
@@ -54,57 +54,57 @@ class TreeView {
 				"id": key
 			})
 		}
-        scope.data = data;
-        scope.InitializeTree();
-        scope.RegisterEvents();
-        signals.folderSelected.dispatch("/", data.content);
+		scope.data = data;
+		scope.InitializeTree();
+		scope.RegisterEvents();
+		signals.folderSelected.dispatch("/", data.content);
 	}
 
 	InitializeTree() {
 		let scope = this;
-        scope.tree = $(scope.dom).jstree({
-	        types: {
-		        folder: {
-			        icon: 'jstree-folder'
-		        },
-		        file: {
-			        icon: 'jstree-file'
-		        }
-	        },
-	        plugins: ["types", "sort", "json_data", "search"],
-	        search: {
-		        case_insensitive: true,
-		        show_only_matches: true,
-		        search_callback: function (searchString, node) {
-			        for(let i = 0; i < node.original.content.length; i++) {
-			        	if(node.original.content[i].text.toLowerCase().indexOf(searchString.toLowerCase()) !== -1) {
-			        		console.log(node.original.content[i].text);
-			        		return true;
-				        }
-			        }
-		        }
-	        },
-	        sort: function(a, b) {
-		        let a1 = this.get_node(a);
-		        let b1 = this.get_node(b);
-		        if (a1.icon == b1.icon) {
-			        return (a1.text.toLowerCase() > b1.text.toLowerCase()) ? 1 : -1;
-		        } else {
-			        return (a1.icon < b1.icon) ? 1 : -1;
-		        }
-	        },
-	        core: {
-		        data: [this.data],
-		        themes: {
-			        dots: false,
-			        icons: true
-		        },
+		scope.tree = $(scope.dom).jstree({
+			types: {
+				folder: {
+					icon: 'jstree-folder'
+				},
+				file: {
+					icon: 'jstree-file'
+				}
+			},
+			plugins: ["types", "sort", "json_data", "search"],
+			search: {
+				case_insensitive: true,
+				show_only_matches: true,
+				search_callback: function (searchString, node) {
+					for(let i = 0; i < node.original.content.length; i++) {
+						if(node.original.content[i].text.toLowerCase().indexOf(searchString.toLowerCase()) !== -1) {
+							console.log(node.original.content[i].text);
+							return true;
+						}
+					}
+				}
+			},
+			sort: function(a, b) {
+				let a1 = this.get_node(a);
+				let b1 = this.get_node(b);
+				if (a1.icon == b1.icon) {
+					return (a1.text.toLowerCase() > b1.text.toLowerCase()) ? 1 : -1;
+				} else {
+					return (a1.icon < b1.icon) ? 1 : -1;
+				}
+			},
+			core: {
+				data: [this.data],
+				themes: {
+					dots: false,
+					icons: true
+				},
 			}
 		});
 	}
 	RegisterEvents() {
 		let scope = this;
-        scope.topControls.find(".search-input").keyup(function() {
+		scope.topControls.find(".search-input").keyup(function() {
 			let searchString = $(this).val();
 			delay(function() {
 				console.log(searchString);

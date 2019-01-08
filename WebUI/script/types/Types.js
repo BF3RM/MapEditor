@@ -56,9 +56,9 @@ class VextMessage {
 }
 
 var LOGLEVEL = {
-    NONE: 0,
-    DEBUG: 1,
-    VERBOSE: 2
+	NONE: 0,
+	DEBUG: 1,
+	VERBOSE: 2
 };
 
 

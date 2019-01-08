@@ -12,14 +12,14 @@
 
 var SetTransformCommand = function (guid, newTransform, oldTransform ) {
 
-    Command.call( this );
+	Command.call( this );
 
-    this.type = 'SetTransformCommand';
-    this.name = 'Set transform';
+	this.type = 'SetTransformCommand';
+	this.name = 'Set transform';
 
-    this.guid = guid;
+	this.guid = guid;
 
-    this.newTransform = newTransform;
+	this.newTransform = newTransform;
 	this.oldTransform = oldTransform;
 
 };

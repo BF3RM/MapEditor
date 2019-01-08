@@ -37,30 +37,30 @@ function GenerateGuid() {
 
 Math.clamp = function (value, min, max) {
 
-    if (value < min) {
-        return min;
-    }
-    else if (value > max) {
-        return max;
-    }
+	if (value < min) {
+		return min;
+	}
+	else if (value > max) {
+		return max;
+	}
 
-    return value;
+	return value;
 };
 
 
 Math.lerp = function (value1, value2, amount) {
-    amount = amount < 0 ? 0 : amount;
-    amount = amount > 1 ? 1 : amount;
-    return (1 - amount) * value1 + amount * value2;
+	amount = amount < 0 ? 0 : amount;
+	amount = amount > 1 ? 1 : amount;
+	return (1 - amount) * value1 + amount * value2;
 };
 
 // *-1 for right handedness
 function FromEuler(value) {
-    return ((value/180)*Math.PI ) * -1
+	return ((value/180)*Math.PI ) * -1
 }
 
 function ToEuler(value) {
-    return ((value*180)/Math.PI ) * -1
+	return ((value*180)/Math.PI ) * -1
 }
 
 

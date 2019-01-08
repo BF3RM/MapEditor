@@ -3,23 +3,23 @@ class VEXTInterface {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
 		this.commands = {
-			"SpawnedBlueprint":     signals.spawnedBlueprint.dispatch,
+			"SpawnedBlueprint":	 signals.spawnedBlueprint.dispatch,
 			"DestroyedBlueprint":   signals.destroyedBlueprint.dispatch,
-			"CreatedGroup":     signals.createdGroup.dispatch,
+			"CreatedGroup":	 signals.createdGroup.dispatch,
 			"DestroyedGroup":   signals.destroyedGroup.dispatch,
-			'SetObjectName':        signals.setObjectName.dispatch,
-			'SetTransform':         signals.setTransform.dispatch,
-			'SetVariation':         signals.setVariation.dispatch,
+			'SetObjectName':		signals.setObjectName.dispatch,
+			'SetTransform':		 signals.setTransform.dispatch,
+			'SetVariation':		 signals.setVariation.dispatch,
 		}
 
 		this.messages = {
 			'SetCameraTransformMessage':			signals.setCameraTransform.dispatch,
 			'SetRaycastTransformMessage':			signals.setRaycastPosition.dispatch,
-			'SetPlayerNameMessage':       			signals.setPlayerName.dispatch,
+			'SetPlayerNameMessage':	   			signals.setPlayerName.dispatch,
 			'SetScreenToWorldPositionMessage':		signals.setScreenToWorldPosition.dispatch,
 			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch
-			// 'SelectedGameObject':       signals.selectedGameObject.dispatch,
-			// 'DeselectedGameObject':    signals.deselectedGameObject.dispatch,
+			// 'SelectedGameObject':	   signals.selectedGameObject.dispatch,
+			// 'DeselectedGameObject':	signals.deselectedGameObject.dispatch,
 		}
 
 		this.paused = false;
