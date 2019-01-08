@@ -65,7 +65,6 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
     s_Params.networked = s_ObjectBlueprint.needNetworkId
 
     local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
-    print("Successfully spawned.")
     if #s_ObjectEntities == 0 then
         print("Spawning failed")
         return false
@@ -114,7 +113,6 @@ function ObjectManager:DestroyEntity(p_Guid)
 end
 
 function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
-
     if self.m_SpawnedEntities[p_Guid] == nil then
         print('Object with id ' .. p_Guid .. ' does not exist')
         return false

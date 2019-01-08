@@ -93,6 +93,10 @@ class VEXTInterface {
 		scope.executing = true;
 		let commands = JSON.parse(responsesRaw);
 		let index = 0;
+
+		editor.logger.Log(LOGLEVEL.VERBOSE, "IN: ");
+		editor.logger.Log(LOGLEVEL.VERBOSE, commands);
+
 		commands.forEach(function (command) {
 			if(scope.commands[command.type] === undefined) {
 				editor.logger.LogError("Failed to call a null signal: " + command.type);

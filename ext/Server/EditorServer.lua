@@ -26,8 +26,6 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 
     local s_TransactionId = p_TransactionId
     local s_UpdatedGameObjects = {}
-    print("Backend:")
-    print(self.m_GameObjects)
     while(s_TransactionId <= #self.m_Transactions) do
         local s_Guid = self.m_Transactions[s_TransactionId]
         if(s_Guid ~= nil) then

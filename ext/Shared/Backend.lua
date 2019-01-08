@@ -149,6 +149,10 @@ function Backend:Error(p_Message, p_Command)
 end
 
 function ToLocal(parentWorld, s_local)
+    if(parentWorld == s_local) then
+        local LT = LinearTransform()
+        return LT
+    end
     local LT = LinearTransform()
 
 
