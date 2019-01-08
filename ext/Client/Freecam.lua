@@ -27,7 +27,7 @@ function Freecam:RegisterVars()
 	self.m_MoveZ = 0.0
 	self.m_SimTickCount = 0
 	self.m_InverseTick = 0.0
-	self.m_SpeedMultiplier = 1.0
+	self.m_SpeedMultiplier = 1.917
 	self.m_RotationSpeedMultiplier = 200
 	self.m_Sprint = false
 

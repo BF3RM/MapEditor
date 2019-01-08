@@ -12,7 +12,7 @@ function InstanceParser:RegisterVars()
 	self.m_Meshes = {}
 	self.m_Variations = {}
 	self.m_MeshVariationDatabases = {}
-    self.m_StaticModelGroupDatabase = {}
+	self.m_StaticModelGroupDatabase = {}
 
 	self.m_IllegalTypes = Set {
 		"DebrisClusterData",
@@ -76,40 +76,40 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 
 		-- Catch all variations
 		if(l_Instance.typeInfo.name == "MeshVariationDatabase") then
-            local s_Instance = MeshVariationDatabase(l_Instance)
+			local s_Instance = MeshVariationDatabase(l_Instance)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
 		end
 
-        if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
-            local s_Instance = StaticModelGroupEntityData(l_Instance)
-            for i,l_Member in ipairs(s_Instance.memberDatas) do
-                local s_Member = StaticModelGroupMemberData(l_Member)
-                if(#s_Member.instanceObjectVariation > 0) then
-                    local s_MemberType = StaticModelEntityData(s_Member.memberType)
-                    if(s_MemberType ~= nil) then
-                        local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+		if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
+			local s_Instance = StaticModelGroupEntityData(l_Instance)
+			for i,l_Member in ipairs(s_Instance.memberDatas) do
+				local s_Member = StaticModelGroupMemberData(l_Member)
+				if(#s_Member.instanceObjectVariation > 0) then
+					local s_MemberType = StaticModelEntityData(s_Member.memberType)
+					if(s_MemberType ~= nil) then
+						local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
 
-                        local s_Variations = {}
-                        for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
-                            -- Eww
-                            s_Variations[l_Variation] = l_Variation
-                        end
+						local s_Variations = {}
+						for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+							-- Eww
+							s_Variations[l_Variation] = l_Variation
+						end
 
-                        if(self.m_Variations[s_Mesh] == nil) then
-                            self.m_Variations[s_Mesh] = {}
-                        end
+						if(self.m_Variations[s_Mesh] == nil) then
+							self.m_Variations[s_Mesh] = {}
+						end
 
-                        for i3, l_Variation in pairs(s_Variations) do
-                            local s_Variation = {
-                                hash =l_Variation,
-                                name ="fuck"
-                            }
-                            table.insert(self.m_Variations[s_Mesh], s_Variation)
-                        end
-                    end
-                end
-            end
-        end
+						for i3, l_Variation in pairs(s_Variations) do
+							local s_Variation = {
+								hash =l_Variation,
+								name ="fuck"
+							}
+							table.insert(self.m_Variations[s_Mesh], s_Variation)
+						end
+					end
+				end
+			end
+		end
 
 		::continue::
 	end
@@ -118,9 +118,9 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function InstanceParser:FillVariations()
-    print("FILL")
+	print("FILL")
 
-    for key, database in pairs(self.m_MeshVariationDatabases) do
+	for key, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database
 		for k, v in ipairs(s_Instance.entries) do
 			local l_mvdEntry = MeshVariationDatabaseEntry(v)
@@ -131,14 +131,14 @@ function InstanceParser:FillVariations()
 			local mesh = Asset(l_mvdEntry.mesh)
 			if(self.m_Variations[l_MeshGuid] == nil) then
 				self.m_Variations[l_MeshGuid] = {}
-            end
-            local s_Hash = l_mvdEntry.variationAssetNameHash
-            local s_Variation = {
-                hash =s_Hash,
-                name ="fuck"
-            }
+			end
+			local s_Hash = l_mvdEntry.variationAssetNameHash
+			local s_Variation = {
+				hash =s_Hash,
+				name ="fuck"
+			}
 
-            table.insert(self.m_Variations[l_MeshGuid], s_Variation)
+			table.insert(self.m_Variations[l_MeshGuid], s_Variation)
 		end
 	end
 	for k, v in pairs(self.m_Blueprints) do
@@ -147,14 +147,14 @@ function InstanceParser:FillVariations()
 		else
 			local l_MeshGuid = self.m_Meshes[v.name:lower() .. "_mesh"]
 
-            if(self.m_Variations[l_MeshGuid] ~= nil ) then
+			if(self.m_Variations[l_MeshGuid] ~= nil ) then
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
 				local jsonTest = (json.encode(self.m_Variations[l_MeshGuid]))
-                if(jsonTest == nil) then
-                    print("------------------")
-                    print(self.m_Variations[l_MeshGuid])
-                    print("------------------")
-                end
+				if(jsonTest == nil) then
+					print("------------------")
+					print(self.m_Variations[l_MeshGuid])
+					print("------------------")
+				end
 			else
 				print("No variation for " .. v.name)
 			end

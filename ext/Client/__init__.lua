@@ -34,16 +34,16 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
 	Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
-    Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
+	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
-    -- Editor Events
-    NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
-    NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
+	-- Editor Events
+	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
+	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
 
 	-- WebUI events
-    Events:Subscribe('MapEditor:SendToServer', self, self.OnSendToServer)
+	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendToServer)
 	Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 
@@ -71,7 +71,7 @@ function MapEditorClient:OnEngineMessage(p_Message)
 	m_Editor:OnEngineMessage(p_Message) 
 end
 function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
-    m_UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
+	m_UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 end
 function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 	m_Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
@@ -82,16 +82,16 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
-    m_Editor:OnUpdatePass(p_Delta, p_Pass)
+	m_Editor:OnUpdatePass(p_Delta, p_Pass)
 end
 function MapEditorClient:OnLevelDestroy()
 	print("Destroy!")
-    Backend:OnLevelDestroy()
+	Backend:OnLevelDestroy()
 end
 
 ----------- Editor functions----------------
 function MapEditorClient:OnSendToServer(p_Command)
-    m_Editor:OnSendToServer(p_Command)
+	m_Editor:OnSendToServer(p_Command)
 end
 function MapEditorClient:OnReceiveCommand(p_Command)
 	m_Editor:OnReceiveCommand(p_Command)
@@ -101,7 +101,7 @@ function MapEditorClient:OnReceiveMessage(p_Message)
 end
 
 function MapEditorClient:OnReceiveUpdate(p_Update)
-    m_Editor:OnReceiveUpdate(p_Update)
+	m_Editor:OnReceiveUpdate(p_Update)
 end
 
 ----------- WebUI functions----------------

@@ -17,30 +17,30 @@ function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
 
-    NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommand)
+	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommand)
 
-    NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
+	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
 
-    Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
-    Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
+	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
 end
 
 function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
-    m_EditorServer:OnUpdatePass(p_Delta, p_Pass)
+	m_EditorServer:OnUpdatePass(p_Delta, p_Pass)
 end
 
 function MapEditorServer:OnReceiveCommand(p_Player, p_Command)
-    m_EditorServer:OnReceiveCommand(p_Player, p_Command)
+	m_EditorServer:OnReceiveCommand(p_Player, p_Command)
 end
 
 function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
-    m_EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
+	m_EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
 function MapEditorServer:OnLevelDestroy()
-    print("Destroy!")
-    Backend:OnLevelDestroy()
+	print("Destroy!")
+	Backend:OnLevelDestroy()
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
