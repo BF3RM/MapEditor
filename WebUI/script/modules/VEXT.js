@@ -82,6 +82,8 @@ class VEXTInterface {
 			scope.emulator.Receive(commands);
 		} else {
 			console.log(commands);
+			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
+			editor.logger.Log(LOGLEVEL.VERBOSE, commands);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(commands));
 		}
 	}
