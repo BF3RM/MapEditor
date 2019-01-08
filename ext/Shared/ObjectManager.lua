@@ -151,29 +151,6 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 end
 
 
-function ToWorld(parentWorld, s_local)
-    local LT = LinearTransform()
-
-
-    LT.left = Vec3( parentWorld.left.x    * s_local.left.x,  parentWorld.left.y    * s_local.left.x,  parentWorld.left.z    * s_local.left.x )
-            + Vec3( parentWorld.up.x      * s_local.left.y,  parentWorld.up.y      * s_local.left.y,  parentWorld.up.z      * s_local.left.y )
-            + Vec3( parentWorld.forward.x * s_local.left.z,  parentWorld.forward.y * s_local.left.z,  parentWorld.forward.z * s_local.left.z )
-
-    LT.up = Vec3( parentWorld.left.x    * s_local.up.x,  parentWorld.left.y    * s_local.up.x,  parentWorld.left.z    * s_local.up.x )
-            + Vec3( parentWorld.up.x      * s_local.up.y,  parentWorld.up.y      * s_local.up.y,  parentWorld.up.z      * s_local.up.y )
-            + Vec3( parentWorld.forward.x * s_local.up.z,  parentWorld.forward.y * s_local.up.z,  parentWorld.forward.z * s_local.up.z )
-
-    LT.forward = Vec3( parentWorld.left.x    * s_local.forward.x,  parentWorld.left.y    * s_local.forward.x,  parentWorld.left.z    * s_local.forward.x )
-            + Vec3( parentWorld.up.x      * s_local.forward.y,  parentWorld.up.y      * s_local.forward.y,  parentWorld.up.z      * s_local.forward.y )
-            + Vec3( parentWorld.forward.x * s_local.forward.z,  parentWorld.forward.y * s_local.forward.z,  parentWorld.forward.z * s_local.forward.z )
-
-    LT.trans = Vec3( parentWorld.left.x    * s_local.trans.x,  parentWorld.left.y    * s_local.trans.x,  parentWorld.left.z    * s_local.trans.x )
-            + Vec3( parentWorld.up.x      * s_local.trans.y,  parentWorld.up.y      * s_local.trans.y,  parentWorld.up.z      * s_local.trans.y )
-            + Vec3( parentWorld.forward.x * s_local.trans.z,  parentWorld.forward.y * s_local.trans.z,  parentWorld.forward.z * s_local.trans.z )
-
-    LT.trans = LT.trans + parentWorld.trans
-    return LT
-end
 
 
 return ObjectManager

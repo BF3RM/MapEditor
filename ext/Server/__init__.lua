@@ -1,5 +1,6 @@
 class 'MapEditorServer'
 
+require "__shared/Util"
 require "__shared/ObjectManager"
 require "__shared/Backend"
 

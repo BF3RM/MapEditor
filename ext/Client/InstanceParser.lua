@@ -162,27 +162,5 @@ function InstanceParser:FillVariations()
 	end
 end
 
-function dump(o)
-	if(o == nil) then
-		print("tried to load jack shit")
-	end
-	if type(o) == 'table' then
-		local s = '{ '
-		for k,v in pairs(o) do
-			 if type(k) ~= 'number' then k = '"'..k..'"' end
-			 s = s .. '['..k..'] = ' .. dump(v) .. ','
-		end
-		return s .. '} '
-	else
-		return tostring(o)
-	end
-end
-
-function Set (list)
-	local set = {}
-	for _, l in ipairs(list) do set[l] = true end
-	return set
-end
-
 return InstanceParser()
 

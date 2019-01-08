@@ -43,7 +43,7 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw)
     local s_Command = p_Command
 
     if not raw then
-        s_Command = self:DecodeParams(json.decode(p_Command))
+        s_Command = DecodeParams(json.decode(p_Command))
     end
 
     local s_Responses = {}
@@ -90,54 +90,6 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
     end
 end
 
-function MergeUserdata(p_Old, p_New)
-    if(p_Old == nil) then
-        return p_New
-    end
-    if(p_New == nil) then
-        return nil
-    end
-    for k,v in pairs(p_New) do
-        p_Old[k] = v
-    end
-    return p_Old
-end
 
-function EditorServer:DecodeParams(p_Table)
-    for s_Key, s_Value in pairs(p_Table) do
-        if s_Key == 'transform' then
-            local s_LinearTransform = LinearTransform(
-                    Vec3(s_Value.left.x, s_Value.left.y, s_Value.left.z),
-                    Vec3(s_Value.up.x, s_Value.up.y, s_Value.up.z),
-                    Vec3(s_Value.forward.x, s_Value.forward.y, s_Value.forward.z),
-                    Vec3(s_Value.trans.x, s_Value.trans.y, s_Value.trans.z))
-
-            p_Table[s_Key] = s_LinearTransform
-
-        elseif type(s_Value) == "table" then
-            self:DecodeParams(s_Value)
-        end
-
-    end
-
-    return p_Table
-end
-
-function EditorServer:EncodeParams(p_Table)
-    if(p_Table == nil) then
-        error("Passed a nil table?!")
-    end
-    for s_Key, s_Value in pairs(p_Table) do
-        if s_Key == 'transform' then
-            p_Table[s_Key] = tostring(s_Value)
-
-        elseif type(s_Value) == "table" then
-            self:EncodeParams(s_Value)
-        end
-
-    end
-
-    return p_Table
-end
 
 return EditorServer()

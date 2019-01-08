@@ -25,8 +25,7 @@ end
 function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
     local s_Screen = UIGraphAsset(p_Screen)
 
-    if	s_Screen.name == 'UI/Flow/Screen/SpawnButtonScreen' or
-            s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
+    if	    s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
             s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
             s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
             s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then

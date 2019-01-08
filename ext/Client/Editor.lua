@@ -108,7 +108,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
         print("Executing command delayed: " .. l_Command.type)
         table.insert(l_Command)
     end
-    self:OnReceiveCommand(self:EncodeParams(s_Responses), true)
+    self:OnReceiveCommand(EncodeParams(s_Responses), true)
     if(#self.m_Queue > 0) then
         self.m_Queue = {}
     end
@@ -120,7 +120,7 @@ function Editor:OnReceiveCommand(p_Command, raw)
     local s_Command = p_Command
 
     if not raw then
-        s_Command = self:DecodeParams(json.decode(p_Command))
+        s_Command = DecodeParams(json.decode(p_Command))
     end
 
     local s_Responses = {}
@@ -145,12 +145,12 @@ function Editor:OnReceiveCommand(p_Command, raw)
         end
     end
     if(#s_Responses > 0) then
-        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self:EncodeParams(s_Responses))))
+        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(EncodeParams(s_Responses))))
     end
 end
 
 function Editor:OnReceiveMessage(p_Message)
-	local s_Message = self:DecodeParams(json.decode(p_Message))
+	local s_Message = DecodeParams(json.decode(p_Message))
 
 	local s_Function = self.m_Messages[s_Message.type]
 	if(s_Function == nil) then
@@ -311,79 +311,4 @@ function Editor:SetPendingRaycast(p_Type, p_Direction)
     }
 end
 
-function ToLocal(a,b)
-	local LT = LinearTransform()
-	LT.left = a.left
-	LT.up = a.up
-	LT.forward = a.forward
-	LT.trans.x = a.trans.x - b.trans.x -- attempt to index a nil value (field 'trans')
-	LT.trans.y = a.trans.y - b.trans.y
-	LT.trans.z = a.trans.z - b.trans.z
-	return LT
-end
-
-function MergeUserdata(p_Old, p_New)
-    if(p_Old == nil) then
-        return p_New
-    end
-    for k,v in pairs(p_New) do
-        p_Old[k] = v
-    end
-    return p_Old
-end
-
-function GetChanges(p_Old, p_New)
-    local s_Changes = {}
-    for k,v in pairs(p_New) do
-        if(tostring(p_Old[k]) ~= tostring(p_New[k])) then
-            if type(p_Old[k]) == "table" then
-                for k1,v1 in pairs(p_Old[k]) do
-                    if(p_Old[k][k1] ~= p_New[k][k1]) then
-                        table.insert(s_Changes, k)
-                    end
-                end
-            else
-                table.insert(s_Changes, k)
-            end
-        end
-    end
-    return s_Changes
-end
-
-function Editor:DecodeParams(p_Table)
-	for s_Key, s_Value in pairs(p_Table) do
-		if s_Key == 'transform' then
-			local s_LinearTransform = LinearTransform(
-				Vec3(s_Value.left.x, s_Value.left.y, s_Value.left.z),
-				Vec3(s_Value.up.x, s_Value.up.y, s_Value.up.z),
-				Vec3(s_Value.forward.x, s_Value.forward.y, s_Value.forward.z),
-				Vec3(s_Value.trans.x, s_Value.trans.y, s_Value.trans.z))
-
-			p_Table[s_Key] = s_LinearTransform
-
-		elseif type(s_Value) == "table" then
-			self:DecodeParams(s_Value)
-		end
-
-	end
-
-	return p_Table
-end
-
-function Editor:EncodeParams(p_Table)
-	if(p_Table == nil) then
-		error("Passed a nil table?!")
-	end
-	for s_Key, s_Value in pairs(p_Table) do
-		if s_Key == 'transform' then
-			p_Table[s_Key] = tostring(s_Value)
-
-		elseif type(s_Value) == "table" then
-			self:EncodeParams(s_Value)
-		end
-
-	end
-
-	return p_Table
-end
 return Editor()
