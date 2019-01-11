@@ -11,7 +11,6 @@ class Editor {
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
 		signals.setVariation.add(this.onSetVariation.bind(this));
-		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 
 		//Messages
 
@@ -383,11 +382,10 @@ class Editor {
 
 
 	Select(guid) {
-		console.log("select");
 		if(keysdown[17]) {
-			signals.selectedGameObject.dispatch(guid, true);
+			this.onSelectedGameObject(guid, true)
 		} else {
-			signals.selectedGameObject.dispatch(guid, false);
+			this.onSelectedGameObject(guid, false)
 		}
 	}
 
@@ -405,10 +403,8 @@ class Editor {
 		}
 
 		// If the object is already in this group and it's a multiselection we deselect it
-		if (gameObject.parent === scope.selectionGroup && isMultiSelection && scope.selectionGroup.children.length !== 1){
-			console.log("Object already selected");
+		if (gameObject.parent === scope.selectionGroup && isMultiSelection){
 			scope.Deselect(guid);
-
 			return;
 		}
 
@@ -435,8 +431,12 @@ class Editor {
 			gameObject.Select();
 			//TODO: update inspector with the group name
 		}
-		
+		signals.selectedGameObject.dispatch(guid, isMultiSelection);
+
 		scope.selectionGroup.Select();
+		if(scope.selectionGroup.children.length !== 0) {
+			scope.threeManager.ShowGizmo();
+		}
 		scope.threeManager.AttachGizmoTo(scope.selectionGroup);
 		scope.threeManager.Render();
 
@@ -447,6 +447,9 @@ class Editor {
 		let gameObject = scope.gameObjects[guid];
 		scope.selectionGroup.DeselectObject(gameObject);
 		signals.deselectedGameObject.dispatch(guid);
+		if(scope.selectionGroup.children.length === 0) {
+			scope.threeManager.HideGizmo()
+		};
 		scope.threeManager.Render();
 	}
 

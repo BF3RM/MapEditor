@@ -129,7 +129,6 @@ class Hierarchy {
 				editor.Select(node.id);
 				return false;
 			},
-
 			plugins: ["search", "dnd", "types", "changed", "conditionalselect"]
 		});
 		// Set data twice so we can update the scope data directly. :shrug:
@@ -189,33 +188,19 @@ class Hierarchy {
 	}
 
 	onSelectedGameObject(guid, isMultipleSelection) {
+		console.log("Selected")
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
-		scope.selecting = true;
 		this.dom.jstree('select_node', node, true);
-		scope.selecting = false;
 	}
 
 	onDeselected(guid) {
+		console.log("deselect " + guid);
 		let scope = this;
 		let node = scope.dom.jstree(true).get_node(guid);
-		scope.selecting = true;
-		this.dom.jstree('deselect_node', node, true);
-		scope.selecting = false;
+		this.dom.jstree(true).deselect_node(node);
 	}
 }
-// conditional select
-(function ($, undefined) {
-	"use strict";
-	$.jstree.defaults.conditionalselect = function () { return true; };
-	$.jstree.plugins.conditionalselect = function (options, parent) {
-		this.activate_node = function (obj, e) {
-			if(this.settings.conditionalselect.call(this, this.get_node(obj))) {
-				parent.activate_node.call(this, obj, e);
-			}
-		};
-	};
-})(jQuery);
 
 class HierarchyEntry {
 	constructor(guid, name, type, position, parent) {
