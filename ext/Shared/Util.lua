@@ -96,32 +96,16 @@ function ToWorld(parentWorld, s_local)
 	return LT
 end
 
-function ToLocal(parentWorld, s_local)
-	if(parentWorld == s_local) then
-		local LT = LinearTransform()
-		return LT
-	end
-	local LT = LinearTransform()
-
-
-	LT.left = Vec3( parentWorld.left.x  / s_local.left.x,  parentWorld.left.y   / s_local.left.x,  parentWorld.left.z   / s_local.left.x )
-			+ Vec3( parentWorld.up.x      / s_local.left.y,  parentWorld.up.y     / s_local.left.y,  parentWorld.up.z     / s_local.left.y )
-			+ Vec3( parentWorld.forward.x / s_local.left.z,  parentWorld.forward.y / s_local.left.z,  parentWorld.forward.z / s_local.left.z )
-
-	LT.up = Vec3( parentWorld.left.x    / s_local.up.x,  parentWorld.left.y / s_local.up.x,  parentWorld.left.z / s_local.up.x )
-			+ Vec3( parentWorld.up.x      / s_local.up.y,  parentWorld.up.y   / s_local.up.y,  parentWorld.up.z   / s_local.up.y )
-			+ Vec3( parentWorld.forward.x / s_local.up.z,  parentWorld.forward.y / s_local.up.z,  parentWorld.forward.z / s_local.up.z )
-
-	LT.forward = Vec3( parentWorld.left.x   / s_local.forward.x,  parentWorld.left.y    / s_local.forward.x,  parentWorld.left.z    / s_local.forward.x )
-			+ Vec3( parentWorld.up.x      / s_local.forward.y,  parentWorld.up.y      / s_local.forward.y,  parentWorld.up.z      / s_local.forward.y )
-			+ Vec3( parentWorld.forward.x / s_local.forward.z,  parentWorld.forward.y / s_local.forward.z,  parentWorld.forward.z / s_local.forward.z )
-
-	LT.trans = Vec3( parentWorld.left.x / s_local.trans.x,  parentWorld.left.y  / s_local.trans.x,  parentWorld.left.z  / s_local.trans.x )
-			+ Vec3( parentWorld.up.x      / s_local.trans.y,  parentWorld.up.y    / s_local.trans.y,  parentWorld.up.z    / s_local.trans.y )
-			+ Vec3( parentWorld.forward.x / s_local.trans.z,  parentWorld.forward.y / s_local.trans.z,  parentWorld.forward.z / s_local.trans.z )
-
-	LT.trans = LT.trans - parentWorld.trans
-	return LT
+-- This isn't correct at all, but it's good enough for what we're trying to do
+function ToLocal(a,b)
+    local LT = LinearTransform()
+    LT.left = a.left
+    LT.up = a.up
+    LT.forward = a.forward
+    LT.trans.x = a.trans.x - b.trans.x
+    LT.trans.y = a.trans.y - b.trans.y
+    LT.trans.z = a.trans.z - b.trans.z
+    return LT
 end
 
 function dump(o)

@@ -35,7 +35,9 @@ function Backend:SpawnBlueprint(p_Command)
 	end
 
 	local s_Children = {}
-	for k,l_Entity in ipairs(s_SpawnResult) do
+
+    local l_Entity = s_SpawnResult[1]
+	--for k,l_Entity in ipairs(s_SpawnResult) do
 		local s_Data = l_Entity.data
 		local s_Entity = SpatialEntity(l_Entity)
 		s_Children[#s_Children + 1 ] = {
@@ -49,7 +51,7 @@ function Backend:SpawnBlueprint(p_Command)
 				trans = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform))
 			},
 		}
-	end
+	--end
 
 	local s_Response = {
 		guid = s_UserData.guid,
