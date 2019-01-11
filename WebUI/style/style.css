@@ -190,7 +190,7 @@ li.ui-widget-seperator {
 }
 
 #inspector input {
-	width: calc(100% - 5px);
+	width: calc(100% - 12px);
 }
 .position, .rotation, .scale {
 	display: flex;

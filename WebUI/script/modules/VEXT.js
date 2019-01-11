@@ -69,7 +69,7 @@ class VEXTInterface {
 		command.sender = editor.playerName;
 
 		if(this.paused) {
-			this.queued.push(command)
+			this.queued.commands.push(command)
 		} else {
 			//Sending this individual command as an array of commands
 			this.SendCommands([command]);
@@ -147,7 +147,7 @@ class VEXTInterface {
 		message.sender = editor.playerName;
 
 		if(this.paused) {
-			this.queued.push(message)
+			this.queued.messages.push(message)
 		} else {
 			//Sending this individual command as an array of commands
 			this.SendMessages([message]);

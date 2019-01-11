@@ -43,7 +43,6 @@ class UI {
 		}).on("change", UI.worldChanged);
 
 
-		$('.scrollbar-outer').scrollbar();
 
 	}
 
@@ -157,7 +156,6 @@ class UI {
 		page.append(dom);
 		this.layout = new GoldenLayout( config, "#GoldenLayoutContainer" );
 
-
 		this.layout.registerComponent( 'example', function( container, state ){
 			container.getElement().html( '<h2>' + state.text + '</h2>');
 		});
@@ -170,6 +168,11 @@ class UI {
 		this.layout.registerComponent( 'HistoryComponent', HistoryComponent);
 		this.layout.registerComponent( 'FavoritesComponent', FavoritesComponent);
 
+		this.layout.on('initialised', function() {
+			$(".lm_content").each(function(e) {
+				let ps = new PerfectScrollbar(this);
+			})
+		});
 		this.layout.init();
 
 
