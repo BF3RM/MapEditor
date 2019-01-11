@@ -490,3 +490,10 @@ tr i {
 	height: 24px;
 	width: 24px;
 }
+
+.dragableHelper {
+    height: 5px;
+    width: 5px;
+    background: red;
+    position: absolute;
+}

@@ -1,27 +1,27 @@
-const CreateGroupCommand = function (guid, parameters) {
+const CreateGroupCommand = function (guid, userData) {
 
 	Command.call(this);
 
 	this.type = 'CreateGroupCommand';
-	this.name = 'Create Group: ' + parameters.name;
+	this.name = 'Create Group: ' + userData.name;
 	this.guid = guid;
 
-	if (parameters === undefined) {
+	if (userData === undefined) {
 		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
-	this.parameters = parameters;
+	this.parameters = userData;
 };
 
 
 CreateGroupCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.parameters))
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.userData))
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "DestroyGroupCommand", this.parameters))
+		editor.vext.SendCommand(new VextCommand(this.guid, "DestroyGroupCommand", this.userData))
 	},
 };
 

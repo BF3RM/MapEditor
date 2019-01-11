@@ -28,6 +28,8 @@ class Blueprint {
 		entry.append(icon);
 		entry.append(name);
 		entry.append(type);
+		entry.attr('draggable', true);
+		entry.addClass("draggable");
 		icon.addClass("jstree-icon favoritable");
 		if(blueprint.favorited)
 			icon.addClass("favorited");
@@ -61,6 +63,29 @@ class Blueprint {
 		name.on('click', function(e, data) {
 			signals.spawnBlueprintRequested.dispatch(blueprint);
 		});
+
+		entry.draggable({
+			helper : function() {
+				let helper = $(document.createElement("div"));
+				helper.addClass("dragableHelper");
+				return helper;
+			},
+			cursorAt: {
+				top: 0,
+				left: 0
+			},
+			appendTo: 'body',
+			start: function(e) {
+				editor.onPreviewDragStart(blueprint)
+			},
+			drag: function(e) {
+				editor.onPreviewDrag(e)
+			},
+			stop: function(e) {
+				editor.onPreviewDragStop()
+			}
+		});
+
 		return entry;
 	}
 

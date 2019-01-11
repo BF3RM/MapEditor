@@ -5,7 +5,7 @@ local m_InstanceParser = require "InstanceParser"
 
 
 local MAX_CAST_DISTANCE = 10000
-local FALLBACK_DISTANCE = 10000
+local FALLBACK_DISTANCE = 10
 
 function Editor:__init()
 	print("Initializing EditorClient")
@@ -33,13 +33,20 @@ function Editor:RegisterVars()
 		MoveObjectMessage = self.MoveObject,
 		SetViewModeMessage = self.SetViewMode,
 		SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition,
-		SelectObject3DMessage = self.SelectObject3D
+		SelectObject3DMessage = self.SelectObject3D,
+        PreviewSpawnMessage = self.PreviewSpawn,
+        PreviewDestroyMessage = self.PreviewDestroy,
+        PreviewMoveMessage = self.PreviewMove
 	}
 
-	self.m_Queue = {};
+	self.m_Queue = {
+        commands = {},
+        messages = {}
+    };
 
 	self.m_TransactionId = 0
 	self.m_GameObjects = {}
+    self.m_VanillaObjects = {}
 end
 
 
@@ -117,7 +124,7 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 			print("error")
 		elseif(s_Response == "queue") then
 			print("Queued command")
-			table.insert(self.m_Queue, l_Command)
+			table.insert(self.m_Queue.commands, l_Command)
 		elseif(s_Response.userData == nil) then
 			print("MISSING USERDATA!")
 		else
@@ -130,37 +137,61 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 	end
 end
 
-function Editor:OnReceiveMessage(p_Message)
-	local s_Message = DecodeParams(json.decode(p_Message))
+function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
+    local s_Messages = p_Messages
+    if p_Raw == nil then
+        s_Messages = DecodeParams(json.decode(p_Messages))
+    end
+    for k, l_Message in ipairs(s_Messages) do
 
-	local s_Function = self.m_Messages[s_Message.type]
-	if(s_Function == nil) then
-		print("Attempted to call a nil function: " .. s_Message.type)
-		return false
-	end
 
-	local s_Response = s_Function(self, s_Message)
-	if(s_Response == false) then
-		-- TODO: Handle errors
-		print("error")
-		return
-	end
+        local s_Function = self.m_Messages[l_Message.type]
+        if(s_Function == nil) then
+            print("Attempted to call a nil function: " .. l_Message.type)
+            return false
+        end
+
+        local s_Response = s_Function(self, l_Message, p_UpdatePass)
+
+        if(s_Response == false) then
+            -- TODO: Handle errors
+            print("error")
+        elseif(s_Response == "queue") then
+            print("Queued message")
+            table.insert(self.m_Queue.messages, l_Message)
+        elseif(s_Response == true) then
+            --TODO: Success message?
+        end
+    end
+
 	-- Messages don't respond
 end
 
 function Editor:OnUpdatePass(p_Delta, p_Pass)
-    if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
+    if(p_Pass ~= UpdatePass.UpdatePass_PreSim or (#self.m_Queue.commands == 0 and #self.m_Queue.messages == 0)) then
         return
     end
-    local s_Responses = {}
-    for k,l_Command in ipairs(self.m_Queue) do
+    local s_Commands = {}
+    for k,l_Command in ipairs(self.m_Queue.commands) do
         print("Executing command in the correct UpdatePass: " .. l_Command.type)
-        table.insert(s_Responses, l_Command)
+        table.insert(s_Commands, l_Command)
     end
-    self:OnReceiveCommand(s_Responses, true, p_Pass)
 
-    if(#self.m_Queue > 0) then
-        self.m_Queue = {}
+    self:OnReceiveCommand(s_Commands, true, p_Pass)
+
+    local s_Messages = {}
+    for k,l_Message in ipairs(self.m_Queue.messages) do
+        print("Executing message in the correct UpdatePass: " .. l_Message.type)
+        table.insert(s_Messages, l_Message)
+    end
+
+    self:OnReceiveMessage(s_Messages, true, p_Pass)
+
+    if(#self.m_Queue.commands > 0) then
+        self.m_Queue.commands = {}
+    end
+    if(#self.m_Queue.messages > 0) then
+        self.m_Queue.messages = {}
     end
 end
 
@@ -171,13 +202,7 @@ end
 --]]
 
 function Editor:MoveObject(p_Message)
-	local s_Result = ObjectManager:SetTransform(p_Message.guid, p_Message.transform, false)
-
-	if(s_Result == false) then
-		-- Notify WebUI of failed
-		print("Failed to move object")
-		return false
-	end
+	return ObjectManager:SetTransform(p_Message.guid, p_Message.transform, false)
 end
 
 function Editor:SetViewMode(p_Message)
@@ -198,12 +223,42 @@ end
 function Editor:SelectObject3D(p_Message, p_Arguments)
 	self:SetPendingRaycast(RaycastType.Select, p_Message.direction)
 end
+
+function Editor:PreviewSpawn(p_Message, p_Arguments)
+    local s_UserData = p_Message.userData
+    return ObjectManager:SpawnBlueprint(s_UserData.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
+end
+function Editor:PreviewDestroy(p_Message, p_UpdatePass)
+    if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
+        return "queue"
+    end
+
+    return ObjectManager:DestroyEntity(p_Message.guid)
+end
+function Editor:PreviewMove(p_Message, p_Arguments)
+    return ObjectManager:SetTransform(p_Message.guid, p_Message.transform, false)
+end
 --[[
 
 	Shit
 
 --]]
 
+function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
+    if p_Data == nil then
+        print("Didnt get no data")
+    else
+        local s_Entity = p_Hook:Call(p_Data, p_Transform)
+        local s_PartitionGuid = m_InstanceParser:GetPartition(p_Data.instanceGuid)
+        if(s_PartitionGuid == nil) then
+            return
+        end
+        local s_Partition = ResourceManager:FindDatabasePartition(Guid(s_PartitionGuid))
+        if(s_Partition == nil) then
+            return
+        end
+    end
+end
 
 function Editor:Raycast()
 	if not self.m_PendingRaycast then

@@ -1,23 +1,23 @@
-const SpawnBlueprintCommand = function (guid, parameters) {
+const SpawnBlueprintCommand = function (guid, userData) {
 
 	Command.call(this);
 
 	this.type = 'SpawnBlueprintCommand';
-	this.name = 'Spawn Blueprint: ' + parameters.name;
+	this.name = 'Spawn Blueprint: ' + userData.name;
 	this.guid = guid;
 
-	if (parameters === undefined) {
+	if (userData === undefined) {
 		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
-	this.parameters = parameters;
+	this.userData = userData;
 };
 
 
 SpawnBlueprintCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.parameters))
+		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.userData))
 	},
 
 	undo: function () {

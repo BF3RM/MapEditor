@@ -1,7 +1,7 @@
 class 'InstanceParser'
 
 function InstanceParser:__init()
-	print("Initializing InstanceParser")
+	print("Initializing InstanceParserClient")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
@@ -18,16 +18,19 @@ function InstanceParser:RegisterVars()
 		"DebrisClusterData",
 		"MeshProxyEntityData"
 	}
+
+
+    self.m_BlueprintInstances = {}
 end
 
 
 function InstanceParser:Clear()
-	self.m_Blueprints = {}
-	self.m_Meshes = {}
-	self.m_Variations = {}
-	self.m_MeshVariationDatabases = {}
+    self:RegisterVars()
 end
 
+function InstanceParser:GetPartition(p_InstanceGuid)
+    return self.m_BlueprintInstances[tostring(p_InstanceGuid)]
+end
 function InstanceParser:RegisterEvents()
 end
 
@@ -41,12 +44,21 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 	
 	local s_Instances = p_Partition.instances
 
+    local s_PrimaryInstance = p_Partition.primaryInstance
+    local s_Blueprint = false
+    if(s_PrimaryInstance:Is("Blueprint") and not s_PrimaryInstance.typeInfo.name == "WorldPartData" and not s_PrimaryInstance.typeInfo.name == "SubWorldData") then
+        s_Blueprint = true
+    end
 
 	for _, l_Instance in ipairs(s_Instances) do
 		if l_Instance == nil then
 			print('Instance is null?')
 			goto continue
 		end
+
+        if(s_Blueprint) then
+            self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
+        end
 
 		-- Catch all blueprints
 		if l_Instance:Is("Blueprint") then

@@ -25,7 +25,10 @@ class VEXTInterface {
 		this.paused = false;
 		this.executing = false;
 
-		this.queued = [];
+		this.queued = {
+			commands: [],
+			messages: []
+		};
 	}
 	/*
 
@@ -37,8 +40,10 @@ class VEXTInterface {
 	}
 	Resume() {
 		this.paused = false;
-		this.SendCommands(this.queued);
-		this.queued = [];
+		this.SendCommands(this.queued.commands);
+		this.queued.commands = [];
+		this.SendMessage(this.queued.messages);
+		this.queued.messages = [];
 	}
 	/*
 
@@ -132,14 +137,41 @@ class VEXTInterface {
 		}
 	}
 
-	SendMessage(message){
-		if(editor.debug) {
-			editor.logger.Log(LOGLEVEL.VERBOSE, message);
+	SendMessage(message) {
+		if(message == null){
+			console.log("NIL?!")
+		}
+		let scope = this;
+		// If we're not sending an array of commands, make us send an array of commands.
+
+		message.sender = editor.playerName;
+
+		if(this.paused) {
+			this.queued.push(message)
 		} else {
-			console.log(message);
-			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(message));
+			//Sending this individual command as an array of commands
+			this.SendMessages([message]);
 		}
 	}
+
+	SendMessages(messages) {
+		if(messages.length === 0) {
+			return;
+		}
+		let scope = this;
+		if(editor.debug) {
+			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
+			editor.logger.Log(LOGLEVEL.VERBOSE, messages);
+			// We don't handle messages in VEXTEmulator yet
+			//scope.emulator.Receive(commands);
+		} else {
+			console.log(messages);
+			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
+			editor.logger.Log(LOGLEVEL.VERBOSE, messages);
+			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
+		}
+	}
+
 
 	HandleMessage(messageRaw) {
 		let message;

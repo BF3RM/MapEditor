@@ -3,6 +3,7 @@ class 'MapEditorServer'
 require "__shared/Util"
 require "__shared/ObjectManager"
 require "__shared/Backend"
+local m_InstanceParser = require "InstanceParser"
 
 ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
 Backend = Backend(Realm.Realm_ClientAndServer)
@@ -23,6 +24,7 @@ function MapEditorServer:RegisterEvents()
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+    Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
 end
 
@@ -56,6 +58,11 @@ function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
 		p_Player:EnableInput(i, p_Enabled)
 	end
 end
+
+function MapEditorServer:OnPartitionLoaded(p_Partition)
+    m_InstanceParser:OnPartitionLoaded(p_Partition)
+end
+
 
 
 

@@ -42,6 +42,10 @@ class Editor {
 		this.raycastTransform = new LinearTransform();
 		this.screenToWorldTransform = new LinearTransform();
 
+		this.previewing = false;
+		this.previewBlueprint = null;
+
+
 		this.isUpdating = false;
 		this.pendingMessages = {};
 
@@ -127,6 +131,48 @@ class Editor {
 		if(value) {
 			this.renderLoop()
 		}
+	}
+
+	onPreviewDragStart(blueprint) {
+		this.previewBlueprint = blueprint;
+	}
+
+	onPreviewDrag(e) {
+		let direction = this.threeManager.getMouse3D(e);
+		let s2wMessage = new SetScreenToWorldTransformMessage(direction);
+		this.vext.SendMessage(s2wMessage);
+		if(this.previewing == false) {
+			return
+		}
+		let moveMessage = new PreviewMoveMessage(this.screenToWorldTransform);
+		this.vext.SendMessage(moveMessage);
+
+	}
+
+	onPreviewDragStop() {
+		this.previewBlueprint = null;
+		this.previewing = false;
+	}
+
+	onPreviewStart() {
+		this.previewing = true;
+		let userData = new ReferenceObjectParameters(this.previewBlueprint.getReference(), "ed170120-0000-0000-0000-000000000000", this.previewBlueprint.getDefaultVariation(), this.previewBlueprint.getName(), new LinearTransform());
+		let message = new PreviewSpawnMessage(userData);
+		this.vext.SendMessage(message);
+	}
+
+	onPreviewStop() {
+		this.previewing = false;
+		this.vext.SendMessage(new PreviewDestroyMessage());
+	}
+
+	onPreviewDrop() {
+		this.previewing = false;
+		editor.onBlueprintSpawnRequested(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
+		this.vext.SendMessage(new PreviewDestroyMessage());
+
+		this.previewBlueprint = null;
+
 	}
 	/*
 

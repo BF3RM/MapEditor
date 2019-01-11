@@ -33,8 +33,7 @@ function MapEditorClient:RegisterEvents()
 
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
-	Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
-	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
+
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
@@ -49,6 +48,10 @@ function MapEditorClient:RegisterEvents()
 
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
+
+    Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
+    Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
+    Hooks:Install('ClientEntityFactory:Create',999, self, self.OnEntityCreate)
 
 
 end
@@ -87,6 +90,10 @@ end
 function MapEditorClient:OnLevelDestroy()
 	print("Destroy!")
 	Backend:OnLevelDestroy()
+end
+
+function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
+    m_Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 
 ----------- Editor functions----------------

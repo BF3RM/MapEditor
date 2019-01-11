@@ -1,4 +1,5 @@
 class 'EditorServer'
+local m_InstanceParser = require "InstanceParser"
 
 function EditorServer:__init()
 	print("Initializing EditorServer")
