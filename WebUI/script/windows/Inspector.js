@@ -139,6 +139,7 @@ class Inspector {
 			})
 		});
 		this.dom = content;
+		this.HideContent();
 	}
 
 	SetTransform(type, key, value, final = false) {
@@ -225,13 +226,17 @@ class Inspector {
 		}
 
 		this.UpdateInspector(editor.selectionGroup, isMultipleSelection)
+		this.ShowContent();
 	}
 
 
-	onDeselectedGameObject(guid){
+	onDeselectedGameObject(guid) {
 		// Set name and variation of child if there's only 1 child left
-		if (editor.selectionGroup.children.length == 1) {
+		if (editor.selectionGroup.children.length > 0) {
 			this.UpdateInspector(editor.selectionGroup, false);
+			this.ShowContent();
+		} else {
+			this.HideContent();
 		}
 	}
 
