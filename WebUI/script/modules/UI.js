@@ -170,8 +170,12 @@ class UI {
 
 		this.layout.on('initialised', function() {
 			$(".lm_content").each(function(e) {
-				let ps = new PerfectScrollbar(this);
-				ps.update();
+				let scope = this;
+				scope.ps = new PerfectScrollbar(scope);
+				scope.ps.update();
+				$(this).on('DOMSubtreeModified', function() {
+					scope.ps.update();
+				})
 			})
 		});
 		this.layout.init();
