@@ -210,22 +210,6 @@ class UI {
 			}
 		});
 
-		dialogs["deleteEntity"] = $("#delete-entity-dialog").dialog({
-			autoOpen: false,
-			height: "auto",
-			width: "auto",
-			modal: true,
-			buttons: {
-				"Yes": this.onConfirmDeleteEntity,
-				"No": function() {
-					dialogs["deleteEntity"].dialog("close");
-				}
-			},
-			close: function() {
-				dialogs["deleteEntity"].dialog("close");
-			}
-		});
-
 		dialogs["saveProject"] = $("#save-project-dialog").dialog({
 			autoOpen: false,
 			height: "auto",
@@ -417,21 +401,6 @@ class UI {
 		editor.ConfirmInstanceSpawn();
 		$(this).dialog("close");
 	}
-
-	onConfirmDeleteEntity() {
-		// if (editor.selected == null) {
-		// 	console.error("Tried to delete a null entity")
-		// }else{
-		// 	editor.execute(new DestroyBlueprintCommand(editor.selected.guid));
-		// }
-
-		for (var i = editor.selectionGroup.children.length - 1; i >= 0; i--) {
-			editor.execute(new DestroyBlueprintCommand(editor.selectionGroup.children[i].guid));
-		}
-		
-		$(this).dialog("close");
-	}
-
 
 	onResize() {
 		this.layout.updateSize();

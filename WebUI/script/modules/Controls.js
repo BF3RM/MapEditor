@@ -85,7 +85,7 @@ $(document).keydown(function(e) {
 		editor.threeManager.ToggleWorldSpace();
 	}
 	if(e.which == 46) { // DEL
-		editor.ui.dialogs["deleteEntity"].dialog("open");
+		editor.DeleteSelected();
 	}
 	if(e.which == 112) { // F1
 		editor.vext.SendEvent('DisableFreecam');

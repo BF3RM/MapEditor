@@ -179,6 +179,17 @@ class Editor {
 
 	 */
 
+	DeleteSelected() {
+		let scope = this;
+		let commands = [];
+		for (let i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
+			commands.push(new DestroyBlueprintCommand(editor.selectionGroup.children[i].guid));
+		}
+		if(commands.length > 0) {
+			scope.execute(new BulkCommand(commands));
+		}
+	}
+
 	getGameObjectByGuid(guid) {
 		return this.gameObjects[guid];
 	}
