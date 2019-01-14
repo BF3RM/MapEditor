@@ -20,6 +20,7 @@ var signals = {
 
 	setTransform: new Signal(),
 	folderSelected: new Signal(),
+	folderFiltered: new Signal(),
 
 	objectMoveStarted: new Signal(),
 	objectMoved: new Signal(),

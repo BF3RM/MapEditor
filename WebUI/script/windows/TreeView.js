@@ -7,6 +7,8 @@ class TreeView {
 		signals.blueprintsRegistered.add(this.LoadData.bind(this))
 
 		this.nodes = [];
+
+		this.searchString = "";
 	}
 
 	LoadData(table) {
@@ -57,7 +59,7 @@ class TreeView {
 		scope.data = data;
 		scope.InitializeTree();
 		scope.RegisterEvents();
-		signals.folderSelected.dispatch("/", data.content);
+		signals.folderSelected.dispatch("/", data.content, scope.searchString);
 	}
 
 	InitializeTree() {
@@ -76,6 +78,7 @@ class TreeView {
 				case_insensitive: true,
 				show_only_matches: true,
 				search_callback: function (searchString, node) {
+					scope.searchString = searchString;
 					for(let i = 0; i < node.original.content.length; i++) {
 						if(node.original.content[i].text.toLowerCase().indexOf(searchString.toLowerCase()) !== -1) {
 							console.log(node.original.content[i].text);
@@ -107,8 +110,8 @@ class TreeView {
 		scope.topControls.find(".search-input").keyup(function() {
 			let searchString = $(this).val();
 			delay(function() {
-				console.log(searchString);
 				scope.tree.jstree('search', searchString);
+				signals.folderFiltered.dispatch(searchString);
 			}, 500);
 
 		});
@@ -123,7 +126,7 @@ class TreeView {
 
 
 
-			signals.folderSelected.dispatch(scope.getFullPath(data.node), scope.nodes);
+			signals.folderSelected.dispatch(scope.getFullPath(data.node), scope.nodes, scope.searchString);
 			/*let id = data.node.original.id;
 			if (id != null) {
 				let blueprint = editor.blueprintManager.getBlueprintByGuid(id);
