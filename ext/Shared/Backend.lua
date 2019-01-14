@@ -53,7 +53,7 @@ function Backend:SpawnBlueprint(p_Command)
 	end
 
 	local s_Response = {
-		guid = s_UserData.guid,
+		guid = p_Command.guid,
 		sender = p_Command.sender,
 		name = s_UserData.name,
 		['type'] = 'SpawnedBlueprint',

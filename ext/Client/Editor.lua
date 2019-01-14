@@ -226,7 +226,7 @@ end
 
 function Editor:PreviewSpawn(p_Message, p_Arguments)
     local s_UserData = p_Message.userData
-    return ObjectManager:SpawnBlueprint(s_UserData.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
+    return ObjectManager:SpawnBlueprint(p_Message.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
 end
 function Editor:PreviewDestroy(p_Message, p_UpdatePass)
     if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then

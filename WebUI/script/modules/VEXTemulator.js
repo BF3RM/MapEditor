@@ -54,7 +54,6 @@ class VEXTemulator {
 			"children": {
 				1: {
 					"type": "ClientStaticModelEntity",
-					"guid": GenerateGuid(),
 					"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
 					"aabb": {
 						"max": "(1.628162, 3.593760, 2.490781)",
@@ -73,7 +72,6 @@ class VEXTemulator {
 		if(command.userData.reference.typeName == "SpatialPrefabBlueprint") {
 			response.children[2] = {
 				"type": "ClientStaticModelEntity",
-					"guid": GenerateGuid(),
 					"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,3,0)",
 					"aabb": {
 						"max": "(1, 3, 2)",

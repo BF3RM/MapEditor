@@ -155,7 +155,7 @@ class Editor {
 
 	onPreviewStart() {
 		this.previewing = true;
-		let userData = new ReferenceObjectParameters(this.previewBlueprint.getReference(), "ed170120-0000-0000-0000-000000000000", this.previewBlueprint.getDefaultVariation(), this.previewBlueprint.getName(), new LinearTransform());
+		let userData = this.previewBlueprint.getUserData();
 		let message = new PreviewSpawnMessage(userData);
 		this.vext.SendMessage(message);
 	}
@@ -335,18 +335,12 @@ class Editor {
 		if(variation === undefined) {
 			variation = blueprint.getDefaultVariation();
 		}
-		/*
-		if(!blueprint.isVariationValid(variation)) {
-			scope.logger.Log(LOGLEVEL.DEBUG, "Blueprint does not have a valid variation. Requesting user input.");
-			// Show variation
-			return false;
-		}
-		*/
+
 
 		//Spawn blueprint
 		let guid = GenerateGuid();
 		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let userData = new ReferenceObjectParameters(blueprint.getReference(), guid, variation, blueprint.getName(), transform);
+		let userData = blueprint.getUserData(transform, variation);
 
 		scope.execute(new SpawnBlueprintCommand(guid, userData));
 	}

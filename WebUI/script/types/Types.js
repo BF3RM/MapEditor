@@ -72,9 +72,8 @@ class ReferenceObject {
 }
 
 class ReferenceObjectParameters {
-	constructor(reference, guid, variation, name, transform) {
+	constructor(reference, variation, name, transform) {
 		this.reference = reference;
-		this.guid = guid;
 		this.variation = variation;
 		this.name = name;
 		this.transform = transform;
