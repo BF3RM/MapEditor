@@ -42,12 +42,12 @@ function Backend:SpawnBlueprint(p_Command)
 		s_Children[#s_Children + 1 ] = {
 			guid = s_Entity.uniqueID,
 			type = l_Entity.typeInfo.name,
-			transform = tostring(ToLocal(s_Entity.transform, s_UserData.transform)),
+			transform = ToLocal(s_Entity.transform, s_UserData.transform),
 			instanceId = s_Entity.instanceID,
 			aabb = {
 				min = tostring(s_Entity.aabb.min),
 				max = tostring(s_Entity.aabb.max),
-				trans = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform))
+				transform = ToLocal(s_Entity.aabbTransform, s_UserData.transform)
 			},
 		}
 	end

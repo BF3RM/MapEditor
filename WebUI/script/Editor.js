@@ -311,7 +311,7 @@ class Editor {
 			this.logger.LogError("Tried to set the transform of a null object: " + command.guid);
 			return;
 		}
-		gameObject.setTransform(new LinearTransform().setFromString(command.userData.transform));
+		gameObject.setTransform(new LinearTransform().setFromTable(command.userData.transform));
 
 		if (this.selectionGroup.children.length === 1 && gameObject === this.selectionGroup.children[0]){
 			this.selectionGroup.setTransform(gameObject.transform);
@@ -393,14 +393,14 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromString(command.userData.transform), command.parent, null, command.userData);
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData);
 
 		this.threeManager.AddObject(gameObject);
 
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromString(entityInfo.transform), gameObject, null, entityInfo.reference);
+			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), gameObject, null, entityInfo.reference);
 
 			let aabb = new AABBHelper( new THREE.Box3(
 				new Vec3().fromString(entityInfo.aabb.min),

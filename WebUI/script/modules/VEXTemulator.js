@@ -45,7 +45,7 @@ class VEXTemulator {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
-		command.userData.transform = command.userData.transform.toString();
+		command.userData.transform = command.userData.transform.toTable();
 		let response = {
 			"guid": command.guid,
 			"sender": command.sender,
@@ -54,11 +54,53 @@ class VEXTemulator {
 			"children": {
 				1: {
 					"type": "ClientStaticModelEntity",
-					"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)",
+					"transform": {
+						"left": {
+							"x": 1,
+							"y": 0,
+							"z": 0
+						},
+						"up": {
+							"x": 0,
+							"y": 1,
+							"z": 0
+						},
+						"forward": {
+							"x": 0,
+							"y": 0,
+							"z": 1
+						},
+						"trans": {
+							"x": 0,
+							"y": 0,
+							"z": 0
+						}
+					},
 					"aabb": {
 						"max": "(1.628162, 3.593760, 2.490781)",
 						"min": "(-1.888471, -0.057315, -2.555373)",
-						"trans": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)"
+						"transform": {
+							"left": {
+								"x": 1,
+								"y": 0,
+								"z": 0
+							},
+							"up": {
+								"x": 0,
+								"y": 1,
+								"z": 0
+							},
+							"forward": {
+								"x": 0,
+								"y": 0,
+								"z": 1
+							},
+							"trans": {
+								"x": 0,
+								"y": 0,
+								"z": 0
+							}
+						}
 					},
 					"reference": {
 						"type": "StaticModelEntityData",
@@ -72,11 +114,53 @@ class VEXTemulator {
 		if(command.userData.reference.typeName == "SpatialPrefabBlueprint") {
 			response.children[2] = {
 				"type": "ClientStaticModelEntity",
-					"transform": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,3,0)",
-					"aabb": {
-						"max": "(1, 3, 2)",
-						"min": "(-1, -0, -2)",
-						"trans": "(1.000000, 0.000000, 0.000000) (0.000000, 1.000000, 0.000000) (0.000000, 0.000000, 1.000000) (0,0,0)"
+				"transform": {
+					"left": {
+						"x": 1,
+						"y": 0,
+						"z": 0
+					},
+					"up": {
+						"x": 0,
+						"y": 1,
+						"z": 0
+					},
+					"forward": {
+						"x": 0,
+						"y": 0,
+						"z": 1
+					},
+					"trans": {
+						"x": 0,
+						"y": 3,
+						"z": 0
+					}
+				},
+				"aabb": {
+					"max": "(1, 3, 2)",
+					"min": "(-1, -0, -2)",
+					"transform": {
+						"left": {
+							"x": 1,
+							"y": 0,
+							"z": 0
+						},
+						"up": {
+							"x": 0,
+							"y": 1,
+							"z": 0
+						},
+						"forward": {
+							"x": 0,
+							"y": 0,
+							"z": 1
+						},
+						"trans": {
+							"x": 0,
+							"y": 0,
+							"z": 0
+						}
+					}
 				},
 				"reference": {
 					"type": "StaticModelEntityData",
@@ -92,7 +176,7 @@ class VEXTemulator {
 			"type": "SetTransform",
 			"guid": command.guid,
 			"userData": {
-				"transform": command.userData.transform.toString()
+				"transform": command.userData.transform.toTable()
 			}
 		};
 		return response;

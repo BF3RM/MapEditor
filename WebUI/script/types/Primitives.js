@@ -59,6 +59,9 @@ class LinearTransform {
 			"(" + this.forward.x + ", " + this.forward.y  + ", " + this.forward.z + ")" +
 			"(" + this.trans.x + ", " + this.trans.y  + ", " + this.trans.z + ")";
 	}
+	toTable() {
+		return{left: this.left, up: this.up, forward: this.forward, trans: this.trans};
+	}
 	setFromString(matrixString) {
 		matrixString = matrixString.replace(/[(]/g,"");
 		matrixString = matrixString.replace(/[)]/g,", ");
@@ -106,6 +109,14 @@ class LinearTransform {
 			matrixArray[12],
 			matrixArray[13],
 			matrixArray[14]);
+		return this;
+	}
+
+	setFromTable(table) {
+		this.left = new Vec3(table.left.x,table.left.y,table.left.z);
+		this.up = new Vec3(table.up.x,table.up.y,table.up.z);
+		this.forward = new Vec3(table.forward.x,table.forward.y,table.forward.z);
+		this.trans = new Vec3(table.trans.x,table.trans.y,table.trans.z);
 		return this;
 	}
 	Clone() {

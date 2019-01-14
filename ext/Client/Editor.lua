@@ -133,7 +133,7 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 		end
 	end
 	if(#s_Responses > 0) then
-		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(EncodeParams(s_Responses))))
+		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Responses)))
 	end
 end
 

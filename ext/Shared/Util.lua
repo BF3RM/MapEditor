@@ -54,23 +54,6 @@ function DecodeParams(p_Table)
 	return p_Table
 end
 
-function EncodeParams(p_Table)
-	if(p_Table == nil) then
-		error("Passed a nil table?!")
-	end
-	for s_Key, s_Value in pairs(p_Table) do
-		if s_Key == 'transform' then
-			p_Table[s_Key] = tostring(s_Value)
-
-		elseif type(s_Value) == "table" then
-			EncodeParams(s_Value)
-		end
-
-	end
-
-	return p_Table
-end
-
 
 function ToWorld(parentWorld, s_local)
 	local LT = LinearTransform()
