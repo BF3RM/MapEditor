@@ -20,7 +20,7 @@ function Editor:RegisterVars()
 		DestroyBlueprintCommand = Backend.DestroyBlueprint,
 		SetTransformCommand = Backend.SetTransform,
 		SelectGameObjectCommand = Backend.SelectGameObject,
-		CreateGroupCommand = Backend.CreateGroup
+		CreateGroupCommand = Backend.CreateGroup,
 	}
 
 	self.m_Changes = {
@@ -49,13 +49,18 @@ function Editor:RegisterVars()
     self.m_VanillaObjects = {}
 end
 
+function Editor:OnPartitionLoaded(p_Partition)
+    m_InstanceParser:OnPartitionLoaded(p_Partition)
+end
 
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		m_InstanceParser:FillVariations()
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
-	end
+        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_VanillaObjects)))
+
+    end
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
 		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
@@ -243,6 +248,18 @@ end
 	Shit
 
 --]]
+function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+    --Avoid nested blueprints for now...
+
+    if(p_Parent ~= nil) and (m_InstanceParser:GetPartition(tostring(p_Parent.instanceGuid)) ~= nil or
+            (p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent.typeInfo.name == "SubWorldReferenceObjectData")) then
+        return
+    end
+    --print(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
+    local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+    table.insert(self.m_VanillaObjects, s_Response)
+
+end
 
 function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
     if p_Data == nil then
@@ -362,5 +379,6 @@ function Editor:SetPendingRaycast(p_Type, p_Direction)
 		direction = p_Direction
 	}
 end
+
 
 return Editor()

@@ -8,6 +8,7 @@ end
 
 
 function InstanceParser:RegisterVars()
+    print("Registered vars")
 	self.m_Blueprints = {}
 	self.m_Meshes = {}
 	self.m_Variations = {}
@@ -25,12 +26,13 @@ end
 
 
 function InstanceParser:Clear()
-    self:RegisterVars()
+    --self:RegisterVars()
 end
 
 function InstanceParser:GetPartition(p_InstanceGuid)
     return self.m_BlueprintInstances[tostring(p_InstanceGuid)]
 end
+
 function InstanceParser:RegisterEvents()
 end
 
@@ -46,7 +48,10 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 
     local s_PrimaryInstance = p_Partition.primaryInstance
     local s_Blueprint = false
-    if(s_PrimaryInstance:Is("Blueprint") and not s_PrimaryInstance.typeInfo.name == "WorldPartData" and not s_PrimaryInstance.typeInfo.name == "SubWorldData") then
+    if(s_PrimaryInstance == nil) then
+        print("Primary is nil")
+    end
+    if(s_PrimaryInstance:Is("Blueprint") and s_PrimaryInstance.typeInfo.name ~= "WorldPartData" and s_PrimaryInstance.typeInfo.name ~= "SubWorldData") then
         s_Blueprint = true
     end
 
@@ -56,7 +61,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			goto continue
 		end
 
-        if(s_Blueprint) then
+        if(s_Blueprint == true) then
             self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
         end
 
@@ -131,6 +136,9 @@ end
 
 function InstanceParser:FillVariations()
 	print("FILL")
+    print(#self.m_MeshVariationDatabases)
+    print(#self.m_Blueprints)
+    print(#self.m_BlueprintInstances)
 
 	for key, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database

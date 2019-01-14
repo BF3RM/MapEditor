@@ -7,7 +7,6 @@ require "__shared/Backend"
 local m_Freecam = require "Freecam"
 local m_Editor = require "Editor"
 local m_UIManager = require "UIManager"
-local m_InstanceParser = require "InstanceParser"
 
 ObjectManager = ObjectManager(Realm.Realm_Client)
 Backend = Backend(Realm.Realm_Client)
@@ -53,6 +52,8 @@ function MapEditorClient:RegisterEvents()
     Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
     Hooks:Install('ClientEntityFactory:Create',999, self, self.OnEntityCreate)
 
+    Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+
 
 end
 
@@ -67,7 +68,7 @@ function MapEditorClient:OnLoaded()
 	WebUI:Show()
 end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
-	m_InstanceParser:OnPartitionLoaded(p_Partition)
+	m_Editor:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -94,6 +95,9 @@ end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
     m_Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
+end
+function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+    m_Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
 
 ----------- Editor functions----------------

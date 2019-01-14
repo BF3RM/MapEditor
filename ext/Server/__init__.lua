@@ -26,6 +26,9 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
     Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
+    Hooks:Install('ServerEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+
+
 end
 
 function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
@@ -63,7 +66,9 @@ function MapEditorServer:OnPartitionLoaded(p_Partition)
     m_InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
-
+function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+    --m_EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+end
 
 
 return MapEditorServer()
