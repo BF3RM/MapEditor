@@ -40,10 +40,14 @@ class VEXTInterface {
 	}
 	Resume() {
 		this.paused = false;
-		this.SendCommands(this.queued.commands);
-		this.queued.commands = [];
-		this.SendMessage(this.queued.messages);
-		this.queued.messages = [];
+		if(this.queued.commands.length > 0) {
+			this.SendCommands(this.queued.commands);
+			this.queued.commands = [];
+		}
+		if(this.queued.messages.length > 0) {
+			this.SendMessage(this.queued.messages);
+			this.queued.messages = [];
+		}
 	}
 	/*
 
