@@ -110,11 +110,16 @@ class TreeView {
 		scope.topControls.find(".search-input").keyup(function() {
 			let searchString = $(this).val();
 			delay(function() {
+				scope.searchString = searchString;
 				scope.tree.jstree('search', searchString);
 				signals.folderFiltered.dispatch(searchString);
 			}, 500);
 
 		});
+		scope.tree.bind("search.jstree", function (e, data) {
+			scope.searchString = data.str;
+		});
+
 
 		$(scope.dom).on('changed.jstree', function(e, data) {
 			if (data.node == null) {
