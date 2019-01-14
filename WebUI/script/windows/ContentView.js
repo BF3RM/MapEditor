@@ -27,7 +27,7 @@ class ContentView {
 		`);
 		for(let i = 0; i < content.length; i++) {
 			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
-			let entry = blueprint.CreateEntry(folderName);
+			let entry = blueprint.CreateEntry();
 			this.directory.append(entry);
 		}
 	}
