@@ -171,6 +171,7 @@ class UI {
 		this.layout.on('initialised', function() {
 			$(".lm_content").each(function(e) {
 				let ps = new PerfectScrollbar(this);
+				ps.update();
 			})
 		});
 		this.layout.init();
