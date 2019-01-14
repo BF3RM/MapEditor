@@ -160,12 +160,18 @@ class GameObject extends THREE.Object3D
 	}
 
 	onSelected() {
+		console.log("Selected");
 		this.selected = true;
 		this.visible = true;
 	}
 	onDeselected() {
+		console.log("Deselected");
 		this.selected = false;
 		this.visible = false;
+	}
+
+	getUserData() {
+		return this.userData;
 	}
 
 }

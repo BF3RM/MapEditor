@@ -51,6 +51,8 @@ class Editor {
 		this.gameObjects = {};
 		this.favorites = [];
 
+		this.copy = null;
+
 		// Creates selection group and add it to the scene
 		this.selectionGroup = new SelectionGroup();
 		this.threeManager.AddObject(this.selectionGroup);
@@ -110,6 +112,44 @@ class Editor {
 			}
 		}
 		return JSON.stringify(result, null, 2);
+	}
+
+	Duplicate() {
+		let scope = this;
+		let commands = [];
+		editor.selectionGroup.children.forEach(function(child) {
+			let guid = GenerateGuid();
+			let gameObject = child;
+			commands.push(new SpawnBlueprintCommand(guid, gameObject.userData));
+
+		});
+		console.log(commands);
+		scope.execute(new BulkCommand(commands));
+	}
+
+	Copy() {
+		let scope = this;
+		let commands = [];
+		editor.selectionGroup.children.forEach(function(child) {
+			let guid = GenerateGuid();
+			commands.push(new SpawnBlueprintCommand(guid, child.getUserData()));
+		});
+		scope.copy = new BulkCommand(commands);
+	}
+
+	Paste() {
+		let scope = this;
+		if(scope.copy !== null) {
+			//Generate a new guid for each command
+			scope.copy.commands.forEach(function (command) {
+				command.guid = GenerateGuid();
+			});
+			scope.execute(scope.copy);
+		}
+	}
+	Cut() {
+		this.Copy();
+		this.DeleteSelected();
 	}
 	/*
 
@@ -182,9 +222,9 @@ class Editor {
 	DeleteSelected() {
 		let scope = this;
 		let commands = [];
-		for (let i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
-			commands.push(new DestroyBlueprintCommand(editor.selectionGroup.children[i].guid));
-		}
+		editor.selectionGroup.children.forEach(function(child) {
+			commands.push(new DestroyBlueprintCommand(child.guid));
+		});
 		if(commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
 		}
@@ -376,7 +416,7 @@ class Editor {
 
 		if(!scope.vext.executing && command.sender === this.playerName) {
 			// Make selection happen after all signals have been handled
-			setTimeout(function() {scope.Select(command.guid)}, 1);
+			setTimeout(function() {scope.Select(command.guid, false)}, 1);
 		}
 	}
 
@@ -386,8 +426,9 @@ class Editor {
 
 
 
-	Select(guid) {
-		if(keysdown[17]) {
+	Select(guid, multi) {
+		console.log(multi);
+		if(keysdown[17] && (multi === undefined || multi === true)) {
 			this.onSelectedGameObject(guid, true)
 		} else {
 			this.onSelectedGameObject(guid, false)
