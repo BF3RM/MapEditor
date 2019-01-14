@@ -42,6 +42,13 @@ class ContentView {
 	onFolderFiltered(searchString) {
 		let scope = this;
 		scope.directory.html("");
+		this.directory.append(`
+			<tr>
+				<th></th>
+				<th><b>Name</b></th>
+				<th><b>Type</b></th>
+			</tr>
+		`);
 		for(let i = 0; i < scope.content.length; i++) {
 			if(scope.matches(scope.content[i].getName(), searchString)) {
 				let entry = scope.content[i].CreateEntry();
