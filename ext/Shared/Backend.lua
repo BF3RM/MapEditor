@@ -25,7 +25,7 @@ end
 
 function Backend:SpawnBlueprint(p_Command)
 	local s_UserData = p_Command.userData
-	local s_SpawnResult = ObjectManager:SpawnBlueprint(s_UserData.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
+	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_Command.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui
@@ -36,9 +36,8 @@ function Backend:SpawnBlueprint(p_Command)
 
 	local s_Children = {}
 
-    local l_Entity = s_SpawnResult[1]
-	--for k,l_Entity in ipairs(s_SpawnResult) do
-		local s_Data = l_Entity.data
+    --local l_Entity = s_SpawnResult[1]
+	for k,l_Entity in ipairs(s_SpawnResult) do
 		local s_Entity = SpatialEntity(l_Entity)
 		s_Children[#s_Children + 1 ] = {
 			guid = s_Entity.uniqueID,
@@ -51,7 +50,7 @@ function Backend:SpawnBlueprint(p_Command)
 				trans = tostring(ToLocal(s_Entity.aabbTransform, s_UserData.transform))
 			},
 		}
-	--end
+	end
 
 	local s_Response = {
 		guid = s_UserData.guid,
