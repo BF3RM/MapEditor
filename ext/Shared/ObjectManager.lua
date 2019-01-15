@@ -12,7 +12,6 @@ function ObjectManager:RegisterVars()
 	self.m_SpawnedOffsets = {}
 	self.m_EntityInstanceIds = {}
 
-    self.m_LastIndex = 1;
 end
 
 function ObjectManager:RegisterEvents()
@@ -103,24 +102,17 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
     local s_Offsets = {}
 
     local s_ObjectEntities = p_Hook:Call()
-    print(#s_ObjectEntities)
-    local s_ObjectCount = #s_ObjectEntities
-    local index = 1;
-    for i = self.m_LastIndex, s_ObjectCount do
-        local l_Entity = s_ObjectEntities[i]
-        print(i .. " | " .. l_Entity.typeInfo.name)
-        if(l_Entity:Is("SpatialEntity") and
-                l_Entity.typeInfo.name ~= "ClientWaterEntity" and
-                l_Entity.typeInfo.name ~= "ServerWaterEntity" and
-                l_Entity.typeInfo.name ~= "MeshProxyEntity") then
-            --print(i .. " | " .. l_Entity.typeInfo.name .. " | " .. l_Entity.instanceID .. " | " ..tostring(p_Blueprint.instanceGuid) .. " | " .. tostring(p_Parent.instanceGuid))
-            s_Spatial[#s_Spatial + 1] = SpatialEntity(l_Entity)
-            s_Offsets[#s_Offsets + 1] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
+
+    for i, l_Entity in pairs(s_ObjectEntities) do
+        l_Entity:Init(self.m_Realm, true)
+        if(l_Entity:Is("SpatialEntity")) then
+            s_Spatial[i] = SpatialEntity(l_Entity)
+            s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
             -- Allows us to connect the entity to the GUID
             self.m_EntityInstanceIds[l_Entity.instanceID] = p_Guid
         end
     end
-    self.m_LastIndex = #s_ObjectEntities + 1
+
     self.m_SpawnedEntities[p_Guid] = s_Spatial
     self.m_SpawnedOffsets[p_Guid] = s_Offsets
 
