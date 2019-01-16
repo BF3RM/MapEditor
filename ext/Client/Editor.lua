@@ -253,6 +253,9 @@ function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_
 
     if(p_Parent ~= nil) and (m_InstanceParser:GetPartition(tostring(p_Parent.instanceGuid)) ~= nil or
             (p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent.typeInfo.name == "SubWorldReferenceObjectData")) then
+
+        local x = p_Hook:Call()
+        p_Hook:Return(x)
         return
     end
     --print(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))

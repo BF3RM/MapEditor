@@ -81,14 +81,37 @@ end
 
 -- This isn't correct at all, but it's good enough for what we're trying to do
 function ToLocal(a,b)
+    --a = world
+    --b = parentWorld
+
     local LT = LinearTransform()
-    LT.left = a.left
-    LT.up = a.up
-    LT.forward = a.forward
+    left = InverseVec3(b.left)
+    up = InverseVec3(b.up)
+    forward = InverseVec3(b.forward)
+
+    LT = a * LT
+
     LT.trans.x = a.trans.x - b.trans.x
     LT.trans.y = a.trans.y - b.trans.y
     LT.trans.z = a.trans.z - b.trans.z
+
     return LT
+end
+
+function InverseSafe (f)
+    if (f > 0.00000000000001) then
+        return 1.0 / f
+    else
+        return 0.0
+    end
+end
+
+function InverseVec3 (v)
+    return Vec3 (InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z));
+end
+
+function InverseQuat (v)
+    return Quat (InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z), InverseSafe (v.w));
 end
 
 function dump(o)

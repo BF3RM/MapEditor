@@ -80,6 +80,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
             type = l_Entity.typeInfo.name,
             transform = ToLocal(s_Entity.transform, p_Transform),
             instanceId = s_Entity.instanceID,
+            transforms = {worldTrans = p_Transform, localTrans = s_Entity.transform},
             aabb = {
                 min = tostring(s_Entity.aabb.min),
                 max = tostring(s_Entity.aabb.max),
@@ -88,7 +89,10 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
         }
     end
     local s_Blueprint = Blueprint(p_Blueprint)
-
+    local s_ParentGuid = nil
+    if(p_Parent ~= nil) then
+        local s_ParentGuid = tostring(p_Parent.instanceGuid)
+    end
     local s_Response = {
         guid = tostring(s_Guid),
         sender = "Server",
@@ -98,7 +102,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
             name = s_Blueprint.name,
             reference = {
                 instanceGuid = tostring(p_Blueprint.instanceGuid),
-                partitionGuid = tostring(p_Parent.instanceGuid),
+                partitionGuid = s_ParentGuid,
                 typeName = p_Blueprint.typeInfo.name,
                 name = s_Blueprint.name,
             },
