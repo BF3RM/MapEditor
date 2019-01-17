@@ -26,7 +26,7 @@ class SelectionGroup extends THREE.Group{
 
 			return;
 		}
-		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
+		//scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 
 		
 		for (var i = 0; i < scope.children.length; i++) {
