@@ -24,8 +24,8 @@ function MapEditorServer:RegisterEvents()
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+    Events:Subscribe('Server:LevelLoaded', self, self.onLevelLoaded)
     Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
-    Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 
 end
 
@@ -46,8 +46,8 @@ function MapEditorServer:OnLevelDestroy()
 	Backend:OnLevelDestroy()
 end
 
-function MapEditorServer:OnEngineMessage(p_Message)
-    m_EditorServer:OnEngineMessage(p_Message)
+function MapEditorServer:onLevelLoaded(p_Message)
+    m_EditorServer:OnLevelLoaded(p_Message)
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)

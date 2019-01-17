@@ -82,9 +82,7 @@ end
 -- This isn't correct at all, but it's good enough for what we're trying to do
 function ToLocal(a,b)
     local LT = LinearTransform()
-    LT.left = a.left
-    LT.up = a.up
-    LT.forward = a.forward
+
     LT.trans.x = a.trans.x - b.trans.x
     LT.trans.y = a.trans.y - b.trans.y
     LT.trans.z = a.trans.z - b.trans.z
