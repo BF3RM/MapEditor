@@ -125,8 +125,6 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 		elseif(s_Response == "queue") then
 			print("Queued command")
 			table.insert(self.m_Queue.commands, l_Command)
-		elseif(s_Response.userData == nil) then
-			print("MISSING USERDATA!")
 		else
 			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
 			table.insert(s_Responses, s_Response)

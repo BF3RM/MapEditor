@@ -1,5 +1,6 @@
 class 'EditorServer'
 local m_InstanceParser = require "InstanceParser"
+local m_SaveFile = require 'SaveFile'
 
 function EditorServer:__init()
 	print("Initializing EditorServer")
@@ -60,14 +61,13 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 		elseif(s_Response == "queue") then
 			print("Queued command")
 			table.insert(self.m_Queue, l_Command)
-		elseif(s_Response.userData == nil) then
-			print("MISSING USERDATA!")
 		else
 			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
 			table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
 			table.insert(s_Responses, s_Response)
 		end
 	end
+    print(json.encode(self.m_GameObjects))
 	if(#s_Responses > 0) then
 		NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", json.encode(s_Command))
 	end
@@ -87,6 +87,22 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 	if(#self.m_Queue > 0) then
 		self.m_Queue = {}
 	end
+end
+
+function EditorServer:OnEngineMessage(p_Message)
+    if p_Message.type == MessageType.ServerLevelFinalizedMessage then
+        self:LoadLevel()
+    end
+end
+
+function EditorServer:LoadLevel()
+    local s_SaveFile = json.decode(m_SaveFile)
+    if(s_SaveFile == nil) then
+        print("Failed to get savefile")
+        return
+    end
+
+    self.m_GameObjects = s_SaveFile
 end
 
 
