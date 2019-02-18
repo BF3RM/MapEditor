@@ -103,12 +103,7 @@ class Editor {
 		for (let k in scope.gameObjects){
 			if (scope.gameObjects.hasOwnProperty(k)) {
 				let gameObject = this.gameObjects[k];
-				result[k] = {
-					guid: gameObject.guid,
-					name: gameObject.name,
-					transform: gameObject.transform,
-					userData: gameObject.userData
-				};
+				result[k] = gameObject.userData;
 			}
 		}
 		return JSON.stringify(result, null, 2);
