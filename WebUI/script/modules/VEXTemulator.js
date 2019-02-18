@@ -35,6 +35,7 @@ class VEXTemulator {
 			"name": command.userData.name,
 			"sender": command.sender,
 		};
+		return response;
 	}
 	DestroyGroup(command) {
 

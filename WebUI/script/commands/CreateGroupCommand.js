@@ -10,7 +10,7 @@ const CreateGroupCommand = function (guid, userData) {
 		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
-	this.parameters = userData;
+	this.userData = userData;
 };
 
 

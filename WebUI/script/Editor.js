@@ -345,7 +345,7 @@ class Editor {
 	}
 
 	onCreatedGroup(command){
-		let group = new Group(command.guid, command.name);
+		let group = new Group(command.guid, command.userData);
 
 		this.gameObjects[command.guid] = group;
 		// if(command.sender === this.playerName) {
