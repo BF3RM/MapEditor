@@ -49,6 +49,7 @@ function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
 		self:DisableFreecamMovement()
 		m_Editor:SetPendingRaycast(RaycastType.Camera)
+        m_Editor.m_FreecamMoving = false
 	end
 
 end
@@ -60,6 +61,7 @@ end
 function UIManager:EnableFreecamMovement()
 	WebUI:DisableKeyboard()
 	WebUI:DisableMouse()
+    m_Editor.m_FreecamMoving = true
 end
 
 function UIManager:DisableFreecamMovement()

@@ -10,10 +10,12 @@ local FALLBACK_DISTANCE = 10
 function Editor:__init()
 	print("Initializing EditorClient")
 	self:RegisterVars()
+
 end
 
 function Editor:RegisterVars()
 	self.m_PendingRaycast = false
+    self.m_FreecamMoving = false
 
 	self.m_Commands = {
 		SpawnBlueprintCommand = Backend.SpawnBlueprint,
@@ -100,7 +102,9 @@ function Editor:OnReceiveUpdate(p_Update)
 end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
-	self:UpdateCameraTransform()
+    if(self.m_FreecamMoving) then
+        self:UpdateCameraTransform()
+    end
 	-- Raycast has to be done in update
 	self:Raycast()
 end
