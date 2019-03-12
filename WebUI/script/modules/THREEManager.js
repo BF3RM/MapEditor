@@ -31,7 +31,9 @@ class THREEManager {
 		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
-		if(debugMode) {
+        this.CreateGizmo();
+
+        if(debugMode) {
 			scope.scene.background = new THREE.Color( 0x373737 );
 			let grid = new THREE.GridHelper( 100, 100, 0x444444, 0x888888 );
             scope.scene.add(grid);
@@ -40,8 +42,13 @@ class THREEManager {
             orbit.update();
             orbit.addEventListener( 'change', scope.Render.bind(scope) );
 
+            this.control.addEventListener( 'dragging-changed', function ( event ) {
+
+                orbit.enabled = ! event.value;
+
+            } );
+
         }
-		this.CreateGizmo();
 		this.SetFov(90);
 
 	}
@@ -81,7 +88,7 @@ class THREEManager {
 		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
 		this.control.setSpace("local");
 
-		this.scene.add(this.control);		
+		this.scene.add(this.control);
 
 		this.HideGizmo();
 
