@@ -26,7 +26,7 @@ end
 function MapEditorClient:RegisterEvents()
 	--Game events
 	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
-	Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
+	Events:Subscribe('Extension:Loaded', self, self.OnLoaded)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	Events:Subscribe('Engine:Update', self, self.OnUpdate)
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
