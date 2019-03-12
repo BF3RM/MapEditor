@@ -28,14 +28,19 @@ class THREEManager {
 		$('#page').append(scope.renderer.domElement);
 
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
-		this.camera.position.set(30, 30, 30);
+		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
 		if(debugMode) {
-			this.scene.background = new THREE.Color( 0x373737 );
+			scope.scene.background = new THREE.Color( 0x373737 );
 			let grid = new THREE.GridHelper( 100, 100, 0x444444, 0x888888 );
-			this.scene.add(grid);
-		}
+            scope.scene.add(grid);
+
+            let orbit = new THREE.OrbitControls( scope.camera, scope.renderer.domElement );
+            orbit.update();
+            orbit.addEventListener( 'change', scope.Render.bind(scope) );
+
+        }
 		this.CreateGizmo();
 		this.SetFov(90);
 

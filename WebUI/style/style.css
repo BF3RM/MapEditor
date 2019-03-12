@@ -72,6 +72,7 @@ li {
 }
 
 #toolbar {
+	z-index: 2147483647;
 	left: 0;
 	top: 0;
 	width: 100%;
@@ -80,6 +81,7 @@ li {
 	display: flex;
 	justify-content: space-between;
 	border-bottom: 2px solid black;
+	position: relative;
 }
 div#worldSpace {
 	margin-left: 10px;
@@ -200,10 +202,6 @@ canvas {
 	left: 0;
 	top: 0;
 	pointer-events: auto;
-}
-
-#toolbar div {
-	z-index: 2147483647;
 }
 
 .window {
