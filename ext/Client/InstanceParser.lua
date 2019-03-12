@@ -96,27 +96,29 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			local s_Instance = StaticModelGroupEntityData(l_Instance)
 			for i,l_Member in ipairs(s_Instance.memberDatas) do
 				local s_Member = StaticModelGroupMemberData(l_Member)
-				if(#s_Member.instanceObjectVariation > 0) then
-					local s_MemberType = StaticModelEntityData(s_Member.memberType)
-					if(s_MemberType ~= nil) then
-						local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+				if(#s_Member.instanceObjectVariation > 0) then					
+					if(s_Member.memberType ~= nil) then
+						if s_Member.memberType.isLazyLoaded == false then
+							local s_MemberType = StaticModelEntityData(s_Member.memberType)
+							local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
 
-						local s_Variations = {}
-						for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
-							-- Eww
-							s_Variations[l_Variation] = l_Variation
-						end
+							local s_Variations = {}
+							for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+								-- Eww
+								s_Variations[l_Variation] = l_Variation
+							end
 
-						if(self.m_Variations[s_Mesh] == nil) then
-							self.m_Variations[s_Mesh] = {}
-						end
+							if(self.m_Variations[s_Mesh] == nil) then
+								self.m_Variations[s_Mesh] = {}
+							end
 
-						for i3, l_Variation in pairs(s_Variations) do
-							local s_Variation = {
-								hash =l_Variation,
-								name ="fuck"
-							}
-							table.insert(self.m_Variations[s_Mesh], s_Variation)
+							for i3, l_Variation in pairs(s_Variations) do
+								local s_Variation = {
+									hash =l_Variation,
+									name ="fuck"
+								}
+								table.insert(self.m_Variations[s_Mesh], s_Variation)
+							end
 						end
 					end
 				end
