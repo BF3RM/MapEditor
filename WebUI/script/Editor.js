@@ -25,7 +25,7 @@ class Editor {
 		this.debug = debug;
 		this.logger = new Logger(LOGLEVEL.VERBOSE);
 		this.threeManager = new THREEManager();
-		this.ui = new UI(debug);
+		this.ui = new EditorUI(debug);
 		this.vext = new VEXTInterface();
 		this.history = new History(this);
 		this.blueprintManager = new BlueprintManager();
@@ -420,6 +420,18 @@ class Editor {
 	}
 
 
+	isSelected(guid) {
+		let scope = this;
+		if(scope.selectionGroup.children.length === 0) {
+			return false
+		}
+		for(let i = 0; i < scope.selectionGroup.children.length; i++) {
+			if(scope.selectionGroup.children[i].guid === guid) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	Select(guid, multi) {
 		console.log(multi);

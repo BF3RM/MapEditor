@@ -447,42 +447,6 @@ label i{
 	background: #b9b9b9;
 	-webkit-mask-position-y: 12px;
 }
-.selectIcon{
-	-webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
-}
-.translateIcon {
-	-webkit-mask: url(../icons/editor/cursor-move.svg) no-repeat center;
-}
-.rotateIcon {
-	-webkit-mask: url(../icons/editor/rotate-3d.svg) no-repeat center;
-}
-.scaleIcon {
-	-webkit-mask: url(../icons/editor/arrow-expand.svg) no-repeat center;
-}
-.globeIcon {
-	-webkit-mask: url(../icons/editor/earth.svg) no-repeat center;
-}
-.cubeIcon {
-	-webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
-}
-.favoritable:hover {
-	-webkit-mask: url(../icons/editor/star.svg) no-repeat center!important;
-}
-
-.favoritable.favorited:hover {
-	-webkit-mask: url(../icons/editor/star-off.svg) no-repeat center!important;
-}
-
-
-.jstree-icon.ObjectBlueprint {
-	-webkit-mask: url(../icons/types/file-document-box-outline.svg) no-repeat center;
-	background-color: #9c9898;
-}
-
-.jstree-icon.SpatialPrefabBlueprint {
-	-webkit-mask: url(../icons/types/file-document-box-multiple-outline.svg) no-repeat center;
-	background-color: #9c9898;
-}
 
 tr i {
 	height: 24px;

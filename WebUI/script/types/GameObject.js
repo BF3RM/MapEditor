@@ -174,6 +174,16 @@ class GameObject extends THREE.Object3D
 		return this.userData;
 	}
 
+	getNode() {
+		return {
+			id: this.guid,
+			name: this.name,
+			type: this.type,
+			draggable: true,
+			droppable: true
+		}
+	}
+
 }
 
 class EntityCreationParams {

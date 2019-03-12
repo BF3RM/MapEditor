@@ -1,4 +1,4 @@
-class UI {
+class EditorUI {
 
 	constructor(debug) {
 		this.Initialize();
