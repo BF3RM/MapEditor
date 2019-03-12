@@ -240,12 +240,12 @@
 
 	<script>
 
-			let debug = false;
+			var debugMode = false;
 			var vext = new VEXTInterface();
 			if(window.location.href.indexOf("webui") === -1) {
-				debug = true;
+				debugMode = true;
 			}
-			var editor = new Editor(debug);
+			var editor = new Editor(debugMode);
 
 		</script>
 </html>

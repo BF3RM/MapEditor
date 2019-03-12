@@ -31,6 +31,11 @@ class THREEManager {
 		this.camera.position.set(30, 30, 30);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
+		if(debugMode) {
+			this.scene.background = new THREE.Color( 0x373737 );
+			let grid = new THREE.GridHelper( 100, 100, 0x444444, 0x888888 );
+			this.scene.add(grid);
+		}
 		this.CreateGizmo();
 		this.SetFov(90);
 

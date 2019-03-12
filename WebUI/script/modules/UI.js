@@ -6,7 +6,7 @@ class UI {
 
 
 		
-		if (debug==true) {
+		if (debugMode) {
 			this.debugWindow = new DebugWindow();
 		}
 		

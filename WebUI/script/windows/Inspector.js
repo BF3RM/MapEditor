@@ -26,7 +26,7 @@ class Inspector {
 		let content = $(document.createElement("div"));
 		content.attr("id", "objectInspector");
 
-		if(debug) {
+		if(debugMode) {
 			let spawnTest = $(document.createElement("button"));
 			spawnTest.text("Spawn");
 			spawnTest.on("click", function() {
