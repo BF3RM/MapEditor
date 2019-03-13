@@ -9,7 +9,7 @@ const DestroyBlueprintCommand = function (guid) {
 	let gameObject = editor.getGameObjectByGuid(guid);
 
 	if(gameObject === undefined) {
-		editor.logger.LogError("Attempted to destroy a null GameObject")
+		LogError("Attempted to destroy a null GameObject")
 	} else {
 		this.userData = iterationCopy(gameObject.userData);
 	}

@@ -7,7 +7,7 @@ const SpawnBlueprintCommand = function (guid, userData) {
 	this.guid = guid;
 
 	if (userData === undefined) {
-		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
+		Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
 	this.userData = iterationCopy(userData);

@@ -1,6 +1,8 @@
 class Editor {
 	constructor(debug) {
 
+		this.editorCore = new EditorCore(debug);
+
 		// Commands
 		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
@@ -23,7 +25,6 @@ class Editor {
 		signals.historyChanged.add(this.onHistoryChanged.bind(this));
 
 		this.debug = debug;
-		this.logger = new Logger(LOGLEVEL.VERBOSE);
 		this.threeManager = new THREEManager();
 		this.ui = new EditorUI(debug);
 		this.vext = new VEXTInterface();
@@ -36,7 +37,6 @@ class Editor {
 			Internal variables
 
 		 */
-		this.playerName = null;
 		// this.selected = [];
 		this.raycastTransform = new LinearTransform();
 		this.screenToWorldTransform = new LinearTransform();
@@ -45,7 +45,6 @@ class Editor {
 		this.previewBlueprint = null;
 
 
-		this.isUpdating = false;
 		this.pendingMessages = {};
 
 		this.gameObjects = {};
@@ -59,14 +58,6 @@ class Editor {
 
 		this.Initialize();
 
-
-		this.lastUpdateTime = 0;
-		this.deltaTime = 1.0/30.0;
-
-		this._renderLoop = this.renderLoop.bind(this);
-		this.renderLoop(); // first call to init loop using the requestAnimationFrame
-
-		
 	}
 
 	AddFavorite(blueprint) {
@@ -93,21 +84,10 @@ class Editor {
 			let imported = document.createElement('script');
 			imported.src = 'script/DebugData.js';
 			document.head.appendChild(imported);
-			this.playerName = "LocalPlayer";
+			this.editorCore.setPlayerName("LocalPlayer");
 		}
 	}
 
-	toJson() {
-		let scope = this;
-		let result = {};
-		for (let k in scope.gameObjects){
-			if (scope.gameObjects.hasOwnProperty(k)) {
-				let gameObject = this.gameObjects[k];
-				result[k] = gameObject.userData;
-			}
-		}
-		return JSON.stringify(result, null, 2);
-	}
 
 	Duplicate() {
 		let scope = this;
@@ -152,20 +132,9 @@ class Editor {
 
 	 */
 
-	setPlayerName(name) {
-		if(name === undefined) {
-			this.logger.LogError("Failed to set player name");
-		} else {
-			this.playerName = name;
-		}
-	}
 
-	setUpdating(value) {
-		editor.isUpdating = value;
-		if(value) {
-			this.renderLoop()
-		}
-	}
+
+
 
 	onPreviewDragStart(blueprint) {
 		this.previewBlueprint = blueprint;
@@ -241,49 +210,7 @@ class Editor {
 		this.pendingMessages[guid] = message;
 	}
 
-	renderLoop()
-	{
-		let scope = this;
-		//GameObject update
 
-		//This var is checked twice because we might have stopped the rendering during the last update.
-		if(this.isUpdating === false) {
-			return;
-		}
-		if ( scope.lastUpdateTime === 0 ||
-			scope.lastUpdateTime + (scope.deltaTime*1000.0) <= Date.now())
-		{
-			scope.lastUpdateTime = Date.now();
-
-			/*for ( var key in this.gameObjects )
-			{
-				var object = this.gameObjects[key];
-
-				if (object.update != undefined)
-					object.update( this.deltaTime );
-
-			}
-			*/
-			for(let guid in scope.pendingMessages) {
-				let changes = scope.pendingMessages[guid].getChanges();
-				if(!changes) {
-					continue;
-				}
-				for(let changeKey in changes) {
-					let change = changes[changeKey];
-					scope.vext.SendMessage(change);
-				}
-				delete scope.pendingMessages[guid];
-			}
-		}
-
-		//Gameobject render
-		//this.threeManager.Render( );
-
-		if(this.isUpdating) {
-			window.requestAnimationFrame( this._renderLoop );
-		}
-	}
 
 	/*
 
@@ -294,7 +221,7 @@ class Editor {
 	onSetObjectName(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
-			this.logger.LogError("Tried to set the name of a null object: " + command.guid);
+			LogError("Tried to set the name of a null object: " + command.guid);
 			return;
 		}
 		gameObject.setName(command.name);
@@ -303,7 +230,7 @@ class Editor {
 	onSetTransform(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
-			this.logger.LogError("Tried to set the transform of a null object: " + command.guid);
+			LogError("Tried to set the transform of a null object: " + command.guid);
 			return;
 		}
 		gameObject.setTransform(new LinearTransform().setFromTable(command.userData.transform));
@@ -318,7 +245,7 @@ class Editor {
 	onSetVariation(command) {
 		let gameObject = this.getGameObjectByGuid(command.guid);
 		if(gameObject === undefined) {
-			this.logger.LogError("Tried to set the variation of a null object: " + command.guid);
+			LogError("Tried to set the variation of a null object: " + command.guid);
 			return;
 		}
 		gameObject.setVariation(command.key);
@@ -361,7 +288,7 @@ class Editor {
 	
 		let scope = this;
 		if(blueprint == null) {
-			scope.logger.LogError("Tried to spawn a nonexistent blueprint");
+			LogError("Tried to spawn a nonexistent blueprint");
 			return false;
 		}
 		if(transform === undefined) {
@@ -374,7 +301,7 @@ class Editor {
 
 		//Spawn blueprint
 		let guid = GenerateGuid();
-		scope.logger.Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
+		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
 		let userData = blueprint.getUserData(transform, variation);
 
 		scope.execute(new SpawnBlueprintCommand(guid, userData));
@@ -409,7 +336,7 @@ class Editor {
 
 		this.gameObjects[command.guid] = gameObject;
 
-		if(!scope.vext.executing && command.sender === this.playerName) {
+		if(!scope.vext.executing && command.sender === this.editorCore.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(command.guid, false)}, 1);
 		}
@@ -451,7 +378,7 @@ class Editor {
 		let gameObject = scope.gameObjects[guid];
 
 		if(gameObject === undefined) {
-			scope.logger.LogError("Failed to select gameobject: " + guid);
+			LogError("Failed to select gameobject: " + guid);
 			return;
 		}
 

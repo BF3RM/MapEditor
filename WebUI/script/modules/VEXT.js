@@ -86,13 +86,13 @@ class VEXTInterface {
 		}
 		let scope = this;
 		if(editor.debug) {
-			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
-			editor.logger.Log(LOGLEVEL.VERBOSE, commands);
+			Log(LOGLEVEL.VERBOSE, "OUT: ");
+			Log(LOGLEVEL.VERBOSE, commands);
 			scope.emulator.Receive(commands);
 		} else {
 			console.log(commands);
-			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
-			editor.logger.Log(LOGLEVEL.VERBOSE, commands);
+			Log(LOGLEVEL.VERBOSE, "OUT: ");
+			Log(LOGLEVEL.VERBOSE, commands);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(commands));
 		}
 	}
@@ -105,12 +105,12 @@ class VEXTInterface {
 		let commands = JSON.parse(responsesRaw);
 		let index = 0;
 
-		editor.logger.Log(LOGLEVEL.VERBOSE, "IN: ");
-		editor.logger.Log(LOGLEVEL.VERBOSE, commands);
+		Log(LOGLEVEL.VERBOSE, "IN: ");
+		Log(LOGLEVEL.VERBOSE, commands);
 
 		commands.forEach(function (command) {
 			if(scope.commands[command.type] === undefined) {
-				editor.logger.LogError("Failed to call a null signal: " + command.type);
+				LogError("Failed to call a null signal: " + command.type);
 				return;
 			}
 			if(index === commands.length - 1) {
@@ -164,14 +164,14 @@ class VEXTInterface {
 		}
 		let scope = this;
 		if(editor.debug) {
-			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
-			editor.logger.Log(LOGLEVEL.VERBOSE, messages);
+			Log(LOGLEVEL.VERBOSE, "OUT: ");
+			Log(LOGLEVEL.VERBOSE, messages);
 			// We don't handle messages in VEXTEmulator yet
 			//scope.emulator.Receive(commands);
 		} else {
 			console.log(messages);
-			editor.logger.Log(LOGLEVEL.VERBOSE, "OUT: ");
-			editor.logger.Log(LOGLEVEL.VERBOSE, messages);
+			Log(LOGLEVEL.VERBOSE, "OUT: ");
+			Log(LOGLEVEL.VERBOSE, messages);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
 		}
 	}
@@ -184,15 +184,15 @@ class VEXTInterface {
 			message = messageRaw;
 			emulator = true;
 		} else {
-			editor.logger.Log(LOGLEVEL.VERBOSE, messageRaw);
+			Log(LOGLEVEL.VERBOSE, messageRaw);
 			message = JSON.parse(messageRaw);
 		}
 
-		editor.logger.Log(LOGLEVEL.VERBOSE, "IN: ");
-		editor.logger.Log(LOGLEVEL.VERBOSE, message);
+		Log(LOGLEVEL.VERBOSE, "IN: ");
+		Log(LOGLEVEL.VERBOSE, message);
 
 		if(this.messages[message.type] === undefined) {
-			editor.logger.LogError("Failed to call a null signal: " + message.type);
+			LogError("Failed to call a null signal: " + message.type);
 			return;
 		}
 		if(emulator) {

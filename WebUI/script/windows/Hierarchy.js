@@ -72,9 +72,9 @@ class Hierarchy {
 
 		//TODO: remove parent's reference in parent.children once groups are implemented
 
-		let node = scope.dom.jstree(true).get_node(command.guid);
+		let node = scope.tree.getNodeById(command.guid);
 		if (node !== null || node != undefined){
-			scope.dom.jstree(true).delete_node(node);
+			scope.tree.removeNode(node);
 		}
 		
 	}
