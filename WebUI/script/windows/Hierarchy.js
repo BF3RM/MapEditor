@@ -250,7 +250,7 @@ class Hierarchy {
 		}
 		row.add(new UI.Icon(node.type));
 		row.add(new UI.Text(node.name));
-		row.add(new UI.Text("(" + Object.keys(node.children).length + ")"));
+		row.add(new UI.Text(Object.keys(node.children).length));
 
 		return row.dom.outerHTML;
 	}

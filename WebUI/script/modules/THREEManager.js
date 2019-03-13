@@ -48,7 +48,6 @@ class THREEManager {
 
             } );
 
-
         }
 		this.SetFov(90);
 
@@ -340,9 +339,9 @@ class THREEManager {
 
 			let message = new SetScreenToWorldTransformMessage(direction);
 			editor.vext.SendMessage(message);
-			if(!editor.editorCore.screenToWorldTransform.isIdentity()) {
+			if(editor.screenToWorldTransform.trans !== new Vec3(0,0,0)) {
 				editor.setUpdating(true);
-				let trans = editor.editorCore.screenToWorldTransform.trans.clone();
+				let trans = editor.screenToWorldTransform.trans;
 
 				editor.selectionGroup.position.set(trans.x, trans.y, trans.z);
 				editor.onControlMove();
