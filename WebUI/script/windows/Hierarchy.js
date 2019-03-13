@@ -25,6 +25,8 @@ class Hierarchy {
 		this.tree = this.InitializeTree();
 		this.topControls = this.CreateTopControls();
 		this.subControls = this.CreateSubControls();
+
+		this.entries = [];
 		this.Initialize();
 
 		this.queue = [];
@@ -32,17 +34,32 @@ class Hierarchy {
 	}
 
 	onSpawnedBlueprint(command) {
+		var t0 = performance.now();
 		let scope = this;
 		let gameObject = editor.getGameObjectByGuid(command.guid);
 
-		let parent = command.parent;
-		let node = scope.tree.getNodeById("root");
+		let entry = gameObject.getNode();
+		scope.entries[command.guid] = entry;
 
-		if(parent != null) {
-			node = scope.tree.getNodeById(parent);
+		this.queue.push(entry);
+
+		if(!editor.vext.executing) {
+			console.log("Drawing");
+			console.log(this.queue.length);
+
+			let parent = command.parent;
+			let parentNode = scope.tree.getNodeById("root");
+
+			if(parent != null) {
+				parentNode = scope.tree.getNodeById(parent);
+			}
+
+			scope.tree.addChildNodes(this.queue, undefined, parentNode);
+
+			this.queue = [];
 		}
-
-		scope.tree.addChildNodes([gameObject.getNode()], undefined, node);
+		var t1 = performance.now();
+		console.log("Execution took " + (t1 - t0) + " milliseconds.");
 	}
 
 	getEntry(guid) {
@@ -112,6 +129,9 @@ class Hierarchy {
 				}
 			},
 			shouldSelectNode: function(node) { // Determine if the node is selectable
+				if(node == null) {
+					return false;
+				}
 				if(node.selectable === false) {
 					return false;
 				}
