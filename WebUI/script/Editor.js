@@ -31,6 +31,7 @@ class Editor {
 		this.history = new History(this);
 		this.blueprintManager = new BlueprintManager();
 		this.entityFactory = new EntityFactory();
+		this.gameContext = new GameContext();
 
 		/*
 

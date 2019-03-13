@@ -8,18 +8,35 @@ class Hierarchy {
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
+		signals.levelLoaded.add(this.onLevelLoaded.bind(this));
+
 
 
 		this.data = {
-			id: 'root',
-			name: 'root',
-			type: 'root',
-			state: {
-				open: true
-			},
-			selectable: false,
-			children: []
-		};
+			"name": "FakeLevel",
+			"gid": "1",
+			"TypeName": "LevelData",
+			"Parent": "root",
+			"children": [
+				{
+					"name": "FakeLevelRoot",
+					"guid": "2",
+					"TypeName": "LevelData",
+					"Parent": "1",
+					"children": [
+						{
+							"name": "FakeLevelDepth1",
+							"guid": "3",
+							"TypeName": "LevelData",
+							"Parent": "2",
+							"children": [
+							]
+						}
+					]
+				}
+			]
+		}
+
 
 		this.dom = this.CreateDom();
 		this.tree = this.InitializeTree();
@@ -90,6 +107,15 @@ class Hierarchy {
 		});
 
 	}
+	onLevelLoaded(levelData) {
+		let scope = this;
+		console.log(levelData)
+		console.log(scope.data)
+
+		scope.data.children.push(levelData);
+		console.log(levelData)
+		this.LoadData(levelData)
+	}
 
 	onDestroyedGroup(command) {
 
@@ -112,7 +138,13 @@ class Hierarchy {
 		});
 		// TODO: Implement node refresh logic here somewhere;
 	}
+	LoadData(data) {
+		let scope = this;
+		scope.data.children.push(data);
+		console.log(scope.data);
+		scope.tree.updateNode(scope.tree.getNodeById("root", {}, undefined))
 
+	}
 	InitializeTree() {
 		let scope = this;
 		return new InfiniteTree({
@@ -144,7 +176,7 @@ class Hierarchy {
 				editor.Select(node.id, keysdown[17]);
 			},
 			togglerClass: "Toggler",
-			nodeIdAttr: "node-id"
+			nodeIdAttr: "guid"
 
 		});
 	}
@@ -230,7 +262,7 @@ class Hierarchy {
 	hierarchyRenderer(node, treeOptions) {
 		let state = node.state;
 		let row = new UI.Row();
-		row.setAttribute("node-id", node.id);
+		row.setAttribute("guid", node.guid);
 		row.setStyle("margin-left", (state.depth * 18) +"px");
 		row.addClass("infinite-tree-item");
 		if(state.selected) {
@@ -251,7 +283,7 @@ class Hierarchy {
 		row.add(new UI.Icon(node.type));
 		row.add(new UI.Text(node.name));
 		row.add(new UI.Text(Object.keys(node.children).length));
-
+		console.log(node)
 		return row.dom.outerHTML;
 	}
 }
