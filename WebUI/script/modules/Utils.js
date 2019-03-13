@@ -94,3 +94,13 @@ Array.prototype.equals = function (array) {
 };
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
+function iterationCopy(src) {
+	let target = {};
+	for (let prop in src) {
+		if (src.hasOwnProperty(prop)) {
+			target[prop] = src[prop];
+		}
+	}
+	return target;
+}

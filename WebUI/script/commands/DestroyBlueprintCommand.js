@@ -6,12 +6,12 @@ const DestroyBlueprintCommand = function (guid) {
 	this.name = 'Destroy Blueprint';
 	this.guid = guid;
 
-	this.gameObject = editor.getGameObjectByGuid(guid);
+	let gameObject = editor.getGameObjectByGuid(guid);
 
-	if(this.gameObject === undefined) {
+	if(gameObject === undefined) {
 		editor.logger.LogError("Attempted to destroy a null GameObject")
 	} else {
-		this.gameObject = this.gameObject.Clone(this.guid);
+		this.userData = iterationCopy(gameObject.userData);
 	}
 };
 
@@ -23,7 +23,7 @@ DestroyBlueprintCommand.prototype = {
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnBlueprintCommand", this.gameObject.userData))
+		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnBlueprintCommand", this.userData))
 	},
 };
 
