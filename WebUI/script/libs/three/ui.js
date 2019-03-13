@@ -74,6 +74,14 @@ UI.Element.prototype = {
 
     },
 
+    removeClass: function ( name ) {
+
+        this.dom.className = this.dom.className.replace(name, '');
+
+        return this;
+
+    },
+
     setId: function ( id ) {
 
         this.dom.id = id;
@@ -1061,3 +1069,100 @@ UI.Icon = function ( iconName) {
 
 UI.Icon.prototype = Object.create( UI.Element.prototype );
 UI.Icon.prototype.constructor = UI.Icon;
+
+// Icon
+
+UI.Table = function ( ) {
+
+    UI.Element.call( this );
+
+    var dom = document.createElement( 'table' );
+
+    dom.className = 'Table';
+
+    this.dom = dom;
+
+    return this;
+
+};
+
+UI.Table.prototype = Object.create( UI.Element.prototype );
+UI.Table.prototype.constructor = UI.Table;
+
+// Icon
+
+UI.TableRow = function ( ) {
+
+    UI.Element.call( this );
+
+    var dom = document.createElement( 'tr' );
+
+    dom.className = 'TableRow';
+
+    this.dom = dom;
+
+    return this;
+
+};
+
+UI.TableRow.prototype = Object.create( UI.Element.prototype );
+UI.TableRow.prototype.constructor = UI.TableRow;
+
+// Icon
+
+UI.TableHeader = function ( header ) {
+
+    UI.Element.call( this );
+
+    var dom = document.createElement( 'th' );
+
+    dom.className = 'TableHeader';
+
+    this.dom = dom;
+    this.setValue( header );
+
+    return this;
+
+};
+
+UI.TableHeader.prototype = Object.create( UI.Element.prototype );
+UI.TableHeader.prototype.constructor = UI.TableHeader;
+
+UI.TableHeader.prototype.setValue = function ( value ) {
+
+    if ( value !== undefined ) {
+
+        this.dom.textContent = value;
+
+    }
+
+    return this;
+
+};
+
+
+UI.TableData = function ( data ) {
+
+    UI.Element.call( this );
+
+    var dom = document.createElement( 'td' );
+
+    dom.className = 'TableData';
+
+    this.dom = dom;
+    this.setValue( data );
+
+    return this;
+
+};
+
+UI.TableData.prototype = Object.create( UI.Element.prototype );
+UI.TableData.prototype.constructor = UI.TableData;
+
+UI.TableData.prototype.setValue = function ( value ) {
+
+    if ( value !== undefined ) {
+        this.dom.textContent = value;
+    }
+    return this;
+};

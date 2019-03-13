@@ -19,76 +19,6 @@ class Blueprint {
 		}
 	}
 
-	CreateEntry(folderName) {
-		let blueprint = this;
-		let entry = $(document.createElement("tr"));
-		let icon = $(document.createElement("i"));
-		let name = $(document.createElement("td"));
-		let type = $(document.createElement("td"));
-		entry.append(icon);
-		entry.append(name);
-		entry.append(type);
-		entry.attr('draggable', true);
-		entry.addClass("draggable");
-		icon.addClass("jstree-icon favoritable");
-		if(blueprint.favorited)
-			icon.addClass("favorited");
-
-		icon.addClass(blueprint.typeName);
-		if(folderName === undefined) {
-			name.html(blueprint.getName());
-		} else {
-			name.html(blueprint.name.replace(folderName, ''));
-		}
-		type.html(blueprint.typeName);
-		icon.on('mouseover', function(e) {
-			if(!blueprint.favorited) {
-				icon.removeClass("favorited");
-			}
-		});
-
-		icon.on('click', function(e) {
-			//Unfavorite
-			if(icon.hasClass("favorited")) {
-				editor.RemoveFavorite(blueprint);
-				icon.removeClass("favorited");
-			} else {
-				//Favorite
-				editor.AddFavorite(blueprint);
-				icon.addClass("favorited")
-			}
-			signals.favoritesChanged.dispatch();
-		});
-
-		name.on('click', function(e, data) {
-			signals.spawnBlueprintRequested.dispatch(blueprint);
-		});
-
-		entry.draggable({
-			helper : function() {
-				let helper = $(document.createElement("div"));
-				helper.addClass("dragableHelper");
-				return helper;
-			},
-			cursorAt: {
-				top: 0,
-				left: 0
-			},
-			appendTo: 'body',
-			start: function(e) {
-				editor.editorCore.onPreviewDragStart(blueprint)
-			},
-			drag: function(e) {
-				editor.editorCore.onPreviewDrag(e)
-			},
-			stop: function(e) {
-				editor.editorCore.onPreviewDragStop()
-			}
-		});
-
-		return entry;
-	}
-
 	SetFavorite(favStatus) {
 		this.favorited = favStatus;
 	}
@@ -147,6 +77,75 @@ class Blueprint {
 			transform = new LinearTransform()
 		}
 		return new ReferenceObjectParameters(scope.getReference(), variation, name, transform);
+	}
+
+	CreateEntry(folderName) {
+		let blueprint = this;
+		let entry = new UI.TableRow();
+		let icon = new UI.Icon(blueprint.typeName);
+
+		let cleanName;
+		if(folderName === undefined) {
+			cleanName = blueprint.getName();
+		} else {
+			cleanName = blueprint.name.replace(folderName, '');
+		}
+		let name = new UI.TableData(cleanName);
+
+		entry.add(icon,name,new UI.TableData(blueprint.typeName));
+
+		entry.setAttribute('draggable', true);
+		entry.addClass("draggable");
+
+		icon.addClass("jstree-icon favoritable");
+		if(blueprint.favorited)
+			icon.addClass("favorited");
+
+		icon.dom.addEventListener('mouseover', function(e) {
+			if(!blueprint.favorited) {
+				icon.removeClass("favorited");
+			}
+		});
+
+		icon.dom.addEventListener('click', function(e) {
+			//Unfavorite
+			if(blueprint.favorited) {
+				editor.RemoveFavorite(blueprint);
+				icon.removeClass("favorited");
+			} else {
+				//Favorite
+				editor.AddFavorite(blueprint);
+				icon.addClass("favorited")
+			}
+		});
+
+		name.dom.addEventListener('click', function(e, data) {
+			signals.spawnBlueprintRequested.dispatch(blueprint);
+		});
+
+		$(entry.dom).draggable({
+			helper : function() {
+				let helper = $(document.createElement("div"));
+				helper.addClass("dragableHelper");
+				return helper;
+			},
+			cursorAt: {
+				top: 0,
+				left: 0
+			},
+			appendTo: 'body',
+			start: function(e) {
+				editor.editorCore.onPreviewDragStart(blueprint)
+			},
+			drag: function(e) {
+				editor.editorCore.onPreviewDrag(e)
+			},
+			stop: function(e) {
+				editor.editorCore.onPreviewDragStop()
+			}
+		});
+
+		return entry;
 	}
 
 }

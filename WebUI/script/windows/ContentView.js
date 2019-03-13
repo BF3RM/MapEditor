@@ -6,53 +6,51 @@ class ContentView {
 
 		signals.folderSelected.add(this.onFolderSelected.bind(this));
 		signals.folderFiltered.add(this.onFolderFiltered.bind(this));
+		this.header = this.Header();
+
 		this.Initialize();
+	}
+
+	Header() {
+		let row = new UI.TableRow();
+		row.add(new UI.TableHeader());
+		row.add(new UI.TableHeader("Name"));
+		row.add(new UI.TableHeader("Type"));
+		return row;
 	}
 
 
 	Initialize() {
-		this.dom = $(document.createElement("div"));
+		this.dom = new UI.Panel();
 
-		this.directory = $(document.createElement("table"));
-
-		this.dom.append(this.directory);
+		this.directory = new UI.Table();
+		this.directory.add(this.header);
+		this.dom.add(this.Header());
+		this.dom.add(this.directory);
 	}
+
 
 	onFolderSelected(folderName, content, searchString) {
 		let scope = this;
 		this.content = [];
-		this.directory.html("");
-		this.directory.append(`
-			<tr>
-				<th></th>
-				<th><b>Name</b></th>
-				<th><b>Type</b></th>
-			</tr>
-		`);
+		this.directory.clear();
 		for(let i = 0; i < content.length; i++) {
 			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
-			let entry = blueprint.CreateEntry();
+			let entry = blueprint.CreateEntry(folderName);
 			this.content.push(blueprint);
 			if(scope.matches(blueprint.getName(), searchString)) {
-				this.directory.append(entry);
+				this.directory.add(entry);
 			}
 		}
 	}
 
 	onFolderFiltered(searchString) {
 		let scope = this;
-		scope.directory.html("");
-		this.directory.append(`
-			<tr>
-				<th></th>
-				<th><b>Name</b></th>
-				<th><b>Type</b></th>
-			</tr>
-		`);
+		scope.directory.clear();
 		for(let i = 0; i < scope.content.length; i++) {
 			if(scope.matches(scope.content[i].getName(), searchString)) {
 				let entry = scope.content[i].CreateEntry();
-				scope.directory.append(entry);
+				scope.directory.add(entry);
 			}
 		}
 	}
@@ -69,5 +67,5 @@ var ContentViewComponent = function( container, state ) {
 	this._state = state;
 	this.element = new ContentView();
 
-	this._container.getElement().html(this.element.dom);
+	this._container.getElement().html(this.element.dom.dom);
 };

@@ -6,16 +6,25 @@ class Favorites {
 		signals.favoritesChanged.add(this.onFavoritesChanged.bind(this));
 		signals.favoriteAdded.add(this.onFavoriteAdded.bind(this));
 		signals.favoriteRemoved.add(this.onFavoriteRemoved.bind(this));
+		this.header = this.Header();
+
 		this.Initialize();
+	}
+
+	Header() {
+		let row = new UI.TableRow();
+		row.add(new UI.TableHeader());
+		row.add(new UI.TableHeader("Name"));
+		row.add(new UI.TableHeader("Type"));
+		return row;
 	}
 
 
 	Initialize() {
-		this.dom = $(document.createElement("div"));
-
-		this.directory = $(document.createElement("table"));
-
-		this.dom.append(this.directory);
+		this.dom = new UI.Panel();
+		this.dom.add(this.header);
+		this.directory = new UI.Table();
+		this.dom.add(this.directory);
 	}
 
 	onFavoriteAdded(blueprint) {
@@ -28,18 +37,10 @@ class Favorites {
 
 	onFavoritesChanged() {
 		let scope = this;
-		scope.directory.html("");
-		scope.directory.append(`
-			<tr>
-				<th></th>
-				<th><b>Name</b></th>
-				<th><b>Type</b></th>
-			</tr>
-		`);
+		scope.directory.clear();
 		Object.keys(editor.favorites).forEach(function(key) {
-
 			let entry = editor.favorites[key].CreateEntry();
-			scope.directory.append(entry);
+			scope.directory.add(entry);
 		});
 	}
 }
@@ -48,5 +49,5 @@ var FavoritesComponent = function( container, state ) {
 	this._state = state;
 	this.element = new Favorites();
 
-	this._container.getElement().html(this.element.dom);
+	this._container.getElement().html(this.element.dom.dom);
 };
