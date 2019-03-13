@@ -174,7 +174,7 @@ class EditorUI {
 				scope.ps = new PerfectScrollbar(scope);
 				scope.ps.update();
 				$(this).on('DOMSubtreeModified', function() {
-					scope.ps.update();
+					//scope.ps.update();
 				})
 			})
 		});

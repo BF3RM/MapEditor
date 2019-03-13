@@ -465,11 +465,17 @@ tr i {
 
 .ps__rail-y {
 	top: 0px!important;
+	right: 0px!important;
 }
 .ps__rail-x {
 	bottom: 0px!important;
+	left: 0px!important;
 }
 .Panel {
 	height: 100%;
 	width: 100%;
+}
+
+.infinite-tree-content {
+	padding-bottom: 40px;
 }
