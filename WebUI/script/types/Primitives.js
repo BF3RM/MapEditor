@@ -123,6 +123,10 @@ class LinearTransform {
 		return new LinearTransform(this.left.clone(), this.up.clone(), this.forward.clone(), this.trans.clone())
 	}
 
+	isIdentity() {
+		return this.trans === new Vec3(0,0,0)
+	}
+
 }
 
 class Variation {
