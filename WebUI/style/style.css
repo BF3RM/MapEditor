@@ -355,7 +355,6 @@ input::-webkit-inner-spin-button {
 }
 
 .lm_content {
-	overflow: scroll!important;
 	color: #999;
 }
 
@@ -458,4 +457,19 @@ tr i {
     width: 5px;
     background: red;
     position: absolute;
+}
+
+.Row.infinite-tree-item {
+	display: flex;
+}
+
+.ps__rail-y {
+	top: 0px!important;
+}
+.ps__rail-x {
+	bottom: 0px!important;
+}
+.Panel {
+	height: 100%;
+	width: 100%;
 }

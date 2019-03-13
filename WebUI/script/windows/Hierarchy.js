@@ -90,7 +90,6 @@ class Hierarchy {
 	Initialize() {
 		let scope = this;
 		scope.tree.on('selectNode', function(node) {
-			console.log(node);
 			// → Node {} (The selected node)
 			// → null (No nodes selected)
 		});
@@ -131,10 +130,7 @@ class Hierarchy {
 	}
 
 	CreateDom() {
-		let scope = this;
-		let dom = document.createElement("div");
-
-		return dom;
+		return new UI.Panel().dom;
 	}
 
 
@@ -196,6 +192,9 @@ class Hierarchy {
 
 	ExpandToNode(node) {
 		let scope = this;
+		if(node == null) {
+			return;
+		}
 		if(node.parent.id != null) {
 			scope.tree.openNode(node.parent);
 			scope.ExpandToNode(node.parent);
@@ -203,7 +202,6 @@ class Hierarchy {
 	}
 
 	onDeselected(guid) {
-		console.log("deselect " + guid);
 		let scope = this;
 		//let node = scope.dom.jstree(true).get_node(guid);
 		//this.dom.jstree(true).deselect_node(node);
@@ -234,7 +232,6 @@ class Hierarchy {
 		row.add(new UI.Text(node.name));
 		row.add(new UI.Text(Object.keys(node.children).length));
 
-		console.log(node);
 		return row.dom.outerHTML;
 	}
 }

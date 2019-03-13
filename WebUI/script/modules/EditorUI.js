@@ -169,7 +169,7 @@ class EditorUI {
 		this.layout.registerComponent( 'FavoritesComponent', FavoritesComponent);
 
 		this.layout.on('initialised', function() {
-			$(".lm_content").each(function(e) {
+			$(".lm_content .infinite-tree-scroll").each(function(e) {
 				let scope = this;
 				scope.ps = new PerfectScrollbar(scope);
 				scope.ps.update();

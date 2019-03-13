@@ -1,6 +1,6 @@
 .infinite-tree-scroll {
   overflow: auto;
-  max-height: 400px; /* Change the height to suit your needs. */
+  max-height: 100%; /* Change the height to suit your needs. */
 }
 .infinite-tree-table {
   width: 100%;
