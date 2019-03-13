@@ -76,13 +76,13 @@ class Blueprint {
 			},
 			appendTo: 'body',
 			start: function(e) {
-				editor.onPreviewDragStart(blueprint)
+				editor.editorCore.onPreviewDragStart(blueprint)
 			},
 			drag: function(e) {
-				editor.onPreviewDrag(e)
+				editor.editorCore.onPreviewDrag(e)
 			},
 			stop: function(e) {
-				editor.onPreviewDragStop()
+				editor.editorCore.onPreviewDragStop()
 			}
 		});
 

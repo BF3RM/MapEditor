@@ -38,12 +38,8 @@ class Editor {
 
 		 */
 		// this.selected = [];
-		this.raycastTransform = new LinearTransform();
-		this.screenToWorldTransform = new LinearTransform();
 
-		this.previewing = false;
-		this.previewBlueprint = null;
-
+		this.playerName = null;
 
 		this.pendingMessages = {};
 
@@ -58,6 +54,17 @@ class Editor {
 
 		this.Initialize();
 
+	}
+
+	setPlayerName(name) {
+		if(name === undefined) {
+			LogError("Failed to set player name");
+		} else {
+			this.playerName = name;
+		}
+	}
+	getPlayerName() {
+		return this.playerName.toString();
 	}
 
 	AddFavorite(blueprint) {
@@ -84,7 +91,7 @@ class Editor {
 			let imported = document.createElement('script');
 			imported.src = 'script/DebugData.js';
 			document.head.appendChild(imported);
-			this.editorCore.setPlayerName("LocalPlayer");
+			this.setPlayerName("LocalPlayer");
 		}
 	}
 
@@ -136,47 +143,6 @@ class Editor {
 
 
 
-	onPreviewDragStart(blueprint) {
-		this.previewBlueprint = blueprint;
-	}
-
-	onPreviewDrag(e) {
-		let direction = this.threeManager.getMouse3D(e);
-		let s2wMessage = new SetScreenToWorldTransformMessage(direction);
-		this.vext.SendMessage(s2wMessage);
-		if(this.previewing == false) {
-			return
-		}
-		let moveMessage = new PreviewMoveMessage(this.screenToWorldTransform);
-		this.vext.SendMessage(moveMessage);
-
-	}
-
-	onPreviewDragStop() {
-		this.previewBlueprint = null;
-		this.previewing = false;
-	}
-
-	onPreviewStart() {
-		this.previewing = true;
-		let userData = this.previewBlueprint.getUserData();
-		let message = new PreviewSpawnMessage(userData);
-		this.vext.SendMessage(message);
-	}
-
-	onPreviewStop() {
-		this.previewing = false;
-		this.vext.SendMessage(new PreviewDestroyMessage());
-	}
-
-	onPreviewDrop() {
-		this.previewing = false;
-		editor.onBlueprintSpawnRequested(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
-		this.vext.SendMessage(new PreviewDestroyMessage());
-
-		this.previewBlueprint = null;
-
-	}
 	/*
 
 		General usage
@@ -199,18 +165,20 @@ class Editor {
 	}
 
 	SetRaycastPosition(x, y, z){
-		this.raycastTransform.trans = new Vec3(x, y, z);
+		this.editorCore.raycastTransform.trans = new Vec3(x, y, z);
 	}
 
 	SetScreenToWorldPosition(x, y, z){
-		this.screenToWorldTransform.trans = new Vec3(x, y, z);
+		this.editorCore.screenToWorldTransform.trans = new Vec3(x, y, z);
 	}
 
 	addPending(guid, message) {
 		this.pendingMessages[guid] = message;
 	}
 
-
+	setUpdating(value) {
+		this.editorCore.setUpdating( value );
+	}
 
 	/*
 
@@ -268,6 +236,8 @@ class Editor {
 		let transform = this.raycastTransform;
 		let userData = { name: "New Group"};
 		this.execute(new CreateGroupCommand(GenerateGuid(), userData));
+		asd
+
 
 	}
 
@@ -292,7 +262,7 @@ class Editor {
 			return false;
 		}
 		if(transform === undefined) {
-			transform = scope.raycastTransform.Clone();
+			transform = scope.editorCore.getRaycastTransform();
 		}
 		if(variation === undefined) {
 			variation = blueprint.getDefaultVariation();
@@ -336,7 +306,7 @@ class Editor {
 
 		this.gameObjects[command.guid] = gameObject;
 
-		if(!scope.vext.executing && command.sender === this.editorCore.getPlayerName()) {
+		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(command.guid, false)}, 1);
 		}
@@ -363,75 +333,16 @@ class Editor {
 	Select(guid, multi) {
 		console.log(multi);
 		if(keysdown[17] && (multi === undefined || multi === true)) {
-			this.onSelectedGameObject(guid, true)
+			this.editorCore.onSelectedGameObject(guid, true)
 		} else {
-			this.onSelectedGameObject(guid, false)
+			this.editorCore.onSelectedGameObject(guid, false)
 		}
 	}
 
 	Deselect(guid) {
-		this.onDeselectedGameObject(guid);
+		this.editorCore.onDeselectedGameObject(guid);
 	}
 
-	onSelectedGameObject(guid, isMultiSelection) {
-		let scope = this;
-		let gameObject = scope.gameObjects[guid];
-
-		if(gameObject === undefined) {
-			LogError("Failed to select gameobject: " + guid);
-			return;
-		}
-
-		// If the object is already in this group and it's a multiselection we deselect it
-		if (gameObject.parent === scope.selectionGroup && isMultiSelection){
-			scope.Deselect(guid);
-			return;
-		}
-
-		// If we are selecting and object already selected (single selection)
-		if (gameObject.parent === scope.selectionGroup && !isMultiSelection && scope.selectionGroup.children.length === 1 && scope.selectionGroup.children[0] === gameObject){
-			return;
-		}
-
-		// Clear selection group when it's a single selection
-		if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
-			for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
-				scope.Deselect(scope.selectionGroup.children[i].guid);
-			}
-		}
-
-		if (gameObject.type === "GameObject"){
-			if (scope.selectionGroup.children.length === 0) {
-				scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
-			}
-
-			scope.selectionGroup.AttachObject(gameObject);
-
-		}else if (gameObject.type === "Group"){
-			gameObject.Select();
-			//TODO: update inspector with the group name
-		}
-		signals.selectedGameObject.dispatch(guid, isMultiSelection);
-
-		scope.selectionGroup.Select();
-		if(scope.selectionGroup.children.length !== 0) {
-			scope.threeManager.ShowGizmo();
-		}
-		scope.threeManager.AttachGizmoTo(scope.selectionGroup);
-		scope.threeManager.Render();
-
-	}
-
-	onDeselectedGameObject(guid) {
-		let scope = this;
-		let gameObject = scope.gameObjects[guid];
-		scope.selectionGroup.DeselectObject(gameObject);
-		signals.deselectedGameObject.dispatch(guid);
-		if(scope.selectionGroup.children.length === 0) {
-			scope.threeManager.HideGizmo()
-		};
-		scope.threeManager.Render();
-	}
 
 	// onSelectedEntities(command) {
 	// 	let scope = this;
@@ -466,20 +377,7 @@ class Editor {
 
 	 */
 	onHistoryChanged(cmd) {
-		let scope = this;
-		if(cmd.currentlySelected !== null && cmd.currentlySelected !== scope.selectionGroup ) {
-			// console.log(cmd);
-			// for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
-			// 	if (scope.selectionGroup.children.length[i] == cmd.currentlySelected){
-			// 		break;
-			// 	}
-			// }
 
-			for (var i = cmd.currentlySelected.length - 1; i >= 0; i--) {
-				scope.Select(cmd.currentlySelected[i].guid);
-			}
-			
-		}
 	}
 
 	execute( cmd, optionalName ) {

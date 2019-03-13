@@ -116,13 +116,21 @@ class VEXTInterface {
 			if(index === commands.length - 1) {
 				scope.executing = false;
 			}
-			scope.commands[command.type](command);
+			scope.commands[command.type](scope.ParseCommand(command));
 			index++;
 
 		});
 		console.log("Done executing");
 		var t1 = performance.now();
 		console.log("Execution took " + (t1 - t0) + " milliseconds.");
+	}
+
+	ParseCommand(command) {
+		if(command.hasOwnProperty("userData")) {
+			let userData = command.userData;
+			command.userData = new ReferenceObjectParameters(userData.reference, userData.variation, userData.name, new LinearTransform().setFromTable(userData.transform));
+		}
+		return command;
 	}
 
 	OnSpawnReferenceObject(command) {

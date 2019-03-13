@@ -10,7 +10,7 @@ const SpawnBlueprintCommand = function (guid, userData) {
 		Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
-	this.userData = iterationCopy(userData);
+	this.userData = userData.clone();
 };
 
 

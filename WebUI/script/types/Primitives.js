@@ -4,7 +4,7 @@ class Vec3 extends THREE.Vector3{
 		super(x,y,z);
 	}
 
-	Clone() {
+	clone() {
 		return new Vec3(this.x, this.y, this.z)
 	}
 
@@ -119,8 +119,8 @@ class LinearTransform {
 		this.trans = new Vec3(table.trans.x,table.trans.y,table.trans.z);
 		return this;
 	}
-	Clone() {
-		return new LinearTransform(this.left, this.up, this.forward, this.trans)
+	clone() {
+		return new LinearTransform(this.left.clone(), this.up.clone(), this.forward.clone(), this.trans.clone())
 	}
 
 }

@@ -84,6 +84,6 @@ class ReferenceObjectParameters {
 	}
 
 	clone() {
-		return new ReferenceObjectParameters(this.reference, this.variation, this.name, this.transform);
+		return new ReferenceObjectParameters(this.reference.clone(), this.variation.toString(), this.name.toString(), this.transform.clone());
 	}
 }

@@ -11,7 +11,7 @@ const DestroyGroupCommand = function (guid) {
 	if(this.gameObject === undefined) {
 		LogError("Attempted to destroy a null GameObject")
 	} else {
-		this.gameObject = this.gameObject.Clone(this.guid);
+		this.gameObject = this.gameObject.clone(this.guid);
 	}
 };
 
