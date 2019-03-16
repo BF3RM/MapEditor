@@ -6,7 +6,6 @@ function InstanceParser:__init()
 	self:RegisterEvents()
 end
 
-
 function InstanceParser:RegisterVars()
     print("Registered vars")
 	self.m_Blueprints = {}
@@ -14,6 +13,7 @@ function InstanceParser:RegisterVars()
 	self.m_Variations = {}
 	self.m_MeshVariationDatabases = {}
 	self.m_StaticModelGroupDatabase = {}
+	self.m_StaticModelGroupEntityDataGuids = {}
 
 	self.m_IllegalTypes = Set {
 		"DebrisClusterData",
@@ -36,8 +36,47 @@ end
 function InstanceParser:RegisterEvents()
 end
 
+
 --TODO: Redo this whole fucking thing.
 
+function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
+	print(self.m_StaticModelGroupEntityDataGuids)
+	local s_Instance = ResourceManager:FindInstanceByGUID(
+		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid), 
+		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid))
+
+	local s_Instance = StaticModelGroupEntityData(s_Instance)
+
+	for i,l_Member in ipairs(s_Instance.memberDatas) do
+		local s_Member = StaticModelGroupMemberData(l_Member)
+
+		if(#s_Member.instanceObjectVariation > 0) then
+			local s_MemberType = StaticModelEntityData(s_Member.memberType)
+
+			if(s_MemberType ~= nil) then
+				local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+
+				local s_Variations = {}
+				for _, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+					-- Eww
+					s_Variations[l_Variation] = l_Variation
+				end
+
+				if(self.m_Variations[s_Mesh] == nil) then
+					self.m_Variations[s_Mesh] = {}
+				end
+
+				for _, l_Variation in pairs(s_Variations) do
+					local s_Variation = {
+						hash =l_Variation,
+						name ="fuck"
+					}
+					table.insert(self.m_Variations[s_Mesh], s_Variation)
+				end
+			end
+		end
+	end
+end
 
 function InstanceParser:OnPartitionLoaded(p_Partition)
 	if p_Partition == nil then
@@ -98,40 +137,15 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 		end
 
 		if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
-			local s_Instance = StaticModelGroupEntityData(l_Instance)
-			for i,l_Member in ipairs(s_Instance.memberDatas) do
-				local s_Member = StaticModelGroupMemberData(l_Member)
-				if(#s_Member.instanceObjectVariation > 0) then
-					local s_MemberType = StaticModelEntityData(s_Member.memberType)
-					if(s_MemberType ~= nil) then
-						local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+			print(l_Instance.instanceGuid)
+			print(p_Partition.guid)
+			self.m_StaticModelGroupEntityDataGuids.instanceGuid = l_Instance.instanceGuid
+			self.m_StaticModelGroupEntityDataGuids.partitionGuid = p_Partition.guid
 
-						local s_Variations = {}
-						for i2, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
-							-- Eww
-							s_Variations[l_Variation] = l_Variation
-						end
-
-						if(self.m_Variations[s_Mesh] == nil) then
-							self.m_Variations[s_Mesh] = {}
-						end
-
-						for i3, l_Variation in pairs(s_Variations) do
-							local s_Variation = {
-								hash =l_Variation,
-								name ="fuck"
-							}
-							table.insert(self.m_Variations[s_Mesh], s_Variation)
-						end
-					end
-				end
-			end
 		end
 
 		::continue::
 	end
-
-
 end
 
 function InstanceParser:FillVariations()

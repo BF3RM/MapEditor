@@ -25,10 +25,11 @@ end
 function MapEditorClient:RegisterEvents()
 	--Game events
 	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
-	Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
+	Events:Subscribe('Extension:Loaded', self, self.OnLoaded)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	Events:Subscribe('Engine:Update', self, self.OnUpdate)
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	Events:Subscribe('Client:LevelLoaded', self, self.OnLevelLoaded)
 
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
@@ -61,6 +62,10 @@ end
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	m_Editor:OnUpdate(p_Delta, p_SimulationDelta)
+end
+
+function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
+	m_Editor:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnLoaded()
