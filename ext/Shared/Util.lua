@@ -1,3 +1,5 @@
+local matrix = require "__shared/matrix"
+
 function MergeUserdata(p_Old, p_New)
 	if(p_Old == nil) then
 		return p_New
@@ -55,65 +57,76 @@ function DecodeParams(p_Table)
 end
 
 
-function ToWorld(s_local, parentWorld)
-	local LT = LinearTransform()
+function ToWorld(p_Local, p_ParentWorld)
+	local s_LinearTransform = LinearTransform()
 
+	local s_MatrixParent = matrix{
+		{p_ParentWorld.left.x,p_ParentWorld.left.y,p_ParentWorld.left.z,0},
+		{p_ParentWorld.up.x,p_ParentWorld.up.y,p_ParentWorld.up.z,0},
+		{p_ParentWorld.forward.x,p_ParentWorld.forward.y,p_ParentWorld.forward.z,0},
+		{p_ParentWorld.trans.x,p_ParentWorld.trans.y,p_ParentWorld.trans.z,1}
+	}
+	
+	local s_MatrixLocal = matrix{
+		{p_Local.left.x,p_Local.left.y,p_Local.left.z,0},
+		{p_Local.up.x,p_Local.up.y,p_Local.up.z,0},
+		{p_Local.forward.x,p_Local.forward.y,p_Local.forward.z,0},
+		{p_Local.trans.x,p_Local.trans.y,p_Local.trans.z,1}
+	}
 
-	LT = parentWorld * s_local
+	local s_MatrixWorld = s_MatrixLocal * s_MatrixParent 
 
-	LT.trans = parentWorld.trans + s_local.trans
-	-- local parentWorld_inverted = parentWorld:Inverse()
+	s_LinearTransform.left = Vec3(s_MatrixWorld[1][1],s_MatrixWorld[1][2],s_MatrixWorld[1][3])
+	s_LinearTransform.up = Vec3(s_MatrixWorld[2][1],s_MatrixWorld[2][2],s_MatrixWorld[2][3])
+	s_LinearTransform.forward = Vec3(s_MatrixWorld[3][1],s_MatrixWorld[3][2],s_MatrixWorld[3][3])
+	s_LinearTransform.trans = Vec3(s_MatrixWorld[4][1],s_MatrixWorld[4][2],s_MatrixWorld[4][3])
 
-print("---")
--- print(parentWorld.trans + s_local.trans)
--- print(parentWorld.typeInfo.name)
--- print(parentWorld.trans.typeInfo.name)
--- print(type(parentWorld.trans.x))
-print(parentWorld)
-print(parentWorld:Inverse())
-	-- local t = Vec3()
-	-- t.x = parentWorld_inverted.left.x * s_local.trans.x +
-	--     	parentWorld_inverted.left.y * s_local.trans.x +
-	--     	parentWorld_inverted.left.z * s_local.trans.x
-	-- t.y = parentWorld_inverted.up.x * s_local.trans.y +
-	--     	parentWorld_inverted.up.y * s_local.trans.y +
-	--     	parentWorld_inverted.up.z * s_local.trans.y
-	-- t.z = parentWorld_inverted.forward.x * s_local.trans.z +
-	--     	parentWorld_inverted.forward.y * s_local.trans.z +
-	--     	parentWorld_inverted.forward.z * s_local.trans.z
--- print(parentWorld.trans + t)
-
-	-- LT.trans = parentWorld.trans + t
-	return LT
+	return s_LinearTransform
 end
 
 
-function ToLocal(world, parentWorld)
+function ToLocal(world, p_ParentWorld)
+    local s_LinearTransform = LinearTransform()
 
-    local finalLT = LinearTransform()
+		local s_MatrixParent = matrix{
+			{p_ParentWorld.left.x,p_ParentWorld.left.y,p_ParentWorld.left.z,0},
+			{p_ParentWorld.up.x,p_ParentWorld.up.y,p_ParentWorld.up.z,0},
+			{p_ParentWorld.forward.x,p_ParentWorld.forward.y,p_ParentWorld.forward.z,0},
+			{p_ParentWorld.trans.x,p_ParentWorld.trans.y,p_ParentWorld.trans.z,1}
+		}
+		
+		local s_MatrixWorld = matrix{
+			{world.left.x,world.left.y,world.left.z,0},
+			{world.up.x,world.up.y,world.up.z,0},
+			{world.forward.x,world.forward.y,world.forward.z,0},
+			{world.trans.x,world.trans.y,world.trans.z,1}
+		}
 
-    local parentWorld_inverted = parentWorld:Inverse()
-
-    finalLT = world * parentWorld_inverted
-
-		local t = world.trans - parentWorld.trans
+		local s_MatrixParent_Inv = matrix.invert(s_MatrixParent) 
+		local s_MatrixLocal = s_MatrixWorld * s_MatrixParent_Inv 
 
 
-		finalLT.trans.x = world.left.x * t.x +
-		    	world.left.y * t.x +
-		    	world.left.z * t.x
-		finalLT.trans.y = world.up.x * t.y +
-		    	world.up.y * t.y +
-		    	world.up.z * t.y
-		finalLT.trans.z = world.forward.x * t.z +
-		    	world.forward.y * t.z +
-		    	world.forward.z * t.z
+		s_LinearTransform.left = Vec3(s_MatrixLocal[1][1],s_MatrixLocal[1][2],s_MatrixLocal[1][3])
+		s_LinearTransform.up = Vec3(s_MatrixLocal[2][1],s_MatrixLocal[2][2],s_MatrixLocal[2][3])
+		s_LinearTransform.forward = Vec3(s_MatrixLocal[3][1],s_MatrixLocal[3][2],s_MatrixLocal[3][3])
+		s_LinearTransform.trans = Vec3(s_MatrixLocal[4][1],s_MatrixLocal[4][2],s_MatrixLocal[4][3])
+		-- s_LinearTransform.trans.x = world.left.x * t.x +
+		--     	world.left.y * t.x +
+		--     	world.left.z * t.x
+		-- s_LinearTransform.trans.y = world.up.x * t.y +
+		--     	world.up.y * t.y +
+		--     	world.up.z * t.y
+		-- s_LinearTransform.trans.z = world.forward.x * t.z +
+		--     	world.forward.y * t.z +
+		--     	world.forward.z * t.z
 
-    -- finalLT.trans.x = world.trans.x - parentWorld.trans.x
-    -- finalLT.trans.y = world.trans.y - parentWorld.trans.y
-    -- finalLT.trans.z = world.trans.z - parentWorld.trans.z
-		-- print(finalLT.trans) --(15.818466, -0.016708, -24.546097)
-    return finalLT
+    -- s_LinearTransform.trans.x = world.trans.x - p_ParentWorld.trans.x
+    -- s_LinearTransform.trans.y = world.trans.y - p_ParentWorld.trans.y
+    -- s_LinearTransform.trans.z = world.trans.z - p_ParentWorld.trans.z
+		-- print(s_LinearTransform.trans) --(15.818466, -0.016708, -24.546097)
+
+print(s_LinearTransform)
+    return s_LinearTransform
 end
 
 function InverseSafe (f)
@@ -132,7 +145,7 @@ function InverseQuat (v)
     return Quat (InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z), InverseSafe (v.w));
 end
 
-function dump(o)
+function dus_MatrixParent(o)
 	if(o == nil) then
 		print("tried to load jack shit")
 	end
@@ -140,7 +153,7 @@ function dump(o)
 		local s = '{ '
 		for k,v in pairs(o) do
 			if type(k) ~= 'number' then k = '"'..k..'"' end
-			s = s .. '['..k..'] = ' .. dump(v) .. ','
+			s = s .. '['..k..'] = ' .. dus_MatrixParent(v) .. ','
 		end
 		return s .. '} '
 	else
