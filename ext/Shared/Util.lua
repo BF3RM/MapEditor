@@ -55,47 +55,65 @@ function DecodeParams(p_Table)
 end
 
 
-function ToWorld(parentWorld, s_local)
+function ToWorld(s_local, parentWorld)
 	local LT = LinearTransform()
 
 
-	LT.left = Vec3( parentWorld.left.x  * s_local.left.x,  parentWorld.left.y   * s_local.left.x,  parentWorld.left.z   * s_local.left.x )
-			+ Vec3( parentWorld.up.x      * s_local.left.y,  parentWorld.up.y     * s_local.left.y,  parentWorld.up.z     * s_local.left.y )
-			+ Vec3( parentWorld.forward.x * s_local.left.z,  parentWorld.forward.y * s_local.left.z,  parentWorld.forward.z * s_local.left.z )
+	LT = parentWorld * s_local
 
-	LT.up = Vec3( parentWorld.left.x    * s_local.up.x,  parentWorld.left.y * s_local.up.x,  parentWorld.left.z * s_local.up.x )
-			+ Vec3( parentWorld.up.x      * s_local.up.y,  parentWorld.up.y   * s_local.up.y,  parentWorld.up.z   * s_local.up.y )
-			+ Vec3( parentWorld.forward.x * s_local.up.z,  parentWorld.forward.y * s_local.up.z,  parentWorld.forward.z * s_local.up.z )
+	LT.trans = parentWorld.trans + s_local.trans
+	-- local parentWorld_inverted = parentWorld:Inverse()
 
-	LT.forward = Vec3( parentWorld.left.x   * s_local.forward.x,  parentWorld.left.y    * s_local.forward.x,  parentWorld.left.z    * s_local.forward.x )
-			+ Vec3( parentWorld.up.x      * s_local.forward.y,  parentWorld.up.y      * s_local.forward.y,  parentWorld.up.z      * s_local.forward.y )
-			+ Vec3( parentWorld.forward.x * s_local.forward.z,  parentWorld.forward.y * s_local.forward.z,  parentWorld.forward.z * s_local.forward.z )
+print("---")
+-- print(parentWorld.trans + s_local.trans)
+-- print(parentWorld.typeInfo.name)
+-- print(parentWorld.trans.typeInfo.name)
+-- print(type(parentWorld.trans.x))
+print(parentWorld)
+print(parentWorld:Inverse())
+	-- local t = Vec3()
+	-- t.x = parentWorld_inverted.left.x * s_local.trans.x +
+	--     	parentWorld_inverted.left.y * s_local.trans.x +
+	--     	parentWorld_inverted.left.z * s_local.trans.x
+	-- t.y = parentWorld_inverted.up.x * s_local.trans.y +
+	--     	parentWorld_inverted.up.y * s_local.trans.y +
+	--     	parentWorld_inverted.up.z * s_local.trans.y
+	-- t.z = parentWorld_inverted.forward.x * s_local.trans.z +
+	--     	parentWorld_inverted.forward.y * s_local.trans.z +
+	--     	parentWorld_inverted.forward.z * s_local.trans.z
+-- print(parentWorld.trans + t)
 
-	LT.trans = Vec3( parentWorld.left.x * s_local.trans.x,  parentWorld.left.y  * s_local.trans.x,  parentWorld.left.z  * s_local.trans.x )
-			+ Vec3( parentWorld.up.x      * s_local.trans.y,  parentWorld.up.y    * s_local.trans.y,  parentWorld.up.z    * s_local.trans.y )
-			+ Vec3( parentWorld.forward.x * s_local.trans.z,  parentWorld.forward.y * s_local.trans.z,  parentWorld.forward.z * s_local.trans.z )
-
-	LT.trans = LT.trans + parentWorld.trans
+	-- LT.trans = parentWorld.trans + t
 	return LT
 end
 
--- This isn't correct at all, but it's good enough for what we're trying to do
-function ToLocal(a,b)
-    --a = world
-    --b = parentWorld
 
-    local LT = LinearTransform()
-    left = InverseVec3(b.left)
-    up = InverseVec3(b.up)
-    forward = InverseVec3(b.forward)
+function ToLocal(world, parentWorld)
 
-    LT = a * LT
+    local finalLT = LinearTransform()
 
-    LT.trans.x = a.trans.x - b.trans.x
-    LT.trans.y = a.trans.y - b.trans.y
-    LT.trans.z = a.trans.z - b.trans.z
+    local parentWorld_inverted = parentWorld:Inverse()
 
-    return LT
+    finalLT = world * parentWorld_inverted
+
+		local t = world.trans - parentWorld.trans
+
+
+		finalLT.trans.x = world.left.x * t.x +
+		    	world.left.y * t.x +
+		    	world.left.z * t.x
+		finalLT.trans.y = world.up.x * t.y +
+		    	world.up.y * t.y +
+		    	world.up.z * t.y
+		finalLT.trans.z = world.forward.x * t.z +
+		    	world.forward.y * t.z +
+		    	world.forward.z * t.z
+
+    -- finalLT.trans.x = world.trans.x - parentWorld.trans.x
+    -- finalLT.trans.y = world.trans.y - parentWorld.trans.y
+    -- finalLT.trans.z = world.trans.z - parentWorld.trans.z
+		-- print(finalLT.trans) --(15.818466, -0.016708, -24.546097)
+    return finalLT
 end
 
 function InverseSafe (f)

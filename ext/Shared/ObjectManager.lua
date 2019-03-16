@@ -163,7 +163,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 				s_Entity.transform = LinearTransform(p_LinearTransform)
 			else
 				local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
-				s_Entity.transform = ToWorld(LinearTransform(p_LinearTransform), s_LocalTransform)
+				s_Entity.transform = ToWorld(s_LocalTransform, LinearTransform(p_LinearTransform))
 
 				if(p_UpdateCollision) then
 					s_Entity:FireEvent("Disable")
