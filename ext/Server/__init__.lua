@@ -51,13 +51,6 @@ end
 
 function MapEditorServer:onLevelLoaded(p_Message)
     m_EditorServer:OnLevelLoaded(p_Message)
-    print("-----------------")
-    local lt = LinearTransform()
-    print(lt)
-    print(lt:Inverse())
-    lt.left.y = 0.1
-    print(lt)
-    print(lt:Inverse())
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
