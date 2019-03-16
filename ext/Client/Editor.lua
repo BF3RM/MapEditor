@@ -50,6 +50,10 @@ function Editor:RegisterVars()
 end
 
 
+function Editor:OnLevelLoaded(p_MapName, p_GameModeName)
+	m_InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
+end
+
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		m_InstanceParser:FillVariations()

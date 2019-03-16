@@ -96,7 +96,8 @@ end
 function EditorServer:LoadLevel()
     print("Loading level")
     local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
-    if(s_SaveFile == nil) then
+
+    if(not s_SaveFile) then
         print("Failed to get savefile")
         return
     end
