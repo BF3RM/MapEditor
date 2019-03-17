@@ -202,7 +202,6 @@ class THREEManager {
 
 	DeleteObject(webObject){
 		THREE.SceneUtils.detach( webObject, webObject.parent, this.scene );
-		this.control.detach(webObject);
 		this.scene.remove( webObject );
 		
 		//this.Render();
@@ -233,7 +232,7 @@ class THREEManager {
 	HideGizmo() {
 		this.control.visible = false;
 		// this.mesh.visible = false;
-		//this.Render();
+		// this.Render();
 	}
 
 	ShowGizmo() {

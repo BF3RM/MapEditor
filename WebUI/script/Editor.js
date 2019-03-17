@@ -213,6 +213,15 @@ class Editor {
 		General usage
 
 	 */
+	test(){
+		let scope = this;
+		let commands = [];			
+		commands.push(new DestroyBlueprintCommand(editor.selectionGroup.children[0].guid));
+		if(commands.length > 0) {
+			scope.execute(new BulkCommand(commands));
+		}
+	
+	}
 
 	DeleteSelected() {
 		let scope = this;
@@ -383,6 +392,11 @@ class Editor {
 	onDestroyedBlueprint(command) {
 		this.threeManager.DeleteObject(this.gameObjects[command.guid]);
 		delete this.gameObjects[command.guid];
+		
+		if(this.selectionGroup.children.length === 0) {
+			this.threeManager.HideGizmo()
+		};
+
 		this.threeManager.Render();
 	}
 
