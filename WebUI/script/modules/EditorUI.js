@@ -1,4 +1,4 @@
-class UI {
+class EditorUI {
 
 	constructor(debug) {
 		this.Initialize();
@@ -6,7 +6,7 @@ class UI {
 
 
 		
-		if (debug==true) {
+		if (debugMode) {
 			this.debugWindow = new DebugWindow();
 		}
 		
@@ -169,12 +169,12 @@ class UI {
 		this.layout.registerComponent( 'FavoritesComponent', FavoritesComponent);
 
 		this.layout.on('initialised', function() {
-			$(".lm_content").each(function(e) {
+			$(".lm_content .infinite-tree-scroll").each(function(e) {
 				let scope = this;
 				scope.ps = new PerfectScrollbar(scope);
 				scope.ps.update();
 				$(this).on('DOMSubtreeModified', function() {
-					scope.ps.update();
+					//scope.ps.update();
 				})
 			})
 		});
@@ -327,7 +327,7 @@ class UI {
 			"\t"
 			);
 		*/
-		$("#saveProjectTextArea").text(editor.toJson());
+		$("#saveProjectTextArea").text(editor.editorCore.toJson());
 
 		editor.ui.dialogs["saveProject"].dialog("open");
 		

@@ -91,13 +91,14 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
     local s_Blueprint = Blueprint(p_Blueprint)
     local s_ParentGuid = nil
     if(p_Parent ~= nil) then
-        local s_ParentGuid = tostring(p_Parent.instanceGuid)
+        s_ParentGuid = tostring(p_Parent.instanceGuid)
     end
     local s_Response = {
         guid = tostring(s_Guid),
         sender = "Server",
         name = s_Blueprint.name,
         ['type'] = 'SpawnedBlueprint',
+		parent = s_ParentGuid,
         userData = {
             name = s_Blueprint.name,
             reference = {

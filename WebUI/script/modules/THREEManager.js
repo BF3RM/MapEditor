@@ -28,10 +28,27 @@ class THREEManager {
 		$('#page').append(scope.renderer.domElement);
 
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
-		this.camera.position.set(30, 30, 30);
+		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
-		this.CreateGizmo();
+        this.CreateGizmo();
+
+        if(debugMode) {
+			scope.scene.background = new THREE.Color( 0x373737 );
+			let grid = new THREE.GridHelper( 100, 100, 0x444444, 0x888888 );
+            scope.scene.add(grid);
+
+            let orbit = new THREE.OrbitControls( scope.camera, scope.renderer.domElement );
+            orbit.update();
+            orbit.addEventListener( 'change', scope.Render.bind(scope) );
+
+            this.control.addEventListener( 'dragging-changed', function ( event ) {
+
+                orbit.enabled = ! event.value;
+
+            } );
+
+        }
 		this.SetFov(90);
 
 	}
@@ -71,7 +88,7 @@ class THREEManager {
 		this.control = new THREE.TransformControls(this.camera, this.renderer.domElement);
 		this.control.setSpace("local");
 
-		this.scene.add(this.control);		
+		this.scene.add(this.control);
 
 		this.HideGizmo();
 
@@ -185,7 +202,6 @@ class THREEManager {
 
 	DeleteObject(webObject){
 		THREE.SceneUtils.detach( webObject, webObject.parent, this.scene );
-		this.control.detach(webObject);
 		this.scene.remove( webObject );
 		
 		//this.Render();
@@ -216,7 +232,7 @@ class THREEManager {
 	HideGizmo() {
 		this.control.visible = false;
 		// this.mesh.visible = false;
-		//this.Render();
+		// this.Render();
 	}
 
 	ShowGizmo() {
@@ -322,9 +338,9 @@ class THREEManager {
 
 			let message = new SetScreenToWorldTransformMessage(direction);
 			editor.vext.SendMessage(message);
-			if(editor.screenToWorldTransform.trans !== new Vec3(0,0,0)) {
+			if(editor.editorCore.screenToWorldTransform.trans !== new Vec3(0,0,0)) {
 				editor.setUpdating(true);
-				let trans = editor.screenToWorldTransform.trans;
+				let trans = editor.editorCore.screenToWorldTransform.trans;
 
 				editor.selectionGroup.position.set(trans.x, trans.y, trans.z);
 				editor.onControlMove();

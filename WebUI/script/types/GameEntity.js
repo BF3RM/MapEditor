@@ -24,10 +24,10 @@ class GameEntity extends THREE.Object3D
 
 		let matrix = new THREE.Matrix4();
 		matrix.set(
-			this.transform.left.x, this.transform.up.x, this.transform.forward.x, 0,
-			this.transform.left.y, this.transform.up.y, this.transform.forward.y, 0,
-			this.transform.left.z, this.transform.up.z, this.transform.forward.z, 0,
-			this.transform.trans.x, this.transform.trans.y, this.transform.trans.z, 1);
+			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x,
+			this.transform.left.y, this.transform.up.y, this.transform.forward.y, this.transform.trans.y,
+			this.transform.left.z, this.transform.up.z, this.transform.forward.z, this.transform.trans.z,
+			0, 0, 0, 1);
 
 		// As the position is local, we have to detach the object from its parent first
 		let parent = this.parent;

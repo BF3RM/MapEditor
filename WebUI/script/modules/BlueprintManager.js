@@ -26,7 +26,7 @@ class BlueprintManager {
 	getBlueprintByGuid(instanceGuid) {
 		let scope = this;
 		if(scope.blueprints[instanceGuid] === null) {
-			editor.logger.LogError("Failed to find blueprint with guid " + instanceGuid);
+			LogError("Failed to find blueprint with guid " + instanceGuid);
 			return null;
 		}
 		return scope.blueprints[instanceGuid];

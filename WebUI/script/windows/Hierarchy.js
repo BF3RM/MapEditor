@@ -1,3 +1,4 @@
+
 class Hierarchy {
 	constructor() {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
@@ -7,61 +8,82 @@ class Hierarchy {
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
-		this.data = {
-			"id": "root",
-			"text": "root",
-			"icon": "",
-			"data": {
-				"position": 0,
-				"parent": null
-			},
-			"state": {
-				"opened": true,
-				"disabled": true,
-				"selected": false
-			},
-			"children": [],
-			"liAttributes": null,
-			"aAttributes": null
-		};
+		signals.levelLoaded.add(this.onLevelLoaded.bind(this));
 
-		this.entries = [];
-		this.entries["root"] = this.data;
+
+
+		this.data = {
+			"name": "FakeLevel",
+			"gid": "1",
+			"TypeName": "LevelData",
+			"Parent": "root",
+			"children": [
+				{
+					"name": "FakeLevelRoot",
+					"guid": "2",
+					"TypeName": "LevelData",
+					"Parent": "1",
+					"children": [
+						{
+							"name": "FakeLevelDepth1",
+							"guid": "3",
+							"TypeName": "LevelData",
+							"Parent": "2",
+							"children": [
+							]
+						}
+					]
+				}
+			]
+		}
 
 
 		this.dom = this.CreateDom();
+		this.tree = this.InitializeTree();
 		this.topControls = this.CreateTopControls();
 		this.subControls = this.CreateSubControls();
+
+		this.entries = [];
 		this.Initialize();
 
 		this.queue = [];
 
+		this.filterOptions = {
+			caseSensitive: false,
+			exactMatch: false,
+			includeAncestors: true,
+			includeDescendants: true
+		};
 
 	}
 
 	onSpawnedBlueprint(command) {
+		var t0 = performance.now();
 		let scope = this;
-		let parent = command.parent;
+		let gameObject = editor.getGameObjectByGuid(command.guid);
 
-		let entry = new HierarchyEntry(command.guid, command.name, command.userData.reference.typeName, scope.data.children.length, "root");
+		let entry = gameObject.getNode();
 		scope.entries[command.guid] = entry;
-		scope.data.children[scope.data.children.length] = entry;
-		if(editor.vext.executing) {
-			this.queue.push(entry);
-		} else {
-			var t0 = performance.now();
+
+		this.queue.push(entry);
+
+		if(!editor.vext.executing) {
 			console.log("Drawing");
 			console.log(this.queue.length);
-			if(this.queue.length === 0) {
-				scope.dom.jstree(true).create_node('root' ,  entry, "last");
-			} else {
-				scope.dom.jstree(true).settings.core.data = scope.data;
-				scope.dom.jstree(true).refresh();
-				this.queue = [];
+
+			let parent = command.parent;
+			let parentNode = scope.tree.getNodeById("root");
+
+			if(parent != null) {
+				parentNode = scope.tree.getNodeById(parent);
 			}
-			var t1 = performance.now();
-			console.log("Execution took " + (t1 - t0) + " milliseconds.");
+
+			scope.tree.addChildNodes(this.queue, undefined, parentNode);
+
+			this.queue = [];
 		}
+		var t1 = performance.now();
+		console.log("Execution took " + (t1 - t0) + " milliseconds.");
 	}
 
 	getEntry(guid) {
@@ -74,9 +96,9 @@ class Hierarchy {
 
 		//TODO: remove parent's reference in parent.children once groups are implemented
 
-		let node = scope.dom.jstree(true).get_node(command.guid);
+		let node = scope.tree.getNodeById(command.guid);
 		if (node !== null || node != undefined){
-			scope.dom.jstree(true).delete_node(node);
+			scope.tree.removeNode(node);
 		}
 		
 	}
@@ -91,6 +113,15 @@ class Hierarchy {
 		scope.dom.jstree(true).create_node('root' ,  entry, "last", function(){
 		});
 
+	}
+	onLevelLoaded(levelData) {
+		let scope = this;
+		console.log(levelData);
+		console.log(scope.data);
+
+		scope.data.children.push(levelData);
+		console.log(levelData);
+		this.LoadData(levelData)
 	}
 
 	onDestroyedGroup(command) {
@@ -107,38 +138,59 @@ class Hierarchy {
 	}
 
 	Initialize() {
-
+		let scope = this;
+		scope.tree.on('selectNode', function(node) {
+			console.log(node);
+			// → Node {} (The selected node)
+			// → null (No nodes selected)
+		});
 		// TODO: Implement node refresh logic here somewhere;
+	}
+	LoadData(data) {
+		let scope = this;
+		scope.data.children.push(data);
+		console.log(scope.data);
+		scope.tree.updateNode(scope.tree.getNodeById("root", {}, undefined))
+
+	}
+	InitializeTree() {
+		let scope = this;
+		return new InfiniteTree({
+			el: scope.dom,
+			data: scope.data,
+			rowRenderer: scope.hierarchyRenderer,
+			autoOpen: true, // Defaults to false
+			droppable: { // Defaults to false
+				hoverClass: 'infinite-tree-droppable-hover',
+				accept: function(event, options) {
+					return true;
+				},
+				drop: function(event, options) {
+				}
+			},
+			shouldSelectNode: function(node) { // Determine if the node is selectable
+				if(node == null) {
+					return false;
+				}
+				if(node.selectable === false) {
+					return false;
+				}
+				if (!node || (node === scope.tree.getSelectedNode())) {
+					return false; // Prevent from deselecting the current node
+				}
+				if(editor.isSelected(node.id)) {
+					return true;
+				}
+				editor.Select(node.id, keysdown[17]);
+			},
+			togglerClass: "Toggler",
+			nodeIdAttr: "guid"
+
+		});
 	}
 
 	CreateDom() {
-		let scope = this;
-		let dom = $(document.createElement("div"));
-		dom.jstree({
-			core: {
-				data: this.data,
-				check_callback: this.check_callback,
-				"multiple" : true
-			},
-			search: {
-				case_insensitive: true,
-				show_only_matches : true
-			},
-			//Disables node selection handled by jstree, allowing selection to be controlled using the selection request.
-			conditionalselect : function (node) {
-				editor.Select(node.id);
-				return false;
-			},
-			plugins: ["search", "dnd", "types", "changed", "conditionalselect"]
-		});
-		// Set data twice so we can update the scope data directly. :shrug:
-		dom.jstree(true).settings.core.data = scope.data;
-
-		dom.bind("move_node.jstree", function (e, data) {
-			scope.onMoved(data);
-		});
-
-		return dom;
+		return new UI.Panel().dom;
 	}
 
 
@@ -154,8 +206,8 @@ class Hierarchy {
 		searchInput.keyup(function () {
 			if(to) { clearTimeout(to); }
 			to = setTimeout(function () {
-				var v = searchInput.val();
-				scope.dom.jstree(true).search(v);
+				let v = searchInput.val();
+				scope.tree.filter(v, scope.filterOptions);
 			}, 250);
 		});
 
@@ -188,35 +240,66 @@ class Hierarchy {
 	}
 
 	onSelectedGameObject(guid, isMultipleSelection) {
-		console.log("Selected")
 		let scope = this;
-		let node = scope.dom.jstree(true).get_node(guid);
-		this.dom.jstree('select_node', node, true);
+		let node = scope.tree.getNodeById(guid);
+		scope.ExpandToNode(node);
+
+		scope.tree.selectNode(node, {
+			autoScroll: true,
+			silent: true
+		});
+	}
+
+	ExpandToNode(node) {
+		let scope = this;
+		if(node == null) {
+			return;
+		}
+		if(node.parent.id != null) {
+			scope.tree.openNode(node.parent);
+			scope.ExpandToNode(node.parent);
+		}
 	}
 
 	onDeselected(guid) {
-		console.log("deselect " + guid);
 		let scope = this;
-		let node = scope.dom.jstree(true).get_node(guid);
-		this.dom.jstree(true).deselect_node(node);
+		//let node = scope.dom.jstree(true).get_node(guid);
+		//this.dom.jstree(true).deselect_node(node);
 	}
-}
 
-class HierarchyEntry {
-	constructor(guid, name, type, position, parent) {
-		this.id = guid;
-		this.text = name;
-		this.icon = type;
-		this.data = {};
-		this.data.position = position;
-		this.data.parent = parent;
-		this.state = {
-			"opened": false,
-			"disabled": false,
-			"selected": false
-		};
-		this.children = [];
-	};
+	hierarchyRenderer(node, treeOptions) {
+		if(node.state.filtered === false){
+			return
+		}
+		let state = node.state;
+		let row = new UI.Row();
+		row.setAttribute("guid", node.id);
+		row.setStyle("margin-left", (state.depth * 18) +"px");
+		row.addClass("infinite-tree-item");
+
+		if(state.selected) {
+			row.addClass("infinite-tree-selected");
+		}
+		if(node.selectable !== undefined) {
+			row.setAttribute("node-selectable", node.selectable);
+		}
+		if(node.hasChildren()) {
+			row.add(new UI.Toggler(state.open));
+		}
+		if(node.draggable) {
+			row.setAttribute("draggable", true);
+		}
+		if(node.droppable) {
+			row.setAttribute("droppable", true);
+		}
+		row.add(new UI.Icon(node.type));
+		row.add(new UI.Text(node.name));
+		row.add(new UI.Text(Object.keys(node.children).length));
+		$(row).on('click', function (e) {
+			console.log(e);
+		});
+		return row.dom.outerHTML;
+	}
 }
 
 var HierarchyComponent = function( container, state ) {

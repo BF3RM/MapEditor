@@ -15,6 +15,9 @@
 		<link rel="stylesheet" href="style/perfect-scrollbar.css">
 		<link rel="stylesheet" href="style/goldenlayout-base.css">
 		<link rel="stylesheet" href="style/goldenlayout-dark-theme.css">
+        <link rel="stylesheet" href="style/infinite-tree.css">
+		<link rel="stylesheet" href="style/icons.css">
+		<link rel="stylesheet" href="style/UIElements.css">
 
 		<!--
 			Our stylesheet should be loaded last
@@ -29,6 +32,7 @@
 		<script src="script/libs/jquery/jquery-sortable.js"></script>
 
 		<script src="script/libs/jstree.js"></script>
+        <script src="script/libs/infinite-tree.js"></script>
 		<script src="script/libs/renderjson.js"></script>
         <script src="script/libs/perfect-scrollbar.min.js"></script>
 
@@ -37,6 +41,8 @@
 		<script src="script/libs/three/three.min.js"></script>
 		<script src="script/libs/three/SceneUtils.js"></script>
 		<script src="script/libs/three/TransformControls.js"></script>
+        <script src="script/libs/three/OrbitControls.js"></script>
+		<script src="script/libs/three/ui.js"></script>
 
 		<script src="script/libs/three/History.js"></script>
 		<script src="script/libs/three/Command.js"></script>
@@ -82,6 +88,7 @@
 		<!--
 			Main
 		-->
+		<script src="script/EditorCore.js"></script>
 		<script src="script/Editor.js"></script>
 
 		<!--
@@ -98,7 +105,8 @@
 		<script src="script/modules/BlueprintManager.js"></script>
 		<script src="script/modules/EntityFactory.js"></script>
 		<script src="script/modules/Controls.js"></script>
-		<script src="script/modules/UI.js"></script>
+		<script src="script/modules/EditorUI.js"></script>
+		<script src="script/modules/GameContext.js"></script>
 
 
 		<!--
@@ -240,12 +248,12 @@
 
 	<script>
 
-			let debug = false;
+			var debugMode = false;
 			var vext = new VEXTInterface();
 			if(window.location.href.indexOf("webui") === -1) {
-				debug = true;
+				debugMode = true;
 			}
-			var editor = new Editor(debug);
+			var editor = new Editor(debugMode);
 
-		</script>
+    </script>
 </html>

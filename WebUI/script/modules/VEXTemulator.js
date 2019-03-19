@@ -35,6 +35,7 @@ class VEXTemulator {
 			"name": command.userData.name,
 			"sender": command.sender,
 		};
+		return response;
 	}
 	DestroyGroup(command) {
 
@@ -45,7 +46,7 @@ class VEXTemulator {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
-		command.userData.transform = command.userData.transform.toTable();
+		//command.userData.transform = command.userData.transform.toTable();
 		let response = {
 			"guid": command.guid,
 			"sender": command.sender,

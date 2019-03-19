@@ -256,16 +256,9 @@ end
 --]]
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
-
-    if(p_Parent ~= nil) and (m_InstanceParser:GetPartition(tostring(p_Parent.instanceGuid)) ~= nil or
-            (p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent.typeInfo.name == "SubWorldReferenceObjectData")) then
-
-        local x = p_Hook:Call()
-        p_Hook:Return(x)
-        return
-    end
-    --print(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
-    local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+	--print(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
+    local s_ParentPartition = m_InstanceParser
+	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
     table.insert(self.m_VanillaObjects, s_Response)
 
 end

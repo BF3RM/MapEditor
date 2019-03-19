@@ -81,7 +81,6 @@ class GameObject extends THREE.Object3D
 		}
 
 		matrix.decompose( this.position, this.quaternion, this.scale );
-		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
 
 		editor.threeManager.Render();
 
@@ -172,6 +171,16 @@ class GameObject extends THREE.Object3D
 
 	getUserData() {
 		return this.userData;
+	}
+
+	getNode() {
+		return {
+			id: this.guid,
+			name: this.name,
+			type: this.type,
+			draggable: true,
+			droppable: true
+		}
 	}
 
 }
