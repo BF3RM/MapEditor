@@ -58,6 +58,9 @@ end
 
 
 function ToWorld(p_Local, p_ParentWorld)
+	p_Local = SanitizeLT(p_Local)
+	p_ParentWorld = SanitizeLT(p_ParentWorld)
+
 	local s_LinearTransform = LinearTransform()
 
 	local s_MatrixParent = matrix{
@@ -81,11 +84,14 @@ function ToWorld(p_Local, p_ParentWorld)
 	s_LinearTransform.forward = Vec3(s_MatrixWorld[3][1],s_MatrixWorld[3][2],s_MatrixWorld[3][3])
 	s_LinearTransform.trans = Vec3(s_MatrixWorld[4][1],s_MatrixWorld[4][2],s_MatrixWorld[4][3])
 
-	return s_LinearTransform
+	return SanitizeLT(s_LinearTransform)
 end
 
 
 function ToLocal(world, p_ParentWorld)
+	world = SanitizeLT(world)
+	p_ParentWorld = SanitizeLT(p_ParentWorld)
+
     local s_LinearTransform = LinearTransform()
 
 		local s_MatrixParent = matrix{
@@ -110,9 +116,45 @@ function ToLocal(world, p_ParentWorld)
 		s_LinearTransform.up = Vec3(s_MatrixLocal[2][1],s_MatrixLocal[2][2],s_MatrixLocal[2][3])
 		s_LinearTransform.forward = Vec3(s_MatrixLocal[3][1],s_MatrixLocal[3][2],s_MatrixLocal[3][3])
 		s_LinearTransform.trans = Vec3(s_MatrixLocal[4][1],s_MatrixLocal[4][2],s_MatrixLocal[4][3])
+		-- s_LinearTransform.trans.x = world.left.x * t.x +
+		--     	world.left.y * t.x +
+		--     	world.left.z * t.x
+		-- s_LinearTransform.trans.y = world.up.x * t.y +
+		--     	world.up.y * t.y +
+		--     	world.up.z * t.y
+		-- s_LinearTransform.trans.z = world.forward.x * t.z +
+		--     	world.forward.y * t.z +
+		--     	world.forward.z * t.z
 
-    return s_LinearTransform
+    -- s_LinearTransform.trans.x = world.trans.x - p_ParentWorld.trans.x
+    -- s_LinearTransform.trans.y = world.trans.y - p_ParentWorld.trans.y
+    -- s_LinearTransform.trans.z = world.trans.z - p_ParentWorld.trans.z
+		-- print(s_LinearTransform.trans) --(15.818466, -0.016708, -24.546097)
+
+    return SanitizeLT(s_LinearTransform)
 end
+
+function SanitizeLT (lt) 
+	lt.left = SanitizeVec3(lt.left)
+	lt.up = SanitizeVec3(lt.up)
+	lt.forward = SanitizeVec3(lt.forward)
+	lt.trans = SanitizeVec3(lt.trans)
+	return lt
+end
+function SanitizeVec3( vec )
+	vec.x = SanitizeFloat(vec.x)
+	vec.y = SanitizeFloat(vec.y)
+	vec.z = SanitizeFloat(vec.z)
+	return vec
+end
+
+function SanitizeFloat( f )
+	if( f < 0.000000001 and f > -0.000000001 ) then
+		return 0
+	end
+	return f
+end
+
 
 function InverseSafe (f)
     if (f > 0.00000000000001) then
