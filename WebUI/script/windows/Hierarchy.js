@@ -48,6 +48,13 @@ class Hierarchy {
 
 		this.queue = [];
 
+		this.filterOptions = {
+			caseSensitive: false,
+			exactMatch: false,
+			includeAncestors: true,
+			includeDescendants: true
+		};
+
 	}
 
 	onSpawnedBlueprint(command) {
@@ -109,11 +116,11 @@ class Hierarchy {
 	}
 	onLevelLoaded(levelData) {
 		let scope = this;
-		console.log(levelData)
-		console.log(scope.data)
+		console.log(levelData);
+		console.log(scope.data);
 
 		scope.data.children.push(levelData);
-		console.log(levelData)
+		console.log(levelData);
 		this.LoadData(levelData)
 	}
 
@@ -133,6 +140,7 @@ class Hierarchy {
 	Initialize() {
 		let scope = this;
 		scope.tree.on('selectNode', function(node) {
+			console.log(node);
 			// → Node {} (The selected node)
 			// → null (No nodes selected)
 		});
@@ -198,8 +206,8 @@ class Hierarchy {
 		searchInput.keyup(function () {
 			if(to) { clearTimeout(to); }
 			to = setTimeout(function () {
-				var v = searchInput.val();
-				scope.dom.jstree(true).search(v);
+				let v = searchInput.val();
+				scope.tree.filter(v, scope.filterOptions);
 			}, 250);
 		});
 
@@ -260,11 +268,15 @@ class Hierarchy {
 	}
 
 	hierarchyRenderer(node, treeOptions) {
+		if(node.state.filtered === false){
+			return
+		}
 		let state = node.state;
 		let row = new UI.Row();
-		row.setAttribute("guid", node.guid);
+		row.setAttribute("guid", node.id);
 		row.setStyle("margin-left", (state.depth * 18) +"px");
 		row.addClass("infinite-tree-item");
+
 		if(state.selected) {
 			row.addClass("infinite-tree-selected");
 		}
@@ -283,26 +295,11 @@ class Hierarchy {
 		row.add(new UI.Icon(node.type));
 		row.add(new UI.Text(node.name));
 		row.add(new UI.Text(Object.keys(node.children).length));
-		console.log(node)
+		$(row).on('click', function (e) {
+			console.log(e);
+		});
 		return row.dom.outerHTML;
 	}
-}
-
-class HierarchyEntry {
-	constructor(guid, name, type, position, parent) {
-		this.id = guid;
-		this.name = name;
-		this.icon = type;
-		this.data = {};
-		this.data.position = position;
-		this.data.parent = parent;
-		this.state = {
-			"opened": false,
-			"disabled": false,
-			"selected": false
-		};
-		this.children = [];
-	};
 }
 
 var HierarchyComponent = function( container, state ) {

@@ -137,7 +137,7 @@ editor.threeManager.ShowGizmo();
 let FakeLevel = `
 {
     "name": "FakeLevel",
-    "gid": "1",
+    "guid": "1",
     "TypeName": "LevelData",
     "Parent": "root",
     "children": [

@@ -333,7 +333,7 @@ class Editor {
 
 	Select(guid, multi) {
 		console.log(multi);
-		if(keysdown[17] && (multi === undefined || multi === true)) {
+		if(keysdown[17] || multi === true) {
 			this.editorCore.onSelectedGameObject(guid, true)
 		} else {
 			this.editorCore.onSelectedGameObject(guid, false)
