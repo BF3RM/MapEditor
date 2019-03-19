@@ -3,7 +3,7 @@ const PreviewSpawnMessage = function (userData) {
 	this.type = 'PreviewSpawnMessage';
 
 	if (userData === undefined) {
-		editor.logger.Log(LOGLEVEL.DEBUG, "Missing spawn userData");
+		Log(LOGLEVEL.DEBUG, "Missing spawn userData");
 		return;
 	}
 	this.userData = userData;

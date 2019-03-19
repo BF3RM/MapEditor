@@ -1,6 +1,7 @@
 let Signal = signals.Signal;
 var signals = {
 
+	levelLoaded: new Signal(),
 	// Object actions
 	windowResized: new Signal(),
 

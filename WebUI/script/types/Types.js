@@ -69,6 +69,10 @@ class ReferenceObject {
 		this.partitionGuid = partitionGuid;
 		this.instanceGuid = instanceGuid;
 	}
+
+	clone() {
+		return new ReferenceObject(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
+	}
 }
 
 class ReferenceObjectParameters {
@@ -77,5 +81,9 @@ class ReferenceObjectParameters {
 		this.variation = variation;
 		this.name = name;
 		this.transform = transform;
+	}
+
+	clone() {
+		return new ReferenceObjectParameters(this.reference.clone(), this.variation.toString(), this.name.toString(), this.transform.clone());
 	}
 }

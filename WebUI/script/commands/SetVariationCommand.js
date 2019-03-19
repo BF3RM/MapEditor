@@ -8,12 +8,12 @@ const SetVariationCommand = function (guid, key) {
 
 
 	if (key === undefined) {
-		editor.logger.LogError("Missing is key");
+		LogError("Missing is key");
 		return;
 	}
 
 	if(editor.getGameObjectByGuid(guid) === undefined) {
-		editor.logger.LogError("Attempted to set key for null GameObject");
+		LogError("Attempted to set key for null GameObject");
 	} else {
 		this.oldkey = editor.getGameObjectByGuid(guid).parameters.variation;
 	}

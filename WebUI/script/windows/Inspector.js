@@ -220,7 +220,7 @@ class Inspector {
 			let variationSelect = $(document.getElementById("objectVariation"));
 			variationSelect.prop("disabled", true);
 			variationSelect.empty();
-			editor.logger.LogError("Tried to set the name of a null entry. " + guid);
+			LogError("Tried to set the name of a null entry. " + guid);
 			this.DisableInspector();
 			return;
 		}
@@ -307,7 +307,7 @@ class Inspector {
 		if(!blueprint.hasVariation()){
 			this.variation.prop("disabled", true);
 			this.variation.empty();
-			editor.logger.LogError("Blueprint Variations not available");
+			LogError("Blueprint Variations not available");
 		}else{
 			console.log(blueprint.variations);
 			this.variation.prop("disabled", false);

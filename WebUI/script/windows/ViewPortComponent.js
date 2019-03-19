@@ -10,13 +10,13 @@ var ViewPortComponent = function( container, state ) {
 		accept: '.draggable',
 		greedy:false,//this will prevent the parent droppables from receiving the droppable object
 		drop: function (event, ui) {
-			editor.onPreviewDrop();
+			editor.editorCore.onPreviewDrop();
 		},
 		over: function(event, ui) {
-			editor.onPreviewStart();
+			editor.editorCore.onPreviewStart();
 		},
 		out: function(event, ui) {
-			editor.onPreviewStop();
+			editor.editorCore.onPreviewStop();
 		},
 	});
 
