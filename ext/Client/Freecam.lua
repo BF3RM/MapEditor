@@ -18,9 +18,11 @@ function Freecam:RegisterVars()
 	self.cameraData = CameraEntityData()
 	self.lastTransform = nil
 
-	self.yaw = 0.0
-	self.pitch = 0.0
-	self.roll = 0.0
+	self.m_Yaw = 0.0
+	self.m_Pitch = 0.0
+	self.m_Roll = 0.0
+	self.m_MoveYaw = 0.0
+	self.m_MovePitch = 0.0
 
 	self.m_MoveX = 0.0
 	self.m_MoveY = 0.0
@@ -39,14 +41,27 @@ function Freecam:RegisterVars()
 end
 
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-	if (self.camera ~= nil and self.m_Freecam == true) then
+	-- if (self.camera ~= nil and self.m_Freecam == true) then
 
-		self.yaw   = self.yaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		self.pitch = self.pitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		--self.roll  = self.roll  - p_Cache:GetLevel([InputConceptIdentifiers.ConceptRoll) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+	-- 	self.m_Yaw   = self.m_Yaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+	-- 	self.m_Pitch = self.m_Pitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+	-- end
+
+	if self.camera ~= nil and self.m_Freecam then
+
+		local s_NewYaw   = self.m_MoveYaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		local s_NewPitch = self.m_MovePitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+
+		self.m_MoveYaw = s_NewYaw
+
+		-- print(self.m_MovePitch.." , ".. s_NewPitch)
+		-- print(math.abs(math.pi - math.abs(s_NewPitch))*2)
+		-- if (math.abs(math.pi - s_NewPitch)* 2 < math.pi) then
+		if (math.abs(s_NewPitch)* 2 < math.pi) then
+			self.m_MovePitch = s_NewPitch
+		end
 	end
 end
-
 
 function Freecam:Create()
 	print("function Freecam:Create()")
@@ -144,9 +159,11 @@ function Freecam:OnUpdateInput(p_Delta)
 		self.cameraData.transform.left = Vec3(1,0,0)
 		self.cameraData.transform.up = Vec3(0,1,0)
 		self.cameraData.transform.forward = Vec3(0,0,1)
-		self.yaw = 0.0
-		self.pitch = 0.0
-		self.roll = 0.0
+		self.m_Yaw = 0.0
+		self.m_Pitch = 0.0
+		self.m_Roll = 0.0
+		self.m_MoveYaw = 0.0
+		self.m_MovePitch = 0.0
 		self.m_CameraDistance = 1.0
 		self.m_ThirdPersonRotX = 0.0
 		self.m_ThirdPersonRotY = 0.0
@@ -221,15 +238,14 @@ function Freecam:UpdateFreeCamera(p_Delta)
 
 	local s_Transform = self.cameraData.transform
 
-	local forward = Vec3( math.sin(self.yaw)*math.cos(self.pitch),
-			math.sin(self.pitch),
-			math.cos(self.yaw)*math.cos(self.pitch))
+	local forward = Vec3( math.sin(self.m_MoveYaw)*math.cos(self.m_MovePitch),
+			math.sin(self.m_MovePitch),
+			math.cos(self.m_MoveYaw)*math.cos(self.m_MovePitch))
 
+	local up = Vec3( -(math.sin(self.m_MoveYaw)*math.sin(self.m_MovePitch)*math.cos(self.m_Roll) + math.cos(self.m_MoveYaw)*math.sin(self.m_Roll)),
+			math.cos(self.m_MovePitch)*math.cos(self.m_Roll),
+			-(math.cos(self.m_MoveYaw)*math.sin(self.m_MovePitch)*math.cos(self.m_Roll) - math.sin(self.m_MoveYaw)*math.sin(self.m_Roll)) )
 
-
-	local up = Vec3( -(math.sin(self.yaw)*math.sin(self.pitch)*math.cos(self.roll) + math.cos(self.yaw)*math.sin(self.roll)),
-			math.cos(self.pitch)*math.cos(self.roll),
-			-(math.cos(self.yaw)*math.sin(self.pitch)*math.cos(self.roll) - math.sin(self.yaw)*math.sin(self.roll)) )
 
 	local left = forward:Cross(Vec3(up.x * -1, up.y * -1, up.z * -1))
 
