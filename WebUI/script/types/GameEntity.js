@@ -49,4 +49,9 @@ class GameEntity extends THREE.Object3D
 		editor.threeManager.Render();
 
 	}
+
+	SetVisible(visible){
+		// console.log(this.children[0]);
+		this.children[0].material.visible = visible;
+	}
 }
