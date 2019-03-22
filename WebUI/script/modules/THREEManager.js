@@ -325,9 +325,15 @@ class THREEManager {
 		} else if(this.controlSelected) {
 			console.log("Control selected")
 		} else if(e.which === 1) {
-			let direction = scope.getMouse3D(e);
-			let message = new SelectObject3DMessage(direction);
-			editor.vext.SendMessage(message);
+			let guid = scope.RaycastSelection(e);
+
+			if (guid !== null){
+				editor.Select(guid);
+			}
+
+			// let direction = scope.getMouse3D(e);
+			// let message = new SelectObject3DMessage(direction);
+			// editor.vext.SendMessage(message);
 		}
 	}
 
@@ -348,6 +354,52 @@ class THREEManager {
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
+	}
+
+	RaycastSelection(e){ 
+		let mousePos = [];
+		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+		let raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( mousePos, this.camera );
+		let tempArray = [];
+
+		Object.keys(editor.gameObjects).forEach(function(i) {
+			if (editor.gameObjects[i] !== null &&
+					editor.gameObjects[i].children !== null  &&
+					editor.gameObjects[i].children[0] !== null  &&
+					editor.gameObjects[i].children[0] !== undefined  &&
+					editor.gameObjects[i].children[0].type === "GameEntity") {
+				for (var j = editor.gameObjects[i].children.length - 1; j >= 0; j--) {
+					tempArray.push(editor.gameObjects[i].children[j]);
+				}
+				
+			}
+		});
+
+		var intersects = raycaster.intersectObjects( tempArray, true );
+
+		if ( intersects.length > 0 ) {
+			for (let i = 0; i < intersects.length; i++) {
+				// console.log("hit")
+				const element = intersects[i];
+				if (element.object == null || element.object.parent == null){
+					continue;
+				}
+				if (element.object.parent.type == "GameEntity"){
+
+					// console.log("hit something")
+					// console.log(element.object.parent.parent);
+					return element.object.parent.parent.guid;
+				}
+			}
+		} else {
+			// console.log("no hit");
+		}
+
+		return null;
+
 	}
 
 	getMouse3D(e) {
