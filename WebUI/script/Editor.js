@@ -345,9 +345,9 @@ class Editor {
 		return false;
 	}
 
-	Select(guid, multi) {
+	Select(guid, multi = false) {
 		console.log(multi);
-		if(keysdown[17] || multi === true) {
+		if(keysdown[17] || multi) {
 			this.editorCore.onSelectedGameObject(guid, true)
 		} else {
 			this.editorCore.onSelectedGameObject(guid, false)

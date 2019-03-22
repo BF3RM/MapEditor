@@ -80,7 +80,6 @@ class SelectionGroup extends THREE.Group{
 		}
 
 		matrix.decompose( this.position, this.quaternion, this.scale );
-		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
 
 		editor.threeManager.Render();
 
