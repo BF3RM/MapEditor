@@ -325,58 +325,14 @@ class THREEManager {
 		} else if(this.controlSelected) {
 			console.log("Control selected")
 		} else if(e.which === 1) {
-			// let direction = scope.getMouse3D(e);
-			let guid = scope.RaycastSelection(e);
-
-			if (guid !== null){
-				editor.Select(guid);
-			}
-			
-			// let message = new SelectObject3DMessage(direction);
-			// editor.vext.SendMessage(message);
+			let direction = scope.getMouse3D(e);
+			let message = new SelectObject3DMessage(direction);
+			editor.vext.SendMessage(message);
 		}
-	}
-
-	RaycastSelection(e){
-		let mousePos = [];
-		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-
-		let raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera( mousePos, this.camera );
-
-		var intersects = raycaster.intersectObjects( this.scene.children, true );
-
-		if ( intersects.length > 0 ) {
-			// console.log(intersects)
-			for (let i = 0; i < intersects.length; i++) {
-				// console.log("hit")
-				const element = intersects[i];
-				if (element.object == null || element.object.parent == null){
-					continue;
-				}
-				if (element.object.parent.type == "GameEntity"){
-
-					// console.log("hit something")
-					// console.log(element.object.parent.parent);
-					return element.object.parent.parent.guid;
-				}
-			}
-		} else {
-			// console.log("no hit");
-		}
-
-		return null;
-
 	}
 
 	onMouseMove(e) {
 		let scope = this;
-		// let guid = scope.RaycastSelection(e);
-		// if (guid !== null){
-		// 	editor.Select(guid);
-		// }
-
 		if(editor.threeManager.raycastPlacing) {
 			let direction = scope.getMouse3D(e);
 
@@ -395,7 +351,6 @@ class THREEManager {
 	}
 
 	getMouse3D(e) {
-		console.log("boii")
 		let mousePos = [];
 		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;

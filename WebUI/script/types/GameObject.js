@@ -12,7 +12,7 @@ class GameObject extends THREE.Object3D
 		this.objectParent = parent;
 		this.userData = userData;
 		this.selected = false;
-		this.isVisible = false;
+		this.visible = false;
 
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);
@@ -20,7 +20,7 @@ class GameObject extends THREE.Object3D
 
 		// Update the matrix after initialization.
 		this.updateTransform();
-		this.SetVisible(false)
+
 	}
 	
 	hasMoved() {
@@ -158,24 +158,15 @@ class GameObject extends THREE.Object3D
 		this.onDeselected();
 	}
 
-	SetVisible(visible){
-		for (var i = this.children.length - 1; i >= 0; i--) {
-			this.children[i].SetVisible(visible);
-		}
-
-		this.isVisible = visible;
-
-	}
-
 	onSelected() {
 		console.log("Selected");
 		this.selected = true;
-		this.SetVisible(true);
+		this.visible = true;
 	}
 	onDeselected() {
 		console.log("Deselected");
 		this.selected = false;
-		this.SetVisible(false);
+		this.visible = false;
 	}
 
 	getUserData() {

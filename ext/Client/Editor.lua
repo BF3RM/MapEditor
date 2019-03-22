@@ -349,7 +349,7 @@ function Editor:Raycast()
 				) then
 					local s_Entity = SpatialEntity(l_Entity)
 					-- Compare the collider's transform to the actual entity's transform
-					if(s_RigidBodyHitTransform.trans == s_Entity.transform.trans) then
+					if(s_RigidBodyHitTransform.trans == s_Entity.transform.trans ) then
 						-- Check if we have that entity's instanceId stored
 						local s_Guid = ObjectManager:GetGuidFromInstanceID(s_Entity.instanceID)
 						if(s_Guid ~= nil) then

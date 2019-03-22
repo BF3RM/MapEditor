@@ -18,12 +18,8 @@ class AABBHelper extends THREE.LineSegments
 		this.box = box;
 
 		this.matrixAutoUpdate = false;
-		this.material.visible = false;
-		this.update();
-	}
 
-	SetColor(color){
-		this.material.color.setHex(color);
+		this.update();
 	}
 
 	update()
