@@ -27,7 +27,7 @@ class THREEManager {
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
 		$('#page').append(scope.renderer.domElement);
 
-		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
+		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 500);
 		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
@@ -154,7 +154,7 @@ class THREEManager {
 		} );
 		let mesh = new THREE.Mesh(geometry, material);
 		
-		this.scene.add(mesh);
+		// this.scene.add(mesh);
 
 		let matrix = new THREE.Matrix4();
 		matrix.set(
@@ -170,10 +170,10 @@ class THREEManager {
 		return mesh;
 	}
 
-	AddObject(object)
-	{
-		if (object.renderInit != undefined)
+	AddObject(object){
+		if (object.renderInit != undefined){
 			object.renderInit();
+		}
 
 		this.scene.add(object);
 
@@ -311,12 +311,14 @@ class THREEManager {
 		}
 	}
 	onMouseUp(e) {
+		let scope = this;
+
 		if(e.which === 1 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
 			editor.onControlMoveEnd();
-			this.Render();
-		} 
+			scope.Render();
+		}
 	}
 	onMouseDown(e) {
 		let scope = this;
@@ -325,15 +327,15 @@ class THREEManager {
 		} else if(this.controlSelected) {
 			console.log("Control selected")
 		} else if(e.which === 1) {
-			let guid = scope.RaycastSelection(e);
+			
+			// scope.RaycastSelection(e);
+			// // if (guid !== null){
+			// // 	editor.Select(guid);
+			// // }
 
-			if (guid !== null){
-				editor.Select(guid);
-			}
-
-			// let direction = scope.getMouse3D(e);
-			// let message = new SelectObject3DMessage(direction);
-			// editor.vext.SendMessage(message);
+			let direction = scope.getMouse3D(e);
+			let message = new SelectObject3DMessage(direction);
+			editor.vext.SendMessage(message);
 		}
 	}
 
@@ -378,28 +380,24 @@ class THREEManager {
 			}
 		});
 
+		console.log(tempArray);
+
 		var intersects = raycaster.intersectObjects( tempArray, true );
 
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
-				// console.log("hit")
+				console.log("hit "+ (i+1) + " times");
 				const element = intersects[i];
 				if (element.object == null || element.object.parent == null){
 					continue;
 				}
 				if (element.object.parent.type == "GameEntity"){
-
-					// console.log("hit something")
-					// console.log(element.object.parent.parent);
-					return element.object.parent.parent.guid;
+					console.log("first hit is: "+element.object.parent.parent.guid)
+					editor.Select(element.object.parent.parent.guid);
+					break;
 				}
 			}
-		} else {
-			// console.log("no hit");
 		}
-
-		return null;
-
 	}
 
 	getMouse3D(e) {

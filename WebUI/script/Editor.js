@@ -181,6 +181,25 @@ class Editor {
 	SetScreenToWorldPosition(x, y, z){
 		this.editorCore.screenToWorldTransform.trans = new Vec3(x, y, z);
 	}
+	
+	// RemoveAllGameObjectsFromScene(){
+	// 	let scene = this.threeManager.scene;
+
+	// 	for (var i = scene.children.length - 1; i >= 0; i--) {
+	// 		if (scene.children[i].type  === "GameObject") {
+	// 			scene.remove(scene.children[i].guid)
+	// 		}
+	// 	}
+	// }
+
+	AddObjectToScene(guid){
+		if (guid == null || editor.gameObjects[guid] == null || editor.gameObjects[guid].parent !== null) {
+			return;
+		}
+
+		editor.threeManager.scene.add(editor.gameObjects[guid]);
+	}
+
 
 	addPending(guid, message) {
 		this.pendingMessages[guid] = message;
@@ -302,7 +321,7 @@ class Editor {
 		let scope = this;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData);
 
-		this.threeManager.AddObject(gameObject);
+		// this.threeManager.AddObject(gameObject);
 
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
@@ -316,11 +335,9 @@ class Editor {
 
 			gameEntity.add(aabb);
 			gameObject.add(gameEntity);
-
 		}
 
 		this.gameObjects[command.guid] = gameObject;
-
 		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(command.guid, false)}, 1);

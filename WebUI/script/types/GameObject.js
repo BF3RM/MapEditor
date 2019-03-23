@@ -12,7 +12,7 @@ class GameObject extends THREE.Object3D
 		this.objectParent = parent;
 		this.userData = userData;
 		this.selected = false;
-		this.visible = false;
+		this.visible = true;
 
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);
@@ -160,13 +160,15 @@ class GameObject extends THREE.Object3D
 
 	onSelected() {
 		console.log("Selected");
-		this.selected = true;
-		this.visible = true;
+		// this.selected = true;
+		// editor.threeManager.scene.add(this);
+		// this.visible = true;
 	}
 	onDeselected() {
 		console.log("Deselected");
-		this.selected = false;
-		this.visible = false;
+		// this.selected = false;
+		// editor.threeManager.scene.remove(this);
+		// this.visible = false;
 	}
 
 	getUserData() {
