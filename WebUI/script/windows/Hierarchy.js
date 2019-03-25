@@ -11,29 +11,12 @@ class Hierarchy {
 		signals.levelLoaded.add(this.onLevelLoaded.bind(this));
 
 
-
 		this.data = {
-			"name": "FakeLevel",
-			"gid": "1",
-			"TypeName": "LevelData",
+			"name": "Root",
+			"id": "root",
+			"TypeName": "Root",
 			"Parent": "root",
 			"children": [
-				{
-					"name": "FakeLevelRoot",
-					"guid": "2",
-					"TypeName": "LevelData",
-					"Parent": "1",
-					"children": [
-						{
-							"name": "FakeLevelDepth1",
-							"guid": "3",
-							"TypeName": "LevelData",
-							"Parent": "2",
-							"children": [
-							]
-						}
-					]
-				}
 			]
 		}
 
@@ -54,36 +37,51 @@ class Hierarchy {
 			includeAncestors: true,
 			includeDescendants: true
 		};
-
 	}
 
+
+
 	onSpawnedBlueprint(command) {
-		var t0 = performance.now();
 		let scope = this;
 		let gameObject = editor.getGameObjectByGuid(command.guid);
 
-		let entry = gameObject.getNode();
-		scope.entries[command.guid] = entry;
+		let currentEntry = gameObject.getNode();
+		scope.entries[command.guid] = currentEntry;
 
-		this.queue.push(entry);
+		this.queue[currentEntry.id] = currentEntry;
 
 		if(!editor.vext.executing) {
 			console.log("Drawing");
 			console.log(this.queue.length);
 
-			let parent = command.parent;
-			let parentNode = scope.tree.getNodeById("root");
+			let updatedNodes = {};
+			let missingParent = {};
 
-			if(parent != null) {
-				parentNode = scope.tree.getNodeById(parent);
+			for( let entryGuid in scope.queue) {
+				let entry = scope.queue[entryGuid];
+				//Check if the parent is in the queue
+				if(this.queue[entry.parentId] != null) {
+					this.queue[entry.parentId].children.push(entry);
+					entry.parent = this.queue[entry.parentId];
+				} else if(this.tree.getNodeById(entry.parentId) != null) {
+					let parentNode = this.tree.getNodeById(entry.parentId);
+					parentNode.children.push(scope.queue[entryGuid]);
+					updatedNodes[entry.parentId] = parentNode;
+					entry.parent = parentNode;
+				} else {
+					let parentNode = this.tree.getNodeById("root");
+					parentNode.children.push(scope.queue[entryGuid]);
+					updatedNodes[entry.parentId] = parentNode;
+					entry.parent = parentNode;
+				}
+			}
+			scope.queue = {};
+			for(let parentNodeId in updatedNodes) {
+				let parentNode = updatedNodes[parentNodeId];
+				scope.tree.updateNode(parentNode);
 			}
 
-			scope.tree.addChildNodes(this.queue, undefined, parentNode);
-
-			this.queue = [];
 		}
-		var t1 = performance.now();
-		console.log("Execution took " + (t1 - t0) + " milliseconds.");
 	}
 
 	getEntry(guid) {
@@ -116,12 +114,18 @@ class Hierarchy {
 	}
 	onLevelLoaded(levelData) {
 		let scope = this;
-		console.log(levelData);
-		console.log(scope.data);
-
-		scope.data.children.push(levelData);
-		console.log(levelData);
-		this.LoadData(levelData)
+		let levelEntry = {
+			id: levelData.instanceGuid,
+			name: levelData.name,
+			type: "LevelData",
+			state: {
+				open: true
+			},
+			selectable: false,
+			children: []
+		};
+		this.data.children.push(levelEntry);
+		scope.tree.loadData(this.data)
 	}
 
 	onDestroyedGroup(command) {
@@ -169,6 +173,8 @@ class Hierarchy {
 				}
 			},
 			shouldSelectNode: function(node) { // Determine if the node is selectable
+				console.log(node);
+
 				if(node == null) {
 					return false;
 				}

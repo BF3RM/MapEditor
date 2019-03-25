@@ -1,3 +1,4 @@
 *.idea
 ui.vuic
 *.DS_STORE
+WebUI/debugData/*

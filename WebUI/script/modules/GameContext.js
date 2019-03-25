@@ -4,10 +4,9 @@ class GameContext {
     }
 
     LoadLevel(levelRaw) {
-        let level = JSON.parse(levelRaw);
-        this.data = this.ParseUserData(level);
-        console.log(this.data);
-        signals.levelLoaded.dispatch(this.data);
+        let levelData = JSON.parse(levelRaw);
+        signals.levelLoaded.dispatch(levelData);
+        //signals.levelLoaded.dispatch(this.data);
     }
 
     ParseUserData(userData) {

@@ -63,11 +63,12 @@ function Backend:SpawnBlueprint(p_Command)
 	return s_Response
 end
 
-function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-    if(p_Transform == nil) then
-        p_Transform = LinearTransform()
-    end
-    local s_Guid = GenerateGuid()
+function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent, p_PartitionGuid, p_ParentGuid, p_ParentPrimaryInstance, p_ParentType)
+	if(p_Transform == nil) then
+		p_Transform = LinearTransform()
+	end
+	local s_Guid = GenerateGuid()
+
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, tostring(s_Guid), p_Transform, p_Blueprint, p_Parent)
 
     local s_Children = {}
@@ -93,17 +94,20 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
     if(p_Parent ~= nil) then
         s_ParentGuid = tostring(p_Parent.instanceGuid)
     end
+
     local s_Response = {
         guid = tostring(s_Guid),
         sender = "Server",
         name = s_Blueprint.name,
         ['type'] = 'SpawnedBlueprint',
-		parent = s_ParentGuid,
+		referenceGuid = s_ParentGuid,
+		parentPartition = p_ParentGuid,
+		parentPrimaryInstance = p_ParentPrimaryInstance,
         userData = {
             name = s_Blueprint.name,
             reference = {
                 instanceGuid = tostring(p_Blueprint.instanceGuid),
-                partitionGuid = s_ParentGuid,
+                partitionGuid = p_PartitionGuid,
                 typeName = p_Blueprint.typeInfo.name,
                 name = s_Blueprint.name,
             },

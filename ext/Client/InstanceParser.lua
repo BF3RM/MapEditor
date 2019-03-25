@@ -22,6 +22,8 @@ function InstanceParser:RegisterVars()
 
 
     self.m_BlueprintInstances = {}
+	self.m_PrimaryInstances = {}
+	self.m_LevelDatas = {}
 end
 
 
@@ -31,6 +33,17 @@ end
 
 function InstanceParser:GetPartition(p_InstanceGuid)
     return self.m_BlueprintInstances[tostring(p_InstanceGuid)]
+end
+
+function InstanceParser:GetPrimaryInstance(p_PartitionGuid)
+	return self.m_PrimaryInstances[tostring(p_PartitionGuid)]
+end
+function InstanceParser:GetLevelDatas()
+	return self.m_LevelDatas
+end
+
+function InstanceParser:GetLevelData(guid)
+    return self.m_LevelDatas[guid]
 end
 
 function InstanceParser:RegisterEvents()
@@ -90,9 +103,10 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
     if(s_PrimaryInstance == nil) then
         print("Primary is nil")
     end
-    if(s_PrimaryInstance:Is("Blueprint") and s_PrimaryInstance.typeInfo.name ~= "WorldPartData" and s_PrimaryInstance.typeInfo.name ~= "SubWorldData") then
+    if(s_PrimaryInstance:Is("Blueprint")) then
         s_Blueprint = true
     end
+	self.m_PrimaryInstances[tostring(p_Partition.guid)] = tostring(s_PrimaryInstance.instanceGuid);
 
 	for _, l_Instance in ipairs(s_Instances) do
 		if l_Instance == nil then
@@ -137,11 +151,19 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 		end
 
 		if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
-			print(l_Instance.instanceGuid)
-			print(p_Partition.guid)
 			self.m_StaticModelGroupEntityDataGuids.instanceGuid = l_Instance.instanceGuid
 			self.m_StaticModelGroupEntityDataGuids.partitionGuid = p_Partition.guid
 
+		end
+
+		if(l_Instance.typeInfo.name == "LevelData") then
+			local s_Instance = LevelData(l_Instance)
+			print(s_Instance.name)
+			self.m_LevelDatas[tostring(l_Instance.instanceGuid)] = {
+				partitionGuid = tostring(p_Partition.guid),
+				instanceGuid = tostring(l_Instance.instanceGuid),
+				name = s_Instance.name
+			}
 		end
 
 		::continue::

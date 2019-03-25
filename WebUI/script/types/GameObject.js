@@ -1,7 +1,7 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, name, transform, parent, children, userData)
+	constructor(guid, name, transform, parentPartition, children, userData)
 	{
 		super( );
 
@@ -9,7 +9,7 @@ class GameObject extends THREE.Object3D
 		this.type = "GameObject";
 		this.name = name;
 		this.transform = transform;
-		this.objectParent = parent;
+		this.parentPartition = parentPartition;
 		this.userData = userData;
 		this.selected = false;
 		this.visible = false;
@@ -160,11 +160,18 @@ class GameObject extends THREE.Object3D
 
 	onSelected() {
 		console.log("Selected");
+		console.log(this);
+		for(let key in this.children) {
+			let child = this.children[key].visible = true;
+		};
 		this.selected = true;
 		this.visible = true;
 	}
 	onDeselected() {
 		console.log("Deselected");
+		for(let key in this.children) {
+			let child = this.children[key].visible = false;
+		};
 		this.selected = false;
 		this.visible = false;
 	}
@@ -178,8 +185,11 @@ class GameObject extends THREE.Object3D
 			id: this.guid,
 			name: this.name,
 			type: this.type,
+			parentId: this.parentPartition,
 			draggable: true,
-			droppable: true
+			droppable: true,
+			children: [],
+			state: {}
 		}
 	}
 

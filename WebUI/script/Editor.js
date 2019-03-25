@@ -53,7 +53,9 @@ class Editor {
 		this.selectionGroup = new SelectionGroup();
 		this.threeManager.AddObject(this.selectionGroup);
 
+		this.missingParent = {};
 		this.Initialize();
+
 
 	}
 
@@ -300,7 +302,8 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData);
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData);
+
 
 		this.threeManager.AddObject(gameObject);
 
@@ -316,10 +319,11 @@ class Editor {
 
 			gameEntity.add(aabb);
 			gameObject.add(gameEntity);
-
 		}
 
 		this.gameObjects[command.guid] = gameObject;
+
+
 
 		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled

@@ -49,6 +49,7 @@ function Editor:RegisterVars()
 	self.m_TransactionId = 0
 	self.m_GameObjects = {}
     self.m_VanillaObjects = {}
+	self.m_VanillaUnresolved = {}
 end
 
 function Editor:OnPartitionLoaded(p_Partition)
@@ -62,9 +63,16 @@ end
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		m_InstanceParser:FillVariations()
+		local s_LevelDatas = m_InstanceParser:GetLevelDatas()
+
+		for k,v in pairs(s_LevelDatas) do
+			WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
+		end
+		print("Unresolved: " .. #self.m_VanillaUnresolved)
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_VanillaObjects)))
+        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_VanillaUnresolved)))
 
     end
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
@@ -256,16 +264,55 @@ end
 --]]
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
-	--print(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
-	if p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent == nil or p_Parent.typeInfo.name == "SubWorldReferenceObjectData" then
-		return
-	end
-	
-    local s_ParentPartition = m_InstanceParser
-	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-    table.insert(self.m_VanillaObjects, s_Response)
 
+	local s_PartitionGuid = m_InstanceParser:GetPartition(p_Blueprint.instanceGuid)
+	local s_ParentPartition = nil
+	local s_ParentPrimaryInstance = nil
+	local s_ParentType = nil
+	if(p_Parent ~= nil) then
+		s_ParentPartition = m_InstanceParser:GetPartition(p_Parent.instanceGuid)
+		s_ParentPrimaryInstance = m_InstanceParser:GetPrimaryInstance(s_ParentPartition)
+		local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), Guid(s_ParentPrimaryInstance))
+		s_ParentType = s_Parent.typeInfo.name
+	else
+		print(p_Blueprint.instanceGuid)
+		s_ParentPartition = "dynamic"
+		s_ParentPrimaryInstance = "dynamic"
+	end
+	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent, s_PartitionGuid, s_ParentPartition, s_ParentPrimaryInstance, s_ParentType)
+
+	-- Check if the current blueprint is referenced from a leveldata
+	if(m_InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
+		s_Response.parentGuid = s_ParentPrimaryInstance
+		table.insert(self.m_VanillaObjects, s_Response)
+	else
+		print(m_InstanceParser:GetLevelDatas())
+	end
+		-- Check if the current blueprint is referenced by earlier blueprints
+	if(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] ~= nil) then
+		-- Loop through all the children that are referencing this blueprint and assign this as their parent.
+		for k,v in pairs(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)]) do
+			v.parentGuid = s_Response.guid
+			table.insert(self.m_VanillaObjects, v)
+		end
+		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
+		-- If the current blueprint don't have a parent assigned, add it to the unresolved list
+		if(s_Response.parentGuid == nil) then
+			-- Add the current blueprint to the unresolved list.
+			if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
+				self.m_VanillaUnresolved[s_ParentPrimaryInstance] = {}
+			end
+			table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance],s_Response)
+		end
+	else -- Blueprint has arrived before the parent. Add it to the unresolved list.
+		if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
+			self.m_VanillaUnresolved[s_ParentPrimaryInstance] = {}
+		end
+		table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance], s_Response)
+	end
 end
+
+
 
 function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
     if p_Data == nil then
