@@ -328,7 +328,11 @@ class THREEManager {
 			console.log("Control selected")
 		} else if(e.which === 1) {
 			
-			scope.RaycastSelection(e);
+			let guid = scope.RaycastSelection(e);
+
+			if (guid !== null) {
+				editor.Select(guid);
+			}
 		}
 	}
 
@@ -348,6 +352,14 @@ class THREEManager {
 				scope.Render();
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
+		}
+
+		let guid = scope.RaycastSelection(e);
+
+		if (guid !== null) {
+			editor.Highlight(guid);
+		}else{
+			editor.Unhighlight();
 		}
 	}
 
@@ -385,8 +397,9 @@ class THREEManager {
 				}
 				if (element.object.parent.type == "GameEntity"){
 					// console.log("first hit is: "+element.object.parent.parent.guid)
-					editor.Select(element.object.parent.parent.guid);
-					break;
+					// editor.Select(element.object.parent.parent.guid);
+					return element.object.parent.parent.guid;
+					// break;
 				}
 			}
 		}
@@ -398,6 +411,8 @@ class THREEManager {
 
 		var arrowHelper = new THREE.ArrowHelper( raycaster.ray.direction, raycaster.ray.origin, length, color );
 		this.scene.add( arrowHelper );
+		return null;
+
 	}
 
 	getMouse3D(e) {
