@@ -31,20 +31,6 @@ class GameObject extends THREE.Object3D
 
 	renderInit()
 	{
-		/*
-		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
-		let material = new THREE.MeshBasicMaterial( 
-		{
-			color: 0xff0000,
-			visible: true ,
-			wireframe: true
-		} );
-
-
-		this.mesh = new THREE.Mesh(geometry, material);
-		this.add(this.mesh);
-
-		*/
 		this.updateTransform();
 	}
 	
@@ -160,15 +146,11 @@ class GameObject extends THREE.Object3D
 
 	onSelected() {
 		console.log("Selected");
-		// this.selected = true;
-		// editor.threeManager.scene.add(this);
-		// this.visible = true;
+		this.selected = true;
 	}
 	onDeselected() {
 		console.log("Deselected");
-		// this.selected = false;
-		// editor.threeManager.scene.remove(this);
-		// this.visible = false;
+		this.selected = false;
 	}
 
 	getUserData() {

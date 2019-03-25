@@ -149,15 +149,26 @@ class Editor {
 		General usage
 
 	 */
-	test(){
-		let scope = this;
-		let commands = [];			
-		commands.push(new DestroyBlueprintCommand(editor.selectionGroup.children[0].guid));
-		if(commands.length > 0) {
-			scope.execute(new BulkCommand(commands));
-		}
-	
-	}
+	// test(){
+
+	// 	for (var i = 0; i <800; i++) {
+
+	// 		this.onBlueprintSpawnRequested(this.blueprintManager.blueprints[1], new LinearTransform(new Vec3(1, 0, 0),new Vec3(0, 1, 0),new Vec3(0, 0, 1),new Vec3(5*i, 0, 0)))
+	// 	}
+	// }
+
+
+	// RemoveAllGameObjectsFromScene(){
+	// 	let scene = editor.threeManager.scene;
+
+	// 	for (var i = scene.children.length - 1; i >= 0; i--) {
+	// 		if (scene.children[i].type  === "GameObject") {
+	// 			scene.remove(scene.children[i]);
+	// 		}
+	// 		editor.threeManager.Render();
+	// 	}
+	// }
+
 
 	DeleteSelected() {
 		let scope = this;
@@ -181,16 +192,6 @@ class Editor {
 	SetScreenToWorldPosition(x, y, z){
 		this.editorCore.screenToWorldTransform.trans = new Vec3(x, y, z);
 	}
-	
-	// RemoveAllGameObjectsFromScene(){
-	// 	let scene = this.threeManager.scene;
-
-	// 	for (var i = scene.children.length - 1; i >= 0; i--) {
-	// 		if (scene.children[i].type  === "GameObject") {
-	// 			scene.remove(scene.children[i].guid)
-	// 		}
-	// 	}
-	// }
 
 	AddObjectToScene(guid){
 		if (guid == null || editor.gameObjects[guid] == null || editor.gameObjects[guid].parent !== null) {
@@ -321,7 +322,7 @@ class Editor {
 		let scope = this;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData);
 
-		// this.threeManager.AddObject(gameObject);
+		this.threeManager.AddObject(gameObject);
 
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
@@ -332,16 +333,18 @@ class Editor {
 				new Vec3().fromString(entityInfo.aabb.min),
 				new Vec3().fromString(entityInfo.aabb.max),
 				0xFF0000));
-
+			
 			gameEntity.add(aabb);
 			gameObject.add(gameEntity);
 		}
 
 		this.gameObjects[command.guid] = gameObject;
+
+		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);
 		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(command.guid, false)}, 1);
-		}
+		}		
 	}
 
 	onObjectChanged(object) {

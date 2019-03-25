@@ -27,7 +27,7 @@ class THREEManager {
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
 		$('#page').append(scope.renderer.domElement);
 
-		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 500);
+		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 5000);
 		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
@@ -328,14 +328,7 @@ class THREEManager {
 			console.log("Control selected")
 		} else if(e.which === 1) {
 			
-			// scope.RaycastSelection(e);
-			// // if (guid !== null){
-			// // 	editor.Select(guid);
-			// // }
-
-			let direction = scope.getMouse3D(e);
-			let message = new SelectObject3DMessage(direction);
-			editor.vext.SendMessage(message);
+			scope.RaycastSelection(e);
 		}
 	}
 
@@ -365,38 +358,27 @@ class THREEManager {
 
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera( mousePos, this.camera );
-		let tempArray = [];
 
-		Object.keys(editor.gameObjects).forEach(function(i) {
-			if (editor.gameObjects[i] !== null &&
-					editor.gameObjects[i].children !== null  &&
-					editor.gameObjects[i].children[0] !== null  &&
-					editor.gameObjects[i].children[0] !== undefined  &&
-					editor.gameObjects[i].children[0].type === "GameEntity") {
-				for (var j = editor.gameObjects[i].children.length - 1; j >= 0; j--) {
-					tempArray.push(editor.gameObjects[i].children[j]);
-				}
-				
-			}
-		});
+		var intersects = raycaster.intersectObjects( Object.values(editor.gameObjects), true );
 
-		console.log(tempArray);
-
-		var intersects = raycaster.intersectObjects( tempArray, true );
-
+		// console.log(editor.test.length);
+		console.log("hit "+ (intersects.length) + " objects");
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
-				console.log("hit "+ (i+1) + " times");
+				
 				const element = intersects[i];
 				if (element.object == null || element.object.parent == null){
 					continue;
 				}
 				if (element.object.parent.type == "GameEntity"){
-					console.log("first hit is: "+element.object.parent.parent.guid)
+					// console.log("first hit is: "+element.object.parent.parent.guid)
 					editor.Select(element.object.parent.parent.guid);
 					break;
 				}
 			}
+		}
+		else{
+			console.log("no hit")
 		}
 	}
 
@@ -405,8 +387,7 @@ class THREEManager {
 		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-		let raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera( mousePos, this.camera );
+		let raycaster = new THREE.Raycaster(mousePos, this.camera, 1, 100);
 		return raycaster.ray.direction;
 	}
 
