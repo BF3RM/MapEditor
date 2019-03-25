@@ -48,7 +48,7 @@ class Editor {
 		this.favorites = [];
 
 		this.copy = null;
-
+		this.test = [];
 		// Creates selection group and add it to the scene
 		this.selectionGroup = new SelectionGroup();
 		this.threeManager.AddObject(this.selectionGroup);
@@ -151,13 +151,26 @@ class Editor {
 		General usage
 
 	 */
-	test(){
-		let scope = this;
-		let commands = [];			
-		commands.push(new DestroyBlueprintCommand(editor.selectionGroup.children[0].guid));
-		if(commands.length > 0) {
-			scope.execute(new BulkCommand(commands));
-		}
+	test(guid){
+
+		// console.log(this.blueprintManager.blueprints[1])
+		// for (var i = 0; i <1000; i++) {
+		// 	this.onBlueprintSpawnRequested(this.blueprintManager.blueprints[guid]);
+		// }
+		for (var i = 0; i <1000; i++) {
+			
+			let aabb = new AABBHelper( new THREE.Box3(
+				new Vec3().fromString("(0,0,0)"),
+				new Vec3().fromString("(1,1,1)"),
+				0xFF0000));
+
+			// gameEntity.add(aabb);
+			editor.threeManager.scene.add(aabb);
+
+			this.test.push(aabb)
+			// gameObject.add(gameEntity);
+
+		}		
 	
 	}
 

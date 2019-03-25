@@ -13,14 +13,15 @@ class GameObject extends THREE.Object3D
 		this.userData = userData;
 		this.selected = false;
 		this.visible = false;
-
+		this.matrixAutoUpdate  = false;
+		this.updateMatrix();		
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);
 		}
 
 		// Update the matrix after initialization.
 		this.updateTransform();
-
+		this.updateMatrix();	
 	}
 	
 	hasMoved() {

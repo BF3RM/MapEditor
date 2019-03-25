@@ -12,10 +12,11 @@ class GameEntity extends THREE.Object3D
 		this.aabb = {
 
 		}
-
+		this.matrixAutoUpdate = false;
+		this.updateMatrix();	
 		// Update the matrix after initialization.
 		this.updateTransform();
-
+		this.updateMatrix();	
 	}
 
 

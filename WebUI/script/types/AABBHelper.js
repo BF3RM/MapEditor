@@ -18,8 +18,9 @@ class AABBHelper extends THREE.LineSegments
 		this.box = box;
 
 		this.matrixAutoUpdate = false;
-
+		this.updateMatrix();	
 		this.update();
+		this.updateMatrix();	
 	}
 
 	update()

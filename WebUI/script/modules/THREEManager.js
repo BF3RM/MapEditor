@@ -27,7 +27,7 @@ class THREEManager {
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
 		$('#page').append(scope.renderer.domElement);
 
-		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 3000);
+		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.scene = new THREE.Scene();
