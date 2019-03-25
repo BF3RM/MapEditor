@@ -364,7 +364,28 @@ class Editor {
 		}
 
 		this.gameObjects[command.guid] = gameObject;
+		// If the parent is the leveldata, ignore all this
+		// todo: make an entry for the leveldata itself maybe?
 
+		// Allows children to be spawned before parents, and then added to the appropriate parent.
+		if(scope.gameContext.levelData[command.parentGuid] == null) {
+			if(this.gameObjects[command.parentGuid] == null) {
+				if(this.missingParent[command.parentGuid] == null) {
+					this.missingParent[command.parentGuid] = []
+				}
+				this.missingParent[command.parentGuid].push(gameObject)
+			} else {
+				this.gameObjects[command.parentGuid].add(gameObject);
+			}
+
+			if(this.missingParent[command.guid] != null) {
+				for(let key in this.missingParent[command.guid]) {
+					let child = this.missingParent[command.guid][key];
+					gameObject.add(child);
+				}
+				delete this.missingParent[command.guid];
+			}
+		}
 
 
 		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);

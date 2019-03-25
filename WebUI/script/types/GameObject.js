@@ -25,6 +25,10 @@ class GameObject extends THREE.Object3D
 		this.updateTransform();
 		this.updateMatrix();	
 	}
+
+	getCleanName() {
+		return this.name.replace(/^.*[\\\/]/, '');
+	}
 	
 	hasMoved() {
 		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
@@ -170,7 +174,7 @@ class GameObject extends THREE.Object3D
 	getNode() {
 		return {
 			id: this.guid,
-			name: this.name,
+			name: this.getCleanName(),
 			type: this.type,
 			parentId: this.parentPartition,
 			draggable: true,

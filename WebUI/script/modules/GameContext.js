@@ -1,10 +1,11 @@
 class GameContext {
     constructor() {
-
+        this.levelData = {};
     }
 
     LoadLevel(levelRaw) {
         let levelData = JSON.parse(levelRaw);
+        this.levelData[levelData.instanceGuid] = levelData;
         signals.levelLoaded.dispatch(levelData);
         //signals.levelLoaded.dispatch(this.data);
     }
