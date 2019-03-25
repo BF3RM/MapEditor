@@ -13,6 +13,7 @@ class GameObject extends THREE.Object3D
 		this.userData = userData;
 		this.selected = false;
 		this.visible = true;
+		this.highlighted = false;
 
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);
@@ -142,6 +143,22 @@ class GameObject extends THREE.Object3D
 	}
 	Deselect() {
 		this.onDeselected();
+	}
+
+	Highlight(){
+		this.highlighted = true;
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].Highlight();
+		}
+	}
+
+	Unhighlight(){
+		this.highlighted = false;
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].Unhighlight();
+		}
 	}
 
 	onSelected() {

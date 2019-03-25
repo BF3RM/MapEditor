@@ -18,7 +18,6 @@ class AABBHelper extends THREE.LineSegments
 		this.box = box;
 
 		this.matrixAutoUpdate = false;
-
 		this.update();
 	}
 
@@ -65,5 +64,9 @@ class AABBHelper extends THREE.LineSegments
 		position.needsUpdate = true;
 
 		this.geometry.computeBoundingSphere();
+	}
+	SetColor(color){
+		this.material.color.setHex( 0xffffff );
+
 	}
 }
