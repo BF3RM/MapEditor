@@ -67,4 +67,8 @@ class AABBHelper extends THREE.LineSegments
 
 		this.geometry.computeBoundingSphere();
 	}
+	SetColor(color){
+		this.material.color.setHex( 0xffffff );
+
+	}
 }

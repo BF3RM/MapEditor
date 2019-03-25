@@ -49,4 +49,12 @@ class GameEntity extends THREE.Object3D
 		editor.threeManager.Render();
 
 	}
+
+	Highlight(){
+		this.children[0].SetColor(0x999999);
+	}
+
+	Unhighlight(){
+		this.children[0].SetColor(0xff0000);
+	}
 }

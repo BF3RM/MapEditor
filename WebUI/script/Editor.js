@@ -49,6 +49,7 @@ class Editor {
 
 		this.copy = null;
 		this.test = [];
+		this.highlightedGO = null;
 		// Creates selection group and add it to the scene
 		this.selectionGroup = new SelectionGroup();
 		this.threeManager.AddObject(this.selectionGroup);
@@ -424,6 +425,29 @@ class Editor {
 
 	Deselect(guid) {
 		this.editorCore.onDeselectedGameObject(guid);
+	}
+
+	Highlight(guid){
+		let gameObject = this.gameObjects[guid];
+		if (gameObject === null || gameObject.selected || gameObject.highlighted) return;
+
+		if (this.highlightedGO !== null){
+			this.Unhighlight(this.highlightedGO);
+		}
+		gameObject.Highlight();
+		this.threeManager.AddObject(gameObject);
+		
+		this.threeManager.Render();
+		this.highlightedGO = guid;
+	}
+
+	Unhighlight(guid = this.highlightedGO){
+		let gameObject = this.gameObjects[guid];
+		if (gameObject === null || gameObject === undefined) return;
+		gameObject.Unhighlight();
+		this.threeManager.scene.remove(gameObject);
+		this.threeManager.Render();
+		this.highlightedGO = null;
 	}
 
 
