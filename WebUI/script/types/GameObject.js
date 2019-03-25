@@ -15,6 +15,8 @@ class GameObject extends THREE.Object3D
 		this.visible = false;
 		this.matrixAutoUpdate  = false;
 		this.updateMatrix();		
+		this.visible = true;
+
 		for (var i = children - 1; i >= 0; i--) {
 			this.add(children[i]);
 		}
@@ -32,20 +34,6 @@ class GameObject extends THREE.Object3D
 
 	renderInit()
 	{
-		/*
-		let geometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5, 1, 1, 1 );
-		let material = new THREE.MeshBasicMaterial( 
-		{
-			color: 0xff0000,
-			visible: true ,
-			wireframe: true
-		} );
-
-
-		this.mesh = new THREE.Mesh(geometry, material);
-		this.add(this.mesh);
-
-		*/
 		this.updateTransform();
 	}
 	
@@ -166,7 +154,6 @@ class GameObject extends THREE.Object3D
 			let child = this.children[key].visible = true;
 		};
 		this.selected = true;
-		this.visible = true;
 	}
 	onDeselected() {
 		console.log("Deselected");
@@ -174,7 +161,6 @@ class GameObject extends THREE.Object3D
 			let child = this.children[key].visible = false;
 		};
 		this.selected = false;
-		this.visible = false;
 	}
 
 	getUserData() {

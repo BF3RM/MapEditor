@@ -25,13 +25,18 @@ class EditorCore {
             return;
         }
 
+        // If the object is not in the scene we add it
+        if (gameObject.parent === null || gameObject.parent === undefined){
+            scope.AddObjectToScene(guid);
+        }
+
         // If the object is already in this group and it's a multiselection we deselect it
         if (gameObject.parent === scope.selectionGroup && isMultiSelection){
             scope.Deselect(guid);
             return;
         }
 
-        // If we are selecting and object already selected (single selection)
+        // If we are selecting an object already selected (single selection)
         if (gameObject.parent === scope.selectionGroup && !isMultiSelection && scope.selectionGroup.children.length === 1 && scope.selectionGroup.children[0] === gameObject){
             return;
         }
@@ -69,6 +74,9 @@ class EditorCore {
         let scope = editor;
         let gameObject = scope.gameObjects[guid];
         scope.selectionGroup.DeselectObject(gameObject);
+
+        scope.threeManager.scene.remove(gameObject);
+
         signals.deselectedGameObject.dispatch(guid);
         if(scope.selectionGroup.children.length === 0) {
             scope.threeManager.HideGizmo()
