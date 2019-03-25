@@ -72,7 +72,7 @@ function Editor:OnEngineMessage(p_Message)
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_VanillaObjects)))
-        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_VanillaUnresolved)))
+        WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(self.m_VanillaUnresolved)))
 
     end
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then

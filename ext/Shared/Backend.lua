@@ -72,23 +72,25 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, tostring(s_Guid), p_Transform, p_Blueprint, p_Parent)
 
     local s_Children = {}
+	if(type(s_SpawnResult) == "table" )then
+		--local l_Entity = s_SpawnResult[1]
+		for k,l_Entity in ipairs(s_SpawnResult) do
+			local s_Entity = SpatialEntity(l_Entity)
+			s_Children[#s_Children + 1 ] = {
+				guid = s_Entity.uniqueID,
+				type = l_Entity.typeInfo.name,
+				transform = ToLocal(s_Entity.transform, p_Transform),
+				instanceId = s_Entity.instanceID,
+				transforms = {worldTrans = p_Transform, localTrans = s_Entity.transform},
+				aabb = {
+					min = tostring(s_Entity.aabb.min),
+					max = tostring(s_Entity.aabb.max),
+					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
+				},
+			}
+		end
+	end
 
-    --local l_Entity = s_SpawnResult[1]
-    for k,l_Entity in ipairs(s_SpawnResult) do
-        local s_Entity = SpatialEntity(l_Entity)
-        s_Children[#s_Children + 1 ] = {
-            guid = s_Entity.uniqueID,
-            type = l_Entity.typeInfo.name,
-            transform = ToLocal(s_Entity.transform, p_Transform),
-            instanceId = s_Entity.instanceID,
-            transforms = {worldTrans = p_Transform, localTrans = s_Entity.transform},
-            aabb = {
-                min = tostring(s_Entity.aabb.min),
-                max = tostring(s_Entity.aabb.max),
-                transform = ToLocal(s_Entity.aabbTransform, p_Transform)
-            },
-        }
-    end
     local s_Blueprint = Blueprint(p_Blueprint)
     local s_ParentGuid = nil
     if(p_Parent ~= nil) then

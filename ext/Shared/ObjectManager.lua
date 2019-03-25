@@ -102,7 +102,9 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
     local s_Offsets = {}
 
     local s_ObjectEntities = p_Hook:Call()
-
+	if p_Blueprint:Is("SubWorldData") or p_Blueprint:Is("WorldPartData") or p_Blueprint:Is("PrefabBlueprint") then
+		return true
+	end
     for i, l_Entity in pairs(s_ObjectEntities) do
         l_Entity:Init(self.m_Realm, true)
         if(l_Entity:Is("SpatialEntity")) then

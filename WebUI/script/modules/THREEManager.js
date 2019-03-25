@@ -353,14 +353,16 @@ class THREEManager {
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
+		if(keysdown[18]) {
+			let guid = scope.RaycastSelection(e);
 
-		let guid = scope.RaycastSelection(e);
-
-		if (guid !== null) {
-			editor.Highlight(guid);
-		}else{
-			editor.Unhighlight();
+			if (guid !== null) {
+				editor.Highlight(guid);
+			}else{
+				editor.Unhighlight();
+			}
 		}
+
 	}
 
 	RaycastSelection(e){ 
@@ -384,15 +386,18 @@ class THREEManager {
 
 		// console.log(editor.test.length);
 		console.log("hit "+ (intersects.length) + " objects");
+		console.log(intersects);
+
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
-				
+
 				const element = intersects[i];
+
 				if (element.object == null || element.object.parent == null){
 					continue;
 				}
-				if(element.object.type == "GameEntity") {
-					editor.Select(element.object.parent.parent.guid);
+				if(element.object.type == "GameObject") {
+					editor.Select(element.object.parent.guid);
 					break;
 				}
 				if (element.object.parent.type == "GameEntity"){
