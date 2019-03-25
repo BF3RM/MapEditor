@@ -360,6 +360,15 @@ class THREEManager {
 		raycaster.setFromCamera( mousePos, this.camera );
 
 		var intersects = raycaster.intersectObjects( Object.values(editor.gameObjects), true );
+		var dir = new THREE.Vector3( 1, 2, 0 );
+
+//normalize the direction vector (convert to vector of length 1)
+		dir.normalize();
+		console.log(raycaster)
+		var origin = new THREE.Vector3( 0, 0, 0 );
+		var length = 100;
+		var miss = 0x00;
+		let color = null;
 
 		// console.log(editor.test.length);
 		console.log("hit "+ (intersects.length) + " objects");
@@ -370,6 +379,10 @@ class THREEManager {
 				if (element.object == null || element.object.parent == null){
 					continue;
 				}
+				if(element.object.type == "GameEntity") {
+					editor.Select(element.object.parent.parent.guid);
+					break;
+				}
 				if (element.object.parent.type == "GameEntity"){
 					// console.log("first hit is: "+element.object.parent.parent.guid)
 					editor.Select(element.object.parent.parent.guid);
@@ -379,7 +392,12 @@ class THREEManager {
 		}
 		else{
 			console.log("no hit")
+			color = miss
 		}
+
+
+		var arrowHelper = new THREE.ArrowHelper( raycaster.ray.direction, raycaster.ray.origin, length, color );
+		this.scene.add( arrowHelper );
 	}
 
 	getMouse3D(e) {
