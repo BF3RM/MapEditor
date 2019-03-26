@@ -401,7 +401,8 @@ class THREEManager {
 		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-		let raycaster = new THREE.Raycaster(mousePos, this.camera, 1, 100);
+		let raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( mousePos, this.camera );
 		return raycaster.ray.direction;
 	}
 
