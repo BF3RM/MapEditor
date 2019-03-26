@@ -35,10 +35,9 @@ function Editor:RegisterVars()
 		MoveObjectMessage = self.MoveObject,
 		SetViewModeMessage = self.SetViewMode,
 		SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition,
-		SelectObject3DMessage = self.SelectObject3D,
-        PreviewSpawnMessage = self.PreviewSpawn,
-        PreviewDestroyMessage = self.PreviewDestroy,
-        PreviewMoveMessage = self.PreviewMove
+		PreviewSpawnMessage = self.PreviewSpawn,
+		PreviewDestroyMessage = self.PreviewDestroy,
+		PreviewMoveMessage = self.PreviewMove
 	}
 
 	self.m_Queue = {
@@ -231,9 +230,6 @@ end
 function Editor:SetScreenToWorldPosition(p_Message)
 	self:SetPendingRaycast(RaycastType.Mouse, p_Message.direction)
 end
-function Editor:SelectObject3D(p_Message, p_Arguments)
-	self:SetPendingRaycast(RaycastType.Select, p_Message.direction)
-end
 
 function Editor:PreviewSpawn(p_Message, p_Arguments)
     local s_UserData = p_Message.userData
@@ -301,8 +297,9 @@ function Editor:Raycast()
 	end
 
 	-- The freecam transform is inverted. Invert it back
-
-
+	print("----")
+	print(self.m_PendingRaycast.direction)
+	print(type(self.m_PendingRaycast.direction))
 	local s_CastPosition = Vec3(s_Transform.trans.x + (s_Direction.x * MAX_CAST_DISTANCE),
 								s_Transform.trans.y + (s_Direction.y * MAX_CAST_DISTANCE),
 								s_Transform.trans.z + (s_Direction.z * MAX_CAST_DISTANCE))
@@ -325,97 +322,10 @@ function Editor:Raycast()
 	if(self.m_PendingRaycast.type == RaycastType.Mouse) then
 		WebUI:ExecuteJS(string.format('editor.SetScreenToWorldPosition(%s, %s, %s)',
 				s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
-
-		
 	end
-
-	-- if(self.m_PendingRaycast.type == RaycastType.Select) then
-	-- 	if(s_Raycast == nil or s_Raycast.rigidBody == nil) then
-	-- 		print("___option 1: raycast or rigidBody nil")
-	-- 		self:GetFistObjectInView(s_Transform.trans, s_CastPosition)
-	-- 	else
-	-- 			-- Catch all entities in view. SpatialRaycast is really wide :shrug:
-	-- 		local s_Entities = RaycastManager:SpatialRaycast(s_Transform.trans, s_CastPosition, SpatialQueryFlags.AllGrids)
-	-- 		-- Store the transform of the collider we hit
-	-- 		local s_RigidBodyHitTransform = SpatialEntity(s_Raycast.rigidBody).transform
-
-	-- 		if s_RigidBodyHitTransform == Vec3(0,0,0) then
-	-- 			print("___option 2: s_RigidBodyHitTransform  == Vec3(0,0,0)")
-	-- 			self:GetFistObjectInView(s_Transform.trans, s_CastPosition)
-	-- 			goto continue
-	-- 		end
-
-	-- 		if(s_Entities ~= nil and #s_Entities > 0) then
-	-- 			for k, l_Entity in pairs(s_Entities) do
-	-- 				-- Filter the entities to not include physics entities
-	-- 				if(l_Entity:Is("SpatialEntity") and
-	-- 						not l_Entity:Is("StaticPhysicsEntity") and
-	-- 						not l_Entity:Is("GroupPhysicsEntity") and
-	-- 						not l_Entity:Is("ClientWaterEntity") and
-	-- 						not l_Entity:Is("WaterPhysicsEntity") and
-	-- 						not l_Entity:Is("ClientSoldierEntity") and
-	-- 						not l_Entity:Is("DebrisClusterContainerEntity") and
-	-- 						not l_Entity:Is("CharacterPhysicsEntity")
-	-- 				) then
-	-- 					local s_Entity = SpatialEntity(l_Entity)
-	-- 					-- Compare the collider's transform to the actual entity's transform
-	-- 					if(s_RigidBodyHitTransform.trans == s_Entity.transform.trans ) then
-	-- 						-- Check if we have that entity's instanceId stored
-	-- 						local s_Guid = ObjectManager:GetGuidFromInstanceID(s_Entity.instanceID)
-	-- 						if(s_Guid ~= nil) then
-	-- 							-- Select it
-	-- 							print("___option 3: found transform match")
-	-- 							WebUI:ExecuteJS(string.format('editor.Select("%s")', s_Guid))
-	-- 							goto continue
-	-- 						end
-	-- 					end
-	-- 				end
-	-- 			end
-
-	-- 			print("___option 4: no match found")
-	-- 			self:GetFistObjectInView(s_Transform.trans, s_CastPosition)
-	-- 		end
-
-	-- 		::continue::
-	-- 	end
-	-- end
 			
 	self.m_PendingRaycast = false
 
-end
-
-function Editor:GetFistObjectInView(p_Position, p_CastPosition)
-	-- Catch all entities in view.
-	local s_Entities = RaycastManager:SpatialRaycast(p_Position, p_CastPosition, SpatialQueryFlags.AllGrids)
-	-- print("-------doing SpatialRaycast")
-	if(s_Entities ~= nil and #s_Entities > 0) then
-		-- local s_Guids = ""
-		for k, l_Entity in pairs(s_Entities) do
-			-- Filter the entities to not include physics entities
-			if(l_Entity:Is("SpatialEntity") and
-					not l_Entity:Is("StaticPhysicsEntity") and
-					not l_Entity:Is("GroupPhysicsEntity") and
-					not l_Entity:Is("ClientWaterEntity") and
-					not l_Entity:Is("WaterPhysicsEntity") and
-					not l_Entity:Is("ClientSoldierEntity") and
-					not l_Entity:Is("DebrisClusterContainerEntity") and
-					not l_Entity:Is("CharacterPhysicsEntity")
-			) then
-				local s_Entity = SpatialEntity(l_Entity)
-					-- Check if we have that entity's instanceId stored
-				local s_Guid = ObjectManager:GetGuidFromInstanceID(s_Entity.instanceID)
-				if(s_Guid ~= nil) then
-					-- Select it
-					-- s_Guids = s_Guids .. ":" .. s_Guid
-					-- print("--found object with guid: ".. s_Guid)
-					WebUI:ExecuteJS(string.format('editor.Select("%s")', s_Guid))
-					break
-				end
-			end
-		end
-
-		-- WebUI:ExecuteJS(string.format('editor.UpdateSceneObjects("%s")', s_Guids))
-	end
 end
 
 function Editor:UpdateCameraTransform()

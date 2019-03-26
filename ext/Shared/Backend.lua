@@ -56,6 +56,7 @@ function Backend:SpawnBlueprint(p_Command)
 		guid = p_Command.guid,
 		sender = p_Command.sender,
 		name = s_UserData.name,
+		isVanilla = false,
 		['type'] = 'SpawnedBlueprint',
 		userData = s_UserData,
 		children = s_Children
@@ -97,6 +98,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
         guid = tostring(s_Guid),
         sender = "Server",
         name = s_Blueprint.name,
+        isVanilla = true,
         ['type'] = 'SpawnedBlueprint',
 		parent = s_ParentGuid,
         userData = {

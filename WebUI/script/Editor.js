@@ -320,7 +320,7 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData);
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData, command.isVanilla);
 
 		this.threeManager.AddObject(gameObject);
 
@@ -343,8 +343,8 @@ class Editor {
 		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);
 		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
-			setTimeout(function() {scope.Select(command.guid, false)}, 1);
-		}		
+			setTimeout(function() {scope.Select(command.guid, false)}, 2);
+		}
 	}
 
 	onObjectChanged(object) {

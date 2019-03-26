@@ -374,7 +374,7 @@ class THREEManager {
 		var intersects = raycaster.intersectObjects( Object.values(editor.gameObjects), true );
 
 		// console.log(editor.test.length);
-		// console.log("hit "+ (intersects.length) + " objects");
+		console.log("hit "+ (intersects.length) + " objects");
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
 				
@@ -391,7 +391,7 @@ class THREEManager {
 			}
 		}
 		else{
-			// console.log("no hit")
+			console.log("no hit")
 			return null;
 		}
 	}
