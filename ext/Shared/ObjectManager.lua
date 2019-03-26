@@ -1,7 +1,9 @@
 class 'ObjectManager'
 
+local m_Logger = Logger("ObjectManager", true)
+
 function ObjectManager:__init(p_Realm)
-	print("Initializing ObjectManager")
+	m_Logger:Write("Initializing ObjectManager")
 	self.m_Realm = p_Realm
 	self:RegisterVars()
 	self:RegisterEvents()
@@ -38,12 +40,12 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 	if p_PartitionGuid == nil or
 			p_InstanceGuid == nil or
 			p_LinearTransform == nil then
-		print('One or more userData are nil')
+		m_Logger:Write('One or more userData are nil')
 		return false
 	end
 
 	if self.m_SpawnedEntities[p_Guid] ~= nil then
-		print('Object with id ' .. p_Guid .. ' already existed as a spawned entity!')
+		m_Logger:Write('Object with id ' .. p_Guid .. ' already existed as a spawned entity!')
 		return false
 	end
 
@@ -58,7 +60,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 
 	local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
-	print('Spawning blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_Guid .. ", Instance: " .. tostring(p_InstanceGuid) .. ", Variation: " .. p_Variation)
+	m_Logger:Write('Spawning blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_Guid .. ", Instance: " .. tostring(p_InstanceGuid) .. ", Variation: " .. p_Variation)
 
 	local s_Params = EntityCreationParams()
 	s_Params.transform = p_LinearTransform
@@ -67,7 +69,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 
 	local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 	if #s_ObjectEntities == 0 then
-		print("Spawning failed")
+		m_Logger:Write("Spawning failed")
 		return false
 	end
 	local s_Spatial = {}
@@ -95,7 +97,7 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
         p_LinearTransform = LinearTransform()
     end
     if(self.m_SpawnedEntities[p_Guid] ~= nil) then
-        print("Blueprint already spawned??")
+        m_Logger:Write("Blueprint already spawned??")
         return false
     end
     local s_Spatial = {}
@@ -124,8 +126,8 @@ function ObjectManager:DestroyEntity(p_Guid)
 	local s_Entities = self:GetEntityByGuid(p_Guid)
 
 	if(s_Entities == false or #s_Entities == 0) then
-		print(s_Entities)
-		print("Failed to get entities")
+		m_Logger:Write(s_Entities)
+		m_Logger:Write("Failed to get entities")
 		return false
 	end
 
@@ -133,7 +135,7 @@ function ObjectManager:DestroyEntity(p_Guid)
 
 	for i, entity in pairs(s_Entities) do
 		if entity ~= nil then
-			print(entity.typeInfo.name)
+			m_Logger:Write(entity.typeInfo.name)
 			entity:Destroy()
 		end
 	end
@@ -142,17 +144,17 @@ end
 
 function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
 	if self.m_SpawnedEntities[p_Guid] == nil then
-		print('Object with id ' .. p_Guid .. ' does not exist')
+		m_Logger:Write('Object with id ' .. p_Guid .. ' does not exist')
 		return false
 	end
 	for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
 		if(l_Entity == nil) then
-			print("Entity is nil?")
+			m_Logger:Write("Entity is nil?")
 			return false
 		end
 
 		if(not l_Entity:Is("SpatialEntity"))then
-			print("not spatial")
+			m_Logger:Write("not spatial")
 			goto continue
 		end
 
@@ -171,7 +173,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 				end
 			end
 		else
-			print("entity is nil??")
+			m_Logger:Write("entity is nil??")
 		end
 		::continue::
 	end

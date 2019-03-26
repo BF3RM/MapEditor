@@ -1,4 +1,4 @@
-local matrix = require "__shared/matrix"
+local matrix = require "__shared/Util/matrix"
 
 function MergeUserdata(p_Old, p_New)
 	if(p_Old == nil) then

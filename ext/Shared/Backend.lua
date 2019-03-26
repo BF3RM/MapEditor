@@ -1,19 +1,19 @@
 class 'Backend'
 
-
+local m_Logger = Logger("Backend", true)
 
 local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10000
 
 function Backend:__init(p_Realm)
-	print("Initializing Backend: " .. tostring(p_Realm))
+	m_Logger:Write("Initializing Backend: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm;
 	self:RegisterVars()
 end
 
 function Backend:RegisterVars()
 	self.m_Queue = {}
-	print("Initialized vars")
+	m_Logger:Write("Initialized vars")
 end
 
 
@@ -29,7 +29,7 @@ function Backend:SpawnBlueprint(p_Command)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui
-		print("Failed to spawn blueprint. ")
+		m_Logger:Write("Failed to spawn blueprint. ")
 
 		return false
 	end
@@ -126,7 +126,7 @@ function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
 	local s_Result = ObjectManager:DestroyEntity(p_Command.guid)
 
 	if(s_Result == false) then
-		print("Failed to destroy entity: " .. p_Command.guid)
+		m_Logger:Write("Failed to destroy entity: " .. p_Command.guid)
 	end
 	local s_Response = {
 		type = "DestroyedBlueprint",
@@ -140,14 +140,14 @@ end
 function Backend:SelectGameObject(p_Command)
 
 	if ( ObjectManager:GetEntityByGuid(p_Command.guid) == nil) then
-		print("Failed to select that gameobject")
+		m_Logger:Write("Failed to select that gameobject")
 		return false
 	end
 	local s_Response = {
 		guid = p_Command.guid,
 		['type'] = 'SelectedGameObject'
 	}
-	print("Selected!")
+	m_Logger:Write("Selected!")
 
 	return s_Response
 end
@@ -170,7 +170,7 @@ function Backend:SetTransform(p_Command)
 
 	if(s_Result == false) then
 		-- Notify WebUI of failed
-		print("failed")
+		m_Logger:Write("failed")
 		return false
 	end
 

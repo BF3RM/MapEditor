@@ -2,9 +2,10 @@ class 'UIManager'
 
 local m_Freecam = require "Freecam"
 local m_Editor = require "Editor"
+local m_Logger = Logger("InstanceParser", true)
 
 function UIManager:__init()
-	print("Initializing UIManager")
+	m_Logger:Write("Initializing UIManager")
 	self:RegisterVars()
 	self:RegisterEvents()
 end

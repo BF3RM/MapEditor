@@ -1,8 +1,6 @@
 class 'MapEditorServer'
 
-require "__shared/Util"
-require "__shared/ObjectManager"
-require "__shared/Backend"
+local m_Logger = Logger("MapEditorServer", true)
 local m_InstanceParser = require "InstanceParser"
 
 ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
@@ -10,7 +8,7 @@ Backend = Backend(Realm.Realm_ClientAndServer)
 local m_EditorServer = require "EditorServer"
 
 function MapEditorServer:__init()
-	print("Initializing MapEditorServer")
+	m_Logger:Write("Initializing MapEditorServer")
 	self:RegisterEvents()
 end
 
@@ -45,7 +43,7 @@ function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
 function MapEditorServer:OnLevelDestroy()
-	print("Destroy!")
+	m_Logger:Write("Destroy!")
 	Backend:OnLevelDestroy()
 end
 

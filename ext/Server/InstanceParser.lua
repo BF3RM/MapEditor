@@ -1,7 +1,9 @@
 class 'InstanceParser'
 
+local m_Logger = Logger("InstanceParser", true)
+
 function InstanceParser:__init()
-    print("Initializing InstanceParserServer")
+    m_Logger:Write("Initializing InstanceParserServer")
     self:RegisterVars()
     self:RegisterEvents()
 end

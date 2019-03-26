@@ -1,6 +1,6 @@
 class 'Editor'
 
-
+local m_Logger = Logger("Editor", true)
 local m_InstanceParser = require "InstanceParser"
 
 
@@ -8,7 +8,7 @@ local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10
 
 function Editor:__init()
-	print("Initializing EditorClient")
+	m_Logger:Write("Initializing EditorClient")
 	self:RegisterVars()
 
 end
@@ -70,10 +70,10 @@ function Editor:OnEngineMessage(p_Message)
 		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
 		if s_LocalPlayer == nil then
-			error("Local player is nil")
+			m_Logger:Error("Local player is nil")
 			return
 		end
-		print("Requesting update")
+		m_Logger:Write("Requesting update")
 		NetEvents:SendLocal("MapEditorServer:RequestUpdate", 1)
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
@@ -93,10 +93,10 @@ function Editor:OnReceiveUpdate(p_Update)
 			local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
-				print("--------------------------------------------------------------------")
-				print("If you ever see this, please report it on the repo.")
-				print(s_Changes)
-				print("--------------------------------------------------------------------")
+				m_Logger:Write("--------------------------------------------------------------------")
+				m_Logger:Write("If you ever see this, please report it on the repo.")
+				m_Logger:Write(s_Changes)
+				m_Logger:Write("--------------------------------------------------------------------")
 			end
 		end
 
@@ -127,15 +127,15 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 	for k, l_Command in ipairs(s_Command) do
 		local s_Function = self.m_Commands[l_Command.type]
 		if(s_Function == nil) then
-			print("Attempted to call a nil function: " .. l_Command.type)
+			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
 			return false
 		end
 		local s_Response = s_Function(self, l_Command, p_UpdatePass)
 		if(s_Response == false) then
 			-- TODO: Handle errors
-			print("error")
+			m_Logger:Error("error")
 		elseif(s_Response == "queue") then
-			print("Queued command")
+			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue.commands, l_Command)
 		else
 			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
@@ -157,7 +157,7 @@ function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
 
         local s_Function = self.m_Messages[l_Message.type]
         if(s_Function == nil) then
-            print("Attempted to call a nil function: " .. l_Message.type)
+            m_Logger:Error("Attempted to call a nil function: " .. l_Message.type)
             return false
         end
 
@@ -165,9 +165,9 @@ function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
 
         if(s_Response == false) then
             -- TODO: Handle errors
-            print("error")
+            m_Logger:Error("error")
         elseif(s_Response == "queue") then
-            print("Queued message")
+            m_Logger:Write("Queued message")
             table.insert(self.m_Queue.messages, l_Message)
         elseif(s_Response == true) then
             --TODO: Success message?
@@ -183,7 +183,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     end
     local s_Commands = {}
     for k,l_Command in ipairs(self.m_Queue.commands) do
-        print("Executing command in the correct UpdatePass: " .. l_Command.type)
+        m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
         table.insert(s_Commands, l_Command)
     end
 
@@ -191,7 +191,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
 
     local s_Messages = {}
     for k,l_Message in ipairs(self.m_Queue.messages) do
-        print("Executing message in the correct UpdatePass: " .. l_Message.type)
+        m_Logger:Write("Executing message in the correct UpdatePass: " .. l_Message.type)
         table.insert(s_Messages, l_Message)
     end
 
@@ -221,7 +221,7 @@ function Editor:SetViewMode(p_Message)
 		local s_WorldRenderSettings = WorldRenderSettings(p_WorldRenderSettings)
 		s_WorldRenderSettings.viewMode = p_Message.viewMode
 	else
-		print("Failed to get WorldRenderSettings")
+		m_Logger:Error("Failed to get WorldRenderSettings")
 		return false;
 		-- Notify WebUI
 	end
@@ -252,7 +252,7 @@ end
 --]]
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
-	--print(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
+	--m_Logger:Write(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
 	if p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent == nil or p_Parent.typeInfo.name == "SubWorldReferenceObjectData" then
 		return
 	end
@@ -265,7 +265,7 @@ end
 
 function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
     if p_Data == nil then
-        print("Didnt get no data")
+        m_Logger:Error("Didnt get no data")
     else
         local s_Entity = p_Hook:Call(p_Data, p_Transform)
         local s_PartitionGuid = m_InstanceParser:GetPartition(p_Data.instanceGuid)
@@ -297,9 +297,6 @@ function Editor:Raycast()
 	end
 
 	-- The freecam transform is inverted. Invert it back
-	print("----")
-	print(self.m_PendingRaycast.direction)
-	print(type(self.m_PendingRaycast.direction))
 	local s_CastPosition = Vec3(s_Transform.trans.x + (s_Direction.x * MAX_CAST_DISTANCE),
 								s_Transform.trans.y + (s_Direction.y * MAX_CAST_DISTANCE),
 								s_Transform.trans.z + (s_Direction.z * MAX_CAST_DISTANCE))

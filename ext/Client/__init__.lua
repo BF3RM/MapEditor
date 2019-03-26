@@ -1,9 +1,5 @@
 class 'MapEditorClient'
 
-require "__shared/Util"
-require "__shared/ObjectManager"
-require "__shared/Backend"
-
 local m_Freecam = require "Freecam"
 local m_Editor = require "Editor"
 local m_UIManager = require "UIManager"
