@@ -177,7 +177,6 @@ class THREEManager {
 		if(object.parent == null) {
 			this.scene.add(object);
 		}
-		console.log(object.parent)
 	}
 
 	MoveObject(webObject, x, y, z){

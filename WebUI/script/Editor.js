@@ -49,7 +49,7 @@ class Editor {
 
 		this.copy = null;
 		this.test = [];
-		this.highlightedGO = null;
+		this.highlightedGameObject = null;
 		// Creates selection group and add it to the scene
 		this.selectionGroup = new SelectionGroup();
 		this.threeManager.AddObject(this.selectionGroup);
@@ -349,7 +349,6 @@ class Editor {
 
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
-			console.log(entityInfo)
 			// UniqueID is fucking broken. this won't work online, boi.
 			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
 
@@ -386,8 +385,8 @@ class Editor {
 		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);
 		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
-			setTimeout(function() {scope.Select(command.guid, false)}, 1);
-		}		
+			setTimeout(function() {scope.Select(command.guid, false)}, 2);
+		}
 	}
 
 	onObjectChanged(object) {
@@ -409,7 +408,7 @@ class Editor {
 	}
 
 	Select(guid, multi = false) {
-		console.log(multi);
+		this.Unhighlight(guid);
 		if(keysdown[17] || multi) {
 			this.editorCore.onSelectedGameObject(guid, true)
 		} else {
@@ -425,23 +424,23 @@ class Editor {
 		let gameObject = this.gameObjects[guid];
 		if (gameObject === null || gameObject.selected || gameObject.highlighted) return;
 
-		if (this.highlightedGO !== null){
-			this.Unhighlight(this.highlightedGO);
+		if (this.highlightedGameObject !== null){
+			this.Unhighlight(this.highlightedGameObject);
 		}
 		gameObject.Highlight();
 		this.threeManager.AddObject(gameObject);
 		
 		this.threeManager.Render();
-		this.highlightedGO = guid;
+		this.highlightedGameObject = guid;
 	}
 
-	Unhighlight(guid = this.highlightedGO){
+	Unhighlight(guid = this.highlightedGameObject){
 		let gameObject = this.gameObjects[guid];
-		if (gameObject === null || gameObject === undefined) return;
+		if (gameObject === null || gameObject === undefined || !gameObject.highlighted) return;
 		gameObject.Unhighlight();
 		this.threeManager.scene.remove(gameObject);
 		this.threeManager.Render();
-		this.highlightedGO = null;
+		this.highlightedGameObject = null;
 	}
 
 
