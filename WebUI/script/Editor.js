@@ -346,7 +346,7 @@ class Editor {
 	onSpawnedBlueprint(command) {
 		let scope = this;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData);
-
+		console.log(command);
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
 			// UniqueID is fucking broken. this won't work online, boi.
@@ -354,6 +354,9 @@ class Editor {
 
 			gameObject.add(gameEntity);
 		}
+
+		this.threeManager.AddObject(gameObject);
+		gameObject.updateMatrixWorld();
 
 		this.gameObjects[command.guid] = gameObject;
 		// If the parent is the leveldata, ignore all this
@@ -367,18 +370,17 @@ class Editor {
 				}
 				this.missingParent[command.parentGuid].push(gameObject)
 			} else {
-				this.gameObjects[command.parentGuid].add(gameObject);
+				THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, this.gameObjects[command.parentGuid] );
 			}
 
 			if(this.missingParent[command.guid] != null) {
 				for(let key in this.missingParent[command.guid]) {
 					let child = this.missingParent[command.guid][key];
-					gameObject.add(child);
+					THREE.SceneUtils.attach( child, editor.threeManager.scene, gameObject );
 				}
 				delete this.missingParent[command.guid];
 			}
 		}
-		this.threeManager.AddObject(gameObject);
 
 
 
