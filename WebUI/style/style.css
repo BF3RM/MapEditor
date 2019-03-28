@@ -459,10 +459,6 @@ tr i {
     position: absolute;
 }
 
-.Row.infinite-tree-item {
-	display: flex;
-}
-
 .ps__rail-y {
 	top: 0px!important;
 	right: 0px!important;
@@ -474,8 +470,10 @@ tr i {
 .Panel {
 	height: 100%;
 	width: 100%;
+	width: 100%;
 }
 
 .infinite-tree-content {
 	padding-bottom: 40px;
+	display:inline-grid;
 }

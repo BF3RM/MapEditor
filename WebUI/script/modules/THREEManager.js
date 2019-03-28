@@ -174,9 +174,10 @@ class THREEManager {
 		if (object.renderInit != undefined){
 			object.renderInit();
 		}
-
-		this.scene.add(object);
-
+		if(object.parent == null) {
+			this.scene.add(object);
+		}
+		console.log(object.parent)
 	}
 
 	MoveObject(webObject, x, y, z){
@@ -380,36 +381,31 @@ class THREEManager {
 		dir.normalize();
 		console.log(raycaster)
 		var origin = new THREE.Vector3( 0, 0, 0 );
-		var length = 100;
-		var miss = 0x00;
+		var miss = 0xc80000;
+		var hit = 0x236e25;
 		let color = null;
 
 		// console.log(editor.test.length);
 		console.log("hit "+ (intersects.length) + " objects");
-		console.log(intersects);
 
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
-
 				const element = intersects[i];
-
 				if (element.object == null || element.object.parent == null){
 					continue;
 				}
-				if(element.object.type == "GameObject") {
-					editor.Select(element.object.parent.guid);
-					break;
-				}
-				if (element.object.parent.type == "GameEntity"){
+				if (element.object.type == "GameEntity"){
 					// console.log("first hit is: "+element.object.parent.parent.guid)
 					// editor.Select(element.object.parent.parent.guid);
-					return element.object.parent.parent.guid;
+					color = hit;
+					return element.object.parent.guid;
 					// break;
+				} else {
 				}
 			}
 		}
 		else{
-			console.log("no hit")
+			console.log("no hit");
 			color = miss
 		}
 

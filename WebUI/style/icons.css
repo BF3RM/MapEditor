@@ -1,6 +1,7 @@
 .Icon {
     height: 16px;
     width: 16px;
+    -webkit-mask-size: contain!important;
 }
 .selectIcon{
     -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
@@ -32,6 +33,11 @@
 
 .Icon-ObjectBlueprint {
     -webkit-mask: url(../icons/types/file-document-box-outline.svg) no-repeat center;
+    background-color: #9c9898;
+}
+
+.Icon-GameObject {
+    -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
     background-color: #9c9898;
 }
 

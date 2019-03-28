@@ -1038,7 +1038,7 @@ UI.Toggler = function (open = false) {
     if(open) {
         state = "open";
     }
-    var dom = document.createElement( 'div' );
+    var dom = document.createElement( 'span' );
 
     dom.className = 'Toggler Toggler-' + state;
 

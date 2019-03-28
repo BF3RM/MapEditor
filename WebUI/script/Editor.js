@@ -347,20 +347,12 @@ class Editor {
 		let scope = this;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData);
 
-
-		this.threeManager.AddObject(gameObject);
-
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
+			console.log(entityInfo)
 			// UniqueID is fucking broken. this won't work online, boi.
-			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), gameObject, null, entityInfo.reference);
+			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
 
-			let aabb = new AABBHelper( new THREE.Box3(
-				new Vec3().fromString(entityInfo.aabb.min),
-				new Vec3().fromString(entityInfo.aabb.max),
-				0xFF0000));
-			
-			gameEntity.add(aabb);
 			gameObject.add(gameEntity);
 		}
 
@@ -387,6 +379,8 @@ class Editor {
 				delete this.missingParent[command.guid];
 			}
 		}
+		this.threeManager.AddObject(gameObject);
+
 
 
 		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);

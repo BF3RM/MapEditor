@@ -179,7 +179,7 @@ class GameObject extends THREE.Object3D
 	onDeselected() {
 		console.log("Deselected");
 		for(let key in this.children) {
-			let child = this.children[key].visible = false;
+			//let child = this.children[key].visible = false;
 		};
 		this.selected = false;
 	}

@@ -289,18 +289,25 @@ class Hierarchy {
 		if(node.selectable !== undefined) {
 			row.setAttribute("node-selectable", node.selectable);
 		}
-		if(node.hasChildren()) {
-			row.add(new UI.Toggler(state.open));
-		}
+
 		if(node.draggable) {
 			row.setAttribute("draggable", true);
 		}
 		if(node.droppable) {
 			row.setAttribute("droppable", true);
 		}
+		if(node.hasChildren()) {
+			row.add(new UI.Toggler(state.open));
+		}
 		row.add(new UI.Icon(node.type));
 		row.add(new UI.Text(node.name));
-		row.add(new UI.Text(Object.keys(node.children).length));
+		if(Object.keys(node.children).length > 0) {
+			let count = new UI.Text(Object.keys(node.children).length);
+			row.add(count);
+			count.setStyle("padding-left", "10px");
+			count.setStyle("opacity", "0.5");
+		}
+		
 		$(row).on('click', function (e) {
 			console.log(e);
 		});
