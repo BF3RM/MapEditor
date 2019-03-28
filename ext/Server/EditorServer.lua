@@ -25,7 +25,7 @@ function EditorServer:RegisterVars()
 
 	self.m_Transactions = {}
 	self.m_GameObjects = {}
-
+	self.m_VanillaObjects = {}
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
@@ -44,6 +44,19 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjects)
 end
 
+
+function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+    --Avoid nested blueprints for now...
+	--m_Logger:Write(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
+	if p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent == nil or p_Parent.typeInfo.name == "SubWorldReferenceObjectData" then
+		return
+	end
+	
+    local s_ParentPartition = m_InstanceParser
+	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+    table.insert(self.m_VanillaObjects, s_Response)
+
+end
 
 function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 	local s_Command = p_Command
