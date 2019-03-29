@@ -244,7 +244,8 @@ class THREEManager {
 
 	Render() {
 		if(!editor.vext.executing) {
-			this.renderer.render(this.scene, this.camera);
+			this.renderer.clear();
+			this.renderer.render( this.scene, this.camera );
 		}
 	}
 
@@ -378,15 +379,6 @@ class THREEManager {
 
 //normalize the direction vector (convert to vector of length 1)
 		dir.normalize();
-		console.log(raycaster)
-		var origin = new THREE.Vector3( 0, 0, 0 );
-		var miss = 0xc80000;
-		var hit = 0x236e25;
-		let color = null;
-
-		// console.log(editor.test.length);
-		console.log("hit "+ (intersects.length) + " objects");
-
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
 				const element = intersects[i];
@@ -396,7 +388,6 @@ class THREEManager {
 				if (element.object.type == "GameEntity"){
 					// console.log("first hit is: "+element.object.parent.parent.guid)
 					// editor.Select(element.object.parent.parent.guid);
-					color = hit;
 					return element.object.parent.guid;
 					// break;
 				} else {
@@ -405,12 +396,7 @@ class THREEManager {
 		}
 		else{
 			console.log("no hit");
-			color = miss
 		}
-
-
-		var arrowHelper = new THREE.ArrowHelper( raycaster.ray.direction, raycaster.ray.origin, length, color );
-		this.scene.add( arrowHelper );
 		return null;
 
 	}
