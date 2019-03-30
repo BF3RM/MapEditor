@@ -81,16 +81,27 @@ end
 
 function Editor:OnReceiveUpdate(p_Update)
 	local s_Responses = {}
-	for k,v in pairs(p_Update) do
-		if(self.m_GameObjects[k] == nil) then
-			local s_Command = {
-				type = "SpawnBlueprintCommand",
-				guid = k,
-				userData = p_Update[k]
-			}
-			table.insert(s_Responses, s_Command)
+	for s_Guid, v in pairs(p_Update) do
+		if(self.m_GameObjects[s_Guid] == nil) then
+			local a = tostring(s_Guid)
+			--If it's a vanilla object, we move it. If not we spawn a new object.
+			if IsVanillaGuid(guid) then
+				local s_Command = {
+					type = "SetTransformCommand",
+					guid = s_Guid,
+					userData = p_Update[s_Guid]
+				}
+				table.insert(s_Responses, s_Command)
+			else
+				local s_Command = {
+					type = "SpawnBlueprintCommand",
+					guid = s_Guid,
+					userData = p_Update[s_Guid]
+				}
+				table.insert(s_Responses, s_Command)
+			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
+			local s_Changes = GetChanges(self.m_GameObjects[s_Guid], p_Update[s_Guid])
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
 				m_Logger:Write("--------------------------------------------------------------------")

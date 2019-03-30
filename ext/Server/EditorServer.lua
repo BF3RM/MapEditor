@@ -54,6 +54,7 @@ function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transfo
 	
     local s_ParentPartition = m_InstanceParser
 	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+
     table.insert(self.m_VanillaObjects, s_Response)
 
 end

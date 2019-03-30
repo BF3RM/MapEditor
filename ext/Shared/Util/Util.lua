@@ -188,6 +188,10 @@ function dus_MatrixParent(o)
 	end
 end
 
+function IsVanillaGuid(guid)
+	return guid:sub(1, 8):upper() == "ED170120"
+end
+
 function Set (list)
 	local set = {}
 	for _, l in ipairs(list) do set[l] = true end
@@ -204,20 +208,18 @@ function GenerateGuid()
 end
 
 function GenerateStaticGuid(n)
-	return "EDITOR0-VANI-LLA00-"..Fill(n, 8)
+	return Guid("ED170120-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
 end
 
-function Fill(n, max)
+function GetFilledNumberAsString(n, stringLength)
 	local n_string = tostring(n)
 	local prefix = ""
 
-	if string.len(n_string) < max then
-		for i=1,max - string.len(n_string) do
+	if string.len(n_string) < stringLength then
+		for i=1,stringLength - string.len(n_string) do
 			prefix = prefix .."0"
 		end
 	end
 
-	return(prefix..n_string)
+	return (prefix..n_string)
 end
-
-
