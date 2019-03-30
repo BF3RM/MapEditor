@@ -68,6 +68,10 @@ function MapEditorClient:OnLoaded()
 	WebUI:Init()
 	WebUI:Show()
 end
+
+function MapEditorClient:OnExtensionUnloading()
+	m_Editor:OnExtensionUnloading()
+end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
 	m_Editor:OnPartitionLoaded(p_Partition)
 end

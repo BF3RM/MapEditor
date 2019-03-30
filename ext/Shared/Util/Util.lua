@@ -202,3 +202,22 @@ end
 function GenerateGuid()
     return Guid(h()..h()..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
+
+function GenerateStaticGuid(n)
+	return "EDITOR0-VANI-LLA00-"..Fill(n, 8)
+end
+
+function Fill(n, max)
+	local n_string = tostring(n)
+	local prefix = ""
+
+	if string.len(n_string) < max then
+		for i=1,max - string.len(n_string) do
+			prefix = prefix .."0"
+		end
+	end
+
+	return(prefix..n_string)
+end
+
+

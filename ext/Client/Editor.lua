@@ -47,7 +47,7 @@ function Editor:RegisterVars()
 
 	self.m_TransactionId = 0
 	self.m_GameObjects = {}
-    self.m_VanillaObjects = {}
+	self.m_VanillaObjects = {}
 end
 
 function Editor:OnPartitionLoaded(p_Partition)

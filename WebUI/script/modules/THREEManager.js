@@ -373,8 +373,7 @@ class THREEManager {
 
 		var intersects = raycaster.intersectObjects( Object.values(editor.gameObjects), true );
 
-		// console.log(editor.test.length);
-		console.log("hit "+ (intersects.length) + " objects");
+		// console.log("hit "+ (intersects.length) + " objects");
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
 				
@@ -383,15 +382,12 @@ class THREEManager {
 					continue;
 				}
 				if (element.object.parent.type == "GameEntity"){
-					// console.log("first hit is: "+element.object.parent.parent.guid)
-					// editor.Select(element.object.parent.parent.guid);
 					return element.object.parent.parent.guid;
-					// break;
 				}
 			}
 		}
 		else{
-			console.log("no hit")
+			// console.log("no hit")
 			return null;
 		}
 	}

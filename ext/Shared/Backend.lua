@@ -5,11 +5,11 @@ local m_Logger = Logger("Backend", true)
 local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10000
 
-local m_VanillaBlueprintNumber = 0
 
 function Backend:__init(p_Realm)
 	m_Logger:Write("Initializing Backend: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm;
+	self.m_VanillaBlueprintNumber = 0
 	self:RegisterVars()
 end
 
@@ -21,6 +21,8 @@ end
 
 
 function Backend:OnLevelDestroy()
+	self.m_VanillaBlueprintNumber = 0
+	
 	ObjectManager:Clear()
 end
 
@@ -71,9 +73,9 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
         p_Transform = LinearTransform()
     end
 
-    m_VanillaBlueprintNumber = m_VanillaBlueprintNumber + 1
+    self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
 
-    local s_Guid = "EDITOR-VANILLA-"..m_VanillaBlueprintNumber
+    local s_Guid = GenerateStaticGuid(self.m_VanillaBlueprintNumber)
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, tostring(s_Guid), p_Transform, p_Blueprint, p_Parent)
 
     local s_Children = {}
@@ -85,7 +87,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 
         -- Some client entities' ids are 0, we create a custom one 
         if s_EntityID == 0 then
-        	s_EntityID = m_VanillaBlueprintNumber.."-"..i
+        	s_EntityID = self.m_VanillaBlueprintNumber.."-"..i
         end
         s_Children[#s_Children + 1 ] = {
             guid = s_EntityID,
