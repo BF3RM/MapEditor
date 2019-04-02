@@ -144,7 +144,8 @@ function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
 	local s_Response = {
 		type = "DestroyedBlueprint",
 		userData = nil,
-		guid =  p_Command.guid
+		guid =  p_Command.guid,
+		isDeleted = true
 	}
 	return s_Response
 end

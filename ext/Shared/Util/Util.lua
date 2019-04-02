@@ -1,5 +1,21 @@
 local matrix = require "__shared/Util/matrix"
 
+function MergeTables(p_Old, p_New)
+	if(p_New == nil) then
+		return p_Old
+	end
+
+	if(p_Old == nil) then
+		return p_New
+	end
+
+	for k,v in pairs(p_New) do
+		p_Old[k] = v
+	end
+
+	return p_Old
+end
+
 function MergeUserdata(p_Old, p_New)
 	if(p_Old == nil) then
 		return p_New
@@ -189,6 +205,9 @@ function dus_MatrixParent(o)
 end
 
 function IsVanillaGuid(guid)
+	if guid == nil then
+		return false
+	end
 	return guid:sub(1, 8):upper() == "ED170120"
 end
 

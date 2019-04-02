@@ -81,16 +81,29 @@ end
 
 function Editor:OnReceiveUpdate(p_Update)
 	local s_Responses = {}
+
 	for s_Guid, v in pairs(p_Update) do
 		if(self.m_GameObjects[s_Guid] == nil) then
-			local a = tostring(s_Guid)
-			--If it's a vanilla object, we move it. If not we spawn a new object.
-			if IsVanillaGuid(guid) then
-				local s_Command = {
-					type = "SetTransformCommand",
-					guid = s_Guid,
-					userData = p_Update[s_Guid]
-				}
+			local s_StringGuid = tostring(s_Guid)
+
+			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
+			if IsVanillaGuid(s_StringGuid)then
+				local s_Command = nil
+
+				if v.isDeleted then
+					s_Command = {
+						type = "DestroyBlueprintCommand",
+						guid = s_Guid,
+
+					}
+				else
+					s_Command = {
+
+						type = "SetTransformCommand",
+						guid = s_Guid,
+						userData = p_Update[s_Guid]
+					}
+				end
 				table.insert(s_Responses, s_Command)
 			else
 				local s_Command = {
@@ -149,10 +162,18 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue.commands, l_Command)
 		else
-			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
+			local s_Transform = LinearTransform()
+			if s_Response.userData ~= nil then
+				s_Transform = s_Response.userData.transform
+			end
+			self.m_GameObjects[l_Command.guid] = {
+				isDeleted = s_Response.isDeleted or false,
+				transform = s_Transform
+			}
 			table.insert(s_Responses, s_Response)
 		end
 	end
+	m_Logger:Write(json.encode(self.m_GameObjects))
 	if(#s_Responses > 0) then
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Responses)))
 	end

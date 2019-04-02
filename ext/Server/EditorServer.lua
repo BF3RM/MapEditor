@@ -80,7 +80,14 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue, l_Command)
 		else
-			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
+			local s_Transform = LinearTransform()
+			if s_Response.userData ~= nil then
+				s_Transform = s_Response.userData.transform
+			end
+			self.m_GameObjects[l_Command.guid] = {
+				isDeleted = s_Response.isDeleted or false,
+				transform = s_Transform
+			}
 			table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
 			table.insert(s_Responses, s_Response)
 		end
