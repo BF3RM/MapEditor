@@ -4,6 +4,8 @@ local m_Logger = Logger("EditorServer", true)
 
 local m_InstanceParser = require "InstanceParser"
 local m_SaveFile = require 'SaveFile'
+local m_IsLevelLoaded = false
+local m_LoadDelay = 0
 
 function EditorServer:__init()
 	m_Logger:Write("Initializing EditorServer")
@@ -99,6 +101,16 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 end
 
 function EditorServer:OnUpdatePass(p_Delta, p_Pass)
+	if m_IsLevelLoaded then
+		m_LoadDelay = m_LoadDelay + p_Delta
+
+		if m_LoadDelay > 10 then
+			self:LoadSave()
+			m_IsLevelLoaded = false
+			m_LoadDelay = 0
+		end
+	end
+
 	if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
 		return
 	end
@@ -113,19 +125,21 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 		self.m_Queue = {}
 	end
 end
-function EditorServer:OnLevelLoaded()
-    self:LoadLevel()
+
+function EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+	m_IsLevelLoaded = true
 end
 
-function EditorServer:LoadLevel()
-    m_Logger:Write("Loading level")
-    -- local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
+function EditorServer:LoadSave()
+    m_Logger:Write("Loading savefile")
+    local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
 
-    -- if(not s_SaveFile) then
-    --     m_Logger:Write("Failed to get savefile")
-    --     return
-    -- end
-    self:UpdateLevel(json.decode(m_SaveFile))
+    if(not s_SaveFile) then
+        m_Logger:Write("Failed to get savefile")
+        return
+    end
+
+    self:UpdateLevel(s_SaveFile)
 end
 
 function EditorServer:UpdateLevel(p_Update)
@@ -137,15 +151,18 @@ function EditorServer:UpdateLevel(p_Update)
 
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
 			if IsVanillaGuid(s_StringGuid) then
+				print("vanilla")
 				local s_Command = nil
 
 				if s_GameObject.isDeleted then
+					print("deleting")
 					s_Command = {
 						type = "DestroyBlueprintCommand",
 						guid = s_Guid,
 
 					}
 				else
+					print("moving")
 					s_Command = {
 						type = "SetTransformCommand",
 						guid = s_Guid,

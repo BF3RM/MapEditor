@@ -23,7 +23,7 @@ function MapEditorServer:RegisterEvents()
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
-    Events:Subscribe('Server:LevelLoaded', self, self.onLevelLoaded)
+    Events:Subscribe('Server:LevelLoaded', self, self.OnLevelLoaded)
     Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
     Hooks:Install('ServerEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
@@ -48,8 +48,8 @@ function MapEditorServer:OnLevelDestroy()
 	Backend:OnLevelDestroy()
 end
 
-function MapEditorServer:onLevelLoaded(p_Message)
-    m_EditorServer:OnLevelLoaded(p_Message)
+function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+    m_EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
