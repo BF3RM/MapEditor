@@ -327,7 +327,9 @@ class EditorUI {
 			"\t"
 			);
 		*/
-		$("#saveProjectTextArea").text(editor.editorCore.toJson());
+		let json = editor.editorCore.getJson()
+		
+		$("#saveProjectTextArea").text(json);
 
 		editor.ui.dialogs["saveProject"].dialog("open");
 		

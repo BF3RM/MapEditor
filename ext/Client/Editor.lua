@@ -82,7 +82,7 @@ end
 function Editor:OnReceiveUpdate(p_Update)
 	local s_Responses = {}
 
-	for s_Guid, v in pairs(p_Update) do
+	for s_Guid, s_GameObject in pairs(p_Update) do
 		if(self.m_GameObjects[s_Guid] == nil) then
 			local s_StringGuid = tostring(s_Guid)
 
@@ -90,7 +90,7 @@ function Editor:OnReceiveUpdate(p_Update)
 			if IsVanillaGuid(s_StringGuid)then
 				local s_Command = nil
 
-				if v.isDeleted then
+				if s_GameObject.isDeleted then
 					s_Command = {
 						type = "DestroyBlueprintCommand",
 						guid = s_Guid,
@@ -101,7 +101,7 @@ function Editor:OnReceiveUpdate(p_Update)
 
 						type = "SetTransformCommand",
 						guid = s_Guid,
-						userData = p_Update[s_Guid]
+						userData = s_GameObject
 					}
 				end
 				table.insert(s_Responses, s_Command)
@@ -109,12 +109,12 @@ function Editor:OnReceiveUpdate(p_Update)
 				local s_Command = {
 					type = "SpawnBlueprintCommand",
 					guid = s_Guid,
-					userData = p_Update[s_Guid]
+					userData = s_GameObject
 				}
 				table.insert(s_Responses, s_Command)
 			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjects[s_Guid], p_Update[s_Guid])
+			local s_Changes = GetChanges(self.m_GameObjects[s_Guid], s_GameObject)
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
 				m_Logger:Write("--------------------------------------------------------------------")
@@ -162,18 +162,18 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue.commands, l_Command)
 		else
-			local s_Transform = LinearTransform()
+			local s_UserData = nil
 			if s_Response.userData ~= nil then
-				s_Transform = s_Response.userData.transform
+				s_UserData = MergeUserdata(s_Response.userData, {isDeleted = s_Response.isDeleted or false})
+			else
+				s_UserData = {isDeleted = s_Response.isDeleted or false, transform = LinearTransform()}
 			end
-			self.m_GameObjects[l_Command.guid] = {
-				isDeleted = s_Response.isDeleted or false,
-				transform = s_Transform
-			}
+			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_UserData)
+				
 			table.insert(s_Responses, s_Response)
 		end
 	end
-	m_Logger:Write(json.encode(self.m_GameObjects))
+	-- m_Logger:Write(json.encode(self.m_GameObjects))
 	if(#s_Responses > 0) then
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Responses)))
 	end
