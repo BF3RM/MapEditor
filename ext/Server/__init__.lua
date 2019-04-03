@@ -17,6 +17,7 @@ function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
 
 	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommand)
+	NetEvents:Subscribe('MapEditorServer:RequestSave', self, self.OnRequestSave)
 
 	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
 

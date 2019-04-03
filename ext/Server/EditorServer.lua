@@ -119,13 +119,13 @@ end
 
 function EditorServer:LoadLevel()
     m_Logger:Write("Loading level")
-    local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
+    -- local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
 
-    if(not s_SaveFile) then
-        m_Logger:Write("Failed to get savefile")
-        return
-    end
-    self:UpdateLevel(s_SaveFile)
+    -- if(not s_SaveFile) then
+    --     m_Logger:Write("Failed to get savefile")
+    --     return
+    -- end
+    self:UpdateLevel(json.decode(m_SaveFile))
 end
 
 function EditorServer:UpdateLevel(p_Update)

@@ -136,6 +136,10 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:Raycast()
 end
 
+function Editor:OnRequestSave()
+	WebUI:ExecuteJS("editor.ui.SetSave('"..json.encode(self.m_GameObjects).."')")
+end
+
 
 function Editor:OnSendToServer(p_Command)
 	NetEvents:SendLocal('MapEditorServer:ReceiveCommand', p_Command)
@@ -173,6 +177,7 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 			table.insert(s_Responses, s_Response)
 		end
 	end
+
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
 	if(#s_Responses > 0) then
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Responses)))

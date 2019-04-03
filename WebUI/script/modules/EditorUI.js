@@ -327,12 +327,15 @@ class EditorUI {
 			"\t"
 			);
 		*/
-		let json = editor.editorCore.getJson()
-		
-		$("#saveProjectTextArea").text(json);
 
+		editor.vext.SendEvent('RequestSave')
+		$("#saveProjectTextArea").text("Loading...");
 		editor.ui.dialogs["saveProject"].dialog("open");
-		
+	}
+
+	SetSave(json){
+		$("#saveProjectTextArea").text(json);
+		// editor.ui.dialogs["saveProject"].dialog("open");
 	}
 
 	onConfirmReloadProject(){
@@ -360,7 +363,7 @@ class EditorUI {
 			editor.rootEntities[key].Delete();
 		}
 
-		editor.vext.SendEvent('MapEditor:LoadProject', 'MapEditor:LoadProject', jsonString)
+		editor.vext.SendEvent('LoadProject')
 		
 		$(this).dialog("close");
 	}
