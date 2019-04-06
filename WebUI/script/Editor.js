@@ -346,7 +346,7 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData, command.isVanilla);
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData, command.isVanilla);
 		this.threeManager.AddObject(gameObject);
 
 		for (let key in command.children) {

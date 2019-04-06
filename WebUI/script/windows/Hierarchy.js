@@ -27,6 +27,7 @@ class Hierarchy {
 		this.subControls = this.CreateSubControls();
 
 		this.entries = [];
+		this.existingParents = [];
 		this.Initialize();
 
 		this.queue = [];
@@ -47,39 +48,41 @@ class Hierarchy {
 
 		let currentEntry = gameObject.getNode();
 		scope.entries[command.guid] = currentEntry;
-
 		this.queue[currentEntry.id] = currentEntry;
 
 		if(!editor.vext.executing) {
 			console.log("Drawing");
-			console.log(this.queue.length);
+			console.log(Object.keys(this.queue).length);
 
 			let updatedNodes = {};
-			let missingParent = {};
 
 			for( let entryGuid in scope.queue) {
 				let entry = scope.queue[entryGuid];
 				//Check if the parent is in the queue
-				if(this.queue[entry.parentId] != null) {
-					this.queue[entry.parentId].children.push(entry);
-					entry.parent = this.queue[entry.parentId];
-				} else if(this.tree.getNodeById(entry.parentId) != null) {
-					let parentNode = this.tree.getNodeById(entry.parentId);
-					parentNode.children.push(scope.queue[entryGuid]);
-					updatedNodes[entry.parentId] = parentNode;
-					entry.parent = parentNode;
+				if(this.queue[entry.parentGuid] != null) {
+					this.queue[entry.parentGuid].children.push(entry);
+					//Check if the parent node is already spawned
+
+				} else if(this.tree.getNodeById(entry.parentGuid) != null) {
+					if( this.existingParents[entry.parentGuid] == null) {
+						this.existingParents[entry.parentGuid] = [];
+					}
+					console.log("Existing" + entry.name);
+					this.existingParents[entry.parentGuid].push(entry);
 				} else {
-					let parentNode = this.tree.getNodeById("root");
-					parentNode.children.push(scope.queue[entryGuid]);
-					updatedNodes[entry.parentId] = parentNode;
-					entry.parent = parentNode;
+					if(this.existingParents["root"] == null) {
+						this.existingParents["root"] = [];
+					}
+					console.log("Root")
+
+					this.existingParents["root"].push(entry);
 				}
 			}
-			scope.queue = {};
-			for(let parentNodeId in updatedNodes) {
-				let parentNode = updatedNodes[parentNodeId];
-				scope.tree.updateNode(parentNode);
+			for(let parentNodeId in this.existingParents) {
+				this.tree.addChildNodes(this.existingParents[parentNodeId], undefined, this.tree.getNodeById(parentNodeId));
+				delete this.existingParents[parentNodeId];
 			}
+			scope.queue = [];
 
 		}
 	}

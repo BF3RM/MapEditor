@@ -1,7 +1,6 @@
 class 'Editor'
 
 local m_Logger = Logger("Editor", true)
-local m_InstanceParser = require "InstanceParser"
 
 
 local MAX_CAST_DISTANCE = 10000
@@ -49,27 +48,29 @@ function Editor:RegisterVars()
 	self.m_GameObjects = {}
     self.m_VanillaObjects = {}
 	self.m_VanillaUnresolved = {}
+
+	self.m_LookupTable = {};
 end
 
 function Editor:OnPartitionLoaded(p_Partition)
-    m_InstanceParser:OnPartitionLoaded(p_Partition)
+    InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function Editor:OnLevelLoaded(p_MapName, p_GameModeName)
-	m_InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
+	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
-		m_InstanceParser:FillVariations()
-		local s_LevelDatas = m_InstanceParser:GetLevelDatas()
+		InstanceParser:FillVariations()
+		local s_LevelDatas = InstanceParser:GetLevelDatas()
 
 		for k,v in pairs(s_LevelDatas) do
 			WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
 		end
-		print("Unresolved: " .. #self.m_VanillaUnresolved)
+		print(self.m_VanillaUnresolved)
 
-		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(m_InstanceParser.m_Blueprints)))
+		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_VanillaObjects)))
         WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(self.m_VanillaUnresolved)))
 
@@ -291,15 +292,19 @@ end
 
 --]]
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-    --Avoid nested blueprints for now...
-	local s_PartitionGuid = m_InstanceParser:GetPartition(p_Blueprint.instanceGuid)
+	--Avoid nested blueprints for now...
+	local s_PartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
 	local s_ParentPartition = nil
 	local s_ParentPrimaryInstance = nil
 	local s_ParentType = nil
+
 	if(p_Parent ~= nil) then
-		s_ParentPartition = m_InstanceParser:GetPartition(p_Parent.instanceGuid)
-		s_ParentPrimaryInstance = m_InstanceParser:GetPrimaryInstance(s_ParentPartition)
-		local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), Guid(s_ParentPrimaryInstance))
+		s_ParentPartition = InstanceParser:GetPartition(p_Parent.instanceGuid)
+		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartition)
+
+		local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), p_Parent.instanceGuid)
+		s_Parent = _G[p_Parent.typeInfo.name](p_Parent)
+
 		s_ParentType = s_Parent.typeInfo.name
 	else
 		print(p_Blueprint.instanceGuid)
@@ -307,35 +312,43 @@ function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_
 		s_ParentPrimaryInstance = "dynamic"
 	end
 	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent, s_PartitionGuid, s_ParentPartition, s_ParentPrimaryInstance, s_ParentType)
+	if(p_Blueprint.typeInfo == WorldPartData.typeInfo or p_Blueprint.typeInfo == SubWorldData.typeInfo) then
+		local s_Blueprint = Blueprint(p_Blueprint)
+		print(s_Blueprint.name)
+	end
+
 
 	-- Check if the current blueprint is referenced from a leveldata
-	if(m_InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
+	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
 		s_Response.parentGuid = s_ParentPrimaryInstance
 		table.insert(self.m_VanillaObjects, s_Response)
-	else
-		print(m_InstanceParser:GetLevelDatas())
+		self.m_LookupTable[s_Response.userData.reference.instanceGuid] = #self.m_VanillaObjects
 	end
-		-- Check if the current blueprint is referenced by earlier blueprints
+	-- Check if the current blueprint has an already spawned parent
+	if(s_Response.parentGuid == nil and self.m_LookupTable[s_ParentPrimaryInstance] ~= nil) then
+		local s_ParentGuid = self.m_VanillaObjects[self.m_LookupTable[s_ParentPrimaryInstance]].guid
+		s_Response.parentGuid = s_ParentGuid
+		table.insert(self.m_VanillaObjects, s_Response)
+		self.m_LookupTable[s_Response.userData.reference.instanceGuid] = #self.m_VanillaObjects
+	end
+
+	-- Check if the current blueprint is referenced by earlier blueprints
 	if(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] ~= nil) then
 		-- Loop through all the children that are referencing this blueprint and assign this as their parent.
 		for k,v in pairs(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)]) do
 			v.parentGuid = s_Response.guid
 			table.insert(self.m_VanillaObjects, v)
+			self.m_LookupTable[v.userData.reference.instanceGuid] = #self.m_VanillaObjects
 		end
 		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
-		-- If the current blueprint don't have a parent assigned, add it to the unresolved list
-		if(s_Response.parentGuid == nil) then
-			-- Add the current blueprint to the unresolved list.
-			if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
-				self.m_VanillaUnresolved[s_ParentPrimaryInstance] = {}
-			end
-			table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance],s_Response)
-		end
-	else -- Blueprint has arrived before the parent. Add it to the unresolved list.
+	end
+	-- We failed to get the parentGuid for this entry. Add it to the unresolved list and wait for the parent.
+	if(s_Response.parentGuid == nil) then
+		-- Add the current blueprint to the unresolved list.
 		if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
 			self.m_VanillaUnresolved[s_ParentPrimaryInstance] = {}
 		end
-		table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance], s_Response)
+		table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance],s_Response)
 	end
 end
 
@@ -346,7 +359,7 @@ function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
         m_Logger:Error("Didnt get no data")
     else
         local s_Entity = p_Hook:Call(p_Data, p_Transform)
-        local s_PartitionGuid = m_InstanceParser:GetPartition(p_Data.instanceGuid)
+        local s_PartitionGuid = InstanceParser:GetPartition(p_Data.instanceGuid)
         if(s_PartitionGuid == nil) then
             return
         end

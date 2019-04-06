@@ -1,9 +1,9 @@
 
 let FakeLevel = `
 {
-  "name": "XP3_Shield",
-  "partitionGuid": "69AFE35D-259F-11E1-98E7-C42BEF8FFB67",
-  "instanceGuid": "57425C7A-7D66-7067-1E26-0F83995C69ED"
+  "name": "Levels/XP2_Skybar/XP2_Skybar",
+  "partitionGuid": "2DF41167-0BAB-11E1-AA4E-EFBA5D767A10",
+  "instanceGuid": "56A884A6-0451-F6B3-D1F1-40BBB4E2CD92"
 }`;
 
 editor.blueprintManager.RegisterBlueprints(xp3shieldBlueprints);

@@ -99,7 +99,12 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 			}
 		end
 	end
-    local s_Blueprint = Blueprint(p_Blueprint)
+
+    local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint)
+	local s_Suffix = ""
+	if(s_Blueprint:Is("PrefabBlueprint")) then
+		s_Suffix = "_" .. #s_Blueprint.objects
+	end
     local s_ParentGuid = nil
     if(p_Parent ~= nil) then
         s_ParentGuid = tostring(p_Parent.instanceGuid)
@@ -108,7 +113,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
     local s_Response = {
         guid = tostring(s_Guid),
         sender = "Server",
-        name = s_Blueprint.name,
+        name = s_Blueprint.name .. s_Suffix,
         isVanilla = true,
         ['type'] = 'SpawnedBlueprint',
 		referenceGuid = s_ParentGuid,

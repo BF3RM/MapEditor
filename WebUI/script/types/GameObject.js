@@ -9,7 +9,7 @@ class GameObject extends THREE.Object3D
 		this.type = "GameObject";
 		this.name = name;
 		this.transform = transform;
-		this.parentPartition = parent;
+		this.parentGuid = parent;
 		this.userData = userData;
 		this.isVanilla = isVanilla;
 		this.selected = false;
@@ -196,7 +196,7 @@ class GameObject extends THREE.Object3D
 			id: this.guid,
 			name: this.getCleanName(),
 			type: this.type,
-			parentId: this.parentPartition,
+			parentGuid: this.parentGuid,
 			draggable: true,
 			droppable: true,
 			children: [],

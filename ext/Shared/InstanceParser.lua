@@ -2,10 +2,12 @@ class 'InstanceParser'
 
 local m_Logger = Logger("InstanceParser", true)
 
-function InstanceParser:__init()
-	m_Logger:Write("Initializing InstanceParserClient")
+function InstanceParser:__init(p_Realm)
+	m_Logger:Write("Initializing InstanceParser")
+	self.m_Realm = p_Realm
 	self:RegisterVars()
 	self:RegisterEvents()
+
 end
 
 function InstanceParser:RegisterVars()
@@ -100,12 +102,13 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 	
 	local s_Instances = p_Partition.instances
 
-    local s_PrimaryInstance = p_Partition.primaryInstance
+    local s_PrimaryInstance = _G[p_Partition.primaryInstance.typeInfo.name](p_Partition.primaryInstance)
     local s_Blueprint = false
     if(s_PrimaryInstance == nil) then
         m_Logger:Write("Primary is nil")
     end
     if(s_PrimaryInstance:Is("Blueprint")) then
+		s_PrimaryInstance = _G[s_PrimaryInstance.typeInfo.name](s_PrimaryInstance)
         s_Blueprint = true
     end
 	self.m_PrimaryInstances[tostring(p_Partition.guid)] = tostring(s_PrimaryInstance.instanceGuid);
@@ -117,8 +120,26 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 		end
 
         if(s_Blueprint == true) then
-            self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
-        end
+			local s_Autogen = false
+			if(string.match(s_PrimaryInstance.name, "nongroupable_autogen") ~= nil) then
+				s_Autogen = true
+			end
+
+			-- If the map uses both the autogen and the original prefab, use the original prefab instead.
+			if(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] ~= nil) then
+				if(s_Autogen == false) then
+					print("Replacing Autogen: " .. s_PrimaryInstance.name)
+					print(l_Instance.instanceGuid)
+				end
+				if(type(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)]) == "string") then
+
+				else
+					print(type(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)]))
+				end
+			else
+				self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
+			end
+		end
 
 		-- Catch all blueprints
 		if l_Instance:Is("Blueprint") then
@@ -126,11 +147,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
 			-- m_Logger:Write(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
 			-- We're not storing the actual instance since we'd rather look it up manually in case of a reload.
-			if(l_Instance.typeInfo.name == "ObjectBlueprint") then
-				if(s_Instance.object == nil or self.m_IllegalTypes[s_Instance.object.typeInfo.name] == true) then
-					return
-				end
-			end
+
 			self.m_Blueprints[tostring(l_Instance.instanceGuid)] = {
 				instanceGuid = tostring(l_Instance.instanceGuid),
 				partitionGuid = tostring(p_Partition.guid),
@@ -220,5 +237,5 @@ function InstanceParser:FillVariations()
 	end
 end
 
-return InstanceParser()
+return InstanceParser
 

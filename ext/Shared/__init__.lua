@@ -4,6 +4,7 @@ require "__shared/Util/Logger"
 require "__shared/Util/Util"
 require "__shared/ObjectManager"
 require "__shared/Backend"
+require "__shared/InstanceParser"
 
 
 local m_Logger = Logger("MapEditorShared", true)

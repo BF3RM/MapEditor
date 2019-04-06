@@ -1,10 +1,10 @@
 class 'MapEditorServer'
 
 local m_Logger = Logger("MapEditorServer", true)
-local m_InstanceParser = require "InstanceParser"
-
+InstanceParser = InstanceParser(Realm.Realm_Server)
 ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
 Backend = Backend(Realm.Realm_ClientAndServer)
+
 local m_EditorServer = require "EditorServer"
 
 function MapEditorServer:__init()
@@ -66,7 +66,7 @@ function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
 end
 
 function MapEditorServer:OnPartitionLoaded(p_Partition)
-    m_InstanceParser:OnPartitionLoaded(p_Partition)
+    InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
