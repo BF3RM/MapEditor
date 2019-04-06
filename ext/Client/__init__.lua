@@ -1,9 +1,5 @@
 class 'MapEditorClient'
 
-require "__shared/Util"
-require "__shared/ObjectManager"
-require "__shared/Backend"
-
 local m_Freecam = require "Freecam"
 local m_Editor = require "Editor"
 local m_UIManager = require "UIManager"
@@ -71,6 +67,10 @@ end
 function MapEditorClient:OnLoaded()
 	WebUI:Init()
 	WebUI:Show()
+end
+
+function MapEditorClient:OnExtensionUnloading()
+	m_Editor:OnExtensionUnloading()
 end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
 	m_Editor:OnPartitionLoaded(p_Partition)

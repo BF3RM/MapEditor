@@ -1,4 +1,20 @@
-local matrix = require "__shared/matrix"
+local matrix = require "__shared/Util/matrix"
+
+function MergeTables(p_Old, p_New)
+	if(p_New == nil) then
+		return p_Old
+	end
+
+	if(p_Old == nil) then
+		return p_New
+	end
+
+	for k,v in pairs(p_New) do
+		p_Old[k] = v
+	end
+
+	return p_Old
+end
 
 function MergeUserdata(p_Old, p_New)
 	if(p_Old == nil) then
@@ -188,6 +204,13 @@ function dus_MatrixParent(o)
 	end
 end
 
+function IsVanillaGuid(guid)
+	if guid == nil then
+		return false
+	end
+	return guid:sub(1, 8):upper() == "ED170120"
+end
+
 function Set (list)
 	local set = {}
 	for _, l in ipairs(list) do set[l] = true end
@@ -201,4 +224,21 @@ end
 
 function GenerateGuid()
     return Guid(h()..h()..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
+end
+
+function GenerateStaticGuid(n)
+	return Guid("ED170120-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
+end
+
+function GetFilledNumberAsString(n, stringLength)
+	local n_string = tostring(n)
+	local prefix = ""
+
+	if string.len(n_string) < stringLength then
+		for i=1,stringLength - string.len(n_string) do
+			prefix = prefix .."0"
+		end
+	end
+
+	return (prefix..n_string)
 end

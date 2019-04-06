@@ -1,9 +1,12 @@
 class 'EditorServer'
+
+local m_Logger = Logger("EditorServer", true)
+
 local m_InstanceParser = require "InstanceParser"
 local m_SaveFile = require 'SaveFile'
 
 function EditorServer:__init()
-	print("Initializing EditorServer")
+	m_Logger:Write("Initializing EditorServer")
 	self:RegisterVars()
 end
 
@@ -22,7 +25,7 @@ function EditorServer:RegisterVars()
 
 	self.m_Transactions = {}
 	self.m_GameObjects = {}
-
+	self.m_VanillaObjects = {}
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
@@ -35,12 +38,26 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 			s_UpdatedGameObjects[s_Guid] = self.m_GameObjects[s_Guid]
 			s_TransactionId = s_TransactionId + 1
 		else
-			print("shit's nil")
+			m_Logger:Write("shit's nil")
 		end
 	end
 	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjects)
 end
 
+
+function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+    --Avoid nested blueprints for now...
+	--m_Logger:Write(p_Blueprint.typeInfo.name .. " | " .. tostring(p_Blueprint.instanceGuid) .. tostring(p_Parent.typeInfo.name ) .. " | " .. tostring(p_Parent.instanceGuid))
+	if p_Blueprint.typeInfo.name == "WorldPartData" or p_Blueprint.typeInfo.name == "SubWorldData" or p_Parent == nil or p_Parent.typeInfo.name == "SubWorldReferenceObjectData" then
+		return
+	end
+	
+    local s_ParentPartition = m_InstanceParser
+	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+
+    table.insert(self.m_VanillaObjects, s_Response)
+
+end
 
 function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 	local s_Command = p_Command
@@ -52,23 +69,30 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 	for k, l_Command in ipairs(s_Command) do
 		local s_Function = self.m_Commands[l_Command.type]
 		if(s_Function == nil) then
-			print("Attempted to call a nil function: " .. l_Command.type)
+			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
 			return false
 		end
 		local s_Response = s_Function(self, l_Command, p_UpdatePass)
 		if(s_Response == false) then
 			-- TODO: Handle errors
-			print("error")
+			m_Logger:Error("error")
 		elseif(s_Response == "queue") then
-			print("Queued command")
+			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue, l_Command)
 		else
-			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
+			local s_Transform = LinearTransform()
+			if s_Response.userData ~= nil then
+				s_Transform = s_Response.userData.transform
+			end
+			self.m_GameObjects[l_Command.guid] = {
+				isDeleted = s_Response.isDeleted or false,
+				transform = s_Transform
+			}
 			table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
 			table.insert(s_Responses, s_Response)
 		end
 	end
-    print(json.encode(self.m_GameObjects))
+    m_Logger:Write(json.encode(self.m_GameObjects))
 	if(#s_Responses > 0) then
 		NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", json.encode(s_Command))
 	end
@@ -80,7 +104,7 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 	end
 	local s_Responses = {}
 	for k,l_Command in ipairs(self.m_Queue) do
-		print("Executing command delayed: " .. l_Command.type)
+		m_Logger:Write("Executing command delayed: " .. l_Command.type)
 		table.insert(s_Responses, l_Command)
 	end
 	self:OnReceiveCommand(nil, s_Responses, true, p_Pass)
@@ -94,11 +118,11 @@ function EditorServer:OnLevelLoaded()
 end
 
 function EditorServer:LoadLevel()
-    print("Loading level")
+    m_Logger:Write("Loading level")
     local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
 
     if(not s_SaveFile) then
-        print("Failed to get savefile")
+        m_Logger:Write("Failed to get savefile")
         return
     end
     self:UpdateLevel(s_SaveFile)
@@ -113,16 +137,16 @@ function EditorServer:UpdateLevel(p_Update)
                 guid = k,
                 userData = p_Update[k]
             }
-            print(s_Command)
+            m_Logger:Write(s_Command)
             table.insert(s_Responses, s_Command)
         else
             local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
             -- Hopefully this will never happen. It's hard to test these changes since they require a desync.
             if(#s_Changes > 0) then
-                print("--------------------------------------------------------------------")
-                print("If you ever see this, please report it on the repo.")
-                print(s_Changes)
-                print("--------------------------------------------------------------------")
+                m_Logger:Write("--------------------------------------------------------------------")
+                m_Logger:Write("If you ever see this, please report it on the repo.")
+                m_Logger:Write(s_Changes)
+                m_Logger:Write("--------------------------------------------------------------------")
             end
         end
 

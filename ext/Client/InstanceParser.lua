@@ -1,13 +1,15 @@
 class 'InstanceParser'
 
+local m_Logger = Logger("InstanceParser", true)
+
 function InstanceParser:__init()
-	print("Initializing InstanceParserClient")
+	m_Logger:Write("Initializing InstanceParserClient")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
 
 function InstanceParser:RegisterVars()
-    print("Registered vars")
+	m_Logger:Write("Registered vars")
 	self.m_Blueprints = {}
 	self.m_Meshes = {}
 	self.m_Variations = {}
@@ -53,7 +55,7 @@ end
 --TODO: Redo this whole fucking thing.
 
 function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
-	print(self.m_StaticModelGroupEntityDataGuids)
+	m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
 	local s_Instance = ResourceManager:FindInstanceByGUID(
 		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid), 
 		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid))
@@ -101,7 +103,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
     local s_PrimaryInstance = p_Partition.primaryInstance
     local s_Blueprint = false
     if(s_PrimaryInstance == nil) then
-        print("Primary is nil")
+        m_Logger:Write("Primary is nil")
     end
     if(s_PrimaryInstance:Is("Blueprint")) then
         s_Blueprint = true
@@ -110,7 +112,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 
 	for _, l_Instance in ipairs(s_Instances) do
 		if l_Instance == nil then
-			print('Instance is null?')
+			m_Logger:Write('Instance is null?')
 			goto continue
 		end
 
@@ -122,7 +124,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 		if l_Instance:Is("Blueprint") then
 
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
-			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
+			-- m_Logger:Write(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
 			-- We're not storing the actual instance since we'd rather look it up manually in case of a reload.
 			if(l_Instance.typeInfo.name == "ObjectBlueprint") then
 				if(s_Instance.object == nil or self.m_IllegalTypes[s_Instance.object.typeInfo.name] == true) then
@@ -171,10 +173,10 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function InstanceParser:FillVariations()
-	print("FILL")
-    print(#self.m_MeshVariationDatabases)
-    print(#self.m_Blueprints)
-    print(#self.m_BlueprintInstances)
+	m_Logger:Write("FILL")
+    m_Logger:Write(#self.m_MeshVariationDatabases)
+    m_Logger:Write(#self.m_Blueprints)
+    m_Logger:Write(#self.m_BlueprintInstances)
 
 	for key, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database
@@ -199,7 +201,7 @@ function InstanceParser:FillVariations()
 	end
 	for k, v in pairs(self.m_Blueprints) do
 		if(self.m_Meshes[v.name:lower() .. "_mesh"] == nil) then
-			--print("Missing: " .. v.name .. "_mesh")
+			--m_Logger:Write("Missing: " .. v.name .. "_mesh")
 		else
 			local l_MeshGuid = self.m_Meshes[v.name:lower() .. "_mesh"]
 
@@ -207,12 +209,12 @@ function InstanceParser:FillVariations()
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
 				local jsonTest = (json.encode(self.m_Variations[l_MeshGuid]))
 				if(jsonTest == nil) then
-					print("------------------")
-					print(self.m_Variations[l_MeshGuid])
-					print("------------------")
+					m_Logger:Write("------------------")
+					m_Logger:Write(self.m_Variations[l_MeshGuid])
+					m_Logger:Write("------------------")
 				end
 			else
-				print("No variation for " .. v.name)
+				m_Logger:Write("No variation for " .. v.name)
 			end
 		end
 	end

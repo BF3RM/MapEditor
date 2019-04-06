@@ -379,6 +379,7 @@ class THREEManager {
 
 //normalize the direction vector (convert to vector of length 1)
 		dir.normalize();
+		// console.log("hit "+ (intersects.length) + " objects");
 		if ( intersects.length > 0 ) {
 			for (let i = 0; i < intersects.length; i++) {
 				const element = intersects[i];
@@ -390,12 +391,16 @@ class THREEManager {
 					// editor.Select(element.object.parent.parent.guid);
 					return element.object.parent.guid;
 					// break;
-				} else {
+				}
+				if (element.object.parent.type == "GameEntity"){
+					return element.object.parent.parent.guid;
 				}
 			}
 		}
 		else{
 			console.log("no hit");
+			// console.log("no hit")
+			return null;
 		}
 		return null;
 
@@ -406,7 +411,8 @@ class THREEManager {
 		mousePos.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		mousePos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-		let raycaster = new THREE.Raycaster(mousePos, this.camera, 1, 100);
+		let raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( mousePos, this.camera );
 		return raycaster.ray.direction;
 	}
 

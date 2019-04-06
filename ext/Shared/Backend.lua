@@ -1,24 +1,28 @@
 class 'Backend'
 
-
+local m_Logger = Logger("Backend", true)
 
 local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10000
 
+
 function Backend:__init(p_Realm)
-	print("Initializing Backend: " .. tostring(p_Realm))
+	m_Logger:Write("Initializing Backend: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm;
+	self.m_VanillaBlueprintNumber = 0
 	self:RegisterVars()
 end
 
 function Backend:RegisterVars()
 	self.m_Queue = {}
-	print("Initialized vars")
+	m_Logger:Write("Initialized vars")
 end
 
 
 
 function Backend:OnLevelDestroy()
+	self.m_VanillaBlueprintNumber = 0
+	
 	ObjectManager:Clear()
 end
 
@@ -29,7 +33,7 @@ function Backend:SpawnBlueprint(p_Command)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui
-		print("Failed to spawn blueprint. ")
+		m_Logger:Write("Failed to spawn blueprint. ")
 
 		return false
 	end
@@ -56,6 +60,7 @@ function Backend:SpawnBlueprint(p_Command)
 		guid = p_Command.guid,
 		sender = p_Command.sender,
 		name = s_UserData.name,
+		isVanilla = false,
 		['type'] = 'SpawnedBlueprint',
 		userData = s_UserData,
 		children = s_Children
@@ -64,20 +69,24 @@ function Backend:SpawnBlueprint(p_Command)
 end
 
 function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent, p_PartitionGuid, p_ParentGuid, p_ParentPrimaryInstance, p_ParentType)
-	if(p_Transform == nil) then
-		p_Transform = LinearTransform()
-	end
-	local s_Guid = GenerateGuid()
+    self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
 
+    local s_Guid = GenerateStaticGuid(self.m_VanillaBlueprintNumber)
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, tostring(s_Guid), p_Transform, p_Blueprint, p_Parent)
 
     local s_Children = {}
 	if(type(s_SpawnResult) == "table" )then
 		--local l_Entity = s_SpawnResult[1]
-		for k,l_Entity in ipairs(s_SpawnResult) do
+		for i, l_Entity in ipairs(s_SpawnResult) do
 			local s_Entity = SpatialEntity(l_Entity)
+			local s_EntityID = tostring(s_Entity.uniqueID)
+
+			-- Some client entities' ids are 0, we create a custom one
+			if s_EntityID == 0 then
+				s_EntityID = self.m_VanillaBlueprintNumber.."-"..i
+			end
 			s_Children[#s_Children + 1 ] = {
-				guid = s_Entity.uniqueID,
+				guid = s_EntityID,
 				type = l_Entity.typeInfo.name,
 				transform = ToLocal(s_Entity.transform, p_Transform),
 				instanceId = s_Entity.instanceID,
@@ -90,7 +99,6 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 			}
 		end
 	end
-
     local s_Blueprint = Blueprint(p_Blueprint)
     local s_ParentGuid = nil
     if(p_Parent ~= nil) then
@@ -101,6 +109,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
         guid = tostring(s_Guid),
         sender = "Server",
         name = s_Blueprint.name,
+        isVanilla = true,
         ['type'] = 'SpawnedBlueprint',
 		referenceGuid = s_ParentGuid,
 		parentPartition = p_ParentGuid,
@@ -130,12 +139,13 @@ function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
 	local s_Result = ObjectManager:DestroyEntity(p_Command.guid)
 
 	if(s_Result == false) then
-		print("Failed to destroy entity: " .. p_Command.guid)
+		m_Logger:Write("Failed to destroy entity: " .. p_Command.guid)
 	end
 	local s_Response = {
 		type = "DestroyedBlueprint",
 		userData = nil,
-		guid =  p_Command.guid
+		guid =  p_Command.guid,
+		isDeleted = true
 	}
 	return s_Response
 end
@@ -144,14 +154,14 @@ end
 function Backend:SelectGameObject(p_Command)
 
 	if ( ObjectManager:GetEntityByGuid(p_Command.guid) == nil) then
-		print("Failed to select that gameobject")
+		m_Logger:Write("Failed to select that gameobject")
 		return false
 	end
 	local s_Response = {
 		guid = p_Command.guid,
 		['type'] = 'SelectedGameObject'
 	}
-	print("Selected!")
+	m_Logger:Write("Selected!")
 
 	return s_Response
 end
@@ -174,7 +184,7 @@ function Backend:SetTransform(p_Command)
 
 	if(s_Result == false) then
 		-- Notify WebUI of failed
-		print("failed")
+		m_Logger:Write("failed")
 		return false
 	end
 

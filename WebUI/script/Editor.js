@@ -49,6 +49,7 @@ class Editor {
 
 		this.copy = null;
 		this.test = [];
+
 		this.highlightedGameObject = null;
 		// Creates selection group and add it to the scene
 		this.selectionGroup = new SelectionGroup();
@@ -345,8 +346,9 @@ class Editor {
 
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData);
-		console.log(command);
+		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parent, null, command.userData, command.isVanilla);
+		this.threeManager.AddObject(gameObject);
+
 		for (let key in command.children) {
 			let entityInfo = command.children[key];
 			// UniqueID is fucking broken. this won't work online, boi.

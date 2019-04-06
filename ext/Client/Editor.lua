@@ -1,6 +1,6 @@
 class 'Editor'
 
-
+local m_Logger = Logger("Editor", true)
 local m_InstanceParser = require "InstanceParser"
 
 
@@ -8,7 +8,7 @@ local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10
 
 function Editor:__init()
-	print("Initializing EditorClient")
+	m_Logger:Write("Initializing EditorClient")
 	self:RegisterVars()
 
 end
@@ -35,10 +35,9 @@ function Editor:RegisterVars()
 		MoveObjectMessage = self.MoveObject,
 		SetViewModeMessage = self.SetViewMode,
 		SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition,
-		SelectObject3DMessage = self.SelectObject3D,
-        PreviewSpawnMessage = self.PreviewSpawn,
-        PreviewDestroyMessage = self.PreviewDestroy,
-        PreviewMoveMessage = self.PreviewMove
+		PreviewSpawnMessage = self.PreviewSpawn,
+		PreviewDestroyMessage = self.PreviewDestroy,
+		PreviewMoveMessage = self.PreviewMove
 	}
 
 	self.m_Queue = {
@@ -79,10 +78,10 @@ function Editor:OnEngineMessage(p_Message)
 		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
 		if s_LocalPlayer == nil then
-			error("Local player is nil")
+			m_Logger:Error("Local player is nil")
 			return
 		end
-		print("Requesting update")
+		m_Logger:Write("Requesting update")
 		NetEvents:SendLocal("MapEditorServer:RequestUpdate", 1)
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
@@ -90,22 +89,46 @@ end
 
 function Editor:OnReceiveUpdate(p_Update)
 	local s_Responses = {}
-	for k,v in pairs(p_Update) do
-		if(self.m_GameObjects[k] == nil) then
-			local s_Command = {
-				type = "SpawnBlueprintCommand",
-				guid = k,
-				userData = p_Update[k]
-			}
-			table.insert(s_Responses, s_Command)
+
+	for s_Guid, v in pairs(p_Update) do
+		if(self.m_GameObjects[s_Guid] == nil) then
+			local s_StringGuid = tostring(s_Guid)
+
+			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
+			if IsVanillaGuid(s_StringGuid)then
+				local s_Command = nil
+
+				if v.isDeleted then
+					s_Command = {
+						type = "DestroyBlueprintCommand",
+						guid = s_Guid,
+
+					}
+				else
+					s_Command = {
+
+						type = "SetTransformCommand",
+						guid = s_Guid,
+						userData = p_Update[s_Guid]
+					}
+				end
+				table.insert(s_Responses, s_Command)
+			else
+				local s_Command = {
+					type = "SpawnBlueprintCommand",
+					guid = s_Guid,
+					userData = p_Update[s_Guid]
+				}
+				table.insert(s_Responses, s_Command)
+			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjects[k], p_Update[k])
+			local s_Changes = GetChanges(self.m_GameObjects[s_Guid], p_Update[s_Guid])
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
-				print("--------------------------------------------------------------------")
-				print("If you ever see this, please report it on the repo.")
-				print(s_Changes)
-				print("--------------------------------------------------------------------")
+				m_Logger:Write("--------------------------------------------------------------------")
+				m_Logger:Write("If you ever see this, please report it on the repo.")
+				m_Logger:Write(s_Changes)
+				m_Logger:Write("--------------------------------------------------------------------")
 			end
 		end
 
@@ -136,21 +159,29 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 	for k, l_Command in ipairs(s_Command) do
 		local s_Function = self.m_Commands[l_Command.type]
 		if(s_Function == nil) then
-			print("Attempted to call a nil function: " .. l_Command.type)
+			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
 			return false
 		end
 		local s_Response = s_Function(self, l_Command, p_UpdatePass)
 		if(s_Response == false) then
 			-- TODO: Handle errors
-			print("error")
+			m_Logger:Error("error")
 		elseif(s_Response == "queue") then
-			print("Queued command")
+			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue.commands, l_Command)
 		else
-			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_Response.userData)
+			local s_Transform = LinearTransform()
+			if s_Response.userData ~= nil then
+				s_Transform = s_Response.userData.transform
+			end
+			self.m_GameObjects[l_Command.guid] = {
+				isDeleted = s_Response.isDeleted or false,
+				transform = s_Transform
+			}
 			table.insert(s_Responses, s_Response)
 		end
 	end
+	m_Logger:Write(json.encode(self.m_GameObjects))
 	if(#s_Responses > 0) then
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Responses)))
 	end
@@ -166,7 +197,7 @@ function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
 
         local s_Function = self.m_Messages[l_Message.type]
         if(s_Function == nil) then
-            print("Attempted to call a nil function: " .. l_Message.type)
+            m_Logger:Error("Attempted to call a nil function: " .. l_Message.type)
             return false
         end
 
@@ -174,9 +205,9 @@ function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
 
         if(s_Response == false) then
             -- TODO: Handle errors
-            print("error")
+            m_Logger:Error("error")
         elseif(s_Response == "queue") then
-            print("Queued message")
+            m_Logger:Write("Queued message")
             table.insert(self.m_Queue.messages, l_Message)
         elseif(s_Response == true) then
             --TODO: Success message?
@@ -192,7 +223,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     end
     local s_Commands = {}
     for k,l_Command in ipairs(self.m_Queue.commands) do
-        print("Executing command in the correct UpdatePass: " .. l_Command.type)
+        m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
         table.insert(s_Commands, l_Command)
     end
 
@@ -200,7 +231,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
 
     local s_Messages = {}
     for k,l_Message in ipairs(self.m_Queue.messages) do
-        print("Executing message in the correct UpdatePass: " .. l_Message.type)
+        m_Logger:Write("Executing message in the correct UpdatePass: " .. l_Message.type)
         table.insert(s_Messages, l_Message)
     end
 
@@ -230,7 +261,7 @@ function Editor:SetViewMode(p_Message)
 		local s_WorldRenderSettings = WorldRenderSettings(p_WorldRenderSettings)
 		s_WorldRenderSettings.viewMode = p_Message.viewMode
 	else
-		print("Failed to get WorldRenderSettings")
+		m_Logger:Error("Failed to get WorldRenderSettings")
 		return false;
 		-- Notify WebUI
 	end
@@ -238,9 +269,6 @@ end
 
 function Editor:SetScreenToWorldPosition(p_Message)
 	self:SetPendingRaycast(RaycastType.Mouse, p_Message.direction)
-end
-function Editor:SelectObject3D(p_Message, p_Arguments)
-	self:SetPendingRaycast(RaycastType.Select, p_Message.direction)
 end
 
 function Editor:PreviewSpawn(p_Message, p_Arguments)
@@ -264,7 +292,6 @@ end
 --]]
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
-
 	local s_PartitionGuid = m_InstanceParser:GetPartition(p_Blueprint.instanceGuid)
 	local s_ParentPartition = nil
 	local s_ParentPrimaryInstance = nil
@@ -316,7 +343,7 @@ end
 
 function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
     if p_Data == nil then
-        print("Didnt get no data")
+        m_Logger:Error("Didnt get no data")
     else
         local s_Entity = p_Hook:Call(p_Data, p_Transform)
         local s_PartitionGuid = m_InstanceParser:GetPartition(p_Data.instanceGuid)
@@ -348,8 +375,6 @@ function Editor:Raycast()
 	end
 
 	-- The freecam transform is inverted. Invert it back
-
-
 	local s_CastPosition = Vec3(s_Transform.trans.x + (s_Direction.x * MAX_CAST_DISTANCE),
 								s_Transform.trans.y + (s_Direction.y * MAX_CAST_DISTANCE),
 								s_Transform.trans.z + (s_Direction.z * MAX_CAST_DISTANCE))
@@ -372,97 +397,10 @@ function Editor:Raycast()
 	if(self.m_PendingRaycast.type == RaycastType.Mouse) then
 		WebUI:ExecuteJS(string.format('editor.SetScreenToWorldPosition(%s, %s, %s)',
 				s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
-
-		
 	end
-
-	-- if(self.m_PendingRaycast.type == RaycastType.Select) then
-	-- 	if(s_Raycast == nil or s_Raycast.rigidBody == nil) then
-	-- 		print("___option 1: raycast or rigidBody nil")
-	-- 		self:GetFistObjectInView(s_Transform.trans, s_CastPosition)
-	-- 	else
-	-- 			-- Catch all entities in view. SpatialRaycast is really wide :shrug:
-	-- 		local s_Entities = RaycastManager:SpatialRaycast(s_Transform.trans, s_CastPosition, SpatialQueryFlags.AllGrids)
-	-- 		-- Store the transform of the collider we hit
-	-- 		local s_RigidBodyHitTransform = SpatialEntity(s_Raycast.rigidBody).transform
-
-	-- 		if s_RigidBodyHitTransform == Vec3(0,0,0) then
-	-- 			print("___option 2: s_RigidBodyHitTransform  == Vec3(0,0,0)")
-	-- 			self:GetFistObjectInView(s_Transform.trans, s_CastPosition)
-	-- 			goto continue
-	-- 		end
-
-	-- 		if(s_Entities ~= nil and #s_Entities > 0) then
-	-- 			for k, l_Entity in pairs(s_Entities) do
-	-- 				-- Filter the entities to not include physics entities
-	-- 				if(l_Entity:Is("SpatialEntity") and
-	-- 						not l_Entity:Is("StaticPhysicsEntity") and
-	-- 						not l_Entity:Is("GroupPhysicsEntity") and
-	-- 						not l_Entity:Is("ClientWaterEntity") and
-	-- 						not l_Entity:Is("WaterPhysicsEntity") and
-	-- 						not l_Entity:Is("ClientSoldierEntity") and
-	-- 						not l_Entity:Is("DebrisClusterContainerEntity") and
-	-- 						not l_Entity:Is("CharacterPhysicsEntity")
-	-- 				) then
-	-- 					local s_Entity = SpatialEntity(l_Entity)
-	-- 					-- Compare the collider's transform to the actual entity's transform
-	-- 					if(s_RigidBodyHitTransform.trans == s_Entity.transform.trans ) then
-	-- 						-- Check if we have that entity's instanceId stored
-	-- 						local s_Guid = ObjectManager:GetGuidFromInstanceID(s_Entity.instanceID)
-	-- 						if(s_Guid ~= nil) then
-	-- 							-- Select it
-	-- 							print("___option 3: found transform match")
-	-- 							WebUI:ExecuteJS(string.format('editor.Select("%s")', s_Guid))
-	-- 							goto continue
-	-- 						end
-	-- 					end
-	-- 				end
-	-- 			end
-
-	-- 			print("___option 4: no match found")
-	-- 			self:GetFistObjectInView(s_Transform.trans, s_CastPosition)
-	-- 		end
-
-	-- 		::continue::
-	-- 	end
-	-- end
 			
 	self.m_PendingRaycast = false
 
-end
-
-function Editor:GetFistObjectInView(p_Position, p_CastPosition)
-	-- Catch all entities in view.
-	local s_Entities = RaycastManager:SpatialRaycast(p_Position, p_CastPosition, SpatialQueryFlags.AllGrids)
-	-- print("-------doing SpatialRaycast")
-	if(s_Entities ~= nil and #s_Entities > 0) then
-		-- local s_Guids = ""
-		for k, l_Entity in pairs(s_Entities) do
-			-- Filter the entities to not include physics entities
-			if(l_Entity:Is("SpatialEntity") and
-					not l_Entity:Is("StaticPhysicsEntity") and
-					not l_Entity:Is("GroupPhysicsEntity") and
-					not l_Entity:Is("ClientWaterEntity") and
-					not l_Entity:Is("WaterPhysicsEntity") and
-					not l_Entity:Is("ClientSoldierEntity") and
-					not l_Entity:Is("DebrisClusterContainerEntity") and
-					not l_Entity:Is("CharacterPhysicsEntity")
-			) then
-				local s_Entity = SpatialEntity(l_Entity)
-					-- Check if we have that entity's instanceId stored
-				local s_Guid = ObjectManager:GetGuidFromInstanceID(s_Entity.instanceID)
-				if(s_Guid ~= nil) then
-					-- Select it
-					-- s_Guids = s_Guids .. ":" .. s_Guid
-					-- print("--found object with guid: ".. s_Guid)
-					WebUI:ExecuteJS(string.format('editor.Select("%s")', s_Guid))
-					break
-				end
-			end
-		end
-
-		-- WebUI:ExecuteJS(string.format('editor.UpdateSceneObjects("%s")', s_Guids))
-	end
 end
 
 function Editor:UpdateCameraTransform()

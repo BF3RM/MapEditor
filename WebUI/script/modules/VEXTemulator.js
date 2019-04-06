@@ -50,6 +50,7 @@ class VEXTemulator {
 		let response = {
 			"guid": command.guid,
 			"sender": command.sender,
+			"isVanilla": false,
 			"type": "SpawnedBlueprint",
 			"name": command.userData.name,
 			"children": {
