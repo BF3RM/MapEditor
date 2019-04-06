@@ -15,6 +15,8 @@ end
 
 function Backend:RegisterVars()
 	self.m_Queue = {}
+	self.m_VanillaObjects = {}
+	self.m_VanillaUnresolved = {}
 	m_Logger:Write("Initialized vars")
 end
 
@@ -75,7 +77,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, tostring(s_Guid), p_Transform, p_Blueprint, p_Parent)
 
     local s_Children = {}
-	if(type(s_SpawnResult) == "table" )then
+	if(p_Blueprint:Is("PrefabBlueprint") == false and type(s_SpawnResult) == "table" )then
 		--local l_Entity = s_SpawnResult[1]
 		for i, l_Entity in ipairs(s_SpawnResult) do
 			local s_Entity = SpatialEntity(l_Entity)
@@ -128,6 +130,50 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
         },
         children = s_Children
     }
+	-- Resolve
+	local s_ParentPartition = nil
+	local s_ParentPrimaryInstance = nil
+
+	if(p_Parent ~= nil) then
+		s_ParentPartition = InstanceParser:GetPartition(p_Parent.instanceGuid)
+		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartition)
+
+		local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), p_Parent.instanceGuid)
+		s_Parent = _G[p_Parent.typeInfo.name](p_Parent)
+	else
+		print(p_Blueprint.instanceGuid)
+		s_ParentPartition = "dynamic"
+		s_ParentPrimaryInstance = "dynamic"
+	end
+
+	-- Check if the current blueprint is referenced from a leveldata
+	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
+		s_Response.parentGuid = s_ParentPrimaryInstance
+		s_Response.resolveType = "Level"
+		table.insert(self.m_VanillaObjects, s_Response)
+
+	end
+
+	-- Check if the current blueprint is referenced by earlier blueprints
+	if(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] ~= nil) then
+		-- Loop through all the children that are referencing this blueprint and assign this as their parent.
+		for k,v in pairs(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)]) do
+			v.parentGuid = s_Response.guid
+			v.resolveType = "Unresolved"
+			table.insert(self.m_VanillaObjects, v)
+		end
+		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
+	end
+	-- We failed to get the parentGuid for this entry. Add it to the unresolved list and wait for the parent.
+	if(s_Response.parentGuid == nil) then
+		-- Add the current blueprint to the unresolved list.
+		if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
+			self.m_VanillaUnresolved[s_ParentPrimaryInstance] = {}
+		end
+		table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance],s_Response)
+	end
+
+
     return s_Response
 end
 

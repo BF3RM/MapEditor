@@ -16,7 +16,7 @@ class EditorCore {
     }
 
 
-    onSelectedGameObject(guid, isMultiSelection) {
+    onSelectedGameObject(guid, isMultiSelection, scrollTo) {
         let scope = editor;
         let gameObject = scope.gameObjects[guid];
 
@@ -48,18 +48,13 @@ class EditorCore {
             }
         }
 
-        if (gameObject.type === "GameObject"){
-            if (scope.selectionGroup.children.length === 0) {
-                scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
-            }
-
-            scope.selectionGroup.AttachObject(gameObject);
-
-        }else if (gameObject.type === "Group"){
-            gameObject.Select();
-            //TODO: update inspector with the group name
+        if (scope.selectionGroup.children.length === 0) {
+            scope.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
         }
-        signals.selectedGameObject.dispatch(guid, isMultiSelection);
+
+        scope.selectionGroup.AttachObject(gameObject);
+
+        signals.selectedGameObject.dispatch(guid, isMultiSelection, scrollTo);
 
         scope.selectionGroup.Select();
         if(scope.selectionGroup.children.length !== 0) {

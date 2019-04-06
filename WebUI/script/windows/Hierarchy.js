@@ -182,15 +182,17 @@ class Hierarchy {
 					return false;
 				}
 				if(node.selectable === false) {
+					console.log("Unselectable")
 					return false;
 				}
 				if (!node || (node === scope.tree.getSelectedNode())) {
+					console.log("Already Selected");
 					return false; // Prevent from deselecting the current node
 				}
 				if(editor.isSelected(node.id)) {
 					return true;
 				}
-				editor.Select(node.id, keysdown[17]);
+				editor.Select(node.id, keysdown[17], false);
 			},
 			togglerClass: "Toggler",
 			nodeIdAttr: "guid"
@@ -248,15 +250,16 @@ class Hierarchy {
 		let parent = editor.getGameObjectByGuid(nodeData.parent);
 	}
 
-	onSelectedGameObject(guid, isMultipleSelection) {
+	onSelectedGameObject(guid, isMultipleSelection, scrollTo) {
 		let scope = this;
 		let node = scope.tree.getNodeById(guid);
 		scope.ExpandToNode(node);
 
 		scope.tree.selectNode(node, {
-			autoScroll: true,
-			silent: true
 		});
+		if(scrollTo) {
+			scope.tree.scrollToNode(node);
+		}
 	}
 
 	ExpandToNode(node) {

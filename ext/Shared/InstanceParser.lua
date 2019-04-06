@@ -131,11 +131,6 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 					print("Replacing Autogen: " .. s_PrimaryInstance.name)
 					print(l_Instance.instanceGuid)
 				end
-				if(type(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)]) == "string") then
-
-				else
-					print(type(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)]))
-				end
 			else
 				self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
 			end

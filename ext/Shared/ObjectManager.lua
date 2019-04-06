@@ -104,15 +104,12 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
     local s_Offsets = {}
 
     local s_ObjectEntities = p_Hook:Call()
-	if p_Blueprint:Is("SubWorldData") or p_Blueprint:Is("WorldPartData") or p_Blueprint:Is("PrefabBlueprint") then
-		return true
-	end
+	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint)
     for i, l_Entity in pairs(s_ObjectEntities) do
-        l_Entity:Init(self.m_Realm, true)
-        if(l_Entity:Is("SpatialEntity")) then
+        if(l_Entity:Is("SpatialEntity") and l_Entity:Is("OccluderVolumeEntity") == false) then
             s_Spatial[i] = SpatialEntity(l_Entity)
-            s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
-            -- Allows us to connect the entity to the GUID
+            s_Offsets[i] = ToLocal(s_Spatial[i].transform, p_LinearTransform)
+			-- Allows us to connect the entity to the GUID
             self.m_EntityInstanceIds[l_Entity.instanceID] = p_Guid
         end
     end

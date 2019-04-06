@@ -411,12 +411,12 @@ class Editor {
 		return false;
 	}
 
-	Select(guid, multi = false) {
+	Select(guid, multi = false, scrollTo = false) {
 		this.Unhighlight(guid);
 		if(keysdown[17] || multi) {
-			this.editorCore.onSelectedGameObject(guid, true)
+			this.editorCore.onSelectedGameObject(guid, true, scrollTo)
 		} else {
-			this.editorCore.onSelectedGameObject(guid, false)
+			this.editorCore.onSelectedGameObject(guid, false, scrollTo)
 		}
 	}
 

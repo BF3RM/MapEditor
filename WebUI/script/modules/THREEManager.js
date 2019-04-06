@@ -332,7 +332,7 @@ class THREEManager {
 			let guid = scope.RaycastSelection(e);
 
 			if (guid !== null) {
-				editor.Select(guid);
+				editor.Select(guid, undefined, true);
 			}
 		}
 	}

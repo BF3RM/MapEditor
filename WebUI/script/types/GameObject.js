@@ -6,7 +6,7 @@ class GameObject extends THREE.Object3D
 		super( );
 
 		this.guid = guid;
-		this.type = "GameObject";
+		this.type = userData.reference.typeName;
 		this.name = name;
 		this.transform = transform;
 		this.parentGuid = parent;
