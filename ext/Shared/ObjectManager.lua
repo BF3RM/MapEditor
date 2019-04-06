@@ -14,6 +14,8 @@ function ObjectManager:RegisterVars()
 	self.m_SpawnedOffsets = {}
 	self.m_EntityInstanceIds = {}
 
+	self.m_ParentTransforms = {}
+
 end
 
 function ObjectManager:RegisterEvents()
@@ -102,7 +104,7 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
     end
     local s_Spatial = {}
     local s_Offsets = {}
-
+	self.m_ParentTransforms[p_Guid] = p_LinearTransform
     local s_ObjectEntities = p_Hook:Call()
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint)
     for i, l_Entity in pairs(s_ObjectEntities) do
@@ -110,7 +112,10 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
             s_Spatial[i] = SpatialEntity(l_Entity)
             s_Offsets[i] = ToLocal(s_Spatial[i].transform, p_LinearTransform)
 			-- Allows us to connect the entity to the GUID
-            self.m_EntityInstanceIds[l_Entity.instanceID] = p_Guid
+			if(self.m_EntityInstanceIds[l_Entity.instanceID] == nil) then
+				self.m_EntityInstanceIds[l_Entity.instanceID] = {}
+			end
+            table.insert(self.m_EntityInstanceIds[l_Entity.instanceID], p_Guid)
         end
     end
 
@@ -156,6 +161,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 			m_Logger:Write("not spatial")
 			goto continue
 		end
+		self.m_ParentTransforms[p_Guid] = p_LinearTransform
 
 		local s_Entity = SpatialEntity(l_Entity)
 
@@ -163,12 +169,15 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 			if(s_Entity.typeInfo.name == "ServerVehicleEntity") then
 				s_Entity.transform = LinearTransform(p_LinearTransform)
 			else
+
 				local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
 				s_Entity.transform = ToWorld(s_LocalTransform, LinearTransform(p_LinearTransform))
 
 				if(p_UpdateCollision) then
 					s_Entity:FireEvent("Disable")
 					s_Entity:FireEvent("Enable")
+					self:UpdateOffsets(p_Guid, s_Entity.instanceID, LinearTransform(p_LinearTransform))
+
 				end
 			end
 		else
@@ -179,7 +188,22 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 	return true
 end
 
-
-
+function ObjectManager:UpdateOffsets(p_Guid, p_InstanceID, p_ParentWorld)
+	local s_StartIndex = 1
+	for k,l_Reference in pairs(self.m_EntityInstanceIds[p_InstanceID]) do
+		if(l_Reference == p_Guid) then
+			s_StartIndex = k + 1
+		end
+	end
+	for i = s_StartIndex, #self.m_EntityInstanceIds[p_InstanceID], 1 do
+		local l_Parent = self.m_EntityInstanceIds[p_InstanceID][i]
+		for index,l_Entity in pairs(self.m_SpawnedEntities[l_Parent]) do
+			if(l_Entity.instanceID == p_InstanceID) then
+				local s_Entity = SpatialEntity(self.m_SpawnedEntities[l_Parent][index])
+				self.m_SpawnedOffsets[l_Parent][index] = ToLocal(s_Entity.transform, self.m_ParentTransforms[l_Parent])
+			end
+		end
+	end
+end
 
 return ObjectManager

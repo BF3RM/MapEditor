@@ -349,8 +349,8 @@ class Editor {
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData, command.isVanilla);
 		this.threeManager.AddObject(gameObject);
 
-		for (let key in command.children) {
-			let entityInfo = command.children[key];
+		for (let key in command.entities) {
+			let entityInfo = command.entities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
 			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
 

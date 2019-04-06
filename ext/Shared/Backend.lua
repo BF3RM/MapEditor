@@ -76,7 +76,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
     local s_Guid = GenerateStaticGuid(self.m_VanillaBlueprintNumber)
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, tostring(s_Guid), p_Transform, p_Blueprint, p_Parent)
 
-    local s_Children = {}
+    local s_Entities = {}
 	if(p_Blueprint:Is("PrefabBlueprint") == false and type(s_SpawnResult) == "table" )then
 		--local l_Entity = s_SpawnResult[1]
 		for i, l_Entity in ipairs(s_SpawnResult) do
@@ -87,7 +87,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 			if s_EntityID == 0 then
 				s_EntityID = self.m_VanillaBlueprintNumber.."-"..i
 			end
-			s_Children[#s_Children + 1 ] = {
+			s_Entities[#s_Entities + 1 ] = {
 				guid = s_EntityID,
 				type = l_Entity.typeInfo.name,
 				transform = ToLocal(s_Entity.transform, p_Transform),
@@ -128,7 +128,8 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
             transform = p_Transform,
             variation = p_Variation
         },
-        children = s_Children
+        entities = s_Entities,
+		children = {}
     }
 	-- Resolve
 	local s_ParentPartition = nil
@@ -146,12 +147,12 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 		s_ParentPrimaryInstance = "dynamic"
 	end
 
+	local s_Resolved = false
 	-- Check if the current blueprint is referenced from a leveldata
 	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
 		s_Response.parentGuid = s_ParentPrimaryInstance
 		s_Response.resolveType = "Level"
-		table.insert(self.m_VanillaObjects, s_Response)
-
+		s_Resolved = true
 	end
 
 	-- Check if the current blueprint is referenced by earlier blueprints
@@ -160,11 +161,15 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 		for k,v in pairs(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)]) do
 			v.parentGuid = s_Response.guid
 			v.resolveType = "Unresolved"
+			table.insert(s_Response.children, v.guid)
 			table.insert(self.m_VanillaObjects, v)
 		end
 		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
 	end
 	-- We failed to get the parentGuid for this entry. Add it to the unresolved list and wait for the parent.
+	if(s_Resolved == true) then
+		table.insert(self.m_VanillaObjects, s_Response)
+	end
 	if(s_Response.parentGuid == nil) then
 		-- Add the current blueprint to the unresolved list.
 		if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
@@ -226,9 +231,8 @@ function Backend:CreateGroup(p_Command)
 	return s_Response
 end
 
-function Backend:SetTransform(p_Command)
+function Backend:SetTransform(p_Command, p_UpdatePass)
 	local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command.userData.transform, true)
-
 	if(s_Result == false) then
 		-- Notify WebUI of failed
 		m_Logger:Write("failed")
