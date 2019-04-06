@@ -114,10 +114,16 @@ class SelectionGroup extends THREE.Group{
 		if (gameObject.parent != this){
 			console.error("Tried to detach a children that is no longer in this group");
 		}
+		THREE.SceneUtils.detach( gameObject, this, editor.threeManager.scene );
 
 		// remove child from parent and add it to scene
-		THREE.SceneUtils.detach( gameObject, this, editor.threeManager.scene );
-		
+		if(gameObject.parentGuid != null) {
+			let parent = editor.getGameObjectByGuid(gameObject.parentGuid);
+			if(parent != null) {
+				THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, parent );
+			}
+		}
+
 		editor.threeManager.Render(); // REMOVE
 	}
 

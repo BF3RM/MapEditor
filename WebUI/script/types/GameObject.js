@@ -15,7 +15,6 @@ class GameObject extends THREE.Object3D
 		this.selected = false;
 		this.visible = false;
 		this.matrixAutoUpdate  = false;
-		this.updateMatrix();		
 		this.visible = true;
 		this.highlighted = false;
 
@@ -60,8 +59,17 @@ class GameObject extends THREE.Object3D
 
 	}
 
-	updateTransform()
+	updateTransform(updateChild = false)
 	{
+		if(updateChild){
+			for(let key in this.children) {
+				let child = this.children[key];
+				if(child instanceof GameObject) {
+					console.log("Updating child")
+					child.updateTransform(true);
+				}
+			};
+		}
 		let matrix = new THREE.Matrix4();
 		matrix.set(
 			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x,
@@ -78,15 +86,11 @@ class GameObject extends THREE.Object3D
 		}
 
 		matrix.decompose( this.position, this.quaternion, this.scale );
-
-		editor.threeManager.Render();
-
+		
 		// remove child from scene and add it to parent
 		if (parent !== null){
 			THREE.SceneUtils.attach( this, editor.threeManager.scene, parent );
 		}
-		editor.threeManager.Render();
-
 	}
 
 
@@ -98,7 +102,8 @@ class GameObject extends THREE.Object3D
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
 		this.userData.transform = linearTransform;
-		this.updateTransform();
+		this.updateTransform(true);
+		editor.threeManager.Render();
 		signals.objectChanged.dispatch(this, "transform", linearTransform);
 
 	}
@@ -172,19 +177,26 @@ class GameObject extends THREE.Object3D
 	}
 
 	onSelected() {
-		console.log("Selected");
 		console.log(this);
 		for(let key in this.children) {
-			let child = this.children[key].visible = true;
+			let child = this.children[key];
+			if(typeof(child) == "GameObject") {
+				child.Select();
+			}
 		};
 		this.selected = true;
+		this.visible = true;
 	}
 	onDeselected() {
 		console.log("Deselected");
 		for(let key in this.children) {
-			//let child = this.children[key].visible = false;
+			let child = this.children[key];
+			if(typeof(child) == "GameObject") {
+				child.Select();
+			}
 		};
-		this.selected = false;
+		this.selected = true;
+		this.visible = true;
 	}
 
 	getUserData() {
