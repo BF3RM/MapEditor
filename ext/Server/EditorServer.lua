@@ -11,20 +11,10 @@ end
 
 function EditorServer:RegisterVars()
 	self.m_PendingRaycast = false
-
-	self.m_Commands = {
-		SpawnBlueprintCommand = Backend.SpawnBlueprint,
-		DestroyBlueprintCommand = Backend.DestroyBlueprint,
-		SetTransformCommand = Backend.SetTransform,
-		SelectGameObjectCommand = Backend.SelectGameObject,
-		CreateGroupCommand = Backend.CreateGroup
-	}
-
 	self.m_Queue = {};
 
 	self.m_Transactions = {}
 	self.m_GameObjects = {}
-	self.m_VanillaObjects = {}
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
@@ -47,9 +37,6 @@ end
 function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
 	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-
-    table.insert(self.m_VanillaObjects, s_Response)
-
 end
 
 function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
@@ -60,7 +47,8 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 
 	local s_Responses = {}
 	for k, l_Command in ipairs(s_Command) do
-		local s_Function = self.m_Commands[l_Command.type]
+
+		local s_Function = Commands.m_Commands[l_Command.type]
 		if(s_Function == nil) then
 			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
 			return false

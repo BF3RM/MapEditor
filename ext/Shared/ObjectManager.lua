@@ -146,6 +146,40 @@ function ObjectManager:DestroyEntity(p_Guid)
 	return true
 end
 
+function ObjectManager:EnableEntity(p_Guid)
+
+	local s_Entities = self:GetEntityByGuid(p_Guid)
+
+	if(s_Entities == false or #s_Entities == 0) then
+		m_Logger:Write(s_Entities)
+		m_Logger:Write("Failed to get entities")
+		return false
+	end
+	for i, entity in pairs(s_Entities) do
+		if entity ~= nil then
+			entity:FireEvent("Enable")
+		end
+	end
+	return true
+end
+
+function ObjectManager:DisableEntity(p_Guid)
+
+	local s_Entities = self:GetEntityByGuid(p_Guid)
+
+	if(s_Entities == false or #s_Entities == 0) then
+		m_Logger:Write(s_Entities)
+		m_Logger:Write("Failed to get entities")
+		return false
+	end
+	for i, entity in pairs(s_Entities) do
+		if entity ~= nil then
+			entity:FireEvent("Disable")
+		end
+	end
+	return true
+end
+
 function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
 	if self.m_SpawnedEntities[p_Guid] == nil then
 		m_Logger:Write('Object with id ' .. p_Guid .. ' does not exist')

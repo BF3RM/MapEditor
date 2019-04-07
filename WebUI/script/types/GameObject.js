@@ -16,6 +16,7 @@ class GameObject extends THREE.Object3D
 		this.visible = false;
 		this.matrixAutoUpdate  = false;
 		this.visible = true;
+		this.enabled = true;
 		this.highlighted = false;
 
 		if (children !== null){
@@ -26,7 +27,7 @@ class GameObject extends THREE.Object3D
 
 		// Update the matrix after initialization.
 		this.updateTransform();
-		this.updateMatrix();	
+		this.updateMatrix();
 	}
 
 	getCleanName() {
@@ -178,6 +179,10 @@ class GameObject extends THREE.Object3D
 
 	onSelected() {
 		console.log(this);
+		if(!this.enabled) {
+			LogError("Attempted to select a disabled gameObject");
+			return
+		}
 		for(let key in this.children) {
 			let child = this.children[key];
 			if(typeof(child) == "GameObject") {
@@ -188,7 +193,10 @@ class GameObject extends THREE.Object3D
 		this.visible = true;
 	}
 	onDeselected() {
-		console.log("Deselected");
+		if(!this.enabled) {
+			LogError("Attempted to deselect a disabled gameObject");
+			return
+		}
 		for(let key in this.children) {
 			let child = this.children[key];
 			if(typeof(child) == "GameObject") {
@@ -197,6 +205,33 @@ class GameObject extends THREE.Object3D
 		};
 		this.selected = true;
 		this.visible = true;
+	}
+	Enable() {
+		for(let key in this.children) {
+			let child = this.children[key];
+			if(typeof(child) == "GameObject") {
+				child.Enable();
+			} else {
+				child.visible = true;
+			}
+		};
+		this.visible = true;
+		this.enabled = true;
+		signals.objectChanged.dispatch(this, "enabled", this.enabled);
+	}
+
+	Disable() {
+		for(let key in this.children) {
+			let child = this.children[key];
+			if(typeof(child) == "GameObject") {
+				child.Disable();
+			} else {
+				child.visible = false;
+			}
+		};
+		this.visible = false;
+		this.enabled = false;
+		signals.objectChanged.dispatch(this, "enabled", this.enabled);
 	}
 
 	getUserData() {
@@ -212,7 +247,9 @@ class GameObject extends THREE.Object3D
 			draggable: true,
 			droppable: true,
 			children: [],
-			state: {}
+			state: {
+				filtered: this.enabled
+			}
 		}
 	}
 

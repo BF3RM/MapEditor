@@ -6,6 +6,10 @@ class Editor {
 		// Commands
 		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.enabledBlueprint.add(this.onEnabledBlueprint.bind(this));
+		signals.disabledBlueprint.add(this.onDisabledBlueprint.bind(this));
+
+
 		signals.createGroupRequested.add(this.onCreateGroupRequested.bind(this));
 		signals.createdGroup.add(this.onCreatedGroup.bind(this));
 		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
@@ -194,13 +198,24 @@ class Editor {
 	// 		editor.threeManager.Render();
 	// 	}
 	// }
-
+	DisableSelected() {
+		let scope = this;
+		let commands = [];
+		editor.selectionGroup.children.forEach(function(child) {
+			commands.push(new DisableBlueprintCommand(child.guid));
+		});
+		if(commands.length > 0) {
+			scope.execute(new BulkCommand(commands));
+		}
+	}
 
 	DeleteSelected() {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(child) {
-			commands.push(new DestroyBlueprintCommand(child.guid));
+			if (child instanceof GameObject) {
+				commands.push(new DestroyBlueprintCommand(child.guid));
+			}
 		});
 		if(commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
@@ -391,6 +406,26 @@ class Editor {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(command.guid, false)}, 2);
 		}
+	}
+
+	onEnabledBlueprint(command) {
+		let gameObject = editor.getGameObjectByGuid(command.guid)
+		if(gameObject == null) {
+			LogError("Attempted to enable a GameObject that doesn't exist")
+			return
+		}
+		let removeFromHierarchy = command.isDeleted ;
+		gameObject.Enable(removeFromHierarchy);
+	}
+
+	onDisabledBlueprint(command) {
+		let gameObject = editor.getGameObjectByGuid(command.guid)
+		if(gameObject == null) {
+			LogError("Attempted to enable a GameObject that doesn't exist")
+			return
+		}
+		let removeFromHierarchy = command.isDeleted ;
+		gameObject.Disable(removeFromHierarchy);
 	}
 
 	onObjectChanged(object) {

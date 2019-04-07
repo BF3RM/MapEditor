@@ -10,6 +10,8 @@ class VEXTInterface {
 			'SetObjectName':		signals.setObjectName.dispatch,
 			'SetTransform':		 signals.setTransform.dispatch,
 			'SetVariation':		 signals.setVariation.dispatch,
+			'EnabledBlueprint':		 signals.enabledBlueprint.dispatch,
+			'DisabledBlueprint':		 signals.disabledBlueprint.dispatch,
 		}
 
 		this.messages = {

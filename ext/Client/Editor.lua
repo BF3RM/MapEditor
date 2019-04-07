@@ -15,14 +15,6 @@ function Editor:RegisterVars()
 	self.m_PendingRaycast = false
     self.m_FreecamMoving = false
 
-	self.m_Commands = {
-		SpawnBlueprintCommand = Backend.SpawnBlueprint,
-		DestroyBlueprintCommand = Backend.DestroyBlueprint,
-		SetTransformCommand = Backend.SetTransform,
-		SelectGameObjectCommand = Backend.SelectGameObject,
-		CreateGroupCommand = Backend.CreateGroup,
-	}
-
 	self.m_Changes = {
 		reference = "SpawnBlueprintCommand",
 		destroyed = "DestroyBlueprintCommand",
@@ -152,7 +144,7 @@ function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
 
 	local s_Responses = {}
 	for k, l_Command in ipairs(s_Command) do
-		local s_Function = self.m_Commands[l_Command.type]
+		local s_Function = Commands.m_Commands[l_Command.type]
 		if(s_Function == nil) then
 			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
 			return false

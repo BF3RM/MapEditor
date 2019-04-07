@@ -4,6 +4,7 @@ local m_Logger = Logger("MapEditorServer", true)
 InstanceParser = InstanceParser(Realm.Realm_Server)
 ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
 Backend = Backend(Realm.Realm_ClientAndServer)
+Commands = Commands(Realm.Realm_ClientAndServer)
 
 local m_EditorServer = require "EditorServer"
 

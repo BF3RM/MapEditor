@@ -7,6 +7,7 @@ local m_UIManager = require "UIManager"
 ObjectManager = ObjectManager(Realm.Realm_Client)
 Backend = Backend(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
+Commands = Commands(Realm.Realm_Client)
 
 
 function MapEditorClient:__init()

@@ -30,6 +30,9 @@ end
 
 
 function Backend:SpawnBlueprint(p_Command)
+	if(IsVanillaGuid(p_Command.guid)) then
+		return Backend:EnableBlueprint(p_Command)
+	end
 	local s_UserData = p_Command.userData
 	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_Command.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
 
@@ -184,7 +187,10 @@ end
 
 
 function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
-    if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
+	if(IsVanillaGuid(p_Command.guid)) then
+		return Backend:DisableBlueprint(p_Command)
+	end
+	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
         return "queue"
     end
 
@@ -202,6 +208,34 @@ function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
 	return s_Response
 end
 
+function Backend:EnableBlueprint(p_Command)
+	local s_Result = ObjectManager:EnableEntity(p_Command.guid)
+
+	if(s_Result == false) then
+		m_Logger:Write("Failed to enable blueprint: " .. p_Command.guid)
+	end
+	local s_Response = {
+		type = "EnabledBlueprint",
+		guid =  p_Command.guid,
+		isDeleted = false
+	}
+	return s_Response
+end
+
+
+function Backend:DisableBlueprint(p_Command)
+	local s_Result = ObjectManager:DisableEntity(p_Command.guid)
+
+	if(s_Result == false) then
+		m_Logger:Write("Failed to disable blueprint: " .. p_Command.guid)
+	end
+	local s_Response = {
+		type = "DisabledBlueprint",
+		guid =  p_Command.guid,
+		isDeleted = true
+	}
+	return s_Response
+end
 
 function Backend:SelectGameObject(p_Command)
 

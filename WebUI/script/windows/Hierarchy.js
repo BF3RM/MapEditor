@@ -8,6 +8,7 @@ class Hierarchy {
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
+		signals.objectChanged.add(this.onObjectChanged.bind(this));
 		signals.levelLoaded.add(this.onLevelLoaded.bind(this));
 
 
@@ -279,8 +280,20 @@ class Hierarchy {
 		//this.dom.jstree(true).deselect_node(node);
 	}
 
+	onObjectChanged(gameObject, key, value) {
+		let scope = this;
+		if(key == "enabled") {
+			let node = this.tree.getNodeById(gameObject.guid);
+			node.children.forEach(function(child) {
+				scope.tree.updateNode(child, {visible: value}, undefined);
+			});
+			this.tree.updateNode(node, {visible: value}, undefined);
+			console.log(node);
+		}
+	}
+
 	hierarchyRenderer(node, treeOptions) {
-		if(node.state.filtered === false){
+		if(node.state.filtered === false || node.visible === false ){
 			return
 		}
 		let state = node.state;
