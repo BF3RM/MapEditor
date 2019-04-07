@@ -1,5 +1,8 @@
 local matrix = require "__shared/Util/matrix"
 
+local CUSTOMOBJ_GUID_PREFIX = "ED170120"
+local VANILLA_GUID_PREFIX = "ED170121"
+
 function MergeTables(p_Old, p_New)
 	if(p_New == nil) then
 		return p_Old
@@ -108,46 +111,32 @@ function ToLocal(world, p_ParentWorld)
 	world = SanitizeLT(world)
 	p_ParentWorld = SanitizeLT(p_ParentWorld)
 
-    local s_LinearTransform = LinearTransform()
+	local s_LinearTransform = LinearTransform()
 
-		local s_MatrixParent = matrix{
-			{p_ParentWorld.left.x,p_ParentWorld.left.y,p_ParentWorld.left.z,0},
-			{p_ParentWorld.up.x,p_ParentWorld.up.y,p_ParentWorld.up.z,0},
-			{p_ParentWorld.forward.x,p_ParentWorld.forward.y,p_ParentWorld.forward.z,0},
-			{p_ParentWorld.trans.x,p_ParentWorld.trans.y,p_ParentWorld.trans.z,1}
-		}
-		
-		local s_MatrixWorld = matrix{
-			{world.left.x,world.left.y,world.left.z,0},
-			{world.up.x,world.up.y,world.up.z,0},
-			{world.forward.x,world.forward.y,world.forward.z,0},
-			{world.trans.x,world.trans.y,world.trans.z,1}
-		}
+	local s_MatrixParent = matrix{
+		{p_ParentWorld.left.x,p_ParentWorld.left.y,p_ParentWorld.left.z,0},
+		{p_ParentWorld.up.x,p_ParentWorld.up.y,p_ParentWorld.up.z,0},
+		{p_ParentWorld.forward.x,p_ParentWorld.forward.y,p_ParentWorld.forward.z,0},
+		{p_ParentWorld.trans.x,p_ParentWorld.trans.y,p_ParentWorld.trans.z,1}
+	}
+	
+	local s_MatrixWorld = matrix{
+		{world.left.x,world.left.y,world.left.z,0},
+		{world.up.x,world.up.y,world.up.z,0},
+		{world.forward.x,world.forward.y,world.forward.z,0},
+		{world.trans.x,world.trans.y,world.trans.z,1}
+	}
 
-		local s_MatrixParent_Inv = matrix.invert(s_MatrixParent) 
-		local s_MatrixLocal = s_MatrixWorld * s_MatrixParent_Inv 
+	local s_MatrixParent_Inv = matrix.invert(s_MatrixParent) 
+	local s_MatrixLocal = s_MatrixWorld * s_MatrixParent_Inv 
 
 
-		s_LinearTransform.left = Vec3(s_MatrixLocal[1][1],s_MatrixLocal[1][2],s_MatrixLocal[1][3])
-		s_LinearTransform.up = Vec3(s_MatrixLocal[2][1],s_MatrixLocal[2][2],s_MatrixLocal[2][3])
-		s_LinearTransform.forward = Vec3(s_MatrixLocal[3][1],s_MatrixLocal[3][2],s_MatrixLocal[3][3])
-		s_LinearTransform.trans = Vec3(s_MatrixLocal[4][1],s_MatrixLocal[4][2],s_MatrixLocal[4][3])
-		-- s_LinearTransform.trans.x = world.left.x * t.x +
-		--     	world.left.y * t.x +
-		--     	world.left.z * t.x
-		-- s_LinearTransform.trans.y = world.up.x * t.y +
-		--     	world.up.y * t.y +
-		--     	world.up.z * t.y
-		-- s_LinearTransform.trans.z = world.forward.x * t.z +
-		--     	world.forward.y * t.z +
-		--     	world.forward.z * t.z
+	s_LinearTransform.left = Vec3(s_MatrixLocal[1][1],s_MatrixLocal[1][2],s_MatrixLocal[1][3])
+	s_LinearTransform.up = Vec3(s_MatrixLocal[2][1],s_MatrixLocal[2][2],s_MatrixLocal[2][3])
+	s_LinearTransform.forward = Vec3(s_MatrixLocal[3][1],s_MatrixLocal[3][2],s_MatrixLocal[3][3])
+	s_LinearTransform.trans = Vec3(s_MatrixLocal[4][1],s_MatrixLocal[4][2],s_MatrixLocal[4][3])
 
-    -- s_LinearTransform.trans.x = world.trans.x - p_ParentWorld.trans.x
-    -- s_LinearTransform.trans.y = world.trans.y - p_ParentWorld.trans.y
-    -- s_LinearTransform.trans.z = world.trans.z - p_ParentWorld.trans.z
-		-- print(s_LinearTransform.trans) --(15.818466, -0.016708, -24.546097)
-
-    return SanitizeLT(s_LinearTransform)
+	return SanitizeLT(s_LinearTransform)
 end
 
 function SanitizeLT (lt) 
@@ -204,11 +193,11 @@ function dus_MatrixParent(o)
 	end
 end
 
-function IsVanillaGuid(guid)
+function IsVanilla(guid)
 	if guid == nil then
 		return false
 	end
-	return guid:sub(1, 8):upper() == "ED170120"
+	return guid:sub(1, 8):upper() == VANILLA_GUID_PREFIX
 end
 
 function Set (list)
@@ -222,12 +211,14 @@ function h()
     return vars[math.floor(MathUtils:GetRandomInt(1,16))]..vars[math.floor(MathUtils:GetRandomInt(1,16))]
 end
 
+-- Generates a random guid.
 function GenerateGuid()
-    return Guid(h()..h()..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
+    return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
+-- Generates a guid based on a given number. Used for vanilla objects.
 function GenerateStaticGuid(n)
-	return Guid("ED170120-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
+	return Guid(VANILLA_GUID_PREFIX.."-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
 end
 
 function GetFilledNumberAsString(n, stringLength)

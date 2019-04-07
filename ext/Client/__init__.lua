@@ -43,6 +43,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendToServer)
 	Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
+	Events:Subscribe('MapEditor:RequestSave', self, self.OnRequestSave)
 
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
@@ -124,6 +125,9 @@ end
 
 ----------- WebUI functions----------------
 
+function MapEditorClient:OnRequestSave()
+	m_Editor:OnRequestSave()
+end
 
 function MapEditorClient:OnEnableFreecamMovement()
 	m_UIManager:OnEnableFreecamMovement()

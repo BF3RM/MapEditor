@@ -8,3 +8,9 @@ RaycastType = {
 	Camera = 1,
 	Mouse = 2
 }
+
+GameObjectType = {
+	ClientOnly = 1,
+	ServerOnly = 2,
+	ClientAndSerer = 3
+}

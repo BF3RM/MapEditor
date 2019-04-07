@@ -30,7 +30,7 @@ end
 
 
 function Backend:SpawnBlueprint(p_Command)
-	if(IsVanillaGuid(p_Command.guid)) then
+	if(IsVanilla(p_Command.guid)) then
 		return Backend:EnableBlueprint(p_Command)
 	end
 	local s_UserData = p_Command.userData
@@ -165,13 +165,13 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 			v.parentGuid = s_Response.guid
 			v.resolveType = "Unresolved"
 			table.insert(s_Response.children, v.guid)
-			table.insert(self.m_VanillaObjects, v)
+			self.m_VanillaObjects[s_Response.guid] = v
 		end
 		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
 	end
 	-- We failed to get the parentGuid for this entry. Add it to the unresolved list and wait for the parent.
 	if(s_Resolved == true) then
-		table.insert(self.m_VanillaObjects, s_Response)
+		self.m_VanillaObjects[s_Response.guid] = s_Response
 	end
 	if(s_Response.parentGuid == nil) then
 		-- Add the current blueprint to the unresolved list.
@@ -187,7 +187,7 @@ end
 
 
 function Backend:DestroyBlueprint(p_Command, p_UpdatePass)
-	if(IsVanillaGuid(p_Command.guid)) then
+	if(IsVanilla(p_Command.guid)) then
 		return Backend:DisableBlueprint(p_Command)
 	end
 	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
