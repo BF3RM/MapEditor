@@ -83,7 +83,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 			s_Spatial[i] = SpatialEntity(l_Entity)
 			s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
 			-- Allows us to connect the entity to the GUID
-			self.m_EntityInstanceIds[l_Entity.instanceID] = p_Guid
+			self.m_EntityInstanceIds[l_Entity.instanceID] = {p_Guid}
 		end
 	end
 
