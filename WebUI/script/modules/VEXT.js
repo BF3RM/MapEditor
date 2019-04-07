@@ -109,6 +109,11 @@ class VEXTInterface {
 		Log(LOGLEVEL.VERBOSE, "IN: ");
 		Log(LOGLEVEL.VERBOSE, commands);
 
+		//convert commands to an array if it's an object
+		if (typeof commands === 'object'){
+			commands = Object.values(commands)
+		}
+
 		commands.forEach(function (command) {
 			if(scope.commands[command.type] === undefined) {
 				LogError("Failed to call a null signal: " + command.type);

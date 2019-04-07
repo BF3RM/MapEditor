@@ -57,7 +57,7 @@ function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transfo
     local s_ParentPartition = m_InstanceParser
 	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 
-    table.insert(self.m_VanillaObjects, s_Response)
+	self.m_VanillaObjects[s_Response.guid] = s_Response
 
 end
 
@@ -77,7 +77,9 @@ function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
 		local s_Response = s_Function(self, l_Command, p_UpdatePass)
 		if(s_Response == false) then
 			-- TODO: Handle errors
-			m_Logger:Error("error")
+			-- m_Logger:Error("error")
+			m_Logger:Warning("... Unable to spawn on server. Might be client only")
+			table.insert(self.m_Queue, l_Command)
 		elseif(s_Response == "queue") then
 			m_Logger:Write("Queued command")
 			table.insert(self.m_Queue, l_Command)
@@ -150,19 +152,19 @@ function EditorServer:UpdateLevel(p_Update)
 			local s_StringGuid = tostring(s_Guid)
 
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
-			if IsVanillaGuid(s_StringGuid) then
-				print("vanilla")
+			if IsVanilla(s_StringGuid) then
+				m_Logger:Write("vanilla")
 				local s_Command = nil
 
 				if s_GameObject.isDeleted then
-					print("deleting")
+					m_Logger:Write("deleting")
 					s_Command = {
 						type = "DestroyBlueprintCommand",
 						guid = s_Guid,
 
 					}
 				else
-					print("moving")
+					m_Logger:Write("moving")
 					s_Command = {
 						type = "SetTransformCommand",
 						guid = s_Guid,

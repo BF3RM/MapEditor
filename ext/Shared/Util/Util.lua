@@ -1,5 +1,6 @@
 local matrix = require "__shared/Util/matrix"
 
+local CUSTOMOBJ_GUID_PREFIX = "ED170120"
 local VANILLA_GUID_PREFIX = "ED170121"
 
 function MergeTables(p_Old, p_New)
@@ -192,7 +193,7 @@ function dus_MatrixParent(o)
 	end
 end
 
-function IsVanillaGuid(guid)
+function IsVanilla(guid)
 	if guid == nil then
 		return false
 	end
@@ -212,7 +213,7 @@ end
 
 -- Generates a random guid.
 function GenerateGuid()
-    return Guid(h()..h()..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
+    return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
 -- Generates a guid based on a given number. Used for vanilla objects.
