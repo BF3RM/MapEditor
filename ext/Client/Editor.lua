@@ -56,9 +56,11 @@ function Editor:OnEngineMessage(p_Message)
 		for k,v in pairs(s_LevelDatas) do
 			WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
 		end
+
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(Backend.m_VanillaObjects)))
 		WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(Backend.m_VanillaUnresolved)))
+		self:UpdateCameraTransform()
 
     end
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then

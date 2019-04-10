@@ -151,12 +151,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 	end
 
 	local s_Resolved = false
-	-- Check if the current blueprint is referenced from a leveldata
-	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
-		s_Response.parentGuid = s_ParentPrimaryInstance
-		s_Response.resolveType = "Level"
-		s_Resolved = true
-	end
+
 
 	-- Check if the current blueprint is referenced by earlier blueprints
 	if(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] ~= nil) then
@@ -165,20 +160,30 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 			v.parentGuid = s_Response.guid
 			v.resolveType = "Unresolved"
 			table.insert(s_Response.children, v.guid)
-			self.m_VanillaObjects[s_Response.guid] = v
+			self.m_VanillaObjects[v.guid] = v
 		end
 		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
 	end
+
 	-- We failed to get the parentGuid for this entry. Add it to the unresolved list and wait for the parent.
-	if(s_Resolved == true) then
-		self.m_VanillaObjects[s_Response.guid] = s_Response
-	end
+
 	if(s_Response.parentGuid == nil) then
 		-- Add the current blueprint to the unresolved list.
 		if(self.m_VanillaUnresolved[s_ParentPrimaryInstance] == nil) then
 			self.m_VanillaUnresolved[s_ParentPrimaryInstance] = {}
 		end
 		table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance],s_Response)
+	end
+
+	-- Check if the current blueprint is referenced from a leveldata
+	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
+		s_Response.parentGuid = s_ParentPrimaryInstance
+		s_Response.resolveType = "Level"
+		s_Resolved = true
+	end
+
+	if(s_Resolved == true) then
+		self.m_VanillaObjects[s_Response.guid] = s_Response
 	end
 
 
