@@ -1,7 +1,6 @@
 class 'Freecam'
 
 local m_Logger = Logger("Freecam", true)
-require "__shared/Enums"
 
 function Freecam:__init()
 	m_Logger:Write("function Freecam:__init()")

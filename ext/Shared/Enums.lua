@@ -14,3 +14,8 @@ GameObjectType = {
 	ServerOnly = 2,
 	ClientAndSerer = 3
 }
+
+EditorMode = {
+	Editor = 1,
+	Play = 2
+}
