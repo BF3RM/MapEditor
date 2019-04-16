@@ -104,7 +104,7 @@ function MapEditorClient:OnLevelDestroy()
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	EditorCommon:OnPartitionLoaded(p_Partition)
+	EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )

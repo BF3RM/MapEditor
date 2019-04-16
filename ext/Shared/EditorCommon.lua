@@ -29,5 +29,8 @@ function EditorCommon:OnPartitionLoaded(p_Partition)
     end
 end
 
+function EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
+    
+end
 
 return EditorCommon
