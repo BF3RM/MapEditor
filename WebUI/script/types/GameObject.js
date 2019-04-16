@@ -78,9 +78,7 @@ class GameObject extends THREE.Object3D
 			THREE.SceneUtils.detach( this, parent, editor.threeManager.scene );
 		}
 
-		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
-		this.setRotationFromMatrix(matrix);
-		this.scale.setFromMatrixScale(matrix);
+		matrix.decompose( this.position, this.quaternion, this.scale );
 		this.updateMatrix();
 		// remove child from scene and add it to parent
 		if (parent !== null){
