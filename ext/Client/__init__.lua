@@ -3,6 +3,7 @@ class 'MapEditorClient'
 local m_Freecam = require "Freecam"
 Editor = require "Editor"
 local m_UIManager = require "UIManager"
+EditorCommon = EditorCommon(Realm.Realm_Client)
 
 ObjectManager = ObjectManager(Realm.Realm_Client)
 Backend = Backend(Realm.Realm_Client)
@@ -64,7 +65,7 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
-	Editor:OnLevelLoaded(p_MapName, p_GameModeName)
+	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnLoaded()
@@ -76,7 +77,8 @@ function MapEditorClient:OnExtensionUnloading()
 	Editor:OnExtensionUnloading()
 end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
-	Editor:OnPartitionLoaded(p_Partition)
+	InstanceParser:OnPartitionLoaded(p_Partition)
+	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message) 
@@ -102,7 +104,7 @@ function MapEditorClient:OnLevelDestroy()
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
-    Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
+	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )

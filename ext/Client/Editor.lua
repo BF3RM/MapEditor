@@ -42,14 +42,6 @@ function Editor:RegisterVars()
 
 end
 
-function Editor:OnPartitionLoaded(p_Partition)
-    InstanceParser:OnPartitionLoaded(p_Partition)
-end
-
-function Editor:OnLevelLoaded(p_MapName, p_GameModeName)
-	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
-end
-
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		InstanceParser:FillVariations()
@@ -288,24 +280,6 @@ end
 
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-end
-
-
-
-function Editor:OnEntityCreate(p_Hook, p_Data, p_Transform)
-    if p_Data == nil then
-        m_Logger:Error("Didnt get no data")
-    else
-        local s_Entity = p_Hook:Call(p_Data, p_Transform)
-        local s_PartitionGuid = InstanceParser:GetPartition(p_Data.instanceGuid)
-        if(s_PartitionGuid == nil) then
-            return
-        end
-        local s_Partition = ResourceManager:FindDatabasePartition(Guid(s_PartitionGuid))
-        if(s_Partition == nil) then
-            return
-        end
-    end
 end
 
 function Editor:Raycast()

@@ -6,7 +6,8 @@ ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
 Backend = Backend(Realm.Realm_ClientAndServer)
 Commands = Commands(Realm.Realm_ClientAndServer)
 
-local m_EditorServer = require "EditorServer"
+EditorServer = require "EditorServer"
+EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
 
 function MapEditorServer:__init()
 	m_Logger:Write("Initializing MapEditorServer")
@@ -31,17 +32,13 @@ function MapEditorServer:RegisterEvents()
 
 
 end
-
+----------- Game functions----------------
 function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
-	m_EditorServer:OnUpdatePass(p_Delta, p_Pass)
+	EditorServer:OnUpdatePass(p_Delta, p_Pass)
 end
 
-function MapEditorServer:OnReceiveCommand(p_Player, p_Command)
-	m_EditorServer:OnReceiveCommand(p_Player, p_Command)
-end
-
-function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
-	m_EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
+function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+	EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 end
 
 function MapEditorServer:OnLevelDestroy()
@@ -49,8 +46,28 @@ function MapEditorServer:OnLevelDestroy()
 	Backend:OnLevelDestroy()
 end
 
-function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
-    m_EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+function MapEditorServer:OnPartitionLoaded(p_Partition)
+	InstanceParser:OnPartitionLoaded(p_Partition)
+	EditorCommon:OnPartitionLoaded(p_Partition)
+end
+
+function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+	EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+end
+
+function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
+	for i=0, 125 do
+		p_Player:EnableInput(i, p_Enabled)
+	end
+end
+----------- Editor functions----------------
+
+function MapEditorServer:OnReceiveCommand(p_Player, p_Command)
+	EditorServer:OnReceiveCommand(p_Player, p_Command)
+end
+
+function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
+	EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
@@ -61,19 +78,15 @@ function MapEditorServer:OnDisableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, true)
 end
 
-function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
-	for i=0, 125 do
-		p_Player:EnableInput(i, p_Enabled)
-	end
-end
 
-function MapEditorServer:OnPartitionLoaded(p_Partition)
-    InstanceParser:OnPartitionLoaded(p_Partition)
-end
 
-function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-    m_EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-end
+
+
+
+
+
+
+
 
 
 return MapEditorServer()
