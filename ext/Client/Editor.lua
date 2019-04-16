@@ -287,7 +287,7 @@ end
 --]]
 
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent, s_PartitionGuid, s_ParentPartition, s_ParentPrimaryInstance, s_ParentType)
+	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 end
 
 

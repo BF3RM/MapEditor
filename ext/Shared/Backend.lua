@@ -17,6 +17,11 @@ function Backend:RegisterVars()
 	self.m_Queue = {}
 	self.m_VanillaObjects = {}
 	self.m_VanillaUnresolved = {}
+
+	self.m_WorldParts = {}
+	self.m_SubWorlds = {}
+
+	self.m_VanillaSpawnindex = 0
 	m_Logger:Write("Initialized vars")
 end
 
@@ -106,6 +111,8 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 	end
 
     local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint)
+
+
     local s_ParentGuid = nil
     if(p_Parent ~= nil) then
         s_ParentGuid = tostring(p_Parent.instanceGuid)
@@ -118,8 +125,6 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
         isVanilla = true,
         ['type'] = 'SpawnedBlueprint',
 		referenceGuid = s_ParentGuid,
-		parentPartition = p_ParentGuid,
-		parentPrimaryInstance = p_ParentPrimaryInstance,
         userData = {
             name = s_Blueprint.name,
             reference = {
@@ -132,8 +137,19 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
             variation = p_Variation
         },
         entities = s_Entities,
-		children = {}
+		children = {},
+		spawnIndex = self.m_VanillaSpawnindex
     }
+
+
+	if(p_Blueprint.typeInfo.name == "SubWorldData") then
+		self.m_SubWorlds[tostring(p_Blueprint.instanceGuid)] = s_Response.guid
+	end
+	if(p_Blueprint.typeInfo.name == "WorldPartData") then
+		self.m_WorldParts[tostring(p_Blueprint.instanceGuid)] = s_Response.guid
+	end
+
+	self.m_VanillaSpawnindex = self.m_VanillaSpawnindex + 1
 	-- Resolve
 	local s_ParentPartition = nil
 	local s_ParentPrimaryInstance = nil
@@ -144,11 +160,17 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 
 		local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), p_Parent.instanceGuid)
 		s_Parent = _G[p_Parent.typeInfo.name](p_Parent)
+
+		s_Response.parentPrimaryInstance = s_ParentPrimaryInstance
+		s_Response.parentPartition = s_ParentPartition
+		s_Response.parentType = s_Parent.typeInfo.name
 	else
 		print(p_Blueprint.instanceGuid)
 		s_ParentPartition = "dynamic"
 		s_ParentPrimaryInstance = "dynamic"
 	end
+
+
 
 	local s_Resolved = false
 
@@ -165,7 +187,29 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 		self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] = nil
 	end
 
-	-- We failed to get the parentGuid for this entry. Add it to the unresolved list and wait for the parent.
+	-- Check if the current blueprint is referenced from a leveldata
+	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
+		s_Response.parentGuid = s_ParentPrimaryInstance
+		s_Response.resolveType = "Level"
+	end
+
+	-- Check if the current blueprint is a child of a WorldPartData
+	if(self.m_WorldParts[s_ParentPrimaryInstance]) then
+		print(self.m_WorldParts[s_ParentPrimaryInstance])
+		local s_Parent = self.m_VanillaObjects[self.m_WorldParts[s_ParentPrimaryInstance]]
+		s_Response.parentGuid = s_Parent.guid
+		s_Response.resolveType = "WorldPart"
+		table.insert(s_Parent.children, s_Response.guid)
+	end
+
+	-- Check if the current blueprint is a child of a WorldPartData
+	if(self.m_SubWorlds[s_ParentPrimaryInstance]) then
+		print(self.m_SubWorlds[s_ParentPrimaryInstance])
+		local s_Parent = self.m_VanillaObjects[self.m_SubWorlds[s_ParentPrimaryInstance]]
+		s_Response.parentGuid = s_Parent.guid
+		s_Response.resolveType = "SubWorld"
+		table.insert(s_Parent.children, s_Response.guid)
+	end
 
 	if(s_Response.parentGuid == nil) then
 		-- Add the current blueprint to the unresolved list.
@@ -175,14 +219,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 		table.insert(self.m_VanillaUnresolved[s_ParentPrimaryInstance],s_Response)
 	end
 
-	-- Check if the current blueprint is referenced from a leveldata
-	if(InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then
-		s_Response.parentGuid = s_ParentPrimaryInstance
-		s_Response.resolveType = "Level"
-		s_Resolved = true
-	end
-
-	if(s_Resolved == true) then
+	if(s_Response.parentGuid ~= nil) then
 		self.m_VanillaObjects[s_Response.guid] = s_Response
 	end
 
