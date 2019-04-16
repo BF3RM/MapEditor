@@ -38,6 +38,8 @@ function Editor:RegisterVars()
 	self.m_TransactionId = 0
 	self.m_GameObjects = {}
 
+	self.m_CameraTransform = nil
+
 end
 
 function Editor:OnPartitionLoaded(p_Partition)
@@ -60,7 +62,6 @@ function Editor:OnEngineMessage(p_Message)
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(Backend.m_VanillaObjects)))
 		WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(Backend.m_VanillaUnresolved)))
-		self:UpdateCameraTransform()
 
     end
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
@@ -126,10 +127,10 @@ function Editor:OnReceiveUpdate(p_Update)
 end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
-    if(self.m_FreecamMoving) then
-        self:UpdateCameraTransform()
-    end
 	-- Raycast has to be done in update
+	if(self:CameraHasMoved() == true) then
+		self:UpdateCameraTransform()
+	end
 	self:Raycast()
 end
 
@@ -352,6 +353,9 @@ function Editor:Raycast()
 	self.m_PendingRaycast = false
 
 end
+function Editor:CameraHasMoved()
+	return self.m_CameraTransform ~= ClientUtils:GetCameraTransform()
+end
 
 function Editor:UpdateCameraTransform()
 	local s_Transform = ClientUtils:GetCameraTransform()
@@ -363,7 +367,7 @@ function Editor:UpdateCameraTransform()
 
 	WebUI:ExecuteJS(string.format('editor.threeManager.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
 		left.x, left.y, left.z, up.x, up.y, up.z, forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
-
+	self.m_CameraTransform = s_Transform
 end
 
 function Editor:SetPendingRaycast(p_Type, p_Direction)

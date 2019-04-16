@@ -69,6 +69,7 @@ function UIManager:DisableFreecamMovement()
 	if m_Freecam:GetCameraMode() == CameraMode.FreeCam then
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
+		m_Editor.m_FreecamMoving = false
 	end
 end
 
