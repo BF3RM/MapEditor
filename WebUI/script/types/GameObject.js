@@ -14,7 +14,7 @@ class GameObject extends THREE.Object3D
 		this.isVanilla = isVanilla;
 		this.selected = false;
 		this.visible = false;
-		this.matrixAutoUpdate  = false;
+		this.matrixAutoUpdate = false;
 		this.visible = true;
 		this.enabled = true;
 		this.highlighted = false;
@@ -60,17 +60,9 @@ class GameObject extends THREE.Object3D
 
 	}
 
-	updateTransform(updateChild = false)
+	updateTransform()
 	{
-		if(updateChild){
-			for(let key in this.children) {
-				let child = this.children[key];
-				if(child instanceof GameObject) {
-					console.log("Updating child")
-					child.updateTransform(true);
-				}
-			};
-		}
+
 		let matrix = new THREE.Matrix4();
 		matrix.set(
 			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x,
@@ -86,14 +78,32 @@ class GameObject extends THREE.Object3D
 			THREE.SceneUtils.detach( this, parent, editor.threeManager.scene );
 		}
 
-		matrix.decompose( this.position, this.quaternion, this.scale );
-		
+		this.position.set(this.transform.trans.x, this.transform.trans.y, this.transform.trans.z);
+		this.setRotationFromMatrix(matrix);
+		this.scale.setFromMatrixScale(matrix);
+		this.updateMatrix();
 		// remove child from scene and add it to parent
 		if (parent !== null){
 			THREE.SceneUtils.attach( this, editor.threeManager.scene, parent );
 		}
 	}
 
+	updateWorldTransform(updateChild = false)
+	{
+
+		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+
+
+		if(updateChild){
+			for(let key in this.children) {
+				let child = this.children[key];
+				if(child instanceof GameObject) {
+					console.log("Updating child")
+					child.updateWorldTransform(true);
+				}
+			};
+		}
+	}
 
 	update( deltaTime )
 	{
@@ -103,7 +113,15 @@ class GameObject extends THREE.Object3D
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
 		this.userData.transform = linearTransform;
-		this.updateTransform(true);
+		this.updateTransform();
+
+		for(let key in this.children) {
+			let child = this.children[key];
+			if(typeof(child) == "GameObject") {
+				child.updateWorldTransform();
+			}
+		}
+
 		editor.threeManager.Render();
 		signals.objectChanged.dispatch(this, "transform", linearTransform);
 
