@@ -351,5 +351,9 @@ function Editor:SetPendingRaycast(p_Type, p_Direction)
 	}
 end
 
+function Editor:OnPartitionLoaded(p_Partition)
+	InstanceParser:OnPartitionLoaded(p_Partition)
+end
+
 
 return Editor()

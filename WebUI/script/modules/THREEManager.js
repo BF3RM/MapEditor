@@ -354,7 +354,7 @@ class THREEManager {
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
-		//if(keysdown[18]) {
+		if(keysdown[18]) {
 			let guid = scope.RaycastSelection(e);
 
 			if (guid !== null) {
@@ -362,7 +362,7 @@ class THREEManager {
 			}else{
 				editor.Unhighlight();
 			}
-		//}
+		}
 
 	}
 

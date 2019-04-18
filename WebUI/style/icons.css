@@ -2,6 +2,7 @@
     height: 16px;
     width: 16px;
     -webkit-mask-size: contain!important;
+    background-color: #9c9898;
 }
 .selectIcon{
     -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
@@ -31,18 +32,25 @@
 
 
 
-.Icon-ObjectBlueprint {
-    -webkit-mask: url(../icons/types/file-document-box-outline.svg) no-repeat center;
-    background-color: #9c9898;
+.Icon-EffectBlueprint {
+    -webkit-mask: url(../icons/types/EffectBlueprint.svg) no-repeat center;
 }
+.Icon-LogicPrefabBlueprint {
+    -webkit-mask: url(../icons/types/LogicPrefabBlueprint.svg) no-repeat center;
+}
+.Icon-ObjectBlueprint {
+    -webkit-mask: url(../icons/types/ObjectBlueprint.svg) no-repeat center;
+}
+.Icon-PrefabBlueprint {
+    -webkit-mask: url(../icons/types/PrefabBlueprint.svg) no-repeat center;
+}
+.Icon-SpatialPrefabBlueprint {
+    -webkit-mask: url(../icons/types/SpatialPrefabBlueprint.svg) no-repeat center;
+}
+
 
 .Icon-GameObject {
     -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
-    background-color: #9c9898;
-}
-
-.Icon-SpatialPrefabBlueprint {
-    -webkit-mask: url(../icons/types/file-document-box-multiple-outline.svg) no-repeat center;
     background-color: #9c9898;
 }
 

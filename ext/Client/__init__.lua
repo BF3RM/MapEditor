@@ -77,7 +77,7 @@ function MapEditorClient:OnExtensionUnloading()
 	Editor:OnExtensionUnloading()
 end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
-	InstanceParser:OnPartitionLoaded(p_Partition)
+	Editor:OnPartitionLoaded(p_Partition)
 	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 
