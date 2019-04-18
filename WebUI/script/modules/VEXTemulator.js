@@ -53,7 +53,7 @@ class VEXTemulator {
 			"isVanilla": false,
 			"type": "SpawnedBlueprint",
 			"name": command.userData.name,
-			"children": {
+			"entities": {
 				1: {
 					"type": "ClientStaticModelEntity",
 					"transform": {
@@ -114,7 +114,7 @@ class VEXTemulator {
 		};
 
 		if(command.userData.reference.typeName == "SpatialPrefabBlueprint") {
-			response.children[2] = {
+			response.entities[2] = {
 				"type": "ClientStaticModelEntity",
 				"transform": {
 					"left": {
