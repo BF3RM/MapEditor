@@ -13,7 +13,6 @@ class GameObject extends THREE.Object3D
 		this.userData = userData;
 		this.isVanilla = isVanilla;
 		this.selected = false;
-		this.visible = false;
 		this.matrixAutoUpdate = false;
 		this.visible = true;
 		this.enabled = true;
@@ -206,7 +205,6 @@ class GameObject extends THREE.Object3D
 			}
 		};
 		this.selected = true;
-		this.visible = true;
 	}
 	onDeselected() {
 		if(!this.enabled) {
@@ -219,8 +217,7 @@ class GameObject extends THREE.Object3D
 				child.Select();
 			}
 		};
-		this.selected = true;
-		this.visible = true;
+		this.selected = false;
 	}
 	Enable() {
 		for(let key in this.children) {

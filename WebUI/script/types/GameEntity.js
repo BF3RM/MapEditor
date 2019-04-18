@@ -1,10 +1,33 @@
 
-class GameEntity extends THREE.LineSegments
+class GameEntity extends THREE.Mesh
 {
 	constructor(guid, typeName, transform, entityInfo, color)
 	{
+		var pointsGeom = new THREE.Geometry();
+		pointsGeom.vertices.push(
+		 	new Vec3().fromString(entityInfo.aabb.min),
+			new Vec3().fromString(entityInfo.aabb.max)
+		);
 
-		if ( color === undefined )
+		var center = new THREE.Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
+		let vmax = new Vec3().fromString(entityInfo.aabb.max);
+		let vmin = new Vec3().fromString(entityInfo.aabb.min);
+
+		var boxGeom = new THREE.BoxGeometry(
+			vmax.x - vmin.x, 
+			vmax.y - vmin.y, 
+			vmax.z - vmin.z
+		);
+
+		boxGeom.translate( center.x - transform.trans.x, center.y - transform.trans.y, center.z - transform.trans.z );
+
+		super(boxGeom, new THREE.MeshBasicMaterial({
+			color: "aqua",
+			wireframe: true,
+			visible: true
+		}));
+
+		if (color === undefined)
 			color = 0xff0000;
 
 		var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
@@ -13,16 +36,15 @@ class GameEntity extends THREE.LineSegments
 		var geometry = new THREE.BufferGeometry();
 		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-		super( geometry, new THREE.LineBasicMaterial( { color: color } ) );
 
-
+		this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial( { color: color } )) 
+		this.add(this.aabb);
+		
 		this.guid = guid;
 		this.type = "GameEntity";
 		this.typeName = typeName;
 		this.transform = transform;
-		this.aabb = {
 
-		}
 		this.matrixAutoUpdate = false;
 		this.updateMatrix();
 		// Update the matrix after initialization.
@@ -102,7 +124,7 @@ class GameEntity extends THREE.LineSegments
 		7: max.x, min.y, min.z
 		*/
 
-		var position = this.geometry.attributes.position;
+		var position = this.aabb.geometry.attributes.position;
 		var array = position.array;
 
 		array[ 0 ] = max.x; array[ 1 ] = max.y; array[ 2 ] = max.z;
@@ -116,7 +138,7 @@ class GameEntity extends THREE.LineSegments
 
 		position.needsUpdate = true;
 
-		this.geometry.computeBoundingSphere();
+		//this.aabb.geometry.computeBoundingBox();
 	}
 
 	Highlight(){
@@ -127,6 +149,6 @@ class GameEntity extends THREE.LineSegments
 		this.SetColor(0xff0000);
 	}
 	SetColor(color){
-		this.material.color.setHex( color );
+		this.aabb.material.color.setHex(color);
 	}
 }

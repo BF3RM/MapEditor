@@ -461,6 +461,7 @@ class Editor {
 
 	Highlight(guid){
 		let gameObject = this.gameObjects[guid];
+
 		if (gameObject === null || gameObject.selected || gameObject.highlighted) return;
 
 		if (this.highlightedGameObject !== null){
