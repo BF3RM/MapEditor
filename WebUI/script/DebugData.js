@@ -43,7 +43,7 @@ var xp3shieldBlueprints = `
 	]
   },
   "3": {
-	"typeName": "SpatialPrefabBlueprint",
+	"typeName": "EffectBlueprint",
 	"name": "test2/M16A4KitPickup3",
 	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
 	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
