@@ -2,12 +2,15 @@ class 'MapEditorShared'
 
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
-require "__shared/ObjectManager"
-require "__shared/Backend"
+require "__shared/Modules/ObjectManager"
+require "__shared/Modules/Backend"
+require "__shared/Modules/InstanceParser"
+require "__shared/Types/Commands"
+require "__shared/Types/Enums"
+require "__shared/Types/GameObject"
+
 require "__shared/EditorCommon"
-require "__shared/InstanceParser"
-require "__shared/Commands"
-require "__shared/Enums"
+
 
 
 local m_Logger = Logger("MapEditorShared", true)
