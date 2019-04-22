@@ -20,6 +20,7 @@ class GameEntity extends THREE.Mesh
 		);
 
 		boxGeom.translate( center.x - transform.trans.x, center.y - transform.trans.y, center.z - transform.trans.z );
+		//boxGeom.translate( center.x, center.y, center.z);
 
 		super(boxGeom, new THREE.MeshBasicMaterial({
 			color: "aqua",
