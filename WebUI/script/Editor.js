@@ -421,7 +421,8 @@ class Editor {
 
 
 		if (gameObject.parent !== null && gameObject.parent !== undefined) {
-			console.log("Object has parent")
+			console.log("Object has parent");
+			THREE.SceneUtils.detach( gameObject, gameObject.parent, this.threeManager.scene);
 		}else{
 			this.threeManager.scene.add(gameObject);			
 		}
@@ -436,7 +437,14 @@ class Editor {
 		gameObject.Unhighlight();
 
 		if (gameObject.parent === this.threeManager.scene) {
-			this.threeManager.scene.remove(gameObject);
+			if (gameObject.parentGuid !== null && gameObject.parentGuid !== undefined && this.gameObjects[gameObject.parentGuid] !== null){
+				console.log(gameObject.parentGuid)
+				console.log(this.gameObjects[gameObject.parentGuid])
+				THREE.SceneUtils.attach(gameObject, this.threeManager.scene, this.gameObjects[gameObject.parentGuid]);
+			}
+			else{
+				this.threeManager.scene.remove(gameObject);
+			}
 		}
 		
 		this.threeManager.Render();
