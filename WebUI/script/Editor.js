@@ -52,17 +52,15 @@ class Editor {
 		this.favorites = [];
 
 		this.copy = null;
-		this.test = [];
 
-		this.highlightedGameObject = null;
-		// Creates selection group and add it to the scene
+		// Creates selection and highlighting group and adds them to the scene
 		this.selectionGroup = new SelectionGroup();
+		this.highlightGroup = new HighlightGroup();
 		this.threeManager.scene.add(this.selectionGroup);
+		this.threeManager.scene.add(this.highlightGroup);
 
 		this.missingParent = {};
 		this.Initialize();
-
-
 	}
 
 	setPlayerName(name) {
@@ -397,6 +395,7 @@ class Editor {
 
 	Select(guid, multi = false, scrollTo = false) {
 		this.Unhighlight(guid);
+
 		if(keysdown[17] || multi) {
 			this.editorCore.onSelectedGameObject(guid, true, scrollTo)
 		} else {
@@ -411,51 +410,26 @@ class Editor {
 	Highlight(guid){
 		let gameObject = this.gameObjects[guid];
 
-		if (gameObject === null || gameObject.selected || gameObject.highlighted) return;
-
-		if (this.highlightedGameObject !== null){
-			this.Unhighlight(this.highlightedGameObject);
-		}
-
-		gameObject.Highlight();
+		if (gameObject === null) return;
 
 
-		if (gameObject.parent !== null && gameObject.parent !== undefined) {
-			console.log("Object has parent");
-			THREE.SceneUtils.detach( gameObject, gameObject.parent, this.threeManager.scene);
-		}else{
-			this.threeManager.scene.add(gameObject);			
-		}
-		
-		this.threeManager.Render();
-		this.highlightedGameObject = guid;
+		this.highlightGroup.HighlightObject(gameObject);
 	}
 
-	Unhighlight(guid = this.highlightedGameObject){
-		let gameObject = this.gameObjects[guid];
-		if (gameObject === null || gameObject === undefined || !gameObject.highlighted) return;
-		gameObject.Unhighlight();
+	Unhighlight(guid){
+		if (guid !== null && guid !== undefined) {
+			let gameObject = this.gameObjects[guid];
 
-		if (gameObject.parent === this.threeManager.scene) {
-			if (gameObject.parentGuid !== null && gameObject.parentGuid !== undefined && this.gameObjects[gameObject.parentGuid] !== null){
-				console.log(gameObject.parentGuid)
-				console.log(this.gameObjects[gameObject.parentGuid])
-				THREE.SceneUtils.attach(gameObject, this.threeManager.scene, this.gameObjects[gameObject.parentGuid]);
-			}
-			else{
-				this.threeManager.scene.remove(gameObject);
+			if (gameObject === null || gameObject === undefined){
+				console.error("Tried to unhighlight an object that doesn't exist");
+				return;
+			}else if (!gameObject.highlighted) {
+				return;
 			}
 		}
-		
-		this.threeManager.Render();
-		this.highlightedGameObject = null;
+
+		this.highlightGroup.UnhighlightCurrentObject()
 	}
-
-
-	// onSelectedEntities(command) {
-	// 	let scope = this;
-
-	// }
 
 	/*
 

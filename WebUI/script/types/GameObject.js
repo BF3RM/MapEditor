@@ -214,7 +214,7 @@ class GameObject extends THREE.Object3D
 		for(let key in this.children) {
 			let child = this.children[key];
 			if(typeof(child) == "GameObject") {
-				child.Select();
+				child.Deselect();
 			}
 		};
 		this.selected = false;
