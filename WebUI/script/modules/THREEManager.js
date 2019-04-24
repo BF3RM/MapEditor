@@ -15,6 +15,7 @@ class THREEManager {
 
 		this.raycastPlacing = false;
 		this.controlSelected = false;
+		this.lastRaycastTime = new Date();
 	}
 	Initialize() {
 		let scope = this;
@@ -64,12 +65,15 @@ class THREEManager {
 					EnableFreecamMovement();
 					break;
 				default:
-					alert('You have a strange Mouse!');
+					// alert('You have a strange Mouse!');
+					break;
 			}
 		});
 		window.addEventListener('resize',this.onWindowResize, false);
 
 		this.renderer.domElement.addEventListener('mousemove',this.onMouseMove.bind(this));
+		this.renderer.domElement.addEventListener('click',this.onClick.bind(this));
+
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 		
@@ -302,6 +306,17 @@ class THREEManager {
 			this.EnableGridSnap();
 		}
 	}
+
+	onClick(e){
+		if(e.which === 1) {
+			let guid = this.RaycastSelection(e);
+
+			if (guid !== null) {
+				editor.Select(guid, undefined, true);
+			}
+		}
+	}
+
 	onMouseUp(e) {
 		let scope = this;
 
@@ -318,14 +333,7 @@ class THREEManager {
 			editor.onControlMoveStart();
 		} else if(this.controlSelected) {
 			console.log("Control selected")
-		} else if(e.which === 1) {
-			
-			let guid = scope.RaycastSelection(e);
-
-			if (guid !== null) {
-				editor.Select(guid, undefined, true);
-			}
-		}
+		} 
 	}
 
 	onMouseMove(e) {
@@ -345,17 +353,26 @@ class THREEManager {
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
-		//if(keysdown[18]) {
-			let guid = scope.RaycastSelection(e);
+		
+		if (e.which == 0){
+			console.log("ee")
+			let now = new Date();
 
-			if (guid !== null) {
-				editor.Highlight(guid);
-			}else{
-				editor.Unhighlight();
+			if(now.getTime() - this.lastRaycastTime.getTime() >= 100){
+				let guid = scope.RaycastSelection(e);
+
+				if (guid !== null) {
+					editor.Highlight(guid);
+				}else{
+					editor.Unhighlight();
+				}
+
+				this.lastRaycastTime = now;
 			}
-		//}
-
+		}
 	}
+
+
 
 	RaycastSelection(e){ 
 		let mousePos = [];
