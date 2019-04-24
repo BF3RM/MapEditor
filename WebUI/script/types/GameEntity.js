@@ -28,8 +28,8 @@ class GameEntity extends THREE.Mesh
 			visible: true
 		}));
 
-		if (color === undefined)
-			color = 0xff0000;
+		if (color === undefined || color === null)
+			color = 0xFF0000;
 
 		var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 		var positions = new Float32Array( 8 * 3 );
@@ -38,7 +38,7 @@ class GameEntity extends THREE.Mesh
 		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-		this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial( { color: color } )) 
+		this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial( { color: color } ));
 		this.add(this.aabb);
 		
 		this.guid = guid;
@@ -147,9 +147,10 @@ class GameEntity extends THREE.Mesh
 	}
 
 	Unhighlight(){
-		this.SetColor(0xff0000);
+		this.SetColor(0xFF0000);
 	}
 	SetColor(color){
 		this.aabb.material.color.setHex(color);
+		editor.threeManager.Render();
 	}
 }
