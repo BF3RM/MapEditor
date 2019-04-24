@@ -170,15 +170,6 @@ class THREEManager {
 		return mesh;
 	}
 
-	AddObject(object){
-		if (object.renderInit != undefined){
-			object.renderInit();
-		}
-		if(object.parent == null) {
-			this.scene.add(object);
-		}
-	}
-
 	MoveObject(webObject, x, y, z){
 		if(webObject == null){
 			return;
@@ -354,7 +345,7 @@ class THREEManager {
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
-		if(keysdown[18]) {
+		//if(keysdown[18]) {
 			let guid = scope.RaycastSelection(e);
 
 			if (guid !== null) {
@@ -362,7 +353,7 @@ class THREEManager {
 			}else{
 				editor.Unhighlight();
 			}
-		}
+		//}
 
 	}
 
