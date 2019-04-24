@@ -200,7 +200,7 @@ class GameObject extends THREE.Object3D
 		}
 		for(let key in this.children) {
 			let child = this.children[key];
-			if(typeof(child) == "GameObject") {
+			if(child.constructor.name === "GameObject") {
 				child.Select();
 			}
 		};
@@ -213,7 +213,7 @@ class GameObject extends THREE.Object3D
 		}
 		for(let key in this.children) {
 			let child = this.children[key];
-			if(typeof(child) == "GameObject") {
+			if(child.constructor.name === "GameObject") {
 				child.Deselect();
 			}
 		};
@@ -222,7 +222,7 @@ class GameObject extends THREE.Object3D
 	Enable() {
 		for(let key in this.children) {
 			let child = this.children[key];
-			if(typeof(child) == "GameObject") {
+			if(child.constructor.name === "GameObject") {
 				child.Enable();
 			} else {
 				child.visible = true;
@@ -236,7 +236,7 @@ class GameObject extends THREE.Object3D
 	Disable() {
 		for(let key in this.children) {
 			let child = this.children[key];
-			if(typeof(child) == "GameObject") {
+			if(child.constructor.name === "GameObject") {
 				child.Disable();
 			} else {
 				child.visible = false;
