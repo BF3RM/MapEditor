@@ -19,6 +19,7 @@ function Backend:RegisterVars()
 	self.m_VanillaUnresolved = {}
 
 	self.m_WorldParts = {}
+	self.m_WorldPartChildren = {}
 	self.m_SubWorlds = {}
 
 	self.m_VanillaSpawnindex = 0
@@ -147,9 +148,13 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 	end
 	if(p_Blueprint.typeInfo.name == "WorldPartData") then
 		self.m_WorldParts[tostring(p_Blueprint.instanceGuid)] = s_Response.guid
+		if(p_Blueprint.instanceGuid == nil) then
+			print("No guid")
+		end
 	end
 
 	self.m_VanillaSpawnindex = self.m_VanillaSpawnindex + 1
+
 	-- Resolve
 	local s_ParentPartition = nil
 	local s_ParentPrimaryInstance = nil
@@ -158,12 +163,23 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 		s_ParentPartition = InstanceParser:GetPartition(p_Parent.instanceGuid)
 		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartition)
 
-		local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), p_Parent.instanceGuid)
-		s_Parent = _G[p_Parent.typeInfo.name](p_Parent)
+		--NoHavok
+		if(s_ParentPartition == nil) then
+			if(p_Blueprint.typeInfo ~= WorldPartData.typeInfo) then
+				s_Response.parentGuid = ""
+				s_Response.resolveType = "NoHavokChild"
+			else
+				s_Response.parentGuid = "root"
+				s_Response.resolveType = "NoHavok"
+			end
+		else
+			local s_Parent = ResourceManager:FindInstanceByGUID(Guid(s_ParentPartition), p_Parent.instanceGuid)
+			s_Parent = _G[p_Parent.typeInfo.name](p_Parent)
 
-		s_Response.parentPrimaryInstance = s_ParentPrimaryInstance
-		s_Response.parentPartition = s_ParentPartition
-		s_Response.parentType = s_Parent.typeInfo.name
+			s_Response.parentPrimaryInstance = s_ParentPrimaryInstance
+			s_Response.parentPartition = s_ParentPartition
+			s_Response.parentType = s_Parent.typeInfo.name
+		end
 	else
 		print(p_Blueprint.instanceGuid)
 		s_ParentPartition = "dynamic"
