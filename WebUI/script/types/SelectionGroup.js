@@ -122,6 +122,9 @@ class SelectionGroup extends THREE.Group{
 			if(parent != null) {
 				THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, parent );
 			}
+			else{
+				console.error("Object parent doesn't exist")
+			}
 		}
 
 		editor.threeManager.Render(); // REMOVE

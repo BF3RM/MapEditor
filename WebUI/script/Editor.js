@@ -52,17 +52,15 @@ class Editor {
 		this.favorites = [];
 
 		this.copy = null;
-		this.test = [];
 
-		this.highlightedGameObject = null;
-		// Creates selection group and add it to the scene
+		// Creates selection and highlighting group and adds them to the scene
 		this.selectionGroup = new SelectionGroup();
-		this.threeManager.AddObject(this.selectionGroup);
+		this.highlightGroup = new HighlightGroup();
+		this.threeManager.scene.add(this.selectionGroup);
+		this.threeManager.scene.add(this.highlightGroup);
 
 		this.missingParent = {};
 		this.Initialize();
-
-
 	}
 
 	setPlayerName(name) {
@@ -157,47 +155,7 @@ class Editor {
 		General usage
 
 	 */
-	test(guid){
 
-		// console.log(this.blueprintManager.blueprints[1])
-		// for (var i = 0; i <1000; i++) {
-		// 	this.onBlueprintSpawnRequested(this.blueprintManager.blueprints[guid]);
-		// }
-		for (var i = 0; i <1000; i++) {
-			
-			let aabb = new AABBHelper( new THREE.Box3(
-				new Vec3().fromString("(0,0,0)"),
-				new Vec3().fromString("(1,1,1)"),
-				0xFF0000));
-
-			// gameEntity.add(aabb);
-			editor.threeManager.scene.add(aabb);
-
-			this.test.push(aabb)
-			// gameObject.add(gameEntity);
-
-		}		
-	
-	}
-	// test(){
-
-	// 	for (var i = 0; i <800; i++) {
-
-	// 		this.onBlueprintSpawnRequested(this.blueprintManager.blueprints[1], new LinearTransform(new Vec3(1, 0, 0),new Vec3(0, 1, 0),new Vec3(0, 0, 1),new Vec3(5*i, 0, 0)))
-	// 	}
-	// }
-
-
-	// RemoveAllGameObjectsFromScene(){
-	// 	let scene = editor.threeManager.scene;
-
-	// 	for (var i = scene.children.length - 1; i >= 0; i--) {
-	// 		if (scene.children[i].type  === "GameObject") {
-	// 			scene.remove(scene.children[i]);
-	// 		}
-	// 		editor.threeManager.Render();
-	// 	}
-	// }
 	DisableSelected() {
 		let scope = this;
 		let commands = [];
@@ -233,15 +191,6 @@ class Editor {
 	SetScreenToWorldPosition(x, y, z){
 		this.editorCore.screenToWorldTransform.trans = new Vec3(x, y, z);
 	}
-
-	AddObjectToScene(guid){
-		if (guid == null || editor.gameObjects[guid] == null || editor.gameObjects[guid].parent !== null) {
-			return;
-		}
-
-		editor.threeManager.scene.add(editor.gameObjects[guid]);
-	}
-
 
 	addPending(guid, message) {
 		this.pendingMessages[guid] = message;
@@ -362,7 +311,6 @@ class Editor {
 	onSpawnedBlueprint(command) {
 		let scope = this;
 		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData, command.isVanilla);
-		this.threeManager.AddObject(gameObject);
 
 		for (let key in command.entities) {
 			let entityInfo = command.entities[key];
@@ -372,7 +320,6 @@ class Editor {
 			gameObject.add(gameEntity);
 		}
 
-		this.threeManager.AddObject(gameObject);
 		gameObject.updateMatrixWorld();
 
 		this.gameObjects[command.guid] = gameObject;
@@ -448,6 +395,7 @@ class Editor {
 
 	Select(guid, multi = false, scrollTo = false) {
 		this.Unhighlight(guid);
+
 		if(keysdown[17] || multi) {
 			this.editorCore.onSelectedGameObject(guid, true, scrollTo)
 		} else {
@@ -462,32 +410,26 @@ class Editor {
 	Highlight(guid){
 		let gameObject = this.gameObjects[guid];
 
-		if (gameObject === null || gameObject.selected || gameObject.highlighted) return;
+		if (gameObject === null) return;
 
-		if (this.highlightedGameObject !== null){
-			this.Unhighlight(this.highlightedGameObject);
+
+		this.highlightGroup.HighlightObject(gameObject);
+	}
+
+	Unhighlight(guid){
+		if (guid !== null && guid !== undefined) {
+			let gameObject = this.gameObjects[guid];
+
+			if (gameObject === null || gameObject === undefined){
+				console.error("Tried to unhighlight an object that doesn't exist");
+				return;
+			}else if (!gameObject.highlighted) {
+				return;
+			}
 		}
-		gameObject.Highlight();
-		this.threeManager.AddObject(gameObject);
-		
-		this.threeManager.Render();
-		this.highlightedGameObject = guid;
+
+		this.highlightGroup.UnhighlightCurrentObject()
 	}
-
-	Unhighlight(guid = this.highlightedGameObject){
-		let gameObject = this.gameObjects[guid];
-		if (gameObject === null || gameObject === undefined || !gameObject.highlighted) return;
-		gameObject.Unhighlight();
-		this.threeManager.scene.remove(gameObject);
-		this.threeManager.Render();
-		this.highlightedGameObject = null;
-	}
-
-
-	// onSelectedEntities(command) {
-	// 	let scope = this;
-
-	// }
 
 	/*
 

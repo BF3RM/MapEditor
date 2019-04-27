@@ -27,7 +27,7 @@ class EditorCore {
 
         // If the object is not in the scene we add it
         if (gameObject.parent === null || gameObject.parent === undefined){
-            scope.AddObjectToScene(guid);
+            scope.threeManager.scene.add(gameObject);
         }
 
         // If the object is already in this group and it's a multiselection we deselect it
