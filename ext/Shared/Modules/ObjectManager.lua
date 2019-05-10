@@ -83,7 +83,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 			s_Spatial[i] = SpatialEntity(l_Entity)
 			s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
 			-- Allows us to connect the entity to the GUID
-			self.m_EntityInstanceIds[l_Entity.instanceID] = {p_Guid}
+			self.m_EntityInstanceIds[l_Entity.instanceId] = {p_Guid}
 		end
 	end
 
@@ -112,10 +112,10 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
             s_Spatial[i] = SpatialEntity(l_Entity)
             s_Offsets[i] = ToLocal(s_Spatial[i].transform, p_LinearTransform)
 			-- Allows us to connect the entity to the GUID
-			if(self.m_EntityInstanceIds[l_Entity.instanceID] == nil) then
-				self.m_EntityInstanceIds[l_Entity.instanceID] = {}
+			if(self.m_EntityInstanceIds[l_Entity.instanceId] == nil) then
+				self.m_EntityInstanceIds[l_Entity.instanceId] = {}
 			end
-            table.insert(self.m_EntityInstanceIds[l_Entity.instanceID], p_Guid)
+            table.insert(self.m_EntityInstanceIds[l_Entity.instanceId], p_Guid)
         end
     end
 
@@ -210,7 +210,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 				if(p_UpdateCollision) then
 					s_Entity:FireEvent("Disable")
 					s_Entity:FireEvent("Enable")
-					self:UpdateOffsets(p_Guid, s_Entity.instanceID, LinearTransform(p_LinearTransform))
+					self:UpdateOffsets(p_Guid, s_Entity.instanceId, LinearTransform(p_LinearTransform))
 
 				end
 			end
@@ -232,7 +232,7 @@ function ObjectManager:UpdateOffsets(p_Guid, p_InstanceID, p_ParentWorld)
 	for i = s_StartIndex, #self.m_EntityInstanceIds[p_InstanceID], 1 do
 		local l_Parent = self.m_EntityInstanceIds[p_InstanceID][i]
 		for index,l_Entity in pairs(self.m_SpawnedEntities[l_Parent]) do
-			if(l_Entity.instanceID == p_InstanceID) then
+			if(l_Entity.instanceId == p_InstanceID) then
 				local s_Entity = SpatialEntity(self.m_SpawnedEntities[l_Parent][index])
 				self.m_SpawnedOffsets[l_Parent][index] = ToLocal(s_Entity.transform, self.m_ParentTransforms[l_Parent])
 			end

@@ -55,10 +55,10 @@ function Backend:SpawnBlueprint(p_Command)
 	for k,l_Entity in ipairs(s_SpawnResult) do
 		local s_Entity = SpatialEntity(l_Entity)
 		s_Children[#s_Children + 1 ] = {
-			guid = s_Entity.uniqueID,
+			guid = s_Entity.uniqueId,
 			type = l_Entity.typeInfo.name,
 			transform = ToLocal(s_Entity.transform, s_UserData.transform),
-			instanceId = s_Entity.instanceID,
+			instanceId = s_Entity.instanceId,
 			aabb = {
 				min = tostring(s_Entity.aabb.min),
 				max = tostring(s_Entity.aabb.max),
@@ -90,7 +90,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 		--local l_Entity = s_SpawnResult[1]
 		for i, l_Entity in ipairs(s_SpawnResult) do
 			local s_Entity = SpatialEntity(l_Entity)
-			local s_EntityID = tostring(s_Entity.uniqueID)
+			local s_EntityID = tostring(s_Entity.uniqueId)
 
 			-- Some client entities' ids are 0, we create a custom one
 			if s_EntityID == 0 then
@@ -100,7 +100,7 @@ function Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation,
 				guid = s_EntityID,
 				type = l_Entity.typeInfo.name,
 				transform = ToLocal(s_Entity.transform, p_Transform),
-				instanceId = s_Entity.instanceID,
+				instanceId = s_Entity.instanceId,
 				transforms = {worldTrans = p_Transform, localTrans = s_Entity.transform},
 				aabb = {
 					min = tostring(s_Entity.aabb.min),
