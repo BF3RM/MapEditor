@@ -1,1 +1,16 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><defs><style>.cls-1,.cls-2{fill:#f6f6f6;}.cls-1{fill-opacity:0;}.cls-2{opacity:0;}.cls-3{fill:#424242;}</style></defs><title>LogicPrefabBlueprint</title><path class="cls-1" d="M16,16H0V0H16Z" transform="translate(0 0)"/><path class="cls-2" d="M3,16a2,2,0,0,1-2-2V2A2,2,0,0,1,3,0h8.06L15,3.56V14a2,2,0,0,1-2,2Z" transform="translate(0 0)"/><path class="cls-3" d="M11,0H2.29A1.14,1.14,0,0,0,1.14,1.14V14.86A1.14,1.14,0,0,0,2.29,16H13.71l1.15-1.14V3.43Zm2.69,14.86H2.29V1.14h8V4.57h3.42Z" transform="translate(0 0)"/><path class="cls-3" d="M12.32,9.94H10.83L8.91,6.86h2l.72-.77v-1h-.72v1H5.2V3.85H9.71V3H5.2l-.72.77V6.09l.67.77H7.09L5.17,9.94H3.68L3,10.71V13l.72.77H6.56L7.28,13V10.71l-.72-.77H6L8,6.86l2,3.08H9.44l-.72.77V13l.72.77h2.88L13,13V10.71Zm-5.71.77V13H3.68V10.71ZM9.44,13V10.71h2.88L12.38,13Z" transform="translate(0 0)"/></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="-391 193 16 16" style="enable-background:new -391 193 16 16;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F6F6F6;fill-opacity:0;}
+	.st1{fill:#424242;}
+</style>
+<title>LogicPrefabBlueprint</title>
+<path class="st0" d="M-375,209h-16v-16h16V209z"/>
+<path class="st0" d="M-388,209c-1.1,0-2-0.9-2-2v-12c0-1.1,0.9-2,2-2h8.1l3.9,3.6V207c0,1.1-0.9,2-2,2H-388z"/>
+<path class="st1" d="M-380,193h-8.7c-0.6,0-1.1,0.5-1.1,1.1c0,0,0,0,0,0v13.7c0,0.6,0.5,1.1,1.1,1.1c0,0,0,0,0,0h11.4l1.1-1.1v-11.4
+	L-380,193z M-377,208h-12v-14h9v3h3V208z"/>
+<path class="st1" d="M-379,203h-1l-2-3h2l1-1v-1h-1v1h-6v-2h5v-1h-5l-1,1v2l1,1h2l-2,3h-1l-1,1v2l1,1h2l1-1v-2l-1-1l0,0l2-3l2,3l0,0
+	l-1,1v2l1,1h2l1-1v-2L-379,203z M-385,204v2h-2v-2H-385z M-381,206v-2h2v2H-381z"/>
+</svg>

@@ -1,8 +1,12 @@
+html {
+    font-size: 12px;
+}
 .Icon {
-    height: 16px;
-    width: 16px;
+    height: 12px;
+    width: 12px;
     -webkit-mask-size: contain!important;
     background-color: #9c9898;
+    margin-right: 1em;
 }
 .selectIcon{
     -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
@@ -22,11 +26,11 @@
 .cubeIcon {
     -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
 }
-.favoritable:hover {
+.afavoritable:hover {
     -webkit-mask: url(../icons/editor/star.svg) no-repeat center;
 }
 
-.favoritable.favorited:hover {
+.faavoritable.favorited:hover {
      -webkit-mask: url(../icons/editor/star-off.svg) no-repeat center;
  }
 
@@ -47,7 +51,21 @@
 .Icon-SpatialPrefabBlueprint {
     -webkit-mask: url(../icons/types/SpatialPrefabBlueprint.svg) no-repeat center;
 }
-
+.Icon-VisualEnvironmentBlueprint {
+    -webkit-mask: url(../icons/types/VisualEnvironmentBlueprint.svg) no-repeat center;
+}
+.Icon-VisualEnvironmentBlueprint2 {
+    -webkit-mask: url(../icons/types/VisualEnvironmentBlueprint2.svg) no-repeat center;
+}
+.Icon-Texture {
+    -webkit-mask: url(../icons/types/Texture.svg) no-repeat center;
+}
+.Icon-Texture2 {
+    -webkit-mask: url(../icons/types/Texture2.svg) no-repeat center;
+}
+.Icon-Light {
+    -webkit-mask: url(../icons/types/Light.svg) no-repeat center;
+}
 
 .Icon-GameObject {
     -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
