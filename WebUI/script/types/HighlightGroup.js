@@ -11,7 +11,7 @@ class HighlightGroup extends THREE.Group{
 	HighlightObject(gameObject){
 		
 		if(gameObject.selected || gameObject.highlighted) return;
-		console.log("Highlighting")
+		// console.log("Highlighting")
 		if (gameObject.parent === null || gameObject.parent === undefined){
 			editor.threeManager.scene.add(gameObject);
 		}
@@ -26,7 +26,7 @@ class HighlightGroup extends THREE.Group{
 
 		let currentObject = this.GetHighlightedGameObject();
 		if (currentObject !== undefined && currentObject !== null) {
-			console.log("Unhighlighting")
+			// console.log("Unhighlighting")
 			this.DetachObject(currentObject);
 			currentObject.Unhighlight();
 		}

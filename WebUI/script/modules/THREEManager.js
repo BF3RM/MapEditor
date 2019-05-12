@@ -355,17 +355,16 @@ class THREEManager {
 		}
 		
 		if (e.which == 0){
-			console.log("ee")
 			let now = new Date();
 
 			if(now.getTime() - this.lastRaycastTime.getTime() >= 100){
 				let guid = scope.RaycastSelection(e);
 
-				if (guid !== null) {
-					editor.Highlight(guid);
-				}else{
-					editor.Unhighlight();
-				}
+				// if (guid !== null) {
+				// 	editor.Highlight(guid);
+				// }else{
+				// 	editor.Unhighlight();
+				// }
 
 				this.lastRaycastTime = now;
 			}
@@ -399,7 +398,7 @@ class THREEManager {
 				}
 				
 				if (element.object.type == "GameEntity"){
-					console.log("first hit is: "+element.object.parent.guid)
+					// console.log("first hit is: "+element.object.parent.guid)
 					return element.object.parent.guid;
 					break;
 				}

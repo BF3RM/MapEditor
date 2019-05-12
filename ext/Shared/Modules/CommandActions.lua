@@ -40,7 +40,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		return nil, CommandActionResultType.Failure
 	end
 
-	local s_Children = {}
+	local s_Entities = {}
 
     --local l_Entity = s_SpawnResult[1]
 	for _, l_Entity in ipairs(s_SpawnResult) do
@@ -48,7 +48,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 
 -- ENTITYDATA
 
-		s_Children[#s_Children + 1] = {
+		s_Entities[#s_Entities + 1] = {
 			guid = s_Entity.uniqueId,
 			type = l_Entity.typeInfo.name,
 			transform = ToLocal(s_Entity.transform, s_UserData.transform),
@@ -68,7 +68,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		isVanilla = false,
 		type = 'SpawnedBlueprint',
 		userData = s_UserData,
-		children = s_Children -- rename to entities because theres no recursive hierarchy implied
+		entities = s_Entities -- rename to entities because theres no recursive hierarchy implied
 	}
 
 	return s_CommandActionResult, CommandActionResultType.Success
