@@ -52,8 +52,8 @@ function Editor:OnEngineMessage(p_Message)
 		end
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
-		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(Backend.m_VanillaObjects)))
-		WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(Backend.m_VanillaUnresolved)))
+		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(VanillaBlueprintsParser.m_VanillaObjects)))
+		WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(VanillaBlueprintsParser.m_VanillaUnresolved)))
 
     end
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
@@ -115,7 +115,8 @@ function Editor:OnReceiveUpdate(p_Update)
 		end
 
 	end
-	self:OnReceiveCommand(s_Responses, true)
+
+	self:OnReceiveCommands(s_Responses, nil)
 end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
@@ -130,47 +131,46 @@ function Editor:OnRequestSave()
 	WebUI:ExecuteJS("editor.ui.SetSave('"..json.encode(self.m_GameObjects).."')")
 end
 
-
-function Editor:OnSendToServer(p_Command)
+function Editor:OnSendCommandsToServer(p_Command)
 	NetEvents:SendLocal('MapEditorServer:ReceiveCommand', p_Command)
 end
 
-function Editor:OnReceiveCommand(p_Command, p_Raw, p_UpdatePass)
-	local s_Command = p_Command
-	if p_Raw == nil then
-		s_Command = DecodeParams(json.decode(p_Command))
-	end
-
-	local s_Responses = {}
-	for k, l_Command in ipairs(s_Command) do
-		local s_Function = Commands.m_Commands[l_Command.type]
-		if(s_Function == nil) then
-			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
+function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
+	local s_CommandActionResults = {}
+	for _, l_Command in ipairs(p_Commands) do
+		local s_CommandAction = CommandActions[l_Command.type]
+		if(s_CommandAction == nil) then
+			m_Logger:Error("Attempted to call a nil command action: " .. l_Command.type)
 			return false
 		end
-		local s_Response = s_Function(self, l_Command, p_UpdatePass)
-		if(s_Response == false) then
-			-- TODO: Handle errors
-			m_Logger:Warning("Unable to spawn object. Might be server only")
-		elseif(s_Response == "queue") then
-			m_Logger:Write("Queued command")
-			table.insert(self.m_Queue.commands, l_Command)
-		else
-			local s_UserData = nil
-			if s_Response.userData ~= nil then
-				s_UserData = MergeUserdata(s_Response.userData, {isDeleted = s_Response.isDeleted or false})
+
+		local s_CommandActionResult, s_CommandActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
+		if (s_CommandActionResultType == CommandActionResultType.Success) then
+			local s_UserData
+
+			if s_CommandActionResult.userData ~= nil then
+				s_UserData = MergeUserdata(s_CommandActionResult.userData, {isDeleted = s_CommandActionResult.isDeleted or false})
 			else
-				s_UserData = {isDeleted = s_Response.isDeleted or false, transform = LinearTransform()}
+				s_UserData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
 			end
+
 			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_UserData)
-				
-			table.insert(s_Responses, s_Response)
+
+			table.insert(s_CommandActionResults, s_CommandActionResult)
+		elseif (s_CommandActionResultType == CommandActionResultType.Queue) then
+			m_Logger:Write("Queued command: " .. l_Command.type)
+			table.insert(self.m_Queue.commands, l_Command)
+		elseif (s_CommandActionResultType == CommandActionResultType.Failure) then
+			-- TODO: Handle errors
+			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
+		else
+			m_Logger:Error("Unknown CommandActionResultType for command: " .. l_Command.type)
 		end
 	end
 
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
-	if(#s_Responses > 0) then
-		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_Responses)))
+	if(#s_CommandActionResults > 0) then
+		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_CommandActionResults)))
 	end
 end
 
@@ -179,7 +179,7 @@ function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
     if p_Raw == nil then
         s_Messages = DecodeParams(json.decode(p_Messages))
     end
-    for k, l_Message in ipairs(s_Messages) do
+    for _, l_Message in ipairs(s_Messages) do
 
 
         local s_Function = self.m_Messages[l_Message.type]
@@ -214,7 +214,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
         table.insert(s_Commands, l_Command)
     end
 
-    self:OnReceiveCommand(s_Commands, true, p_Pass)
+    self:OnReceiveCommands(s_Commands, p_Pass)
 
     local s_Messages = {}
     for k,l_Message in ipairs(self.m_Queue.messages) do
@@ -279,7 +279,7 @@ end
 --]]
 
 function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+	local s_Response = VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 end
 
 function Editor:Raycast()

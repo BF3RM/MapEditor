@@ -19,3 +19,9 @@ EditorMode = {
 	Editor = 1,
 	Play = 2
 }
+
+CommandActionResultType = {
+	Success = 1,
+	Failure = 2,
+	Queue = 3
+}

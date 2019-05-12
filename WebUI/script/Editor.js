@@ -292,7 +292,7 @@ class Editor {
 		//Spawn blueprint
 		let guid = GenerateGuid();
 		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let userData = blueprint.getUserData(transform, variation);
+		let userData = blueprint.getReferenceObjectData(transform, variation);
 
 		scope.execute(new SpawnBlueprintCommand(guid, userData));
 	}

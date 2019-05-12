@@ -3,9 +3,9 @@ class 'MapEditorShared'
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
 require "__shared/Modules/ObjectManager"
-require "__shared/Modules/Backend"
+require "__shared/Modules/CommandActions"
+require "__shared/Modules/VanillaBlueprintsParser"
 require "__shared/Modules/InstanceParser"
-require "__shared/Types/Commands"
 require "__shared/Types/Enums"
 require "__shared/Types/GameObject"
 

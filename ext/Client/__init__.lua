@@ -5,11 +5,10 @@ Editor = require "Editor"
 local m_UIManager = require "UIManager"
 EditorCommon = EditorCommon(Realm.Realm_Client)
 
+VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 ObjectManager = ObjectManager(Realm.Realm_Client)
-Backend = Backend(Realm.Realm_Client)
+CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
-Commands = Commands(Realm.Realm_Client)
-
 
 function MapEditorClient:__init()
 	print("Initializing MapEditorClient")
@@ -37,12 +36,12 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
 	-- Editor Events
-	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
+	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
 
 	-- WebUI events
-	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendToServer)
-	Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommand)
+	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
+	-- Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands) -- meant for client side only commands, not used yet
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 	Events:Subscribe('MapEditor:RequestSave', self, self.OnRequestSave)
 
@@ -76,6 +75,7 @@ end
 function MapEditorClient:OnExtensionUnloading()
 	Editor:OnExtensionUnloading()
 end
+
 function MapEditorClient:OnPartitionLoaded(p_Partition)
 	Editor:OnPartitionLoaded(p_Partition)
 	EditorCommon:OnPartitionLoaded(p_Partition)
@@ -84,9 +84,11 @@ end
 function MapEditorClient:OnEngineMessage(p_Message) 
 	Editor:OnEngineMessage(p_Message) 
 end
+
 function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 	m_UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 end
+
 function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 	m_Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 end
@@ -95,12 +97,15 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	m_Freecam:OnUpdateInput(p_Delta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
+
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
 	Editor:OnUpdatePass(p_Delta, p_Pass)
 end
+
 function MapEditorClient:OnLevelDestroy()
 	print("Destroy!")
-	Backend:OnLevelDestroy()
+	VanillaBlueprintsParser:OnLevelDestroy()
+	ObjectManager:OnLevelDestroy()
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
@@ -111,12 +116,16 @@ function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 end
 
 ----------- Editor functions----------------
-function MapEditorClient:OnSendToServer(p_Command)
-	Editor:OnSendToServer(p_Command)
+function MapEditorClient:OnSendCommandsToServer(p_CommandsJson)
+	Editor:OnSendCommandsToServer(p_CommandsJson)
 end
-function MapEditorClient:OnReceiveCommand(p_Command)
-	Editor:OnReceiveCommand(p_Command)
+
+function MapEditorClient:OnReceiveCommands(p_CommandsJson)
+	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
+
+	Editor:OnReceiveCommands(s_Commands, nil)
 end
+
 function MapEditorClient:OnReceiveMessage(p_Message)
 	Editor:OnReceiveMessage(p_Message)
 end

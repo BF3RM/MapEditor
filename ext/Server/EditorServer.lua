@@ -23,7 +23,7 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 
 	local s_TransactionId = p_TransactionId
 	local s_UpdatedGameObjects = {}
-	while(s_TransactionId <= #self.m_Transactions) do
+	while (s_TransactionId <= #self.m_Transactions) do
 		local s_Guid = self.m_Transactions[s_TransactionId]
 		if(s_Guid ~= nil) then
 			s_UpdatedGameObjects[s_Guid] = self.m_GameObjects[s_Guid]
@@ -38,48 +38,49 @@ end
 
 function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
-	local s_Response = Backend:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+	local s_Response = VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 end
 
-function EditorServer:OnReceiveCommand(p_Player, p_Command, p_Raw, p_UpdatePass)
-	local s_Command = p_Command
-	if p_Raw == nil then
-		s_Command = DecodeParams(json.decode(p_Command))
-	end
+function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
+	local s_CommandActionResults = {}
+	for _, l_Command in ipairs(p_Commands) do
 
-	local s_Responses = {}
-	for k, l_Command in ipairs(s_Command) do
+		local s_CommandAction = CommandActions[l_Command.type]
 
-		local s_Function = Commands.m_Commands[l_Command.type]
-		if(s_Function == nil) then
-			m_Logger:Error("Attempted to call a nil function: " .. l_Command.type)
+		if (s_CommandAction == nil) then
+			m_Logger:Error("Attempted to call a nil command action: " .. l_Command.type)
 			return false
 		end
-		local s_Response = s_Function(self, l_Command, p_UpdatePass)
-		if(s_Response == false) then
-			-- TODO: Handle errors
-			-- m_Logger:Error("error")
-			m_Logger:Warning("... Unable to spawn on server. Might be client only")
-			table.insert(self.m_Queue, l_Command)
-		elseif(s_Response == "queue") then
-			m_Logger:Write("Queued command")
-			table.insert(self.m_Queue, l_Command)
-		else
-			local s_UserData = nil
-			if s_Response.userData ~= nil then
-				s_UserData = MergeUserdata(s_Response.userData, {isDeleted = s_Response.isDeleted or false})
+
+		local s_CommandActionResult, s_CommandActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
+
+		if (s_CommandActionResultType == CommandActionResultType.Success) then
+			local s_UserData
+			if s_CommandActionResult.userData ~= nil then
+				s_UserData = MergeUserdata(s_CommandActionResult.userData, {isDeleted = s_CommandActionResult.isDeleted or false})
 			else
-				s_UserData = {isDeleted = s_Response.isDeleted or false, transform = LinearTransform()}
+				s_UserData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
 			end
+
 			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_UserData)
-				
+
 			table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
-			table.insert(s_Responses, s_Response)
+			table.insert(s_CommandActionResults, s_CommandActionResult)
+
+		elseif (s_CommandActionResultType == CommandActionResultType.Queue) then
+			m_Logger:Write("Queued command: " .. l_Command.type)
+			table.insert(self.m_Queue, l_Command)
+
+		elseif (s_CommandActionResultType == CommandActionResultType.Failure) then
+			-- TODO: Handle errors
+			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
+		else
+			m_Logger:Error("Unknown CommandActionResultType for command: " .. l_Command.type)
 		end
 	end
     -- m_Logger:Write(json.encode(self.m_GameObjects))
-	if(#s_Responses > 0) then
-		NetEvents:BroadcastLocal("MapEditor:ReceiveCommand", json.encode(s_Command))
+	if (#s_CommandActionResults > 0) then
+		NetEvents:BroadcastLocal('MapEditor:ReceiveCommand', json.encode(p_Commands))
 	end
 end
 
@@ -103,7 +104,7 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 		m_Logger:Write("Executing command delayed: " .. l_Command.type)
 		table.insert(s_Responses, l_Command)
 	end
-	self:OnReceiveCommand(nil, s_Responses, true, p_Pass)
+	self:OnReceiveCommands(nil, s_Responses, true, p_Pass)
 
 	if(#self.m_Queue > 0) then
 		self.m_Queue = {}
@@ -174,7 +175,7 @@ function EditorServer:UpdateLevel(p_Update)
 		end
 
 	end
-	self:OnReceiveCommand(nil, s_Responses, true)
+	self:OnReceiveCommands(nil, s_Responses, true)
 end
 
 

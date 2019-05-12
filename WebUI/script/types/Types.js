@@ -75,7 +75,7 @@ class ReferenceObject {
 	}
 }
 
-class ReferenceObjectParameters {
+class ReferenceObjectData {
 	constructor(reference, variation, name, transform) {
 		this.reference = reference;
 		this.variation = variation;
@@ -84,6 +84,6 @@ class ReferenceObjectParameters {
 	}
 
 	clone() {
-		return new ReferenceObjectParameters(this.reference.clone(), this.variation.toString(), this.name.toString(), this.transform.clone());
+		return new ReferenceObjectData(this.reference.clone(), this.variation.toString(), this.name.toString(), this.transform.clone());
 	}
 }
