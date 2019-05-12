@@ -58,13 +58,11 @@ end
 
 function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
-	local s_Instance = ResourceManager:FindInstanceByGUID(
+	local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGUID(
 		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid), 
-		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid))
+		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid)))
 
-	local s_Instance = StaticModelGroupEntityData(s_Instance)
-
-	for i,l_Member in ipairs(s_Instance.memberDatas) do
+	for _,l_Member in ipairs(s_Instance.memberDatas) do
 		local s_Member = StaticModelGroupMemberData(l_Member)
 
 		if(#s_Member.instanceObjectVariation > 0) then
@@ -190,15 +188,15 @@ function InstanceParser:FillVariations()
     m_Logger:Write(#self.m_Blueprints)
     m_Logger:Write(#self.m_BlueprintInstances)
 
-	for key, database in pairs(self.m_MeshVariationDatabases) do
+	for _, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database
-		for k, v in ipairs(s_Instance.entries) do
+		for _, v in ipairs(s_Instance.entries) do
 			local l_mvdEntry = MeshVariationDatabaseEntry(v)
 			if(l_mvdEntry.mesh == nil) then
 				return
 			end
 			local l_MeshGuid = tostring(l_mvdEntry.mesh.instanceGuid)
-			local mesh = Asset(l_mvdEntry.mesh)
+			--local mesh = Asset(l_mvdEntry.mesh)
 			if(self.m_Variations[l_MeshGuid] == nil) then
 				self.m_Variations[l_MeshGuid] = {}
 			end

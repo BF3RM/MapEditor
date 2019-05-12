@@ -34,10 +34,10 @@ end
 
 function GetChanges(p_Old, p_New)
 	local s_Changes = {}
-	for k,v in pairs(p_New) do
+	for k,_ in pairs(p_New) do
 		if(tostring(p_Old[k]) ~= tostring(p_New[k])) then
 			if type(p_Old[k]) == "table" then
-				for k1,v1 in pairs(p_Old[k]) do
+				for k1,_ in pairs(p_Old[k]) do
 					if(p_Old[k][k1] ~= p_New[k][k1]) then
 						table.insert(s_Changes, k)
 					end
@@ -226,7 +226,7 @@ function GetFilledNumberAsString(n, stringLength)
 	local prefix = ""
 
 	if string.len(n_string) < stringLength then
-		for i=1,stringLength - string.len(n_string) do
+		for _=1,stringLength - string.len(n_string) do
 			prefix = prefix .."0"
 		end
 	end

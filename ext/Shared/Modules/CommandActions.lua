@@ -2,8 +2,6 @@ class 'CommandActions'
 
 local m_Logger = Logger("CommandActions", true)
 
-local MAX_CAST_DISTANCE = 10000
-local FALLBACK_DISTANCE = 10000
 
 function CommandActions:__init(p_Realm)
 	m_Logger:Write("Initializing CommandActions: " .. tostring(p_Realm))

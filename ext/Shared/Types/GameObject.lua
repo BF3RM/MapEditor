@@ -1,6 +1,6 @@
 class 'GameObject'
 
-local m_Logger = Logger("EditorCommon", true)
+local m_Logger = Logger("GameObject", true)
 
 
 function GameObject:__init()
