@@ -1,10 +1,11 @@
 class 'MapEditorServer'
 
 local m_Logger = Logger("MapEditorServer", true)
+
+VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
 ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
-Backend = Backend(Realm.Realm_ClientAndServer)
-Commands = Commands(Realm.Realm_ClientAndServer)
+CommandActions = CommandActions(Realm.Realm_ClientAndServer)
 
 EditorServer = require "EditorServer"
 EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
@@ -18,7 +19,7 @@ function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
 
-	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommand)
+	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorServer:RequestSave', self, self.OnRequestSave)
 
 	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
@@ -43,7 +44,8 @@ end
 
 function MapEditorServer:OnLevelDestroy()
 	m_Logger:Write("Destroy!")
-	Backend:OnLevelDestroy()
+	VanillaBlueprintsParser:OnLevelDestroy()
+	ObjectManager:OnLevelDestroy()
 end
 
 function MapEditorServer:OnPartitionLoaded(p_Partition)
@@ -62,8 +64,10 @@ function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
 end
 ----------- Editor functions----------------
 
-function MapEditorServer:OnReceiveCommand(p_Player, p_Command)
-	EditorServer:OnReceiveCommand(p_Player, p_Command)
+function MapEditorServer:OnReceiveCommands(p_Player, p_CommandsJson)
+	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
+
+	EditorServer:OnReceiveCommands(p_Player, s_Commands)
 end
 
 function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)

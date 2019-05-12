@@ -65,7 +65,7 @@ class Blueprint {
 		return this.name.substring(this.name.lastIndexOf('/')+1);
 	}
 
-	getUserData(transform, variation, name, ) {
+	getReferenceObjectData(transform, variation, name, ) {
 		let scope = this;
 		if(variation === undefined) {
 			variation = scope.getDefaultVariation()
@@ -76,7 +76,7 @@ class Blueprint {
 		if(transform === undefined) {
 			transform = new LinearTransform()
 		}
-		return new ReferenceObjectParameters(scope.getReference(), variation, name, transform);
+		return new ReferenceObjectData(scope.getReference(), variation, name, transform);
 	}
 
 	CreateEntry(folderName) {

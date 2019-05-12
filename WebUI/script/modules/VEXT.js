@@ -99,32 +99,32 @@ class VEXTInterface {
 		}
 	}
 
-	HandleResponse(responsesRaw, emulator) {
-		console.log(responsesRaw);
+	HandleResponse(commandActionResultsString, emulator) {
+		console.log(commandActionResultsString);
 		var t0 = performance.now();
 
 		let scope = this;
 		scope.executing = true;
-		let commands = JSON.parse(responsesRaw);
+		let commandActionResults = JSON.parse(commandActionResultsString);
 		let index = 0;
 
 		Log(LOGLEVEL.VERBOSE, "IN: ");
-		Log(LOGLEVEL.VERBOSE, commands);
+		Log(LOGLEVEL.VERBOSE, commandActionResults);
 
-		//convert commands to an array if it's an object
-		if (typeof commands === 'object'){
-			commands = Object.values(commands)
+		//convert commandActionResults to an array if it's an object
+		if (typeof commandActionResults === 'object'){
+			commandActionResults = Object.values(commandActionResults)
 		}
 
-		commands.forEach(function (command) {
-			if(scope.commands[command.type] === undefined) {
-				LogError("Failed to call a null signal: " + command.type);
+		commandActionResults.forEach(function (commandActionResult) {
+			if(scope.commands[commandActionResult.type] === undefined) {
+				LogError("Failed to call a null signal: " + commandActionResult.type);
 				return;
 			}
-			if(index === commands.length - 1) {
+			if(index === commandActionResults.length - 1) {
 				scope.executing = false;
 			}
-			scope.commands[command.type](scope.ParseCommand(command));
+			scope.commands[commandActionResult.type](scope.ParseCommandActionResult(commandActionResult));
 			index++;
 
 		});
@@ -133,16 +133,13 @@ class VEXTInterface {
 		console.log("Execution took " + (t1 - t0) + " milliseconds.");
 	}
 
-	ParseCommand(command) {
-		if(command.hasOwnProperty("userData")) {
-			let userData = command.userData;
-			command.userData = new ReferenceObjectParameters(userData.reference, userData.variation, userData.name, new LinearTransform().setFromTable(userData.transform));
+	ParseCommandActionResult(commandActionResult) {
+		if(commandActionResult.hasOwnProperty("userData")) {
+			let userData = commandActionResult.userData;
+			commandActionResult.userData = new ReferenceObjectData(userData.reference, userData.variation, userData.name, new LinearTransform().setFromTable(userData.transform));
 		}
-		return command;
-	}
 
-	OnSpawnReferenceObject(command) {
-		
+		return commandActionResult;
 	}
 
 	SendEvent(eventName, param){

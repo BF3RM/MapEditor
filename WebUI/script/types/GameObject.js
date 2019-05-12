@@ -7,7 +7,7 @@ class GameObject extends THREE.Object3D
 
 		this.guid = guid;
 		this.type = userData.reference.typeName;
-		this.name = name;
+		this.name = name; // name is unused / obsolete
 		this.transform = transform;
 		this.parentGuid = parent;
 		this.userData = userData;
@@ -30,7 +30,7 @@ class GameObject extends THREE.Object3D
 	}
 
 	getCleanName() {
-		return this.name.replace(/^.*[\\\/]/, '');
+		return this.userData.name.replace(/^.*[\\\/]/, '');
 	}
 	
 	hasMoved() {

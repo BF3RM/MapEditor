@@ -15,12 +15,12 @@ function ObjectManager:RegisterVars()
 	self.m_EntityInstanceIds = {}
 
 	self.m_ParentTransforms = {}
-
 end
 
 function ObjectManager:RegisterEvents()
 
 end
+
 function ObjectManager:GetEntityByGuid(p_Guid)
 	if(self.m_SpawnedEntities[p_Guid] ~= nil) then
 		return self.m_SpawnedEntities[p_Guid]
@@ -28,15 +28,14 @@ function ObjectManager:GetEntityByGuid(p_Guid)
 		return false
 	end
 end
+
 function ObjectManager:GetGuidFromInstanceID(p_InstanceID)
 	return self.m_EntityInstanceIds[p_InstanceID]
 end
 
-function ObjectManager:Clear()
+function ObjectManager:OnLevelDestroy()
 	self:RegisterVars()
 end
-
-
 
 function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p_LinearTransform, p_Variation)
 	if p_PartitionGuid == nil or

@@ -190,7 +190,7 @@ class EditorCore {
 
     onPreviewStart() {
         this.previewing = true;
-        let userData = this.previewBlueprint.getUserData();
+        let userData = this.previewBlueprint.getReferenceObjectData();
         let message = new PreviewSpawnMessage(userData);
         editor.vext.SendMessage(message);
     }

@@ -55,7 +55,7 @@ function DecodeParams(p_Table)
     if(p_Table == nil) then
         print("No table received")
         return false
-    end
+	end
 	for s_Key, s_Value in pairs(p_Table) do
 		if s_Key == 'transform' then
 			local s_LinearTransform = LinearTransform(
