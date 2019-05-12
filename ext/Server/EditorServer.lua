@@ -100,7 +100,7 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 		return
 	end
 	local s_Responses = {}
-	for k,l_Command in ipairs(self.m_Queue) do
+	for _,l_Command in ipairs(self.m_Queue) do
 		m_Logger:Write("Executing command delayed: " .. l_Command.type)
 		table.insert(s_Responses, l_Command)
 	end
@@ -137,9 +137,9 @@ function EditorServer:UpdateLevel(p_Update)
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
 			if IsVanilla(s_StringGuid) then
 				m_Logger:Write("vanilla")
-				local s_Command = nil
+				local s_Command
 
-				if s_GameObject.isDeleted then
+                if s_GameObject.isDeleted then
 					m_Logger:Write("deleting")
 					s_Command = {
 						type = "DestroyBlueprintCommand",

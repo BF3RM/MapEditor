@@ -47,7 +47,7 @@ function Editor:OnEngineMessage(p_Message)
 		InstanceParser:FillVariations()
 		local s_LevelDatas = InstanceParser:GetLevelDatas()
 
-		for k,v in pairs(s_LevelDatas) do
+		for _,v in pairs(s_LevelDatas) do
 			WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
 		end
 
@@ -78,9 +78,9 @@ function Editor:OnReceiveUpdate(p_Update)
 
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
 			if IsVanilla(s_StringGuid)then
-				local s_Command = nil
+				local s_Command
 
-				if s_GameObject.isDeleted then
+                if s_GameObject.isDeleted then
 					s_Command = {
 						type = "DestroyBlueprintCommand",
 						guid = s_Guid,
@@ -209,7 +209,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
         return
     end
     local s_Commands = {}
-    for k,l_Command in ipairs(self.m_Queue.commands) do
+    for _,l_Command in ipairs(self.m_Queue.commands) do
         m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
         table.insert(s_Commands, l_Command)
     end
@@ -217,7 +217,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     self:OnReceiveCommands(s_Commands, p_Pass)
 
     local s_Messages = {}
-    for k,l_Message in ipairs(self.m_Queue.messages) do
+    for _,l_Message in ipairs(self.m_Queue.messages) do
         m_Logger:Write("Executing message in the correct UpdatePass: " .. l_Message.type)
         table.insert(s_Messages, l_Message)
     end

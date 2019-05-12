@@ -105,7 +105,6 @@ function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blu
     local s_Offsets = {}
 	self.m_ParentTransforms[p_Guid] = p_LinearTransform
     local s_ObjectEntities = p_Hook:Call()
-	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint)
     for i, l_Entity in pairs(s_ObjectEntities) do
         if(l_Entity:Is("SpatialEntity") and l_Entity:Is("OccluderVolumeEntity") == false) then
             s_Spatial[i] = SpatialEntity(l_Entity)
@@ -136,7 +135,7 @@ function ObjectManager:DestroyEntity(p_Guid)
 
 	self.m_SpawnedEntities[p_Guid] = nil;
 
-	for i, entity in pairs(s_Entities) do
+	for _, entity in pairs(s_Entities) do
 		if entity ~= nil then
 			m_Logger:Write(entity.typeInfo.name)
 			entity:Destroy()
@@ -154,7 +153,7 @@ function ObjectManager:EnableEntity(p_Guid)
 		m_Logger:Write("Failed to get entities")
 		return false
 	end
-	for i, entity in pairs(s_Entities) do
+	for _, entity in pairs(s_Entities) do
 		if entity ~= nil then
 			entity:FireEvent("Enable")
 		end
@@ -171,7 +170,7 @@ function ObjectManager:DisableEntity(p_Guid)
 		m_Logger:Write("Failed to get entities")
 		return false
 	end
-	for i, entity in pairs(s_Entities) do
+	for _, entity in pairs(s_Entities) do
 		if entity ~= nil then
 			entity:FireEvent("Disable")
 		end

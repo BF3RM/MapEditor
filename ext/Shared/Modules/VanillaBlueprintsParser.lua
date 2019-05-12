@@ -62,8 +62,8 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
     local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint)
 
 
-    local s_ParentGuid = nil
-    if(p_Parent ~= nil) then
+    local s_ParentGuid
+	if(p_Parent ~= nil) then
         s_ParentGuid = tostring(p_Parent.instanceGuid)
     end
 
@@ -135,8 +135,6 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
 		s_ParentPartition = "dynamic"
 		s_ParentPrimaryInstance = "dynamic"
 	end
-
-	local s_Resolved = false
 
 	-- Check if the current blueprint is referenced by earlier blueprints
 	if(self.m_VanillaUnresolved[tostring(p_Blueprint.instanceGuid)] ~= nil) then
