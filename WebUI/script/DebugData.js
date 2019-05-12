@@ -64,7 +64,7 @@ var xp3shieldBlueprints = `
 	]
   },
   "4": {
-	"typeName": "SpatialPrefabBlueprint",
+	"typeName": "LogicPrefabBlueprint",
 	"name": "test2/M16A4KitPickup4",
 	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
 	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
@@ -85,7 +85,7 @@ var xp3shieldBlueprints = `
 	]
   },
   "5": {
-	"typeName": "SpatialPrefabBlueprint",
+	"typeName": "PrefabBlueprint",
 	"name": "test2/M16A4KitPickup5",
 	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
 	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
@@ -106,7 +106,91 @@ var xp3shieldBlueprints = `
 	]
   },
   "6": {
-	"typeName": "SpatialPrefabBlueprint",
+	"typeName": "VisualEnvironmentBlueprint",
+	"name": "test2/M16A4KitPickup6",
+	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
+	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
+	"variations": [
+		{
+			"hash": "3490128360", 
+			"name": "SomeVariation: 3490128360"
+		}, {
+			"hash": "1446624100", 
+			"name": "SomeVariation: 1446624100"
+		}, {
+			"hash": "219528900", 
+			"name": "SomeVariation: 219528900"
+		}, {
+			"hash": "1215191320", 
+			"name": "SomeVariation: 1215191320"
+		}
+	]
+  },
+  "7": {
+	"typeName": "Texture",
+	"name": "test2/M16A4KitPickup6",
+	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
+	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
+	"variations": [
+		{
+			"hash": "3490128360", 
+			"name": "SomeVariation: 3490128360"
+		}, {
+			"hash": "1446624100", 
+			"name": "SomeVariation: 1446624100"
+		}, {
+			"hash": "219528900", 
+			"name": "SomeVariation: 219528900"
+		}, {
+			"hash": "1215191320", 
+			"name": "SomeVariation: 1215191320"
+		}
+	]
+  },
+    "8": {
+	"typeName": "Light",
+	"name": "test2/M16A4KitPickup6",
+	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
+	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
+	"variations": [
+		{
+			"hash": "3490128360", 
+			"name": "SomeVariation: 3490128360"
+		}, {
+			"hash": "1446624100", 
+			"name": "SomeVariation: 1446624100"
+		}, {
+			"hash": "219528900", 
+			"name": "SomeVariation: 219528900"
+		}, {
+			"hash": "1215191320", 
+			"name": "SomeVariation: 1215191320"
+		}
+	]
+  },
+    "9": {
+	"typeName": "Texture2",
+	"name": "test2/M16A4KitPickup6",
+	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
+	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
+	"variations": [
+		{
+			"hash": "3490128360", 
+			"name": "SomeVariation: 3490128360"
+		}, {
+			"hash": "1446624100", 
+			"name": "SomeVariation: 1446624100"
+		}, {
+			"hash": "219528900", 
+			"name": "SomeVariation: 219528900"
+		}, {
+			"hash": "1215191320", 
+			"name": "SomeVariation: 1215191320"
+		}
+	]
+  },
+  "10": {
+	"typeName": "VisualEnvironmentBlueprint2",
 	"name": "test2/M16A4KitPickup6",
 	"partitionGuid": "225C2806-0CE7-11E0-915B-91EB202EAE87",
 	"instanceGuid": "29E3B4B8-062A-1DA8-E13D-8D7095F2A610",
@@ -127,6 +211,8 @@ var xp3shieldBlueprints = `
 	]
   }
 }
+
+
 `;
 let FakeLevel = `
 {
