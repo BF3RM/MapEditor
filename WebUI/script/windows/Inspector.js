@@ -73,14 +73,12 @@ class Inspector {
 		variationLabel.attr("for", "objectVariation");
 		variationLabel.text("Variation");
 
-		this.variation = $(document.createElement("select"));
-		variationControl.append(this.variation);
-		this.variation.attr({
-			"id": "objectVariation"
-		});
-		this.variation.prop("disabled", true);
+		this.variation = new UI.Select();
+		variationControl.append(this.variation.dom);
+		this.variation.setAttribute("id", "objectVariation");
+		this.variation.setDisabled(true);
 
-		this.variation.on('change',function(){
+		this.variation.onChange(function(){
 			if (editor.selectionGroup.children.length === 0){
 				return;
 			}
@@ -197,7 +195,7 @@ class Inspector {
 			}
 
 			this.UpdateName(gameObject.name);
-			if (selectionGroup.type === "GameObject") {
+			if (selectionGroup.children.length === 1) {
 				this.UpdateVariation(gameObject, gameObject.userData.variation);
 			}
 		}
@@ -217,10 +215,10 @@ class Inspector {
 		let gameObject = editor.getGameObjectByGuid(guid);
 		if(gameObject === undefined) {
 			let variationSelect = $(document.getElementById("objectVariation"));
-			variationSelect.prop("disabled", true);
-			variationSelect.empty();
+			variationSelect.setDisabled(true);
+			variationSelect.setOptions([]);
 			LogError("Tried to set the name of a null entry. " + guid);
-			this.DisableInspector();
+			this.HideContent();
 			return;
 		}
 
@@ -243,9 +241,9 @@ class Inspector {
 		// Only update the inspector if the moved object is the first object selected in selectionGroup (they share the same matrix)
 		if (editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === go) {
 			if(this.updates[key] !== undefined) {
-				this.updates[key](editor.selectionGroup, value);
+				this.updates[key](go, value);
 			} else {
-				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1);
+				this.UpdateInspector(go, editor.selectionGroup.children.length !== 1);
 			}
 		}
 	}
@@ -305,20 +303,21 @@ class Inspector {
 		// We're refreshing the whole thing. Might as well, right?
 		let blueprint =  editor.blueprintManager.getBlueprintByGuid(go.userData.reference.instanceGuid);
 		if(!blueprint.hasVariation()){
-			this.variation.prop("disabled", true);
-			this.variation.empty();
+			this.variation.setDisabled(true);
+			this.variation.setOptions([]);
 			LogError("Blueprint Variations not available");
 		}else{
 			console.log(blueprint.variations);
-			this.variation.prop("disabled", false);
-			this.variation.empty();
-
+			this.variation.setDisabled(false);
+			let variations = [];
 			for(let key in blueprint.variations) {
-				let newOption = new Option(blueprint.variations[key], key);
-				this.variation.append(newOption);
+				let variation = blueprint.variations[key];
+				variations[variation.hash] = variation.name;
 			}
+			this.variation.setOptions(variations);
+
 		}
-		this.variation.find("option[value=" + variation  + "]").attr("selected",true);
+		this.variation.setValue(variation);
 	}
 }
 
