@@ -256,9 +256,6 @@ class Editor {
 		let transform = this.raycastTransform;
 		let userData = { name: "New Group"};
 		this.execute(new CreateGroupCommand(GenerateGuid(), userData));
-		asd
-
-
 	}
 
 	onCreatedGroup(command){

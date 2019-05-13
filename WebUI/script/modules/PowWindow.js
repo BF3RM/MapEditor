@@ -1,5 +1,4 @@
 class PowWindow {
-	//TODO: z-index focus on title click.
 	//Better resize-controls (They are a little small atm)
 	//Make it beautiful
 

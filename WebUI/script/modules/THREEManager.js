@@ -72,8 +72,6 @@ class THREEManager {
 		window.addEventListener('resize',this.onWindowResize, false);
 
 		this.renderer.domElement.addEventListener('mousemove',this.onMouseMove.bind(this));
-		this.renderer.domElement.addEventListener('click',this.onClick.bind(this));
-
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 		
@@ -307,15 +305,6 @@ class THREEManager {
 		}
 	}
 
-	onClick(e){
-		if(e.which === 1) {
-			let guid = this.RaycastSelection(e);
-
-			if (guid !== null) {
-				editor.Select(guid, undefined, true);
-			}
-		}
-	}
 
 	onMouseUp(e) {
 		let scope = this;
@@ -333,7 +322,15 @@ class THREEManager {
 			editor.onControlMoveStart();
 		} else if(this.controlSelected) {
 			console.log("Control selected")
-		} 
+		}  else {
+			if(e.which === 1) {
+				let guid = this.RaycastSelection(e);
+
+				if (guid !== null) {
+					editor.Select(guid, undefined, true);
+				}
+			}
+		}
 	}
 
 	onMouseMove(e) {

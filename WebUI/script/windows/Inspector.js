@@ -188,7 +188,7 @@ class Inspector {
 		}
 
 		if (isMultipleSelection) {
-			this.UpdateName(selectionGroup, selectionGroup.name);
+			this.UpdateName("---Multiple--");
 		}else{
 			let gameObject = selectionGroup.children[0];
 			if (gameObject == null){
@@ -196,11 +196,10 @@ class Inspector {
 				return;
 			}
 
-			this.UpdateName(gameObject, gameObject.name);
+			this.UpdateName(gameObject.name);
 			if (selectionGroup.type === "GameObject") {
 				this.UpdateVariation(gameObject, gameObject.userData.variation);
 			}
-			
 		}
 		
 		this.UpdateTransform(selectionGroup, selectionGroup.transform);
@@ -246,13 +245,13 @@ class Inspector {
 			if(this.updates[key] !== undefined) {
 				this.updates[key](editor.selectionGroup, value);
 			} else {
-				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
+				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1);
 			}
 		}
 	}
 
 	onSelectionGroupMoved(){
-		this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length === 1);
+		this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1);
 	}
 
 	UpdateTransform(gameObject, linearTransform) {
@@ -298,9 +297,10 @@ class Inspector {
 			});
 		});
 	}
-	UpdateName(go, name) {
+	UpdateName(name) {
 		this.name[0].value = name;
 	}
+
 	UpdateVariation(go, variation) {
 		// We're refreshing the whole thing. Might as well, right?
 		let blueprint =  editor.blueprintManager.getBlueprintByGuid(go.userData.reference.instanceGuid);

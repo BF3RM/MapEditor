@@ -143,8 +143,6 @@ class GameObject extends THREE.Object3D
 	}
 
 	onMoveStart() {
-		console.log("move start")
-		// TODO: Validate that the object exists
 	}
 
 	onMove() {
@@ -193,7 +191,6 @@ class GameObject extends THREE.Object3D
 	}
 
 	onSelected() {
-		console.log(this);
 		if(!this.enabled) {
 			LogError("Attempted to select a disabled gameObject");
 			return
