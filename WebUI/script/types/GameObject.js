@@ -1,17 +1,20 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, name, transform, parent, children, userData, isVanilla)
+	constructor(guid, name, transform, parent, children, gameObjectData)
 	{
 		super( );
 
+		if (guid != gameObjectData.guid) {
+			LogError("Mismatch between GameObject GUID and GameObjectData GUID")
+		}
+
 		this.guid = guid;
-		this.type = userData.reference.typeName;
+		this.type = gameObjectData.reference.typeName;
 		this.name = name; // name is unused / obsolete
 		this.transform = transform;
 		this.parentGuid = parent;
-		this.userData = userData;
-		this.isVanilla = isVanilla;
+		this.gameObjectData = gameObjectData;
 		this.selected = false;
 		this.matrixAutoUpdate = false;
 		this.visible = true;
@@ -30,7 +33,7 @@ class GameObject extends THREE.Object3D
 	}
 
 	getCleanName() {
-		return this.userData.name.replace(/^.*[\\\/]/, '');
+		return this.gameObjectData.name.replace(/^.*[\\\/]/, '');
 	}
 	
 	hasMoved() {
@@ -55,8 +58,8 @@ class GameObject extends THREE.Object3D
 		if(Object.keys(changes).length === 0) {
 			return false;
 		}
-		return changes
 
+		return changes
 	}
 
 	updateTransform()
@@ -109,7 +112,7 @@ class GameObject extends THREE.Object3D
 
 	setTransform(linearTransform) {
 		this.transform = linearTransform;
-		this.userData.transform = linearTransform;
+		this.gameObjectData.transform = linearTransform;
 		this.updateTransform();
 
 		for(let key in this.children) {
@@ -125,12 +128,12 @@ class GameObject extends THREE.Object3D
 	}
 	setName(name) {
 		this.name = name;
-		this.userData.name = name;
+		this.gameObjectData.name = name;
 		signals.objectChanged.dispatch(this, "name", name);
 	}
 
 	setVariation(key) {
-		this.userData.variation = key;
+		this.gameObjectData.variation = key;
 		signals.objectChanged.dispatch(this, "variation", key);
 	}
 
@@ -139,7 +142,7 @@ class GameObject extends THREE.Object3D
 			guid = GenerateGuid();
 		}
 
-		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.userData);
+		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.gameObjectData);
 	}
 
 	onMoveStart() {
@@ -162,7 +165,7 @@ class GameObject extends THREE.Object3D
 			return; // No position change
 		}
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		let command = new SetTransformCommand(this.guid, transform, scope.transform);
+		let command = new SetTransformCommand(this.guid, transform);
 		editor.execute(command);
 		signals.objectChanged.dispatch(this, "transform", transform);
 
@@ -219,6 +222,7 @@ class GameObject extends THREE.Object3D
 		};
 		this.selected = false;
 	}
+
 	Enable() {
 		for(let key in this.children) {
 			let child = this.children[key];
@@ -245,10 +249,6 @@ class GameObject extends THREE.Object3D
 		this.visible = false;
 		this.enabled = false;
 		signals.objectChanged.dispatch(this, "enabled", this.enabled);
-	}
-
-	getUserData() {
-		return this.userData;
 	}
 
 	getNode() {

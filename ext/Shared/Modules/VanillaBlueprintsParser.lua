@@ -67,16 +67,15 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
         s_ParentGuid = tostring(p_Parent.instanceGuid)
     end
 
--- RESPONSE
+	-- TODO: Change to CommandActionResult
 
     local s_Response = {
         guid = tostring(s_Guid),
         sender = "Server",
         name = s_Blueprint.name, -- name field is obsolete
         type = 'SpawnedBlueprint',
-        isVanilla = true,
 		referenceGuid = s_ParentGuid,
-        userData = {
+        gameObjectData = {
             name = s_Blueprint.name,
             reference = {
                 instanceGuid = tostring(p_Blueprint.instanceGuid),

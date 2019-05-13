@@ -83,40 +83,13 @@ class EditorCore {
         return this.raycastTransform.clone()
     }
 
-    getJson(){
-        let scope = editor;
-        let result = {};
-        for (let k in scope.gameObjects){
-            if (scope.gameObjects.hasOwnProperty(k)) {
-                let gameObject = scope.gameObjects[k];
-
-                if (!gameObject.isVanilla) {
-                    result[k] = gameObject.userData;
-                    // result[k].isVanilla = gameObject.isVanilla;
-                }
-            }
-        }
-        return JSON.stringify(result, null, 2); 
-    }
-
-    static toJson() {
-        let scope = editor;
-        let result = {};
-        for (let k in scope.gameObjects){
-            if (scope.gameObjects.hasOwnProperty(k)) {
-                let gameObject = scope.gameObjects[k];
-                result[k] = gameObject.userData;
-            }
-        }
-        return JSON.stringify(result, null, 2);
-    }
-
     setUpdating(value) {
         this.isUpdating = value;
         if(value) {
             this.renderLoop()
         }
     }
+
     renderLoop()
     {
         let scope = this;

@@ -39,28 +39,12 @@ class VextEvents {
 	}
 
 }
-class VextCommand {
-	constructor(guid, type, userData) {
-		this.guid = guid;
-		this.type = type;
-		this.userData = userData;
-	}
-}
-class VextMessage {
-	constructor(index, id, key, value) {
-		this.index = index;
-		this.id = id;
-		this.key = key;
-		this.value = value;
-	}
-}
 
 var LOGLEVEL = {
 	NONE: 0,
 	DEBUG: 1,
 	VERBOSE: 2
 };
-
 
 class ReferenceObject {
 	constructor(typeName, name,  partitionGuid, instanceGuid) {
@@ -83,7 +67,7 @@ class ReferenceObjectData {
 		this.transform = transform;
 	}
 
-	clone() {
+	clone(guid = GenerateGuid()) {
 		return new ReferenceObjectData(this.reference.clone(), this.variation.toString(), this.name.toString(), this.transform.clone());
 	}
 }

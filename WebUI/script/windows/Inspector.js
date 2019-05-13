@@ -84,7 +84,9 @@ class Inspector {
 			if (editor.selectionGroup.children.length === 0){
 				return;
 			}
-			editor.execute(new SetVariationCommand(editor.selectionGroup.children[0].guid, this.value));
+
+			let variationKey = this.value
+			editor.execute(new SetVariationCommand(editor.selectionGroup.children[0].guid, variationKey));
 		});
 
 		let deleteButton = $(document.createElement("button"));

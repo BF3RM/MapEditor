@@ -9,7 +9,6 @@ function GameObject:__init()
     self.type = nil
     self.parent = nil
     self.userData = nil
-    self.children = {}
     self.entities = {}
 end
 

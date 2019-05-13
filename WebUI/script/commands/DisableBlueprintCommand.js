@@ -11,11 +11,17 @@ const DisableBlueprintCommand = function (guid) {
 DisableBlueprintCommand.prototype = {
 
     execute: function () {
-        editor.vext.SendCommand(new VextCommand(this.guid, this.type))
+        let gameObjectData = {
+            'guid': this.guid
+        };
+        editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
     },
 
     undo: function () {
-        editor.vext.SendCommand(new VextCommand(this.guid, "EnableBlueprintCommand"))
+        let gameObjectData = {
+            'guid': this.guid
+        };
+        editor.vext.SendCommand(new VextCommand("EnableBlueprintCommand", gameObjectData))
     },
 };
 

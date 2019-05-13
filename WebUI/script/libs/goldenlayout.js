@@ -1950,11 +1950,11 @@ lm.utils.copy( lm.controls.BrowserPopout.prototype, {
 
 		urlParts = document.location.href.split( '?' );
 
-		// URL doesn't contain GET-userData
+		// URL doesn't contain GET-gameObjectData
 		if( urlParts.length === 1 ) {
 			return urlParts[ 0 ] + '?gl-window=' + storageKey;
 
-			// URL contains GET-userData
+			// URL contains GET-gameObjectData
 		} else {
 			return document.location.href + '&gl-window=' + storageKey;
 		}

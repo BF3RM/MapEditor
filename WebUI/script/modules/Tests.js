@@ -21,7 +21,7 @@ function Test(count) {
 
 		let guid = GenerateGuid();
 		let bp = randomBlueprint();
-		let userData = new ReferenceObjectData(bp.getReference(), 0, bp.getName(), lt);
+		let userData = bp.getReferenceObjectData();
 
 		commands.push(new SpawnBlueprintCommand(guid, userData));
 	}

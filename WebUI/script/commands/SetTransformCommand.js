@@ -1,43 +1,35 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
-/**
- * @param object GameObject
- * @param newPosition Vec3
- * @param optionalOldPosition Vec3
- * @constructor
- */
-
-var SetTransformCommand = function (guid, newTransform, oldTransform ) {
+const SetTransformCommand = function (guid, newTransform) {
 
 	Command.call( this );
 
 	this.type = 'SetTransformCommand';
 	this.name = 'Set transform';
-
 	this.guid = guid;
-
 	this.newTransform = newTransform;
-	this.oldTransform = oldTransform;
 
+	let gameObject = editor.getGameObjectByGuid(guid);
+
+	if(gameObject === undefined) {
+		LogError("Attempted to set name for null GameObject");
+	} else {
+		this.oldTransform = gameObject.gameObjectData.transform.clone()
+	}
 };
 
-
 SetTransformCommand.prototype = {
-
 	execute: function () {
-		let s_UserData = {
+		let gameObjectData = {
+			'guid': this.guid,
 			'transform': this.newTransform
 		};
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_UserData))
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
 	},
 
 	undo: function () {
-		let s_UserData = {
+		let gameObjectData = {
+			'guid': this.guid,
 			'transform': this.oldTransform
 		};
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, s_UserData))
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
 	},
 };

@@ -9,10 +9,6 @@ class Editor {
 		signals.enabledBlueprint.add(this.onEnabledBlueprint.bind(this));
 		signals.disabledBlueprint.add(this.onDisabledBlueprint.bind(this));
 
-
-		signals.createGroupRequested.add(this.onCreateGroupRequested.bind(this));
-		signals.createdGroup.add(this.onCreatedGroup.bind(this));
-		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
@@ -107,10 +103,9 @@ class Editor {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(child) {
-			let guid = GenerateGuid();
-			let gameObject = child;
-			commands.push(new SpawnBlueprintCommand(guid, gameObject.userData));
-
+			let gameObjectData = child.gameObjectData.clone();
+			gameObjectData.guid = GenerateGuid();
+			commands.push(new SpawnBlueprintCommand(guid, gameObjectData));
 		});
 		console.log(commands);
 		scope.execute(new BulkCommand(commands));
@@ -119,9 +114,9 @@ class Editor {
 	Copy() {
 		let scope = this;
 		let commands = [];
-		editor.selectionGroup.children.forEach(function(child) {
+		editor.selectionGroup.children.forEach(function(childGameObject) {
 			let guid = GenerateGuid();
-			commands.push(new SpawnBlueprintCommand(guid, child.getUserData()));
+			commands.push(new SpawnBlueprintCommand(guid, childGameObject.gameObjectData));
 		});
 		scope.copy = new BulkCommand(commands);
 	}
@@ -159,8 +154,8 @@ class Editor {
 	DisableSelected() {
 		let scope = this;
 		let commands = [];
-		editor.selectionGroup.children.forEach(function(child) {
-			commands.push(new DisableBlueprintCommand(child.guid));
+		editor.selectionGroup.children.forEach(function(childGameObject) {
+			commands.push(new DisableBlueprintCommand(childGameObject.gameObjectData));
 		});
 		if(commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
@@ -170,9 +165,9 @@ class Editor {
 	DeleteSelected() {
 		let scope = this;
 		let commands = [];
-		editor.selectionGroup.children.forEach(function(child) {
-			if (child instanceof GameObject) {
-				commands.push(new DestroyBlueprintCommand(child.guid));
+		editor.selectionGroup.children.forEach(function(childGameObject) {
+			if (childGameObject instanceof GameObject) {
+				commands.push(new DestroyBlueprintCommand(childGameObject.guid));
 			}
 		});
 		if(commands.length > 0) {
@@ -221,7 +216,7 @@ class Editor {
 			LogError("Tried to set the transform of a null object: " + command.guid);
 			return;
 		}
-		gameObject.setTransform(new LinearTransform().setFromTable(command.userData.transform));
+		gameObject.setTransform(new LinearTransform().setFromTable(command.gameObjectData.transform));
 
 		if (this.selectionGroup.children.length === 1 && gameObject === this.selectionGroup.children[0]){
 			this.selectionGroup.setTransform(gameObject.transform);
@@ -252,28 +247,6 @@ class Editor {
 
 	}
 
-	onCreateGroupRequested(){
-		let transform = this.raycastTransform;
-		let userData = { name: "New Group"};
-		this.execute(new CreateGroupCommand(GenerateGuid(), userData));
-		asd
-
-
-	}
-
-	onCreatedGroup(command){
-		let group = new Group(command.guid, command.userData);
-
-		this.gameObjects[command.guid] = group;
-		// if(command.sender === this.playerName) {
-		// 	this.Select(command.guid)
-		// }
-	}
-
-	onDestroyedGroup(command){
-
-	}
-
 	onBlueprintSpawnRequested(blueprint, transform, variation) {
 	
 		let scope = this;
@@ -292,9 +265,9 @@ class Editor {
 		//Spawn blueprint
 		let guid = GenerateGuid();
 		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let userData = blueprint.getReferenceObjectData(transform, variation);
+		let gameObjectData = blueprint.getReferenceObjectData(transform, variation);
 
-		scope.execute(new SpawnBlueprintCommand(guid, userData));
+		scope.execute(new SpawnBlueprintCommand(guid, gameObjectData));
 	}
 
 	onDestroyedBlueprint(command) {
@@ -308,14 +281,21 @@ class Editor {
 		this.threeManager.Render();
 	}
 
+	// TODO: change command param to CommandActionResult type
+
 	onSpawnedBlueprint(command) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid, command.name, new LinearTransform().setFromTable(command.userData.transform), command.parentGuid, null, command.userData, command.isVanilla);
+		let gameObject = new GameObject(command.guid,
+										command.name,
+										new LinearTransform().setFromTable(command.gameObjectData.transform),
+										command.parentGuid,
+										null,
+										command.gameObjectData);
 
 		for (let key in command.entities) {
 			let entityInfo = command.entities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let gameEntity = new GameEntity(entityInfo.uniqueID, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
+			let gameEntity = new GameEntity(entityInfo.uniqueId, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
 
 			gameObject.add(gameEntity);
 		}

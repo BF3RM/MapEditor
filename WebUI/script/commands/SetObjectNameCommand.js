@@ -16,7 +16,7 @@ const SetObjectNameCommand = function (guid, name) {
 	if(editor.getGameObjectByGuid(guid) === undefined) {
 		LogError("Attempted to set name for null GameObject");
 	} else {
-		this.oldname = editor.getGameObjectByGuid(guid).name;
+		this.oldName = editor.getGameObjectByGuid(guid).name;
 	}
 };
 
@@ -24,10 +24,18 @@ const SetObjectNameCommand = function (guid, name) {
 SetObjectNameCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.name))
+		let gameObjectData = {
+			'guid': this.guid,
+			'name': this.name
+		};
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type, this.oldname))
+		let gameObjectData = {
+			'guid': this.guid,
+			'name': this.oldName
+		};
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
 	},
 };

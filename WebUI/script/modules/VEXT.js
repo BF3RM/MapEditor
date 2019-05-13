@@ -69,9 +69,6 @@ class VEXTInterface {
 	 */
 
 	SendCommand(command) {
-		let scope = this;
-		// If we're not sending an array of commands, make us send an array of commands.
-
 		command.sender = editor.playerName;
 
 		if(this.paused) {
@@ -86,6 +83,7 @@ class VEXTInterface {
 		if(commands.length === 0) {
 			return;
 		}
+
 		let scope = this;
 		if(editor.debug) {
 			Log(LOGLEVEL.VERBOSE, "OUT: ");
@@ -134,7 +132,7 @@ class VEXTInterface {
 	}
 
 	ParseCommandActionResult(commandActionResult) {
-		if(commandActionResult.hasOwnProperty("userData")) {
+		if(commandActionResult.hasOwnProperty("gameObjectData")) {
 			let userData = commandActionResult.userData;
 			commandActionResult.userData = new ReferenceObjectData(userData.reference, userData.variation, userData.name, new LinearTransform().setFromTable(userData.transform));
 		}

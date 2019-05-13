@@ -8,10 +8,15 @@ const DestroyBlueprintCommand = function (guid) {
 
 	let gameObject = editor.getGameObjectByGuid(guid);
 
-	if(gameObject === undefined) {
-		LogError("Attempted to destroy a null GameObject")
+	if (gameObject == null) {
+		LogError("Tried destroying blueprint that was not existing.");
+		return;
+	}
+
+	if(gameObject.gameObjectData == null) {
+		LogError("Attempted to destroy a null GameObject without gameObjectData")
 	} else {
-		this.userData = iterationCopy(gameObject.userData);
+		this.gameObjectData = iterationCopy(gameObjectData);
 	}
 };
 
@@ -19,11 +24,14 @@ const DestroyBlueprintCommand = function (guid) {
 DestroyBlueprintCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, this.type))
+		let gameObjectData = {
+			'guid': this.guid
+		};
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData)) // the lua side doesnt need the gameObjectData just to delete the object, so we save memory
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand(this.guid, "SpawnBlueprintCommand", this.userData))
+		editor.vext.SendCommand(new VextCommand("SpawnBlueprintCommand", this.gameObjectData))
 	},
 };
 

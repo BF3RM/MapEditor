@@ -83,23 +83,20 @@ function Editor:OnReceiveUpdate(p_Update)
                 if s_GameObject.isDeleted then
 					s_Command = {
 						type = "DestroyBlueprintCommand",
-						guid = s_Guid,
-
+						gameObjectData = s_GameObject
 					}
 				else
 					s_Command = {
 
 						type = "SetTransformCommand",
-						guid = s_Guid,
-						userData = s_GameObject
+						gameObjectData = s_GameObject
 					}
 				end
 				table.insert(s_Responses, s_Command)
 			else
 				local s_Command = {
 					type = "SpawnBlueprintCommand",
-					guid = s_Guid,
-					userData = s_GameObject
+					gameObjectData = s_GameObject
 				}
 				table.insert(s_Responses, s_Command)
 			end
@@ -146,15 +143,15 @@ function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 
 		local s_CommandActionResult, s_CommandActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
 		if (s_CommandActionResultType == CommandActionResultType.Success) then
-			local s_UserData
+			local s_GameObjectData
 
-			if s_CommandActionResult.userData ~= nil then
-				s_UserData = MergeUserdata(s_CommandActionResult.userData, {isDeleted = s_CommandActionResult.isDeleted or false})
+			if s_CommandActionResult.gameObjectData ~= nil then
+				s_GameObjectData = MergeUserdata(s_CommandActionResult.gameObjectData, {isDeleted = s_CommandActionResult.isDeleted or false})
 			else
-				s_UserData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
+				s_GameObjectData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
 			end
 
-			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_UserData)
+			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_GameObjectData)
 
 			table.insert(s_CommandActionResults, s_CommandActionResult)
 		elseif (s_CommandActionResultType == CommandActionResultType.Queue) then

@@ -41,7 +41,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 	if p_PartitionGuid == nil or
 			p_InstanceGuid == nil or
 			p_LinearTransform == nil then
-		m_Logger:Write('One or more userData are nil')
+		m_Logger:Write('One or more gameObjectData are nil')
 		return false
 	end
 

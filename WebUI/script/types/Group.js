@@ -1,10 +1,10 @@
 class Group {
-	constructor(guid, userData)
+	constructor(gameObjectData)
 	{
 		this.guid = guid;
 		this.type = "Group";
 		this.selected = false;
-		this.userData = userData;
+		this.gameObjectData = gameObjectData;
 	}
 
 	Select() {

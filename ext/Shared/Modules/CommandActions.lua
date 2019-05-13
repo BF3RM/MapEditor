@@ -2,7 +2,6 @@ class 'CommandActions'
 
 local m_Logger = Logger("CommandActions", true)
 
-
 function CommandActions:__init(p_Realm)
 	m_Logger:Write("Initializing CommandActions: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm;
@@ -18,7 +17,6 @@ function CommandActions:RegisterVars()
 	self.DestroyBlueprintCommand = self.DestroyBlueprint
 	self.SetTransformCommand = self.SetTransform
 	self.SelectGameObjectCommand = self.SelectGameObject
-	self.CreateGroupCommand = self.CreateGroup
 	self.EnableBlueprintCommand = self.EnableBlueprint
 	self.DisableBlueprintCommand = self.DisableBlueprint
 end
@@ -28,8 +26,12 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		return self:EnableBlueprint(p_Command)
 	end
 
-	local s_UserData = p_Command.userData
-	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_Command.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
+	local s_GameObjectData = p_Command.gameObjectData
+	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_Command.guid,
+														s_GameObjectData.reference.partitionGuid,
+														s_GameObjectData.reference.instanceGuid,
+														s_GameObjectData.transform,
+														s_GameObjectData.variation)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui
@@ -49,23 +51,24 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		s_Entities[#s_Entities + 1] = {
 			guid = s_Entity.uniqueId,
 			type = l_Entity.typeInfo.name,
-			transform = ToLocal(s_Entity.transform, s_UserData.transform),
+			transform = ToLocal(s_Entity.transform, s_GameObjectData.transform),
 			instanceId = s_Entity.instanceId,
 			aabb = {
 				min = tostring(s_Entity.aabb.min),
 				max = tostring(s_Entity.aabb.max),
-				transform = ToLocal(s_Entity.aabbTransform, s_UserData.transform)
+				transform = ToLocal(s_Entity.aabbTransform, s_GameObjectData.transform)
 			},
 		}
 	end
 
+	-- TODO: Change to CommandActionResult
+
 	local s_CommandActionResult = { -- export to own class. discuss structure. pack everything into 'data' property?
 		guid = p_Command.guid,
 		sender = p_Command.sender,
-		name = s_UserData.name, -- name field is obsolete
-		isVanilla = false,
+		-- name = s_UserData.name, -- name field is obsolete
 		type = 'SpawnedBlueprint',
-		userData = s_UserData,
+		gameObjectData = s_GameObjectData,
 		entities = s_Entities -- rename to entities because theres no recursive hierarchy implied
 	}
 
@@ -87,9 +90,11 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
 		m_Logger:Write("Failed to destroy entity: " .. p_Command.guid)
 	end
 
+	-- TODO: Change to CommandActionResult
+
 	local s_CommandActionResult = {
 		type = "DestroyedBlueprint",
-		userData = nil,
+		gameObjectData = nil,
 		guid =  p_Command.guid,
 		isDeleted = true
 	}
@@ -103,6 +108,8 @@ function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
 	if(s_Result == false) then
 		m_Logger:Write("Failed to enable blueprint: " .. p_Command.guid)
 	end
+
+	-- TODO: Change to CommandActionResult
 
 	local s_CommandActionResult = {
 		type = "EnabledBlueprint",
@@ -120,6 +127,8 @@ function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 		m_Logger:Write("Failed to disable blueprint: " .. p_Command.guid)
 	end
 
+	-- TODO: Change to CommandActionResult
+
 	local s_CommandActionResult = {
 		type = "DisabledBlueprint",
 		guid =  p_Command.guid,
@@ -136,26 +145,14 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 		return nil, CommandActionResultType.Failure
 	end
 
+	-- TODO: Change to CommandActionResult
+
 	local s_CommandActionResult = {
 		guid = p_Command.guid,
 		type = 'SelectedGameObject'
 	}
 
 	m_Logger:Write("Selected!")
-
-	return s_CommandActionResult, CommandActionResultType.Success
-end
-
-function CommandActions:CreateGroup(p_Command, p_UpdatePass)
-	-- TODO: save the new group
-
-	local s_CommandActionResult = {
-		guid = p_Command.guid,
-		type = 'CreatedGroup',
-		transform = p_Command.userData.transform,
-		name = p_Command.userData.name, -- name field is obsolete
-		sender = p_Command.sender,
-	}
 
 	return s_CommandActionResult, CommandActionResultType.Success
 end
@@ -167,6 +164,8 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 		m_Logger:Write("failed")
 		return nil, CommandActionResultType.Failure
 	end
+
+	-- TODO: Change to CommandActionResult
 
 	local s_CommandActionResult = {
 		type = "SetTransform",
