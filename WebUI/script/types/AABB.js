@@ -6,8 +6,8 @@ class AABB {
     }
 
     setFromTable(table) {
-        this.min = new Vec3().setFromTable(table.min);
-        this.max = new Vec3().setFromTable(table.max);
+        this.min = new Vec3().setFromString(table.min);
+        this.max = new Vec3().setFromString(table.max);
         this.transform = new LinearTransform().setFromTable(table.transform);
 
         return this;

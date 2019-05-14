@@ -116,7 +116,7 @@ class Editor {
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
 			let gameObjectTransferData = childGameObject.getGameObjectTransferData()
-			//gameObjectTransferData.guid = GenerateGuid();
+			gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
@@ -140,20 +140,21 @@ class Editor {
 	}
 
 	SpawnBlueprint(blueprint, transform, variation, parentData) {
-		let scope = this;
 		if(blueprint == null) {
 			LogError("Tried to spawn a nonexistent blueprint");
 			return false;
 		}
 
 		if(transform === undefined) {
-			transform = scope.editorCore.getRaycastTransform();
+			transform = this.editorCore.getRaycastTransform();
 		}
 
 		if(variation === undefined) {
 			variation = blueprint.getDefaultVariation();
 		}
-
+		if(parentData === undefined) {
+			parentData = new GameObjectParentData("root", "root", "root", "root");
+		}
 		//Spawn blueprint
 		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
 		let gameObjectTransferData = new GameObjectTransferData({
@@ -165,7 +166,7 @@ class Editor {
 			variation: variation,
 		});
 
-		scope.execute(new SpawnBlueprintCommand(gameObjectTransferData));
+		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
 	}
 
 /*	DisableSelected() {
@@ -312,8 +313,8 @@ class Editor {
 										blueprint,
 										gameObjectTransferData.variation);
 
-		for (let key in gameObjectTransferData.entities) {
-			let entityData = gameObjectTransferData.entities[key];
+		for (let key in gameObjectTransferData.gameEntities) {
+			let entityData = gameObjectTransferData.gameEntities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
 			let gameEntity = new GameEntity(entityData.instanceId, entityData.indexInBlueprint, entityData.typeName, entityData.transform, entityData.aabb);
 

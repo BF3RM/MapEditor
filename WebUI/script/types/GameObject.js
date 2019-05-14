@@ -32,9 +32,16 @@ class GameObject extends THREE.Object3D
 		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
 	}
 
-	getGameObjectTransferData(){
+	getGameObjectTransferData(key = null){
+		if(key != null) {
+			let gameObjectTransferData = new GameObjectTransferData({
+				"guid": this.guid
+			});
+			gameObjectTransferData[key] = this[key];
+			return gameObjectTransferData;
+		}
 		return new GameObjectTransferData({
-			guid: GenerateGuid(),
+			guid: this.guid,
 			name: this.name,
 			blueprintCtrRef: this.blueprint.getCtrRef(),
 			parentData: this.parentData,
@@ -112,7 +119,7 @@ class GameObject extends THREE.Object3D
 	}
 
 	setTransform(linearTransform) {
-		this.transform = linearTransformg;
+		this.transform = linearTransform;
 		this.updateTransform();
 
 		for(let key in this.children) {
@@ -167,7 +174,10 @@ class GameObject extends THREE.Object3D
 			return; // No position change
 		}
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		let command = new SetTransformCommand(new GameObjectTransferData(this.guid), transform);
+		let command = new SetTransformCommand(new GameObjectTransferData({
+			"guid": this.guid,
+			"transform": this.transform
+		}), transform);
 		editor.execute(command);
 		signals.objectChanged.dispatch(this, "transform", transform);
 

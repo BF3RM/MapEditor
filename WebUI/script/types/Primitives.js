@@ -15,7 +15,7 @@ class Vec3 extends THREE.Vector3{
 		return this;
 	}
 
-	fromString(matrixString) {
+	setFromString(matrixString) {
 		matrixString = matrixString.replace(/[(]/g,"");
 		matrixString = matrixString.replace(/[)]/g,", ");
 		let matrix = matrixString.split(",");

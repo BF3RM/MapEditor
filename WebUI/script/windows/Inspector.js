@@ -78,11 +78,12 @@ class Inspector {
 		this.variation.setAttribute("id", "objectVariation");
 		this.variation.setDisabled(true);
 
-		this.variation.onChange(function(){
-			if (editor.selectionGroup.children.length === 0){
+		this.variation.onChange(function(e,c,d){
+			if (editor.selectionGroup.children.length !== 1){
 				return;
 			}
-			editor.execute(new SetVariationCommand(editor.selectionGroup.children[0].guid, this.value));
+			let gameObjectTransferData = editor.selectionGroup.children[0].getGameObjectTransferData("variation");
+			editor.execute(new SetVariationCommand(gameObjectTransferData, this.dom.value));
 		});
 
 		let deleteButton = $(document.createElement("button"));
@@ -196,7 +197,7 @@ class Inspector {
 
 			this.UpdateName(gameObject.name);
 			if (selectionGroup.children.length === 1) {
-				this.UpdateVariation(gameObject, gameObject.userData.variation);
+				this.UpdateVariation(gameObject, gameObject.variation);
 			}
 		}
 		
@@ -243,7 +244,7 @@ class Inspector {
 			if(this.updates[key] !== undefined) {
 				this.updates[key](go, value);
 			} else {
-				this.UpdateInspector(go, editor.selectionGroup.children.length !== 1);
+				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1);
 			}
 		}
 	}

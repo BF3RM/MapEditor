@@ -101,7 +101,7 @@ class ContentView {
 		});
 
 		name.dom.addEventListener('click', function(e, data) {
-			signals.spawnBlueprintRequested.dispatch(blueprint);
+			editor.SpawnBlueprint(blueprint);
 		});
 
 		$(entry.dom).draggable({

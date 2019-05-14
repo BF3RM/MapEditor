@@ -1,20 +1,26 @@
 
 class GameObjectTransferData
 {
-    constructor(guid, name, blueprintCtrRef, parentData, transform, variation, gameEntities, isDeleted)
+    constructor(args = {})
     {
-        this.guid = guid;
-        this.name = name; // for debugging only
-        this.blueprintCtrRef= blueprintCtrRef;
-        this.parentData = parentData;
-        this.transform = transform;
-        this.variation = variation;
-        this.gameEntities = gameEntities;
-        this.isDeleted = isDeleted;
+        if (Object.keys(args).length !== 0 &&  args.guid === undefined) {
+            LogError("Attempted to create a GameObjectTransferData without a specified GUID")
+        }
+        this.guid = args.guid;
+        this.name = args.name; // for debugging only
+        this.parentData = args.parentData;
+        this.blueprintCtrRef= args.blueprintCtrRef;
+        this.transform = args.transform;
+        this.variation = args.variation;
+        this.gameEntities = args.gameEntities;
+        this.isDeleted = args.isDeleted;
     }
 
     setFromTable(table) {
         let scope = this;
+        if(table.guid === undefined) {
+            LogError("Attempted to create a GameObjectTransferData without a specified GUID")
+        }
         Object.keys(table).forEach(function(key) {
             let value = table[key];
 
