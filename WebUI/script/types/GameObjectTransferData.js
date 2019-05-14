@@ -42,6 +42,6 @@ class GameObjectTransferData
             scope[key] = value;
         });
 
-        return scope;
+        return this;
     }
 }

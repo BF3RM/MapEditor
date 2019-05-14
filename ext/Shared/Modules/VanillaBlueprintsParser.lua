@@ -42,12 +42,12 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
 
 			local s_IndexInBlueprint = #s_GameEntities + 1
 
-			s_GameEntities[s_IndexInBlueprint] = GameEntityData{
+			s_GameEntities[s_IndexInBlueprint] = {
 				indexInBlueprint = s_IndexInBlueprint,
 				typeName = l_Entity.typeInfo.name,
 				transform = ToLocal(s_Entity.transform, p_Transform),
 				instanceId = s_Entity.instanceId,
-				aabb = AABB{
+				aabb = {
 					min = tostring(s_Entity.aabb.min),
 					max = tostring(s_Entity.aabb.max),
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
@@ -69,20 +69,20 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
 		end
 	end
 
-	local s_CommandActionResult = CommandActionResult{
+	local s_CommandActionResult = {
 		type = 'SpawnedBlueprint',
 		sender = 'Server',
-		gameObjectTransferData = GameObjectTransferData{
+		gameObjectTransferData = {
 			guid = s_Guid,
 			name = s_Blueprint.name,
 			typeName = s_Blueprint.typeInfo.name,
-			blueprintCtrRef = CtrRef{
+			blueprintCtrRef = {
 				typeName = s_Blueprint.typeInfo.name,
 				name = s_Blueprint.name,
 				partitionGuid = InstanceParser:GetPartition(s_Blueprint.instanceGuid),
 				instanceGuid = tostring(s_Blueprint.instanceGuid)
 			},
-			parentData = GameObjectParentData{
+			parentData = {
 				guid = nil,
 				typeName = nil,
 				primaryInstanceGuid = nil,
@@ -91,7 +91,7 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
 			},
 			transform = p_Transform,
 			variation = p_Variation,
-			--gameEntities = s_GameEntities
+			gameEntities = s_GameEntities
 		}
 	}
 

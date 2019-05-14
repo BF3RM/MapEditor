@@ -11,6 +11,8 @@ class CtrRef {
         this.name = table.name;
         this.partitionGuid = table.partitionGuid;
         this.instanceGuid = table.instanceGuid;
+
+        return this;
     }
 
     clone() {

@@ -16,5 +16,7 @@ class GameObjectParentData
         this.primaryInstanceGuid = table.primaryInstanceGuid;
         this.partitionGuid = table.partitionGuid;
         this.resolveType = table.resolveType;
+
+        return this;
     }
 }

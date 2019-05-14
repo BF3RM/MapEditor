@@ -128,7 +128,7 @@ class Editor {
 		if(scope.copy !== null) {
 			//Generate a new guid for each command
 			scope.copy.commands.forEach(function (command) {
-				command.guid = GenerateGuid();
+				command.guid = GenerateGuid(); // TODO: CHANGE IT
 			});
 			scope.execute(scope.copy);
 		}
@@ -298,21 +298,23 @@ class Editor {
 	onSpawnedBlueprint(commandActionResult) {
 		let scope = this;
 		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
-		let gameObjectGuid = gameObjectTransferData.guid
-		let parentGuid = gameObjectTransferData.parentData.guid
+		let gameObjectGuid = gameObjectTransferData.guid;
+		let parentGuid = gameObjectTransferData.parentData.guid;
+		let blueprint = this.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
 
 		// TODO: change GameObject ctor
-		let gameObject = new GameObject(commandActionResult.guid,
-										commandActionResult.name,
-										new LinearTransform().setFromTable(commandActionResult.gameObjectTransferData.transform),
-										commandActionResult.parentGuid,
-										null,
-										commandActionResult.gameObjectTransferData);
+		let gameObject = new GameObject(gameObjectTransferData.guid,
+										gameObjectTransferData.typeName,
+										gameObjectTransferData.name,
+										gameObjectTransferData.transform,
+										gameObjectTransferData.parentData,
+										blueprint,
+										gameObjectTransferData.variation);
 
-		for (let key in commandActionResult.entities) {
-			let entityInfo = commandActionResult.entities[key];
+		for (let key in gameObjectTransferData.entities) {
+			let entityData = gameObjectTransferData.entities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let gameEntity = new GameEntity(entityInfo.uniqueId, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
+			let gameEntity = new GameEntity(entityData.instanceId, entityData.indexInBlueprint, entityData.typeName, entityData.transform, entityData.aabb);
 
 			gameObject.add(gameEntity);
 		}

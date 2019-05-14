@@ -43,12 +43,13 @@ class Hierarchy {
 
 
 
-	onSpawnedBlueprint(command) {
+	onSpawnedBlueprint(commandActionResult) {
 		let scope = this;
-		let gameObject = editor.getGameObjectByGuid(command.guid);
+		let gameObjectGuid = commandActionResult.gameObjectTransferData.guid
+		let gameObject = editor.getGameObjectByGuid();
 
 		let currentEntry = gameObject.getNode();
-		scope.entries[command.guid] = currentEntry;
+		scope.entries[gameObjectGuid] = currentEntry;
 		this.queue[currentEntry.id] = currentEntry;
 
 		if(!editor.vext.executing) {
@@ -102,7 +103,7 @@ class Hierarchy {
 		if (node !== null || node != undefined){
 			scope.tree.removeNode(node);
 		}
-		
+
 	}
 
 	onCreatedGroup(command) {

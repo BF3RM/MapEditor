@@ -1,17 +1,17 @@
 
 class GameEntity extends THREE.Mesh
 {
-	constructor(guid, typeName, transform, entityInfo, color)
+	constructor(instanceId, indexInBlueprint, typeName, transform, aabb, color)
 	{
 		var pointsGeom = new THREE.Geometry();
 		pointsGeom.vertices.push(
-		 	new Vec3().fromString(entityInfo.aabb.min),
-			new Vec3().fromString(entityInfo.aabb.max)
+		 	aabb.min,
+			aabb.max
 		);
 
 		var center = new THREE.Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
-		let vmax = new Vec3().fromString(entityInfo.aabb.max);
-		let vmin = new Vec3().fromString(entityInfo.aabb.min);
+		let vmax = aabb.max;
+		let vmin = aabb.min;
 
 		var boxGeom = new THREE.BoxGeometry(
 			vmax.x - vmin.x, 
@@ -41,7 +41,8 @@ class GameEntity extends THREE.Mesh
 		this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial( { color: color } ));
 		this.add(this.aabb);
 		
-		this.guid = guid;
+		this.guid = instanceId;
+		this.indexInBlueprint = indexInBlueprint;
 		this.type = "GameEntity";
 		this.typeName = typeName;
 		this.transform = transform;
@@ -56,8 +57,8 @@ class GameEntity extends THREE.Mesh
 
 
 		this.box = new THREE.Box3(
-			new Vec3().fromString(entityInfo.aabb.min),
-			new Vec3().fromString(entityInfo.aabb.max),
+			aabb.min,
+			aabb.max,
 			0xFF0000);
 
 		this.matrixAutoUpdate = false;

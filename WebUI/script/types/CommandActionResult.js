@@ -9,5 +9,7 @@ class CommandActionResult {
         this.type = table.type;
         this.sender = table.sender;
         this.gameObjectTransferData = new GameObjectTransferData().setFromTable(table.gameObjectTransferData);
+
+        return this;
     }
 }

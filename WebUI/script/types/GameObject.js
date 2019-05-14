@@ -1,7 +1,7 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, typeName, name, transform, parentData, children, blueprint, variation)
+	constructor(guid, typeName, name, transform, parentData, blueprint, variation)
 	{
 		super( );
 
@@ -10,20 +10,14 @@ class GameObject extends THREE.Object3D
 		this.name = name;
 		this.transform = transform;
 		this.parentData = parentData;
-		this.variation = variation;
 		this.blueprint = blueprint;
+		this.variation = variation;
 
 		this.selected = false;
 		this.matrixAutoUpdate = false;
 		this.visible = true;
 		this.enabled = true;
 		this.highlighted = false;
-
-		if (children !== null){
-			for (let i = children.length - 1; i >= 0; i--) {
-				this.add(children[i]);
-			}
-		}
 
 		// Update the matrix after initialization.
 		this.updateTransform();
