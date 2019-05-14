@@ -5,7 +5,6 @@ class Blueprint {
 		this.typeName = typeName;
 		this.name = name;
 		this.variations = variations;
-		this.favorited = false;
 	}
 
 	getDefaultVariation() {
@@ -20,10 +19,6 @@ class Blueprint {
 
 	SetFavorite(favStatus) {
 		this.favorited = favStatus;
-	}
-
-	ToggleFavorite() {
-		this.favorited = !this.favorited;
 	}
 
 	hasVariation () {
@@ -64,74 +59,4 @@ class Blueprint {
 	getName() {
 		return this.name.substring(this.name.lastIndexOf('/')+1);
 	}
-
-	CreateEntry(folderName) {
-		let blueprint = this;
-		let entry = new UI.TableRow();
-		let icon = new UI.Icon(blueprint.typeName);
-
-		let cleanName;
-		if(folderName === undefined) {
-			cleanName = blueprint.getName();
-		} else {
-			cleanName = blueprint.name.replace(folderName, '');
-		}
-		let name = new UI.TableData(cleanName);
-
-		entry.add(icon,name,new UI.TableData(blueprint.typeName));
-
-		entry.setAttribute('draggable', true);
-		entry.addClass("draggable");
-
-		icon.addClass("jstree-icon favoritable");
-		if(blueprint.favorited)
-			icon.addClass("favorited");
-
-		icon.dom.addEventListener('mouseover', function(e) {
-			if(!blueprint.favorited) {
-				icon.removeClass("favorited");
-			}
-		});
-
-		icon.dom.addEventListener('click', function(e) {
-			//Unfavorite
-			if(blueprint.favorited) {
-				editor.RemoveFavorite(blueprint);
-				icon.removeClass("favorited");
-			} else {
-				//Favorite
-				editor.AddFavorite(blueprint);
-				icon.addClass("favorited")
-			}
-		});
-
-		name.dom.addEventListener('click', function(e, data) {
-			editor.SpawnBlueprint(blueprint);
-		});
-
-		$(entry.dom).draggable({
-			helper : function() {
-				let helper = $(document.createElement("div"));
-				helper.addClass("dragableHelper");
-				return helper;
-			},
-			cursorAt: {
-				top: 0,
-				left: 0
-			},
-			appendTo: 'body',
-			start: function(e) {
-				editor.editorCore.onPreviewDragStart(blueprint)
-			},
-			drag: function(e) {
-				editor.editorCore.onPreviewDrag(e)
-			},
-			stop: function(e) {
-				editor.editorCore.onPreviewDragStop()
-			}
-		});
-
-		return entry;
-	}
-
 }

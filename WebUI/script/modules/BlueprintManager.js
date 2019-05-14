@@ -18,7 +18,8 @@ class BlueprintManager {
 		let scope = this;
 		let blueprints = JSON.parse(blueprintsRaw);
 		for(let key in blueprints) {
-			scope.RegisterBlueprint(key, blueprints[key]);
+			let bp = blueprints[key]
+			scope.RegisterBlueprint(bp.instanceGuid, bp);
 		}
 		signals.blueprintsRegistered.dispatch(editor.blueprintManager.blueprints);
 	}

@@ -109,6 +109,11 @@ class EditorUI {
 						componentName: 'HierarchyComponent',
 						isClosable: false,
 						title: "Hierarchy",
+					},{
+						type: 'component',
+						componentName: 'EntityViewComponent',
+						isClosable: false,
+						title: "Entities",
 					}]
 				},
 					{
@@ -167,6 +172,7 @@ class EditorUI {
 		this.layout.registerComponent( 'ContentViewComponent', ContentViewComponent);
 		this.layout.registerComponent( 'HistoryComponent', HistoryComponent);
 		this.layout.registerComponent( 'FavoritesComponent', FavoritesComponent);
+		this.layout.registerComponent( 'EntityViewComponent', EntityViewComponent);
 
 		this.layout.on('initialised', function() {
 			$(".lm_content .infinite-tree-scroll").each(function(e) {

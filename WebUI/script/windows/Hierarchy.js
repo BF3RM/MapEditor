@@ -21,6 +21,7 @@ class Hierarchy {
 			]
 		}
 
+		this.selectedNodes = [];
 
 		this.dom = this.CreateDom();
 		this.tree = this.InitializeTree();
@@ -187,13 +188,6 @@ class Hierarchy {
 					console.log("Unselectable")
 					return false;
 				}
-				if (!node || (node === scope.tree.getSelectedNode())) {
-					console.log("Already Selected");
-					return false; // Prevent from deselecting the current node
-				}
-				if(editor.isSelected(node.id)) {
-					return true;
-				}
 				editor.Select(node.id, keysdown[17], false);
 			},
 			togglerClass: "Toggler",
@@ -254,13 +248,13 @@ class Hierarchy {
 
 	onSelectedGameObject(guid, isMultipleSelection, scrollTo) {
 		let scope = this;
-		let node = scope.tree.getNodeById(guid);
-		scope.ExpandToNode(node);
+		let currentNode = scope.tree.getNodeById(guid);
 
-		scope.tree.selectNode(node, {
-		});
+		currentNode.state.selected = true;
+		scope.tree.updateNode(currentNode, {}, { shallowRendering: true });
+
 		if(scrollTo) {
-			scope.tree.scrollToNode(node);
+			scope.tree.scrollToNode(currentNode);
 		}
 	}
 
@@ -277,8 +271,10 @@ class Hierarchy {
 
 	onDeselected(guid) {
 		let scope = this;
-		//let node = scope.dom.jstree(true).get_node(guid);
-		//this.dom.jstree(true).deselect_node(node);
+		let currentNode = scope.tree.getNodeById(guid);
+
+		currentNode.state.selected = false;
+		scope.tree.updateNode(currentNode, {}, { shallowRendering: true });
 	}
 
 	onObjectChanged(gameObject, key, value) {

@@ -38,7 +38,7 @@ end
 
 function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     --Avoid nested blueprints for now...
-	local s_Response = VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+	VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 end
 
 function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
