@@ -1,10 +1,10 @@
-const PreviewSpawnMessage = function (userData) {
+const PreviewSpawnMessage = function (gameObjectTransferData) {
 	this.guid = "ed170120-0000-0000-0000-000000000000";
 	this.type = 'PreviewSpawnMessage';
 
-	if (userData === undefined) {
+	if (gameObjectTransferData === undefined) {
 		Log(LOGLEVEL.DEBUG, "Missing spawn gameObjectTransferData");
 		return;
 	}
-	this.userData = userData;
+	this.gameObjectTransferData = gameObjectTransferData;
 };

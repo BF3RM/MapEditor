@@ -42,48 +42,49 @@ class VEXTemulator {
 
 	}
 
-	SpawnBlueprint(command) {
+	SpawnBlueprint(commandActionResult) {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
 		//command.gameObjectTransferData.transform = command.gameObjectTransferData.transform.toTable();
 		let response = {
-			"guid": command.guid,
-			"sender": command.sender,
+			"sender": "Server",
 			"type": "SpawnedBlueprint",
-			"name": command.userData.name,
-			"entities": {
-				1: {
-					"type": "ClientStaticModelEntity",
-					"transform": {
-						"left": {
-							"x": 1,
-							"y": 0,
-							"z": 0
-						},
-						"up": {
-							"x": 0,
-							"y": 1,
-							"z": 0
-						},
-						"forward": {
-							"x": 0,
-							"y": 0,
-							"z": 1
-						},
-						"trans": {
-							"x": 0,
-							"y": 0,
-							"z": 0
-						}
+			"gameObjectTransferData": {
+				"transform": {
+					"left": {
+						"x": -0.050000000745058,
+						"y": -2.1855681708871E-9,
+						"z": 2.1855688370209E-9
 					},
-					"aabb": {
-						"max": "(1.628162, 3.593760, 2.490781)",
-						"min": "(-1.888471, -0.057315, -2.555373)",
+					"up": {
+						"x": -2.1855701692886E-9,
+						"y": -2.1855675047533E-9,
+						"z": -0.050000000745058
+					},
+					"forward": {
+						"x": 2.1855761644929E-9,
+						"y": -0.050000000745058,
+						"z": 2.1855692811101E-9
+					},
+					"trans": {
+						"x": 11.582192420959,
+						"y": 11.933897972107,
+						"z": 16.226287841797
+					}
+				},
+				"blueprintCtrRef": {
+					"typeName": "ObjectBlueprint",
+					"instanceGuid": "3F62C691-168F-408C-BDE8-F54020D780B8",
+					"name": "XP2/Objects/InvisibleCollision_01_XP2/InvisibleCollision_CharAndVeh_01_Scalable_XP2",
+					"partitionGuid": "7455FBF9-8BEE-453B-B358-03088038BFFD"
+				},
+				"gameEntities": [
+					{
 						"transform": {
 							"left": {
 								"x": 1,
-								"y": 0,
+								"y": -2.2275843392094E-9,
 								"z": 0
 							},
 							"up": {
@@ -93,26 +94,61 @@ class VEXTemulator {
 							},
 							"forward": {
 								"x": 0,
-								"y": 0,
+								"y": -6.4584368963949E-9,
 								"z": 1
 							},
 							"trans": {
 								"x": 0,
-								"y": 0,
+								"y": 6.4000374777606E-7,
 								"z": 0
 							}
+						},
+						"instanceId": 3815363904,
+						"indexInBlueprint": 1,
+						"typeName": "ClientStaticModelEntity",
+						"aabb": {
+							"transform": {
+								"left": {
+									"x": 1,
+									"y": -2.2275843392094E-9,
+									"z": 0
+								},
+								"up": {
+									"x": 0,
+									"y": 1,
+									"z": 0
+								},
+								"forward": {
+									"x": 0,
+									"y": -6.4584368963949E-9,
+									"z": 1
+								},
+								"trans": {
+									"x": 0,
+									"y": 6.4000374777606E-7,
+									"z": 0
+								}
+							},
+							"min": "(-1.250027, -0.410821, -49.999981)",
+							"max": "(1.249973, 24.589176, 50.000011)"
 						}
-					},
-					"reference": {
-						"type": "StaticModelEntityData",
-						"instanceGuid": "E424EBD2-6677-11E0-8501-BA28C3073B32"
 					}
+				],
+				"guid": "ED170121-0000-0000-0000-000000000919",
+				"typeName": "ObjectBlueprint",
+				"parentData": {
+					"primaryInstanceGuid": "0635B690-A490-4EC2-9BCD-2F2F53F3B6ED",
+					"guid": "ED170121-0000-0000-0000-000000000899",
+					"typeName": "ReferenceObjectData",
+					"resolveType": "Unresolved",
+					"partitionGuid": "CE23C072-CF87-4F50-8E88-70DF17E85144"
 				},
-			},
-			"userData": command.userData
+				"name": "XP2/Objects/InvisibleCollision_01_XP2/InvisibleCollision_CharAndVeh_01_Scalable_XP2",
+				"variation": 0
+			}
 		};
 
-		if(command.userData.reference.typeName == "SpatialPrefabBlueprint") {
+		if(command.gameObjectTransferData.blueprintCtrRef.typeName == "SpatialPrefabBlueprint") {
 			response.entities[2] = {
 				"type": "ClientStaticModelEntity",
 				"transform": {

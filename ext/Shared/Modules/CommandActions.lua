@@ -21,13 +21,13 @@ function CommandActions:RegisterVars()
 	self.DisableBlueprintCommand = self.DisableBlueprint
 end
 
-function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
-	if(IsVanilla(p_Command.guid)) then
+function CommandActions:SpawnBlueprint(p_CommandActionResult, p_UpdatePass)
+	if(IsVanilla(p_CommandActionResult.gameObjectTransferData.guid)) then
 		return self:EnableBlueprint(p_Command)
 	end
 
-	local s_GameObjectTransferData = p_Command.gameObjectTransferData
-	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_Command.guid,
+	local s_GameObjectTransferData = p_CommandActionResult.gameObjectTransferData
+	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_CommandActionResult.gameObjectTransferData.guid,
 														s_GameObjectTransferData.reference.partitionGuid,
 														s_GameObjectTransferData.reference.instanceGuid,
 														s_GameObjectTransferData.transform,
@@ -64,8 +64,8 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	-- TODO: Change to CommandActionResult
 
 	local s_CommandActionResult = { -- export to own class. discuss structure. pack everything into 'data' property?
-		guid = p_Command.guid,
-		sender = p_Command.sender,
+		guid = p_CommandActionResult.gameObjectTransferData.guid,
+		sender = p_CommandActionResult.sender,
 		-- name = s_UserData.name, -- name field is obsolete
 		type = 'SpawnedBlueprint',
 		gameObjectTransferData = s_GameObjectTransferData,
@@ -75,8 +75,8 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	return s_CommandActionResult, CommandActionResultType.Success
 end
 
-function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
-	if(IsVanilla(p_Command.guid)) then
+function CommandActions:DestroyBlueprint(p_CommandActionResult, p_UpdatePass)
+	if(IsVanilla(p_CommandActionResult.gameObjectTransferData.guid)) then
 		return CommandActions:DisableBlueprint(p_Command)
 	end
 
@@ -84,10 +84,10 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
         return nil, CommandActionResultType.Queue
     end
 
-	local s_Result = ObjectManager:DestroyEntity(p_Command.guid)
+	local s_Result = ObjectManager:DestroyEntity(p_CommandActionResult.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
-		m_Logger:Write("Failed to destroy entity: " .. p_Command.guid)
+		m_Logger:Write("Failed to destroy entity: " .. p_CommandActionResult.gameObjectTransferData.guid)
 	end
 
 	-- TODO: Change to CommandActionResult
@@ -95,52 +95,52 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		type = "DestroyedBlueprint",
 		gameObjectTransferData = nil,
-		guid =  p_Command.guid,
+		guid =  p_CommandActionResult.gameObjectTransferData.guid,
 		isDeleted = true
 	}
 
 	return s_CommandActionResult, CommandActionResultType.Success
 end
 
-function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
-	local s_Result = ObjectManager:EnableEntity(p_Command.guid)
+function CommandActions:EnableBlueprint(p_CommandActionResult, p_UpdatePass)
+	local s_Result = ObjectManager:EnableEntity(p_CommandActionResult.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
-		m_Logger:Write("Failed to enable blueprint: " .. p_Command.guid)
+		m_Logger:Write("Failed to enable blueprint: " .. p_CommandActionResult.gameObjectTransferData.guid)
 	end
 
 	-- TODO: Change to CommandActionResult
 
 	local s_CommandActionResult = {
 		type = "EnabledBlueprint",
-		guid =  p_Command.guid,
+		guid =  p_CommandActionResult.gameObjectTransferData.guid,
 		isDeleted = false
 	}
 
 	return s_CommandActionResult, CommandActionResultType.Success
 end
 
-function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
-	local s_Result = ObjectManager:DisableEntity(p_Command.guid)
+function CommandActions:DisableBlueprint(p_CommandActionResult, p_UpdatePass)
+	local s_Result = ObjectManager:DisableEntity(p_CommandActionResult.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
-		m_Logger:Write("Failed to disable blueprint: " .. p_Command.guid)
+		m_Logger:Write("Failed to disable blueprint: " .. p_CommandActionResult.gameObjectTransferData.guid)
 	end
 
 	-- TODO: Change to CommandActionResult
 
 	local s_CommandActionResult = {
 		type = "DisabledBlueprint",
-		guid =  p_Command.guid,
+		guid =  p_CommandActionResult.gameObjectTransferData.guid,
 		isDeleted = true
 	}
 
 	return s_CommandActionResult, CommandActionResultType.Success
 end
 
-function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
+function CommandActions:SelectGameObject(p_CommandActionResult, p_UpdatePass)
 
-	if (ObjectManager:GetEntityByGuid(p_Command.guid) == nil) then
+	if (ObjectManager:GetEntityByGuid(p_CommandActionResult.gameObjectTransferData.guid) == nil) then
 		m_Logger:Write("Failed to select that gameobject")
 		return nil, CommandActionResultType.Failure
 	end
@@ -148,7 +148,7 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 	-- TODO: Change to CommandActionResult
 
 	local s_CommandActionResult = {
-		guid = p_Command.guid,
+		guid = p_CommandActionResult.gameObjectTransferData.guid,
 		type = 'SelectedGameObject'
 	}
 
@@ -157,8 +157,8 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 	return s_CommandActionResult, CommandActionResultType.Success
 end
 
-function CommandActions:SetTransform(p_Command, p_UpdatePass)
-	local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command..transform, true)
+function CommandActions:SetTransform(p_CommandActionResult, p_UpdatePass)
+	local s_Result = ObjectManager:SetTransform(p_CommandActionResult.gameObjectTransferData.guid, p_CommandActionResult.gameObjectTransferData.transform, true)
 	if (s_Result == false) then
 		-- Notify WebUI of failed
 		m_Logger:Write("failed")
@@ -169,9 +169,9 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		type = "SetTransform",
-		guid = p_Command.guid,
+		guid = p_CommandActionResult.gameObjectTransferData.guid,
 		gameObjectTransferData = {
-			transform = p_Command.userData.transform
+			transform = p_CommandActionResult.userData.transform
 		}
 	}
 
