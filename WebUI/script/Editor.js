@@ -116,7 +116,7 @@ class Editor {
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
 			let gameObjectTransferData = childGameObject.getGameObjectTransferData()
-			gameObjectTransferData.guid = GenerateGuid();
+			//gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
@@ -128,7 +128,7 @@ class Editor {
 		if(scope.copy !== null) {
 			//Generate a new guid for each command
 			scope.copy.commands.forEach(function (command) {
-				command.guid = GenerateGuid(); // TODO: CHANGE IT
+				command.gameObjectTransferData.guid = GenerateGuid();
 			});
 			scope.execute(scope.copy);
 		}
@@ -284,9 +284,10 @@ class Editor {
 		gameObject.setVariation(gameObjectTransferData.variation);
 	}
 
-	onDestroyedBlueprint(command) {
-		this.threeManager.DeleteObject(this.gameObjects[command.guid]);
-		delete this.gameObjects[command.guid];
+	onDestroyedBlueprint(commandActionResult) {
+		let gameObjectGuid = commandActionResult.gameObjectTransferData.guid
+		this.threeManager.DeleteObject(this.gameObjects[gameObjectGuid]);
+		delete this.gameObjects[gameObjectGuid];
 		
 		if(this.selectionGroup.children.length === 0) {
 			this.threeManager.HideGizmo()
@@ -353,23 +354,23 @@ class Editor {
 		}
 	}
 
-	onEnabledBlueprint(command) {
-		let gameObject = editor.getGameObjectByGuid(command.guid)
+	onEnabledBlueprint(commandActionResult) {
+		let gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid)
 		if(gameObject == null) {
 			LogError("Attempted to enable a GameObject that doesn't exist")
 			return
 		}
-		let removeFromHierarchy = command.isDeleted ;
+		let removeFromHierarchy = commandActionResult.gameObjectTransferData.isDeleted;
 		gameObject.Enable(removeFromHierarchy);
 	}
 
-	onDisabledBlueprint(command) {
-		let gameObject = editor.getGameObjectByGuid(command.guid)
+	onDisabledBlueprint(commandActionResult) {
+		let gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid)
 		if(gameObject == null) {
 			LogError("Attempted to disable a GameObject that doesn't exist")
 			return
 		}
-		let removeFromHierarchy = command.isDeleted ;
+		let removeFromHierarchy = commandActionResult.gameObjectTransferData.isDeleted ;
 		gameObject.Disable(removeFromHierarchy);
 	}
 

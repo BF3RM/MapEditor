@@ -160,13 +160,14 @@ class GameObject extends THREE.Object3D
 		signals.objectChanged.dispatch(this, "transform", transform);
 		// Send move message to client
 	}
+
 	onMoveEnd() {
 		let scope = this;
 		if(!scope.hasMoved()) {
 			return; // No position change
 		}
 		let transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		let command = new SetTransformCommand(this.guid, transform);
+		let command = new SetTransformCommand(new GameObjectTransferData(this.guid), transform);
 		editor.execute(command);
 		signals.objectChanged.dispatch(this, "transform", transform);
 

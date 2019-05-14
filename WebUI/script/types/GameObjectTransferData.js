@@ -1,7 +1,7 @@
 
 class GameObjectTransferData
 {
-    constructor(guid, name, blueprintCtrRef, parentData, transform, variation, gameEntities)
+    constructor(guid, name, blueprintCtrRef, parentData, transform, variation, gameEntities, isDeleted)
     {
         this.guid = guid;
         this.name = name; // for debugging only
@@ -9,7 +9,8 @@ class GameObjectTransferData
         this.parentData = parentData;
         this.transform = transform;
         this.variation = variation;
-        this.gameEntities = gameEntities
+        this.gameEntities = gameEntities;
+        this.isDeleted = isDeleted;
     }
 
     setFromTable(table) {

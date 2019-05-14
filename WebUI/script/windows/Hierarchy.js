@@ -3,8 +3,6 @@ class Hierarchy {
 	constructor() {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		signals.createdGroup.add(this.onCreatedGroup.bind(this));
-		signals.destroyedGroup.add(this.onDestroyedGroup.bind(this));
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
@@ -47,7 +45,7 @@ class Hierarchy {
 	onSpawnedBlueprint(commandActionResult) {
 		let scope = this;
 		let gameObjectGuid = commandActionResult.gameObjectTransferData.guid
-		let gameObject = editor.getGameObjectByGuid();
+		let gameObject = editor.getGameObjectByGuid(gameObjectGuid);
 
 		let currentEntry = gameObject.getNode();
 		scope.entries[gameObjectGuid] = currentEntry;
@@ -94,30 +92,17 @@ class Hierarchy {
 		return this.entries[guid];
 	}
 
-	onDestroyedBlueprint(command) {
+	onDestroyedBlueprint(commandActionResult) {
 		let scope = this;
-		let parent = command.parent;
 
 		//TODO: remove parent's reference in parent.children once groups are implemented
 
-		let node = scope.tree.getNodeById(command.guid);
+		let node = scope.tree.getNodeById(commandActionResult.gameObjectTransferData.guid);
 		if (node !== null || node != undefined){
 			scope.tree.removeNode(node);
 		}
-
 	}
 
-	onCreatedGroup(command) {
-		let scope = this;
-		let parent = command.parent;
-		//		scope.dom.jstree(true).create_node("root", new HierarchyEntry(command.guid, command.name, command.type), "last");
-		let entry = new HierarchyEntry(command.guid, command.name, "", scope.data.children.length, "root");
-		scope.entries[command.guid] = entry;
-		scope.data.children[scope.data.children.length] = entry;
-		scope.dom.jstree(true).create_node('root' ,  entry, "last", function(){
-		});
-
-	}
 	onLevelLoaded(levelData) {
 		let scope = this;
 		let levelEntry = {
@@ -134,16 +119,12 @@ class Hierarchy {
 		scope.tree.loadData(this.data)
 	}
 
-	onDestroyedGroup(command) {
-
-	}
-
-	onSetObjectName(command) {
+	onSetObjectName(commandActionResult) {
 		let scope = this;
-		let node = scope.dom.jstree(true).get_node(command.guid);
+		let node = scope.dom.jstree(true).get_node(commandActionResult.gameObjectTransferData.guid);
 		if (node !== null || node !== undefined){
 
-			scope.dom.jstree(true).rename_node(node, command.name);
+			scope.dom.jstree(true).rename_node(node, commandActionResult.gameObjectTransferData.name);
 		}
 	}
 
@@ -156,13 +137,7 @@ class Hierarchy {
 		});
 		// TODO: Implement node refresh logic here somewhere;
 	}
-	LoadData(data) {
-		let scope = this;
-		scope.data.children.push(data);
-		console.log(scope.data);
-		scope.tree.updateNode(scope.tree.getNodeById("root", {}, undefined))
 
-	}
 	InitializeTree() {
 		let scope = this;
 		return new InfiniteTree({
