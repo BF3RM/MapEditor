@@ -175,7 +175,7 @@ class EditorCore {
 
     onPreviewDrop() {
         this.previewing = false;
-        editor.onBlueprintSpawnRequested(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
+        editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
         editor.vext.SendMessage(new PreviewDestroyMessage());
 
         this.previewBlueprint = null;

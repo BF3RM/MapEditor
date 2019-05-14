@@ -158,7 +158,7 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 end
 
 function CommandActions:SetTransform(p_Command, p_UpdatePass)
-	local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command.userData.transform, true)
+	local s_Result = ObjectManager:SetTransform(p_Command.guid, p_Command..transform, true)
 	if (s_Result == false) then
 		-- Notify WebUI of failed
 		m_Logger:Write("failed")

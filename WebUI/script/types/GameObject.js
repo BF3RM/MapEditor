@@ -259,7 +259,7 @@ class GameObject extends THREE.Object3D
 			id: this.guid,
 			name: this.getCleanName(),
 			type: this.typeName,
-			parentGuid: this.parentGuid,
+			parentGuid: this.parentData.guid,
 			draggable: true,
 			droppable: true,
 			children: [],

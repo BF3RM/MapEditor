@@ -40,8 +40,8 @@ class HighlightGroup extends THREE.Group{
 		THREE.SceneUtils.detach( gameObject, this, editor.threeManager.scene );
 
 		// remove child from parent and add it to scene
-		if(gameObject.parentGuid !== null && gameObject.parentGuid !== undefined) {
-			let parent = editor.getGameObjectByGuid(gameObject.parentGuid);
+		if(gameObject.parentData.guid !== null && gameObject.parentData.guid !== undefined) {
+			let parent = editor.getGameObjectByGuid(gameObject.parentData.guid);
 			if(parent !== null && parent !== undefined) {
 				THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, parent );
 			}
