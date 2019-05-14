@@ -2,7 +2,6 @@ class 'CommandActionResult'
 
 local m_Logger = Logger("CommandActionResult", true)
 
-
 function CommandActionResult:__init(arg)
     if arg.type == nil then
         m_Logger:Error("type cant be nil")
@@ -14,12 +13,14 @@ function CommandActionResult:__init(arg)
         return nil
     end
 
-    if arg.gameObjectData == nil then
-        m_Logger:Error("gameObjectData cant be nil")
+    if arg.gameObjectTransferData == nil then
+        m_Logger:Error("gameObjectTransferData cant be nil")
         return nil
     end
 
-    self.gameObjectData = arg.gameObjectData -- has to be set always
+    self.type = arg.type
+    self.sender = arg.sender
+    self.gameObjectTransferData = arg.gameObjectTransferData
 end
 
 return CommandActionResult

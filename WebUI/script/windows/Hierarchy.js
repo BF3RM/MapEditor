@@ -232,7 +232,7 @@ class Hierarchy {
 			let child = editor.getGameObjectByGuid(node.id);
 			let parent = editor.getGameObjectByGuid(par.id);
 
-			if (child === undefined || parent === undefined || parent.type !== "Group" || child.type === "GameEntity"){
+			if (child === undefined || parent === undefined || child.type === "GameEntity"){
 				return false;
 			}
 		}

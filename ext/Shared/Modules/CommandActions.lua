@@ -26,12 +26,12 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		return self:EnableBlueprint(p_Command)
 	end
 
-	local s_GameObjectData = p_Command.gameObjectData
+	local s_GameObjectTransferData = p_Command.gameObjectTransferData
 	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_Command.guid,
-														s_GameObjectData.reference.partitionGuid,
-														s_GameObjectData.reference.instanceGuid,
-														s_GameObjectData.transform,
-														s_GameObjectData.variation)
+														s_GameObjectTransferData.reference.partitionGuid,
+														s_GameObjectTransferData.reference.instanceGuid,
+														s_GameObjectTransferData.transform,
+														s_GameObjectTransferData.variation)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui
@@ -51,12 +51,12 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		s_Entities[#s_Entities + 1] = {
 			guid = s_Entity.uniqueId,
 			type = l_Entity.typeInfo.name,
-			transform = ToLocal(s_Entity.transform, s_GameObjectData.transform),
+			transform = ToLocal(s_Entity.transform, s_GameObjectTransferData.transform),
 			instanceId = s_Entity.instanceId,
 			aabb = {
 				min = tostring(s_Entity.aabb.min),
 				max = tostring(s_Entity.aabb.max),
-				transform = ToLocal(s_Entity.aabbTransform, s_GameObjectData.transform)
+				transform = ToLocal(s_Entity.aabbTransform, s_GameObjectTransferData.transform)
 			},
 		}
 	end
@@ -68,7 +68,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		sender = p_Command.sender,
 		-- name = s_UserData.name, -- name field is obsolete
 		type = 'SpawnedBlueprint',
-		gameObjectData = s_GameObjectData,
+		gameObjectTransferData = s_GameObjectTransferData,
 		entities = s_Entities -- rename to entities because theres no recursive hierarchy implied
 	}
 
@@ -94,7 +94,7 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		type = "DestroyedBlueprint",
-		gameObjectData = nil,
+		gameObjectTransferData = nil,
 		guid =  p_Command.guid,
 		isDeleted = true
 	}
@@ -170,7 +170,7 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		type = "SetTransform",
 		guid = p_Command.guid,
-		userData = {
+		gameObjectTransferData = {
 			transform = p_Command.userData.transform
 		}
 	}

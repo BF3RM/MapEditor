@@ -1,9 +1,9 @@
 
 class VextCommand {
-    constructor(type, partialGameObjectData) {
+    constructor(type, gameObjectTransferData) {
         this.type = type;
-        // The GameObjectData can be incomplete, it gets merged with existing data on lua side
+        // The GameObjectTransferData can be incomplete, it gets merged with existing data on lua side
         // Only send the minimal info required by the CommandActions
-        this.gameObjectData = partialGameObjectData;
+        this.gameObjectTransferData = gameObjectTransferData;
     }
 }

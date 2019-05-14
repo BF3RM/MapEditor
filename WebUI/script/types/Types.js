@@ -45,29 +45,3 @@ var LOGLEVEL = {
 	DEBUG: 1,
 	VERBOSE: 2
 };
-
-class ReferenceObject {
-	constructor(typeName, name,  partitionGuid, instanceGuid) {
-		this.typeName = typeName;
-		this.name = name;
-		this.partitionGuid = partitionGuid;
-		this.instanceGuid = instanceGuid;
-	}
-
-	clone() {
-		return new ReferenceObject(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
-	}
-}
-
-class ReferenceObjectData {
-	constructor(reference, variation, name, transform) {
-		this.reference = reference;
-		this.variation = variation;
-		this.name = name;
-		this.transform = transform;
-	}
-
-	clone(guid = GenerateGuid()) {
-		return new ReferenceObjectData(this.reference.clone(), this.variation.toString(), this.name.toString(), this.transform.clone());
-	}
-}

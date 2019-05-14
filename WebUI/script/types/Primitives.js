@@ -8,12 +8,13 @@ class Vec3 extends THREE.Vector3{
 		return new Vec3(this.x, this.y, this.z)
 	}
 
-	fromObject(object) {
+	setFromTable(object) {
 		this.x = Number(object.x);
 		this.y = Number(object.y);
 		this.z = Number(object.z);
 		return this;
 	}
+
 	fromString(matrixString) {
 		matrixString = matrixString.replace(/[(]/g,"");
 		matrixString = matrixString.replace(/[)]/g,", ");

@@ -4,7 +4,6 @@ class Editor {
 		this.editorCore = new EditorCore(debug);
 
 		// Commands
-		signals.spawnBlueprintRequested.add(this.onBlueprintSpawnRequested.bind(this));
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.enabledBlueprint.add(this.onEnabledBlueprint.bind(this));
 		signals.disabledBlueprint.add(this.onDisabledBlueprint.bind(this));
@@ -66,6 +65,7 @@ class Editor {
 			this.playerName = name;
 		}
 	}
+
 	getPlayerName() {
 		return this.playerName;
 	}
@@ -98,14 +98,14 @@ class Editor {
 		}
 	}
 
-
 	Duplicate() {
 		let scope = this;
 		let commands = [];
-		editor.selectionGroup.children.forEach(function(child) {
-			let gameObjectData = child.gameObjectData.clone();
-			gameObjectData.guid = GenerateGuid();
-			commands.push(new SpawnBlueprintCommand(guid, gameObjectData));
+		editor.selectionGroup.children.forEach(function(childGameObject) {
+			let gameObjectTransferData = childGameObject.getGameObjectTransferData()
+			gameObjectTransferData.guid = GenerateGuid();
+
+			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
 		console.log(commands);
 		scope.execute(new BulkCommand(commands));
@@ -115,8 +115,10 @@ class Editor {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
-			let guid = GenerateGuid();
-			commands.push(new SpawnBlueprintCommand(guid, childGameObject.gameObjectData));
+			let gameObjectTransferData = childGameObject.getGameObjectTransferData()
+			gameObjectTransferData.guid = GenerateGuid();
+
+			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
 		scope.copy = new BulkCommand(commands);
 	}
@@ -131,48 +133,81 @@ class Editor {
 			scope.execute(scope.copy);
 		}
 	}
+
 	Cut() {
 		this.Copy();
 		this.DeleteSelected();
 	}
-	/*
 
-		Internal shit
+	SpawnBlueprint(blueprint, transform, variation, parentData) {
+		let scope = this;
+		if(blueprint == null) {
+			LogError("Tried to spawn a nonexistent blueprint");
+			return false;
+		}
 
-	 */
+		if(transform === undefined) {
+			transform = scope.editorCore.getRaycastTransform();
+		}
 
+		if(variation === undefined) {
+			variation = blueprint.getDefaultVariation();
+		}
 
+		//Spawn blueprint
+		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
+		let gameObjectTransferData = new GameObjectTransferData({
+			guid: GenerateGuid(),
+			name: blueprint.name,
+			parentData: parentData,
+			blueprintCtrRef: blueprint.getCtrRef(),
+			transform: transform,
+			variation: variation,
+		});
 
+		scope.execute(new SpawnBlueprintCommand(gameObjectTransferData));
+	}
 
-
-	/*
-
-		General usage
-
-	 */
-
-	DisableSelected() {
+/*	DisableSelected() {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
-			commands.push(new DisableBlueprintCommand(childGameObject.gameObjectData));
+			let gameObjectTransferData = new GameObjectTransferData({
+				guid: childGameObject.guid
+			});
+
+			commands.push(new DisableBlueprintCommand(gameObjectTransferData));
 		});
 		if(commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
 		}
-	}
+	}*/
+
+	// TODO: EnableBlueprintCommand and DisableBlueprintCommand are not invoked anywhere, but the whole lua side works.
 
 	DeleteSelected() {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
 			if (childGameObject instanceof GameObject) {
-				commands.push(new DestroyBlueprintCommand(childGameObject.guid));
+				commands.push(new DestroyBlueprintCommand(childGameObject.getGameObjectTransferData()));
 			}
 		});
+
 		if(commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
 		}
+	}
+
+	getGameObjectFromGameObjectTransferData(gameObjectTransferData, callerName) {
+		let gameObject = this.getGameObjectByGuid(gameObjectTransferData.guid);
+
+		if(gameObject === undefined) {
+			LogError(callerName + ": Couldn't find the GameObject for GameObjectTransferData. Name: " + gameObjectTransferData.name + " | Guid: " + gameObjectTransferData.guid);
+			return;
+		}
+
+		return gameObject;
 	}
 
 	getGameObjectByGuid(guid) {
@@ -197,26 +232,43 @@ class Editor {
 
 	/*
 
+    Controls
+
+	*/
+
+	onControlMoveStart() {
+		let scope = this;
+		scope.selectionGroup.onMoveStart();
+	}
+
+	onControlMove() {
+		let scope = this;
+		scope.selectionGroup.onMove();
+	}
+
+	onControlMoveEnd() {
+		let scope = this;
+		scope.selectionGroup.onMoveEnd();
+	}
+
+	/*
+
 		Commands
 
 	*/
 
-	onSetObjectName(command) {
-		let gameObject = this.getGameObjectByGuid(command.guid);
-		if(gameObject === undefined) {
-			LogError("Tried to set the name of a null object: " + command.guid);
-			return;
-		}
-		gameObject.setName(command.name);
+	onSetObjectName(commandActionResult) {
+		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
+		let gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, "onSetObjectName");
+
+		gameObject.setName(gameObjectTransferData.name);
 	}
 
-	onSetTransform(command) {
-		let gameObject = this.getGameObjectByGuid(command.guid);
-		if(gameObject === undefined) {
-			LogError("Tried to set the transform of a null object: " + command.guid);
-			return;
-		}
-		gameObject.setTransform(new LinearTransform().setFromTable(command.gameObjectData.transform));
+	onSetTransform(commandActionResult) {
+		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
+		let gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, "onSetTransform");
+
+		gameObject.setTransform(gameObjectTransferData.transform);
 
 		if (this.selectionGroup.children.length === 1 && gameObject === this.selectionGroup.children[0]){
 			this.selectionGroup.setTransform(gameObject.transform);
@@ -225,49 +277,11 @@ class Editor {
 		this.threeManager.Render();
 	}
 
-	onSetVariation(command) {
-		let gameObject = this.getGameObjectByGuid(command.guid);
-		if(gameObject === undefined) {
-			LogError("Tried to set the variation of a null object: " + command.guid);
-			return;
-		}
-		gameObject.setVariation(command.key);
-	}
-	onControlMoveStart() {
-		let scope = this;
-		scope.selectionGroup.onMoveStart();
-	}
-	onControlMove() {
-		let scope = this;
-		scope.selectionGroup.onMove();
-	}
-	onControlMoveEnd() {
-		let scope = this;
-		scope.selectionGroup.onMoveEnd();
+	onSetVariation(commandActionResult) {
+		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
+		let gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, "onSetVariation");
 
-	}
-
-	onBlueprintSpawnRequested(blueprint, transform, variation) {
-	
-		let scope = this;
-		if(blueprint == null) {
-			LogError("Tried to spawn a nonexistent blueprint");
-			return false;
-		}
-		if(transform === undefined) {
-			transform = scope.editorCore.getRaycastTransform();
-		}
-		if(variation === undefined) {
-			variation = blueprint.getDefaultVariation();
-		}
-
-
-		//Spawn blueprint
-		let guid = GenerateGuid();
-		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let gameObjectData = blueprint.getReferenceObjectData(transform, variation);
-
-		scope.execute(new SpawnBlueprintCommand(guid, gameObjectData));
+		gameObject.setVariation(gameObjectTransferData.variation);
 	}
 
 	onDestroyedBlueprint(command) {
@@ -281,19 +295,22 @@ class Editor {
 		this.threeManager.Render();
 	}
 
-	// TODO: change command param to CommandActionResult type
-
-	onSpawnedBlueprint(command) {
+	onSpawnedBlueprint(commandActionResult) {
 		let scope = this;
-		let gameObject = new GameObject(command.guid,
-										command.name,
-										new LinearTransform().setFromTable(command.gameObjectData.transform),
-										command.parentGuid,
-										null,
-										command.gameObjectData);
+		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
+		let gameObjectGuid = gameObjectTransferData.guid
+		let parentGuid = gameObjectTransferData.parentData.guid
 
-		for (let key in command.entities) {
-			let entityInfo = command.entities[key];
+		// TODO: change GameObject ctor
+		let gameObject = new GameObject(commandActionResult.guid,
+										commandActionResult.name,
+										new LinearTransform().setFromTable(commandActionResult.gameObjectTransferData.transform),
+										commandActionResult.parentGuid,
+										null,
+										commandActionResult.gameObjectTransferData);
+
+		for (let key in commandActionResult.entities) {
+			let entityInfo = commandActionResult.entities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
 			let gameEntity = new GameEntity(entityInfo.uniqueId, entityInfo.type, new LinearTransform().setFromTable(entityInfo.transform), entityInfo, null);
 
@@ -302,36 +319,35 @@ class Editor {
 
 		gameObject.updateMatrixWorld();
 
-		this.gameObjects[command.guid] = gameObject;
+		this.gameObjects[gameObjectGuid] = gameObject;
 		// If the parent is the leveldata, ignore all this
 		// todo: make an entry for the leveldata itself maybe?
 
 		// Allows children to be spawned before parents, and then added to the appropriate parent.
-		if(scope.gameContext.levelData[command.parentGuid] == null) {
-			if(this.gameObjects[command.parentGuid] == null) {
-				if(this.missingParent[command.parentGuid] == null) {
-					this.missingParent[command.parentGuid] = []
+		if(scope.gameContext.levelData[parentGuid] == null) {
+			if(this.gameObjects[parentGuid] == null) {
+				if(this.missingParent[parentGuid] == null) {
+					this.missingParent[parentGuid] = []
 				}
-				this.missingParent[command.parentGuid].push(gameObject)
+				this.missingParent[parentGuid].push(gameObject)
 			} else {
-				THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, this.gameObjects[command.parentGuid] );
+				THREE.SceneUtils.attach(gameObject, editor.threeManager.scene, this.gameObjects[parentGuid] );
 			}
 
-			if(this.missingParent[command.guid] != null) {
-				for(let key in this.missingParent[command.guid]) {
-					let child = this.missingParent[command.guid][key];
-					THREE.SceneUtils.attach( child, editor.threeManager.scene, gameObject );
+			if(this.missingParent[gameObjectGuid] != null) {
+				for(let key in this.missingParent[gameObjectGuid]) {
+					let child = this.missingParent[gameObjectGuid][key];
+					THREE.SceneUtils.attach(child, editor.threeManager.scene, gameObject);
 				}
-				delete this.missingParent[command.guid];
+
+				delete this.missingParent[gameObjectGuid];
 			}
 		}
 
-
-
 		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);
-		if(!scope.vext.executing && command.sender === this.getPlayerName()) {
+		if(!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
-			setTimeout(function() {scope.Select(command.guid, false)}, 2);
+			setTimeout(function() {scope.Select(gameObjectGuid, false)}, 2);
 		}
 	}
 
@@ -348,7 +364,7 @@ class Editor {
 	onDisabledBlueprint(command) {
 		let gameObject = editor.getGameObjectByGuid(command.guid)
 		if(gameObject == null) {
-			LogError("Attempted to enable a GameObject that doesn't exist")
+			LogError("Attempted to disable a GameObject that doesn't exist")
 			return
 		}
 		let removeFromHierarchy = command.isDeleted ;

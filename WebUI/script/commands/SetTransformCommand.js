@@ -1,35 +1,27 @@
-const SetTransformCommand = function (guid, newTransform) {
+const SetTransformCommand = function (gameObjectTransferData, newTransform) {
 
 	Command.call( this );
 
 	this.type = 'SetTransformCommand';
 	this.name = 'Set transform';
-	this.guid = guid;
+	this.gameObjectTransferData = gameObjectTransferData;
 	this.newTransform = newTransform;
-
-	let gameObject = editor.getGameObjectByGuid(guid);
-
-	if(gameObject === undefined) {
-		LogError("Attempted to set name for null GameObject");
-	} else {
-		this.oldTransform = gameObject.gameObjectData.transform.clone()
-	}
 };
 
 SetTransformCommand.prototype = {
 	execute: function () {
-		let gameObjectData = {
-			'guid': this.guid,
+		let gameObjectTransferData = new GameObjectTransferData({
+			'guid': this.gameObjectTransferData.guid,
 			'transform': this.newTransform
-		};
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
+		});
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
 	},
 
 	undo: function () {
-		let gameObjectData = {
-			'guid': this.guid,
-			'transform': this.oldTransform
-		};
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
+		let gameObjectTransferData = new GameObjectTransferData({
+			'guid': this.gameObjectTransferData.guid,
+			'transform': this.gameObjectTransferData.transform
+		});
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
 	},
 };

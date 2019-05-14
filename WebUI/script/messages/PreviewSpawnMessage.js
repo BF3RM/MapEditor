@@ -3,7 +3,7 @@ const PreviewSpawnMessage = function (userData) {
 	this.type = 'PreviewSpawnMessage';
 
 	if (userData === undefined) {
-		Log(LOGLEVEL.DEBUG, "Missing spawn gameObjectData");
+		Log(LOGLEVEL.DEBUG, "Missing spawn gameObjectTransferData");
 		return;
 	}
 	this.userData = userData;

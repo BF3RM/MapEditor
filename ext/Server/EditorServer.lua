@@ -16,23 +16,23 @@ function EditorServer:RegisterVars()
 	self.m_Queue = {};
 
 	self.m_Transactions = {}
-	self.m_GameObjects = {}
+	self.m_GameObjectTransferDatas = {}
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 
 	local s_TransactionId = p_TransactionId
-	local s_UpdatedGameObjects = {}
+	local s_UpdatedGameObjectTransferDatas = {}
 	while (s_TransactionId <= #self.m_Transactions) do
 		local s_Guid = self.m_Transactions[s_TransactionId]
 		if(s_Guid ~= nil) then
-			s_UpdatedGameObjects[s_Guid] = self.m_GameObjects[s_Guid]
+			s_UpdatedGameObjectTransferDatas[s_Guid] = self.m_GameObjectTransferDatas[s_Guid]
 			s_TransactionId = s_TransactionId + 1
 		else
 			m_Logger:Write("shit's nil")
 		end
 	end
-	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjects)
+	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
 end
 
 
@@ -62,7 +62,7 @@ function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
 				s_UserData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
 			end
 
-			self.m_GameObjects[l_Command.guid] = MergeUserdata(self.m_GameObjects[l_Command.guid], s_UserData)
+			self.m_GameObjectTransferDatas[l_Command.guid] = MergeUserdata(self.m_GameObjectTransferDatas[l_Command.guid], s_UserData)
 
 			table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
 			table.insert(s_CommandActionResults, s_CommandActionResult)
@@ -131,7 +131,7 @@ function EditorServer:UpdateLevel(p_Update)
 	local s_Responses = {}
 
 	for s_Guid, s_GameObject in pairs(p_Update) do
-		if(self.m_GameObjects[s_Guid] == nil) then
+		if(self.m_GameObjectTransferDatas[s_Guid] == nil) then
 			local s_StringGuid = tostring(s_Guid)
 
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
@@ -164,7 +164,7 @@ function EditorServer:UpdateLevel(p_Update)
 				table.insert(s_Responses, s_Command)
 			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjects[s_Guid], s_GameObject)
+			local s_Changes = GetChanges(self.m_GameObjectTransferDatas[s_Guid], s_GameObject)
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
 				m_Logger:Write("--------------------------------------------------------------------")

@@ -7,9 +7,13 @@ require "__shared/Modules/CommandActions"
 require "__shared/Modules/VanillaBlueprintsParser"
 require "__shared/Modules/InstanceParser"
 require "__shared/Types/Enums"
-require "__shared/Types/GameObject"
-
 require "__shared/EditorCommon"
+require "__shared/Types/AABB"
+require "__shared/Types/CtrRef"
+require "__shared/Types/CommandActionResult"
+require "__shared/Types/GameEntityData"
+require "__shared/Types/GameObjectTransferData"
+require "__shared/Types/GameObjectParentData"
 
 
 

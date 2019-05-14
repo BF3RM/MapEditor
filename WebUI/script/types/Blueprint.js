@@ -5,7 +5,6 @@ class Blueprint {
 		this.typeName = typeName;
 		this.name = name;
 		this.variations = variations;
-
 		this.favorited = false;
 	}
 
@@ -30,6 +29,7 @@ class Blueprint {
 	hasVariation () {
 		return !(this.variations === undefined || Object.keys(this.variations).length == null || Object.keys(this.variations).length === 0);
 	}
+
 	isVariationValid(variation) {
 		let scope = this;
 		return (scope.hasVariation() /* && scope.getVariation(variation) !== undefined */);
@@ -55,28 +55,14 @@ class Blueprint {
 		}
 	}
 
-	getReference() {
+	getCtrRef() {
 		let scope = this;
-		return new ReferenceObject(scope.typeName, scope.name, scope.partitionGuid, scope.instanceGuid);
+		return new CtrRef(scope.typeName, scope.name, scope.partitionGuid, scope.instanceGuid);
 	}
 
 	// Changes Some/Path/BlueprintName into just BlueprintName
 	getName() {
 		return this.name.substring(this.name.lastIndexOf('/')+1);
-	}
-
-	getReferenceObjectData(transform, variation, name, ) {
-		let scope = this;
-		if(variation === undefined) {
-			variation = scope.getDefaultVariation()
-		}
-		if(name === undefined) {
-			name = scope.getName()
-		}
-		if(transform === undefined) {
-			transform = new LinearTransform()
-		}
-		return new ReferenceObjectData(scope.getReference(), variation, name, transform);
 	}
 
 	CreateEntry(folderName) {
@@ -120,7 +106,7 @@ class Blueprint {
 		});
 
 		name.dom.addEventListener('click', function(e, data) {
-			signals.spawnBlueprintRequested.dispatch(blueprint);
+			editor.SpawnBlueprint(blueprint);
 		});
 
 		$(entry.dom).draggable({

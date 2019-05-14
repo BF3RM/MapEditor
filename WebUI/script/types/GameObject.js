@@ -1,20 +1,18 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, name, transform, parent, children, gameObjectData)
+	constructor(guid, typeName, name, transform, parentData, children, blueprint, variation)
 	{
 		super( );
 
-		if (guid != gameObjectData.guid) {
-			LogError("Mismatch between GameObject GUID and GameObjectData GUID")
-		}
-
 		this.guid = guid;
-		this.type = gameObjectData.reference.typeName;
-		this.name = name; // name is unused / obsolete
+		this.typeName = typeName;
+		this.name = name;
 		this.transform = transform;
-		this.parentGuid = parent;
-		this.gameObjectData = gameObjectData;
+		this.parentData = parentData;
+		this.variation = variation;
+		this.blueprint = blueprint;
+
 		this.selected = false;
 		this.matrixAutoUpdate = false;
 		this.visible = true;
@@ -22,7 +20,7 @@ class GameObject extends THREE.Object3D
 		this.highlighted = false;
 
 		if (children !== null){
-			for (var i = children.length - 1; i >= 0; i--) {
+			for (let i = children.length - 1; i >= 0; i--) {
 				this.add(children[i]);
 			}
 		}
@@ -33,14 +31,23 @@ class GameObject extends THREE.Object3D
 	}
 
 	getCleanName() {
-		return this.gameObjectData.name.replace(/^.*[\\\/]/, '');
+		return this.name.replace(/^.*[\\\/]/, '');
 	}
 	
 	hasMoved() {
 		return !this.transform.toMatrix().equals(this.matrixWorld.elements);
 	}
 
-
+	getGameObjectTransferData(){
+		return new GameObjectTransferData({
+			guid: GenerateGuid(),
+			name: this.name,
+			blueprintCtrRef: this.blueprint.getCtrRef(),
+			parentData: this.parentData,
+			transform: this.transform,
+			variation: this.variation
+		});
+	}
 
 	renderInit()
 	{
@@ -111,8 +118,7 @@ class GameObject extends THREE.Object3D
 	}
 
 	setTransform(linearTransform) {
-		this.transform = linearTransform;
-		this.gameObjectData.transform = linearTransform;
+		this.transform = linearTransformg;
 		this.updateTransform();
 
 		for(let key in this.children) {
@@ -126,14 +132,14 @@ class GameObject extends THREE.Object3D
 		signals.objectChanged.dispatch(this, "transform", linearTransform);
 
 	}
+
 	setName(name) {
 		this.name = name;
-		this.gameObjectData.name = name;
 		signals.objectChanged.dispatch(this, "name", name);
 	}
 
 	setVariation(key) {
-		this.gameObjectData.variation = key;
+		this.variation = key;
 		signals.objectChanged.dispatch(this, "variation", key);
 	}
 
@@ -142,7 +148,8 @@ class GameObject extends THREE.Object3D
 			guid = GenerateGuid();
 		}
 
-		return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.gameObjectData);
+		// TODO: Create a new GameObject with a new GUID
+		// return new GameObject(guid, this.name, this.transform, this.objectParent, this.children, this.gameObjectTransferData);
 	}
 
 	onMoveStart() {
@@ -175,6 +182,7 @@ class GameObject extends THREE.Object3D
 	Select() {
 		this.onSelected();
 	}
+
 	Deselect() {
 		this.onDeselected();
 	}
@@ -255,7 +263,7 @@ class GameObject extends THREE.Object3D
 		return {
 			id: this.guid,
 			name: this.getCleanName(),
-			type: this.type,
+			type: this.typeName,
 			parentGuid: this.parentGuid,
 			draggable: true,
 			droppable: true,
@@ -266,11 +274,4 @@ class GameObject extends THREE.Object3D
 		}
 	}
 
-}
-
-class EntityCreationParams {
-	constructor(variation, networked) {
-		this.variation = variation;
-		this.networked = networked;
-	}
 }

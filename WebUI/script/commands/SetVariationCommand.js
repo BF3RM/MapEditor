@@ -1,47 +1,34 @@
-const SetVariationCommand = function (guid, variationKey) {
+const SetVariationCommand = function (gameObjectTransferData, newVariationKey) {
 
 	Command.call(this);
 
 	this.type = 'SetVariationCommand';
-	this.guid = guid;
-	this.newVariationKey = variationKey;
+	this.gameObjectTransferData = gameObjectTransferData;
+	this.newVariationKey = newVariationKey;
 
-	if (variationKey === undefined) {
+	if (newVariationKey === undefined) {
 		LogError("Missing variationKey");
 		return;
-	}
-
-	let gameObject = editor.getGameObjectByGuid(guid);
-
-	if (gameObject == null) {
-		LogError("Tried setting variation for a GameObject that doesnt exist.");
-		return;
-	}
-
-	if(gameObject.gameObjectData == null) {
-		LogError("Attempted to set the variation for a GameObject without gameObjectData")
-	} else {
-		this.oldVariationKey = gameObjectData.variation;
 	}
 };
 
 
 SetVariationCommand.prototype = {
 	execute: function () {
-		let gameObjectData = {
-			'guid': this.guid,
+		let gameObjectTransferData = new GameObjectTransferData({
+			'guid': this.gameObjectTransferData.guid,
 			'variation': this.newVariationKey
-		};
+		});
 
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
 	},
 
 	undo: function () {
-		let gameObjectData = {
-			'guid': this.guid,
-			'variation': this.oldVariationKey
-		};
+		let gameObjectTransferData = new GameObjectTransferData({
+			'guid': this.gameObjectTransferData.guid,
+			'variation': this.gameObjectTransferData.variation
+		});
 
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
+		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
 	},
 };

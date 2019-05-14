@@ -1,27 +1,26 @@
-const EnableBlueprintCommand = function (guid) {
+const EnableBlueprintCommand = function (gameObjectTransferData) {
 
     Command.call(this);
 
     this.type = 'EnableBlueprintCommand';
     this.name = 'Enable Blueprint';
-    this.guid = guid;
+    this.gameObjectTransferData = gameObjectTransferData;
 };
 
 
 EnableBlueprintCommand.prototype = {
-
     execute: function () {
-        let gameObjectData = {
-            'guid': this.guid
+        let gameObjectTransferData = {
+            'guid': this.gameObjectTransferData.guid
         };
-        editor.vext.SendCommand(new VextCommand(this.type, gameObjectData))
+        editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
     },
 
     undo: function () {
-        let gameObjectData = {
-            'guid': this.guid
+        let gameObjectTransferData = {
+            'guid': this.gameObjectTransferData.guid
         };
-        editor.vext.SendCommand(new VextCommand("DisableBlueprintCommand", gameObjectData))
+        editor.vext.SendCommand(new VextCommand("DisableBlueprintCommand", gameObjectTransferData))
     },
 };
 

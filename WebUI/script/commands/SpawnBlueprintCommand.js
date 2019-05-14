@@ -1,29 +1,24 @@
-const SpawnBlueprintCommand = function (gameObjectData) {
+const SpawnBlueprintCommand = function (gameObjectTransferData) {
 
 	Command.call(this);
 
 	this.type = 'SpawnBlueprintCommand';
-	this.name = 'Spawn Blueprint: ' + gameObjectData.name;
-
-	if (gameObjectData === undefined) {
-		Log(LOGLEVEL.DEBUG, "Missing spawn gameObjectData");
-		return;
-	}
-
-	this.gameObjectData = gameObjectData.clone(); // sending the whole GameObjectData as a reference
-
-	this.guid = gameObjectData.guid
+	this.name = 'Spawn Blueprint: ' + gameObjectTransferData.name;
+	this.gameObjectTransferData = gameObjectTransferData
 };
 
 
 SpawnBlueprintCommand.prototype = {
 
 	execute: function () {
-		editor.vext.SendCommand(new VextCommand(this.type, this.gameObjectData))
+		editor.vext.SendCommand(new VextCommand(this.type, this.gameObjectTransferData))
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand("DestroyBlueprintCommand"))
+		let gameObjectTransferData = new GameObjectTransferData({
+			'guid': this.gameObjectTransferData.guid,
+		});
+		editor.vext.SendCommand(new VextCommand("DestroyBlueprintCommand", gameObjectTransferData))
 	},
 };
 
