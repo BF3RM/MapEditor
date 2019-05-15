@@ -2,12 +2,12 @@ class 'MapEditorServer'
 
 local m_Logger = Logger("MapEditorServer", true)
 
+EditorServer = require "EditorServer"
+
 VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
 ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
 CommandActions = CommandActions(Realm.Realm_ClientAndServer)
-
-EditorServer = require "EditorServer"
 EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
 
 function MapEditorServer:__init()

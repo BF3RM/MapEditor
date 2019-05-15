@@ -20,7 +20,7 @@ EditorMode = {
 	Play = 2
 }
 
-CommandActionResultType = {
+ActionResultType = {
 	Success = 1,
 	Failure = 2,
 	Queue = 3

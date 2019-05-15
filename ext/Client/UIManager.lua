@@ -1,7 +1,5 @@
 class 'UIManager'
 
-local m_Freecam = require "Freecam"
-local m_Editor = require "Editor"
 local m_Logger = Logger("InstanceParser", true)
 
 function UIManager:__init()
@@ -39,7 +37,7 @@ end
 function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
 		
-		if m_Freecam:GetCameraMode() == CameraMode.FreeCam then
+		if Freecam:GetCameraMode() == CameraMode.FreeCam then
 			self:DisableFreecam()
 		else
 			self:EnableFreecam()
@@ -49,8 +47,8 @@ function UIManager:OnUpdateInput(p_Delta)
 		-- We let go of right mouse button. Activate the UI again.
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
 		self:DisableFreecamMovement()
-		m_Editor:SetPendingRaycast(RaycastType.Camera)
-        m_Editor.m_FreecamMoving = false
+		Editor:SetPendingRaycast(RaycastType.Camera)
+		Freecam.isMoving = false
 	end
 
 end
@@ -62,14 +60,14 @@ end
 function UIManager:EnableFreecamMovement()
 	WebUI:DisableKeyboard()
 	WebUI:DisableMouse()
-    m_Editor.m_FreecamMoving = true
+	Freecam.isMoving = true
 end
 
 function UIManager:DisableFreecamMovement()
-	if m_Freecam:GetCameraMode() == CameraMode.FreeCam then
+	if Freecam:GetCameraMode() == CameraMode.FreeCam then
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
-		m_Editor.m_FreecamMoving = false
+		Freecam.isMoving = false
 	end
 end
 
@@ -81,7 +79,7 @@ end
 function UIManager:EnableFreecam()
 	NetEvents:SendLocal('EnableInputRestriction')
 
-	m_Freecam:Enable()
+	Freecam:Enable()
 
 	WebUI:BringToFront()
 	WebUI:EnableMouse()
@@ -92,13 +90,12 @@ end
 
 function UIManager:DisableFreecam()
 	NetEvents:SendLocal('DisableInputRestriction')
-	m_Freecam:Disable()
+	Freecam:Disable()
 	--WebUI:BringToFront()
 	-- WebUI:Hide()
 	WebUI:DisableMouse()
 
 	self:EnableFreecamMovement()
-
 end
 
 

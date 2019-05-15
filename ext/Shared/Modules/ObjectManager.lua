@@ -73,6 +73,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 		m_Logger:Write("Spawning failed")
 		return false
 	end
+
 	local s_Spatial = {}
 	local s_Offsets = {}
 
@@ -86,7 +87,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 		end
 	end
 
-
+	-- TODO: Check if we actually need to have the spawned entities
 	self.m_SpawnedEntities[p_Guid] = s_Spatial
 	self.m_SpawnedOffsets[p_Guid] = s_Offsets
 
@@ -127,6 +128,8 @@ function ObjectManager:DestroyEntity(p_Guid)
 
 	local s_Entities = self:GetEntityByGuid(p_Guid)
 
+	print(p_Guid)
+
 	if(s_Entities == false or #s_Entities == 0) then
 		m_Logger:Write(s_Entities)
 		m_Logger:Write("Failed to get entities")
@@ -141,6 +144,7 @@ function ObjectManager:DestroyEntity(p_Guid)
 			entity:Destroy()
 		end
 	end
+
 	return true
 end
 
@@ -180,17 +184,18 @@ end
 
 function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
 	if self.m_SpawnedEntities[p_Guid] == nil then
-		m_Logger:Write('Object with id ' .. p_Guid .. ' does not exist')
+		m_Logger:Error('Object with id ' .. p_Guid .. ' does not exist')
 		return false
 	end
+
 	for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
 		if(l_Entity == nil) then
-			m_Logger:Write("Entity is nil?")
+			m_Logger:Error("Entity is nil?")
 			return false
 		end
 
 		if(not l_Entity:Is("SpatialEntity"))then
-			m_Logger:Write("not spatial")
+			m_Logger:Warning("not spatial")
 			goto continue
 		end
 		self.m_ParentTransforms[p_Guid] = p_LinearTransform
@@ -215,8 +220,10 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 		else
 			m_Logger:Write("entity is nil??")
 		end
+
 		::continue::
 	end
+
 	return true
 end
 

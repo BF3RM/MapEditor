@@ -9,8 +9,6 @@ function CommandActions:__init(p_Realm)
 end
 
 function CommandActions:RegisterVars()
-	self.m_Queue = {}
-
 	m_Logger:Write("Initialized vars")
 
 	self.SpawnBlueprintCommand = self.SpawnBlueprint
@@ -21,15 +19,20 @@ function CommandActions:RegisterVars()
 	self.DisableBlueprintCommand = self.DisableBlueprint
 end
 
-function CommandActions:SpawnBlueprint(p_CommandActionResult, p_UpdatePass)
-	if(IsVanilla(p_CommandActionResult.gameObjectTransferData.guid)) then
-		return self:EnableBlueprint(p_Command)
+function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The SpawnBlueprintCommand needs to have a valid gameObjectTransferData set.")
+		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = p_CommandActionResult.gameObjectTransferData
-	local s_SpawnResult = ObjectManager:SpawnBlueprint(p_CommandActionResult.gameObjectTransferData.guid,
-														s_GameObjectTransferData.reference.partitionGuid,
-														s_GameObjectTransferData.reference.instanceGuid,
+	if(IsVanilla(p_Command.gameObjectTransferData.guid)) then
+		return self:EnableBlueprint(p_Command, p_UpdatePass)
+	end
+
+	local s_GameObjectTransferData = p_Command.gameObjectTransferData
+	local s_SpawnResult = ObjectManager:SpawnBlueprint(s_GameObjectTransferData.guid,
+														s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
+														s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
 														s_GameObjectTransferData.transform,
 														s_GameObjectTransferData.variation)
 
@@ -37,7 +40,7 @@ function CommandActions:SpawnBlueprint(p_CommandActionResult, p_UpdatePass)
 		-- Send error to webui
 		m_Logger:Write("Failed to spawn blueprint. ")
 
-		return nil, CommandActionResultType.Failure
+		return nil, ActionResultType.Failure
 	end
 
 	local s_Entities = {}
@@ -45,8 +48,6 @@ function CommandActions:SpawnBlueprint(p_CommandActionResult, p_UpdatePass)
     --local l_Entity = s_SpawnResult[1]
 	for _, l_Entity in ipairs(s_SpawnResult) do
 		local s_Entity = SpatialEntity(l_Entity)
-
--- ENTITYDATA
 
 		s_Entities[#s_Entities + 1] = {
 			guid = s_Entity.uniqueId,
@@ -61,121 +62,155 @@ function CommandActions:SpawnBlueprint(p_CommandActionResult, p_UpdatePass)
 		}
 	end
 
-	-- TODO: Change to CommandActionResult
+	-- we can use the gameObjectTransferData that we received, fill in the entities and send it back
+	s_GameObjectTransferData.gameEntities = s_Entities
 
-	local s_CommandActionResult = { -- export to own class. discuss structure. pack everything into 'data' property?
-		guid = p_CommandActionResult.gameObjectTransferData.guid,
-		sender = p_CommandActionResult.sender,
-		-- name = s_UserData.name, -- name field is obsolete
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
 		type = 'SpawnedBlueprint',
 		gameObjectTransferData = s_GameObjectTransferData,
-		entities = s_Entities -- rename to entities because theres no recursive hierarchy implied
 	}
 
-	return s_CommandActionResult, CommandActionResultType.Success
+	return s_CommandActionResult, ActionResultType.Success
 end
 
-function CommandActions:DestroyBlueprint(p_CommandActionResult, p_UpdatePass)
-	if(IsVanilla(p_CommandActionResult.gameObjectTransferData.guid)) then
-		return CommandActions:DisableBlueprint(p_Command)
+function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The DestroyBlueprint needs to have a valid gameObjectTransferData set.")
+		return
+	end
+
+	if(IsVanilla(p_Command.gameObjectTransferData.guid)) then
+		return CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 	end
 
 	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
-        return nil, CommandActionResultType.Queue
+        return nil, ActionResultType.Queue
     end
 
-	local s_Result = ObjectManager:DestroyEntity(p_CommandActionResult.gameObjectTransferData.guid)
+	local s_Result = ObjectManager:DestroyEntity(p_Command.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
-		m_Logger:Write("Failed to destroy entity: " .. p_CommandActionResult.gameObjectTransferData.guid)
+		m_Logger:Write("Failed to destroy entity: " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
 	end
 
-	-- TODO: Change to CommandActionResult
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		isDeleted = true
+	}
 
 	local s_CommandActionResult = {
+		sender = p_Command.sender,
 		type = "DestroyedBlueprint",
-		gameObjectTransferData = nil,
-		guid =  p_CommandActionResult.gameObjectTransferData.guid,
-		isDeleted = true
+		gameObjectTransferData = s_GameObjectTransferData
 	}
 
-	return s_CommandActionResult, CommandActionResultType.Success
+	return s_CommandActionResult, ActionResultType.Success
 end
 
-function CommandActions:EnableBlueprint(p_CommandActionResult, p_UpdatePass)
-	local s_Result = ObjectManager:EnableEntity(p_CommandActionResult.gameObjectTransferData.guid)
-
-	if(s_Result == false) then
-		m_Logger:Write("Failed to enable blueprint: " .. p_CommandActionResult.gameObjectTransferData.guid)
+function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The EnableBlueprint needs to have a valid gameObjectTransferData set.")
+		return
 	end
 
-	-- TODO: Change to CommandActionResult
+	local s_Result = ObjectManager:EnableEntity(p_Command.gameObjectTransferData.guid)
+
+	if(s_Result == false) then
+		m_Logger:Write("Failed to enable blueprint: " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
+	end
+
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		isEnabled = true
+	}
 
 	local s_CommandActionResult = {
+		sender = p_Command.sender,
 		type = "EnabledBlueprint",
-		guid =  p_CommandActionResult.gameObjectTransferData.guid,
-		isDeleted = false
+		gameObjectTransferData =  s_GameObjectTransferData,
 	}
 
-	return s_CommandActionResult, CommandActionResultType.Success
+	return s_CommandActionResult, ActionResultType.Success
 end
 
-function CommandActions:DisableBlueprint(p_CommandActionResult, p_UpdatePass)
-	local s_Result = ObjectManager:DisableEntity(p_CommandActionResult.gameObjectTransferData.guid)
+function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The DisableBlueprint needs to have a valid gameObjectTransferData set.")
+		return
+	end
+
+	local s_Result = ObjectManager:DisableEntity(p_Command.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
-		m_Logger:Write("Failed to disable blueprint: " .. p_CommandActionResult.gameObjectTransferData.guid)
+		m_Logger:Write("Failed to disable blueprint: " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
 	end
 
-	-- TODO: Change to CommandActionResult
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		isEnabled = false
+	}
 
 	local s_CommandActionResult = {
+		sender = p_Command.sender,
 		type = "DisabledBlueprint",
-		guid =  p_CommandActionResult.gameObjectTransferData.guid,
-		isDeleted = true
+		gameObjectTransferData = s_GameObjectTransferData,
 	}
 
-	return s_CommandActionResult, CommandActionResultType.Success
+	return s_CommandActionResult, ActionResultType.Success
 end
 
-function CommandActions:SelectGameObject(p_CommandActionResult, p_UpdatePass)
+function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The SelectGameObject needs to have a valid gameObjectTransferData set.")
+		return
+	end
 
-	if (ObjectManager:GetEntityByGuid(p_CommandActionResult.gameObjectTransferData.guid) == nil) then
+	if (ObjectManager:GetEntityByGuid(p_Command.gameObjectTransferData.guid) == nil) then
 		m_Logger:Write("Failed to select that gameobject")
-		return nil, CommandActionResultType.Failure
+		return nil, ActionResultType.Failure
 	end
 
-	-- TODO: Change to CommandActionResult
-
-	local s_CommandActionResult = {
-		guid = p_CommandActionResult.gameObjectTransferData.guid,
-		type = 'SelectedGameObject'
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
 	}
 
-	m_Logger:Write("Selected!")
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = 'SelectedGameObject',
+		gameObjectTransferData = s_GameObjectTransferData,
+	}
 
-	return s_CommandActionResult, CommandActionResultType.Success
+	return s_CommandActionResult, ActionResultType.Success
 end
 
-function CommandActions:SetTransform(p_CommandActionResult, p_UpdatePass)
-	local s_Result = ObjectManager:SetTransform(p_CommandActionResult.gameObjectTransferData.guid, p_CommandActionResult.gameObjectTransferData.transform, true)
-	if (s_Result == false) then
-		-- Notify WebUI of failed
-		m_Logger:Write("failed")
-		return nil, CommandActionResultType.Failure
+function CommandActions:SetTransform(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The SetTransform needs to have a valid gameObjectTransferData set.")
+		return
 	end
 
-	-- TODO: Change to CommandActionResult
+	local s_Result = ObjectManager:SetTransform(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.transform, true)
+	if (s_Result == false) then
+		m_Logger:Write("Failed to set transform for object " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
+	end
 
-	local s_CommandActionResult = {
-		type = "SetTransform",
-		guid = p_CommandActionResult.gameObjectTransferData.guid,
-		gameObjectTransferData = {
-			transform = p_CommandActionResult.userData.transform
-		}
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		transform = p_Command.gameObjectTransferData.transform
 	}
 
-	return s_CommandActionResult, CommandActionResultType.Success
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = "SetTransform",
+		gameObjectTransferData = s_GameObjectTransferData
+	}
+
+	return s_CommandActionResult, ActionResultType.Success
 end
 
 return CommandActions
