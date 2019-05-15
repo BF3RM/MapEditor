@@ -170,13 +170,13 @@
 					</li>
 				</ul>
 				<div id="tools">
-					<label for="select"><i class="selectIcon"></i></label>
+					<label for="select"><i class="selectIcon" onclick="editor.threeManager.SetGizmoMode('select')"></i></label>
 					<input type="radio" name="tools" id="select" checked="">
-					<label for="translate"><i class="translateIcon"></i></label>
+					<label for="translate"><i class="translateIcon" onclick="editor.threeManager.SetGizmoMode('translate')"></i></label>
 					<input type="radio" name="tools" id="translate">
-					<label for="rotate"><i class="rotateIcon"></i></label>
+					<label for="rotate"><i class="rotateIcon" onclick="editor.threeManager.SetGizmoMode('rotate')"></i></label>
 					<input type="radio" name="tools" id="rotate">
-					<label for="scale"><i class="scaleIcon"></i></label>
+					<label for="scale"><i class="scaleIcon" onclick="editor.threeManager.SetGizmoMode('scale')"></i></label>
 					<input type="radio" name="tools" id="scale">
 				</div>
 

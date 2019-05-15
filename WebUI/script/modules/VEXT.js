@@ -132,6 +132,7 @@ class VEXTInterface {
 		console.log("Done executing");
 		let t1 = performance.now();
 		console.log("Execution took " + (t1 - t0) + " milliseconds.");
+		editor.threeManager.Render();
 	}
 
 	SendEvent(eventName, param){
@@ -209,7 +210,7 @@ class VEXTInterface {
 		} else {
 			this.commands[message.type](message);
 		}
-
+		editor.threeManager.Render();
 	}
 }
 

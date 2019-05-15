@@ -140,7 +140,6 @@ class EditorCore {
 
 
     onPreviewDragStart(blueprint) {
-        this.previewing = true;
         this.previewBlueprint = blueprint;
     }
 
@@ -148,7 +147,7 @@ class EditorCore {
         let direction = editor.threeManager.getMouse3D(e);
         let s2wMessage = new SetScreenToWorldTransformMessage(direction);
         editor.vext.SendMessage(s2wMessage);
-        if(this.previewBlueprint == null) {
+        if(this.previewBlueprint == null || this.previewing == false) {
             return
         }
         let moveMessage = new PreviewMoveMessage(this.screenToWorldTransform.clone());
@@ -162,6 +161,7 @@ class EditorCore {
     }
 
     onPreviewStart() {
+        console.log(this.previewing);
         this.previewing = true;
         let userData = this.previewBlueprint.getCtrRef();
         let message = new PreviewSpawnMessage(userData);
@@ -169,11 +169,13 @@ class EditorCore {
     }
 
     onPreviewStop() {
+        console.log(this.previewing);
         this.previewing = false;
         editor.vext.SendMessage(new PreviewDestroyMessage());
     }
 
     onPreviewDrop() {
+        console.log(this.previewing);
         this.previewing = false;
         editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
         editor.vext.SendMessage(new PreviewDestroyMessage());

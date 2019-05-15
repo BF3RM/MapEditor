@@ -226,8 +226,7 @@ class Hierarchy {
 		let currentNode = scope.tree.getNodeById(guid);
 
 		currentNode.state.selected = true;
-		scope.tree.updateNode(currentNode, {}, { shallowRendering: true });
-
+		scope.tree.updateNode(currentNode, {}, { shallowRendering: false });
 		if(scrollTo) {
 			scope.tree.scrollToNode(currentNode);
 		}

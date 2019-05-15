@@ -254,6 +254,7 @@ class THREEManager {
 
 		if (p_Mode === "select") {
 			this.HideGizmo();
+			this.Render();
 			return
 		}
 
@@ -262,6 +263,7 @@ class THREEManager {
 		}
 		this.control.setMode(p_Mode);
 		console.log("Changed gizmo mode to " + p_Mode)
+		this.Render();
 	}
 
 	SetWorldSpace(p_Space) {

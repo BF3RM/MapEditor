@@ -179,29 +179,21 @@ class Inspector {
 		}
 	}
 
-	UpdateInspector(selectionGroup, isMultipleSelection) {
+	UpdateInspector(gameObject, isMultipleSelection, key, value) {
 
-		if(selectionGroup == null) {
-			console.log("Tried to update the inspector and selectionGroup is null?");
+		if(gameObject == null) {
+			console.log("Tried to update the inspector and gameObject is null?");
 			return;
 		}
 
 		if (isMultipleSelection) {
 			this.UpdateName("---Multiple--");
 		}else{
-			let gameObject = selectionGroup.children[0];
-			if (gameObject == null){
-				// Selection group has no children
-				return;
-			}
-
 			this.UpdateName(gameObject.name);
-			if (selectionGroup.children.length === 1) {
-				this.UpdateVariation(gameObject, gameObject.variation);
-			}
+			this.UpdateVariation(gameObject, gameObject.variation);
 		}
 		
-		this.UpdateTransform(selectionGroup, selectionGroup.transform);
+		this.UpdateTransform(gameObject, gameObject.transform);
 		
 	}
 
@@ -223,7 +215,7 @@ class Inspector {
 			return;
 		}
 
-		this.UpdateInspector(editor.selectionGroup, isMultipleSelection)
+		this.UpdateInspector(gameObject, isMultipleSelection, "full");
 		this.ShowContent();
 	}
 
@@ -244,7 +236,7 @@ class Inspector {
 			if(this.updates[key] !== undefined) {
 				this.updates[key](go, value);
 			} else {
-				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1);
+				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1, key, value);
 			}
 		}
 	}
@@ -277,8 +269,8 @@ class Inspector {
 
 				// if(isNaN(controlsVal[index][val])) {
 				if(isNaN(control[val])) {
-					console.log("dafuq")
-					transform[con][val].addClass("invalid")
+					console.log("dafuq");
+					transform[con][val].addClass("invalid");
 					return
 				}
 				if(transform[con][val].hasClass("invalid")) {
@@ -308,7 +300,6 @@ class Inspector {
 			this.variation.setOptions([]);
 			LogError("Blueprint Variations not available");
 		}else{
-			console.log(blueprint.variations);
 			this.variation.setDisabled(false);
 			let variations = [];
 			for(let key in blueprint.variations) {
