@@ -15,8 +15,6 @@ require "__shared/Types/GameEntityData"
 require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
 
-
-
 local m_Logger = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()

@@ -52,26 +52,26 @@ function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
 			return false
 		end
 
-		local s_CommandActionResult, s_CommandActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
+		local s_CommandActionResult, s_ActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
 
-		if (s_CommandActionResultType == CommandActionResultType.Success) then
-			local s_UserData
-			if s_CommandActionResult.userData ~= nil then
-				s_UserData = MergeUserdata(s_CommandActionResult.userData, {isDeleted = s_CommandActionResult.isDeleted or false})
-			else
-				s_UserData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
+		if (s_ActionResultType == ActionResultType.Success) then
+			if (s_CommandActionResult.gameObjectTransferData == nil) then
+				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
-			self.m_GameObjectTransferDatas[l_Command.guid] = MergeUserdata(self.m_GameObjectTransferDatas[l_Command.guid], s_UserData)
-
-			table.insert(self.m_Transactions, tostring(l_Command.guid)) -- Store that this transaction has happened.
+			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
 			table.insert(s_CommandActionResults, s_CommandActionResult)
 
-		elseif (s_CommandActionResultType == CommandActionResultType.Queue) then
+			local s_Guid = s_GameObjectTransferData.guid
+			self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
+
+			table.insert(self.m_Transactions, s_Guid) -- Store that this transaction has happened.
+
+		elseif (s_ActionResultType == ActionResultType.Queue) then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue, l_Command)
 
-		elseif (s_CommandActionResultType == CommandActionResultType.Failure) then
+		elseif (s_ActionResultType == ActionResultType.Failure) then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
 		else
@@ -99,12 +99,15 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 	if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
 		return
 	end
-	local s_Responses = {}
+
+	local s_QueuedCommands = {}
+
 	for _,l_Command in ipairs(self.m_Queue) do
 		m_Logger:Write("Executing command delayed: " .. l_Command.type)
-		table.insert(s_Responses, l_Command)
+		table.insert(s_QueuedCommands, l_Command)
 	end
-	self:OnReceiveCommands(nil, s_Responses, true, p_Pass)
+
+	self:OnReceiveCommands(nil, s_QueuedCommands, p_Pass)
 
 	if(#self.m_Queue > 0) then
 		self.m_Queue = {}
@@ -124,47 +127,60 @@ function EditorServer:LoadSave()
         return
     end
 
-    self:UpdateLevel(s_SaveFile)
+    self:UpdateLevelFromSaveFile(s_SaveFile)
 end
 
-function EditorServer:UpdateLevel(p_Update)
-	local s_Responses = {}
+function EditorServer:UpdateLevelFromSaveFile(p_SaveFile)
+	local s_SaveFileCommands = {}
 
-	for s_Guid, s_GameObject in pairs(p_Update) do
-		if(self.m_GameObjectTransferDatas[s_Guid] == nil) then
-			local s_StringGuid = tostring(s_Guid)
+	for l_Guid, l_GameObjectTransferData in pairs(p_SaveFile) do
+		if (self.m_GameObjectTransferDatas[l_Guid] == nil) then
+			local s_Command
 
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
-			if IsVanilla(s_StringGuid) then
-				m_Logger:Write("vanilla")
-				local s_Command
-
-                if s_GameObject.isDeleted then
-					m_Logger:Write("deleting")
+			if IsVanilla(l_Guid) then
+                if l_GameObjectTransferData.isDeleted then
 					s_Command = {
+						sender = "LoadingSaveFile",
 						type = "DestroyBlueprintCommand",
-						guid = s_Guid,
-
+						gameObjectTransferData = {
+							guid = l_Guid
+						}
 					}
 				else
-					m_Logger:Write("moving")
 					s_Command = {
+						sender = "LoadingSaveFile",
 						type = "SetTransformCommand",
-						guid = s_Guid,
-						userData = s_GameObject
+						gameObjectTransferData = {
+							guid = l_Guid,
+							transform = l_GameObjectTransferData.transform
+						}
 					}
 				end
-				table.insert(s_Responses, s_Command)
+
+				table.insert(s_SaveFileCommands, s_Command)
 			else
-				local s_Command = {
+				s_Command = {
+					sender = "LoadingSaveFile",
 					type = "SpawnBlueprintCommand",
-					guid = s_Guid,
-					userData = s_GameObject
+					gameObjectTransferData = {
+						guid = l_Guid,
+						name = l_GameObjectTransferData.name,
+						typeName = l_GameObjectTransferData.typeName,
+						blueprintCtrRef = l_GameObjectTransferData.blueprintCtrRef,
+						parentData = l_GameObjectTransferData.parentData,
+						transform = l_GameObjectTransferData.transform,
+						variation = l_GameObjectTransferData.variation,
+						gameEntities = l_GameObjectTransferData.gameEntities,
+						isEnabled = l_GameObjectTransferData.gameEntities.isEnabled,
+						isDeleted = l_GameObjectTransferData.gameEntities.isDeleted
+					}
 				}
-				table.insert(s_Responses, s_Command)
+
+				table.insert(s_SaveFileCommands, s_Command)
 			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjectTransferDatas[s_Guid], s_GameObject)
+			local s_Changes = GetChanges(self.m_GameObjectTransferDatas[l_Guid], l_GameObjectTransferData)
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
 				m_Logger:Write("--------------------------------------------------------------------")
@@ -173,9 +189,9 @@ function EditorServer:UpdateLevel(p_Update)
 				m_Logger:Write("--------------------------------------------------------------------")
 			end
 		end
-
 	end
-	self:OnReceiveCommands(nil, s_Responses, true)
+
+	self:OnReceiveCommands(nil, s_SaveFileCommands, true)
 end
 
 

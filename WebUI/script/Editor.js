@@ -1,6 +1,7 @@
 class Editor {
 	constructor(debug) {
 
+		this.config = new Config();
 		this.editorCore = new EditorCore(debug);
 
 		// Commands
@@ -155,6 +156,7 @@ class Editor {
 		if(parentData === undefined) {
 			parentData = new GameObjectParentData("root", "root", "root", "root");
 		}
+
 		//Spawn blueprint
 		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
 		let gameObjectTransferData = new GameObjectTransferData({
@@ -164,6 +166,8 @@ class Editor {
 			blueprintCtrRef: blueprint.getCtrRef(),
 			transform: transform,
 			variation: variation,
+			isDeleted: false,
+			isEnabled: true
 		});
 
 		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -292,7 +296,7 @@ class Editor {
 		
 		if(this.selectionGroup.children.length === 0) {
 			this.threeManager.HideGizmo()
-		};
+		}
 
 		this.threeManager.Render();
 	}
@@ -356,23 +360,27 @@ class Editor {
 	}
 
 	onEnabledBlueprint(commandActionResult) {
-		let gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid)
+		let gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
+
 		if(gameObject == null) {
-			LogError("Attempted to enable a GameObject that doesn't exist")
-			return
+			LogError("Attempted to enable a GameObject that doesn't exist");
+			return;
 		}
+
 		let removeFromHierarchy = commandActionResult.gameObjectTransferData.isDeleted;
 		gameObject.Enable(removeFromHierarchy);
 	}
 
 	onDisabledBlueprint(commandActionResult) {
-		let gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid)
+		let gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
+
 		if(gameObject == null) {
-			LogError("Attempted to disable a GameObject that doesn't exist")
-			return
+			LogError("Attempted to disable a GameObject that doesn't exist");
+			return;
 		}
-		let removeFromHierarchy = commandActionResult.gameObjectTransferData.isDeleted ;
-		gameObject.Disable(removeFromHierarchy);
+
+		let isDeletedVanillaObject = commandActionResult.gameObjectTransferData.isDeleted;
+		gameObject.Disable(isDeletedVanillaObject);
 	}
 
 	onObjectChanged(object) {

@@ -60,7 +60,12 @@ class GameObject extends THREE.Object3D
 		let changes = {};
 		// Add more realtime-updates here.
 		if(scope.hasMoved()) {
-			changes["transform"] = new MoveObjectMessage(scope.guid,  new LinearTransform().setFromMatrix(scope.matrixWorld));
+			let gameObjectTransferData = new GameObjectTransferData({
+				"guid": scope.guid,
+				"transform": new LinearTransform().setFromMatrix(scope.matrixWorld),
+			});
+
+			changes["transform"] = new MoveObjectMessage(gameObjectTransferData);
 		}
 
 		if(Object.keys(changes).length === 0) {
@@ -222,6 +227,7 @@ class GameObject extends THREE.Object3D
 		};
 		this.selected = true;
 	}
+
 	onDeselected() {
 		if(!this.enabled) {
 			LogError("Attempted to deselect a disabled gameObject");

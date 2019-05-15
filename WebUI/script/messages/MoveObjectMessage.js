@@ -1,7 +1,12 @@
 class MoveObjectMessage {
-	constructor(guid, transform) {
+	constructor(gameObjectTransferData) {
 		this.type = "MoveObjectMessage";
-		this.guid = guid;
-		this.transform = transform;
+
+		if (gameObjectTransferData === undefined) {
+			Log(LOGLEVEL.DEBUG, "MoveObjectMessage: Missing gameObjectTransferData");
+			return;
+		}
+
+		this.gameObjectTransferData = gameObjectTransferData;
 	}
 }

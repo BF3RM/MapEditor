@@ -1,10 +1,11 @@
 class 'MapEditorClient'
 
-local m_Freecam = require "Freecam"
+Freecam = require "Freecam"
 Editor = require "Editor"
-local m_UIManager = require "UIManager"
-EditorCommon = EditorCommon(Realm.Realm_Client)
+UIManager = require "UIManager"
+MessageActions = require "MessageActions"
 
+EditorCommon = EditorCommon(Realm.Realm_Client)
 VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 ObjectManager = ObjectManager(Realm.Realm_Client)
 CommandActions = CommandActions(Realm.Realm_Client)
@@ -53,8 +54,6 @@ function MapEditorClient:RegisterEvents()
     Hooks:Install('ClientEntityFactory:Create',999, self, self.OnEntityCreate)
 
     Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
-
-
 end
 
 ----------- Game functions----------------
@@ -86,16 +85,16 @@ function MapEditorClient:OnEngineMessage(p_Message)
 end
 
 function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
-	m_UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
+	UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 end
 
 function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-	m_Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
+	Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 end
 
 function MapEditorClient:OnUpdateInput(p_Delta)
-	m_Freecam:OnUpdateInput(p_Delta)
-	m_UIManager:OnUpdateInput(p_Delta)
+	Freecam:OnUpdateInput(p_Delta)
+	UIManager:OnUpdateInput(p_Delta)
 end
 
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
@@ -111,6 +110,7 @@ end
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
 	EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
+
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
     Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
@@ -130,22 +130,22 @@ function MapEditorClient:OnReceiveMessage(p_Message)
 	Editor:OnReceiveMessage(p_Message)
 end
 
-function MapEditorClient:OnReceiveUpdate(p_Update)
-	Editor:OnReceiveUpdate(p_Update)
+function MapEditorClient:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
+	Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 end
 
 ----------- WebUI functions----------------
 
 function MapEditorClient:OnRequestSave()
-	m_Editor:OnRequestSave()
+	Editor:OnRequestSave()
 end
 
 function MapEditorClient:OnEnableFreecamMovement()
-	m_UIManager:OnEnableFreecamMovement()
+	UIManager:OnEnableFreecamMovement()
 end
 
 function MapEditorClient:OnDisableFreecam()
-	m_UIManager:OnDisableFreecam()
+	UIManager:OnDisableFreecam()
 end
 
 return MapEditorClient()

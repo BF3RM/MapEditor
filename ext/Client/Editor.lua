@@ -13,22 +13,6 @@ end
 
 function Editor:RegisterVars()
 	self.m_PendingRaycast = false
-    self.m_FreecamMoving = false
-
-	self.m_Changes = {
-		reference = "SpawnBlueprintCommand",
-		destroyed = "DestroyBlueprintCommand",
-		transform = "SetTransformCommand",
-	}
-
-	self.m_Messages = {
-		MoveObjectMessage = self.MoveObject,
-		SetViewModeMessage = self.SetViewMode,
-		SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition,
-		PreviewSpawnMessage = self.PreviewSpawn,
-		PreviewDestroyMessage = self.PreviewDestroy,
-		PreviewMoveMessage = self.PreviewMove
-	}
 
 	self.m_Queue = {
         commands = {},
@@ -41,23 +25,6 @@ function Editor:RegisterVars()
 	self.m_CameraTransform = nil
 
 end
-
---[[function Editor:Dump(o)
-	if(o == nil) then
-		print("tried to load jack shit")
-	end
-	if type(o) == 'table' then
-		local s = '{ '
-		for k,v in pairs(o) do
-			if type(k) ~= 'number' then k = '"'..k..'"' end
-			s = s .. '['..k..'] = ' .. self:Dump(v) .. ','
-			print(s)
-		end
-		return s .. '} '
-	else
-		return tostring(o)
-	end
-end]]
 
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
@@ -80,16 +47,16 @@ function Editor:OnEngineMessage(p_Message)
 			m_Logger:Error("Local player is nil")
 			return
 		end
-		m_Logger:Write("Requesting update")
+
 		NetEvents:SendLocal("MapEditorServer:RequestUpdate", 1)
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
 end
 
-function Editor:OnReceiveUpdate(p_Update)
+function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 	local s_Responses = {}
 
-	for s_Guid, s_GameObjectTransferData in pairs(p_Update) do
+	for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
 		if(self.m_GameObjectTransferDatas[s_Guid] == nil) then
 			local s_StringGuid = tostring(s_Guid)
 
@@ -109,12 +76,14 @@ function Editor:OnReceiveUpdate(p_Update)
 						gameObjectTransferData = s_GameObjectTransferData
 					}
 				end
+
 				table.insert(s_Responses, s_Command)
 			else
 				local s_Command = {
 					type = "SpawnBlueprintCommand",
 					gameObjectTransferData = s_GameObjectTransferData
 				}
+
 				table.insert(s_Responses, s_Command)
 			end
 		else
@@ -138,6 +107,7 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	if(self:CameraHasMoved() == true) then
 		self:UpdateCameraTransform()
 	end
+
 	self:Raycast()
 end
 
@@ -149,6 +119,10 @@ function Editor:OnSendCommandsToServer(p_Command)
 	NetEvents:SendLocal('MapEditorServer:ReceiveCommand', p_Command)
 end
 
+function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+	VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+end
+
 function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
 	for _, l_Command in ipairs(p_Commands) do
@@ -158,31 +132,30 @@ function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 			return false
 		end
 
-		local s_CommandActionResult, s_CommandActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
-		if (s_CommandActionResultType == CommandActionResultType.Success) then
-			local s_GameObjectTransferData
+		local s_CommandActionResult, s_ActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
 
-			if s_CommandActionResult.gameObjectTransferData ~= nil then
-				s_GameObjectTransferData = MergeUserdata(s_CommandActionResult.gameObjectTransferData, { isDeleted = s_CommandActionResult.isDeleted or false})
-			else
-				s_GameObjectTransferData = {isDeleted = s_CommandActionResult.isDeleted or false, transform = LinearTransform()}
+		if (s_ActionResultType == ActionResultType.Success) then
+			if (s_CommandActionResult.gameObjectTransferData == nil) then
+				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
-			self.m_GameObjectTransferDatas[l_Command.guid] = MergeUserdata(self.m_GameObjectTransferDatas[l_Command.guid], s_GameObjectTransferData)
-
+			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
 			table.insert(s_CommandActionResults, s_CommandActionResult)
-		elseif (s_CommandActionResultType == CommandActionResultType.Queue) then
+
+			local s_Guid = s_GameObjectTransferData.guid
+			self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
+
+		elseif (s_ActionResultType == ActionResultType.Queue) then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue.commands, l_Command)
-		elseif (s_CommandActionResultType == CommandActionResultType.Failure) then
+		elseif (s_ActionResultType == ActionResultType.Failure) then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
 		else
-			m_Logger:Error("Unknown CommandActionResultType for command: " .. l_Command.type)
+			m_Logger:Error("Unknown ActionResultType for command: " .. l_Command.type)
 		end
 	end
 
-	m_Logger:Write(json.encode(self.m_GameObjectTransferDatas))
 	if(#s_CommandActionResults > 0) then
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_CommandActionResults)))
 	end
@@ -193,36 +166,39 @@ function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)
     if p_Raw == nil then
         s_Messages = DecodeParams(json.decode(p_Messages))
     end
+
     for _, l_Message in ipairs(s_Messages) do
 
-
-        local s_Function = self.m_Messages[l_Message.type]
-        if(s_Function == nil) then
+        local s_MessageAction = MessageActions[l_Message.type]
+        if(s_MessageAction == nil) then
             m_Logger:Error("Attempted to call a nil function: " .. l_Message.type)
             return false
         end
 
-        local s_Response = s_Function(self, l_Message, p_UpdatePass)
+        local s_ActionResultType = s_MessageAction(self, l_Message, p_UpdatePass)
 
-        if(s_Response == false) then
-            -- TODO: Handle errors
-            m_Logger:Error("error")
-        elseif(s_Response == "queue") then
-            m_Logger:Write("Queued message")
-            table.insert(self.m_Queue.messages, l_Message)
-        elseif(s_Response == true) then
-            --TODO: Success message?
-        end
+		if (s_ActionResultType == ActionResultType.Success) then
+			return
+
+		elseif (s_ActionResultType == ActionResultType.Queue) then
+			table.insert(self.m_Queue.messages, l_Message)
+
+		elseif (s_ActionResultType == ActionResultType.Failure) then
+			m_Logger:Error("Failed to get a valid return for executing message: " .. tostring(l_Message.type))
+
+		else
+			m_Logger:Error("Unknown ActionResultType for message: " .. l_Message.type)
+		end
     end
-
-	-- Messages don't respond
 end
 
 function Editor:OnUpdatePass(p_Delta, p_Pass)
     if(p_Pass ~= UpdatePass.UpdatePass_PreSim or (#self.m_Queue.commands == 0 and #self.m_Queue.messages == 0)) then
         return
     end
+
     local s_Commands = {}
+
     for _,l_Command in ipairs(self.m_Queue.commands) do
         m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
         table.insert(s_Commands, l_Command)
@@ -231,6 +207,7 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     self:OnReceiveCommands(s_Commands, p_Pass)
 
     local s_Messages = {}
+
     for _,l_Message in ipairs(self.m_Queue.messages) do
         m_Logger:Write("Executing message in the correct UpdatePass: " .. l_Message.type)
         table.insert(s_Messages, l_Message)
@@ -241,59 +218,10 @@ function Editor:OnUpdatePass(p_Delta, p_Pass)
     if(#self.m_Queue.commands > 0) then
         self.m_Queue.commands = {}
     end
+
     if(#self.m_Queue.messages > 0) then
         self.m_Queue.messages = {}
     end
-end
-
---[[
-
-	Messages
-
---]]
-
-function Editor:MoveObject(p_Message)
-	return ObjectManager:SetTransform(p_Message.guid, p_Message.transform, false)
-end
-
-function Editor:SetViewMode(p_Message)
-	local p_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
-	if p_WorldRenderSettings ~= nil then
-		local s_WorldRenderSettings = WorldRenderSettings(p_WorldRenderSettings)
-		s_WorldRenderSettings.viewMode = p_Message.viewMode
-	else
-		m_Logger:Error("Failed to get WorldRenderSettings")
-		return false;
-		-- Notify WebUI
-	end
-end
-
-function Editor:SetScreenToWorldPosition(p_Message)
-	self:SetPendingRaycast(RaycastType.Mouse, p_Message.direction)
-end
-
-function Editor:PreviewSpawn(p_Message, p_Arguments)
-    local s_UserData = p_Message.userData
-    return ObjectManager:SpawnBlueprint(p_Message.guid, s_UserData.reference.partitionGuid, s_UserData.reference.instanceGuid, s_UserData.transform, s_UserData.variation)
-end
-function Editor:PreviewDestroy(p_Message, p_UpdatePass)
-    if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
-        return "queue"
-    end
-
-    return ObjectManager:DestroyEntity(p_Message.guid)
-end
-function Editor:PreviewMove(p_Message, p_Arguments)
-    return ObjectManager:SetTransform(p_Message.guid, p_Message.transform, false)
-end
---[[
-
-	Shit
-
---]]
-
-function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-	local s_Response = VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 end
 
 function Editor:Raycast()
@@ -339,8 +267,8 @@ function Editor:Raycast()
 	end
 			
 	self.m_PendingRaycast = false
-
 end
+
 function Editor:CameraHasMoved()
 	return self.m_CameraTransform ~= ClientUtils:GetCameraTransform()
 end

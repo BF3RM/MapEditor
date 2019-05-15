@@ -1,10 +1,12 @@
 class EditorCore {
+
+
     constructor() {
         this.raycastTransform = new LinearTransform();
         this.screenToWorldTransform = new LinearTransform();
 
         this.previewBlueprint = null;
-        this.previewing = false;
+        this.isPreviewBlueprintSpawned = false;
 
         this.isUpdating = false;
 
@@ -140,7 +142,6 @@ class EditorCore {
 
 
     onPreviewDragStart(blueprint) {
-        this.previewing = true;
         this.previewBlueprint = blueprint;
     }
 
@@ -148,37 +149,52 @@ class EditorCore {
         let direction = editor.threeManager.getMouse3D(e);
         let s2wMessage = new SetScreenToWorldTransformMessage(direction);
         editor.vext.SendMessage(s2wMessage);
-        if(this.previewBlueprint == null) {
+        if(this.previewBlueprint == null || this.isPreviewBlueprintSpawned == false) {
             return
         }
-        let moveMessage = new PreviewMoveMessage(this.screenToWorldTransform.clone());
-        editor.vext.SendMessage(moveMessage);
 
+        let gameObjectTransferData = new GameObjectTransferData({
+            "guid": editor.config.PreviewGameObjectGuid,
+            "transform": this.screenToWorldTransform.clone()
+        });
+
+        editor.vext.SendMessage(new MoveObjectMessage(gameObjectTransferData));
     }
 
     onPreviewDragStop() {
         this.previewBlueprint = null;
-        this.previewing = false;
+        this.isPreviewBlueprintSpawned = false;
     }
 
     onPreviewStart() {
-        this.previewing = true;
-        let userData = this.previewBlueprint.getCtrRef();
-        let message = new PreviewSpawnMessage(userData);
-        editor.vext.SendMessage(message);
+        if (this.previewBlueprint == null) {
+            LogError("EditorCore.js:onPreviewStart(): this.previewBlueprint was null.");
+            return;
+        }
+
+        let gameObjectTransferData = new GameObjectTransferData({
+            "guid": editor.config.PreviewGameObjectGuid,
+            "blueprintCtrRef": this.previewBlueprint.getCtrRef(),
+            "transform": this.screenToWorldTransform.clone(),
+            "variation": this.previewBlueprint.getDefaultVariation(),
+        });
+
+        editor.vext.SendMessage(new PreviewSpawnMessage(gameObjectTransferData));
+        this.isPreviewBlueprintSpawned = true;
     }
 
     onPreviewStop() {
-        this.previewing = false;
-        editor.vext.SendMessage(new PreviewDestroyMessage());
+        let gameObjectTransferData = new GameObjectTransferData({ "guid": editor.config.PreviewGameObjectGuid });
+        editor.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
+        this.isPreviewBlueprintSpawned = false;
     }
 
     onPreviewDrop() {
-        this.previewing = false;
         editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
-        editor.vext.SendMessage(new PreviewDestroyMessage());
 
+        let gameObjectTransferData = new GameObjectTransferData({ "guid": editor.config.PreviewGameObjectGuid });
+        editor.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
+        this.isPreviewBlueprintSpawned = false;
         this.previewBlueprint = null;
-
     }
 }

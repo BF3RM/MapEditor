@@ -6,6 +6,7 @@ class GameObjectTransferData
         if (Object.keys(args).length !== 0 &&  args.guid === undefined) {
             LogError("Attempted to create a GameObjectTransferData without a specified GUID")
         }
+
         this.guid = args.guid;
         this.name = args.name; // for debugging only
         this.parentData = args.parentData;
@@ -14,6 +15,7 @@ class GameObjectTransferData
         this.variation = args.variation;
         this.gameEntities = args.gameEntities;
         this.isDeleted = args.isDeleted;
+        this.isEnabled = args.isEnabled;
     }
 
     setFromTable(table) {

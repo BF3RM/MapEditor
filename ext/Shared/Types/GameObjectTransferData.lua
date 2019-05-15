@@ -11,6 +11,8 @@ function GameObjectTransferData:__init(arg)
     self.transform = arg.transform
     self.variation = arg.variation
     self.gameEntities = arg.gameEntities
+    self.isDeleted = arg.isDeleted
+    self.isEnabled = arg.isEnabled
 end
 
 return GameObjectTransferData

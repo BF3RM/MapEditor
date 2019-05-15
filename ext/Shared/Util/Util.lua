@@ -19,7 +19,7 @@ function MergeTables(p_Old, p_New)
 	return p_Old
 end
 
-function MergeUserdata(p_Old, p_New)
+function MergeGameObjectTransferData(p_Old, p_New)
 	if(p_Old == nil) then
 		return p_New
 	end

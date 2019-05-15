@@ -1,4 +1,13 @@
-const PreviewDestroyMessage = function () {
-	this.guid = "ed170120-0000-0000-0000-000000000000";
-	this.type = 'PreviewDestroyMessage';
-};
+class PreviewDestroyMessage {
+	constructor(gameObjectTransferData) {
+		this.type = "PreviewDestroyMessage";
+
+		if (gameObjectTransferData === undefined) {
+			Log(LOGLEVEL.DEBUG, "PreviewDestroyMessage: Missing gameObjectTransferData");
+			return;
+		}
+
+		this.gameObjectTransferData = gameObjectTransferData;
+	}
+}
+
