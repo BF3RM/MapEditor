@@ -185,7 +185,6 @@ class Inspector {
 			console.log("Tried to update the inspector and gameObject is null?");
 			return;
 		}
-
 		if (isMultipleSelection) {
 			this.UpdateName("---Multiple--");
 		}else{
@@ -236,13 +235,13 @@ class Inspector {
 			if(this.updates[key] !== undefined) {
 				this.updates[key](go, value);
 			} else {
-				this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1, key, value);
+				this.UpdateInspector(go, editor.selectionGroup.children.length !== 1, key, value);
 			}
 		}
 	}
 
 	onSelectionGroupMoved(){
-		this.UpdateInspector(editor.selectionGroup, editor.selectionGroup.children.length !== 1);
+		this.UpdateInspector(editor.selectionGroup.children[0], editor.selectionGroup.children.length !== 1);
 	}
 
 	UpdateTransform(gameObject, linearTransform) {
@@ -264,7 +263,7 @@ class Inspector {
 		let xyz = ["x","y","z"];
 		let transform = this.transform;
 		$.each(controls, function (index, con) {
-			let control = gameObject[con];
+			let control = editor.selectionGroup[con];
 			$.each(xyz, function(index2, val) {
 
 				// if(isNaN(controlsVal[index][val])) {
