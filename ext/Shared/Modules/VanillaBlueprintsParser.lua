@@ -29,24 +29,18 @@ function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transfo
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, s_Guid, p_Transform, p_Blueprint, p_Parent)
 
     local s_GameEntities = {}
-	if(p_Blueprint:Is("PrefabBlueprint") == false and type(s_SpawnResult) == "table")then
+	if (p_Blueprint:Is("PrefabBlueprint") == false and type(s_SpawnResult) == "table")then
 		--local l_Entity = s_SpawnResult[1]
 		for i, l_Entity in ipairs(s_SpawnResult) do
 			local s_Entity = SpatialEntity(l_Entity)
-			local s_EntityID = tostring(s_Entity.uniqueId)
-
-			-- Some client entities' ids are 0, we create a custom one
-			if s_EntityID == 0 then
-				s_EntityID = self.m_VanillaBlueprintNumber.."-"..i
-			end
 
 			local s_IndexInBlueprint = #s_GameEntities + 1
 
 			s_GameEntities[s_IndexInBlueprint] = {
+				instanceId = s_Entity.instanceId,
 				indexInBlueprint = s_IndexInBlueprint,
 				typeName = l_Entity.typeInfo.name,
 				transform = ToLocal(s_Entity.transform, p_Transform),
-				instanceId = s_Entity.instanceId,
 				aabb = {
 					min = tostring(s_Entity.aabb.min),
 					max = tostring(s_Entity.aabb.max),

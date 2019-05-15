@@ -60,11 +60,11 @@ function MessageActions:PreviewSpawn(p_Message, p_Arguments)
         m_Logger:Error("gameObjectTransferData must be set on PreviewSpawn")
     end
 
-    local s_Result = ObjectManager:SpawnBlueprint(s_gameObjectTransferData.guid,
-                                                s_gameObjectTransferData.blueprintCtrRef.partitionGuid,
-                                                s_gameObjectTransferData.blueprintCtrRef.instanceGuid,
-                                                s_gameObjectTransferData.transform,
-                                                s_gameObjectTransferData.variation)
+    local _, s_Result = ObjectManager:SpawnBlueprint(s_gameObjectTransferData.guid,
+                                                    s_gameObjectTransferData.blueprintCtrRef.partitionGuid,
+                                                    s_gameObjectTransferData.blueprintCtrRef.instanceGuid,
+                                                    s_gameObjectTransferData.transform,
+                                                    s_gameObjectTransferData.variation)
 
     if s_Result == false then
         return ActionResultType.Failure

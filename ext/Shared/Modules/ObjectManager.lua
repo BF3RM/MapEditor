@@ -42,12 +42,12 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 			p_InstanceGuid == nil or
 			p_LinearTransform == nil then
 		m_Logger:Write('One or more gameObjectTransferData are nil')
-		return false
+		return nil, false
 	end
 
 	if self.m_SpawnedEntities[p_Guid] ~= nil then
 		m_Logger:Write('Object with id ' .. p_Guid .. ' already existed as a spawned entity!')
-		return false
+		return nil, false
 	end
 
 	p_Variation = p_Variation or 0
@@ -56,7 +56,7 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 
 	if s_Blueprint == nil then
 		error('Couldn\'t find the specified instance')
-		return false
+		return nil, false
 	end
 
 	local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
@@ -71,49 +71,79 @@ function ObjectManager:SpawnBlueprint(p_Guid, p_PartitionGuid, p_InstanceGuid, p
 	local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 	if #s_ObjectEntities == 0 then
 		m_Logger:Write("Spawning failed")
-		return false
+		return nil, false
 	end
 
-	local s_Spatial = {}
+	local s_EntityTransferDatas = {}
+	local s_SpatialEntities = {}
 	local s_Offsets = {}
 
-	for i, l_Entity in pairs(s_ObjectEntities) do
+	for l_IndexInBlueprint, l_Entity in pairs(s_ObjectEntities) do
 		l_Entity:Init(self.m_Realm, true)
-		if(l_Entity:Is("SpatialEntity")) then
-			s_Spatial[i] = SpatialEntity(l_Entity)
-			s_Offsets[i] = ToLocal(SpatialEntity(l_Entity).transform, p_LinearTransform)
-			-- Allows us to connect the entity to the GUID
-			self.m_EntityInstanceIds[l_Entity.instanceId] = {p_Guid}
+
+		local s_EntityTransferData = {
+			indexInBlueprint = l_IndexInBlueprint,
+			instanceId = l_Entity.instanceId,
+			type = l_Entity.typeInfo.name,
+		}
+
+		-- TODO: Change how the m_EntityInstanceIds stuff is handled, so its actually readable
+		if(self.m_EntityInstanceIds[l_Entity.instanceId] == nil) then
+			self.m_EntityInstanceIds[l_Entity.instanceId] = {}
 		end
+
+		table.insert(self.m_EntityInstanceIds[l_Entity.instanceId], p_Guid)
+
+		if(l_Entity:Is("SpatialEntity")) then
+			local s_SpatialEntity = SpatialEntity(l_Entity)
+			s_SpatialEntities[l_IndexInBlueprint] = s_SpatialEntity
+			s_Offsets[l_IndexInBlueprint] = ToLocal(s_SpatialEntity.transform, p_LinearTransform)
+			-- Allows us to connect the entity to the GUID
+
+			s_EntityTransferData.transform = ToLocal(s_SpatialEntity.transform, p_LinearTransform)
+			s_EntityTransferData.aabb = {
+				min = s_SpatialEntity.aabb.min,
+				max = s_SpatialEntity.aabb.max,
+				transform = ToLocal(s_SpatialEntity.aabbTransform, p_LinearTransform)
+			}
+		end
+
+		table.insert(s_EntityTransferDatas, s_EntityTransferData)
 	end
 
 	-- TODO: Check if we actually need to have the spawned entities
-	self.m_SpawnedEntities[p_Guid] = s_Spatial
+	self.m_SpawnedEntities[p_Guid] = s_SpatialEntities
 	self.m_SpawnedOffsets[p_Guid] = s_Offsets
 
-	return s_Spatial
+	return s_EntityTransferDatas, true
 end
 
 function ObjectManager:BlueprintSpawned(p_Hook, p_Guid, p_LinearTransform, p_Blueprint, p_Parent)
     if(p_LinearTransform == nil) then
         p_LinearTransform = LinearTransform()
     end
+
     if(self.m_SpawnedEntities[p_Guid] ~= nil) then
         m_Logger:Write("Blueprint already spawned??")
         return false
     end
+
     local s_Spatial = {}
     local s_Offsets = {}
+
+	-- TODO: Update Parent transforms differently
 	self.m_ParentTransforms[p_Guid] = p_LinearTransform
     local s_ObjectEntities = p_Hook:Call()
+
     for i, l_Entity in pairs(s_ObjectEntities) do
-        if(l_Entity:Is("SpatialEntity") and l_Entity:Is("OccluderVolumeEntity") == false) then
+        if (l_Entity:Is("SpatialEntity") and l_Entity:Is("OccluderVolumeEntity") == false) then
             s_Spatial[i] = SpatialEntity(l_Entity)
             s_Offsets[i] = ToLocal(s_Spatial[i].transform, p_LinearTransform)
 			-- Allows us to connect the entity to the GUID
 			if(self.m_EntityInstanceIds[l_Entity.instanceId] == nil) then
 				self.m_EntityInstanceIds[l_Entity.instanceId] = {}
 			end
+
             table.insert(self.m_EntityInstanceIds[l_Entity.instanceId], p_Guid)
         end
     end
@@ -188,7 +218,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 		return false
 	end
 
-	for i, l_Entity in pairs( self.m_SpawnedEntities[p_Guid]) do
+	for i, l_Entity in pairs(self.m_SpawnedEntities[p_Guid]) do
 		if(l_Entity == nil) then
 			m_Logger:Error("Entity is nil?")
 			return false
@@ -198,6 +228,7 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 			m_Logger:Warning("not spatial")
 			goto continue
 		end
+
 		self.m_ParentTransforms[p_Guid] = p_LinearTransform
 
 		local s_Entity = SpatialEntity(l_Entity)
@@ -214,7 +245,6 @@ function ObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision
 					s_Entity:FireEvent("Disable")
 					s_Entity:FireEvent("Enable")
 					self:UpdateOffsets(p_Guid, s_Entity.instanceId, LinearTransform(p_LinearTransform))
-
 				end
 			end
 		else
@@ -236,7 +266,7 @@ function ObjectManager:UpdateOffsets(p_Guid, p_InstanceID, p_ParentWorld)
 	end
 	for i = s_StartIndex, #self.m_EntityInstanceIds[p_InstanceID], 1 do
 		local l_Parent = self.m_EntityInstanceIds[p_InstanceID][i]
-		for index,l_Entity in pairs(self.m_SpawnedEntities[l_Parent]) do
+		for index, l_Entity in pairs(self.m_SpawnedEntities[l_Parent]) do
 			if(l_Entity.instanceId == p_InstanceID) then
 				local s_Entity = SpatialEntity(self.m_SpawnedEntities[l_Parent][index])
 				self.m_SpawnedOffsets[l_Parent][index] = ToLocal(s_Entity.transform, self.m_ParentTransforms[l_Parent])
