@@ -1,8 +1,9 @@
-class 'GameEntityData'
+class 'GameEntity'
 
-local m_Logger = Logger("GameEntityData", true)
+local m_Logger = Logger("GameEntity", true)
 
-function GameEntityData:__init(arg)
+function GameEntity:__init(arg)
+    self.entity = arg.entity
     self.indexInBlueprint = arg.indexInBlueprint;
     self.instanceId = arg.instanceId;
     self.typeName = arg.typeName;
@@ -10,4 +11,4 @@ function GameEntityData:__init(arg)
     self.aabb = arg.aabb;
 end
 
-return GameEntityData
+return GameEntity
