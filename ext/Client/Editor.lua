@@ -8,7 +8,6 @@ local FALLBACK_DISTANCE = 10
 function Editor:__init()
 	m_Logger:Write("Initializing EditorClient")
 	self:RegisterVars()
-
 end
 
 function Editor:RegisterVars()
@@ -21,9 +20,9 @@ function Editor:RegisterVars()
 
 	self.m_TransactionId = 0
 	self.m_GameObjectTransferDatas = {}
+	self.m_CommandActionResults = { }
 
 	self.m_CameraTransform = nil
-
 end
 
 function Editor:OnEngineMessage(p_Message)
@@ -31,13 +30,11 @@ function Editor:OnEngineMessage(p_Message)
 		InstanceParser:FillVariations()
 		local s_LevelDatas = InstanceParser:GetLevelDatas()
 
-		for _,v in pairs(s_LevelDatas) do
+		for _, v in pairs(s_LevelDatas) do
 			WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
 		end
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
-		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(VanillaBlueprintsParser.m_VanillaObjects)))
-		WebUI:ExecuteJS(string.format("console.log('%s')", json.encode(VanillaBlueprintsParser.m_VanillaUnresolved)))
     end
 
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
@@ -119,9 +116,9 @@ function Editor:OnSendCommandsToServer(p_Command)
 	NetEvents:SendLocal('MapEditorServer:ReceiveCommand', p_Command)
 end
 
-function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-	VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-end
+--function Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+--	VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+--end
 
 function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
@@ -143,6 +140,7 @@ function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 			table.insert(s_CommandActionResults, s_CommandActionResult)
 
 			local s_Guid = s_GameObjectTransferData.guid
+			-- TODO: Dont store all gameobjecttransferdatas, we have the gameobjectmanager.gameobjects for that.
 			self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
 
 		elseif (s_ActionResultType == ActionResultType.Queue) then
@@ -159,6 +157,38 @@ function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 	if(#s_CommandActionResults > 0) then
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_CommandActionResults)))
 	end
+end
+
+function Editor:OnGameObjectReady(p_GameObject)
+	m_Logger:Write("Editor:OnGameObjectReady(p_GameObject)")
+	self:CreateCommandActionResultsRecursively(p_GameObject)
+
+	if(#self.m_CommandActionResults > 0) then
+		m_Logger:Write("Sending stuff to JS")
+
+		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_CommandActionResults)))
+	else
+		m_Logger:Error("OnGameObjectReady: No results were yielded for some reason")
+	end
+
+	self.m_CommandActionResults = { }
+end
+
+function Editor:CreateCommandActionResultsRecursively(p_GameObject)
+	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
+	s_GameObjectTransferData.gameEntities = p_GameObject.gameEntities
+
+	local s_CommandActionResult = {
+		sender = p_GameObject.creatorName,
+		type = 'SpawnedBlueprint',
+		gameObjectTransferData = s_GameObjectTransferData,
+	}
+
+	for _, s_ChildGameObject in pairs(p_GameObject.children) do
+		self:CreateCommandActionResultsRecursively(s_ChildGameObject)
+	end
+
+	table.insert(self.m_CommandActionResults, s_CommandActionResult)
 end
 
 function Editor:OnReceiveMessage(p_Messages, p_Raw, p_UpdatePass)

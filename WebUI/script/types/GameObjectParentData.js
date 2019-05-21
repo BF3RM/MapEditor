@@ -1,13 +1,12 @@
 
 class GameObjectParentData
 {
-    constructor(guid, typeName, primaryInstanceGuid, partitionGuid, resolveType)
+    constructor(guid, typeName, primaryInstanceGuid, partitionGuid)
     {
         this.guid = guid;
         this.typeName = typeName;
         this.primaryInstanceGuid = primaryInstanceGuid;
         this.partitionGuid = partitionGuid;
-        this.resolveType = resolveType;
     }
 
     setFromTable(table) {
@@ -15,7 +14,6 @@ class GameObjectParentData
         this.typeName = table.typeName;
         this.primaryInstanceGuid = table.primaryInstanceGuid;
         this.partitionGuid = table.partitionGuid;
-        this.resolveType = table.resolveType;
 
         return this;
     }

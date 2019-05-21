@@ -1,7 +1,7 @@
 
 class GameEntity extends THREE.Mesh
 {
-	constructor(instanceId, indexInBlueprint, typeName, transform, aabb, color)
+	constructor(instanceId, indexInBlueprint, typeName, transform, isSpatial, aabb)
 	{
 		var pointsGeom = new THREE.Geometry();
 		pointsGeom.vertices.push(
@@ -46,6 +46,7 @@ class GameEntity extends THREE.Mesh
 		this.type = "GameEntity";
 		this.typeName = typeName;
 		this.transform = transform;
+		this.isSpatial = isSpatial;
 
 		this.matrixAutoUpdate = false;
 		this.updateMatrix();

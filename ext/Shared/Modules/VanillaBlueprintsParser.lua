@@ -25,7 +25,7 @@ end
 function VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent, p_PartitionGuid)
     self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
 
-    local s_Guid = tostring(GenerateStaticGuid(self.m_VanillaBlueprintNumber))
+    local s_Guid = tostring(GenerateVanillaGuid(self.m_VanillaBlueprintNumber))
     local s_SpawnResult = ObjectManager:BlueprintSpawned(p_Hook, s_Guid, p_Transform, p_Blueprint, p_Parent)
 
     local s_GameEntities = {}

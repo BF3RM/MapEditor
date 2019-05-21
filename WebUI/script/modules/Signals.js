@@ -8,6 +8,7 @@ var signals = {
 	spawnBlueprintRequested: new Signal(),
 
 	spawnedBlueprint: new Signal(),
+	blueprintSpawnInvoked: new Signal(),
 	destroyedBlueprint: new Signal(),
 
 	enabledBlueprint: new Signal(),

@@ -26,7 +26,7 @@ function MessageActions:MoveObject(p_Message)
         return
     end
 
-    local s_Result = ObjectManager:SetTransform(gameObjectTransferData.guid, gameObjectTransferData.transform, false)
+    local s_Result = GameObjectManager:SetTransform(gameObjectTransferData.guid, gameObjectTransferData.transform, false)
 
     if s_Result == true then
         return ActionResultType.Success

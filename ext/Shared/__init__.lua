@@ -2,9 +2,10 @@ class 'MapEditorShared'
 
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
-require "__shared/Modules/ObjectManager"
+--require "__shared/Modules/ObjectManager"
+require "__shared/Modules/GameObjectManager"
 require "__shared/Modules/CommandActions"
-require "__shared/Modules/VanillaBlueprintsParser"
+--require "__shared/Modules/VanillaBlueprintsParser"
 require "__shared/Modules/InstanceParser"
 require "__shared/Types/Enums"
 require "__shared/EditorCommon"
@@ -12,15 +13,15 @@ require "__shared/Types/AABB"
 require "__shared/Types/CtrRef"
 require "__shared/Types/CommandActionResult"
 require "__shared/Types/GameEntity"
+require "__shared/Types/GameEntityTransferData"
+require "__shared/Types/GameObject"
 require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
-require "__shared/Types/GameObject"
 
 local m_Logger = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
-
 end
 
 return MapEditorShared()

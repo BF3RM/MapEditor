@@ -6,8 +6,9 @@ UIManager = require "UIManager"
 MessageActions = require "MessageActions"
 
 EditorCommon = EditorCommon(Realm.Realm_Client)
-VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
-ObjectManager = ObjectManager(Realm.Realm_Client)
+--VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
+--ObjectManager = ObjectManager(Realm.Realm_Client)
+GameObjectManager = GameObjectManager(Realm.Realm_ClientAndServer)
 CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
 
@@ -29,16 +30,13 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('Engine:Update', self, self.OnUpdate)
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Events:Subscribe('Client:LevelLoaded', self, self.OnLevelLoaded)
-
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
-
-
-
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
+	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
 	-- WebUI events
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
@@ -51,7 +49,7 @@ function MapEditorClient:RegisterEvents()
 
     Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
     Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
-    Hooks:Install('ClientEntityFactory:Create',999, self, self.OnEntityCreate)
+    Hooks:Install('ClientEntityFactory:Create', 999, self, self.OnEntityCreate)
 
     Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
@@ -103,8 +101,7 @@ end
 
 function MapEditorClient:OnLevelDestroy()
 	print("Destroy!")
-	VanillaBlueprintsParser:OnLevelDestroy()
-	ObjectManager:OnLevelDestroy()
+	GameObjectManager:OnLevelDestroy()
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
@@ -112,10 +109,15 @@ function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-    Editor:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
 
 ----------- Editor functions----------------
+
+function MapEditorClient:OnGameObjectReady(p_GameObject)
+	Editor:OnGameObjectReady(p_GameObject)
+end
+
 function MapEditorClient:OnSendCommandsToServer(p_CommandsJson)
 	Editor:OnSendCommandsToServer(p_CommandsJson)
 end

@@ -6,6 +6,7 @@ class Editor {
 
 		// Commands
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
+		signals.blueprintSpawnInvoked.add(this.onBlueprintSpawnInvoked.bind(this));
 		signals.enabledBlueprint.add(this.onEnabledBlueprint.bind(this));
 		signals.disabledBlueprint.add(this.onDisabledBlueprint.bind(this));
 
@@ -320,7 +321,7 @@ class Editor {
 		for (let key in gameObjectTransferData.gameEntities) {
 			let entityData = gameObjectTransferData.gameEntities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let gameEntity = new GameEntity(entityData.instanceId, entityData.indexInBlueprint, entityData.typeName, entityData.transform, entityData.aabb);
+			let gameEntity = new GameEntity(entityData.instanceId, entityData.indexInBlueprint, entityData.typeName, entityData.transform, entityData.isSpatial, entityData.aabb);
 
 			gameObject.add(gameEntity);
 		}
@@ -357,6 +358,10 @@ class Editor {
 			// Make selection happen after all signals have been handled
 			setTimeout(function() {scope.Select(gameObjectGuid, false)}, 2);
 		}
+	}
+
+	onBlueprintSpawnInvoked(commandActionResult) {
+		console.log("Successfully invoke spawning of blueprint: " + commandActionResult.gameObjectTransferData.name + " | " + commandActionResult.gameObjectTransferData.guid)
 	}
 
 	onEnabledBlueprint(commandActionResult) {

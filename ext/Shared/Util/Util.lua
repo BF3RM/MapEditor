@@ -1,7 +1,8 @@
 local matrix = require "__shared/Util/matrix"
 
-local CUSTOMOBJ_GUID_PREFIX = "ED170120"
-local VANILLA_GUID_PREFIX = "ED170121"
+local TEMP_GUID_PREFIX = "ED170120"
+local CUSTOMOBJ_GUID_PREFIX = "ED170121"
+local VANILLA_GUID_PREFIX = "ED170122"
 
 function MergeTables(p_Old, p_New)
 	if(p_New == nil) then
@@ -211,13 +212,17 @@ function h()
     return vars[math.floor(MathUtils:GetRandomInt(1,16))]..vars[math.floor(MathUtils:GetRandomInt(1,16))]
 end
 
+function GenerateTempGuid()
+	return Guid(TEMP_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
+end
+
 -- Generates a random guid.
-function GenerateGuid()
+function GenerateCustomGuid()
     return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
 -- Generates a guid based on a given number. Used for vanilla objects.
-function GenerateStaticGuid(n)
+function GenerateVanillaGuid(n)
 	return Guid(VANILLA_GUID_PREFIX.."-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
 end
 

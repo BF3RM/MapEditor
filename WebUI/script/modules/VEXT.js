@@ -4,6 +4,7 @@ class VEXTInterface {
 		this.commandQueue = [];
 		this.commands = {
 			"SpawnedBlueprint":	 signals.spawnedBlueprint.dispatch,
+			"BlueprintSpawnInvoked": signals.blueprintSpawnInvoked.dispatch,
 			"DestroyedBlueprint":   signals.destroyedBlueprint.dispatch,
 			"CreatedGroup":	 signals.createdGroup.dispatch,
 			"DestroyedGroup":   signals.destroyedGroup.dispatch,

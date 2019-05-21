@@ -36,10 +36,10 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
 
-function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
-    --Avoid nested blueprints for now...
-	VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-end
+--function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+--    --Avoid nested blueprints for now...
+--	VanillaBlueprintsParser:BlueprintSpawned(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+--end
 
 function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
@@ -82,6 +82,12 @@ function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
 	if (#s_CommandActionResults > 0) then
 		NetEvents:BroadcastLocal('MapEditor:ReceiveCommand', json.encode(p_Commands))
 	end
+end
+
+function EditorServer:OnGameObjectReady(p_GameObject)
+	m_Logger:Write("Editor:OnGameObjectReady(p_GameObject)")
+
+	-- TODO: xD
 end
 
 function EditorServer:OnUpdatePass(p_Delta, p_Pass)
