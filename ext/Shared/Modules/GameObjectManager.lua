@@ -200,7 +200,7 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     local s_BlueprintInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid
     local s_PendingInfo = self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid]
 
-    if (s_CustomGameObjectGuid ~= nil) then -- the spawning of this blueprint was invoked by the user
+    if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
     else
         self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
