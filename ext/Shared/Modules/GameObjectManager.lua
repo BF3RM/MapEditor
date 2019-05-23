@@ -74,6 +74,9 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
         m_Logger:Error("Spawning failed")
         return false
     end
+    for _,l_Entity in pairs(s_ObjectEntities) do
+        l_Entity:Init(self.m_Realm, true)
+    end
 
     self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName }
     return true

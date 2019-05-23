@@ -293,8 +293,8 @@ class Inspector {
 
 	UpdateVariation(gameObject, variation) {
 		// We're refreshing the whole thing. Might as well, right?
-		let blueprint =  gameObject.blueprint;
-		if(!blueprint.hasVariation()){
+		let blueprint =  gameObject.getBlueprint();
+		if(!blueprint || !blueprint.hasVariation()){
 			this.variation.setDisabled(true);
 			this.variation.setOptions([]);
 			LogError("Blueprint Variations not available");
@@ -306,7 +306,6 @@ class Inspector {
 				variations[variation.hash] = variation.name;
 			}
 			this.variation.setOptions(variations);
-
 		}
 		this.variation.setValue(variation);
 	}

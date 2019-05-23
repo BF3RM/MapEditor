@@ -114,6 +114,7 @@ class EditorUI {
 						componentName: 'EntityViewComponent',
 						isClosable: false,
 						title: "Entities",
+						height: 10,
 					}]
 				},
 					{

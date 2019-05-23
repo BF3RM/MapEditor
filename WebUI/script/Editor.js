@@ -307,7 +307,7 @@ class Editor {
 		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
 		let gameObjectGuid = gameObjectTransferData.guid;
 		let parentGuid = gameObjectTransferData.parentData.guid;
-		let blueprint = this.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
+
 
 		// TODO: change GameObject ctor
 		let gameObject = new GameObject(gameObjectTransferData.guid,
@@ -315,7 +315,7 @@ class Editor {
 										gameObjectTransferData.name,
 										gameObjectTransferData.transform,
 										gameObjectTransferData.parentData,
-										blueprint,
+										gameObjectTransferData.blueprintCtrRef,
 										gameObjectTransferData.variation,
 										gameObjectTransferData.gameEntities);
 

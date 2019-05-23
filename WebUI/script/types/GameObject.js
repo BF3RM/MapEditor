@@ -1,7 +1,7 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, typeName, name, transform, parentData, blueprint, variation, gameEntities)
+	constructor(guid, typeName, name, transform, parentData, blueprintCtrRef, variation, gameEntities)
 	{
 		super( );
 
@@ -10,7 +10,7 @@ class GameObject extends THREE.Object3D
 		this.name = name;
 		this.transform = transform;
 		this.parentData = parentData;
-		this.blueprint = blueprint;
+		this.blueprintCtrRef = blueprintCtrRef;
 		this.variation = variation;
 		this.gameEntities = gameEntities;
 
@@ -23,6 +23,9 @@ class GameObject extends THREE.Object3D
 		// Update the matrix after initialization.
 		this.updateTransform();
 		this.updateMatrix();
+	}
+	getBlueprint() {
+		return editor.blueprintManager.getBlueprintByGuid(this.blueprintCtrRef.instanceGuid);
 	}
 
 	getCleanName() {

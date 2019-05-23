@@ -391,19 +391,19 @@ class THREEManager {
 			
 			for (let i = 0; i < intersects.length; i++) {
 				const element = intersects[i];
-				
-				if (element.object == null || element.object.parent == null){
+
+				if (element.object == null || element.object.parent == null || element.object.type === "LineSegments"){
 					continue;
 				}
-				
-				if (element.object.type == "GameEntity"){
+				//TODO: More raycast logic. Select prefab, then select child if prefab is already selected?
+				if (element.object.parent !== undefined && element.object.parent.type === "Object3D"){
+					let parent = element.object.parent;
 					// console.log("first hit is: "+element.object.parent.guid)
-					return element.object.parent.guid;
-					break;
+					return parent.guid;
 				}
 			}
 		}
-		else{
+		else {
 			// console.log("no hit")
 			return null;
 		}
