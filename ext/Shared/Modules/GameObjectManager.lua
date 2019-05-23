@@ -63,6 +63,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
     m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
+    self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName }
 
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
@@ -72,13 +73,13 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
     if #s_ObjectEntities == 0 then
         m_Logger:Error("Spawning failed")
+        self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = nil
         return false
     end
     for _,l_Entity in pairs(s_ObjectEntities) do
         l_Entity:Init(self.m_Realm, true)
     end
 
-    self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName }
     return true
 end
 

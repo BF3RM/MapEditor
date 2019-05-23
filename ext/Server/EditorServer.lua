@@ -86,7 +86,9 @@ end
 
 function EditorServer:OnGameObjectReady(p_GameObject)
 	m_Logger:Write("Editor:OnGameObjectReady(p_GameObject)")
-
+	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
+	local s_Guid = s_GameObjectTransferData.guid
+	self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
 	-- TODO: xD
 end
 
