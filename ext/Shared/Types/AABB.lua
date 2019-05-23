@@ -8,4 +8,11 @@ function AABB:__init(arg)
     self.transform = arg.transform
 end
 
+function AABB:GetTable()
+    return {
+        min = self.min,
+        max = self.max,
+        transform = self.transform
+    }
+end
 return AABB

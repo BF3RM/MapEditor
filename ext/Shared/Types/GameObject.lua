@@ -19,13 +19,14 @@ function GameObject:__init(arg)
     self.children = arg.children -- never gets sent to js
 end
 
+
 function GameObject:GetGameObjectTransferData()
     local s_GameObjectTransferData = {
         guid = self.guid,
         name = self.name,
         typeName = self.typeName,
-        blueprintCtrRef = self.blueprintCtrRef,
-        parentData = self.parentData,
+        blueprintCtrRef = self.blueprintCtrRef:GetTable(),
+        parentData = self.parentData:GetTable(),
         transform = self.transform,
         variation = self.variation,
         isEnabled = self.isEnabled,

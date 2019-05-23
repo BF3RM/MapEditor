@@ -12,7 +12,7 @@ class EntityView {
 
     Header() {
         let row = new UI.TableRow();
-        row.add(new UI.TableHeader());
+        row.add(new UI.TableHeader(""));
         row.add(new UI.TableHeader("Name"));
         row.add(new UI.TableHeader("Type"));
         return row;
@@ -23,7 +23,6 @@ class EntityView {
         this.dom = new UI.Panel();
 
         this.directory = new UI.Table();
-        this.directory.add(this.header);
         this.dom.add(this.Header());
         this.dom.add(this.directory);
     }
@@ -34,12 +33,10 @@ class EntityView {
         this.content = [];
         this.directory.clear();
         let go = editor.getGameObjectByGuid(guid);
-        go.children.forEach(function (child) {
-            if(child.type == "GameEntity") {
-                let entry = scope.entityRenderer(child);
-                scope.content.push(entry);
-                scope.directory.add(entry);
-            }
+        go.gameEntities.forEach(function (child) {
+            let entry = scope.entityRenderer(child);
+            scope.content.push(entry);
+            scope.directory.add(entry);
         })
 
     }

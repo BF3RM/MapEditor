@@ -1,7 +1,7 @@
 
 class GameObject extends THREE.Object3D
 {
-	constructor(guid, typeName, name, transform, parentData, blueprint, variation)
+	constructor(guid, typeName, name, transform, parentData, blueprint, variation, gameEntities)
 	{
 		super( );
 
@@ -12,6 +12,7 @@ class GameObject extends THREE.Object3D
 		this.parentData = parentData;
 		this.blueprint = blueprint;
 		this.variation = variation;
+		this.gameEntities = gameEntities;
 
 		this.selected = false;
 		this.matrixAutoUpdate = false;

@@ -23,6 +23,8 @@ function Editor:RegisterVars()
 	self.m_CommandActionResults = { }
 
 	self.m_CameraTransform = nil
+
+	self.m_LevelLoaded = false
 end
 
 function Editor:OnEngineMessage(p_Message)
@@ -35,6 +37,7 @@ function Editor:OnEngineMessage(p_Message)
 		end
 
 		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
+		self.m_LevelLoaded = true
     end
 
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
@@ -101,7 +104,7 @@ end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
-	if(self:CameraHasMoved() == true) then
+	if(self.m_LevelLoaded and self:CameraHasMoved() == true) then
 		self:UpdateCameraTransform()
 	end
 
@@ -176,7 +179,6 @@ end
 
 function Editor:CreateCommandActionResultsRecursively(p_GameObject)
 	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
-	s_GameObjectTransferData.gameEntities = p_GameObject.gameEntities
 
 	local s_CommandActionResult = {
 		sender = p_GameObject.creatorName,

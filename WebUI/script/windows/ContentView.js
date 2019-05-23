@@ -24,7 +24,6 @@ class ContentView {
 		this.dom = new UI.Panel();
 
 		this.directory = new UI.Table();
-		this.directory.add(this.header);
 		this.dom.add(this.Header());
 		this.dom.add(this.directory);
 	}

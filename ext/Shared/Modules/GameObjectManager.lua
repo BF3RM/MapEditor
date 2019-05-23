@@ -46,7 +46,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
         return false
     end
 
-    if self.m_SpawnedEntities[p_GameObjectGuid] ~= nil then
+    if self.m_Entities[p_GameObjectGuid] ~= nil then
         m_Logger:Write('Object with id ' .. p_GameObjectGuid .. ' already existed as a spawned entity!')
         return false
     end
@@ -100,7 +100,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
     local s_GameEntities = {}
 
     for l_Index, l_Entity in ipairs(s_SpawnedEntities) do
-        if (self.m_Entities[l_Entity.instanceId] ~= nil) then -- Only happens for the direct children of the blueprint, they get yielded first
+        if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
             local s_GameEntity = GameEntity{
                 entity = l_Entity,
                 instanceId = l_Entity.instanceId,
@@ -112,9 +112,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
                 local s_Entity = SpatialEntity(l_Entity)
                 s_GameEntity.isSpatial = true
                 s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
-                s_GameEntity.aabb = {
-                    min = tostring(s_Entity.aabb.min),
-                    max = tostring(s_Entity.aabb.max),
+                s_GameEntity.aabb = AABB {
+                    min = s_Entity.aabb.min,
+                    max = s_Entity.aabb.max,
                     transform = ToLocal(s_Entity.aabbTransform, p_Transform)
                 }
             end
@@ -129,7 +129,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         guid = s_TempGuid, -- we set a tempGuid, it will later be set to a vanilla or custom guid
         name = s_Blueprint.name,
         typeName = p_Blueprint.typeInfo.name,
-        parentData = {},
+        parentData = ParentData{},
         transform = p_Transform,
         variation = p_Variation,
         isVanilla = true,
@@ -139,7 +139,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         children = {}
     }
 
-    s_GameObject.blueprintCtrRef = {
+    s_GameObject.blueprintCtrRef = CtrRef {
         typeName = s_Blueprint.typeInfo.name,
         name = s_Blueprint.name,
         partitionGuid = s_BlueprintPartitionGuid,
@@ -153,7 +153,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         self:PostProcessGameObjectAndChildren(s_GameObject)
     elseif (InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then -- top level vanilla (level data) -> proceed in postprocessing
         m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
-        s_GameObject.parentData = {
+        s_GameObject.parentData = ParentData{
             guid = s_ParentPrimaryInstance,
             typeName = "LevelData",
             primaryInstanceGuid = s_ParentPrimaryInstance,
@@ -178,7 +178,7 @@ function GameObjectManager:ResolveChildren(p_GameObject)
     end
 
     for _, s_ChildGameObject in pairs(s_ChildrenOfCurrentBlueprint) do
-        local s_ParentData = {
+        local s_ParentData = ParentData{
             guid = p_GameObject.guid,
             typeName = p_GameObject.blueprintCtrRef.typeName,
             primaryInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid,

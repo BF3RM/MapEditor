@@ -82,6 +82,7 @@ class VEXTemulator {
 						},
 						"instanceId": 3815363904,
 						"indexInBlueprint": 1,
+						"isSpatial": true,
 						"typeName": "ClientStaticModelEntity",
 						"aabb": {
 							"transform": {
@@ -106,9 +107,23 @@ class VEXTemulator {
 									"z": 0
 								}
 							},
-							"min": "(-1,-1,-1)",
-							"max": "(1,1,1)"
+							"min": {
+								"x": -1,
+								"y": -1,
+								"z": -1,
+							},
+							"max": {
+								"x": 1,
+								"y": 1,
+								"z": 1,
+							},
 						}
+					}, {
+
+						"instanceId": 3815363904,
+						"indexInBlueprint": 1,
+						"isSpatial": false,
+						"typeName": "WhateverEntity",
 					}
 				],
 				"guid": commandActionResult.gameObjectTransferData.guid,

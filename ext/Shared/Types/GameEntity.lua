@@ -19,9 +19,10 @@ function GameEntity:GetGameEntityTransferData()
         typeName = self.typeName,
         isSpatial = self.isSpatial,
         transform = self.transform,
-        aabb = self.aabb,
     }
-
+    if(self.aabb ~= nil) then
+        s_GameEntityTransferData.aabb = self.aabb:GetTable()
+    end
     return s_GameEntityTransferData
 end
 

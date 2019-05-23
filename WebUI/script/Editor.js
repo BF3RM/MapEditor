@@ -316,14 +316,16 @@ class Editor {
 										gameObjectTransferData.transform,
 										gameObjectTransferData.parentData,
 										blueprint,
-										gameObjectTransferData.variation);
+										gameObjectTransferData.variation,
+										gameObjectTransferData.gameEntities);
 
 		for (let key in gameObjectTransferData.gameEntities) {
 			let entityData = gameObjectTransferData.gameEntities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			let gameEntity = new GameEntity(entityData.instanceId, entityData.indexInBlueprint, entityData.typeName, entityData.transform, entityData.isSpatial, entityData.aabb);
-
-			gameObject.add(gameEntity);
+			if(entityData.isSpatial) {
+				let gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
+				gameObject.add(gameEntity);
+			}
 		}
 
 		gameObject.updateMatrixWorld();

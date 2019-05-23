@@ -47,7 +47,6 @@ class GameObjectTransferData
                 default:
                     break;
             }
-
             scope[key] = value;
         });
 
