@@ -3,24 +3,40 @@ class SpatialGameEntity extends THREE.Mesh
 {
     constructor(instanceId, transform, aabb)
     {
-        var pointsGeom = new THREE.Geometry();
+        let pointsGeom = new THREE.Geometry();
         pointsGeom.vertices.push(
             aabb.min,
             aabb.max
         );
 
-        var center = new THREE.Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
+
+        let center = new THREE.Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
+
+
+        let pointsdebug = new THREE.Geometry();
+        pointsdebug.vertices.push(
+            center,
+            transform.trans
+        );
+
+        let points = new THREE.Points(pointsdebug, new THREE.PointsMaterial({
+            color: "red",
+            size: 0.05
+        }));
+
+
+
         let vmax = aabb.max;
         let vmin = aabb.min;
 
-        var boxGeom = new THREE.BoxGeometry(
+        let boxGeom = new THREE.BoxGeometry(
             vmax.x - vmin.x,
             vmax.y - vmin.y,
             vmax.z - vmin.z
         );
 
-        boxGeom.translate( center.x - transform.trans.x, center.y - transform.trans.y, center.z - transform.trans.z );
-        //boxGeom.translate( center.x, center.y, center.z);
+        //boxGeom.translate( center.x - transform.trans.x, center.y - transform.trans.y, center.z - transform.trans.z );
+        boxGeom.translate( center.x, center.y, center.z);
 
         super(boxGeom, new THREE.MeshBasicMaterial({
             color: "aqua",
@@ -30,10 +46,10 @@ class SpatialGameEntity extends THREE.Mesh
 
         let	color = 0xFF0000;
 
-        var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
-        var positions = new Float32Array( 8 * 3 );
+        let indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+        let positions = new Float32Array( 8 * 3 );
 
-        var geometry = new THREE.BufferGeometry();
+        let geometry = new THREE.BufferGeometry();
         geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
         geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
@@ -50,7 +66,7 @@ class SpatialGameEntity extends THREE.Mesh
 
         this.box = null;
 
-
+        this.add(points);
         this.box = new THREE.Box3(
             aabb.min,
             aabb.max,

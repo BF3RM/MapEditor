@@ -115,10 +115,10 @@ class GameObject extends THREE.Object3D
 			for(let key in this.children) {
 				let child = this.children[key];
 				if(child instanceof GameObject) {
-					console.log("Updating child")
+					console.log("Updating child");
 					child.updateWorldTransform(true);
 				}
-			};
+			}
 		}
 	}
 
@@ -133,7 +133,7 @@ class GameObject extends THREE.Object3D
 
 		for(let key in this.children) {
 			let child = this.children[key];
-			if(typeof(child) == "GameObject") {
+			if (child.constructor.name === "GameObject") {
 				child.updateWorldTransform();
 			}
 		}
@@ -204,7 +204,7 @@ class GameObject extends THREE.Object3D
 	Highlight(){
 		this.highlighted = true;
 
-		for (var i = 0; i < this.children.length; i++) {
+		for (let i = 0; i < this.children.length; i++) {
 			this.children[i].Highlight();
 		}
 	}
@@ -212,7 +212,7 @@ class GameObject extends THREE.Object3D
 	Unhighlight(){
 		this.highlighted = false;
 
-		for (var i = 0; i < this.children.length; i++) {
+		for (let i = 0; i < this.children.length; i++) {
 			this.children[i].Unhighlight();
 		}
 	}
@@ -228,7 +228,7 @@ class GameObject extends THREE.Object3D
 			if(child.constructor.name === "GameObject") {
 				child.Select();
 			}
-		};
+		}
 		this.selected = true;
 	}
 
@@ -242,7 +242,7 @@ class GameObject extends THREE.Object3D
 			if(child.constructor.name === "GameObject") {
 				child.Deselect();
 			}
-		};
+		}
 		this.selected = false;
 	}
 
@@ -254,7 +254,7 @@ class GameObject extends THREE.Object3D
 			} else {
 				child.visible = true;
 			}
-		};
+		}
 		this.visible = true;
 		this.enabled = true;
 		signals.objectChanged.dispatch(this, "enabled", this.enabled);
@@ -268,7 +268,7 @@ class GameObject extends THREE.Object3D
 			} else {
 				child.visible = false;
 			}
-		};
+		}
 		this.visible = false;
 		this.enabled = false;
 		signals.objectChanged.dispatch(this, "enabled", this.enabled);

@@ -3,9 +3,9 @@ class SelectionGroup extends THREE.Group{
 	{
 		super( );
 
-		this.guid = guid
+		this.guid = guid;
 		this.type = "SelectionGroup";
-		this.name = name
+		this.name = name;
 		this.transform = transform;
 
 		// Update the matrix after initialization.
@@ -29,7 +29,7 @@ class SelectionGroup extends THREE.Group{
 		//scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 
 		
-		for (var i = 0; i < scope.children.length; i++) {
+		for (let i = 0; i < scope.children.length; i++) {
 			scope.children[i].onMove();
 		}
 
@@ -45,7 +45,7 @@ class SelectionGroup extends THREE.Group{
 		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
 	
 		
-		for (var i = 0; i < scope.children.length; i++) {
+		for (let i = 0; i < scope.children.length; i++) {
 			scope.children[i].onMoveEnd();
 		}
 
@@ -73,7 +73,7 @@ class SelectionGroup extends THREE.Group{
 		// To move the group without moving the children we have to detach them first
 		let temp = [];
 
-		for (var i = this.children.length - 1; i >= 0; i--) {
+		for (let i = this.children.length - 1; i >= 0; i--) {
 			//TODO: matrix should be calculated here doing the average of all children's positions, maybe
 			temp[i] = this.children[i];
 			this.DetachObject(this.children[i]);
@@ -83,7 +83,7 @@ class SelectionGroup extends THREE.Group{
 
 		editor.threeManager.Render();
 
-		for (var i = temp.length - 1; i >= 0; i--) {
+		for (let i = temp.length - 1; i >= 0; i--) {
 
 			this.AttachObject(temp[i]);
 		}

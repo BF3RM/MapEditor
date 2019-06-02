@@ -3,7 +3,7 @@ class HighlightGroup extends THREE.Group{
 	{
 		super( );
 
-		this.guid = GenerateGuid()
+		this.guid = GenerateGuid();
 		this.type = "HighlightGroup";
 		this.name = "Highlighting Group";
 	}

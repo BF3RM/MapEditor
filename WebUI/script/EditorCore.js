@@ -45,7 +45,7 @@ class EditorCore {
 
         // Clear selection group when it's a single selection
         if(!isMultiSelection && scope.selectionGroup.children.length !== 0) {
-            for (var i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
+            for (let i = scope.selectionGroup.children.length - 1; i >= 0; i--) {
                 scope.Deselect(scope.selectionGroup.children[i].guid);
             }
         }
@@ -150,7 +150,7 @@ class EditorCore {
         let s2wMessage = new SetScreenToWorldTransformMessage(direction);
         editor.vext.SendMessage(s2wMessage);
 
-        if(this.previewBlueprint == null || this.isPreviewBlueprintSpawned == false) {
+        if(this.previewBlueprint == null || this.isPreviewBlueprintSpawned === false) {
             return
         }
 
