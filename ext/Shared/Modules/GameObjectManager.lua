@@ -222,28 +222,32 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     p_GameObject.isVanilla = p_IsVanilla
     p_GameObject.creatorName = p_CreatorName
 
-    for _, s_ChildGameObject in pairs(p_GameObject.children) do
-        local s_ChildGuid
+    if p_GameObject.children ~= nil then
+        for _, s_ChildGameObject in pairs(p_GameObject.children) do
+            local s_ChildGuid
 
-        if (p_IsVanilla == true) then
-            self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
+            if (p_IsVanilla == true) then
+                self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
 
-            s_ChildGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
-        else
-            s_ChildGuid = GenerateCustomGuid()
+                s_ChildGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
+            else
+                s_ChildGuid = GenerateCustomGuid()
+            end
+
+            -- Update parentData as well:
+            s_ChildGameObject.parentData.guid = p_CustomGuid
+            --s_ChildGameObject.parentData.typeName = p_GameObject.blueprintCtrRef.typeName
+            --s_ChildGameObject.parentData.primaryInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid
+            --s_ChildGameObject.parentData.partitionGuid = p_GameObject.blueprintCtrRef.partitionGuid
+
+            self:SetGuidAndAddGameObjectRecursively(s_ChildGameObject, p_IsVanilla, s_ChildGuid, p_CreatorName)
         end
-
-        -- Update parentData as well:
-        s_ChildGameObject.parentData.guid = p_CustomGuid
-        --s_ChildGameObject.parentData.typeName = p_GameObject.blueprintCtrRef.typeName
-        --s_ChildGameObject.parentData.primaryInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid
-        --s_ChildGameObject.parentData.partitionGuid = p_GameObject.blueprintCtrRef.partitionGuid
-
-        self:SetGuidAndAddGameObjectRecursively(s_ChildGameObject, p_IsVanilla, s_ChildGuid, p_CreatorName)
     end
 
-    for _, l_Entity in pairs(p_GameObject.gameEntities) do
-        self.m_Entities[l_Entity.instanceId] = p_GameObject.guid
+    if p_GameObject.gameEntities ~= nil then
+        for _, l_Entity in pairs(p_GameObject.gameEntities) do
+            self.m_Entities[l_Entity.instanceId] = p_GameObject.guid
+        end
     end
 
     self.m_GameObjects[p_GameObject.guid] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
@@ -258,25 +262,11 @@ function GameObjectManager:DestroyGameObject(p_Guid)
         return false
     end
 
-    self:DestroyGameObjectRecursively(s_GameObject)
+    s_GameObject:Destroy()
 
     return true
 end
 
-function GameObjectManager:DestroyGameObjectRecursively(p_GameObject)
-    for _, l_ChildGameObject in pairs(p_GameObject.children) do
-        self:DestroyGameObjectRecursively(l_ChildGameObject)
-    end
-
-    for _, l_Entity in pairs(p_GameObject:GetEntities()) do
-        if l_Entity ~= nil then
-            m_Logger:Write("Destroying entity: " .. l_Entity.typeInfo.name)
-            l_Entity:Destroy()
-        end
-    end
-
-    self.m_GameObjects[p_GameObject.guid] = nil
-end
 
 function GameObjectManager:EnableGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]
@@ -286,23 +276,9 @@ function GameObjectManager:EnableGameObject(p_Guid)
         return false
     end
 
-    self:EnableGameObjectRecursively(s_GameObject)
+    s_GameObject:Enable()
 
     return true
-end
-
-function GameObjectManager:EnableGameObjectRecursively(p_GameObject)
-    for _, l_ChildGameObject in pairs(p_GameObject.children) do
-        self:EnableGameObjectRecursively(l_ChildGameObject)
-    end
-
-    for _, l_Entity in pairs(p_GameObject:GetEntities()) do
-        if l_Entity ~= nil then
-            l_Entity:FireEvent("Enable")
-        end
-    end
-
-    p_GameObject.isEnabled = true
 end
 
 function GameObjectManager:DisableGameObject(p_Guid)
@@ -313,24 +289,11 @@ function GameObjectManager:DisableGameObject(p_Guid)
         return false
     end
 
-    self:EnableGameObjectRecursively(s_GameObject)
+    s_GameObject:Disable()
 
     return true
 end
 
-function GameObjectManager:DisableGameObjectRecursively(p_GameObject)
-    for _, l_ChildGameObject in pairs(p_GameObject.children) do
-        self:DisableGameObjectRecursively(l_ChildGameObject)
-    end
-
-    for _, l_Entity in pairs(p_GameObject:GetEntities()) do
-        if l_Entity ~= nil then
-            l_Entity:FireEvent("Disable")
-        end
-    end
-
-    p_GameObject.isEnabled = false
-end
 
 function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
     local s_GameObject = self.m_GameObjects[p_Guid]

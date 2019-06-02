@@ -9,7 +9,7 @@ function GameObject:__init(arg)
     self.typeName = arg.typeName
     self.blueprintCtrRef = arg.blueprintCtrRef
     self.parentData = arg.parentData
-    self.transform = arg.transform
+    self.transform = arg.transform  -- world transform
     self.variation = arg.variation
     --self.gameEntities = arg.gameEntities -- we only store the Ids of the entities here
     self.isVanilla = arg.isVanilla -- never gets sent to js
@@ -17,6 +17,60 @@ function GameObject:__init(arg)
     self.isEnabled = arg.isEnabled
     self.gameEntities = arg.gameEntities
     self.children = arg.children -- never gets sent to js
+end
+
+function GameObject:Disable()
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:Disable()
+        end
+    end
+
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Disable()
+            end
+        end
+
+    end
+
+    self.isEnabled = false
+end
+
+function GameObject:Enable()
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:Enable()
+        end
+    end
+
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Enable()
+            end
+        end
+    end
+
+    self.isEnabled = true
+end
+
+function GameObject:Destroy()
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:Destroy()
+        end
+    end
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Destroy()
+            end
+        end
+    end
+
+    GameObjectManager.m_GameObjects[self.guid] = nil
 end
 
 function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
@@ -29,6 +83,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
                 return false
             end
 
+            -- We calculate the offset to get where the child gameobject should be
             local s_Offset = ToLocal(l_ChildGameObject.transform, self.transform)
             local s_LinearTransform = ToWorld(s_Offset, p_LinearTransform)
 

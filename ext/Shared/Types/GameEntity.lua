@@ -8,7 +8,7 @@ function GameEntity:__init(arg)
     self.instanceId = arg.instanceId
     self.typeName = arg.typeName
     self.isSpatial = arg.isSpatial or false
-    self.transform = arg.transform
+    self.transform = arg.transform -- local transform
     self.aabb = arg.aabb
 end
 
@@ -24,6 +24,19 @@ function GameEntity:GetGameEntityTransferData()
         s_GameEntityTransferData.aabb = self.aabb:GetTable()
     end
     return s_GameEntityTransferData
+end
+
+function GameEntity:Disable()
+    self.entity:FireEvent("Disable")
+end
+
+function GameEntity:Enable()
+    self.entity:FireEvent("Enable")
+end
+
+function GameEntity:Destroy()
+    m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
+    self.entity:Destroy()
 end
 
 function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)

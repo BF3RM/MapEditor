@@ -82,7 +82,7 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
 			return nil, ActionResultType.Failure
 		end
 	else
-		local s_Result = GameObjectManager:DestroyEntity(p_Command.gameObjectTransferData.guid)
+		local s_Result = GameObjectManager:DestroyGameObject(p_Command.gameObjectTransferData.guid)
 
 		if(s_Result == false) then
 			m_Logger:Write("Failed to destroy entity: " .. p_Command.gameObjectTransferData.guid)

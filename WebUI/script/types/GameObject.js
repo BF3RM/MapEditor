@@ -47,7 +47,7 @@ class GameObject extends THREE.Object3D
 		return new GameObjectTransferData({
 			guid: this.guid,
 			name: this.name,
-			blueprintCtrRef: this.blueprint.getCtrRef(),
+			blueprintCtrRef: this.blueprintCtrRef,
 			parentData: this.parentData,
 			transform: this.transform,
 			variation: this.variation
