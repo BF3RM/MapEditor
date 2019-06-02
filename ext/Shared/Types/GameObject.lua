@@ -19,6 +19,28 @@ function GameObject:__init(arg)
     self.children = arg.children -- never gets sent to js
 end
 
+function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
+    -- TODO: update self.transform
+
+    for _, l_GameEntity in pairs(self.gameEntities) do
+        if(l_GameEntity == nil) then
+            m_Logger:Error("GameEntity is nil?")
+            return false
+        end
+
+        local response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
+
+        if not response then
+            return false
+        end
+
+        ::continue::
+    end
+
+    self.transform = LinearTransform(p_LinearTransform)
+
+    return true
+end
 
 function GameObject:GetGameObjectTransferData()
     local s_GameObjectTransferData = {

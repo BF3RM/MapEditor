@@ -26,4 +26,42 @@ function GameEntity:GetGameEntityTransferData()
     return s_GameEntityTransferData
 end
 
+function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
+    -- TODO: update self.transform
+
+    local s_Entity = self.entity
+
+    if(s_Entity == nil) then
+        m_Logger:Error("Entity is nil?")
+        return false
+    end
+
+    if (not s_Entity:Is("SpatialEntity"))then
+        m_Logger:Warning("Entity is not spatial")
+        return true
+    end
+
+
+    s_Entity = SpatialEntity(s_Entity)
+
+    if s_Entity ~= nil then
+        if(s_Entity.typeInfo.name == "ServerVehicleEntity") then
+            s_Entity.transform = LinearTransform(p_LinearTransform)
+        else
+            s_Entity.transform = ToWorld(self.transform, LinearTransform(p_LinearTransform))
+
+            if(p_UpdateCollision) then
+                s_Entity:FireEvent("Disable")
+                s_Entity:FireEvent("Enable")
+                --self:UpdateOffsets(p_Guid, s_Entity.instanceId, LinearTransform(p_LinearTransform))
+            end
+        end
+    else
+        m_Logger:Write("Entity is nil after casting it to SpatialEntity??")
+    end
+
+    return true
+end
+
+
 return GameEntity

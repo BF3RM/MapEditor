@@ -11,6 +11,7 @@ end
 function GameObjectManager:RegisterVars()
     self.m_VanillaBlueprintNumber = 0
 
+    self.m_SpawnedOffsets = {}
     self.m_GameObjects = {}
     self.m_PendingCustomBlueprintGuids = {}
     self.m_Entities = {}
@@ -332,50 +333,14 @@ function GameObjectManager:DisableGameObjectRecursively(p_GameObject)
 end
 
 function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
-    return false
-    -- TODO: Implement including updating all children properly
-    --if self.m_SpawnedEntities[p_Guid] == nil then
-    --    m_Logger:Error('Object with id ' .. p_Guid .. ' does not exist')
-    --    return false
-    --end
-    --
-    --for i, l_Entity in pairs(self.m_SpawnedEntities[p_Guid]) do
-    --    if(l_Entity == nil) then
-    --        m_Logger:Error("Entity is nil?")
-    --        return false
-    --    end
-    --
-    --    if(not l_Entity:Is("SpatialEntity"))then
-    --        m_Logger:Warning("not spatial")
-    --        goto continue
-    --    end
-    --
-    --    self.m_ParentTransforms[p_Guid] = p_LinearTransform
-    --
-    --    local s_Entity = SpatialEntity(l_Entity)
-    --
-    --    if s_Entity ~= nil then
-    --        if(s_Entity.typeInfo.name == "ServerVehicleEntity") then
-    --            s_Entity.transform = LinearTransform(p_LinearTransform)
-    --        else
-    --
-    --            local s_LocalTransform = self.m_SpawnedOffsets[p_Guid][i]
-    --            s_Entity.transform = ToWorld(s_LocalTransform, LinearTransform(p_LinearTransform))
-    --
-    --            if(p_UpdateCollision) then
-    --                s_Entity:FireEvent("Disable")
-    --                s_Entity:FireEvent("Enable")
-    --                self:UpdateOffsets(p_Guid, s_Entity.instanceId, LinearTransform(p_LinearTransform))
-    --            end
-    --        end
-    --    else
-    --        m_Logger:Write("entity is nil??")
-    --    end
-    --
-    --    ::continue::
-    --end
-    --
-    --return true
+    local s_GameObject = self.m_GameObjects[p_Guid]
+
+    if s_GameObject == nil then
+        m_Logger:Error('Object with id ' .. p_Guid .. ' does not exist')
+        return false
+    end
+
+    return s_GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 end
 
 return GameObjectManager
