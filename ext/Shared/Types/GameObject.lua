@@ -22,19 +22,34 @@ end
 function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
     -- TODO: update self.transform
 
-    for _, l_GameEntity in pairs(self.gameEntities) do
-        if(l_GameEntity == nil) then
-            m_Logger:Error("GameEntity is nil?")
-            return false
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            if(l_ChildGameObject == nil) then
+                m_Logger:Error("l_ChildGameObject is nil?")
+                return false
+            end
+
+            local response = l_ChildGameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
+
+            if not response then
+                return false
+            end
         end
+    end
 
-        local response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if(l_GameEntity == nil) then
+                m_Logger:Error("GameEntity is nil?")
+                return false
+            end
 
-        if not response then
-            return false
+            local response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
+
+            if not response then
+                return false
+            end
         end
-
-        ::continue::
     end
 
     self.transform = LinearTransform(p_LinearTransform)
