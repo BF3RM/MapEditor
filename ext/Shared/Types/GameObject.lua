@@ -29,9 +29,12 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
                 return false
             end
 
-            local response = l_ChildGameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
+            local s_Offset = ToLocal(l_ChildGameObject.transform, self.transform)
+            local s_LinearTransform = ToWorld(s_Offset, p_LinearTransform)
 
-            if not response then
+            local s_Response = l_ChildGameObject:SetTransform(s_LinearTransform, p_UpdateCollision)
+
+            if not s_Response then
                 return false
             end
         end
