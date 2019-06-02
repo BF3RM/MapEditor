@@ -9,22 +9,7 @@ class SpatialGameEntity extends THREE.Mesh
             aabb.max
         );
 
-
         let center = new THREE.Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
-
-
-        let pointsdebug = new THREE.Geometry();
-        pointsdebug.vertices.push(
-            center,
-            transform.trans
-        );
-
-        let points = new THREE.Points(pointsdebug, new THREE.PointsMaterial({
-            color: "red",
-            size: 0.05
-        }));
-
-
 
         let vmax = aabb.max;
         let vmin = aabb.min;
@@ -35,7 +20,6 @@ class SpatialGameEntity extends THREE.Mesh
             vmax.z - vmin.z
         );
 
-        //boxGeom.translate( center.x - transform.trans.x, center.y - transform.trans.y, center.z - transform.trans.z );
         boxGeom.translate( center.x, center.y, center.z);
 
         super(boxGeom, new THREE.MeshBasicMaterial({
@@ -64,9 +48,6 @@ class SpatialGameEntity extends THREE.Mesh
         this.updateTransform();
         this.updateMatrix();
 
-        this.box = null;
-
-        this.add(points);
         this.box = new THREE.Box3(
             aabb.min,
             aabb.max,
