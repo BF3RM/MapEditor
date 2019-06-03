@@ -8,6 +8,7 @@ class THREEManager {
 
 		this.worldSpace = "local";
 		this.gridSnap = false;
+		this.highlightingEnabled = true;
 
 		this.Initialize();
 		this.RegisterEvents();
@@ -62,6 +63,7 @@ class THREEManager {
 					break;
 				case 3: // right mouse
 					EnableFreecamMovement();
+					this.highlightingEnabled = false;
 					break;
 				default:
 					// alert('You have a strange Mouse!');
@@ -308,6 +310,7 @@ class THREEManager {
 
 
 	onMouseUp(e) {
+		console.log("mouse up : " + e.which)
 		let scope = this;
 
 		if(e.which === 1 && editor.threeManager.raycastPlacing) {
@@ -334,10 +337,13 @@ class THREEManager {
 		}
 	}
 
+	MouseEnabled(){
+		this.highlightingEnabled = true;
+	}
+
 	onMouseMove(e) {
-		console.log(e.which);
 		let scope = this;
-		if(editor.threeManager.raycastPlacing) {
+		if(scope.raycastPlacing) {
 			let direction = scope.getMouse3D(e);
 
 			let message = new SetScreenToWorldTransformMessage(direction);
@@ -352,8 +358,10 @@ class THREEManager {
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
+
+
 		
-		if (e.which === 0){
+		if (this.highlightingEnabled){
 
 			let now = new Date();
 
