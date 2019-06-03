@@ -100,8 +100,8 @@ class SpatialGameEntity extends THREE.Mesh
         if ( this.box.isEmpty() )
             return;
 
-        var min = this.box.min;
-        var max = this.box.max;
+        let min = this.box.min;
+        let max = this.box.max;
 
         /*
           5____4
@@ -118,8 +118,8 @@ class SpatialGameEntity extends THREE.Mesh
         7: max.x, min.y, min.z
         */
 
-        var position = this.aabb.geometry.attributes.position;
-        var array = position.array;
+        let position = this.aabb.geometry.attributes.position;
+        let array = position.array;
 
         array[ 0 ] = max.x; array[ 1 ] = max.y; array[ 2 ] = max.z;
         array[ 3 ] = min.x; array[ 4 ] = max.y; array[ 5 ] = max.z;

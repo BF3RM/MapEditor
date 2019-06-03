@@ -4,7 +4,6 @@ class THREEManager {
 		this.scene = null;
 		this.renderer = null;
 		this.control = null;
-		this.controlContainer = null;
 		this.texture = null;
 
 		this.worldSpace = "local";
@@ -262,7 +261,7 @@ class THREEManager {
 			this.ShowGizmo();
 		}
 		this.control.setMode(p_Mode);
-		console.log("Changed gizmo mode to " + p_Mode)
+		console.log("Changed gizmo mode to " + p_Mode);
 		this.Render();
 	}
 
@@ -280,7 +279,7 @@ class THREEManager {
 	}
 
 	ToggleWorldSpace() {
-		if(this.worldSpace == "local") {
+		if(this.worldSpace === "local") {
 			this.SetWorldSpace("world")
 		} else {
 			this.SetWorldSpace("local")
@@ -336,6 +335,7 @@ class THREEManager {
 	}
 
 	onMouseMove(e) {
+		console.log(e.which);
 		let scope = this;
 		if(editor.threeManager.raycastPlacing) {
 			let direction = scope.getMouse3D(e);
@@ -353,17 +353,18 @@ class THREEManager {
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		}
 		
-		if (e.which == 0){
+		if (e.which === 0){
+
 			let now = new Date();
 
 			if(now.getTime() - this.lastRaycastTime.getTime() >= 100){
 				let guid = scope.RaycastSelection(e);
 
-				// if (guid !== null) {
-				// 	editor.Highlight(guid);
-				// }else{
-				// 	editor.Unhighlight();
-				// }
+				if (guid !== null) {
+					editor.Highlight(guid);
+				}else{
+					editor.Unhighlight();
+				}
 
 				this.lastRaycastTime = now;
 			}
@@ -380,8 +381,8 @@ class THREEManager {
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera( mousePos, this.camera );
 
-		var intersects = raycaster.intersectObjects( Object.values(editor.gameObjects), true );
-		var dir = new THREE.Vector3( 1, 2, 0 );
+		let intersects = raycaster.intersectObjects( Object.values(editor.gameObjects), true );
+		let dir = new THREE.Vector3( 1, 2, 0 );
 
 		//normalize the direction vector (convert to vector of length 1)
 		dir.normalize();
@@ -428,7 +429,7 @@ class THREEManager {
 
 		editor.setUpdating(true);
 
-		if(keysdown[16] == true && e.target.mode == "translate" && e.target.axis == "XYZ") {
+		if(keysdown[16] === true && e.target.mode === "translate" && e.target.axis === "XYZ") {
 			let event = document.createEvent("HTMLEvents");
 			event.initEvent("mouseup", true, true); // The custom event that will be created
 			editor.threeManager.raycastPlacing = true;

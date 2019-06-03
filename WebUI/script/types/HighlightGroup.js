@@ -34,7 +34,7 @@ class HighlightGroup extends THREE.Group{
 
 	DetachObject(gameObject){
 
-		if (gameObject.parent != this){
+		if (gameObject.parent !== this){
 			console.error("Tried to detach a children that is no longer in this group");
 		}
 		THREE.SceneUtils.detach( gameObject, this, editor.threeManager.scene );
@@ -46,7 +46,7 @@ class HighlightGroup extends THREE.Group{
 				THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, parent );
 			}
 			else{
-				console.error("Object parent doesn't exist")
+				console.error("Object parent doesn't exist. ")
 			}
 		}
 

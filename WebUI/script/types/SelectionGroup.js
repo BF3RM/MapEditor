@@ -1,12 +1,12 @@
-class SelectionGroup extends THREE.Group{
-	constructor(guid = GenerateGuid(), name = "Selection Group", transform = new LinearTransform())
+class SelectionGroup extends THREE.Object3D{
+	constructor()
 	{
 		super( );
 
-		this.guid = guid;
+		this.guid = GenerateGuid();
 		this.type = "SelectionGroup";
-		this.name = name;
-		this.transform = transform;
+		this.name = "Selection Group";
+		this.transform = new LinearTransform();
 
 		// Update the matrix after initialization.
 		this.updateTransform();
@@ -111,12 +111,12 @@ class SelectionGroup extends THREE.Group{
 	}
 
 	DetachObject(gameObject){
-		if (gameObject.parent != this){
+		if (gameObject.parent !== this){
 			console.error("Tried to detach a children that is no longer in this group");
 		}
 		THREE.SceneUtils.detach( gameObject, this, editor.threeManager.scene );
 
-		// remove child from parent and add it to scene
+		// remove child from parent and add it to its parent
 		if(gameObject.parentData.guid != null && gameObject.parentData.guid !== "root") {
 			let parent = editor.getGameObjectByGuid(gameObject.parentData.guid);
 			if(parent != null) {
