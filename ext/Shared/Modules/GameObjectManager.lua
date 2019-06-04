@@ -11,7 +11,6 @@ end
 function GameObjectManager:RegisterVars()
     self.m_VanillaBlueprintNumber = 0
 
-    self.m_SpawnedOffsets = {}
     self.m_GameObjects = {}
     self.m_PendingCustomBlueprintGuids = {}
     self.m_Entities = {}
@@ -250,7 +249,7 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
         end
     end
 
-    self.m_GameObjects[p_GameObject.guid] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
+    self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
 function GameObjectManager:DestroyGameObject(p_Guid)
