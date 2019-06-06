@@ -36,6 +36,7 @@ end
 
 function GameEntity:Destroy()
     m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
+    GameObjectManager.m_Entities[self.entity.instanceId] = nil
     self.entity:Destroy()
 end
 

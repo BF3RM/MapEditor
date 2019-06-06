@@ -140,7 +140,10 @@ function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 			end
 
 			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
-			table.insert(s_CommandActionResults, s_CommandActionResult)
+
+			if l_Command.type ~= "SpawnBlueprintCommand" then
+				table.insert(s_CommandActionResults, s_CommandActionResult)
+			end
 
 			local s_Guid = s_GameObjectTransferData.guid
 			-- TODO: Dont store all gameobjecttransferdatas, we have the gameobjectmanager.gameobjects for that.
@@ -168,7 +171,6 @@ function Editor:OnGameObjectReady(p_GameObject)
 
 	if(#self.m_CommandActionResults > 0) then
 		m_Logger:Write("Sending stuff to JS")
-
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_CommandActionResults)))
 	else
 		m_Logger:Error("OnGameObjectReady: No results were yielded for some reason")
@@ -179,7 +181,7 @@ end
 
 function Editor:CreateCommandActionResultsRecursively(p_GameObject)
 	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
-
+	print(s_GameObjectTransferData)
 	local s_CommandActionResult = {
 		sender = p_GameObject.creatorName,
 		type = 'SpawnedBlueprint',

@@ -37,10 +37,12 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end
 
 	local s_GameObjectTransferData = p_Command.gameObjectTransferData
+
 	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
 																p_Command.sender,
 																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
 																s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
+																s_GameObjectTransferData.parentData,
 																s_GameObjectTransferData.transform,
 																s_GameObjectTransferData.variation)
 
@@ -52,7 +54,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 
 	local s_ResultGameObjectTransferData = {
 		guid = s_GameObjectTransferData.guid,
-		name = s_GameObjectTransferData.name
+		name = s_GameObjectTransferData.name,
 	}
 
 	local s_CommandActionResult = {

@@ -12,9 +12,6 @@ class HighlightGroup extends THREE.Group{
 		
 		if(gameObject.selected || gameObject.highlighted || gameObject.typeName === "WorldPartData" || gameObject.typeName === "LevelData") return;
 		// console.log("Highlighting")
-		/*if (gameObject.parent === null || gameObject.parent === undefined){
-			editor.threeManager.scene.add(gameObject);
-		}*/
 
 		this.UnhighlightCurrentObject();
 		this.AttachObject(gameObject);
@@ -68,8 +65,12 @@ class HighlightGroup extends THREE.Group{
 			console.error("Tried to attach an object to highlightGroup while it already has an object highlighted")
 		}
 
-		// remove child from parent and add it to scene
-		THREE.SceneUtils.detach( gameObject, gameObject.parent, editor.threeManager.scene );
+		if (gameObject.parent === null) {
+			editor.threeManager.scene.add(gameObject);
+		}else{
+			// remove child from parent and add it to scene
+			THREE.SceneUtils.detach( gameObject, gameObject.parent, editor.threeManager.scene );
+		}
 
 		// remove child from scene and add it to parent
 		THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, this );

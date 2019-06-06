@@ -37,7 +37,7 @@ function GameObjectManager:GetGameEntities(p_EntityIds)
     return s_GameEntities
 end
 
-function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_LinearTransform, p_Variation)
+function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation)
     if p_BlueprintPartitionGuid == nil or
         p_BlueprintInstanceGuid == nil or
         p_LinearTransform == nil then
@@ -63,7 +63,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
     m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
-    self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName }
+    self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData }
 
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
@@ -71,11 +71,13 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     s_Params.networked = s_ObjectBlueprint.needNetworkId
 
     local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
+
     if #s_ObjectEntities == 0 then
         m_Logger:Error("Spawning failed")
         self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = nil
         return false
     end
+
     for _,l_Entity in pairs(s_ObjectEntities) do
         l_Entity:Init(self.m_Realm, true)
     end
@@ -84,6 +86,10 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 end
 
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+    if not loadVanilla and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+        return
+    end
+
     local s_TempGuid = GenerateTempGuid()
 
     local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
@@ -104,7 +110,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
     local s_GameEntities = {}
 
     for l_Index, l_Entity in ipairs(s_SpawnedEntities) do
+        print(l_Entity.instanceId)
         if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
+
             local s_GameEntity = GameEntity{
                 entity = l_Entity,
                 instanceId = l_Entity.instanceId,
@@ -202,6 +210,16 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     local s_PendingInfo = self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid]
 
     if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
+        -- TODO: move around in hierarchy using parentData
+        local s_ParentData = ParentData{
+            guid = s_PendingInfo.parentData.guid,
+            typeName = s_PendingInfo.parentData.typeName,
+            primaryInstanceGuid = s_PendingInfo.parentData.primaryInstanceGuid,
+            partitionGuid = s_PendingInfo.parentData.partitionGuid
+        }
+
+        p_GameObject.parentData = s_ParentData
+
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
     else
         self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
@@ -252,14 +270,24 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
+
+
 function GameObjectManager:DestroyGameObject(p_Guid)
-    -- TODO: Delete GO from array, delete all children, and destroy entities if it has any
     local s_GameObject = self.m_GameObjects[p_Guid]
 
     if (s_GameObject == nil) then
         m_Logger:Error("Failed to destroy blueprint: " .. p_Guid)
         return false
     end
+
+--[[
+    -- temp
+    if p_GameObject.gameEntities ~= nil then
+        for _, l_Entity in pairs(p_GameObject.gameEntities) do
+            self.m_Entities[l_Entity.instanceId] = nil
+        end
+    end
+]]
 
     s_GameObject:Destroy()
 

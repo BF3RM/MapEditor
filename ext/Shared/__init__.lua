@@ -20,6 +20,7 @@ require "__shared/Types/GameObjectParentData"
 require "__shared/Types/ParentData"
 
 local m_Logger = Logger("MapEditorShared", true)
+loadVanilla = false
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
