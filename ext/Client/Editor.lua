@@ -141,6 +141,7 @@ function Editor:OnReceiveCommands(p_Commands, p_UpdatePass)
 
 			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
 
+			-- Spawned objects are sent when they are ready on OnGameObjectReady
 			if l_Command.type ~= "SpawnBlueprintCommand" then
 				table.insert(s_CommandActionResults, s_CommandActionResult)
 			end
@@ -181,7 +182,7 @@ end
 
 function Editor:CreateCommandActionResultsRecursively(p_GameObject)
 	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
-	print(s_GameObjectTransferData)
+
 	local s_CommandActionResult = {
 		sender = p_GameObject.creatorName,
 		type = 'SpawnedBlueprint',

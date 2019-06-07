@@ -86,7 +86,8 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 end
 
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-    if not loadVanilla and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+    -- We dont load vanilla objects if the flag is active
+    if not LOAD_VANILLA and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
         return
     end
 
@@ -110,7 +111,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
     local s_GameEntities = {}
 
     for l_Index, l_Entity in ipairs(s_SpawnedEntities) do
-        print(l_Entity.instanceId)
+
         if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
 
             local s_GameEntity = GameEntity{
@@ -210,7 +211,7 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     local s_PendingInfo = self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid]
 
     if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
-        -- TODO: move around in hierarchy using parentData
+
         local s_ParentData = ParentData{
             guid = s_PendingInfo.parentData.guid,
             typeName = s_PendingInfo.parentData.typeName,
@@ -219,6 +220,17 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
         }
 
         p_GameObject.parentData = s_ParentData
+
+        if s_ParentData.guid ~= "root" then
+            local s_ParentObject = self.m_GameObjects[s_ParentData.guid]
+
+            if s_ParentObject == nil then
+                m_Logger:Error("Couldn't find the parent instance. Parent guid: ".. s_ParentData.guid)
+            end
+
+            table.insert(s_ParentObject.children, p_GameObject)
+
+        end
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
     else
@@ -270,8 +282,6 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
-
-
 function GameObjectManager:DestroyGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]
 
@@ -279,15 +289,6 @@ function GameObjectManager:DestroyGameObject(p_Guid)
         m_Logger:Error("Failed to destroy blueprint: " .. p_Guid)
         return false
     end
-
---[[
-    -- temp
-    if p_GameObject.gameEntities ~= nil then
-        for _, l_Entity in pairs(p_GameObject.gameEntities) do
-            self.m_Entities[l_Entity.instanceId] = nil
-        end
-    end
-]]
 
     s_GameObject:Destroy()
 

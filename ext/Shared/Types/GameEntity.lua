@@ -36,8 +36,8 @@ end
 
 function GameEntity:Destroy()
     m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
-    GameObjectManager.m_Entities[self.entity.instanceId] = nil
     self.entity:Destroy()
+    GameObjectManager.m_Entities[self.instanceId] = nil
 end
 
 function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
