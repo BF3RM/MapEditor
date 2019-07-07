@@ -1,6 +1,7 @@
 class THREEManager {
 	constructor() {
 		this.camera = null;
+		this.cameraControls = null;
 		this.scene = null;
 		this.renderer = null;
 		this.control = null;
@@ -16,6 +17,12 @@ class THREEManager {
 		this.raycastPlacing = false;
 		this.controlSelected = false;
 		this.lastRaycastTime = new Date();
+
+		this.delta = new THREE.Vector3();
+		this.box = new THREE.Box3();
+        this.sphere = new THREE.Sphere();
+        this.center = new THREE.Vector3();
+
 	}
 	Initialize() {
 		let scope = this;
@@ -39,13 +46,33 @@ class THREEManager {
 			let grid = new THREE.GridHelper( 100, 100, 0x444444, 0x888888 );
             scope.scene.add(grid);
 
-            let orbit = new THREE.OrbitControls( scope.camera, scope.renderer.domElement );
-            orbit.update();
-            orbit.addEventListener( 'change', scope.Render.bind(scope) );
+
+
+            // snip ( init three scene... )
+            CameraControls.install( { THREE: THREE } );
+
+            const clock = new THREE.Clock();
+            scope.cameraControls = new CameraControls( scope.camera, scope.renderer.domElement );
+
+            ( function anim () {
+
+                // snip
+                const delta = clock.getDelta();
+                const hasControlsUpdated = scope.cameraControls.update( delta );
+
+                requestAnimationFrame( anim );
+
+                // you can skip this condition to render though
+                if ( hasControlsUpdated ) {
+
+                    scope.Render()
+
+                }
+            } )();
 
             this.control.addEventListener( 'dragging-changed', function ( event ) {
 
-                orbit.enabled = ! event.value;
+                scope.cameraControls.enabled = ! event.value;
 
             } );
 
@@ -53,6 +80,36 @@ class THREEManager {
 		this.SetFov(90);
 
 	}
+
+	Focus(target) {
+	    let scope = this;
+        if(target === undefined) {
+            target = editor.selectionGroup;
+        }
+        if(target === undefined) {
+            return;
+        }
+
+
+        let distance;
+
+        scope.box.setFromObject( target );
+
+
+        scope.center.setFromMatrixPosition( target.matrixWorld );
+        distance = 0.1;
+
+        scope.delta.set( 0, 0, 1 );
+        scope.delta.applyQuaternion( scope.camera.quaternion );
+        scope.delta.multiplyScalar( distance * 4 );
+
+        let newPos = scope.center.add( scope.delta );
+        scope.cameraControls.moveTo(newPos.x,newPos.y,newPos.z, true);
+        scope.cameraControls.dollyTo(5, true);
+
+
+        scope.Render();
+    }
 
 	RegisterEvents() {
 		$(this.renderer.domElement).mousedown(function(event) {
@@ -494,6 +551,18 @@ class THREEManager {
 		this.camera.setRotationFromMatrix(m);
 		this.camera.position.set(x, y, z);
 
+        this.cameraControls._target = new THREE.Vector3();
+        this.cameraControls._targetEnd = new THREE.Vector3();
+
+        // rotation
+        this.cameraControls._spherical.setFromVector3( this.camera.position );
+        this.cameraControls._sphericalEnd = this.cameraControls._spherical.clone();
+
+        // reset
+        this.cameraControls._target0 = this.cameraControls._target.clone();
+        this.cameraControls._position0 = this.cameraControls._camera.position.clone();
+        this.cameraControls._zoom0 = this.cameraControls._camera.zoom;
+        this.cameraControls.update(0);
 		this.Render();
 	}
 
