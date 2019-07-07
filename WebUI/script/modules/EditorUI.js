@@ -6,12 +6,12 @@ class EditorUI {
 
 
 		
-		if (debugMode) {
+		if (debug) {
 			this.debugWindow = new DebugWindow();
 		}
 		
 		this.windows = {};
-		this.windowZ = 1;
+		this.windowZ = 100;
 		this.debug = debug;
 
 		this.layout = null;
@@ -48,9 +48,10 @@ class EditorUI {
 
 	InitializeWindows() {
 		let page = $('#page');
-		/*this.windows = {
-			'inspector': new PowWindow("inspector", "Inspector", this.inspector),
-			'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
+		this.windows = {
+            'debug': new PowWindow("debugWindow", "Debug info", this.debugWindow)
+        };
+		/*	'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
 			'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
 
 

@@ -165,6 +165,7 @@ li.ui-widget-seperator {
 	display: flex; /* important */
 	flex-direction: column; /* important */
 	border: 1px solid #a0a0a0;
+    z-index: 100;
 }
 .content {
 	height: inherit;

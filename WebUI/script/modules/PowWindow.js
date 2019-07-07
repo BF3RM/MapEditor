@@ -79,29 +79,16 @@ class PowWindow {
 			minHeight: 200,
 			minWidth: 200,
 			containment: "#page",
-			// Hack to make sure the canvas doesn't catch our mouseover.
-			start: function( event, ui ) {
-				$('#page').find('canvas').css("z-index", -1);
-			},
-			stop: function( event, ui ) {
-				$('#page').find('canvas').css("z-index", 0);
-			},
+
 		});
 
 		dom.draggable({
 			handle: header,
 			containment: "#page",
 			
-			// Hack to make sure the canvas doesn't catch our mouseover.
-			start: function( event, ui ) {
-				$('#page').find('canvas').css("z-index", -1);
-			},
-			stop: function( event, ui ) {
-				$('#page').find('canvas').css("z-index", 0);
-			},
+
 		});
 
-		content.scrollbar();
 
 
 		this.dom = dom;
