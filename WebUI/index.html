@@ -118,12 +118,11 @@
 
 
 		<!--
-			Windows
+			Views
 		-->
 
 		<script src="script/Views/TreeView.js"></script>
 		<script src="script/Views/InspectorView.js"></script>
-		<script src="script/Windows/DebugWindow.js"></script>
 		<script src="script/Views/HierarchyView.js"></script>
 		<script src="script/Views/ContentView.js"></script>
 		<script src="script/Views/ViewPortComponent.js"></script>
@@ -132,42 +131,50 @@
 		<script src="script/Views/EntityView.js"></script>
         <script src="script/Views/ProjectView.js"></script>
 
-		<script src="script/modules/Tests.js"></script>
+        <!--
+            Windows
+        -->
+        <script src="script/Windows/DebugWindow.js"></script>
+        <script src="script/Windows/ProjectWindow.js"></script>
+
+
+        <script src="script/modules/Tests.js"></script>
 
 	</head>
 	<body>
 		<div id="toolbar">
 			<div id="toolbarLeft">
 				<ul id="menubar">
+                    <!--
 					<li><div>File</div>
-						<ul>
-							<li><div onclick="signals.createGroupRequested.dispatch()">Add Group</div></li>
-							<li class="ui-widget-seperator"></li>
-							<li><div onclick="editor.ui.OpenClearDialog()">New Project</div></li>
-							<li><div onclick="editor.ui.OpenSaveDialog()">Save</div></li>
-							<li><div onclick="editor.ui.OpenLoadDialog()">Load</div></li>
-							<li><div onclick="editor.ui.OpenReloadDialog()">Reset collision</div></li>
-						</ul>
-					</li>
-					<li><div>Edit</div>
-						<ul>
-							<li><div onclick="editor.undo()">Undo</div></li>
-							<li><div onclick="editor.redo()">Redo</div></li>
-						</ul>
-					</li>
-					<li><div>Menu</div>
-						<ul>
-							<li><div onclick="editor.ui.windows.inspector.Toggle()">InspectorView</div></li>
-							<li><div onclick="editor.ui.windows.treeView.Toggle()">Blueprints</div></li>
-							<li><div onclick="editor.ui.windows.hierarchy.Toggle()">HierarchyView</div></li>
+                        <ul>
+                            <li><div onclick="signals.createGroupRequested.dispatch()">Add Group</div></li>
+                            <li class="ui-widget-seperator"></li>
+                            <li><div onclick="editor.ui.OpenClearDialog()">New Project</div></li>
+                            <li><div onclick="editor.ui.OpenSaveDialog()">Save</div></li>
+                            <li><div onclick="editor.ui.OpenLoadDialog()">Load</div></li>
+                            <li><div onclick="editor.ui.OpenReloadDialog()">Reset collision</div></li>
+                        </ul>
+                    </li>
+                    <li><div>Edit</div>
+                        <ul>
+                            <li><div onclick="editor.undo()">Undo</div></li>
+                            <li><div onclick="editor.redo()">Redo</div></li>
+                        </ul>
+                    </li>
+                    <li id="windows"><div>Windows</div>
+                        <ul>
+                            <li><div onclick="editor.ui.windows.inspector.Toggle()">InspectorView</div></li>
+                            <li><div onclick="editor.ui.windows.treeView.Toggle()">Blueprints</div></li>
+                            <li><div onclick="editor.ui.windows.hierarchy.Toggle()">HierarchyView</div></li>
                             <li><div onclick="editor.ui.windows.debugWindow.Toggle()">Debug</div></li>
-
-							<li class="ui-widget-seperator"></li>
-							<li><div>Objects</div></li>
-							<li><div>Emitters</div></li>
-							<li><div>Lights</div></li>
-						</ul>
-					</li>
+                            <li class="ui-widget-seperator"></li>
+                            <li><div>Objects</div></li>
+                            <li><div>Emitters</div></li>
+                            <li><div>Lights</div></li>
+                        </ul>
+                    </li>
+                    -->
 				</ul>
 				<div id="tools">
 					<label for="select"><i class="selectIcon" onclick="editor.threeManager.SetGizmoMode('select')"></i></label>

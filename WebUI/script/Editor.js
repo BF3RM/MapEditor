@@ -33,6 +33,7 @@ class Editor {
 		this.blueprintManager = new BlueprintManager();
 		this.entityFactory = new EntityFactory();
 		this.gameContext = new GameContext();
+        this.projectManager = new ProjectManager();
 
 		/*
 
@@ -98,6 +99,9 @@ class Editor {
 			document.head.appendChild(imported);
 			this.setPlayerName("LocalPlayer");
 		}
+
+        signals.editorReady.dispatch(true)
+
 	}
 
 	Duplicate() {

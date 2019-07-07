@@ -15,9 +15,15 @@ class EditorUI {
 		this.debug = debug;
 
 		this.layout = null;
-		this.InitializeWindows();
+		this.page = $('#page');
+		this.windowContainer = undefined;
+		this.menubar = {};
+		this.InitializeViews();
+        this.InitializeWindows();
 
 		signals.windowResized.add(this.onResize.bind(this));
+
+
 
 	}
 
@@ -42,21 +48,50 @@ class EditorUI {
 			icon: false
 		}).on("change", UI.worldChanged);
 
-
-
 	}
 
-	InitializeWindows() {
+	RegisterWindow(windowId, windowTitle, windowModule, visible) {
+        this.windows[windowId] = new PowWindow(windowId, windowTitle, windowModule, visible);
+        this.windowContainer.append(this.windows[windowId].dom)
+    }
+
+    RegisterMenubarEntry(menu, entryName, entryCallback) {
+	    let menubarContainer = $('#menubar');
+        if(this.menubar[menu] === undefined) {
+            this.menubar[menu] = {};
+            this.menubar[menu].dom = new UI.Table();
+            menubarContainer.append(this.menubar[menu].dom);
+        }
+    }
+
+    OpenWindow(windowId) {
+	    if(this.windows[windowId] === undefined) {
+	        LogError("Attempted to open an undefined window:" + windowId)
+	    }
+        this.windows[windowId].Show();
+    }
+    HideWindow(windowId) {
+        if(this.windows[windowId] === undefined) {
+            LogError("Attempted to hide an undefined window:" + windowId)
+        }
+        this.windows[windowId].Hide();
+    }
+    ToggleWindow(windowId) {
+        if(this.windows[windowId] === undefined) {
+            LogError("Attempted to toggle an undefined window:" + windowId)
+        }
+        this.windows[windowId].Toggle();
+    }
+
+
+    InitializeWindows() {
+        this.windowContainer = $(document.createElement("div"));
+        this.windowContainer.attr("id", "windowContainer");
+        this.page.append(this.windowContainer)
+    }
+
+	InitializeViews() {
 		let page = $('#page');
-		this.windows = {
-            'debug': new PowWindow("debugWindow", "Debug info", this.debugWindow)
-        };
-		/*	'hierarchy': new PowWindow("hierarchy", "Hierarchy", this.hierarchy),
-			'treeView': new PowWindow("treeView", "Blueprints", this.treeView),
-
-
-		};*/
-
 		let config;
 		config = {
 			settings: {
@@ -187,7 +222,6 @@ class EditorUI {
 			})
 		});
 		this.layout.init();
-
 
 	}
 

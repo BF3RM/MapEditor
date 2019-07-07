@@ -178,7 +178,19 @@ li.ui-widget-seperator {
 	display: flex;
 	padding: 3px;
 }
-
+.window {
+    pointer-events: all;
+}
+#windowContainer {
+    position: absolute;
+    top: 32px;
+    left: 0;
+    height: calc(100% - 32px);
+    z-index: 100;
+    width: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
 .content ol ul {
 	padding-left: 30px;
 }

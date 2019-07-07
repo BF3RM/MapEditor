@@ -30,7 +30,7 @@ class PowWindow {
 			"height": this.height,
 			"width": this.width
 		});
-		if(this.visible == false) {
+		if(this.visible === false) {
 			dom.css("display", "none");
 		}
 
@@ -78,14 +78,13 @@ class PowWindow {
 			handles: "n, e, s, w, ne, se, sw, nw",
 			minHeight: 200,
 			minWidth: 200,
-			containment: "#page",
+			containment: "#windowContainer",
 
 		});
 
 		dom.draggable({
 			handle: header,
-			containment: "#page",
-			
+            containment: "#windowContainer",
 
 		});
 
