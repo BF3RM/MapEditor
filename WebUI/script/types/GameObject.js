@@ -20,10 +20,16 @@ class GameObject extends THREE.Object3D
 		this.enabled = true;
 		this.highlighted = false;
 
+		this.completeBoundingBox = new THREE.Box3();
+
 		// Update the matrix after initialization.
 		this.updateTransform();
 		this.updateMatrix();
 	}
+
+	AddEntity(entity) {
+	    this.add(entity);
+    }
 	getBlueprint() {
 		return editor.blueprintManager.getBlueprintByGuid(this.blueprintCtrRef.instanceGuid);
 	}

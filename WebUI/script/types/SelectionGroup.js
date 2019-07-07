@@ -72,6 +72,7 @@ class SelectionGroup extends THREE.Object3D{
 		
 		// To move the group without moving the children we have to detach them first
 		let temp = [];
+		let x = 0;
 
 		for (let i = this.children.length - 1; i >= 0; i--) {
 			//TODO: matrix should be calculated here doing the average of all children's positions, maybe
@@ -102,13 +103,15 @@ class SelectionGroup extends THREE.Object3D{
 		for (let i = this.children.length - 1; i >= 0; i--) {
 			this.children[i].Select();
 		}
+		this.Center()
 	}
 
 	onDeselected() {
 		for (let i = this.children.length - 1; i >= 0; i--) {
 			this.children[i].Deselect();
 		}
-	}
+        this.Center()
+    }
 
 	DetachObject(gameObject){
 		if (gameObject.parent !== this){
@@ -144,18 +147,48 @@ class SelectionGroup extends THREE.Object3D{
 			THREE.SceneUtils.detach( gameObject, gameObject.parent, editor.threeManager.scene );
 		}
 
-		// remove child from scene and add it to parent
-		THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, this );
+        // remove child from scene and add it to parent
+        THREE.SceneUtils.attach( gameObject, editor.threeManager.scene, this );
 
 		editor.threeManager.Render(); // REMOVE
 	}
 
+    Center() {
+        let temp = [];
+        let x = 0;
+        let z = 0;
+        let y = 0;
+
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            //TODO: matrix should be calculated here doing the average of all children's positions, maybe
+            x += this.children[i].matrixWorld.elements[12];
+            y += this.children[i].matrixWorld.elements[13];
+            z += this.children[i].matrixWorld.elements[14];
+        }
+
+        x = x / (this.children.length);
+        y = y / (this.children.length);
+        z = z / (this.children.length);
+
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            //TODO: matrix should be calculated here doing the average of all children's positions, maybe
+            temp[i] = this.children[i];
+            this.DetachObject(this.children[i]);
+        }
+        this.position.set(x,y,z);
+        editor.threeManager.Render();
+
+        for (let i = temp.length - 1; i >= 0; i--) {
+            this.AttachObject(temp[i])
+        }
+    }
 
 	DeselectObject(gameObject){
 		if (gameObject.parent === this){
 			gameObject.Deselect();
 			this.DetachObject(gameObject);
 		}
+		this.onDeselected()
 	}
 
 }

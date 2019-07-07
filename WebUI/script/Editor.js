@@ -341,7 +341,7 @@ class Editor {
 			// UniqueID is fucking broken. this won't work online, boi.
 			if(entityData.isSpatial) {
 				let gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
-				gameObject.add(gameEntity);
+				gameObject.AddEntity(gameEntity);
 			}
 		}
 

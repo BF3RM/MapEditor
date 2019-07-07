@@ -180,7 +180,9 @@ class InspectorView {
 	}
 
 	UpdateInspector(gameObject, isMultipleSelection, key, value) {
-
+        if(gameObject == editor.selectionGroup) {
+            return
+        }
 		if(gameObject == null) {
 			console.log("Tried to update the inspector and gameObject is null?");
 			return;
