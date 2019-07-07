@@ -1,4 +1,4 @@
-class Inspector {
+class InspectorView {
 	constructor() {
 		this.dom = null;
 		this.transform = null;
@@ -314,7 +314,7 @@ class Inspector {
 var InspectorComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
-	this.element = new Inspector();
+	this.element = new InspectorView();
 
 	this._container.getElement().html(this.element.dom);
 	this._container.getElement().parents().attr('id', 'inspector');

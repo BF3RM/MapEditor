@@ -1,5 +1,5 @@
 
-class Hierarchy {
+class HierarchyView {
 	constructor() {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
@@ -308,7 +308,7 @@ class Hierarchy {
 var HierarchyComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
-	this.element = new Hierarchy();
+	this.element = new HierarchyView();
 
 	this._container.getElement().append(this.element.topControls);
 	this._container.getElement().append(this.element.dom);

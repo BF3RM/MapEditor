@@ -1,4 +1,4 @@
-class Favorites {
+class FavoritesView {
 	constructor() {
 		this.dom = null;
 		this.directory = null;
@@ -47,7 +47,7 @@ class Favorites {
 var FavoritesComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
-	this.element = new Favorites();
+	this.element = new FavoritesView();
 
 	this._container.getElement().html(this.element.dom.dom);
 };

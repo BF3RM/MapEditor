@@ -1,4 +1,4 @@
-class HistoryWindow {
+class HistoryView {
 	constructor() {
 		this.dom = this.CreateDom();
 		this.Initialize();
@@ -51,6 +51,6 @@ class HistoryWindow {
 var HistoryComponent = function(container, state ) {
 	this._container = container;
 	this._state = state;
-	this._element = new HistoryWindow();
+	this._element = new HistoryView();
 	container.getElement().html(this._element.dom);
 };
