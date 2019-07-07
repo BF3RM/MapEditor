@@ -6,12 +6,12 @@ class EditorUI {
 
 
 		
-		if (debug) {
+		if (debugMode) {
 			this.debugWindow = new DebugWindow();
 		}
 		
 		this.windows = {};
-		this.windowZ = 100;
+		this.windowZ = 1;
 		this.debug = debug;
 
 		this.layout = null;

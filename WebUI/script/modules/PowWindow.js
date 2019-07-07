@@ -79,16 +79,12 @@ class PowWindow {
 			minHeight: 200,
 			minWidth: 200,
 			containment: "#windowContainer",
-
 		});
 
 		dom.draggable({
 			handle: header,
             containment: "#windowContainer",
-
 		});
-
-
 
 		this.dom = dom;
 		this.content.append(this.element.dom);
