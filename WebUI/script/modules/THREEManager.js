@@ -105,8 +105,22 @@ class THREEManager {
 
         let newPos = scope.center.add( scope.delta );
         scope.cameraControls.moveTo(newPos.x,newPos.y,newPos.z, true);
-        scope.cameraControls.dollyTo(5, true);
 
+        const paddingLeft   = 0;
+        const paddingRight  = 0;
+        const paddingBottom = 0;
+        const paddingTop    = 0;
+
+        const boundingBox = target.isBox3 ? target.clone() : new THREE.Box3().setFromObject( target );
+
+        const size = boundingBox.getSize( _v3A );
+        const boundingWidth  = size.x + paddingLeft + paddingRight;
+        const boundingHeight = size.y + paddingTop  + paddingBottom;
+        const boundingDepth  = size.z;
+
+
+        distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
+        scope.cameraControls.dollyTo(distance, true);
 
         scope.Render();
     }
