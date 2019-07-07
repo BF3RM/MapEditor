@@ -139,7 +139,7 @@ function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 		return
 	end
 
-	local s_Result = GameObjectManager:DisableEntity(p_Command.gameObjectTransferData.guid)
+	local s_Result = GameObjectManager:DisableGameObject(p_Command.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
 		m_Logger:Error("Failed to disable blueprint: " .. p_Command.gameObjectTransferData.guid)

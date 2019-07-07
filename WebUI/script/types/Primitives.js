@@ -89,27 +89,29 @@ class LinearTransform {
 		return this;
 	}
 	setFromMatrix(matrix) {
-		let matrixArray = matrix.toArray();
+	    if(!Array.isArray(matrix)) {
+            matrix = matrix.toArray();
+        }
 
 		this.left = new Vec3(
-			matrixArray[0],
-			matrixArray[1],
-			matrixArray[2]);
+			matrix[0],
+			matrix[1],
+			matrix[2]);
 
 		this.up = new Vec3(
-			matrixArray[4],
-			matrixArray[5],
-			matrixArray[6]);
+			matrix[4],
+			matrix[5],
+			matrix[6]);
 
 		this.forward = new Vec3(
-			matrixArray[8],
-			matrixArray[9],
-			matrixArray[10]);
+			matrix[8],
+			matrix[9],
+			matrix[10]);
 
 		this.trans = new Vec3(
-			matrixArray[12],
-			matrixArray[13],
-			matrixArray[14]);
+			matrix[12],
+			matrix[13],
+			matrix[14]);
 		return this;
 	}
 

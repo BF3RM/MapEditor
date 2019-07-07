@@ -9,8 +9,6 @@ function Freecam:__init()
 end
 
 function Freecam:RegisterVars()
-	self.isMoving = false
-
 	self.m_Freecam = false
 	self.m_Mode = CameraMode.FirstPerson
 
@@ -38,6 +36,18 @@ function Freecam:RegisterVars()
 	self.m_ThirdPersonRotY = 0.0
 
 	self.m_LastSpectatedPlayer = 0
+end
+
+function Freecam:OnControlStart()
+	self.m_Mode = CameraMode.Editor
+end
+function Freecam:OnControlEnd()
+	self.m_Mode = CameraMode.FreeCam
+end
+function Freecam:OnControlUpdate(p_Transform)
+	print(p_Transform.transform)
+	print(p_Transform.transform.trans.x)
+	self:UpdateEditor(p_Transform.transform)
 end
 
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
@@ -220,6 +230,9 @@ function Freecam:UpdateCameraControls(p_Delta)
 			self.m_CameraDistance = 1.0
 		end
 	end
+end
+function Freecam:UpdateEditor(p_Transform)
+	self.m_CameraData.transform = p_Transform
 end
 
 function Freecam:UpdateFreeCamera(p_Delta)

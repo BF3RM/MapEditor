@@ -42,41 +42,56 @@ class THREEManager {
         this.CreateGizmo();
 
         if(debugMode) {
-			scope.scene.background = new THREE.Color( 0x373737 );
-			let grid = new THREE.GridHelper( 100, 100, 0x444444, 0x888888 );
+            scope.scene.background = new THREE.Color(0x373737);
+            let grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);
             scope.scene.add(grid);
-
-
-
-            // snip ( init three scene... )
-            CameraControls.install( { THREE: THREE } );
-
-            const clock = new THREE.Clock();
-            scope.cameraControls = new CameraControls( scope.camera, scope.renderer.domElement );
-
-            ( function anim () {
-
-                // snip
-                const delta = clock.getDelta();
-                const hasControlsUpdated = scope.cameraControls.update( delta );
-
-                requestAnimationFrame( anim );
-
-                // you can skip this condition to render though
-                if ( hasControlsUpdated ) {
-
-                    scope.Render()
-
-                }
-            } )();
-
-            this.control.addEventListener( 'dragging-changed', function ( event ) {
-
-                scope.cameraControls.enabled = ! event.value;
-
-            } );
-
         }
+
+
+        // snip ( init three scene... )
+        CameraControls.install( { THREE: THREE } );
+
+        const clock = new THREE.Clock();
+        scope.cameraControls = new CameraControls( scope.camera, scope.renderer.domElement );
+
+        ( function anim () {
+
+            // snip
+            const delta = clock.getDelta();
+            const hasControlsUpdated = scope.cameraControls.update( delta );
+
+            requestAnimationFrame( anim );
+
+            // you can skip this condition to render though
+            if ( hasControlsUpdated ) {
+
+                scope.Render()
+
+            }
+        } )();
+        scope.cameraControls.addEventListener( 'controlstart', function( event ) {
+            editor.vext.SendEvent("controlStart");
+        } );
+        scope.cameraControls.addEventListener( 'controlend', function( event ) {
+            editor.vext.SendEvent("controlEnd");
+        } );
+        scope.cameraControls.addEventListener( 'update', function( event ) {
+
+            //lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
+            let transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld.elements);
+
+            editor.vext.SendEvent("controlUpdate", {
+                transform: transform,
+            });
+        } );
+
+
+        this.control.addEventListener( 'dragging-changed', function ( event ) {
+
+            scope.cameraControls.enabled = ! event.value;
+
+        } );
+
 		this.SetFov(90);
 
 	}
