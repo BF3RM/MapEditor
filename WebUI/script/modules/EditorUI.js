@@ -17,7 +17,9 @@ class EditorUI {
 		this.layout = null;
 		this.page = $('#page');
 		this.windowContainer = undefined;
-		this.menubar = {};
+		this.menubar = {
+		    entries: {},
+        };
 		this.InitializeViews();
         this.InitializeWindows();
 
@@ -30,12 +32,17 @@ class EditorUI {
 
 	// Maybe this isn't the way it's supposed to be done...
 	Initialize() {
-		$("#menubar").menu({
-			position: {
-				at: "left bottom"
-			}
-		});
-
+        $('#menubar').menu({
+            position: { my: 'left top', at: 'left bottom' },
+            blur: function() {
+                $(this).menu('option', 'position', { my: 'left top', at: 'left bottom' });
+            },
+            focus: function(e, ui) {
+                if ($('#menubar').get(0) !== $(ui).get(0).item.parent().get(0)) {
+                    $(this).menu('option', 'position', { my: 'left top', at: 'right top' });
+                }
+            },
+        });
 		$('#worldView').selectmenu({
 			change: UI.worldViewChanged
 		});
@@ -55,13 +62,40 @@ class EditorUI {
         this.windowContainer.append(this.windows[windowId].dom)
     }
 
-    RegisterMenubarEntry(menu, entryName, entryCallback) {
+    RegisterMenubarEntry(path, entryCallback = undefined) {
 	    let menubarContainer = $('#menubar');
-        if(this.menubar[menu] === undefined) {
-            this.menubar[menu] = {};
-            this.menubar[menu].dom = new UI.Table();
-            menubarContainer.append(this.menubar[menu].dom);
+	    let lastEntry = this.menubar;
+
+        for(let i = 0; i < path.length; i++) {
+            let currentEntry = path[i];
+            if(currentEntry === "") {
+                lastEntry.list.add(new UI.ListItem(""));
+                break;
+            }
+            if(lastEntry.entries[currentEntry] === undefined) {
+                lastEntry.entries[currentEntry] = {};
+                lastEntry.entries[currentEntry].entries = {};
+                lastEntry.entries[currentEntry].elem = new UI.ListItem(currentEntry);
+                if(i === 0){
+                    menubarContainer.append(lastEntry.entries[currentEntry].elem.dom);
+                } else {
+                    lastEntry.list.add(lastEntry.entries[currentEntry].elem);
+                }
+            }
+            if(i !== path.length - 1 && lastEntry.entries[currentEntry].list == null) {
+                lastEntry.entries[currentEntry].list = new UI.UnsortedList();
+                lastEntry.entries[currentEntry].elem.add(lastEntry.entries[currentEntry].list);
+            }
+            lastEntry = lastEntry.entries[currentEntry];
         }
+        if(entryCallback !== undefined) {
+            lastEntry.elem.onClick(function () {
+                entryCallback();
+            });
+        }
+
+
+        menubarContainer.menu("refresh");
     }
 
     OpenWindow(windowId) {

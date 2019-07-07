@@ -1,5 +1,6 @@
 let Signal = signals.Signal;
 var signals = {
+    editorInitializing: new Signal(),
     editorReady: new Signal(),
 
 	levelLoaded: new Signal(),

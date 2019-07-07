@@ -88,6 +88,7 @@ class Editor {
 	}
 
 	Initialize() {
+        signals.editorInitializing.dispatch(true);
 		// Adds the chrome background and debug window
 		if(this.debug === true) {
 			$('body').css({
@@ -100,8 +101,20 @@ class Editor {
 			this.setPlayerName("LocalPlayer");
 		}
 
-        signals.editorReady.dispatch(true)
 
+        this.ui.RegisterMenubarEntry(["Edit", "Undo"],this.undo.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Redo"],this.undo.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
+        this.ui.RegisterMenubarEntry(["Edit", "Cut"],this.Cut.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Copy"],this.Copy.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Pate"],this.Paste.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
+        this.ui.RegisterMenubarEntry(["Edit", "Duplicate"], this.Duplicate.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Delete"], this.DeleteSelected.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
+
+
+        signals.editorReady.dispatch(true)
 	}
 
 	Duplicate() {

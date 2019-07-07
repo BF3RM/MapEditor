@@ -170,6 +170,39 @@ events.forEach( function ( event ) {
 
 } );
 
+
+// Unsorted List
+
+UI.UnsortedList = function () {
+
+    UI.Element.call( this );
+
+    this.dom = document.createElement( 'ul' );
+
+    return this;
+
+};
+
+UI.UnsortedList.prototype = Object.create( UI.Element.prototype );
+UI.UnsortedList.prototype.constructor = UI.UnsortedList;
+
+// ListItem
+
+UI.ListItem = function (content) {
+
+    UI.Element.call( this );
+
+    this.dom = document.createElement( 'li' );
+    if(content !== undefined) {
+        this.dom.innerHTML = "<div>" + content + "</div>";
+    }
+    return this;
+
+};
+
+UI.ListItem.prototype = Object.create( UI.Element.prototype );
+UI.ListItem.prototype.constructor = UI.ListItem();
+
 // Span
 
 UI.Span = function () {

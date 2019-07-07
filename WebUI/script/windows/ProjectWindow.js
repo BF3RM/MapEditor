@@ -2,7 +2,6 @@ class ProjectWindow {
     constructor() {
         this.dom = null;
         this.topControls = this.CreateTopControls();
-        this.debugBox = null;
         this.Initialize();
     }
 
@@ -12,8 +11,6 @@ class ProjectWindow {
             "height": "99%",
             "width": "99%"
         });
-
-
     }
 
     Update() {
@@ -35,7 +32,6 @@ class ProjectWindow {
                     }
                 }
             ))));
-
     }
 
     CreateTopControls() {
