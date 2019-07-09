@@ -1,9 +1,10 @@
 class 'Freecam'
 
 local m_Logger = Logger("Freecam", true)
+local m_RotationHelper = require "__shared/Util/RotationHelper"
 
 function Freecam:__init()
-	m_Logger:Write("function Freecam:__init()")
+	m_Logger:Write("Initializing FreeCam module")
 
 	self:RegisterVars()
 end
@@ -43,6 +44,8 @@ function Freecam:OnControlStart()
 	self.m_Mode = CameraMode.Editor
 end
 function Freecam:OnControlEnd()
+	self:UpdateFreeCameraVars()
+
 	self.m_Mode = CameraMode.FreeCam
 end
 function Freecam:OnControlUpdate(p_Transform)
@@ -51,6 +54,17 @@ end
 
 function Freecam:OnEnableFreecamMovement()
 	self.m_Mode = CameraMode.FreeCam
+end
+
+function Freecam:UpdateFreeCameraVars()
+	local s_Yaw, s_Pitch, s_Roll = m_RotationHelper:GetYPRfromLUF(
+			self.m_CameraData.transform.left,
+			self.m_CameraData.transform.up,
+			self.m_CameraData.transform.forward)
+
+	self.m_MoveYaw = s_Yaw - math.pi
+	self.m_MovePitch = math.pi - s_Pitch
+	self.m_LastTransform = self.m_CameraData.transform.trans
 end
 
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)

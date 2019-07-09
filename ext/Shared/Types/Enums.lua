@@ -2,7 +2,7 @@ CameraMode = {
 	FirstPerson = 1,
 	FreeCam = 2,
 	Orbital = 3,
-	Editor = 3,
+	Editor = 4,
 }
 
 RaycastType = {
