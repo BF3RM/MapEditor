@@ -23,6 +23,8 @@ class THREEManager {
         this.sphere = new THREE.Sphere();
         this.center = new THREE.Vector3();
 
+        this.waitingForControlEnd = false;
+        this.updatingCamera = false;
 	}
 	Initialize() {
 		let scope = this;
@@ -64,25 +66,29 @@ class THREEManager {
 
             // you can skip this condition to render though
             if ( hasControlsUpdated ) {
-
                 scope.Render()
-
+            }
+            if(scope.waitingForControlEnd && !scope.updatingCamera && !hasControlsUpdated) {
+                editor.vext.SendEvent("controlEnd");
+                scope.waitingForControlEnd = false;
             }
         } )();
+
         scope.cameraControls.addEventListener( 'controlstart', function( event ) {
             editor.vext.SendEvent("controlStart");
         } );
         scope.cameraControls.addEventListener( 'controlend', function( event ) {
-            editor.vext.SendEvent("controlEnd");
+            scope.waitingForControlEnd = true;
         } );
         scope.cameraControls.addEventListener( 'update', function( event ) {
+            if(!scope.updatingCamera) {
 
-            //lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
-            let transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld.elements);
-
-            editor.vext.SendEvent("controlUpdate", {
-                transform: transform,
-            });
+                //lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
+                let transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld.elements);
+                editor.vext.SendEvent("controlUpdate", {
+                    transform: transform,
+                });
+            };
         } );
 
 
@@ -97,7 +103,8 @@ class THREEManager {
 	}
 
 	Focus(target) {
-	    let scope = this;
+        editor.vext.SendEvent("controlStart");
+        let scope = this;
         if(target === undefined) {
             target = editor.selectionGroup;
         }
@@ -570,6 +577,7 @@ class THREEManager {
 	}
 
 	UpdateCameraTransform(lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
+	    this.updatingCamera = true;
 		let m = new THREE.Matrix4();
 
 		m.set(lx, ux, fx, 0,
@@ -579,20 +587,13 @@ class THREEManager {
 
 		this.camera.setRotationFromMatrix(m);
 		this.camera.position.set(x, y, z);
+        let distance = 10;
+        let target = new Vec3(x + (fx * -1 * distance), y + (fy * -1 * distance), z + (fz * -1 * distance));
 
-        this.cameraControls._target = new THREE.Vector3();
-        this.cameraControls._targetEnd = new THREE.Vector3();
-
-        // rotation
-        this.cameraControls._spherical.setFromVector3( this.camera.position );
-        this.cameraControls._sphericalEnd = this.cameraControls._spherical.clone();
-
-        // reset
-        this.cameraControls._target0 = this.cameraControls._target.clone();
-        this.cameraControls._position0 = this.cameraControls._camera.position.clone();
-        this.cameraControls._zoom0 = this.cameraControls._camera.zoom;
-        this.cameraControls.update(0);
+        this.cameraControls.setLookAt(x,y,z, target.x, target.y, target.z, false);
 		this.Render();
-	}
+        this.updatingCamera = false;
+
+    }
 
 }

@@ -270,6 +270,7 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
             --s_ChildGameObject.parentData.partitionGuid = p_GameObject.blueprintCtrRef.partitionGuid
 
             self:SetGuidAndAddGameObjectRecursively(s_ChildGameObject, p_IsVanilla, s_ChildGuid, p_CreatorName)
+	        self.m_GameObjects[tostring(s_ChildGameObject.guid)] = s_ChildGameObject
         end
     end
 
@@ -300,7 +301,7 @@ function GameObjectManager:EnableGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]
 
     if (s_GameObject == nil) then
-        m_Logger:Error("Failed to enable blueprint: " .. p_Guid)
+        m_Logger:Error("Failed to find and enable blueprint: " .. p_Guid)
         return false
     end
 
@@ -313,7 +314,7 @@ function GameObjectManager:DisableGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]
 
     if (s_GameObject == nil) then
-        m_Logger:Error("Failed to enable blueprint: " .. p_Guid)
+        m_Logger:Error("Failed to find and disable blueprint: " .. p_Guid)
         return false
     end
 

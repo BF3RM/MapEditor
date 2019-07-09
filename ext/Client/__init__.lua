@@ -47,7 +47,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
 	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
-	Events:Subscribe('MapEditor:controlEnd', self, self.OnCameraControlStop)
+	Events:Subscribe('MapEditor:controlEnd', self, self.OnCameraControlEnd)
 	Events:Subscribe('MapEditor:controlUpdate', self, self.OnCameraControlUpdate)
 
     Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
@@ -147,6 +147,7 @@ end
 
 function MapEditorClient:OnEnableFreecamMovement()
 	UIManager:OnEnableFreecamMovement()
+	Freecam:OnEnableFreecamMovement()
 end
 
 function MapEditorClient:OnDisableFreecam()
@@ -161,6 +162,6 @@ function MapEditorClient:OnCameraControlEnd()
 end
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
-	Freecam:OnControlUpdate(s_Transform)
+	Freecam:OnControlUpdate(s_Transform.transform)
 end
 return MapEditorClient()

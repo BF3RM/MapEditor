@@ -1,3 +1,5 @@
+// https://github.com/yomotsu/camera-controls
+
 let _v2;
 let _v3A;
 let _v3B;
@@ -260,7 +262,10 @@ class CameraControls extends EventDispatcher {
                     y = ( event.clientY - elementRect.y ) / elementRect.w * - 2 + 1;
 
                 }
-
+                scope.dispatchEvent( {
+                    type: 'controlstart',
+                    originalEvent: event,
+                } );
                 dollyInternal( - delta, x, y );
 
             }
@@ -427,9 +432,11 @@ class CameraControls extends EventDispatcher {
 
                 if ( scope._camera.isPerspectiveCamera ) {
 
-                    const distance = scope._sphericalEnd.radius * dollyScale - scope._sphericalEnd.radius;
+                    let distance = scope._sphericalEnd.radius * dollyScale - scope._sphericalEnd.radius;
                     const prevRadius = scope._sphericalEnd.radius;
-
+                    if(distance === 0) {
+                        distance = 0.1;
+                    }
                     scope.dolly( distance );
 
                     if ( scope.dollyToCursor ) {

@@ -104,7 +104,7 @@ end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
-	if(self.m_LevelLoaded and self:CameraHasMoved() == true) then
+	if(self.m_LevelLoaded and Freecam.m_Mode == CameraMode.FreeCam and self:CameraHasMoved() == true) then
 		self:UpdateCameraTransform()
 	end
 

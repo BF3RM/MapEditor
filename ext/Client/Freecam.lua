@@ -11,6 +11,7 @@ end
 function Freecam:RegisterVars()
 	self.m_Freecam = false
 	self.m_Mode = CameraMode.FirstPerson
+	self.m_EditorControlled = false
 
 	self.m_Camera = nil
 	self.m_CameraData = CameraEntityData()
@@ -45,9 +46,11 @@ function Freecam:OnControlEnd()
 	self.m_Mode = CameraMode.FreeCam
 end
 function Freecam:OnControlUpdate(p_Transform)
-	print(p_Transform.transform)
-	print(p_Transform.transform.trans.x)
-	self:UpdateEditor(p_Transform.transform)
+	self:UpdateEditor(p_Transform)
+end
+
+function Freecam:OnEnableFreecamMovement()
+	self.m_Mode = CameraMode.FreeCam
 end
 
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
@@ -57,7 +60,7 @@ function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 	-- 	self.m_Pitch = self.m_Pitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 	-- end
 
-	if self.m_Camera ~= nil and self.m_Freecam then
+	if self.m_Camera ~= nil and self.m_Freecam and self.m_Mode == CameraMode.FreeCam then
 
 		local s_NewYaw   = self.m_MoveYaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 		local s_NewPitch = self.m_MovePitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
@@ -142,7 +145,7 @@ function Freecam:Update(p_Delta, p_SimDelta)
 end
 
 function Freecam:OnUpdateInput(p_Delta)
-	if self.m_Mode == CameraMode.FirstPerson then
+	if self.m_Mode == CameraMode.FirstPerson or self.m_Mode == CameraMode.Editor then
 		return
 	end
 
@@ -232,7 +235,9 @@ function Freecam:UpdateCameraControls(p_Delta)
 	end
 end
 function Freecam:UpdateEditor(p_Transform)
-	self.m_CameraData.transform = p_Transform
+	if(self.m_Mode == CameraMode.Editor) then
+		self.m_CameraData.transform = p_Transform
+	end
 end
 
 function Freecam:UpdateFreeCamera(p_Delta)

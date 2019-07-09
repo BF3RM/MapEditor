@@ -37,7 +37,7 @@ end
 function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
 		
-		if Freecam:GetCameraMode() == CameraMode.FreeCam then
+		if Freecam:GetCameraMode() ~= CameraMode.FirstPerson then
 			self:DisableFreecam()
 		else
 			self:EnableFreecam()
@@ -50,7 +50,6 @@ function UIManager:OnUpdateInput(p_Delta)
 		Editor:SetPendingRaycast(RaycastType.Camera)
 		Freecam.isMoving = false
 	end
-
 end
 
 function UIManager:OnEnableFreecamMovement()
