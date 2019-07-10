@@ -168,6 +168,7 @@ class THREEManager {
 		this.renderer.domElement.addEventListener('mousemove',this.onMouseMove.bind(this));
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+		this.renderer.domElement.addEventListener("click", this.onClick.bind(this));
 		
 		this.control.addEventListener('change', this.onControlChanged.bind(this));
 		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
@@ -403,7 +404,6 @@ class THREEManager {
 
 
 	onMouseUp(e) {
-		console.log("mouse up : " + e.which)
 		let scope = this;
 
 		if(e.which === 1 && editor.threeManager.raycastPlacing) {
@@ -413,19 +413,23 @@ class THREEManager {
 			scope.Render();
 		}
 	}
+
 	onMouseDown(e) {
 		let scope = this;
 		if (scope.raycastPlacing) {
 			editor.onControlMoveStart();
 		} else if(this.controlSelected) {
 			console.log("Control selected")
-		}  else {
-			if(e.which === 1) {
-				let guid = this.RaycastSelection(e);
+		}
+	}
 
-				if (guid !== null) {
-					editor.Select(guid, undefined, true);
-				}
+	onClick(e){
+		let scope = this;
+		if( !scope.raycastPlacing && e.which === 1){
+			let guid = this.RaycastSelection(e);
+
+			if (guid !== null) {
+				editor.Select(guid, undefined, true);
 			}
 		}
 	}
@@ -454,7 +458,7 @@ class THREEManager {
 
 
 		
-		if (this.highlightingEnabled){
+		if (this.highlightingEnabled && e.which !== 1){
 
 			let now = new Date();
 
