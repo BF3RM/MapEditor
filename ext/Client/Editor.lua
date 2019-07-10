@@ -104,7 +104,7 @@ end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
-	if(self.m_LevelLoaded and Freecam.m_Mode == CameraMode.FreeCam and self:CameraHasMoved() == true) then
+	if(self.m_LevelLoaded and FreeCam:GetCameraMode() == CameraMode.FreeCam and self:CameraHasMoved() == true) then
 		self:UpdateCameraTransform()
 	end
 
@@ -276,7 +276,7 @@ function Editor:Raycast()
 		return
 	end
 
-	-- The freecam transform is inverted. Invert it back
+	-- The freeCam transform is inverted. Invert it back
 	local s_CastPosition = Vec3(s_Transform.trans.x + (s_Direction.x * MAX_CAST_DISTANCE),
 								s_Transform.trans.y + (s_Direction.y * MAX_CAST_DISTANCE),
 								s_Transform.trans.z + (s_Direction.z * MAX_CAST_DISTANCE))

@@ -1,6 +1,6 @@
 class 'MapEditorClient'
 
-Freecam = require "Freecam"
+FreeCam = require "Freecam"
 Editor = require "Editor"
 UIManager = require "UIManager"
 MessageActions = require "MessageActions"
@@ -44,8 +44,8 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 	Events:Subscribe('MapEditor:RequestSave', self, self.OnRequestSave)
 
-	Events:Subscribe('MapEditor:EnableFreecamMovement', self, self.OnEnableFreecamMovement)
-	Events:Subscribe('MapEditor:DisableFreecam', self, self.OnDisableFreecam)
+	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
+	Events:Subscribe('MapEditor:DisableFreeCam', self, self.OnDisableFreeCam)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
 	Events:Subscribe('MapEditor:controlEnd', self, self.OnCameraControlEnd)
 	Events:Subscribe('MapEditor:controlUpdate', self, self.OnCameraControlUpdate)
@@ -90,11 +90,11 @@ function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_Paren
 end
 
 function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-	Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
+	FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 end
 
 function MapEditorClient:OnUpdateInput(p_Delta)
-	Freecam:OnUpdateInput(p_Delta)
+	FreeCam:OnUpdateInput(p_Delta)
 	UIManager:OnUpdateInput(p_Delta)
 end
 
@@ -145,23 +145,23 @@ function MapEditorClient:OnRequestSave()
 	Editor:OnRequestSave()
 end
 
-function MapEditorClient:OnEnableFreecamMovement()
-	UIManager:OnEnableFreecamMovement()
-	Freecam:OnEnableFreecamMovement()
+function MapEditorClient:OnEnableFreeCamMovement()
+	UIManager:OnEnableFreeCamMovement()
+	FreeCam:OnEnableFreeCamMovement()
 end
 
-function MapEditorClient:OnDisableFreecam()
-	UIManager:OnDisableFreecam()
+function MapEditorClient:OnDisableFreeCam()
+	UIManager:OnDisableFreeCam()
 end
 
 function MapEditorClient:OnCameraControlStart()
-	Freecam:OnControlStart()
+	FreeCam:OnControlStart()
 end
 function MapEditorClient:OnCameraControlEnd()
-	Freecam:OnControlEnd()
+	FreeCam:OnControlEnd()
 end
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
-	Freecam:OnControlUpdate(s_Transform.transform)
+	FreeCam:OnControlUpdate(s_Transform.transform)
 end
 return MapEditorClient()

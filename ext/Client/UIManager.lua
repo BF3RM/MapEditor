@@ -37,65 +37,62 @@ end
 function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
 		
-		if Freecam:GetCameraMode() ~= CameraMode.FirstPerson then
-			self:DisableFreecam()
+		if FreeCam:GetCameraMode() ~= CameraMode.FirstPerson then
+			self:DisableFreeCam()
 		else
-			self:EnableFreecam()
+			self:EnableFreeCam()
 		end
 	end
 
 		-- We let go of right mouse button. Activate the UI again.
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
-		self:DisableFreecamMovement()
+		self:DisableFreeCamMovement()
 		Editor:SetPendingRaycast(RaycastType.Camera)
-		Freecam.isMoving = false
 	end
 end
 
-function UIManager:OnEnableFreecamMovement()
-	self:EnableFreecamMovement()
+function UIManager:OnEnableFreeCamMovement()
+	self:EnableFreeCamMovement()
 end
 
-function UIManager:EnableFreecamMovement()
+function UIManager:EnableFreeCamMovement()
 	WebUI:DisableKeyboard()
 	WebUI:DisableMouse()
-	Freecam.isMoving = true
 end
 
-function UIManager:DisableFreecamMovement()
-	if Freecam:GetCameraMode() == CameraMode.FreeCam then
+function UIManager:DisableFreeCamMovement()
+	if FreeCam:GetCameraMode() == CameraMode.FreeCam then
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
 		WebUI:ExecuteJS('editor.threeManager.MouseEnabled()')
-		Freecam.isMoving = false
 	end
 end
 
 
-function UIManager:OnDisableFreecam()
-	self:DisableFreecam()
+function UIManager:OnDisableFreeCam()
+	self:DisableFreeCam()
 end
 
-function UIManager:EnableFreecam()
+function UIManager:EnableFreeCam()
 	NetEvents:SendLocal('EnableInputRestriction')
 
-	Freecam:Enable()
+	FreeCam:Enable()
 
 	WebUI:BringToFront()
 	WebUI:EnableMouse()
 	WebUI:Show()
 
-	self:DisableFreecamMovement()
+	self:DisableFreeCamMovement()
 end
 
-function UIManager:DisableFreecam()
+function UIManager:DisableFreeCam()
 	NetEvents:SendLocal('DisableInputRestriction')
-	Freecam:Disable()
+	FreeCam:Disable()
 	--WebUI:BringToFront()
 	-- WebUI:Hide()
 	WebUI:DisableMouse()
 
-	self:EnableFreecamMovement()
+	self:EnableFreeCamMovement()
 end
 
 
