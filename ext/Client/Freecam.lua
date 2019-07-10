@@ -18,9 +18,6 @@ function Freecam:RegisterVars()
 	self.m_CameraData = CameraEntityData()
 	self.m_LastTransform = nil
 
-	self.m_Yaw = 0.0
-	self.m_Pitch = 0.0
-	self.m_Roll = 0.0
 	self.m_MoveYaw = 0.0
 	self.m_MovePitch = 0.0
 
@@ -68,11 +65,6 @@ function Freecam:UpdateFreeCameraVars()
 end
 
 function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-	-- if (self.m_Camera ~= nil and self.m_Freecam == true) then
-
-	-- 	self.m_Yaw   = self.m_Yaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-	-- 	self.m_Pitch = self.m_Pitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-	-- end
 
 	if self.m_Camera ~= nil and self.m_Freecam and self.m_Mode == CameraMode.FreeCam then
 
@@ -81,9 +73,6 @@ function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 
 		self.m_MoveYaw = s_NewYaw
 
-		-- m_Logger:Write(self.m_MovePitch.." , ".. s_NewPitch)
-		-- m_Logger:Write(math.abs(math.pi - math.abs(s_NewPitch))*2)
-		-- if (math.abs(math.pi - s_NewPitch)* 2 < math.pi) then
 		if (math.abs(s_NewPitch)* 2 < math.pi) then
 			self.m_MovePitch = s_NewPitch
 		end
@@ -178,9 +167,6 @@ function Freecam:OnUpdateInput(p_Delta)
 		self.m_CameraData.transform.left = Vec3(1,0,0)
 		self.m_CameraData.transform.up = Vec3(0,1,0)
 		self.m_CameraData.transform.forward = Vec3(0,0,1)
-		self.m_Yaw = 0.0
-		self.m_Pitch = 0.0
-		self.m_Roll = 0.0
 		self.m_MoveYaw = 0.0
 		self.m_MovePitch = 0.0
 		self.m_CameraDistance = 1.0
@@ -262,9 +248,9 @@ function Freecam:UpdateFreeCamera(p_Delta)
 			math.sin(self.m_MovePitch),
 			math.cos(self.m_MoveYaw)*math.cos(self.m_MovePitch))
 
-	local up = Vec3( -(math.sin(self.m_MoveYaw)*math.sin(self.m_MovePitch)*math.cos(self.m_Roll) + math.cos(self.m_MoveYaw)*math.sin(self.m_Roll)),
-			math.cos(self.m_MovePitch)*math.cos(self.m_Roll),
-			-(math.cos(self.m_MoveYaw)*math.sin(self.m_MovePitch)*math.cos(self.m_Roll) - math.sin(self.m_MoveYaw)*math.sin(self.m_Roll)) )
+	local up = Vec3( -(math.sin(self.m_MoveYaw)*math.sin(self.m_MovePitch)),
+			math.cos(self.m_MovePitch),
+			-(math.cos(self.m_MoveYaw)*math.sin(self.m_MovePitch)) )
 
 
 	local left = forward:Cross(Vec3(up.x * -1, up.y * -1, up.z * -1))
