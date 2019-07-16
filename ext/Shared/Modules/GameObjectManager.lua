@@ -87,7 +87,7 @@ end
 
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
     -- We dont load vanilla objects if the flag is active
-    if not LOAD_VANILLA and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+    if not ME_CONFIG.LOAD_VANILLA and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
         return
     end
 
