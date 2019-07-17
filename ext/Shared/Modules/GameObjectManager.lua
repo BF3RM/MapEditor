@@ -142,7 +142,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         guid = s_TempGuid, -- we set a tempGuid, it will later be set to a vanilla or custom guid
         name = s_Blueprint.name,
         typeName = p_Blueprint.typeInfo.name,
-        parentData = ParentData{},
+        parentData = {},
         transform = p_Transform,
         variation = p_Variation,
         isVanilla = true,
@@ -166,7 +166,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         self:PostProcessGameObjectAndChildren(s_GameObject)
     elseif (InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then -- top level vanilla (level data) -> proceed in postprocessing
         m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
-        s_GameObject.parentData = ParentData{
+        s_GameObject.parentData = GameObjectParentData{
             guid = s_ParentPrimaryInstance,
             typeName = "LevelData",
             primaryInstanceGuid = s_ParentPrimaryInstance,
@@ -191,7 +191,7 @@ function GameObjectManager:ResolveChildren(p_GameObject)
     end
 
     for _, s_ChildGameObject in pairs(s_ChildrenOfCurrentBlueprint) do
-        local s_ParentData = ParentData{
+        local s_ParentData = GameObjectParentData{
             guid = p_GameObject.guid,
             typeName = p_GameObject.blueprintCtrRef.typeName,
             primaryInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid,
@@ -212,7 +212,7 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
 
     if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
 
-        local s_ParentData = ParentData{
+        local s_ParentData = GameObjectParentData{
             guid = s_PendingInfo.parentData.guid,
             typeName = s_PendingInfo.parentData.typeName,
             primaryInstanceGuid = s_PendingInfo.parentData.primaryInstanceGuid,

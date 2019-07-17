@@ -9,4 +9,13 @@ function GameObjectParentData:__init(arg)
     self.partitionGuid = arg.partitionGuid
 end
 
+function GameObjectParentData:GetTable()
+    return {
+        guid = self.guid,
+        typeName = self.typeName,
+        primaryInstanceGuid = self.primaryInstanceGuid,
+        partitionGuid = self.partitionGuid
+    }
+end
+
 return GameObjectParentData
