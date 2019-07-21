@@ -142,7 +142,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         guid = s_TempGuid, -- we set a tempGuid, it will later be set to a vanilla or custom guid
         name = s_Blueprint.name,
         typeName = p_Blueprint.typeInfo.name,
-        parentData = {},
+        parentData = GameObjectParentData{},
         transform = p_Transform,
         variation = p_Variation,
         isVanilla = true,

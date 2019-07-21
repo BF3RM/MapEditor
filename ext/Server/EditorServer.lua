@@ -5,6 +5,7 @@ local m_Logger = Logger("EditorServer", true)
 local m_SaveFile = require 'SaveFile'
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
+local m_MapName
 
 function EditorServer:__init()
 	m_Logger:Write("Initializing EditorServer")
@@ -29,10 +30,34 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 			s_UpdatedGameObjectTransferDatas[s_Guid] = self.m_GameObjectTransferDatas[s_Guid]
 			s_TransactionId = s_TransactionId + 1
 		else
-			m_Logger:Write("shit's nil")
+			m_Logger:Write("Shit's nil")
 		end
 	end
 	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
+end
+
+function EditorServer:OnRequestSave(p_Player)
+	m_Logger:Write("Save requested")
+
+	-- TODO: check player's permission once that is implemented
+
+	local s_SaveData ={}
+
+	for l_Guid, l_GameObjectTransferData in pairs(self.m_GameObjectTransferDatas) do
+		s_SaveData[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
+	end
+
+	local s_SaveFile = {
+		header = {
+			mapName = m_MapName,
+			--version = ""
+		},
+		data = s_SaveData
+	}
+
+	local s_JSONSaveFile = json.encode(s_SaveFile)
+
+	NetEvents:SendToLocal("MapEditorClient:ReceiveSave", p_Player, s_JSONSaveFile)
 end
 
 
@@ -93,6 +118,7 @@ function EditorServer:OnGameObjectReady(p_GameObject)
 end
 
 function EditorServer:OnUpdatePass(p_Delta, p_Pass)
+	-- TODO: ugly, find a better way
 	if m_IsLevelLoaded then
 		m_LoadDelay = m_LoadDelay + p_Delta
 
@@ -124,6 +150,8 @@ end
 
 function EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	m_IsLevelLoaded = true
+
+	m_MapName = p_Map
 end
 
 function EditorServer:LoadSave()
@@ -131,23 +159,29 @@ function EditorServer:LoadSave()
     local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
 
     if(not s_SaveFile) then
-        m_Logger:Write("Failed to get savefile")
+        m_Logger:Write("Failed to get savefile.")
         return
     end
 
-    self:UpdateLevelFromSaveFile(s_SaveFile)
+	if s_SaveFile.header.mapName ~= m_MapName then
+		m_Logger:Warning("Tried to load a savefile from a different map.")
+		return
+	end
+
+	--self:UpdateLevelFromOldSaveFile(s_SaveFile)
+    self:UpdateLevelFromSaveFile(s_SaveFile.data)
 end
 
-function EditorServer:UpdateLevelFromSaveFile(p_SaveFile)
+function EditorServer:UpdateLevelFromSaveFile(p_SaveData)
 	local s_SaveFileCommands = {}
 
-	for l_Guid, l_GameObjectTransferData in pairs(p_SaveFile) do
+	for l_Guid, l_GameObjectSaveData in pairs(p_SaveData) do
 		if (self.m_GameObjectTransferDatas[l_Guid] == nil) then
 			local s_Command
 
 			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
 			if IsVanilla(l_Guid) then
-                if l_GameObjectTransferData.isDeleted then
+                if l_GameObjectSaveData.isDeleted then
 					s_Command = {
 						sender = "LoadingSaveFile",
 						type = "DestroyBlueprintCommand",
@@ -161,7 +195,7 @@ function EditorServer:UpdateLevelFromSaveFile(p_SaveFile)
 						type = "SetTransformCommand",
 						gameObjectTransferData = {
 							guid = l_Guid,
-							transform = l_GameObjectTransferData.transform
+							transform = l_GameObjectSaveData.transform
 						}
 					}
 				end
@@ -169,26 +203,97 @@ function EditorServer:UpdateLevelFromSaveFile(p_SaveFile)
 				table.insert(s_SaveFileCommands, s_Command)
 			else
 				s_Command = {
+					guid = l_Guid,
 					sender = "LoadingSaveFile",
 					type = "SpawnBlueprintCommand",
 					gameObjectTransferData = {
 						guid = l_Guid,
-						name = l_GameObjectTransferData.name,
-						typeName = l_GameObjectTransferData.typeName,
-						blueprintCtrRef = l_GameObjectTransferData.blueprintCtrRef,
-						parentData = l_GameObjectTransferData.parentData,
-						transform = l_GameObjectTransferData.transform,
-						variation = l_GameObjectTransferData.variation,
-						gameEntities = l_GameObjectTransferData.gameEntities,
-						isEnabled = l_GameObjectTransferData.gameEntities.isEnabled,
-						isDeleted = l_GameObjectTransferData.gameEntities.isDeleted
+						name = l_GameObjectSaveData.name,
+						typeName = l_GameObjectSaveData.typeName,
+						blueprintCtrRef = l_GameObjectSaveData.blueprintCtrRef,
+						parentData = l_GameObjectSaveData.parentData,
+						transform = l_GameObjectSaveData.transform,
+						variation = l_GameObjectSaveData.variation,
+						gameEntities = {},
+						isEnabled = l_GameObjectSaveData.isEnabled or true,
+						isDeleted = l_GameObjectSaveData.isDeleted or false
 					}
 				}
 
 				table.insert(s_SaveFileCommands, s_Command)
 			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjectTransferDatas[l_Guid], l_GameObjectTransferData)
+			local s_Changes = GetChanges(GameObjectSaveData(self.m_GameObjectTransferDatas[l_Guid]), l_GameObjectSaveData)
+			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
+			if(#s_Changes > 0) then
+				m_Logger:Write("--------------------------------------------------------------------")
+				m_Logger:Write("If you ever see this, please report it on the repo.")
+				print(s_Changes) -- logger wont print the table, we have to use print
+				m_Logger:Write("--------------------------------------------------------------------")
+			end
+		end
+	end
+
+	self:OnReceiveCommands(nil, s_SaveFileCommands, true)
+end
+
+function EditorServer:UpdateLevelFromOldSaveFile(p_SaveFile)
+	local s_SaveFileCommands = {}
+
+	for l_Guid, l_GameObjectSaveData in pairs(p_SaveFile) do
+		if (self.m_GameObjectTransferDatas[l_Guid] == nil) then
+			local s_Command
+
+			--If it's a vanilla object we move it or we delete it. If not we spawn a new object.
+			if IsVanilla(l_Guid) then
+				if l_GameObjectSaveData.isDeleted then
+					s_Command = {
+						sender = "LoadingSaveFile",
+						type = "DestroyBlueprintCommand",
+						gameObjectTransferData = {
+							guid = l_Guid
+						}
+					}
+				else
+					s_Command = {
+						sender = "LoadingSaveFile",
+						type = "SetTransformCommand",
+						gameObjectTransferData = {
+							guid = l_Guid,
+							transform = l_GameObjectSaveData.transform
+						}
+					}
+				end
+
+				table.insert(s_SaveFileCommands, s_Command)
+			else
+				s_Command = {
+					guid = l_Guid,
+					sender = "LoadingSaveFile",
+					type = "SpawnBlueprintCommand",
+					gameObjectTransferData = {
+						guid = l_Guid,
+						name = l_GameObjectSaveData.name,
+						typeName = l_GameObjectSaveData.reference.typeName,
+						blueprintCtrRef = CtrRef {
+							typeName = l_GameObjectSaveData.reference.typeName,
+							name = l_GameObjectSaveData.reference.name,
+							partitionGuid = l_GameObjectSaveData.reference.partitionGuid,
+							instanceGuid = l_GameObjectSaveData.reference.instanceGuid
+						},
+						parentData = GameObjectParentData{guid = "root"},
+						transform = l_GameObjectSaveData.transform,
+						variation = l_GameObjectSaveData.variation,
+						gameEntities = l_GameObjectSaveData.gameEntities or {},
+						isEnabled = l_GameObjectSaveData.isEnabled or true,
+						isDeleted = l_GameObjectSaveData.isDeleted or false
+					}
+				}
+
+				table.insert(s_SaveFileCommands, s_Command)
+			end
+		else
+			local s_Changes = GetChanges(GameObjectSaveData(self.m_GameObjectTransferDatas[l_Guid]), l_GameObjectSaveData)
 			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
 			if(#s_Changes > 0) then
 				m_Logger:Write("--------------------------------------------------------------------")
@@ -201,7 +306,5 @@ function EditorServer:UpdateLevelFromSaveFile(p_SaveFile)
 
 	self:OnReceiveCommands(nil, s_SaveFileCommands, true)
 end
-
-
 
 return EditorServer()

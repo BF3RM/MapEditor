@@ -78,6 +78,10 @@ function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 	EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
+function MapEditorServer:OnRequestSave(p_Player)
+	EditorServer:OnRequestSave(p_Player)
+end
+
 function MapEditorServer:OnEnableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, false)
 end

@@ -22,11 +22,31 @@ class ProjectManager {
     onEditorReady() {
         editor.ui.RegisterMenubarEntry(["Edit", "Project Settings"], this.NewProject);
         editor.ui.RegisterMenubarEntry(["File", "Preferences"], this.NewProject);
+        editor.ui.RegisterMenubarEntry(["File", "Save Project"], this.SaveProject);
         editor.ui.RegisterMenubarEntry(["File", "New Project", "From template", "Other map"], this.NewProject);
     }
 
     NewProject() {
 
+    }
+
+    SaveProject() {
+        let dialogElement = $("#save-project-dialog");
+        let closeButton = {
+            text: "Close", click: function () { dialogElement.dialog("close")}
+        };
+
+        editor.ui.CreateDialog(dialogElement, [closeButton], null)
+                .dialog("open");
+
+        $("#saveProjectTextArea").text("Loading...");
+        editor.vext.SendEvent('RequestSave');
+    }
+
+    SetSave(json){
+
+        $("#saveProjectTextArea").text(json);
+        // editor.ui.dialogs["saveProject"].dialog("open");
     }
 
     LoadProject(blueprintsRaw) {

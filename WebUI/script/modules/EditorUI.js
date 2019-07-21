@@ -2,10 +2,7 @@ class EditorUI {
 
 	constructor(debug) {
 		this.Initialize();
-		this.dialogs = this.InitializeDialogs();
 
-
-		
 		if (debugMode) {
 			this.debugWindow = new DebugWindow();
 		}
@@ -272,7 +269,23 @@ class EditorUI {
 		editor.vext.SendMessage(message);
 	}
 
-	InitializeDialogs() {
+	CreateDialog(dialogElement, buttons, customCloseFn = dialogElement.dialog("close")){
+		if (dialogElement == null){
+			console.error("Invalid dialog element.")
+		}
+
+
+		return dialogElement.dialog({
+			autoOpen: false,
+			height: "auto",
+			width: "auto",
+			modal: true,
+			buttons: buttons,
+			close: customCloseFn
+		});
+	}
+
+/*	InitializeDialogs() {
 		let dialogs = {};
 		dialogs["variation"] = $("#variation-dialog").dialog({
 			autoOpen: false,
@@ -337,7 +350,7 @@ class EditorUI {
 			}
 		});
 
-		
+
 
 		dialogs["clearProject"] = $("#clear-dialog").dialog({
 			autoOpen: false,
@@ -357,7 +370,7 @@ class EditorUI {
 
 
 		return dialogs;
-	}
+	}*/
 
 	UpdateUI(){
 		if(this.debug) {
@@ -370,6 +383,7 @@ class EditorUI {
 
 	*/
 
+/*
 	OpenReloadDialog(){
 		editor.ui.dialogs["reloadProject"].dialog("open");
 	}
@@ -381,38 +395,9 @@ class EditorUI {
 	OpenClearDialog(){
 		editor.ui.dialogs["clearProject"].dialog("open");
 	}
+*/
 
-	OpenSaveDialog() {
-		/*let jsonString = JSON.stringify(
-			editor.rootEntities, function( key, value) {
-				if(key == 'webObject') {
-					return null;
-				}
-				else if(key == 'parent'){
-					if (value != null) {
-						return value.id;
 
-					}
-					else{
-						return null;
-					}
-				}else{
-					return value;
-				}
-			},
-			"\t"
-			);
-		*/
-
-		editor.vext.SendEvent('RequestSave')
-		$("#saveProjectTextArea").text("Loading...");
-		editor.ui.dialogs["saveProject"].dialog("open");
-	}
-
-	SetSave(json){
-		$("#saveProjectTextArea").text(json);
-		// editor.ui.dialogs["saveProject"].dialog("open");
-	}
 
 	onConfirmReloadProject(){
 		let jsonString = JSON.stringify(

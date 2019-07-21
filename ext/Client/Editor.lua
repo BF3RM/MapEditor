@@ -92,7 +92,7 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 			if(#s_Changes > 0) then
 				m_Logger:Write("--------------------------------------------------------------------")
 				m_Logger:Write("If you ever see this, please report it on the repo.")
-				m_Logger:Write(s_Changes)
+				print(s_Changes) -- logger wont print the table, we have to use print
 				m_Logger:Write("--------------------------------------------------------------------")
 			end
 		end
@@ -100,6 +100,12 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 	end
 
 	self:OnReceiveCommands(s_Responses, nil)
+end
+
+function Editor:OnReceiveSave(p_SaveFile)
+	m_Logger:Write("Save received")
+	p_SaveFile = p_SaveFile or "Error"
+	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
 end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
@@ -112,7 +118,8 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function Editor:OnRequestSave()
-	WebUI:ExecuteJS("editor.ui.SetSave('"..json.encode(self.m_GameObjectTransferDatas).."')")
+	m_Logger:Write("Save requested")
+	NetEvents:SendLocal("MapEditorServer:RequestSave")
 end
 
 function Editor:OnSendCommandsToServer(p_Command)

@@ -36,6 +36,8 @@ function MapEditorClient:RegisterEvents()
 	-- Editor Events
 	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
+	NetEvents:Subscribe('MapEditorClient:ReceiveSave', self, self.OnReceiveSave)
+
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
 	-- WebUI events
@@ -137,6 +139,10 @@ end
 
 function MapEditorClient:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 	Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
+end
+
+function MapEditorClient:OnReceiveSave(p_SaveFile)
+	Editor:OnReceiveSave(p_SaveFile)
 end
 
 ----------- WebUI functions----------------
