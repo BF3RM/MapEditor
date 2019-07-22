@@ -113,7 +113,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
     for l_Index, l_Entity in ipairs(s_SpawnedEntities) do
 
         if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
-
             local s_GameEntity = GameEntity{
                 entity = l_Entity,
                 instanceId = l_Entity.instanceId,
@@ -121,7 +120,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
                 typeName = l_Entity.typeInfo.name,
             }
 
-            if(l_Entity:Is("SpatialEntity")) then
+            if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
                 local s_Entity = SpatialEntity(l_Entity)
                 s_GameEntity.isSpatial = true
                 s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
