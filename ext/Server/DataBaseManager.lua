@@ -3,6 +3,7 @@ class 'DataBaseManager'
 local m_Logger = Logger("DataBaseManager", true)
 
 local m_DB_Header_Table_Name = "project_header"
+local m_ProjectName_Unique_Index = "idx_project_name"
 local m_ProjectName_Text_Column_Name = "project_name"
 local m_MapName_Text_Column_Name = "map_name"
 local m_RequiredBundles_Text_Column_Name = "required_bundles"
@@ -39,7 +40,9 @@ function DataBaseManager:CreateOrUpdateDatabase()
 			]] .. m_ProjectName_Text_Column_Name .. [[ TEXT,
 			]] .. m_MapName_Text_Column_Name .. [[ TEXT,
 			]] .. m_RequiredBundles_Text_Column_Name .. [[ TEXT
-		)
+		);
+
+		CREATE UNIQUE INDEX ]] .. m_ProjectName_Unique_Index .. [[ ON ]] .. m_DB_Header_Table_Name ..  [[(]] .. m_ProjectName_Text_Column_Name .. [[);
 	]]
 
 	if not SQL:Query(createDataTableQuery) then
@@ -63,7 +66,7 @@ function DataBaseManager:CreateOrUpdateDatabase()
 end
 
 function DataBaseManager:SaveProjectHeader(p_Header)
-	local s_Query = 'INSERT INTO ' .. m_DB_Header_Table_Name .. ' (' .. m_ProjectName_Text_Column_Name .. ', ' .. m_MapName_Text_Column_Name .. ', ' .. m_RequiredBundles_Text_Column_Name .. ') VALUES (?, ?, ?)'
+	local s_Query = 'INSERT OR REPLACE INTO ' .. m_DB_Header_Table_Name .. ' (' .. m_ProjectName_Text_Column_Name .. ', ' .. m_MapName_Text_Column_Name .. ', ' .. m_RequiredBundles_Text_Column_Name .. ') VALUES (?, ?, ?)'
 
 	if not SQL:Query(s_Query, p_Header.projectName, p_Header.mapName, p_Header.requiredBundles) then
         print('Failed to execute query: ' .. SQL:Error())
@@ -110,7 +113,24 @@ function DataBaseManager:GetProjectHeaders()
 	return s_ProjectHeaders
 end
 
-function DataBaseManager:GetProjectData(p_ProjectName)
+function DataBaseManager:GetProjectHeader(p_ProjectName)
+	local s_ProjectHeaderRow = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE '.. m_ProjectName_Text_Column_Name .. ' = "' .. p_ProjectName .. '" LIMIT 1')
+
+	if not s_ProjectHeaderRow then
+		print('Failed to execute query: ' .. SQL:Error())
+		return
+	end
+
+	local s_Header = {
+		projectName = s_ProjectHeaderRow[m_ProjectName_Text_Column_Name],
+		mapName = s_ProjectHeaderRow[m_MapName_Text_Column_Name],
+		requiredBundles = s_ProjectHeaderRow[m_RequiredBundles_Text_Column_Name]
+	}
+
+	return s_Header
+end
+
+function DataBaseManager:GetProjectDataByProjectName(p_ProjectName)
 	local projectDataJson = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectName_Text_Column_Name .. ' = "' .. p_ProjectName .. '" LIMIT 1')
 
 	if not projectDataJson then

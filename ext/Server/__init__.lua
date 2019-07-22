@@ -24,7 +24,8 @@ function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommands)
 
 	NetEvents:Subscribe('MapEditorServer:RequestProjectSave', self, self.OnRequestProjectSave)
-
+	NetEvents:Subscribe('MapEditorServer:RequestProjectLoad', self, self.OnRequestProjectLoad)
+	NetEvents:Subscribe('MapEditorServer:RequestProjectData', self, self.OnRequestProjectData)
 	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
@@ -85,6 +86,14 @@ function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName
 	EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
 end
 
+function MapEditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
+	EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
+end
+
+function MapEditorServer:OnRequestProjectData(p_Player, p_ProjectName)
+	EditorServer:OnRequestProjectData(p_Player, p_ProjectName)
+end
+
 function MapEditorServer:OnEnableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, false)
 end
@@ -92,16 +101,5 @@ end
 function MapEditorServer:OnDisableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, true)
 end
-
-
-
-
-
-
-
-
-
-
-
 
 return MapEditorServer()

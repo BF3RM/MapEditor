@@ -108,6 +108,11 @@ end
 -- 	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
 -- end
 
+function Editor:OnReceiveProjectData(p_ProjectData)
+	-- TODO: Handle properly in the project admin view
+-- 	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
+end
+
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
 	if(self.m_LevelLoaded and FreeCam:GetCameraMode() == CameraMode.FreeCam and self:CameraHasMoved() == true) then
@@ -120,6 +125,16 @@ end
 function Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
 	m_Logger:Write("Save requested")
 	NetEvents:SendLocal("MapEditorServer:RequestProjectSave", p_ProjectName, p_MapName, p_RequiredBundles)
+end
+
+function Editor:OnRequestProjectLoad(p_ProjectName)
+	m_Logger:Write("Load requested")
+	NetEvents:SendLocal("MapEditorServer:RequestProjectLoad", p_ProjectName)
+end
+
+function Editor:OnRequestProjectData(p_ProjectName)
+	m_Logger:Write("Project Data requested")
+	NetEvents:SendLocal("MapEditorServer:RequestProjectData", p_ProjectName)
 end
 
 function Editor:OnSendCommandsToServer(p_Command)

@@ -39,11 +39,12 @@ class ProjectManager {
         editor.ui.CreateDialog(dialogElement, [closeButton], null)
                 .dialog("open");
 
+        // TODO: Replace with proper View-Data
         let projectName = "DebugProject";
         let mapName = "XP1_001";
         let requiredBundles = [ 1, 2, 3 ];
 
-        $("#saveProjectTextArea").text("Loading...");
+        $("#saveProjectTextArea").text("Saving...");
         editor.vext.SendEvent('RequestProjectSave', projectName, mapName, requiredBundles);
     }
 
@@ -53,7 +54,20 @@ class ProjectManager {
         // editor.ui.dialogs["saveProject"].dialog("open");
     }
 
-    LoadProject(blueprintsRaw) {
+    LoadProject() {
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+
+        $("#saveProjectTextArea").text("Loading...");
+        editor.vext.SendEvent('RequestProjectLoad', projectName);
+    }
+
+    RequestProjectData() {
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+
+        $("#saveProjectTextArea").text("Loading...");
+        editor.vext.SendEvent('RequestProjectData', projectName);
     }
 
     ListProjects(instanceGuid) {

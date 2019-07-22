@@ -36,7 +36,7 @@ function MapEditorClient:RegisterEvents()
 	-- Editor Events
 	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
-	NetEvents:Subscribe('MapEditorClient:ReceiveSave', self, self.OnReceiveSave)
+	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
@@ -45,7 +45,9 @@ function MapEditorClient:RegisterEvents()
 	-- Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands) -- meant for client side only commands, not used yet
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
-
+	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
+	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
+	
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
 	Events:Subscribe('MapEditor:DisableFreeCam', self, self.OnDisableFreeCam)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
@@ -141,14 +143,26 @@ function MapEditorClient:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 	Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 end
 
-function MapEditorClient:OnReceiveSave(p_SaveFile)
-	Editor:OnReceiveSave(p_SaveFile)
+function MapEditorClient:OnReceiveProjectData(p_ProjectData)
+	Editor:OnReceiveProjectData(p_ProjectData)
 end
+
+-- function MapEditorClient:OnReceiveSave(p_SaveFile)
+-- 	Editor:OnReceiveSave(p_SaveFile)
+-- end
 
 ----------- WebUI functions----------------
 
 function MapEditorClient:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
 	Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
+end
+
+function MapEditorClient:OnRequestProjectLoad(p_ProjectName)
+	Editor:OnRequestProjectLoad(p_ProjectName)
+end
+
+function MapEditorClient:OnRequestProjectData(p_ProjectName)
+	Editor:OnRequestProjectData(p_ProjectName)
 end
 
 function MapEditorClient:OnEnableFreeCamMovement()
