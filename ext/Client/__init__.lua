@@ -47,6 +47,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
 	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
 	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
+	Events:Subscribe('MapEditor:RequestProjectDelete', self, self.OnRequestProjectDelete)
 	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
 	
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
@@ -169,6 +170,10 @@ end
 
 function MapEditorClient:OnRequestProjectLoad(p_ProjectName)
 	Editor:OnRequestProjectLoad(p_ProjectName)
+end
+
+function MapEditorClient:OnRequestProjectDelete(p_ProjectName)
+	Editor:OnRequestProjectDelete(p_ProjectName)
 end
 
 function MapEditorClient:OnRequestProjectData(p_ProjectName)

@@ -62,6 +62,14 @@ class ProjectManager {
         editor.vext.SendEvent('RequestProjectLoad', projectName);
     }
 
+    DeleteProject() {
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+
+        $("#saveProjectTextArea").text("Deleting...");
+        editor.vext.SendEvent('RequestProjectDelete', projectName);
+    }
+
     RequestProjectData() {
         // TODO: Replace with proper View-Data
         let projectName = "DebugProject";

@@ -4,8 +4,6 @@ local m_Logger = Logger("EditorServer", true)
 
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
-local m_MapName
-local m_CurrentProjectHeader -- dont reset this, is required info for map restart
 
 function EditorServer:__init()
 	m_Logger:Write("Initializing EditorServer")
@@ -18,6 +16,8 @@ function EditorServer:RegisterVars()
 
 	self.m_Transactions = {}
 	self.m_GameObjectTransferDatas = {}
+	self.m_CurrentProjectHeader -- dont reset this, is required info for map restart
+	self.m_MapName
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
@@ -43,11 +43,11 @@ function EditorServer:OnRequestProjectHeaderUpdate(p_Player)
 end
 
 function EditorServer:UpdateClientProjectHeader(p_Player)
-	if m_CurrentProjectHeader ~= nil then
+	if self.m_CurrentProjectHeader ~= nil then
 		if p_Player == nil then -- update all players
-			NetEvents:SendLocal("MapEditorClient:ReceiveCurrentProjectHeader", m_CurrentProjectHeader)
+			NetEvents:SendLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
 		else
-			NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, m_CurrentProjectHeader)
+			NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, self.m_CurrentProjectHeader)
 		end
 	end
 end
@@ -62,13 +62,20 @@ end
 
 function EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
 	m_Logger:Write("Load requested: " .. p_ProjectName)
+	-- TODO: check player's permission once that is implemented
 
-	m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectName)
+	self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectName)
 	self:UpdateClientProjectHeader()
 
 	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
 	-- Invoke Restart
-	RCON:SendCommand('mapList.restartRound')
+	if self.m_CurrentProjectHeader.mapName == self.m_MapName then
+		RCON:SendCommand('mapList.restartRound')
+	else
+		RCON:SendCommand('mapList.clear')
+		RCON:SendCommand('mapList.add ' .. self.m_CurrentProjectHeader.mapName .. ' ConquestLarge0 10') -- TODO: add proper map / gameplay support
+		RCON:SendCommand('mapList.runNextRound')
+	end
 end
 
 function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
@@ -84,6 +91,12 @@ function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p
 	end
 
 	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_RequiredBundles, s_GameObjectSaveDatas)
+end
+
+function EditorServer:OnRequestProjectDelete(p_ProjectName)
+	m_Logger:Write("Delete requested: " .. p_ProjectName))
+
+	DataBaseManager:DeleteProject(p_ProjectName)
 end
 
 --function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
@@ -144,21 +157,21 @@ end
 
 function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 	-- TODO: ugly, find a better entry point to invoke project data loading
-	if m_IsLevelLoaded == true and m_CurrentProjectHeader ~= nil then
+	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil then
 		m_LoadDelay = m_LoadDelay + p_Delta
 
 		if m_LoadDelay > 10 and
-			m_CurrentProjectHeader.projectName ~= nil then
+			self.m_CurrentProjectHeader.projectName ~= nil then
 
 			m_IsLevelLoaded = false
 			m_LoadDelay = 0
 			
-			if m_MapName ~= m_CurrentProjectHeader.mapName then
+			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
 				m_Logger:Error("Cant load project that is not built for the same map as current one.")
 			end
 
 			-- Load User Data from Database
-			local s_ProjectData = DataBaseManager:GetProjectDataByProjectName(m_CurrentProjectHeader.projectName)
+			local s_ProjectData = DataBaseManager:GetProjectDataByProjectName(self.m_CurrentProjectHeader.projectName)
 			--self:UpdateLevelFromOldSaveFile(s_SaveFile)
 			self:UpdateLevelFromSaveFile(s_ProjectData)
 		end
@@ -185,7 +198,7 @@ end
 function EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	m_IsLevelLoaded = true
 
-	m_MapName = p_Map
+	self.m_MapName = p_Map
 end
 
 function EditorServer:UpdateLevelFromSaveFile(p_SaveData)

@@ -25,6 +25,7 @@ function MapEditorServer:RegisterEvents()
 
 	NetEvents:Subscribe('MapEditorServer:RequestProjectSave', self, self.OnRequestProjectSave)
 	NetEvents:Subscribe('MapEditorServer:RequestProjectLoad', self, self.OnRequestProjectLoad)
+	NetEvents:Subscribe('MapEditorServer:RequestProjectDelete', self, self.OnRequestProjectDelete)
 	NetEvents:Subscribe('MapEditorServer:RequestProjectData', self, self.OnRequestProjectData)
 
 	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
@@ -103,6 +104,10 @@ end
 
 function MapEditorServer:OnRequestProjectData(p_Player, p_ProjectName)
 	EditorServer:OnRequestProjectData(p_Player, p_ProjectName)
+end
+
+function MapEditorServer:OnRequestProjectDelete(p_ProjectName)
+	EditorServer:OnRequestProjectDelete(p_ProjectName)
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
