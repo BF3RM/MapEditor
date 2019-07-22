@@ -91,7 +91,37 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 		else
 			--TODO: handle moving or whatever was done to existing objects
 
+			local s_Changes GetChanges( self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
 
+			for _, change in ipairs(s_Changes) do
+				local s_Command
+
+				if change == "transform" then
+					s_Command = {
+						type = "SetTransformCommand",
+						gameObjectTransferData = s_GameObjectTransferData
+					}
+				elseif change == "isEnabled" then
+					-- TODO: add this when enabling/disabling is implemented on lua
+				elseif change == "isDeleted" then
+					if s_GameObjectTransferData.isDeleted then
+						s_Command = {
+							type = "DestroyBlueprintCommand",
+							gameObjectTransferData = {
+								guid = s_Guid
+							}
+						}
+					end
+				elseif change == "parentData" then
+					-- TODO: add this when changing parent data is implemented
+				elseif change == "name" then
+					-- TODO: add this when changing name is implemented on lua
+				else
+					m_Logger:Error("Found an unhandled change: "..change)
+				end
+
+				table.insert(s_Responses, s_Command)
+			end
 		end
 	end
 
