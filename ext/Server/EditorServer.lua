@@ -24,6 +24,7 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 
 	local s_TransactionId = p_TransactionId
 	local s_UpdatedGameObjectTransferDatas = {}
+
 	while (s_TransactionId <= #self.m_Transactions) do
 		local s_Guid = self.m_Transactions[s_TransactionId]
 		if(s_Guid ~= nil) then
@@ -33,33 +34,26 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 			m_Logger:Write("Shit's nil")
 		end
 	end
+
 	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
 end
 
-function EditorServer:OnRequestSave(p_Player)
+function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
 	m_Logger:Write("Save requested")
 
 	-- TODO: check player's permission once that is implemented
 
-	local s_SaveData ={}
+	local s_GameObjectSaveDatas = {}
 
 	for l_Guid, l_GameObjectTransferData in pairs(self.m_GameObjectTransferDatas) do
-		s_SaveData[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
+		s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
 	end
 
-	local s_SaveFile = {
-		header = {
-			mapName = m_MapName,
-			--version = ""
-		},
-		data = s_SaveData
-	}
+	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_RequiredBundles, s_GameObjectSaveDatas)
 
-	local s_JSONSaveFile = json.encode(s_SaveFile)
 
-	NetEvents:SendToLocal("MapEditorClient:ReceiveSave", p_Player, s_JSONSaveFile)
+	-- NetEvents:SendToLocal("MapEditorClient:ReceiveSave", p_Player, s_JSONSaveFile)
 end
-
 
 --function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 --    --Avoid nested blueprints for now...

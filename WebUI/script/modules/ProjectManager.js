@@ -39,8 +39,12 @@ class ProjectManager {
         editor.ui.CreateDialog(dialogElement, [closeButton], null)
                 .dialog("open");
 
+        let projectName = "DebugProject";
+        let mapName = "XP1_001";
+        let requiredBundles = [ 1, 2, 3 ];
+
         $("#saveProjectTextArea").text("Loading...");
-        editor.vext.SendEvent('RequestSave');
+        editor.vext.SendEvent('RequestProjectSave', projectName, mapName, requiredBundles);
     }
 
     SetSave(json){

@@ -102,11 +102,11 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 	self:OnReceiveCommands(s_Responses, nil)
 end
 
-function Editor:OnReceiveSave(p_SaveFile)
-	m_Logger:Write("Save received")
-	p_SaveFile = p_SaveFile or "Error"
-	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
-end
+-- function Editor:OnReceiveSave(p_SaveFile)
+-- 	m_Logger:Write("Save received")
+-- 	p_SaveFile = p_SaveFile or "Error"
+-- 	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
+-- end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
@@ -117,9 +117,9 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:Raycast()
 end
 
-function Editor:OnRequestSave()
+function Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
 	m_Logger:Write("Save requested")
-	NetEvents:SendLocal("MapEditorServer:RequestSave")
+	NetEvents:SendLocal("MapEditorServer:RequestProjectSave", p_ProjectName, p_MapName, p_RequiredBundles)
 end
 
 function Editor:OnSendCommandsToServer(p_Command)

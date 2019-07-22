@@ -3,6 +3,7 @@ class 'MapEditorServer'
 local m_Logger = Logger("MapEditorServer", true)
 
 EditorServer = require "EditorServer"
+DataBaseManager = require "DataBaseManager"
 
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
@@ -21,7 +22,8 @@ function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
 
 	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommands)
-	NetEvents:Subscribe('MapEditorServer:RequestSave', self, self.OnRequestSave)
+
+	NetEvents:Subscribe('MapEditorServer:RequestProjectSave', self, self.OnRequestProjectSave)
 
 	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
 
@@ -34,6 +36,7 @@ function MapEditorServer:RegisterEvents()
 
     Hooks:Install('ServerEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
+
 ----------- Game functions----------------
 function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
 	EditorServer:OnUpdatePass(p_Delta, p_Pass)
@@ -78,8 +81,8 @@ function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 	EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 end
 
-function MapEditorServer:OnRequestSave(p_Player)
-	EditorServer:OnRequestSave(p_Player)
+function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
+	EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
