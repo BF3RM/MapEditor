@@ -16,8 +16,8 @@ function EditorServer:RegisterVars()
 
 	self.m_Transactions = {}
 	self.m_GameObjectTransferDatas = {}
-	self.m_CurrentProjectHeader -- dont reset this, is required info for map restart
-	self.m_MapName
+	self.m_CurrentProjectHeader = nil -- dont reset this, is required info for map restart
+	self.m_MapName = nil
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
@@ -69,17 +69,14 @@ function EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
 
 	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
 	-- Invoke Restart
-	if self.m_CurrentProjectHeader.mapName == self.m_MapName then
-		RCON:SendCommand('mapList.restartRound')
-	else
-		RCON:SendCommand('mapList.clear')
-		RCON:SendCommand('mapList.add ' .. self.m_CurrentProjectHeader.mapName .. ' ConquestLarge0 10') -- TODO: add proper map / gameplay support
-		RCON:SendCommand('mapList.runNextRound')
-	end
+
+	RCON:SendCommand('mapList.clear')
+	RCON:SendCommand('mapList.add ' .. self.m_CurrentProjectHeader.mapName .. ' ' .. self.m_CurrentProjectHeader.gameModeName .. ' 1') -- TODO: add proper map / gameplay support
+	RCON:SendCommand('mapList.runNextRound')
 end
 
-function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
-	m_Logger:Write("Save requested: " .. p_ProjectName))
+function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+	m_Logger:Write("Save requested: " .. p_ProjectName)
 
 	-- TODO: check player's permission once that is implemented
 
@@ -90,11 +87,11 @@ function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p
 		s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
 	end
 
-	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_RequiredBundles, s_GameObjectSaveDatas)
+	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, s_GameObjectSaveDatas)
 end
 
 function EditorServer:OnRequestProjectDelete(p_ProjectName)
-	m_Logger:Write("Delete requested: " .. p_ProjectName))
+	m_Logger:Write("Delete requested: " .. p_ProjectName)
 
 	DataBaseManager:DeleteProject(p_ProjectName)
 end

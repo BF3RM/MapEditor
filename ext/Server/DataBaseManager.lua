@@ -6,6 +6,7 @@ local m_DB_Header_Table_Name = "project_header"
 local m_ProjectName_Unique_Index = "idx_project_name"
 local m_ProjectName_Text_Column_Name = "project_name"
 local m_MapName_Text_Column_Name = "map_name"
+local m_GameModeName_Text_Column_Name = "gamemode_name"
 local m_RequiredBundles_Text_Column_Name = "required_bundles"
 local m_TimeStamp_Text_Column_Name = "timestamp"
 
@@ -17,10 +18,11 @@ function DataBaseManager:__init()
 	m_Logger:Write("Initializing DataBaseManager")
 end
 
-function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_RequiredBundles, p_GameObjectSaveDatas)
+function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas)
 	local s_Header = {
 		projectName = p_ProjectName,
 		mapName = p_MapName,
+		gameModeName = p_GameModeName,
 		requiredBundles = p_RequiredBundles,
 		timeStamp = SharedUtils:GetTimeMS()
 	}
@@ -80,6 +82,8 @@ function DataBaseManager:SaveProjectHeader(p_Header)
 		type(p_Header.projectName) ~= "string" or
 		p_Header.mapName == nil or
 		type(p_Header.mapName) ~= "string" or
+		p_Header.gameModeName == nil or
+		type(p_Header.gameModeName) ~= "string" or
 		p_Header.requiredBundles == nil or
 		type(p_Header.requiredBundles) ~= "string" or
 		p_Header.timeStamp == nil or
@@ -91,11 +95,11 @@ function DataBaseManager:SaveProjectHeader(p_Header)
 	m_Logger:Write("SaveProjectHeader() " .. tostring(p_Header))
 
 
-	local s_Query = 'INSERT OR REPLACE INTO ' .. m_DB_Header_Table_Name .. ' (' .. m_ProjectName_Text_Column_Name .. ', ' .. m_MapName_Text_Column_Name .. ', ' .. m_RequiredBundles_Text_Column_Name .. ') VALUES (?, ?, ?)'
+	local s_Query = [[INSERT OR REPLACE INTO ]] .. m_DB_Header_Table_Name .. [[ (]] .. m_ProjectName_Text_Column_Name .. [[, ]] .. m_MapName_Text_Column_Name .. [[, ]] .. m_GameModeName_Text_Column_Name .. [[, ]] .. m_RequiredBundles_Text_Column_Name .. [[) VALUES (?, ?, ?, ?)]]
 
 	m_Logger:Write(s_Query)
 
-	if not SQL:Query(s_Query, p_Header.projectName, p_Header.mapName, p_Header.requiredBundles) then
+	if not SQL:Query(s_Query, p_Header.projectName, p_Header.mapName, p_Header.gameModeName, p_Header.requiredBundles) then
         m_Logger:Error('Failed to execute query: ' .. SQL:Error())
         return
 	end
@@ -139,8 +143,9 @@ function DataBaseManager:GetProjectHeaders()
 		local s_Header = {
 			projectName = row[m_ProjectName_Text_Column_Name],
 			mapName = row[m_MapName_Text_Column_Name],
+			gameModeName = row[m_GameModeName_Text_Column_Name],
 			requiredBundles = row[m_RequiredBundles_Text_Column_Name],
-			timeStamp = s_ProjectHeaderRow[m_TimeStamp_Text_Column_Name]
+			timeStamp = row[m_TimeStamp_Text_Column_Name]
 		}
 
 		table.insert(s_ProjectHeaders, s_Header)
@@ -164,6 +169,7 @@ function DataBaseManager:GetProjectHeader(p_ProjectName)
 	local s_Header = {
 		projectName = s_ProjectHeaderRow[m_ProjectName_Text_Column_Name],
 		mapName = s_ProjectHeaderRow[m_MapName_Text_Column_Name],
+		gameModeName = s_ProjectHeaderRow[m_GameModeName_Text_Column_Name],
 		requiredBundles = s_ProjectHeaderRow[m_RequiredBundles_Text_Column_Name],
 		timeStamp = s_ProjectHeaderRow[m_TimeStamp_Text_Column_Name]
 	}

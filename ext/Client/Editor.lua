@@ -20,12 +20,12 @@ function Editor:RegisterVars()
 
 	self.m_TransactionId = 0
 	self.m_GameObjectTransferDatas = {}
-	self.m_CommandActionResults = { }
+	self.m_CommandActionResults = {}
 
 	self.m_CameraTransform = nil
 
 	self.m_LevelLoaded = false
-	self.m_CurrentProjectHeader
+	self.m_CurrentProjectHeader = nil
 end
 
 function Editor:OnEngineMessage(p_Message)
