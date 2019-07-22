@@ -21,19 +21,39 @@ function EditorServer:RegisterVars()
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
+    if p_Player == nil then
+        return
+    end
 
-	local s_TransactionId = p_TransactionId
-	local s_UpdatedGameObjectTransferDatas = {}
-	while (s_TransactionId <= #self.m_Transactions) do
-		local s_Guid = self.m_Transactions[s_TransactionId]
-		if(s_Guid ~= nil) then
-			s_UpdatedGameObjectTransferDatas[s_Guid] = self.m_GameObjectTransferDatas[s_Guid]
-			s_TransactionId = s_TransactionId + 1
-		else
-			m_Logger:Write("Shit's nil")
-		end
-	end
-	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
+    --- Client up to date
+    if p_TransactionId == #self.m_Transactions then
+        m_Logger:Write("Client up to date")
+
+        return
+    --- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
+    elseif p_TransactionId ~= 0 then
+        m_Logger:Warning(p_Player.name.."'s client is desynced, syncing it. This should rarely happen, did the client hung up? network problem? Please report it on the repo.")
+    end
+
+    if p_TransactionId > #self.m_Transactions then
+        m_Logger:Error("Client's transaction id is greater than the server's. This should never happen.")
+        return
+    end
+
+    local s_UpdatedGameObjectTransferDatas = {}
+
+    for l_TransactionId = p_TransactionId + 1, #self.m_Transactions do
+        local s_Guid = self.m_Transactions[l_TransactionId]
+        if s_Guid ~= nil then
+            s_UpdatedGameObjectTransferDatas[s_Guid] = self.m_GameObjectTransferDatas[s_Guid]
+        else
+            m_Logger:Write("Shit's nil")
+        end
+    end
+
+    -- TODO: These should be on the same netevent, merge them when this vext issue is fixed: https://github.com/EmulatorNexus/VeniceUnleashed/issues/451
+    NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
+    NetEvents:SendToLocal("MapEditorClient:UpdateTransactionId", p_Player, #self.m_Transactions)
 end
 
 function EditorServer:OnRequestSave(p_Player)

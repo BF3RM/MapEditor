@@ -48,12 +48,14 @@ function Editor:OnEngineMessage(p_Message)
 			return
 		end
 
-		NetEvents:SendLocal("MapEditorServer:RequestUpdate", 1)
+		--- Client requests all updates that the server has.
+		NetEvents:SendLocal("MapEditorServer:RequestUpdate", self.m_TransactionId)
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
 end
 
 function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
+
 	local s_Responses = {}
 
 	for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
@@ -64,7 +66,7 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 			if IsVanilla(s_StringGuid)then
 				local s_Command
 
-                if s_GameObject.isDeleted then
+				if s_GameObject.isDeleted then
 					s_Command = {
 						type = "DestroyBlueprintCommand",
 						gameObjectTransferData = s_GameObjectTransferData
@@ -87,19 +89,27 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 				table.insert(s_Responses, s_Command)
 			end
 		else
-			local s_Changes = GetChanges(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
-			-- Hopefully this will never happen. It's hard to test these changes since they require a desync.
-			if(#s_Changes > 0) then
-				m_Logger:Write("--------------------------------------------------------------------")
-				m_Logger:Write("If you ever see this, please report it on the repo.")
-				print(s_Changes) -- logger wont print the table, we have to use print
-				m_Logger:Write("--------------------------------------------------------------------")
-			end
-		end
+			--TODO: handle moving or whatever was done to existing objects
 
+
+		end
 	end
 
 	self:OnReceiveCommands(s_Responses, nil)
+end
+
+function Editor:OnUpdateTransactionId(p_TransactionId)
+	if p_TransactionId < self.m_TransactionId then
+		m_Logger:Error("Client's transaction id is greater than the server's. This should never happen.")
+		return
+	end
+
+	--- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
+	if p_TransactionId ~= self.m_TransactionId and self.m_TransactionId ~= 0 then
+		m_Logger:Warning("Client is desynced, syncing it. This should rarely happen, did the client hung up? network problem? Please report it on the repo.")
+	end
+
+	self.m_TransactionId = p_TransactionId
 end
 
 function Editor:OnReceiveSave(p_SaveFile)
