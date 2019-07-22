@@ -37,6 +37,7 @@ function MapEditorClient:RegisterEvents()
 	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
+	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
@@ -58,6 +59,7 @@ function MapEditorClient:RegisterEvents()
     Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
     Hooks:Install('ClientEntityFactory:Create', 999, self, self.OnEntityCreate)
 
+	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles) 
     Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
@@ -115,6 +117,10 @@ function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
 	EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 
+function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+end
+
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
@@ -145,6 +151,10 @@ end
 
 function MapEditorClient:OnReceiveProjectData(p_ProjectData)
 	Editor:OnReceiveProjectData(p_ProjectData)
+end
+
+function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
+	Editor:OnReceiveCurrentProjectHeader(p_ProjectHeader)
 end
 
 -- function MapEditorClient:OnReceiveSave(p_SaveFile)

@@ -38,6 +38,20 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 	NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
 end
 
+function EditorServer:OnRequestProjectHeaderUpdate(p_Player)
+	self:UpdateClientProjectHeader(p_Player)
+end
+
+function EditorServer:UpdateClientProjectHeader(p_Player)
+	if m_CurrentProjectHeader ~= nil then
+		if p_Player == nil then -- update all players
+			NetEvents:SendLocal("MapEditorClient:ReceiveCurrentProjectHeader", m_CurrentProjectHeader)
+		else
+			NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, m_CurrentProjectHeader)
+		end
+	end
+end
+
 function EditorServer:OnRequestProjectData(p_Player, p_ProjectName)
 	m_Logger:Write("Data requested: " .. p_ProjectName)
 
@@ -50,8 +64,11 @@ function EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
 	m_Logger:Write("Load requested: " .. p_ProjectName)
 
 	m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectName)
+	self:UpdateClientProjectHeader()
 
-	self:InvokeRestart()
+	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
+	-- Invoke Restart
+	RCON:SendCommand('mapList.restartRound')
 end
 
 function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
@@ -61,6 +78,7 @@ function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p
 
 	local s_GameObjectSaveDatas = {}
 
+	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for l_Guid, l_GameObjectTransferData in pairs(self.m_GameObjectTransferDatas) do
 		s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
 	end
@@ -168,10 +186,6 @@ function EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	m_IsLevelLoaded = true
 
 	m_MapName = p_Map
-end
-
-function EditorServer:InvokeRestart()
-	RCON:SendCommand('mapList.restartRound')
 end
 
 function EditorServer:UpdateLevelFromSaveFile(p_SaveData)

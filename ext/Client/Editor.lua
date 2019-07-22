@@ -5,6 +5,8 @@ local m_Logger = Logger("Editor", true)
 local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10
 
+local m_CurrentProjectHeader
+
 function Editor:__init()
 	m_Logger:Write("Initializing EditorClient")
 	self:RegisterVars()
@@ -49,6 +51,7 @@ function Editor:OnEngineMessage(p_Message)
 		end
 
 		NetEvents:SendLocal("MapEditorServer:RequestUpdate", 1)
+		NetEvents:SendLocal("MapEditorServer:RequestProjectHeaderUpdate")
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
 end
@@ -135,6 +138,10 @@ end
 function Editor:OnRequestProjectData(p_ProjectName)
 	m_Logger:Write("Project Data requested")
 	NetEvents:SendLocal("MapEditorServer:RequestProjectData", p_ProjectName)
+end
+
+function Editor:OnReceiveCurrentProjectHeader(p_ProjectHeader)
+	m_CurrentProjectHeader = p_ProjectHeader
 end
 
 function Editor:OnSendCommandsToServer(p_Command)

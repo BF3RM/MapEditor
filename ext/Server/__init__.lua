@@ -26,7 +26,9 @@ function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('MapEditorServer:RequestProjectSave', self, self.OnRequestProjectSave)
 	NetEvents:Subscribe('MapEditorServer:RequestProjectLoad', self, self.OnRequestProjectLoad)
 	NetEvents:Subscribe('MapEditorServer:RequestProjectData', self, self.OnRequestProjectData)
+
 	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
+	NetEvents:Subscribe('MapEditorServer:RequestProjectHeaderUpdate', self, self.OnRequestProjectHeaderUpdate)
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
@@ -35,6 +37,7 @@ function MapEditorServer:RegisterEvents()
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
+	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles) 
     Hooks:Install('ServerEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
@@ -61,6 +64,10 @@ function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
 
+function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, EditorServer.m_CurrentProjectHeader)
+end
+
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
 	for i=0, 125 do
 		p_Player:EnableInput(i, p_Enabled)
@@ -80,6 +87,10 @@ end
 
 function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
 	EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
+end
+
+function MapEditorServer:OnRequestProjectHeaderUpdate(p_Player)
+	EditorServer:OnRequestProjectHeaderUpdate(p_Player)
 end
 
 function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)

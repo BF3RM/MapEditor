@@ -33,4 +33,28 @@ function EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
     
 end
 
+function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectHeader)
+    if p_ProjectHeader == nil then
+        return
+    end
+
+	-- Catch the earliest possible bundle. Both server & client.
+	if(p_Bundles[1] == "gameconfigurations/game" or p_Bundles[1] == "UI/Flow/Bundle/LoadingBundleMp") then 
+		-- Mount your superbundle and bundles..
+
+        -- TODO: Properly invoke bundle mounting
+        -- for _, bundle in pairs(p_ProjectHeader.requiredBundles) do
+
+        -- end
+
+        -- Events:Dispatch('BundleMounter:LoadBundle', 'levels/sp_paris/sp_paris', {
+        --     "levels/sp_paris/heat_pc_only",
+        --     "levels/sp_paris/sp_paris",
+        --     "levels/sp_paris/chase",
+        --     "levels/sp_paris/loweroffice",
+        --     "levels/sp_paris/loweroffice_pc"
+        -- })
+	end
+end
+
 return EditorCommon
