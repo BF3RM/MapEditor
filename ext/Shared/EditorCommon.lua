@@ -42,18 +42,12 @@ function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectH
 	if(p_Bundles[1] == "gameconfigurations/game" or p_Bundles[1] == "UI/Flow/Bundle/LoadingBundleMp") then 
 		-- Mount your superbundle and bundles..
 
-        -- TODO: Properly invoke bundle mounting
-        -- for _, bundle in pairs(p_ProjectHeader.requiredBundles) do
+        -- for _, s_BundleName in pairs(p_ProjectHeader.requiredBundles) do
+        --     local s_Bundle = Bundles[s_BundleName] -- Bundles doesnt exit yet
 
+        --     Events:Dispatch('BundleMounter:LoadBundles', s_Bundle.superBundle, s_Bundle.path)
+        -- -- TODO Might make sense to gather all bundles of a superbundle and send them together, but not sure if worth the effort
         -- end
-
-        -- Events:Dispatch('BundleMounter:LoadBundle', 'levels/sp_paris/sp_paris', {
-        --     "levels/sp_paris/heat_pc_only",
-        --     "levels/sp_paris/sp_paris",
-        --     "levels/sp_paris/chase",
-        --     "levels/sp_paris/loweroffice",
-        --     "levels/sp_paris/loweroffice_pc"
-        -- })
 	end
 end
 
