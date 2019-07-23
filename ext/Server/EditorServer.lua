@@ -65,13 +65,25 @@ function EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
 	-- TODO: check player's permission once that is implemented
 
 	self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectName)
+
+	local s_MapName = self.m_CurrentProjectHeader.mapName
+	local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
+
+	if s_MapName == nil or
+		Maps[s_MapName] == nil or
+		s_GameModeName == nil or
+		GameModes[s_GameModeName] == nil then
+			
+		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
+	end
+
 	self:UpdateClientProjectHeader()
 
 	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
 	-- Invoke Restart
 
 	RCON:SendCommand('mapList.clear')
-	RCON:SendCommand('mapList.add ' .. self.m_CurrentProjectHeader.mapName .. ' ' .. self.m_CurrentProjectHeader.gameModeName .. ' 1') -- TODO: add proper map / gameplay support
+	RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
 	RCON:SendCommand('mapList.runNextRound')
 end
 
