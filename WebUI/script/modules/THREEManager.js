@@ -409,14 +409,17 @@ class THREEManager {
 		if(e.which === 1 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
-			editor.onControlMoveEnd();
+            scope.cameraControls.enabled = true;
+            editor.onControlMoveEnd();
 			scope.Render();
+
 		}
 	}
 
 	onMouseDown(e) {
 		let scope = this;
 		if (scope.raycastPlacing) {
+            scope.cameraControls.enabled = false;
 			editor.onControlMoveStart();
 		} else if(this.controlSelected) {
 			console.log("Control selected")
