@@ -42,10 +42,11 @@ class ProjectManager {
         // TODO: Replace with proper View-Data
         let projectName = "DebugProject";
         let mapName = "XP1_001";
-        let requiredBundles = [ 1, 2, 3 ];
+        let gameModeName = "ConquestAssaultLarge0";
+        let requiredBundles = [ 1, 2, 3 ]; // replace with the paths of the bundles
 
         $("#saveProjectTextArea").text("Saving...");
-        editor.vext.SendEvent('RequestProjectSave', projectName, mapName, requiredBundles);
+        editor.vext.SendEvent('RequestProjectSave', projectName, mapName, gameModeName, requiredBundles);
     }
 
     SetSave(json){

@@ -118,7 +118,7 @@ function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
 	EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 
-function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
 end
 

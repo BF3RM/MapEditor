@@ -19,17 +19,14 @@ function DataBaseManager:__init()
 end
 
 function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas)
-	local s_Header = {
-		projectName = p_ProjectName,
-		mapName = p_MapName,
-		gameModeName = p_GameModeName,
-		requiredBundles = p_RequiredBundles,
-		timeStamp = SharedUtils:GetTimeMS()
-	}
+	local s_TimeStamp = SharedUtils:GetTimeMS()
+
+	local s_GameObjectSaveDatasJson = json.encode(p_GameObjectSaveDatas)
+	local s_RequiredBundlesJson = json.encode(p_RequiredBundles)
 
 	self:CreateOrUpdateDatabase()
-	local s_HeaderId = self:SaveProjectHeader(s_Header)
-	self:SaveProjectData(s_HeaderId, s_JSON_Data)
+	local s_HeaderId = self:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, s_RequiredBundlesJson, s_TimeStamp)
+	self:SaveProjectData(s_HeaderId, s_GameObjectSaveDatasJson)
 end
 
 function DataBaseManager:CreateOrUpdateDatabase()
@@ -38,13 +35,14 @@ function DataBaseManager:CreateOrUpdateDatabase()
 	if not SQL:Open() then
         return
 	end
-	
+
 	-- Create our data table:
 	local createProjectHeaderTableQuery = [[
 		CREATE TABLE IF NOT EXISTS ]] .. m_DB_Header_Table_Name .. [[ (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			]] .. m_ProjectName_Text_Column_Name .. [[ TEXT,
 			]] .. m_MapName_Text_Column_Name .. [[ TEXT,
+			]] .. m_GameModeName_Text_Column_Name .. [[ TEXT,
 			]] .. m_RequiredBundles_Text_Column_Name .. [[ TEXT,
 			]] .. m_TimeStamp_Text_Column_Name .. [[ INTEGER
 		);
@@ -54,7 +52,7 @@ function DataBaseManager:CreateOrUpdateDatabase()
 
 	m_Logger:Write(createProjectHeaderTableQuery)
 
-	if not SQL:Query(createDataTableQuery) then
+	if not SQL:Query(createProjectHeaderTableQuery) then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
 		return
 	end
@@ -63,66 +61,76 @@ function DataBaseManager:CreateOrUpdateDatabase()
     local createProjectDataTableQuery = [[
         CREATE TABLE IF NOT EXISTS ]] .. m_DB_Data_Table_Name .. [[ (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			]] .. m_ProjectHeader_Id_Column_Name .. [[ INTEGER REFERENCES ]] .. m_DB_Header_Table_Name.. [[(id) ON DELETE CASCADE
+			]] .. m_ProjectHeader_Id_Column_Name .. [[ INTEGER REFERENCES ]] .. m_DB_Header_Table_Name.. [[(id) ON DELETE CASCADE,
             ]] .. m_SaveFile_Text_Column_Name .. [[ TEXT
-		)
+		);
 	]]
-	
+
 	m_Logger:Write(createProjectDataTableQuery)
 
     if not SQL:Query(createProjectDataTableQuery) then
         m_Logger:Error('Failed to execute query: ' .. SQL:Error())
         return
-    end
-end
-
-function DataBaseManager:SaveProjectHeader(p_Header)
-	if p_Header == nil or
-		p_Header.projectName == nil or
-		type(p_Header.projectName) ~= "string" or
-		p_Header.mapName == nil or
-		type(p_Header.mapName) ~= "string" or
-		p_Header.gameModeName == nil or
-		type(p_Header.gameModeName) ~= "string" or
-		p_Header.requiredBundles == nil or
-		type(p_Header.requiredBundles) ~= "string" or
-		p_Header.timeStamp == nil or
-		type(p_Header.timeStamp) ~= "number" then
-			m_Logger:Error("Failed to save Project, one or more parameters are invalid: " .. tostring(p_Header))
-			return
 	end
 
-	m_Logger:Write("SaveProjectHeader() " .. tostring(p_Header))
+	m_Logger:Write("Successfully created database!")
+end
 
+function DataBaseManager:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundlesJson, p_TimeStamp)
+	if p_ProjectName == nil or
+		type(p_ProjectName) ~= "string" then
+		m_Logger:Error("Failed to save Project - header.projectName is invalid: " .. tostring(p_ProjectName))
+	end
 
-	local s_Query = [[INSERT OR REPLACE INTO ]] .. m_DB_Header_Table_Name .. [[ (]] .. m_ProjectName_Text_Column_Name .. [[, ]] .. m_MapName_Text_Column_Name .. [[, ]] .. m_GameModeName_Text_Column_Name .. [[, ]] .. m_RequiredBundles_Text_Column_Name .. [[) VALUES (?, ?, ?, ?)]]
+	if p_MapName == nil or
+		type(p_MapName) ~= "string" then
+		m_Logger:Error("Failed to save Project - header.mapName is invalid: " .. tostring(p_MapName))
+	end
+
+	if p_GameModeName == nil or
+		type(p_GameModeName) ~= "string" then
+		m_Logger:Error("Failed to save Project - header.gameModeName is invalid: " .. tostring(p_GameModeName))
+	end
+
+	if p_RequiredBundlesJson == nil or
+		type(p_RequiredBundlesJson) ~= "string" then
+		m_Logger:Error("Failed to save Project - header.requiredBundles is invalid: " .. tostring(p_RequiredBundlesJson))
+	end
+
+	if p_TimeStamp == nil or
+		type(p_TimeStamp) ~= "number" then
+		m_Logger:Error("Failed to save Project - header.timeStamp is invalid: " .. tostring(p_TimeStamp))
+	end
+
+	local s_Query = [[INSERT OR REPLACE INTO ]] .. m_DB_Header_Table_Name .. [[ (]] .. m_ProjectName_Text_Column_Name .. [[, ]] .. m_MapName_Text_Column_Name .. [[, ]] .. m_GameModeName_Text_Column_Name .. [[, ]] .. m_RequiredBundles_Text_Column_Name .. [[, ]] .. m_TimeStamp_Text_Column_Name .. [[) VALUES (?, ?, ?, ?, ?)]]
 
 	m_Logger:Write(s_Query)
+	m_Logger:Write("Inserting values:")
+	m_Logger:Write(p_ProjectName .. " | " .. p_MapName .. " | " .. p_GameModeName .. " | " ..  p_RequiredBundlesJson .. " | " .. tostring(p_TimeStamp))
 
-	if not SQL:Query(s_Query, p_Header.projectName, p_Header.mapName, p_Header.gameModeName, p_Header.requiredBundles) then
+	if not SQL:Query(s_Query, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundlesJson, p_TimeStamp) then
         m_Logger:Error('Failed to execute query: ' .. SQL:Error())
         return
 	end
-	
-	m_Logger:Write('Inserted header. Insert ID: ' .. tostring(SQL:LastInsertID()) .. '. Rows affected: ' .. tostring(SQL:AffectedRows()))
-	return SQL:LastInsertID()
+
+	m_Logger:Write('Inserted header. Insert ID: ' .. tostring(SQL:LastInsertId()) .. '. Rows affected: ' .. tostring(SQL:AffectedRows()))
+	return SQL:LastInsertId()
 end
 
-function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatas)
-	m_Logger:Write("SaveProjectData() " .. tostring(p_HeaderId) .. " | " .. #p_GameObjectSaveDatas)
-
-	local s_JSON_Data = json.encode(p_GameObjectSaveDatas)
+function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
+	m_Logger:Write("SaveProjectData() " .. tostring(p_HeaderId))
+	m_Logger:Write(p_GameObjectSaveDatasJson)
 
 	local s_Query = 'INSERT INTO ' .. m_DB_Data_Table_Name .. ' (' .. m_ProjectHeader_Id_Column_Name .. ', ' .. m_SaveFile_Text_Column_Name .. ') VALUES (?, ?)'
 
 	m_Logger:Write(s_Query)
 
-	if not SQL:Query(s_Query, p_HeaderId, s_JSON_Data) then
+	if not SQL:Query(s_Query, p_HeaderId, p_GameObjectSaveDatasJson) then
         m_Logger:Error('Failed to execute query: ' .. SQL:Error())
         return
 	end
-	
-	m_Logger:Write('Inserted data. Insert ID: ' .. tostring(SQL:LastInsertID()) .. '. Rows affected: ' .. tostring(SQL:AffectedRows()))
+
+	m_Logger:Write('Inserted data. Insert ID: ' .. tostring(SQL:LastInsertId()) .. '. Rows affected: ' .. tostring(SQL:AffectedRows()))
 end
 
 function DataBaseManager:GetProjectHeaders()

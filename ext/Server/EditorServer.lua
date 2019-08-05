@@ -93,11 +93,15 @@ function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p
 	-- TODO: check player's permission once that is implemented
 
 	local s_GameObjectSaveDatas = {}
+	local count = 0
 
 	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for l_Guid, l_GameObjectTransferData in pairs(self.m_GameObjectTransferDatas) do
+		count = count + 1
 		s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
 	end
+
+	m_Logger:Write("GameObjectSaveDatas: " .. count)
 
 	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, s_GameObjectSaveDatas)
 end

@@ -35,11 +35,42 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
     Events:Subscribe('Server:LevelLoaded', self, self.OnLevelLoaded)
     Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	Events:Subscribe('Player:Chat', self, self.OnChat)
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles) 
     Hooks:Install('ServerEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+end
+
+----------- Debug ----------------
+
+function string:split(sep)
+	local sep, fields = sep or ":", {}
+	local pattern = string.format("([^%s]+)", sep)
+	self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	return fields
+ end
+
+function MapEditorServer:OnChat(p_Player, p_RecipientMask, p_Message)
+	if p_Message == '' then
+		return
+	end
+
+	if p_Player == nil then
+		return
+	end
+
+	m_Logger:Write('Chat: ' .. p_Message)
+
+	p_Message = p_Message:lower()
+
+	local s_Parts = p_Message:split(' ')
+	local firstPart = s_Parts[1]
+
+	if firstPart == 'save' then
+		EditorServer:OnRequestProjectSave(p_Player, "DebugProject", "XP3_Shield", "ConquestLarge0", { "levels/mp_001/mp_001", "levels/mp_001/conquest" })
+	end
 end
 
 ----------- Game functions----------------
@@ -94,8 +125,8 @@ function MapEditorServer:OnRequestProjectHeaderUpdate(p_Player)
 	EditorServer:OnRequestProjectHeaderUpdate(p_Player)
 end
 
-function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
-	EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_RequiredBundles)
+function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+	EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
 end
 
 function MapEditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)

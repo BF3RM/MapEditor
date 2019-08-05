@@ -1,7 +1,7 @@
 -- dummy data, replace with generated ones
 
 Bundles = {
-    "levels/mp_001/mp_001" = {
+    ["levels/mp_001/mp_001"] = {
         SuperBundle = "levels/mp_001/mp_001",
         Path = "levels/mp_001/mp_001",
         IsPrimaryBundle = true,
@@ -12,7 +12,7 @@ Bundles = {
         }
     },
 
-    "levels/mp_001/conquest" = {
+    ["levels/mp_001/conquest"] = {
         SuperBundle = "levels/mp_001/mp_001",
         Path = "levels/mp_001/conquest",
         IsPrimaryBundle = false,
@@ -26,7 +26,7 @@ Bundles = {
         }
     },
 
-    "levels/mp_001/conquest_large" = {
+    ["levels/mp_001/conquest_large"] = {
         SuperBundle = "levels/mp_001/mp_001",
         Path = "levels/mp_001/conquest_large",
         IsPrimaryBundle = false,
@@ -39,7 +39,7 @@ Bundles = {
         }
     },
 
-    "levels/mp_001/mp_001_settings_win32" = {
+    ["levels/mp_001/mp_001_settings_win32"] = {
         SuperBundle = "levels/mp_001/mp_001",
         Path = "levels/mp_001/mp_001_settings_win32",
         IsPrimaryBundle = false,
