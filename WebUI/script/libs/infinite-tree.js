@@ -1,4 +1,4 @@
-/*! infinite-tree v1.16.2 | (c) 2018 Cheton Wu <cheton@gmail.com> | MIT | https://github.com/cheton/infinite-tree */
+/*! xl-infinite-tree v1.14.12 | (c) 2019 Cheton Wu <cheton@gmail.com> | MIT | https://github.com/cheton/infinite-tree */
 (function webpackUniversalModuleDefinition(root, factory) {
     if(typeof exports === 'object' && typeof module === 'object')
         module.exports = factory();
@@ -387,7 +387,7 @@
         /***/ (function(module, exports, __webpack_require__) {
 
             var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-  Copyright (c) 2016 Jed Watson.
+  Copyright (c) 2017 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
 */
@@ -409,8 +409,11 @@
 
                         if (argType === 'string' || argType === 'number') {
                             classes.push(arg);
-                        } else if (Array.isArray(arg)) {
-                            classes.push(classNames.apply(null, arg));
+                        } else if (Array.isArray(arg) && arg.length) {
+                            var inner = classNames.apply(null, arg);
+                            if (inner) {
+                                classes.push(inner);
+                            }
                         } else if (argType === 'object') {
                             for (var key in arg) {
                                 if (hasOwn.call(arg, key) && arg[key]) {
@@ -424,6 +427,7 @@
                 }
 
                 if (typeof module !== 'undefined' && module.exports) {
+                    classNames.default = classNames;
                     module.exports = classNames;
                 } else if (true) {
                     // register as 'classnames', consistent with npm package name
@@ -1306,20 +1310,14 @@
                         return false;
                     }
 
-                    if ((typeof index === 'undefined' ? 'undefined' : _typeof(index)) === 'object') {
-                        // The 'object' type might be Node or null
-                        parentNode = index || this.state.rootNode; // Defaults to rootNode if not specified
+                    parentNode = parentNode || this.state.rootNode; // Defaults to rootNode if not specified
+
+                    if (index === undefined) {
                         index = parentNode.children.length;
-                    } else {
-                        parentNode = parentNode || this.state.rootNode; // Defaults to rootNode if not specified
                     }
 
                     if (!ensureNodeInstance(parentNode)) {
                         return false;
-                    }
-
-                    if (typeof index !== 'number') {
-                        index = parentNode.children.length;
                     }
 
                     // Assign parent
@@ -1553,8 +1551,7 @@
                     }
 
                     // Retrieve node index
-                    var nodeIndex = this.nodes.indexOf(node);
-                    if (nodeIndex < 0) {
+                    if (this.nodes.indexOf(node) < 0) {
                         error('Invalid node index');
                         return false;
                     }
@@ -1567,7 +1564,7 @@
                     // Toggle the collapsing state
                     node.state.collapsing = true;
                     // Update the row corresponding to the node
-                    this.rows[nodeIndex] = this.options.rowRenderer(node, this.options);
+                    this.rows[this.nodes.indexOf(node)] = this.options.rowRenderer(node, this.options);
                     // Update list
                     this.update();
 
@@ -1581,8 +1578,8 @@
                             // row #4     node.0.1
                             var selectedIndex = _this4.nodes.indexOf(_this4.state.selectedNode);
                             var _total = node.state.total;
-                            var rangeFrom = nodeIndex + 1;
-                            var rangeTo = nodeIndex + _total;
+                            var rangeFrom = _this4.nodes.indexOf(node) + 1;
+                            var rangeTo = _this4.nodes.indexOf(node) + _total;
 
                             if (rangeFrom <= selectedIndex && selectedIndex <= rangeTo) {
                                 _this4.selectNode(node, options);
@@ -1602,13 +1599,13 @@
                         }
 
                         // Update nodes & rows
-                        _this4.nodes.splice(nodeIndex + 1, total);
-                        _this4.rows.splice(nodeIndex + 1, total);
+                        _this4.nodes.splice(_this4.nodes.indexOf(node) + 1, total);
+                        _this4.rows.splice(_this4.nodes.indexOf(node) + 1, total);
 
                         // Toggle the collapsing state
                         node.state.collapsing = false;
                         // Update the row corresponding to the node
-                        _this4.rows[nodeIndex] = _this4.options.rowRenderer(node, _this4.options);
+                        _this4.rows[_this4.nodes.indexOf(node)] = _this4.options.rowRenderer(node, _this4.options);
 
                         // Update list
                         _this4.update();
@@ -2008,8 +2005,6 @@
                     this.emit('willOpenNode', node);
 
                     // Retrieve node index
-                    var nodeIndex = this.nodes.indexOf(node);
-
                     var fn = function fn() {
                         node.state.open = true;
 
@@ -2032,7 +2027,7 @@
                         // Toggle the expanding state
                         node.state.expanding = false;
 
-                        if (nodeIndex >= 0) {
+                        if (_this6.nodes.indexOf(node) >= 0) {
                             var rows = [];
                             // Update rows
                             rows.length = nodes.length;
@@ -2042,11 +2037,11 @@
                             }
 
                             // Update nodes & rows
-                            _this6.nodes.splice.apply(_this6.nodes, [nodeIndex + 1, 0].concat(nodes));
-                            _this6.rows.splice.apply(_this6.rows, [nodeIndex + 1, 0].concat(rows));
+                            _this6.nodes.splice.apply(_this6.nodes, [_this6.nodes.indexOf(node) + 1, 0].concat(nodes));
+                            _this6.rows.splice.apply(_this6.rows, [_this6.nodes.indexOf(node) + 1, 0].concat(rows));
 
                             // Update the row corresponding to the node
-                            _this6.rows[nodeIndex] = _this6.options.rowRenderer(node, _this6.options);
+                            _this6.rows[_this6.nodes.indexOf(node)] = _this6.options.rowRenderer(node, _this6.options);
 
                             // Update list
                             _this6.update();
@@ -2062,7 +2057,7 @@
                         }
                     };
 
-                    if (nodeIndex < 0) {
+                    if (this.nodes.indexOf(node) < 0) {
                         // Toggle the expanding state
                         node.state.expanding = true;
 
@@ -2090,7 +2085,7 @@
                         // Toggle the loading state
                         node.state.loading = true;
                         // Update the row corresponding to the node
-                        this.rows[nodeIndex] = this.options.rowRenderer(node, this.options);
+                        this.rows[this.nodes.indexOf(node)] = this.options.rowRenderer(node, this.options);
                         // Update list
                         this.update();
 
@@ -2101,9 +2096,7 @@
 
                                 nodes = (0, _ensureArray2['default'])(nodes);
 
-                                var currentNodeIndex = _this6.nodes.indexOf(node);
-
-                                if (nodes.length === 0 && currentNodeIndex >= 0) {
+                                if (nodes.length === 0 && _this6.nodes.indexOf(node) >= 0) {
                                     node.state.open = true;
 
                                     if (_this6.state.openNodes.indexOf(node) < 0) {
@@ -2116,7 +2109,7 @@
                                     // Toggle the loading state
                                     node.state.loading = false;
                                     // Update the row corresponding to the node
-                                    _this6.rows[currentNodeIndex] = _this6.options.rowRenderer(node, _this6.options);
+                                    _this6.rows[_this6.nodes.indexOf(node)] = _this6.options.rowRenderer(node, _this6.options);
                                     // Update list
                                     _this6.update();
 
@@ -2126,7 +2119,7 @@
                                     return;
                                 }
 
-                                _this6.addChildNodes(nodes, node);
+                                _this6.addChildNodes(nodes, undefined, node);
 
                                 // Ensure the node has children to prevent infinite loop
                                 if (node.hasChildren()) {
@@ -2136,9 +2129,8 @@
                                         asyncCallback: function asyncCallback() {
                                             // Toggle the loading state
                                             node.state.loading = false;
-                                            var openedNodeIndex = _this6.nodes.indexOf(node);
                                             // Update the row corresponding to the node
-                                            _this6.rows[openedNodeIndex] = _this6.options.rowRenderer(node, _this6.options);
+                                            _this6.rows[_this6.nodes.indexOf(node)] = _this6.options.rowRenderer(node, _this6.options);
                                             // Update list
                                             _this6.update();
 
@@ -2151,7 +2143,7 @@
                                     // Toggle the loading state
                                     node.state.loading = false;
                                     // Update the row corresponding to the node
-                                    _this6.rows[currentNodeIndex] = _this6.options.rowRenderer(node, _this6.options);
+                                    _this6.rows[_this6.nodes.indexOf(node)] = _this6.options.rowRenderer(node, _this6.options);
                                     // Update list
                                     _this6.update();
 
@@ -2169,7 +2161,7 @@
                     node.state.expanding = true;
 
                     // Update the row corresponding to the node
-                    this.rows[nodeIndex] = this.options.rowRenderer(node, this.options);
+                    this.rows[this.nodes.indexOf(node)] = this.options.rowRenderer(node, this.options);
                     // Update list
                     this.update();
 
@@ -2360,6 +2352,13 @@
 
                     return true;
                 };
+
+                InfiniteTree.prototype.queryNodeById = function queryNodeById(nodeId) {
+                    var queryId = nodeId ? nodeId.replace(/"/g, '\\"', nodeId) : nodeId;
+                    var nodeSelector = '[' + this.options.nodeIdAttr + '="' + queryId + '"]';
+                    return this.contentElement.querySelector(nodeSelector);
+                };
+
                 // Sets the current scroll position to this node.
                 // @param {Node} node The Node object.
                 // @return {boolean} Returns true on success, false otherwise.
@@ -2383,7 +2382,7 @@
                     var firstChild = this.contentElement.firstChild;
                     while (firstChild) {
                         var className = firstChild.className || '';
-                        if (className.indexOf('clusterize-extra-row') < 0 && firstChild.offsetHeight > 0) {
+                        if (className.indexOf('infinite-tree-extra-row') < 0 && firstChild.offsetHeight > 0) {
                             break;
                         }
                         firstChild = firstChild.nextSibling;
@@ -2395,8 +2394,7 @@
                     }
 
                     // Find the absolute position of the node
-                    var nodeSelector = '[' + this.options.nodeIdAttr + '="' + node.id + '"]';
-                    var nodeEl = this.contentElement.querySelector(nodeSelector);
+                    var nodeEl = this.queryNodeById(node.id);
                     if (nodeEl) {
                         this.scrollTop(nodeEl.offsetTop);
                     }
@@ -2417,6 +2415,7 @@
                     }
                     return this.scrollElement.scrollTop;
                 };
+
                 // Selects a node.
                 // @param {Node} node The Node object. If null or undefined, deselects the current node.
                 // @param {object} [options] The options object.
@@ -2509,8 +2508,7 @@
                         }
 
                         if (autoScroll && this.scrollElement && this.contentElement) {
-                            var nodeSelector = '[' + this.options.nodeIdAttr + '="' + node.id + '"]';
-                            var nodeEl = this.contentElement.querySelector(nodeSelector);
+                            var nodeEl = this.queryNodeById(node.id);
                             if (nodeEl) {
                                 var offsetTop = nodeEl.offsetTop || 0;
                                 var offsetHeight = nodeEl.offsetHeight || 0;
