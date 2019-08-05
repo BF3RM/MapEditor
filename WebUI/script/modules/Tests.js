@@ -19,11 +19,17 @@ function Test(count) {
 		let lt = new LinearTransform();
 		lt.trans = new Vec3(getRandom(30),getRandom(30),getRandom(30));
 
-		let guid = GenerateGuid();
 		let bp = randomBlueprint();
-		let userData = new ReferenceObjectData(bp.getReference(), 0, bp.getName(), lt);
+        let transferData = new GameObjectTransferData();
+        transferData.transform = new LinearTransform();
+        transferData.transform.trans.x = Math.random() * 10;
+        transferData.transform.trans.z = Math.random() * 10;
+        transferData.blueprintCtrRef = bp.getCtrRef();
+        transferData.guid = GenerateGuid();
+        transferData.name = bp.name;
+        transferData.parentData = new GameObjectParentData();
 
-		commands.push(new SpawnBlueprintCommand(guid, userData));
+        commands[i] = new SpawnBlueprintCommand(transferData);
 	}
 	let command = new BulkCommand(commands);
 	editor.execute(command);
