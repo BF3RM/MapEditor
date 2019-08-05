@@ -178,12 +178,12 @@ class CameraControls extends EventDispatcher {
 
                     case THREE.MOUSE.MIDDLE:
 
-                        scope._state = STATE.DOLLY;
+                        scope._state = STATE.TRUCK;
                         break;
 
                     case THREE.MOUSE.RIGHT:
 
-                        scope._state = STATE.TRUCK;
+                        //scope._state = STATE.TRUCK; // Handled by VU
                         break;
 
                 }
@@ -266,7 +266,10 @@ class CameraControls extends EventDispatcher {
                     y = ( event.clientY - elementRect.y ) / elementRect.w * - 2 + 1;
 
                 }
-
+                scope.dispatchEvent( {
+                    type: 'controlstart',
+                    originalEvent: event,
+                } );
                 dollyInternal( - delta, x, y );
 
             }
@@ -433,9 +436,11 @@ class CameraControls extends EventDispatcher {
 
                 if ( scope._camera.isPerspectiveCamera ) {
 
-                    const distance = scope._sphericalEnd.radius * dollyScale - scope._sphericalEnd.radius;
+                    let distance = scope._sphericalEnd.radius * dollyScale - scope._sphericalEnd.radius;
                     const prevRadius = scope._sphericalEnd.radius;
-
+                    if(distance === 0) {
+                        distance = 0.1;
+                    }
                     scope.dolly( distance );
 
                     if ( scope.dollyToCursor ) {
