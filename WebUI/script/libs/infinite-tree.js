@@ -931,6 +931,7 @@
 
                         // When el is not specified, the tree will run in the stealth mode
                         el: null,
+                        scrollEl: null,
 
                         // The following options will have no effect in the stealth mode
                         layout: 'div',
@@ -1222,10 +1223,11 @@
                         this.clusterize = new _clusterize2['default']({
                             tag: tag,
                             rows: [],
-                            scrollElement: this.scrollElement,
+                            scrollElement: this.options.scrollEl || this.scrollElement,
                             contentElement: this.contentElement,
                             emptyText: this.options.noDataText,
-                            emptyClass: this.options.noDataClass
+                            emptyClass: this.options.noDataClass,
+                            el: this.options.el
                         });
 
                         this.clusterize.on('clusterWillChange', function () {
@@ -2407,13 +2409,20 @@
 
 
                 InfiniteTree.prototype.scrollTop = function scrollTop(value) {
-                    if (!this.scrollElement) {
+                    if (!this.options.scrollEl && !this.scrollElement) {
                         return 0;
                     }
-                    if (value !== undefined) {
-                        this.scrollElement.scrollTop = Number(value);
+                    if (this.options.scrollEl) {
+                        if (value !== undefined) {
+                            this.options.scrollEl.scrollTop = this.contentElement.offsetTop + Number(value);
+                        }
+                        return this.options.scrollEl.scrollTop - this.contentElement.offsetTop;
+                    } else {
+                        if (value !== undefined) {
+                            this.scrollElement.scrollTop = Number(value);
+                        }
+                        return this.scrollElement.scrollTop;
                     }
-                    return this.scrollElement.scrollTop;
                 };
 
                 // Selects a node.
@@ -3112,7 +3121,8 @@
                         tag: null,
                         emptyClass: '',
                         emptyText: '',
-                        keepParity: true
+                        keepParity: true,
+                        el: null
                     };
                     _this.state = {
                         lastClusterIndex: -1,
@@ -3211,21 +3221,29 @@
                     }
 
                     // Remember scroll position
-                    var scrollTop = _this.scrollElement.scrollTop;
+                    var scrollTop = _this.getScrollTop();
 
                     _this.changeDOM();
 
                     // Restore scroll position
-                    _this.scrollElement.scrollTop = scrollTop;
+                    _this.setScrollTop(scrollTop);
 
                     (0, _dom.addEventListener)(_this.scrollElement, 'scroll', _this.scrollEventListener);
-                    (0, _dom.addEventListener)(window, 'resize', _this.resizeEventListener);
+                    (0, _dom.addEventListener)(_this.options.el, 'resize', _this.resizeEventListener);
+
+
                     return _this;
+                }
+                Clusterize.prototype.getScrollTop = function getScrollTop() {
+                    return Math.max(0, this.scrollElement.scrollTop - this.contentElement.offsetTop);
+                }
+                Clusterize.prototype.setScrollTop  = function setScrollTop(val) {
+                    this.scrollElement.scrollTop = this.contentElement.offsetTop + Number(val);
                 }
 
                 Clusterize.prototype.destroy = function destroy(clean) {
                     (0, _dom.removeEventListener)(this.scrollElement, 'scroll', this.scrollEventListener);
-                    (0, _dom.removeEventListener)(window, 'resize', this.resizeEventListener);
+                    (0, _dom.removeEventListener)(this.options.el, 'resize', this.resizeEventListener);
 
                     var rows = clean ? this.generateEmptyRow() : this.rows();
                     this.setContent(rows.join(''));
@@ -3235,16 +3253,16 @@
                     this.rows = (0, _ensureArray2['default'])(rows);
 
                     // Remember scroll position
-                    var scrollTop = this.scrollElement.scrollTop;
+                    var scrollTop = this.getScrollTop();
 
                     if (this.rows.length * this.state.itemHeight < scrollTop) {
-                        this.scrollElement.scrollTop = 0;
+                        this.setScrollTop(0);
                         this.state.lastClusterIndex = 0;
                     }
                     this.changeDOM();
 
                     // Restore scroll position
-                    this.scrollElement.scrollTop = scrollTop;
+                    this.setScrollTop(scrollTop);
                 };
 
                 Clusterize.prototype.clear = function clear() {
@@ -3312,7 +3330,7 @@
                     if (!blockHeight || !clusterHeight) {
                         return 0;
                     }
-                    return Math.floor(this.scrollElement.scrollTop / (clusterHeight - blockHeight)) || 0;
+                    return Math.floor(this.getScrollTop() / (clusterHeight - blockHeight)) || 0;
                 };
 
                 Clusterize.prototype.generateEmptyRow = function generateEmptyRow() {
