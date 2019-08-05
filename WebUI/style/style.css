@@ -367,17 +367,16 @@ input::-webkit-inner-spin-button {
 }
 
 .lm_content {
-	color: #999;
+    color: #999;
+    background: rgba(34, 34, 34, 0.8);
+    height: 100%;
+    overflow: scroll;
 }
 
 .lm_header .lm_tab.lm_active {
 	border-bottom: none;
 	box-shadow: none!important;
 	padding-bottom: 3px;
-}
-
-.lm_content {
-	background: rgba(34, 34, 34, 0.8);
 }
 
 
@@ -471,21 +470,11 @@ tr i {
     position: absolute;
 }
 
-.ps__rail-y {
-	top: 0px!important;
-	right: 0px!important;
-}
-.ps__rail-x {
-	bottom: 0px!important;
-	left: 0px!important;
-}
-.Panel {
-	height: 100%;
-	width: 100%;
-	width: 100%;
+.lm_content .Panel {
+    height: calc(100% - 26px);
+    width: 100%;
 }
 
 .infinite-tree-content {
-	padding-bottom: 40px;
 	display:inline-grid;
 }

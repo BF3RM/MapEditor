@@ -8,6 +8,7 @@ class HierarchyView {
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
 		signals.levelLoaded.add(this.onLevelLoaded.bind(this));
+		signals.objectFocused.add(this.onObjectFocused.bind(this));
 
 
 		this.data = {
@@ -23,6 +24,7 @@ class HierarchyView {
 
 		this.dom = this.CreateDom();
 		this.tree = this.InitializeTree();
+		console.log(this.tree);
 		this.topControls = this.CreateTopControls();
 		this.subControls = this.CreateSubControls();
 
@@ -144,7 +146,9 @@ class HierarchyView {
 			el: scope.dom,
 			data: scope.data,
 			rowRenderer: scope.hierarchyRenderer,
-			autoOpen: true, // Defaults to false
+
+			autoOpen: false, // Defaults to false
+            rowsInBlock: 100,
 			droppable: { // Defaults to false
 				hoverClass: 'infinite-tree-droppable-hover',
 				accept: function(event, options) {
@@ -228,7 +232,7 @@ class HierarchyView {
 		currentNode.state.selected = true;
 		scope.tree.updateNode(currentNode, {}, { shallowRendering: false });
 		if(scrollTo) {
-			scope.tree.scrollToNode(currentNode);
+			scope.Focus(currentNode);
 		}
 	}
 
@@ -262,6 +266,31 @@ class HierarchyView {
 			console.log(node);
 		}
 	}
+
+    onObjectFocused(target) {
+        let guid;
+	    if(target === editor.selectionGroup) {
+            guid = target.children[0].guid;
+        }
+        let focusedNode = this.tree.getNodeById(guid);
+        if(focusedNode !== null) {
+            this.Focus(focusedNode)
+        }
+    }
+
+    Focus(node) {
+        this.OpenRecursive(node);
+        this.tree.scrollToNode(node);
+    }
+
+    OpenRecursive(node) {
+	    if(node.parent !== null) {
+	        this.OpenRecursive(node.parent);
+        }
+	    if(node.id !==  null) {
+            this.tree.openNode(node);
+        }
+    }
 
 	hierarchyRenderer(node, treeOptions) {
 		if(node.state.filtered === false || node.visible === false ){

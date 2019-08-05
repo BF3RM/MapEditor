@@ -232,8 +232,27 @@ class EditorUI {
 		this.layout.registerComponent( 'example', function( container, state ){
 			container.getElement().html( '<h2>' + state.text + '</h2>');
 		});
+        this.layout.on('componentCreated',function(component) {
+            console.log(component);
+            let scope = this;
+            let elem = $(component.container._element[0]);
+            let scrollbar = elem.find(".infinite-tree-scroll");
+            if(scrollbar.length > 0) {
+                scope.ps = new PerfectScrollbar(scrollbar[0]);
+                let content = elem.find(".lm_content")[0];
+                content.setAttribute("style", "overflow:hidden")
+            } else {
+                let content = elem.find(".lm_content");
+                scope.ps = new PerfectScrollbar(content[0]);
+            }
 
-		this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
+            component.container.on('resize',function() {
+                scope.ps.update();
+            });
+
+        });
+
+        this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
 		this.layout.registerComponent( 'HierarchyComponent', HierarchyComponent);
 		this.layout.registerComponent( 'InspectorComponent', InspectorComponent);
 		this.layout.registerComponent( 'TreeViewComponent', TreeViewComponent);
@@ -245,8 +264,7 @@ class EditorUI {
 		this.layout.on('initialised', function() {
 			$(".lm_content .infinite-tree-scroll").each(function(e) {
 				let scope = this;
-				scope.ps = new PerfectScrollbar(scope);
-				scope.ps.update();
+
 				$(this).on('DOMSubtreeModified', function() {
 					//scope.ps.update();
 				})

@@ -47,7 +47,7 @@ $(document).keydown(function(e) {
 		editor.threeManager.SetGizmoMode("scale")
 	}
 	if(e.which == 70) { // F
-        editor.threeManager.Focus();
+        editor.Focus();
 	}
 	if(e.which == 71) { // G
 

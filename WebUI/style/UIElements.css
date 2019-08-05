@@ -3,7 +3,6 @@
 }
 
 .Toggler {
-    height: 16px;
     width: 16px;
     -webkit-mask: url(../icons/editor/ExpandChevronRight_16x.svg) no-repeat center;
     /* padding: 12px; */

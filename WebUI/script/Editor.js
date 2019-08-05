@@ -114,14 +114,30 @@ class Editor {
         this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
 
 
+        //All our UI stuff should be initialized by now.
+        // We're going to trigger a resize so the content can adapt to being done initializing.
+        // It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
+        //window.dispatchEvent(new Event('resize'));
         signals.editorReady.dispatch(true)
+
 	}
+    Focus(guid) {
+	    let target = this.selectionGroup;
+	    if(guid) {
+	        target = this.getGameObjectByGuid(guid)
+        } else if(target.children.length === 0) {
+	        return; // Nothing specified, nothing selected. skip.
+        }
+
+        this.threeManager.Focus(target);
+        signals.objectFocused.dispatch(target);
+    }
 
 	Duplicate() {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
-			let gameObjectTransferData = childGameObject.getGameObjectTransferData()
+			let gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -134,7 +150,7 @@ class Editor {
 		let scope = this;
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
-			let gameObjectTransferData = childGameObject.getGameObjectTransferData()
+			let gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -425,7 +441,7 @@ class Editor {
 		return false;
 	}
 
-	Select(guid, multi = false, scrollTo = false) {
+	Select(guid, multi = false, scrollTo = true) {
 		this.Unhighlight(guid);
 
 		if(keysdown[17] || multi) {

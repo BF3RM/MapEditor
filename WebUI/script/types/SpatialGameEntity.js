@@ -23,9 +23,9 @@ class SpatialGameEntity extends THREE.Mesh
         boxGeom.translate( center.x, center.y, center.z);
 
         super(boxGeom, new THREE.MeshBasicMaterial({
-            color: "aqua",
+            color: 0x999999,
             wireframe: true,
-            visible: true
+            visible: false
         }));
 
         let	color = 0xFF0000;

@@ -143,6 +143,8 @@ class THREEManager {
 
         distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
         scope.cameraControls.dollyTo(distance, true);
+        console.log(target.guid);
+        signals.objectFocused.dispatch(target.guid);
 
         scope.Render();
     }
