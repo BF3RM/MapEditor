@@ -1,5 +1,5 @@
 // https://github.com/yomotsu/camera-controls
-
+let _AXIS_Y;
 let _v2;
 let _v3A;
 let _v3B;
@@ -25,6 +25,8 @@ class CameraControls extends EventDispatcher {
 
     static install( libs ) {
 
+        THREE = libs.THREE;
+        _AXIS_Y = new THREE.Vector3( 0, 1, 0 );
         _v2 = new THREE.Vector2();
         _v3A = new THREE.Vector3();
         _v3B = new THREE.Vector3();
@@ -42,6 +44,8 @@ class CameraControls extends EventDispatcher {
         super();
 
         this._camera = camera;
+        this._yAxisUpSpace = new THREE.Quaternion().setFromUnitVectors( this._camera.up, _AXIS_Y );
+        this._yAxisUpSpaceInverse = this._yAxisUpSpace.clone().inverse();
         this._state = STATE.NONE;
         this.enabled = true;
 
@@ -89,7 +93,7 @@ class CameraControls extends EventDispatcher {
         this._targetEnd = new THREE.Vector3();
 
         // rotation
-        this._spherical = new THREE.Spherical().setFromVector3( this._camera.position );
+        this._spherical = new THREE.Spherical().setFromVector3( this._camera.position.applyQuaternion( this._yAxisUpSpace ) );
         this._sphericalEnd = this._spherical.clone();
 
         // reset
@@ -174,12 +178,12 @@ class CameraControls extends EventDispatcher {
 
                     case THREE.MOUSE.MIDDLE:
 
-                        scope._state = STATE.TRUCK;
+                        scope._state = STATE.DOLLY;
                         break;
 
                     case THREE.MOUSE.RIGHT:
 
-                        //scope._state = STATE.TRUCK; // Handled by VU
+                        scope._state = STATE.TRUCK;
                         break;
 
                 }
@@ -262,10 +266,7 @@ class CameraControls extends EventDispatcher {
                     y = ( event.clientY - elementRect.y ) / elementRect.w * - 2 + 1;
 
                 }
-                scope.dispatchEvent( {
-                    type: 'controlstart',
-                    originalEvent: event,
-                } );
+
                 dollyInternal( - delta, x, y );
 
             }
@@ -432,11 +433,9 @@ class CameraControls extends EventDispatcher {
 
                 if ( scope._camera.isPerspectiveCamera ) {
 
-                    let distance = scope._sphericalEnd.radius * dollyScale - scope._sphericalEnd.radius;
+                    const distance = scope._sphericalEnd.radius * dollyScale - scope._sphericalEnd.radius;
                     const prevRadius = scope._sphericalEnd.radius;
-                    if(distance === 0) {
-                        distance = 0.1;
-                    }
+
                     scope.dolly( distance );
 
                     if ( scope.dollyToCursor ) {
@@ -692,13 +691,13 @@ class CameraControls extends EventDispatcher {
 
         const positionA = _v3A.set( positionAX, positionAY, positionAZ );
         const targetA = _v3B.set( targetAX, targetAY, targetAZ );
-        _sphericalA.setFromVector3( positionA.sub( targetA ) );
+        _sphericalA.setFromVector3( positionA.sub( targetA ).applyQuaternion( this._yAxisUpSpace ) );
 
         const targetB = _v3A.set( targetBX, targetBY, targetBZ );
         this._targetEnd.copy( targetA ).lerp( targetB, t ); // tricky
 
         const positionB = _v3B.set( positionBX, positionBY, positionBZ );
-        _sphericalB.setFromVector3( positionB.sub( targetB ) );
+        _sphericalB.setFromVector3( positionB.sub( targetB ).applyQuaternion( this._yAxisUpSpace ) );
 
         const deltaTheta  = _sphericalB.theta  - _sphericalA.theta;
         const deltaPhi    = _sphericalB.phi    - _sphericalA.phi;
@@ -808,7 +807,7 @@ class CameraControls extends EventDispatcher {
     getPosition( out ) {
 
         const _out = !! out && out.isVector3 ? out : new THREE.Vector3();
-        return _out.setFromSpherical( this._sphericalEnd ).add( this._targetEnd );
+        return _out.setFromSpherical( this._sphericalEnd ).applyQuaternion( this._yAxisUpSpaceInverse ).add( this._targetEnd );
 
     }
 
@@ -830,11 +829,14 @@ class CameraControls extends EventDispatcher {
 
     }
 
-    update( delta ) {
+    updateCameraUp() {
 
-        // var offset = new THREE.Vector3();
-        // var quat = new THREE.Quaternion().setFromUnitVectors( this._camera.up, new THREE.Vector3( 0, 1, 0 ) );
-        // var quatInverse = quat.clone().inverse();
+        this._yAxisUpSpace.setFromUnitVectors( this._camera.up, _AXIS_Y );
+        this._yAxisUpSpaceInverse.copy( this._yAxisUpSpace ).inverse();
+
+    }
+
+    update( delta ) {
 
         const currentDampingFactor = this._state === STATE.NONE ? this.dampingFactor : this.draggingDampingFactor;
         const lerpRatio = 1.0 - Math.exp( - currentDampingFactor * delta / 0.016 );
@@ -874,8 +876,9 @@ class CameraControls extends EventDispatcher {
 
             if ( this._camera.isPerspectiveCamera ) {
 
-                const direction = _v3A.copy( _v3A.setFromSpherical( this._sphericalEnd ) ).normalize().negate();
-                const planeX = _v3B.copy( direction ).cross( _v3C.set( 0.0, 1.0, 0.0 ) ).normalize();
+                const direction = _v3A.copy( _v3A.setFromSpherical( this._sphericalEnd ).applyQuaternion( this._yAxisUpSpaceInverse ) ).normalize().negate();
+                const planeX = _v3B.copy( direction ).cross( _v3C.copy( this._camera.up ) ).normalize();
+                if ( planeX.lengthSq() === 0 ) planeX.x = 1.0;
                 const planeY = _v3C.crossVectors( planeX, direction );
                 const worldToScreen = this._sphericalEnd.radius * Math.tan( this._camera.fov * THREE.Math.DEG2RAD * 0.5 );
                 const prevRadius = this._sphericalEnd.radius - this._dollyControlAmount;
@@ -893,14 +896,14 @@ class CameraControls extends EventDispatcher {
         }
 
         this._spherical.makeSafe();
-        this._camera.position.setFromSpherical( this._spherical ).add( this._target );
+        this._camera.position.setFromSpherical( this._spherical ).applyQuaternion( this._yAxisUpSpaceInverse ).add( this._target );
         this._camera.lookAt( this._target );
 
         if ( this._boundaryEnclosesCamera ) {
 
             this._encloseToBoundary(
                 this._camera.position.copy( this._target ),
-                _v3A.setFromSpherical( this._spherical ),
+                _v3A.setFromSpherical( this._spherical ).applyQuaternion( this._yAxisUpSpaceInverse ),
                 1.0
             );
 
@@ -965,7 +968,7 @@ class CameraControls extends EventDispatcher {
         this._position0.fromArray( obj.position0 );
 
         this._targetEnd.fromArray( obj.target );
-        this._sphericalEnd.setFromVector3( position.sub( this._target0 ) );
+        this._sphericalEnd.setFromVector3( position.sub( this._target0 ).applyQuaternion( this._yAxisUpSpace ) );
 
         if ( ! enableTransition ) {
 
