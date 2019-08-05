@@ -450,11 +450,7 @@ class THREEManager {
 				scope.Render();
 			}
 			//editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
-		}
-
-
-		
-		if (this.highlightingEnabled && e.which !== 1){
+		} else if (this.highlightingEnabled && e.which !== 1){
 
 			let now = new Date();
 
@@ -526,6 +522,7 @@ class THREEManager {
 	onControlMouseDown(e) {
 		//Stop moving
 		this.controlSelected = true;
+        editor.Unhighlight();
 		editor.onControlMoveStart();
 
 		editor.setUpdating(true);
