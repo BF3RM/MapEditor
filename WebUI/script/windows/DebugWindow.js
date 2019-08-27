@@ -18,7 +18,7 @@ class DebugWindow {
 
 	Update() {
 		if(editor == null) {
-			console.log("Unable to find editor")
+			console.log("Unable to find editor");
 			return;
 		}
 		this.dom.html(renderjson(JSON.parse(
@@ -35,7 +35,6 @@ class DebugWindow {
 				}
 			}
 			))));
-
 	}
 
 	CreateTopControls() {

@@ -34,6 +34,7 @@ class Editor {
 		this.entityFactory = new EntityFactory();
 		this.gameContext = new GameContext();
         this.projectManager = new ProjectManager();
+        this.fbdMan = new FrostbiteDataManager();
 
 		/*
 
@@ -59,7 +60,43 @@ class Editor {
 
 		this.missingParent = {};
 		this.Initialize();
+
 	}
+
+    Initialize() {
+        signals.editorInitializing.dispatch(true);
+        // Adds the chrome background and debug window
+        if(this.debug === true) {
+            $('body').css({
+                "background": 'url(\"img/bf3bg.png\"',
+                'background-size': 'cover'
+            });
+            let imported = document.createElement('script');
+            imported.src = 'script/DebugData.js';
+            document.head.appendChild(imported);
+            this.setPlayerName("LocalPlayer");
+        }
+
+
+        this.ui.RegisterMenubarEntry(["Edit", "Undo"],this.undo.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Redo"],this.undo.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
+        this.ui.RegisterMenubarEntry(["Edit", "Cut"],this.Cut.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Copy"],this.Copy.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Pate"],this.Paste.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
+        this.ui.RegisterMenubarEntry(["Edit", "Duplicate"], this.Duplicate.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Delete"], this.DeleteSelected.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
+
+
+
+        //All our UI stuff should be initialized by now.
+        // We're going to trigger a resize so the content can adapt to being done initializing.
+        // It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
+        //window.dispatchEvent(new Event('resize'));
+        signals.editorReady.dispatch(true)
+    }
 
 	setPlayerName(name) {
 		if(name === undefined) {
@@ -87,40 +124,7 @@ class Editor {
 		signals.favoritesChanged.dispatch();
 	}
 
-	Initialize() {
-        signals.editorInitializing.dispatch(true);
-		// Adds the chrome background and debug window
-		if(this.debug === true) {
-			$('body').css({
-				"background": 'url(\"img/bf3bg.png\"',
-				'background-size': 'cover'
-			});
-			let imported = document.createElement('script');
-			imported.src = 'script/DebugData.js';
-			document.head.appendChild(imported);
-			this.setPlayerName("LocalPlayer");
-		}
 
-
-        this.ui.RegisterMenubarEntry(["Edit", "Undo"],this.undo.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Redo"],this.undo.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
-        this.ui.RegisterMenubarEntry(["Edit", "Cut"],this.Cut.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Copy"],this.Copy.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Pate"],this.Paste.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
-        this.ui.RegisterMenubarEntry(["Edit", "Duplicate"], this.Duplicate.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Delete"], this.DeleteSelected.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", ""]); // Seperator
-
-
-        //All our UI stuff should be initialized by now.
-        // We're going to trigger a resize so the content can adapt to being done initializing.
-        // It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
-        //window.dispatchEvent(new Event('resize'));
-        signals.editorReady.dispatch(true)
-
-	}
     Focus(guid) {
 	    let target = this.selectionGroup;
 	    if(guid) {

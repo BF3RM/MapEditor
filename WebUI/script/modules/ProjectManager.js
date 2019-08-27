@@ -27,7 +27,7 @@ class ProjectManager {
     }
 
     NewProject() {
-
+        editor.ui.OpenWindow("projectManager");
     }
 
     SaveProject() {
