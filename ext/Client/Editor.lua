@@ -20,11 +20,12 @@ function Editor:RegisterVars()
 
 	self.m_TransactionId = 0
 	self.m_GameObjectTransferDatas = {}
-	self.m_CommandActionResults = { }
+	self.m_CommandActionResults = {}
 
 	self.m_CameraTransform = nil
 
 	self.m_LevelLoaded = false
+	self.m_CurrentProjectHeader = nil
 end
 
 function Editor:OnEngineMessage(p_Message)
@@ -49,7 +50,7 @@ function Editor:OnEngineMessage(p_Message)
 		end
 
 		--- Client requests all updates that the server has.
-		NetEvents:SendLocal("MapEditorServer:RequestUpdate", self.m_TransactionId)
+		NetEvents:SendLocal("MapEditorServer:RequestProjectHeaderUpdate")
 		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
 	end
 end
@@ -142,10 +143,15 @@ function Editor:OnUpdateTransactionId(p_TransactionId)
 	self.m_TransactionId = p_TransactionId
 end
 
-function Editor:OnReceiveSave(p_SaveFile)
-	m_Logger:Write("Save received")
-	p_SaveFile = p_SaveFile or "Error"
-	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
+-- function Editor:OnReceiveSave(p_SaveFile)
+-- 	m_Logger:Write("Save received")
+-- 	p_SaveFile = p_SaveFile or "Error"
+-- 	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
+-- end
+
+function Editor:OnReceiveProjectData(p_ProjectData)
+	-- TODO: Handle properly in the project admin view
+-- 	WebUI:ExecuteJS("editor.projectManager.SetSave('"..p_SaveFile.."')")
 end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
@@ -157,9 +163,28 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	self:Raycast()
 end
 
-function Editor:OnRequestSave()
-	m_Logger:Write("Save requested")
-	NetEvents:SendLocal("MapEditorServer:RequestSave")
+function Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+	m_Logger:Write("Save requested: " .. p_ProjectName)
+	NetEvents:SendLocal("MapEditorServer:RequestProjectSave", p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+end
+
+function Editor:OnRequestProjectLoad(p_ProjectName)
+	m_Logger:Write("Load requested: " .. p_ProjectName)
+	NetEvents:SendLocal("MapEditorServer:RequestProjectLoad", p_ProjectName)
+end
+
+function Editor:OnRequestProjectLoad(p_ProjectName)
+	m_Logger:Write("Delete requested: " .. p_ProjectName)
+	NetEvents:SendLocal("MapEditorServer:RequestProjectDelete", p_ProjectName)
+end
+
+function Editor:OnRequestProjectData(p_ProjectName)
+	m_Logger:Write("Project Data requested: " .. p_ProjectName)
+	NetEvents:SendLocal("MapEditorServer:RequestProjectData", p_ProjectName)
+end
+
+function Editor:OnReceiveCurrentProjectHeader(p_ProjectHeader)
+	self.m_CurrentProjectHeader = p_ProjectHeader
 end
 
 function Editor:OnSendCommandsToServer(p_Command)

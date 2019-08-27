@@ -36,8 +36,8 @@ function MapEditorClient:RegisterEvents()
 	-- Editor Events
 	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
 	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
-	NetEvents:Subscribe('MapEditorClient:UpdateTransactionId', self, self.OnUpdateTransactionId)
-	NetEvents:Subscribe('MapEditorClient:ReceiveSave', self, self.OnReceiveSave)
+	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
+	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
@@ -45,8 +45,11 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
 	-- Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands) -- meant for client side only commands, not used yet
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
-	Events:Subscribe('MapEditor:RequestSave', self, self.OnRequestSave)
-
+	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
+	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
+	Events:Subscribe('MapEditor:RequestProjectDelete', self, self.OnRequestProjectDelete)
+	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
+	
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
 	Events:Subscribe('MapEditor:DisableFreeCam', self, self.OnDisableFreeCam)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
@@ -57,6 +60,7 @@ function MapEditorClient:RegisterEvents()
     Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
     Hooks:Install('ClientEntityFactory:Create', 999, self, self.OnEntityCreate)
 
+	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles) 
     Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
@@ -114,6 +118,10 @@ function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
 	EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 
+function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+end
+
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
@@ -146,14 +154,34 @@ function MapEditorClient:OnUpdateTransactionId(p_TransactionId)
 	Editor:OnUpdateTransactionId(p_TransactionId)
 end
 
-function MapEditorClient:OnReceiveSave(p_SaveFile)
-	Editor:OnReceiveSave(p_SaveFile)
+function MapEditorClient:OnReceiveProjectData(p_ProjectData)
+	Editor:OnReceiveProjectData(p_ProjectData)
 end
+
+function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
+	Editor:OnReceiveCurrentProjectHeader(p_ProjectHeader)
+end
+
+-- function MapEditorClient:OnReceiveSave(p_SaveFile)
+-- 	Editor:OnReceiveSave(p_SaveFile)
+-- end
 
 ----------- WebUI functions----------------
 
-function MapEditorClient:OnRequestSave()
-	Editor:OnRequestSave()
+function MapEditorClient:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
+	Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
+end
+
+function MapEditorClient:OnRequestProjectLoad(p_ProjectName)
+	Editor:OnRequestProjectLoad(p_ProjectName)
+end
+
+function MapEditorClient:OnRequestProjectDelete(p_ProjectName)
+	Editor:OnRequestProjectDelete(p_ProjectName)
+end
+
+function MapEditorClient:OnRequestProjectData(p_ProjectName)
+	Editor:OnRequestProjectData(p_ProjectName)
 end
 
 function MapEditorClient:OnEnableFreeCamMovement()

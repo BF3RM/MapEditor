@@ -2,10 +2,8 @@ class 'EditorServer'
 
 local m_Logger = Logger("EditorServer", true)
 
-local m_SaveFile = require 'SaveFile'
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
-local m_MapName
 
 function EditorServer:__init()
 	m_Logger:Write("Initializing EditorServer")
@@ -18,6 +16,8 @@ function EditorServer:RegisterVars()
 
 	self.m_Transactions = {}
 	self.m_GameObjectTransferDatas = {}
+	self.m_CurrentProjectHeader = nil -- dont reset this, is required info for map restart
+	self.m_MapName = nil
 end
 
 function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
@@ -56,30 +56,79 @@ function EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
     NetEvents:SendToLocal("MapEditorClient:UpdateTransactionId", p_Player, #self.m_Transactions)
 end
 
-function EditorServer:OnRequestSave(p_Player)
-	m_Logger:Write("Save requested")
+function EditorServer:OnRequestProjectHeaderUpdate(p_Player)
+	self:UpdateClientProjectHeader(p_Player)
+end
+
+function EditorServer:UpdateClientProjectHeader(p_Player)
+	if self.m_CurrentProjectHeader ~= nil then
+		if p_Player == nil then -- update all players
+			NetEvents:SendLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+		else
+			NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, self.m_CurrentProjectHeader)
+		end
+	end
+end
+
+function EditorServer:OnRequestProjectData(p_Player, p_ProjectName)
+	m_Logger:Write("Data requested: " .. p_ProjectName)
+
+	local s_ProjectDataJson = DataBaseManager:GetProjectDataByProjectName(p_ProjectName)
+
+	NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectDataJson)
+end
+
+function EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
+	m_Logger:Write("Load requested: " .. p_ProjectName)
+	-- TODO: check player's permission once that is implemented
+
+	self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectName)
+
+	local s_MapName = self.m_CurrentProjectHeader.mapName
+	local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
+
+	if s_MapName == nil or
+		Maps[s_MapName] == nil or
+		s_GameModeName == nil or
+		GameModes[s_GameModeName] == nil then
+			
+		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
+	end
+
+	self:UpdateClientProjectHeader()
+
+	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
+	-- Invoke Restart
+
+	RCON:SendCommand('mapList.clear')
+	RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
+	RCON:SendCommand('mapList.runNextRound')
+end
+
+function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+	m_Logger:Write("Save requested: " .. p_ProjectName)
 
 	-- TODO: check player's permission once that is implemented
 
-	local s_SaveData ={}
+	local s_GameObjectSaveDatas = {}
+	local count = 0
 
+	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for l_Guid, l_GameObjectTransferData in pairs(self.m_GameObjectTransferDatas) do
-		s_SaveData[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
+		count = count + 1
+		s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObjectTransferData):GetAsTable()
 	end
 
-	local s_SaveFile = {
-		header = {
-			mapName = m_MapName,
-			--version = ""
-		},
-		data = s_SaveData
-	}
+	m_Logger:Write("GameObjectSaveDatas: " .. count)
 
-	local s_JSONSaveFile = json.encode(s_SaveFile)
-
-	NetEvents:SendToLocal("MapEditorClient:ReceiveSave", p_Player, s_JSONSaveFile)
+	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, s_GameObjectSaveDatas)
 end
 
+function EditorServer:OnRequestProjectDelete(p_ProjectName)
+	m_Logger:Write("Delete requested: " .. p_ProjectName)
+
+	DataBaseManager:DeleteProject(p_ProjectName)
+end
 
 --function EditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 --    --Avoid nested blueprints for now...
@@ -138,15 +187,24 @@ function EditorServer:OnGameObjectReady(p_GameObject)
 end
 
 function EditorServer:OnUpdatePass(p_Delta, p_Pass)
-	-- TODO: ugly, find a better way
-	if m_IsLevelLoaded then
+	-- TODO: ugly, find a better entry point to invoke project data loading
+	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil then
 		m_LoadDelay = m_LoadDelay + p_Delta
 
-		if m_LoadDelay > 10 then
+		if m_LoadDelay > 10 and
+			self.m_CurrentProjectHeader.projectName ~= nil then
+
 			m_IsLevelLoaded = false
 			m_LoadDelay = 0
-			self:LoadSave()
+			
+			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
+				m_Logger:Error("Cant load project that is not built for the same map as current one.")
+			end
 
+			-- Load User Data from Database
+			local s_ProjectData = DataBaseManager:GetProjectDataByProjectName(self.m_CurrentProjectHeader.projectName)
+			--self:UpdateLevelFromOldSaveFile(s_SaveFile)
+			self:UpdateLevelFromSaveFile(s_ProjectData)
 		end
 	end
 
@@ -171,25 +229,7 @@ end
 function EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	m_IsLevelLoaded = true
 
-	m_MapName = p_Map
-end
-
-function EditorServer:LoadSave()
-    m_Logger:Write("Loading savefile")
-    local s_SaveFile = DecodeParams(json.decode(m_SaveFile))
-
-    if(not s_SaveFile) then
-        m_Logger:Write("Failed to get savefile.")
-        return
-    end
-
-	if s_SaveFile.header.mapName ~= m_MapName then
-		m_Logger:Warning("Tried to load a savefile from a different map.")
-		return
-	end
-
-	--self:UpdateLevelFromOldSaveFile(s_SaveFile)
-    self:UpdateLevelFromSaveFile(s_SaveFile.data)
+	self.m_MapName = p_Map
 end
 
 function EditorServer:UpdateLevelFromSaveFile(p_SaveData)

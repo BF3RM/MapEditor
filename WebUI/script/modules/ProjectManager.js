@@ -39,8 +39,14 @@ class ProjectManager {
         editor.ui.CreateDialog(dialogElement, [closeButton], null)
                 .dialog("open");
 
-        $("#saveProjectTextArea").text("Loading...");
-        editor.vext.SendEvent('RequestSave');
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+        let mapName = "XP1_001";
+        let gameModeName = "ConquestAssaultLarge0";
+        let requiredBundles = [ 1, 2, 3 ]; // replace with the paths of the bundles
+
+        $("#saveProjectTextArea").text("Saving...");
+        editor.vext.SendEvent('RequestProjectSave', projectName, mapName, gameModeName, requiredBundles);
     }
 
     SetSave(json){
@@ -49,7 +55,28 @@ class ProjectManager {
         // editor.ui.dialogs["saveProject"].dialog("open");
     }
 
-    LoadProject(blueprintsRaw) {
+    LoadProject() {
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+
+        $("#saveProjectTextArea").text("Loading...");
+        editor.vext.SendEvent('RequestProjectLoad', projectName);
+    }
+
+    DeleteProject() {
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+
+        $("#saveProjectTextArea").text("Deleting...");
+        editor.vext.SendEvent('RequestProjectDelete', projectName);
+    }
+
+    RequestProjectData() {
+        // TODO: Replace with proper View-Data
+        let projectName = "DebugProject";
+
+        $("#saveProjectTextArea").text("Loading...");
+        editor.vext.SendEvent('RequestProjectData', projectName);
     }
 
     ListProjects(instanceGuid) {
