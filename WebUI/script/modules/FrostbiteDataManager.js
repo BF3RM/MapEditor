@@ -1,11 +1,17 @@
 class FrostbiteDataManager {
     constructor() {
+        this.window = new ImportWindow();
+
         this.superBundles = {};
         this.bundles = {};
         this.partitions = {};
 
         this._files = {};
         this._data = null;
+
+        signals.editorInitializing.add(this._onEditorInitializing.bind(this));
+        signals.editorReady.add(this._onEditorReady.bind(this));
+
         this._Init();
 
     }
@@ -23,7 +29,17 @@ class FrostbiteDataManager {
         });
     }
 
+    _onEditorInitializing() {
+        editor.ui.RegisterWindow("ImportWindow", "Import bundle", this.window, true);
+    }
 
+    _onEditorReady() {
+        let scope = this;
+        editor.ui.RegisterMenubarEntry(["Edit", "Import"], function () {
+            this.window.Update();
+            editor.ui.OpenWindow("importwindow");
+        } );
+    }
 
     _ExtractFiles() {
         let scope = this;
@@ -63,24 +79,56 @@ class FrostbiteDataManager {
         });
         console.log("Loaded " + p_FileName);
     }
+    getBundle(path) {
+        return this.bundles[path];
+    }
+    getSuperBundles() {
+        let scope = this;
+        let superBundles = {};
+        Object.keys(scope._files["superbundles"]).forEach(function (superBundleName) {
+            superBundles[superBundleName] = scope.superBundles[superBundleName];
+        });
+        return superBundles;
+    }
 
     getBundles(p_SuperBundleName) {
         let scope = this;
-        let superBundle = scope._files["superbundles"][p_SuperBundleName.toLowerCase()];
         let bundles = {};
-        Object.values(superBundle.bundles).forEach(function (bundleName) {
-            bundles[bundleName] = scope.bundles[bundleName];
-        });
+
+
+        if(p_SuperBundleName === undefined || p_SuperBundleName === "All") {
+            Object.keys(scope.superBundles).forEach(function (superName) {
+                let superBundle = scope._files["superbundles"][superName.toLowerCase()];
+                Object.values(superBundle.bundles).forEach(function (bundleName) {
+                    bundles[bundleName] = scope.bundles[bundleName];
+                });
+            });
+        } else {
+            let superBundle = scope._files["superbundles"][p_SuperBundleName.toLowerCase()];
+            Object.values(superBundle.bundles).forEach(function (bundleName) {
+                bundles[bundleName] = scope.bundles[bundleName];
+            });
+        }
         return bundles;
     };
 
     getPartitions(p_BundleName) {
         let scope = this;
-        let bundle = this._files["bundles"][p_BundleName.toLowerCase()];
         let partitions = {};
-        Object.values(bundle.partitions).forEach(function (partitionName) {
-            partitions[partitionName] = scope.partitions[partitionName];
-        });
+
+        if(p_BundleName === undefined || p_BundleName === "All") {
+            Object.keys(bundle.bundles).forEach(function (bundleName) {
+                let bundle = this._files["bundles"][bundleName.toLowerCase()];
+                Object.values(bundle.partitions).forEach(function (partitionName) {
+                    partitions[partitionName] = scope.partitions[partitionName];
+                });
+            });
+        } else {
+            let bundle = this._files["bundles"][p_BundleName.toLowerCase()];
+            Object.values(bundle.partitions).forEach(function (partitionName) {
+                partitions[partitionName] = scope.partitions[partitionName];
+            });
+        }
         return partitions;
     };
 
@@ -88,6 +136,8 @@ class FrostbiteDataManager {
         let superBundle = this._files["partitions"][p_PartitionName.toLowerCase()];
         return superBundle.bundlesReferencedIn;
     }
+
+
 }
 
 class FBSuperBundle {
@@ -100,6 +150,12 @@ class FBSuperBundle {
     get bundles() {
         return editor.fbdMan.getBundles(this.name);
     }
+    get paths() {
+        return getPaths(this.name)
+    }
+    get fileName() {
+        return getFilename(this.name)
+    }
 }
 
 class FBBundle {
@@ -111,6 +167,12 @@ class FBBundle {
 
     get partitions() {
         return editor.fbdMan.getPartitions(this.name);
+    }
+    get paths() {
+        return getPaths(this.name)
+    }
+    get fileName() {
+        return getFilename(this.name)
     }
 }
 
@@ -125,5 +187,11 @@ class FBPartition {
 
     get bundlesReferencedIn() {
         return editor.fbdMan.getBundlesReferencedIn(this.name);
+    }
+    get paths() {
+        return getPaths(this.name)
+    }
+    get fileName() {
+        return getFilename(this.name)
     }
 }

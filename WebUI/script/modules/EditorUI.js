@@ -55,8 +55,8 @@ class EditorUI {
 	}
 
 	RegisterWindow(windowId, windowTitle, windowModule, visible) {
-        this.windows[windowId] = new PowWindow(windowId, windowTitle, windowModule, visible);
-        this.windowContainer.append(this.windows[windowId].dom)
+        this.windows[windowId.toLowerCase()] = new PowWindow(windowId, windowTitle, windowModule, visible);
+        this.windowContainer.append(this.windows[windowId.toLowerCase()].dom)
     }
 
     RegisterMenubarEntry(path, entryCallback = undefined) {
@@ -96,22 +96,22 @@ class EditorUI {
     }
 
     OpenWindow(windowId) {
-	    if(this.windows[windowId] === undefined) {
+	    if(this.windows[windowId.toLowerCase()] === undefined) {
 	        LogError("Attempted to open an undefined window:" + windowId)
 	    }
-        this.windows[windowId].Show();
+        this.windows[windowId.toLowerCase()].Show();
     }
     HideWindow(windowId) {
-        if(this.windows[windowId] === undefined) {
+        if(this.windows[windowId.toLowerCase()] === undefined) {
             LogError("Attempted to hide an undefined window:" + windowId)
         }
-        this.windows[windowId].Hide();
+        this.windows[windowId.toLowerCase()].Hide();
     }
     ToggleWindow(windowId) {
-        if(this.windows[windowId] === undefined) {
+        if(this.windows[windowId.toLowerCase()] === undefined) {
             LogError("Attempted to toggle an undefined window:" + windowId)
         }
-        this.windows[windowId].Toggle();
+        this.windows[windowId.toLowerCase()].Toggle();
     }
 
 
@@ -271,7 +271,6 @@ class EditorUI {
 			})
 		});
 		this.layout.init();
-
 	}
 
 	static toolsChanged(e) {

@@ -64,6 +64,7 @@ class Editor {
 	}
 
     Initialize() {
+	    let scope = this;
         signals.editorInitializing.dispatch(true);
         // Adds the chrome background and debug window
         if(this.debug === true) {
@@ -83,7 +84,7 @@ class Editor {
         this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
         this.ui.RegisterMenubarEntry(["Edit", "Cut"],this.Cut.bind(this));
         this.ui.RegisterMenubarEntry(["Edit", "Copy"],this.Copy.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Pate"],this.Paste.bind(this));
+        this.ui.RegisterMenubarEntry(["Edit", "Paste"],this.Paste.bind(this));
         this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
         this.ui.RegisterMenubarEntry(["Edit", "Duplicate"], this.Duplicate.bind(this));
         this.ui.RegisterMenubarEntry(["Edit", "Delete"], this.DeleteSelected.bind(this));

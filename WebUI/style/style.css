@@ -478,3 +478,41 @@ tr i {
 .infinite-tree-content {
 	display:inline-grid;
 }
+
+#BundleImport {
+    display: grid;
+    grid-template-columns: [first] 50% [line2] 50%;
+}
+
+#BundleImport .Panel{
+    min-height: 200px;
+    min-width: 200px;
+    width: 100%;
+}
+
+#BundleImport #LevelSelection {
+    grid-row: 1;
+    grid-column: 1;
+}
+
+#BundleImport #BundleSelection {
+    grid-row: 2;
+    grid-column: 1;
+}
+
+#BundleImport #PathSelection {
+    grid-row: 2;
+    grid-column: 2;
+}
+
+#BundleImport #ContentSelection {
+    grid-row: 3;
+    grid-column-start: 1;
+    grid-column-start: 2;
+    grid-column: 1;
+}
+#BundleImport #SearchInput {
+    grid-row: 4;
+    grid-column: 1;
+}
+
