@@ -11,12 +11,230 @@ class ImportWindow {
         this.debugBox = null;
 
         this.missing = [];
-        this.Initialize();
+        this.layout = null;
         this.InitializeWidgets();
         this.CreateContent();
+        this.Initialize();
+
     }
+
+    WhateverComponent = function( container, state ) {
+        this._container = container;
+        this._state = state;
+
+        container.innerText ="hi";
+
+    };
+
     Initialize() {
-        this.panel.setId("BundleImport")
+        let scope = this;
+        this.panel.setId("BundleImport");
+        let config;
+        config = {
+            settings: {
+                hasHeaders: true,
+                constrainDragToContainer: true,
+                reorderEnabled: true,
+                selectionEnabled: false,
+                popoutWholeStack: false,
+                blockedPopoutsThrowError: true,
+                closePopoutsOnUnload: true,
+                showPopoutIcon: false,
+                showMaximiseIcon: false,
+                showCloseIcon: false,
+                responsiveMode: 'onload'
+            },
+            dimensions: {
+                borderWidth: 5,
+                minItemHeight: 10,
+                minItemWidth: 10,
+                headerHeight: 20,
+                dragProxyWidth: 300,
+                dragProxyHeight: 200
+            },
+            labels: {
+                close: 'close',
+                maximise: 'maximise',
+                minimise: 'minimise',
+                popout: 'open in new window',
+                popin: 'pop in',
+                tabDropdown: 'additional tabs'
+            },
+            content: [
+                {
+                    type: 'column',
+                    isClosable: true,
+                    reorderEnabled: true,
+                    title: '',
+                    content: [
+                        {
+                            type: 'row',
+                            width: 10,
+                            isClosable: true,
+                            reorderEnabled: true,
+                            title: '',
+                            height: 88.70967741935483,
+                            content: [
+                                {
+                                    type: 'column',
+                                    isClosable: true,
+                                    reorderEnabled: true,
+                                    title: '',
+                                    width: 50,
+                                    content: [
+                                        {
+                                            type: 'stack',
+                                            height: 10.526315789473683,
+                                            isClosable: true,
+                                            reorderEnabled: true,
+                                            title: '',
+                                            activeItemIndex: 0,
+                                            content: [
+                                                {
+                                                    type: 'component',
+                                                    componentName: 'LevelSelection',
+                                                    isClosable: false,
+                                                    title: 'LevelSelection',
+                                                    height: 4,
+                                                    reorderEnabled: true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'stack',
+                                            height: 30.9955026133463,
+                                            isClosable: true,
+                                            reorderEnabled: true,
+                                            title: '',
+                                            activeItemIndex: 0,
+                                            content: [
+                                                {
+                                                    type: 'component',
+                                                    componentName: 'PathSelection',
+                                                    isClosable: false,
+                                                    title: 'PathSelection',
+                                                    height: 4,
+                                                    reorderEnabled: true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'stack',
+                                            height: 58.47818159718002,
+                                            isClosable: true,
+                                            reorderEnabled: true,
+                                            title: '',
+                                            activeItemIndex: 0,
+                                            content: [
+                                                {
+                                                    type: 'component',
+                                                    componentName: 'ContentSelection',
+                                                    isClosable: false,
+                                                    title: 'ContentSelection',
+                                                    height: 30,
+                                                    reorderEnabled: true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: 'column',
+                                    isClosable: true,
+                                    reorderEnabled: true,
+                                    title: '',
+                                    width: 50,
+                                    content: [
+                                        {
+                                            type: 'stack',
+                                            height: 54.08163265306123,
+                                            isClosable: true,
+                                            reorderEnabled: true,
+                                            title: '',
+                                            activeItemIndex: 0,
+                                            content: [
+                                                {
+                                                    type: 'component',
+                                                    componentName: 'BundleSelection',
+                                                    isClosable: false,
+                                                    title: 'BundleSelection',
+                                                    height: 4,
+                                                    reorderEnabled: true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: 'stack',
+                                            height: 45.91836734693877,
+                                            isClosable: true,
+                                            reorderEnabled: true,
+                                            title: '',
+                                            activeItemIndex: 0,
+                                            content: [
+                                                {
+                                                    type: 'component',
+                                                    componentName: 'ContentInfo',
+                                                    isClosable: false,
+                                                    title: 'ContentInfo',
+                                                    height: 30,
+                                                    reorderEnabled: true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type: 'stack',
+                            header: {},
+                            isClosable: true,
+                            reorderEnabled: true,
+                            title: '',
+                            activeItemIndex: 0,
+                            height: 11.290322580645162,
+                            content: [
+                                {
+                                    type: 'component',
+                                    componentName: 'SearchInput',
+                                    isClosable: false,
+                                    title: 'SearchInput',
+                                    reorderEnabled: true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            isClosable: true,
+            reorderEnabled: true,
+            title: '',
+            openPopouts: [],
+            maximisedItemId: null
+        }
+
+        this.layout = new GoldenLayout( config, "#BundleImport" );
+
+        Object.values(this.widgets).forEach(function (l_Widget) {
+            l_Widget.component = function (container, state) {
+                this._container = container;
+                this._state = state;
+                container.on( 'tab', function( tab ){
+                    //tab.element.hide();
+                    //console.log(tab);
+                });
+                this._container.getElement().html(l_Widget.el.dom);
+            };
+            scope.layout.registerComponent( l_Widget.name, l_Widget.component);
+            console.log("Registered component: " + l_Widget.name)
+        });
+
+
+        this.layout.init();
+        this.dom.addEventListener("resize", () => {
+            this.layout.updateSize();
+        })
+
     }
     InitializeWidgets() {
         this.AddWidget("LevelSelection", UI.Select);
@@ -30,13 +248,15 @@ class ImportWindow {
     AddWidget(name, widgetType) {
         this.widgets[name] = {
             data: {},
+            name: name,
+            component: null,
             el: new widgetType()
         };
     }
     SpawnWidgets() {
         let scope = this;
         Object.values(this.widgets).forEach(function (l_Widget) {
-            scope.panel.add(l_Widget.el)
+            //scope.panel.add(l_Widget.el)
         });
     }
 
@@ -53,8 +273,8 @@ class ImportWindow {
         wget = scope.widgets["BundleSelection"];
         wget.el.setId("BundleSelection");
         wget.data.treeData = {
-            id: "root",
-            name: "root",
+            id: "All",
+            name: "All",
             children: [],
             state: {
                 open: true
@@ -96,8 +316,8 @@ class ImportWindow {
         wget = scope.widgets["PathSelection"];
         wget.el.setId("PathSelection");
         wget.data.treeData = {
-            id: "root",
-            name: "root",
+            id: "All",
+            name: "All",
             children: [],
             state: {
                 open: true
@@ -128,7 +348,7 @@ class ImportWindow {
                     console.log("Unselectable");
                     return false;
                 }
-
+                let currentNode = node;
                 scope.OnPathSelected(node.id);
             },
             togglerClass: "Toggler",
@@ -170,13 +390,19 @@ class ImportWindow {
     OnBundleSelected(p_Bundle) {
         let scope = this;
         this.bundle = p_Bundle;
-        scope.GeneratePathData(p_Bundle);
+        setTimeout(() => {
+            scope.GeneratePathData(p_Bundle);
+        });
+        console.log("bundle")
     }
 
     OnPathSelected(p_Path) {
         let scope = this;
 
-        scope.GenerateContentData(p_Path);
+        setTimeout(() => {
+            scope.GenerateContentData(this.bundle, p_Path);
+        });
+        console.log("path")
     }
 
     SetSuperbundle(value) {
@@ -185,7 +411,10 @@ class ImportWindow {
 
         let scope = this;
 
-        scope.GenerateBundleData(value);
+        setTimeout(() => {
+            scope.GenerateBundleData(value);
+        });
+        console.log("super")
     }
 
     SetBundle(value) {
@@ -211,26 +440,45 @@ class ImportWindow {
         let PathTreeData = this.GenerateTreeData(data, false);
         this.SetData("PathSelection", PathTreeData)
     }
-    async GenerateContentData(path) {
-        let bundle = editor.fbdMan.getBundle(this.bundle);
+    async GenerateContentData(bundleName, path) {
+        let currentBundle = this.bundle;
+        if(path === "All") {
+            path = "";
+        }
+        if(currentBundle === "All") {
+            currentBundle = ""
+        }
+        let bundles = editor.fbdMan.getBundles(this.superBundle);
+        let partitions = [];
+
         let out = {
-            id: "root",
-            name: "root",
+            id: "All",
+            name: "All",
             children: []
         };
-        for( var partitionId in bundle.partitions) {
-            var partition = bundle.partitions[partitionId];
-            if(partition === undefined) {
-                this.missing.push(partitionId);
-            } else {
-                if(partition.children === undefined && partition.name.includes(path)) {
-                    out.children.push({
-                        "id": partition.name,
-                        "name": partition.name.replace(path, ""),
-                    })
+
+
+        Object.values(bundles).forEach( (bundle) => {
+            if (bundle.name.includes(currentBundle)) {
+                let partitions = bundle.partitions;
+                for (var partitionName in partitions) {
+                    let partition = partitions[partitionName];
+                    if (partition.children === undefined && partition.name.includes(path)) {
+                        out.children.push({
+                            "id": partition.name,
+                            "name": partition.name.replace(path, ""),
+                        })
+                    } else if(partition.name.includes(path)) {
+                        out.children.push({
+                            "id": partition.name,
+                            "name": partition.name.replace(path, ""),
+                        })
+                    }
                 }
             }
-        }
+        });
+
+
         this.SetPathViewData(out);
     }
 
@@ -244,8 +492,8 @@ class ImportWindow {
     }
     GenerateTreeData(data, addFile = true) {
         let out = {
-            id: "root",
-            name: "root",
+            id: "All",
+            name: "All",
             children: [],
             state: {
                 open: true
@@ -258,8 +506,13 @@ class ImportWindow {
             if(entry === undefined) {
                 continue;
             }
+            let paths = entry.paths;
+            // Typescript would've caught this shit before I had to implement this hack
+            if(paths === undefined) {
+                paths = entry;
+            }
             var fullpath = "";
-            entry.paths.forEach(function(subPath) {
+            paths.forEach(function(subPath) {
                 let parentIndex = parentPath.children.find(x => x.name.toLowerCase() === subPath.toLowerCase());
                 if (parentIndex === undefined) {
                     if(fullpath != "") {
@@ -267,8 +520,9 @@ class ImportWindow {
                     }
                     fullpath += subPath;
                     let a = parentPath.children.push({
-                        id: fullpath,
+                        id: entry.name.replace("/"+entry.fileName, ""),
                         name: subPath,
+                        loadOnDemand: true,
                         children: [],
                     });
                     parentPath = parentPath.children[a - 1];
@@ -317,6 +571,7 @@ class ImportWindow {
         let state = node.state;
         let row = new UI.Row();
         row.setAttribute("guid", node.id);
+        console.log(node)
         row.setStyle("margin-left", (state.depth * 18) +"px");
         row.addClass("infinite-tree-item");
 

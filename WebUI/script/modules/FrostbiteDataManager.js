@@ -103,31 +103,66 @@ class FrostbiteDataManager {
                     bundles[bundleName] = scope.bundles[bundleName];
                 });
             });
-        } else {
+        }else if(scope._files["superbundles"][p_SuperBundleName.toLowerCase()] !== undefined) {
             let superBundle = scope._files["superbundles"][p_SuperBundleName.toLowerCase()];
             Object.values(superBundle.bundles).forEach(function (bundleName) {
                 bundles[bundleName] = scope.bundles[bundleName];
             });
+        } else {
+            for (let key of Object.keys(scope._files["superbundles"])) {
+                if (key.startsWith(p_SuperBundleName.toLowerCase())) {
+                    let superBundle = scope._files["superbundles"][key];
+                    bundles[key] = superBundle.bundles[key];
+                }
+            }
         }
+
         return bundles;
     };
 
+    getBundle(p_BundleName) {
+        return this.bundles[p_BundleName];
+    }
+    getPartition(p_PartitionName) {
+        return this.partitions[p_PartitionName];
+    }
+    getSuperBundle(p_SuperBundleName) {
+        return this.superBundles[p_BundleName];
+    }
     getPartitions(p_BundleName) {
         let scope = this;
         let partitions = {};
 
         if(p_BundleName === undefined || p_BundleName === "All") {
-            Object.keys(bundle.bundles).forEach(function (bundleName) {
-                let bundle = this._files["bundles"][bundleName.toLowerCase()];
+            Object.keys(scope._files["bundles"]).forEach(function (bundleName) {
+                let bundle = scope._files["bundles"][bundleName.toLowerCase()];
                 Object.values(bundle.partitions).forEach(function (partitionName) {
-                    partitions[partitionName] = scope.partitions[partitionName];
+                    let partition = scope.getPartition(partitionName);
+                    if(partition !== undefined) {
+                        partitions[partitionName] = scope.partitions[partitionName];
+                    }
                 });
             });
-        } else {
-            let bundle = this._files["bundles"][p_BundleName.toLowerCase()];
+        } else if(scope._files["bundles"][p_BundleName.toLowerCase()] !== undefined) {
+            let bundle = scope._files["bundles"][p_BundleName.toLowerCase()];
             Object.values(bundle.partitions).forEach(function (partitionName) {
-                partitions[partitionName] = scope.partitions[partitionName];
+                let partition = scope.getPartition(partitionName);
+                if(partition !== undefined) {
+                    partitions[partitionName] = scope.partitions[partitionName];
+                }
             });
+        } else {
+            for (let key of Object.keys(scope._files["bundles"])) {
+                if (key.startsWith(p_BundleName)) {
+                    let bundle = scope._files["bundles"][key];
+                    Object.values(bundle.partitions).forEach( (partitionName)=> {
+                        let partition = scope.getPartition(partitionName);
+                        if(partition !== undefined) {
+                            partitions[partition.name] = partition;
+                        }
+                    });
+                }
+            }
         }
         return partitions;
     };

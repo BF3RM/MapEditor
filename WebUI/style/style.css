@@ -479,41 +479,14 @@ tr i {
 	display:inline-grid;
 }
 
+#ImportWindow {
+    background-color: #000000e8;
+}
 #BundleImport {
     display: grid;
     grid-template-columns: [first] 50% [line2] 50%;
     height: 100%;
-}
-
-#BundleImport .Panel{
-    min-height: 200px;
-    min-width: 200px;
+    overflow: hidden;
     width: 100%;
-}
-
-#BundleImport #LevelSelection {
-    grid-row: 1;
-    grid-column: 1;
-}
-
-#BundleImport #BundleSelection {
-    grid-row: 2;
-    grid-column: 1;
-}
-
-#BundleImport #PathSelection {
-    grid-row: 2;
-    grid-column: 2;
-}
-
-#BundleImport #ContentSelection {
-    grid-row: 3;
-    grid-column-start: 1;
-    grid-column-end: 2;
-    overflow: scroll;
-}
-#BundleImport #SearchInput {
-    grid-row: 4;
-    grid-column: 1;
 }
 

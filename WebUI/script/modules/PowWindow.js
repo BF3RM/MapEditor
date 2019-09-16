@@ -79,6 +79,9 @@ class PowWindow {
 			minHeight: 200,
 			minWidth: 200,
 			containment: "#windowContainer",
+            resize: (e,u) => {
+                this.element.dom.dispatchEvent(new Event('resize'));
+            }
 		});
 
 		dom.draggable({
@@ -87,6 +90,7 @@ class PowWindow {
 		});
 
 		this.dom = dom;
+
 		this.content.append(this.element.dom);
 
 		if(this.element.subControls != null) {
