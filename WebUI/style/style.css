@@ -482,6 +482,7 @@ tr i {
 #BundleImport {
     display: grid;
     grid-template-columns: [first] 50% [line2] 50%;
+    height: 100%;
 }
 
 #BundleImport .Panel{
@@ -508,8 +509,8 @@ tr i {
 #BundleImport #ContentSelection {
     grid-row: 3;
     grid-column-start: 1;
-    grid-column-start: 2;
-    grid-column: 1;
+    grid-column-end: 2;
+    overflow: scroll;
 }
 #BundleImport #SearchInput {
     grid-row: 4;

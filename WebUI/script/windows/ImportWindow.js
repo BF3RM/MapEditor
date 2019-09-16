@@ -23,6 +23,7 @@ class ImportWindow {
         this.AddWidget("BundleSelection", UI.Panel);
         this.AddWidget("PathSelection", UI.Panel);
         this.AddWidget("ContentSelection", UI.UnsortedList);
+        this.AddWidget("ContentInfo", UI.UnsortedList);
         this.AddWidget("SearchInput", UI.Input);
         this.SpawnWidgets();
     }
@@ -207,7 +208,7 @@ class ImportWindow {
 
     async GeneratePathData(bundle) {
         let data = editor.fbdMan.getPartitions(bundle);
-        let PathTreeData = this.GenerateTreeData(data);
+        let PathTreeData = this.GenerateTreeData(data, false);
         this.SetData("PathSelection", PathTreeData)
     }
     async GenerateContentData(path) {
@@ -241,7 +242,7 @@ class ImportWindow {
             wget.el.add(new UI.ListItem().add(new UI.Text(child.name)))
         });
     }
-    GenerateTreeData(data) {
+    GenerateTreeData(data, addFile = true) {
         let out = {
             id: "root",
             name: "root",
@@ -277,10 +278,12 @@ class ImportWindow {
                     // Replace lowercase paths with the actual case.
                 }
             });
-            parentPath.children.push({
-                id: entry.name,
-                name: entry.fileName,
-            })
+            if(addFile) {
+                parentPath.children.push({
+                    id: entry.name,
+                    name: entry.fileName,
+                })
+            }
         }
         return out;
     }
