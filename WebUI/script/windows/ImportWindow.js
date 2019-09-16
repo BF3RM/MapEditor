@@ -1,3 +1,4 @@
+//Cursed land, do not touch.
 class ImportWindow {
     constructor() {
         this.panel = new UI.Panel();
@@ -599,6 +600,7 @@ class ImportWindow {
             count.setStyle("padding-left", "10px");
             count.setStyle("opacity", "0.5");
         }
+
 
         $(row).on('click', function (e) {
             console.log(e);
