@@ -490,3 +490,6 @@ tr i {
     width: 100%;
 }
 
+#ContentSelection {
+    height: calc(100%);
+}

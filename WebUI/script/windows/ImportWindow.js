@@ -16,16 +16,13 @@ class ImportWindow {
         this.InitializeWidgets();
         this.CreateContent();
         this.Initialize();
-
+	    this.filterOptions = {
+		    caseSensitive: false,
+		    exactMatch: false,
+		    includeAncestors: true,
+		    includeDescendants: true
+	    };
     }
-
-    WhateverComponent = function( container, state ) {
-        this._container = container;
-        this._state = state;
-
-        container.innerText ="hi";
-
-    };
 
     Initialize() {
         let scope = this;
@@ -212,7 +209,9 @@ class ImportWindow {
             title: '',
             openPopouts: [],
             maximisedItemId: null
-        }
+        };
+
+
 
         this.layout = new GoldenLayout( config, "#BundleImport" );
 
@@ -227,16 +226,17 @@ class ImportWindow {
                 this._container.getElement().html(l_Widget.el.dom);
             };
             scope.layout.registerComponent( l_Widget.name, l_Widget.component);
-            console.log("Registered component: " + l_Widget.name)
+            console.log("Registered component: " + l_Widget.name);
         });
 
 
         this.layout.init();
         this.dom.addEventListener("resize", () => {
             this.layout.updateSize();
-        })
+        });
 
     }
+
     InitializeWidgets() {
         this.AddWidget("LevelSelection", UI.Select);
         this.AddWidget("BundleSelection", UI.Panel);
@@ -307,6 +307,7 @@ class ImportWindow {
                     return false;
                 }
                 scope.OnBundleSelected(node.id);
+                return true;
             },
             togglerClass: "Toggler",
             nodeIdAttr: "guid"
@@ -328,8 +329,8 @@ class ImportWindow {
             el:  wget.el.dom,
             data: wget.data.treeData,
             rowRenderer: scope.hierarchyRenderer,
+	        autoOpen: true, // Defaults to false
 
-            autoOpen: true, // Defaults to false
             rowsInBlock: 100,
             droppable: { // Defaults to false
                 hoverClass: 'infinite-tree-droppable-hover',
@@ -351,18 +352,63 @@ class ImportWindow {
                 }
                 let currentNode = node;
                 scope.OnPathSelected(node.id);
+	            return true;
+
             },
             togglerClass: "Toggler",
             nodeIdAttr: "guid"
 
         });
 
-        wget = scope.widgets["ContentSelection"];
-        wget.el.setId("ContentSelection");
-        wget.data = {};
+	    wget = scope.widgets["ContentSelection"];
+	    wget.el.setId("ContentSelection");
+	    wget.data.treeData = {
+		    id: "All",
+		    name: "All",
+		    children: [],
+		    state: {
+			    open: true
+		    }
+	    };
+	    wget.data.tree = new InfiniteTree({
+		    el:  wget.el.dom,
+		    data: wget.data.treeData,
+		    rowRenderer: scope.hierarchyRenderer,
 
+		    autoOpen: true, // Defaults to false
+		    rowsInBlock: 100,
+		    shouldSelectNode: function(node) { // Determine if the node is selectable
+
+			    if(node == null) {
+				    return false;
+			    }
+			    if(node.selectable === false) {
+				    console.log("Unselectable");
+				    return false;
+			    }
+			    let currentNode = node;
+			    console.log(currentNode);
+			    let entry = editor.fbdMan.getPartition(currentNode.id);
+			    console.log(entry);
+			    scope.OnPartitionSelected(entry);
+			    return true;
+
+		    },
+		    togglerClass: "Toggler",
+		    nodeIdAttr: "guid"
+
+	    });
         wget = scope.widgets["SearchInput"];
         wget.el.setId("SearchInput");
+        wget.el.setValue("Search");
+        wget.data.to = false;
+        wget.el.dom.addEventListener("keyup", () => {
+	        if(wget.data.to) { clearTimeout(wget.data.to); }
+	        wget.data.to = setTimeout(function () {
+		        let v = wget.el.getValue();
+		        scope.widgets["ContentSelection"].data.tree.filter(v, scope.filterOptions);
+	        }, 250);
+        });
 
     }
 
@@ -394,7 +440,7 @@ class ImportWindow {
         setTimeout(() => {
             scope.GeneratePathData(p_Bundle);
         });
-        console.log("bundle")
+        console.log("bundle");
     }
 
     OnPathSelected(p_Path) {
@@ -403,7 +449,7 @@ class ImportWindow {
         setTimeout(() => {
             scope.GenerateContentData(this.bundle, p_Path);
         });
-        console.log("path")
+        console.log("path");
     }
 
     SetSuperbundle(value) {
@@ -415,7 +461,7 @@ class ImportWindow {
         setTimeout(() => {
             scope.GenerateBundleData(value);
         });
-        console.log("super")
+        console.log("super");
     }
 
     SetBundle(value) {
@@ -423,31 +469,28 @@ class ImportWindow {
         this.bundle = value;
         let scope = this;
 
-        let wget = scope.widgets["ContentSelection"];
-        wget.data = {};
-
         scope.GenerateContentData(value);
 
     }
 
-    async GenerateBundleData(superBundle) {
+    GenerateBundleData(superBundle) {
         let data = editor.fbdMan.getBundles(superBundle);
         let BundleTreeData = this.GenerateTreeData(data);
-        this.SetData("BundleSelection", BundleTreeData)
+        this.SetData("BundleSelection", BundleTreeData);
     }
 
-    async GeneratePathData(bundle) {
+    GeneratePathData(bundle) {
         let data = editor.fbdMan.getPartitions(bundle);
         let PathTreeData = this.GenerateTreeData(data, false);
-        this.SetData("PathSelection", PathTreeData)
+        this.SetData("PathSelection", PathTreeData);
     }
-    async GenerateContentData(bundleName, path) {
+    GenerateContentData(bundleName, path) {
         let currentBundle = this.bundle;
         if(path === "All") {
             path = "";
         }
         if(currentBundle === "All") {
-            currentBundle = ""
+            currentBundle = "";
         }
         let bundles = editor.fbdMan.getBundles(this.superBundle);
         let partitions = [];
@@ -455,7 +498,10 @@ class ImportWindow {
         let out = {
             id: "All",
             name: "All",
-            children: []
+            children: [],
+	        state: {
+		        open: true
+	        }
         };
 
 
@@ -468,29 +514,33 @@ class ImportWindow {
                         out.children.push({
                             "id": partition.name,
                             "name": partition.name.replace(path, ""),
-                        })
+	                        "guid": partition.guid
+                        });
                     } else if(partition.name.includes(path)) {
                         out.children.push({
                             "id": partition.name,
                             "name": partition.name.replace(path, ""),
-                        })
+	                        "guid": partition.guid
+                        });
                     }
                 }
             }
         });
 
-
+		out.children.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
         this.SetPathViewData(out);
     }
 
     SetPathViewData(data) {
-        let scope = this;
-        let wget = scope.widgets["ContentSelection"];
-        wget.el.clear();
-        Object.values(data.children).forEach(function (child) {
-            wget.el.add(new UI.ListItem().add(new UI.Text(child.name)))
-        });
+    	console.log(data);
+	    let scope = this;
+
+	    this.SetData("ContentSelection", data);
     }
+
+	ContentRenderer(entry) {
+		return ( new UI.Row().add(new UI.Text(entry.name)).dom.outerHTML);
+	}
     GenerateTreeData(data, addFile = true) {
         let out = {
             id: "All",
@@ -517,7 +567,7 @@ class ImportWindow {
                 let parentIndex = parentPath.children.find(x => x.name.toLowerCase() === subPath.toLowerCase());
                 if (parentIndex === undefined) {
                     if(fullpath != "") {
-                        fullpath += "/"
+                        fullpath += "/";
                     }
                     fullpath += subPath;
                     let a = parentPath.children.push({
@@ -537,7 +587,7 @@ class ImportWindow {
                 parentPath.children.push({
                     id: entry.name,
                     name: entry.fileName,
-                })
+                });
             }
         }
         return out;
@@ -547,8 +597,10 @@ class ImportWindow {
         let scope = this;
         let wget = scope.widgets[widget];
         console.log(data);
-        wget.data.tree.loadData(data);
-        console.log("Shieeet")
+	    data.state.open = true;
+	    wget.data.treeData = data;
+	    wget.data.tree.loadData(data);
+        console.log("Shieeet");
     }
 
 
@@ -562,17 +614,16 @@ class ImportWindow {
         control.on('click', function() {
             scope.Update();
         });
-        return(control)
+        return(control);
     }
 
     hierarchyRenderer(node, treeOptions) {
         if(node.state.filtered === false || node.visible === false ){
-            return
+            return;
         }
         let state = node.state;
         let row = new UI.Row();
         row.setAttribute("guid", node.id);
-        console.log(node)
         row.setStyle("margin-left", (state.depth * 18) +"px");
         row.addClass("infinite-tree-item");
 
@@ -607,4 +658,9 @@ class ImportWindow {
         });
         return row.dom.outerHTML;
     }
+
+    OnPartitionSelected(partition) {
+        let wget = this.widgets["ContentInfo"];
+        wget.el.add(new UI.Row().add(new UI.Text(partition.typeName + ", " + partition.name)));
+    };
 }

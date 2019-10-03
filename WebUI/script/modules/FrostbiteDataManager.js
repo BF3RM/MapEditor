@@ -121,13 +121,13 @@ class FrostbiteDataManager {
     };
 
     getBundle(p_BundleName) {
-        return this.bundles[p_BundleName];
+        return this.bundles[p_BundleName.toLowerCase()];
     }
     getPartition(p_PartitionName) {
-        return this.partitions[p_PartitionName];
+        return this.partitions[p_PartitionName.toLowerCase()];
     }
     getSuperBundle(p_SuperBundleName) {
-        return this.superBundles[p_BundleName];
+        return this.superBundles[p_SuperBundleName.toLowerCase()];
     }
     getPartitions(p_BundleName) {
         let scope = this;
