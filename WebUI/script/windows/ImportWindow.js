@@ -435,7 +435,7 @@ class ImportWindow {
 				    console.log("Unselectable");
 				    return false;
 			    }
-			    scope.OnBundleSelected(node.id);
+			    scope.OnBundleSelected(node.id, true);
 			    return true;
 		    },
 		    togglerClass: "Toggler",
@@ -465,17 +465,20 @@ class ImportWindow {
 
     }
 
-    OnBundleSelected(p_BundleName) {
+    OnBundleSelected(p_BundleName, p_ShowOnly = false) {
     	console.log(p_BundleName);
         let scope = this;
         setTimeout(() => {
             scope.GeneratePathData(p_BundleName);
         });
+        if(p_ShowOnly) {
+        	return;
+        }
 	    let bundleData = editor.fbdMan.getBundle(p_BundleName);
 	    if(bundleData === undefined) {
 	    	return;
 	    }
-		scope.bundle = bundleData;
+		scope.bundle = bundleData.name;
 	    let wget = scope.widgets["ContentInfo"];
 	    // Add bundle
 	    if(scope.importList.bundles[this.bundle.name] === undefined) {
@@ -504,7 +507,7 @@ class ImportWindow {
 
 			// Create entry for tree
 	        wget.data.tree.appendChildNode({
-		        id: "bundle_"+ scope.bundle.name,
+		        id: scope.bundle.name,
 		        name: scope.bundle.fileName,
 		        file: scope.superBundle.name,
 		        children: [],
@@ -520,7 +523,7 @@ class ImportWindow {
 			    wget.data.tree.removeNode(node);
 		    }
 		    scope.importList.bundles[p_BundleName] = undefined;
-	        let node = wget.data.tree.getNodeById("bundle_" + p_BundleName);
+	        let node = wget.data.tree.getNodeById(p_BundleName);
 	        wget.data.tree.removeNode(node);
         }
 
@@ -531,7 +534,7 @@ class ImportWindow {
         let scope = this;
 
         setTimeout(() => {
-            scope.GenerateContentData(this.bundle.name, p_Path);
+            scope.GenerateContentData(p_Path);
         });
         console.log("path");
     }
@@ -568,7 +571,7 @@ class ImportWindow {
         let PathTreeData = this.GenerateTreeData(data, false);
         this.SetData("PathSelection", PathTreeData);
     }
-    GenerateContentData(bundleName, path) {
+    GenerateContentData(path) {
         let currentBundle = this.bundle.name;
         if(path === "All") {
             path = "";
@@ -576,7 +579,7 @@ class ImportWindow {
         if(currentBundle === "All") {
             currentBundle = "";
         }
-        let bundles = editor.fbdMan.getBundles(this.superBundle.name);
+        let bundles = editor.fbdMan.getBundles(currentBundle);
         let partitions = [];
 
         let out = {
