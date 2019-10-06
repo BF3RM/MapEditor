@@ -22,6 +22,12 @@ class ImportWindow {
 		    includeAncestors: true,
 		    includeDescendants: true
 	    };
+
+
+	    this.importList = {
+	    	superBundles: {},
+		    bundles: {}
+	    };
     }
 
     Initialize() {
@@ -288,14 +294,6 @@ class ImportWindow {
 
             autoOpen: true, // Defaults to false
             rowsInBlock: 100,
-            droppable: { // Defaults to false
-                hoverClass: 'infinite-tree-droppable-hover',
-                accept: function(event, options) {
-                    return true;
-                },
-                drop: function(event, options) {
-                }
-            },
             shouldSelectNode: function(node) { // Determine if the node is selectable
                 console.log(node);
 
@@ -410,6 +408,39 @@ class ImportWindow {
 	        }, 250);
         });
 
+	    wget = scope.widgets["ContentInfo"];
+	    wget.data.treeData = {
+		    id: "SuperBundles",
+		    name: "SuperBundles",
+		    children: [],
+		    state: {
+			    open: true
+		    }
+	    };
+
+	    wget.data.tree = new InfiniteTree({
+		    el:  wget.el.dom,
+		    data: wget.data.treeData,
+		    rowRenderer: scope.hierarchyRenderer,
+
+		    autoOpen: true, // Defaults to false
+		    rowsInBlock: 100,
+		    shouldSelectNode: function(node) { // Determine if the node is selectable
+			    console.log(node);
+
+			    if(node == null) {
+				    return false;
+			    }
+			    if(node.selectable === false) {
+				    console.log("Unselectable");
+				    return false;
+			    }
+			    scope.OnBundleSelected(node.id);
+			    return true;
+		    },
+		    togglerClass: "Toggler",
+		    nodeIdAttr: "guid"
+	    });
     }
 
     Update() {
@@ -434,12 +465,65 @@ class ImportWindow {
 
     }
 
-    OnBundleSelected(p_Bundle) {
+    OnBundleSelected(p_BundleName) {
+    	console.log(p_BundleName);
         let scope = this;
-        this.bundle = p_Bundle;
         setTimeout(() => {
-            scope.GeneratePathData(p_Bundle);
+            scope.GeneratePathData(p_BundleName);
         });
+	    let bundleData = editor.fbdMan.getBundle(p_BundleName);
+	    if(bundleData === undefined) {
+	    	return;
+	    }
+		scope.bundle = bundleData;
+	    let wget = scope.widgets["ContentInfo"];
+	    // Add bundle
+	    if(scope.importList.bundles[this.bundle.name] === undefined) {
+		    // Superbundle not mounted, mount it
+			if(scope.importList.superBundles[this.superBundle.name] === undefined) {
+				scope.importList.superBundles[this.superBundle.name] = {
+					id: this.superBundle.name,
+					name: this.superBundle.fileName,
+					children: []
+				};
+				// Add tree node
+				wget.data.tree.appendChildNode({
+					id: "superbundle_"+ scope.superBundle.name,
+					file: scope.superBundle.name,
+					name: scope.superBundle.fileName,
+					children: [],
+					state: {
+						open: true
+					}
+				}, wget.data.tree.getNodeById("SuperBundles"));
+			}
+			// Register that we want to load this bundle
+		    scope.importList.superBundles[this.superBundle.name].children[scope.bundle.name] = true;
+			// Register that this bundle is supposed to be mounted
+	        scope.importList.bundles[this.bundle.name] = this.bundle;
+
+			// Create entry for tree
+	        wget.data.tree.appendChildNode({
+		        id: "bundle_"+ scope.bundle.name,
+		        name: scope.bundle.fileName,
+		        file: scope.superBundle.name,
+		        children: [],
+		        state: {
+			        open: true
+		        }
+	        }, wget.data.tree.getNodeById("superbundle_"+ scope.superBundle.name));
+        } else { // Remove bundle
+		    scope.importList.superBundles[this.superBundle.name].children[scope.bundle.name] = undefined;
+		    if(Object.keys(scope.importList.superBundles[this.superBundle.name].children).length === 0) {
+			    scope.importList.superBundles[this.superBundle.name] = undefined;
+			    let node = wget.data.tree.getNodeById("superbundle_" + this.superBundle.name);
+			    wget.data.tree.removeNode(node);
+		    }
+		    scope.importList.bundles[p_BundleName] = undefined;
+	        let node = wget.data.tree.getNodeById("bundle_" + p_BundleName);
+	        wget.data.tree.removeNode(node);
+        }
+
         console.log("bundle");
     }
 
@@ -447,19 +531,19 @@ class ImportWindow {
         let scope = this;
 
         setTimeout(() => {
-            scope.GenerateContentData(this.bundle, p_Path);
+            scope.GenerateContentData(this.bundle.name, p_Path);
         });
         console.log("path");
     }
 
-    SetSuperbundle(value) {
-        console.log("Changing SuperBundle to " + value);
-        this.superBundle = value;
+    SetSuperbundle(p_SuperBundleName) {
+        console.log("Changing SuperBundle to " + p_SuperBundleName);
+        this.superBundle = editor.fbdMan.getSuperBundle(p_SuperBundleName);
 
         let scope = this;
 
         setTimeout(() => {
-            scope.GenerateBundleData(value);
+            scope.GenerateBundleData(p_SuperBundleName);
         });
         console.log("super");
     }
@@ -485,14 +569,14 @@ class ImportWindow {
         this.SetData("PathSelection", PathTreeData);
     }
     GenerateContentData(bundleName, path) {
-        let currentBundle = this.bundle;
+        let currentBundle = this.bundle.name;
         if(path === "All") {
             path = "";
         }
         if(currentBundle === "All") {
             currentBundle = "";
         }
-        let bundles = editor.fbdMan.getBundles(this.superBundle);
+        let bundles = editor.fbdMan.getBundles(this.superBundle.name);
         let partitions = [];
 
         let out = {
@@ -527,7 +611,7 @@ class ImportWindow {
             }
         });
 
-		out.children.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+		out.children.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
         this.SetPathViewData(out);
     }
 
