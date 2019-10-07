@@ -272,7 +272,7 @@ class ImportWindow {
         let wget = scope.widgets["LevelSelection"];
         wget.el.setId("LevelSelection");
         wget.data = [];
-        wget.data["All"] = "All";
+        wget.data["all"] = "All";
         wget.el.setOptions(wget.data);
         wget.el.setValue("All");
 
@@ -280,7 +280,7 @@ class ImportWindow {
         wget = scope.widgets["BundleSelection"];
         wget.el.setId("BundleSelection");
         wget.data.treeData = {
-            id: "All",
+            id: "all",
             name: "All",
             children: [],
             state: {
@@ -316,7 +316,7 @@ class ImportWindow {
         wget = scope.widgets["PathSelection"];
         wget.el.setId("PathSelection");
         wget.data.treeData = {
-            id: "All",
+            id: "all",
             name: "All",
             children: [],
             state: {
@@ -361,7 +361,7 @@ class ImportWindow {
 	    wget = scope.widgets["ContentSelection"];
 	    wget.el.setId("ContentSelection");
 	    wget.data.treeData = {
-		    id: "All",
+		    id: "all",
 		    name: "All",
 		    children: [],
 		    state: {
@@ -403,6 +403,7 @@ class ImportWindow {
         wget.el.dom.addEventListener("keyup", () => {
 	        if(wget.data.to) { clearTimeout(wget.data.to); }
 	        wget.data.to = setTimeout(function () {
+		        let wget = scope.widgets["SearchInput"];
 		        let v = wget.el.getValue();
 		        scope.widgets["ContentSelection"].data.tree.filter(v, scope.filterOptions);
 	        }, 250);
@@ -448,13 +449,13 @@ class ImportWindow {
         let wget = scope.widgets["LevelSelection"];
         let superBundles = editor.fbdMan.getSuperBundles();
         let superBundleNames = [];
-        superBundleNames["All"] = "All";
+        superBundleNames["all"] = "All";
         Object.keys(superBundles).forEach(function (name) {
             superBundleNames[name] = name;
         });
         wget.data = superBundleNames;
         wget.el.setOptions(wget.data);
-        wget.el.setValue("All");
+        wget.el.setValue("all");
         wget.el.onChange(function (e) {
             let val = e.target.value;
             scope.SetSuperbundle(val);
@@ -478,7 +479,7 @@ class ImportWindow {
 	    if(bundleData === undefined) {
 	    	return;
 	    }
-		scope.bundle = bundleData.name;
+		scope.bundle = bundleData;
 	    let wget = scope.widgets["ContentInfo"];
 	    // Add bundle
 	    if(scope.importList.bundles[this.bundle.name] === undefined) {
@@ -553,7 +554,7 @@ class ImportWindow {
 
     SetBundle(value) {
         console.log("Changing Bundle to " + value);
-        this.bundle = value;
+        this.bundle = editor.fbdMan.getBundle(value);
         let scope = this;
 
         scope.GenerateContentData(value);
@@ -572,18 +573,18 @@ class ImportWindow {
         this.SetData("PathSelection", PathTreeData);
     }
     GenerateContentData(path) {
-        let currentBundle = this.bundle.name;
         if(path === "All") {
             path = "";
         }
-        if(currentBundle === "All") {
-            currentBundle = "";
-        }
+	    let currentBundle = this.bundle.name;
         let bundles = editor.fbdMan.getBundles(currentBundle);
+	    if(currentBundle.toLowerCase() === "all") {
+		    currentBundle = "";
+	    }
         let partitions = [];
 
         let out = {
-            id: "All",
+            id: "all",
             name: "All",
             children: [],
 	        state: {
@@ -592,24 +593,29 @@ class ImportWindow {
         };
 
 
+        let added = [];
         Object.values(bundles).forEach( (bundle) => {
             if (bundle.name.includes(currentBundle)) {
                 let partitions = bundle.partitions;
                 for (var partitionName in partitions) {
-                    let partition = partitions[partitionName];
-                    if (partition.children === undefined && partition.name.includes(path)) {
-                        out.children.push({
-                            "id": partition.name,
-                            "name": partition.name.replace(path, ""),
-	                        "guid": partition.guid
-                        });
-                    } else if(partition.name.includes(path)) {
-                        out.children.push({
-                            "id": partition.name,
-                            "name": partition.name.replace(path, ""),
-	                        "guid": partition.guid
-                        });
-                    }
+	                let partition = partitions[partitionName];
+	                if(added[partition.name] === undefined) {
+		                if (partition.children === undefined && partition.name.includes(path)) {
+			                out.children.push({
+				                "id": partition.name,
+				                "name": partition.name.replace(path, ""),
+				                "guid": partition.guid
+			                });
+			                added[partition.name] = true;
+		                } else if(partition.name.includes(path)) {
+			                out.children.push({
+				                "id": partition.name,
+				                "name": partition.name.replace(path, ""),
+				                "guid": partition.guid
+			                });
+			                added[partition.name] = true;
+		                }
+	                }
                 }
             }
         });
@@ -630,7 +636,7 @@ class ImportWindow {
 	}
     GenerateTreeData(data, addFile = true) {
         let out = {
-            id: "All",
+            id: "all",
             name: "All",
             children: [],
             state: {

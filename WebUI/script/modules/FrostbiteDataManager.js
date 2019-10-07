@@ -2,8 +2,20 @@ class FrostbiteDataManager {
     constructor() {
         this.window = new ImportWindow();
 
-        this.superBundles = {};
-        this.bundles = {};
+        this.superBundles = {
+        	all: new FBSuperBundle({
+		        name: "All",
+		        chunkCount: 0,
+		        bundleCount: 0,
+	        })
+        };
+        this.bundles = {
+	        all: new FBBundle({
+		        name: "All",
+		        partitionCount: 0,
+		        size: 0,
+	        })
+        };
         this.partitions = {};
 
         this._files = {};
@@ -93,36 +105,25 @@ class FrostbiteDataManager {
 
     getBundles(p_SuperBundleName) {
         let scope = this;
-        let bundles = {};
+        let bundles = [];
 
 
-        if(p_SuperBundleName === undefined || p_SuperBundleName === "All") {
-            Object.keys(scope.superBundles).forEach(function (superName) {
-                let superBundle = scope._files["superbundles"][superName.toLowerCase()];
-                Object.values(superBundle.bundles).forEach(function (bundleName) {
-                    bundles[bundleName] = scope.bundles[bundleName];
-                });
+        if(p_SuperBundleName === undefined || p_SuperBundleName.toLowerCase() === "all") {
+	        return scope.bundles
+        }else if(scope.superBundles[p_SuperBundleName.toLowerCase()] !== undefined) {
+            let bundlesRaw = scope.getBundlesRaw(p_SuperBundleName);
+            Object.values(bundlesRaw).forEach((bundle) => {
+            	bundles.push(scope.getBundle(bundle))
             });
-        }else if(scope._files["superbundles"][p_SuperBundleName.toLowerCase()] !== undefined) {
-            let superBundle = scope._files["superbundles"][p_SuperBundleName.toLowerCase()];
-            Object.values(superBundle.bundles).forEach(function (bundleName) {
-                bundles[bundleName] = scope.bundles[bundleName];
-            });
-        } else {
-            for (let key of Object.keys(scope._files["superbundles"])) {
-                if (key.startsWith(p_SuperBundleName.toLowerCase())) {
-                    let superBundle = scope._files["superbundles"][key];
-                    bundles[key] = superBundle.bundles[key];
-                }
-            }
         }
-
         return bundles;
     };
 
-    getBundle(p_BundleName) {
-        return this.bundles[p_BundleName.toLowerCase()];
+    getBundlesRaw(p_SuperBundleName) {
+    	let scope = this;
+    	return scope._files["superbundles"][p_SuperBundleName.toLowerCase()].bundles;
     }
+
     getPartition(p_PartitionName) {
         return this.partitions[p_PartitionName.toLowerCase()];
     }
@@ -133,7 +134,7 @@ class FrostbiteDataManager {
         let scope = this;
         let partitions = {};
 
-        if(p_BundleName === undefined || p_BundleName === "All") {
+        if(p_BundleName === undefined || p_BundleName.toLowerCase() === "all") {
             Object.keys(scope._files["bundles"]).forEach(function (bundleName) {
                 let bundle = scope._files["bundles"][bundleName.toLowerCase()];
                 Object.values(bundle.partitions).forEach(function (partitionName) {
@@ -183,6 +184,10 @@ class FBSuperBundle {
     }
 
     get bundles() {
+    	let scope = this;
+    	if(this.name == "All") {
+		    return editor.fbdMan.getBundles();
+	    }
         return editor.fbdMan.getBundles(this.name);
     }
     get paths() {
