@@ -164,7 +164,7 @@ function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
-	m_Logger:Write("Save requested: " .. p_ProjectName)
+	m_Logger:Write("Editor:OnRequestProjectSave: " .. p_ProjectName .. " | " .. p_MapName .. " | " .. p_GameModeName .. " | " .. p_RequiredBundles)
 	NetEvents:SendLocal("MapEditorServer:RequestProjectSave", p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
 end
 

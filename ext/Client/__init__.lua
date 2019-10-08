@@ -1,5 +1,7 @@
 class 'MapEditorClient'
 
+local m_Logger = Logger("MapEditorClient", true)
+
 FreeCam = require "Freecam"
 Editor = require "Editor"
 UIManager = require "UIManager"
@@ -168,8 +170,9 @@ end
 
 ----------- WebUI functions----------------
 
-function MapEditorClient:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
-	Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_RequiredBundles)
+function MapEditorClient:OnRequestProjectSave(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+	m_Logger:Write("MapEditorClient:OnRequestProjectSave: " .. p_ProjectName .. " | " .. p_MapName .. " | " .. p_GameModeName .. " | " .. p_RequiredBundles)
+	Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
 end
 
 function MapEditorClient:OnRequestProjectLoad(p_ProjectName)
@@ -196,11 +199,14 @@ end
 function MapEditorClient:OnCameraControlStart()
 	FreeCam:OnControlStart()
 end
+
 function MapEditorClient:OnCameraControlEnd()
 	FreeCam:OnControlEnd()
 end
+
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
 	FreeCam:OnControlUpdate(s_Transform.transform)
 end
+
 return MapEditorClient()

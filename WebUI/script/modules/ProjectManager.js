@@ -43,7 +43,7 @@ class ProjectManager {
         let projectName = "DebugProject";
         let mapName = "XP1_001";
         let gameModeName = "ConquestAssaultLarge0";
-        let requiredBundles = [ 1, 2, 3 ]; // replace with the paths of the bundles
+        let requiredBundles = "{ 'levels/sp_sniper/malldefence_animation5', 'levels/sp_sniper/background_persistant', 'levels/sp_sniper/mall_behindstreet' }"; // replace with the paths of the bundles
 
         $("#saveProjectTextArea").text("Saving...");
         editor.vext.SendEvent('RequestProjectSave', projectName, mapName, gameModeName, requiredBundles);
