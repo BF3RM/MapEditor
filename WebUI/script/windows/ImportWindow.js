@@ -476,7 +476,7 @@ class ImportWindow {
         	return;
         }
 	    let bundleData = editor.fbdMan.getBundle(p_BundleName);
-	    if(bundleData === undefined) {
+	    if(bundleData === undefined || bundleData.name.toLowerCase() === "all") {
 	    	return;
 	    }
 		scope.bundle = bundleData;

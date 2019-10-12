@@ -4,14 +4,14 @@ class FrostbiteDataManager {
 
         this.superBundles = {
         	all: new FBSuperBundle({
-		        name: "All",
+		        name: "all",
 		        chunkCount: 0,
 		        bundleCount: 0,
 	        })
         };
         this.bundles = {
 	        all: new FBBundle({
-		        name: "All",
+		        name: "all",
 		        partitionCount: 0,
 		        size: 0,
 	        })
