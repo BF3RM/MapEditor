@@ -105,8 +105,8 @@ function EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
 	RCON:SendCommand('mapList.runNextRound')
 end
 
-function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
-	m_Logger:Write("Save requested: " .. p_ProjectName)
+function EditorServer:OnRequestProjectSave(p_Player, p_ProjectSaveData)
+	m_Logger:Write("Save requested: " .. p_ProjectSaveData.projectName)
 
 	-- TODO: check player's permission once that is implemented
 
@@ -121,7 +121,7 @@ function EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p
 
 	m_Logger:Write("GameObjectSaveDatas: " .. count)
 
-	DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, s_GameObjectSaveDatas)
+	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, p_ProjectSaveData.mapName, p_ProjectSaveData.gameModeName, p_ProjectSaveData.requiredBundles, s_GameObjectSaveDatas)
 end
 
 function EditorServer:OnRequestProjectDelete(p_ProjectName)

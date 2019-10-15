@@ -170,9 +170,9 @@ end
 
 ----------- WebUI functions----------------
 
-function MapEditorClient:OnRequestProjectSave(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
-	m_Logger:Write("MapEditorClient:OnRequestProjectSave: " .. p_ProjectName .. " | " .. p_MapName .. " | " .. p_GameModeName .. " | " .. p_RequiredBundles)
-	Editor:OnRequestProjectSave(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+function MapEditorClient:OnRequestProjectSave(p_ProjectSaveDataJson)
+	local s_ProjectSaveData = DecodeParams(json.decode(p_ProjectSaveDataJson))
+	Editor:OnRequestProjectSave(s_ProjectSaveData)
 end
 
 function MapEditorClient:OnRequestProjectLoad(p_ProjectName)

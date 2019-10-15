@@ -36,6 +36,12 @@ function Logger:Write(p_Message)
 	print("["..self.className.."] " .. tostring(p_Message))
 end
 
+function Logger:WriteTable(p_Table)
+	for key, value in pairs(p_Table) do
+		self:Write(tostring(key) .. " - " .. tostring(value))
+	end
+end
+
 function Logger:Warning(p_Message)
 	if self.className == nil then
 		return
