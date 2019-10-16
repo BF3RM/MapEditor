@@ -157,72 +157,91 @@ class EditorUI {
 				content: [{
 					type: 'column',
 					content: [{
-						type:'stack',
+						type: 'stack',
 						height: 25,
 						content: [{
 							type: 'component',
 							componentName: 'InspectorComponent',
 							isClosable: false,
 							title: "Inspector",
-						},{
+						}, {
 							type: 'component',
 							componentName: 'HistoryComponent',
 							isClosable: false,
 							title: "History",
 						}]
 					},
-					{
-						type: 'component',
-						componentName: 'HierarchyComponent',
-						isClosable: false,
-						title: "Hierarchy",
-					},{
-						type: 'component',
-						componentName: 'EntityViewComponent',
-						isClosable: false,
-						title: "Entities",
-						height: 10,
-					}]
+						{
+							type: 'component',
+							componentName: 'HierarchyComponent',
+							isClosable: false,
+							title: "Hierarchy",
+						}, {
+							type: 'component',
+							componentName: 'EntityViewComponent',
+							isClosable: false,
+							title: "Entities",
+							height: 10,
+						}
+					]
 				},
 					{
-						type: 'component',
-						componentName: 'ViewPortComponent',
-						width: 70,
-						isClosable: false,
-						reorderEnabled: false,
-						title: "ViewPort",
-						header: {
-							show: false
-						},
-						id: "renderView"
-					}, {
 						type: 'column',
-						content: [
-							{
+						width: 70,
+						content: [{
+							type: 'row',
+							height: 90,
+							content: [{
 								type: 'component',
-								componentName: 'FavoritesComponent',
+								componentName: 'ViewPortComponent',
 								isClosable: false,
-								title: "Favorites",
-								height: 10,
-							}, {
+								reorderEnabled: false,
+								title: "ViewPort",
+								header: {
+									show: false
+								},
+								id: "renderView"
+							}]
+						}, {
+							type: 'row',
+							height: 10,
+							content: [{
+								type: 'component',
+								componentName: 'ConsoleViewComponent',
+								width: 70,
+								isClosable: false,
+								reorderEnabled: false,
+								title: "Console",
+							}]
+						}]
+					},
+				{
+					type: 'column',
+					content: [{
+						type: 'component',
+						componentName: 'FavoritesComponent',
+						isClosable: false,
+						title: "Favorites",
+						height: 10,
+					}, {
+						type: 'component',
+						componentName: 'TreeViewComponent',
+						isClosable: false,
+						title: "Data Explorer",
+					},
+						{
 							type: 'component',
-							componentName: 'TreeViewComponent',
+							componentName: 'ContentViewComponent',
 							isClosable: false,
-							title: "Data Explorer",
-						},
-							{
-								type: 'component',
-								componentName: 'ContentViewComponent',
-								isClosable: false,
-								title: "Data",
-								height: 30
-							}
-						]
-					}
+							title: "Data",
+							height: 30
+						}
+					]
+				}
 
-				]
-			}]
-		};
+			]
+		}]
+	};
 
 		let dom = $(document.createElement("div"));
 		dom.attr('id', "GoldenLayoutContainer");
@@ -260,6 +279,7 @@ class EditorUI {
 		this.layout.registerComponent( 'HistoryComponent', HistoryComponent);
 		this.layout.registerComponent( 'FavoritesComponent', FavoritesComponent);
 		this.layout.registerComponent( 'EntityViewComponent', EntityViewComponent);
+		this.layout.registerComponent( 'ConsoleViewComponent', ConsoleViewComponent);
 
 		this.layout.on('initialised', function() {
 			$(".lm_content .infinite-tree-scroll").each(function(e) {

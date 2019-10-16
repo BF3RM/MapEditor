@@ -64,158 +64,158 @@ class ImportWindow {
                 popin: 'pop in',
                 tabDropdown: 'additional tabs'
             },
-            content: [
-                {
-                    type: 'column',
-                    isClosable: true,
-                    reorderEnabled: true,
-                    title: '',
-                    content: [
-                        {
-                            type: 'row',
-                            width: 10,
-                            isClosable: true,
-                            reorderEnabled: true,
-                            title: '',
-                            height: 88.70967741935483,
-                            content: [
-                                {
-                                    type: 'column',
-                                    isClosable: true,
-                                    reorderEnabled: true,
-                                    title: '',
-                                    width: 50,
-                                    content: [
-                                        {
-                                            type: 'stack',
-                                            height: 10.526315789473683,
-                                            isClosable: true,
-                                            reorderEnabled: true,
-                                            title: '',
-                                            activeItemIndex: 0,
-                                            content: [
-                                                {
-                                                    type: 'component',
-                                                    componentName: 'LevelSelection',
-                                                    isClosable: false,
-                                                    title: 'LevelSelection',
-                                                    height: 4,
-                                                    reorderEnabled: true
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            type: 'stack',
-                                            height: 30.9955026133463,
-                                            isClosable: true,
-                                            reorderEnabled: true,
-                                            title: '',
-                                            activeItemIndex: 0,
-                                            content: [
-                                                {
-                                                    type: 'component',
-                                                    componentName: 'PathSelection',
-                                                    isClosable: false,
-                                                    title: 'PathSelection',
-                                                    height: 4,
-                                                    reorderEnabled: true
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            type: 'stack',
-                                            height: 58.47818159718002,
-                                            isClosable: true,
-                                            reorderEnabled: true,
-                                            title: '',
-                                            activeItemIndex: 0,
-                                            content: [
-                                                {
-                                                    type: 'component',
-                                                    componentName: 'ContentSelection',
-                                                    isClosable: false,
-                                                    title: 'ContentSelection',
-                                                    height: 30,
-                                                    reorderEnabled: true
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    type: 'column',
-                                    isClosable: true,
-                                    reorderEnabled: true,
-                                    title: '',
-                                    width: 50,
-                                    content: [
-                                        {
-                                            type: 'stack',
-                                            height: 54.08163265306123,
-                                            isClosable: true,
-                                            reorderEnabled: true,
-                                            title: '',
-                                            activeItemIndex: 0,
-                                            content: [
-                                                {
-                                                    type: 'component',
-                                                    componentName: 'BundleSelection',
-                                                    isClosable: false,
-                                                    title: 'BundleSelection',
-                                                    height: 4,
-                                                    reorderEnabled: true
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            type: 'stack',
-                                            height: 45.91836734693877,
-                                            isClosable: true,
-                                            reorderEnabled: true,
-                                            title: '',
-                                            activeItemIndex: 0,
-                                            content: [
-                                                {
-                                                    type: 'component',
-                                                    componentName: 'ContentInfo',
-                                                    isClosable: false,
-                                                    title: 'ContentInfo',
-                                                    height: 30,
-                                                    reorderEnabled: true
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            type: 'stack',
-                            header: {},
-                            isClosable: true,
-                            reorderEnabled: true,
-                            title: '',
-                            activeItemIndex: 0,
-                            height: 11.290322580645162,
-                            content: [
-                                {
-                                    type: 'component',
-                                    componentName: 'BottomControls',
-                                    isClosable: false,
-                                    title: 'BottomControls',
-                                    reorderEnabled: true
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            isClosable: true,
-            reorderEnabled: true,
-            title: '',
-            openPopouts: [],
-            maximisedItemId: null
-        };
+			content: [
+				{
+					type: 'column',
+					isClosable: false,
+					reorderEnabled: false,
+					title: '',
+					content: [
+						{
+							type: 'row',
+							width: 10,
+							isClosable: false,
+							reorderEnabled: false,
+							title: '',
+							height: 90,
+							content: [
+								{
+									type: 'column',
+									isClosable: false,
+									reorderEnabled: false,
+									title: '',
+									width: 50,
+									content: [
+										{
+											type: 'stack',
+											height: 10,
+											isClosable: false,
+											reorderEnabled: false,
+											title: '',
+											activeItemIndex: 0,
+											content: [
+												{
+													type: 'component',
+													componentName: 'LevelSelection',
+													isClosable: false,
+													title: 'LevelSelection',
+													height: 4,
+													reorderEnabled: false
+												}
+											]
+										},
+										{
+											type: 'stack',
+											height: 30,
+											isClosable: false,
+											reorderEnabled: false,
+											title: '',
+											activeItemIndex: 0,
+											content: [
+												{
+													type: 'component',
+													componentName: 'PathSelection',
+													isClosable: false,
+													title: 'PathSelection',
+													height: 4,
+													reorderEnabled: false
+												}
+											]
+										},
+										{
+											type: 'stack',
+											height: 50,
+											isClosable: false,
+											reorderEnabled: false,
+											title: '',
+											activeItemIndex: 0,
+											content: [
+												{
+													type: 'component',
+													componentName: 'ContentSelection',
+													isClosable: false,
+													title: 'ContentSelection',
+													height: 30,
+													reorderEnabled: false
+												}
+											]
+										}
+									]
+								},
+								{
+									type: 'column',
+									isClosable: false,
+									reorderEnabled: false,
+									title: '',
+									width: 50,
+									content: [
+										{
+											type: 'stack',
+											height: 50,
+											isClosable: false,
+											reorderEnabled: false,
+											title: '',
+											activeItemIndex: 0,
+											content: [
+												{
+													type: 'component',
+													componentName: 'BundleSelection',
+													isClosable: false,
+													title: 'BundleSelection',
+													height: 4,
+													reorderEnabled: false
+												}
+											]
+										},
+										{
+											type: 'stack',
+											height: 45,
+											isClosable: false,
+											reorderEnabled: false,
+											title: '',
+											activeItemIndex: 0,
+											content: [
+												{
+													type: 'component',
+													componentName: 'ContentInfo',
+													isClosable: false,
+													title: 'ContentInfo',
+													height: 30,
+													reorderEnabled: false
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							type: 'stack',
+							header: {},
+							isClosable: false,
+							reorderEnabled: false,
+							title: '',
+							activeItemIndex: 0,
+							height: 10,
+							content: [
+								{
+									type: 'component',
+									componentName: 'BottomControls',
+									isClosable: false,
+									title: 'BottomControls',
+									reorderEnabled: false
+								}
+							]
+						}
+					]
+				}
+			],
+			isClosable: false,
+			reorderEnabled: false,
+			title: '',
+			openPopouts: [],
+			maximisedItemId: null
+		};
 
 
 
