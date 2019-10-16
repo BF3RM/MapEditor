@@ -46,7 +46,7 @@ class ProjectManager {
             mapName: "XP1_001",
             gameModeName: "ConquestAssaultLarge0",
             requiredBundles: "{ 'levels/sp_sniper/malldefence_animation5', 'levels/sp_sniper/background_persistant', 'levels/sp_sniper/mall_behindstreet' }", // replace with the paths of the bundles
-        }
+        };
 
         $("#saveProjectTextArea").text("Saving...");
         editor.vext.SendEvent('RequestProjectSave', projectSaveData);

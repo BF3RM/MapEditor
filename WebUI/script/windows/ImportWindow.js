@@ -200,9 +200,9 @@ class ImportWindow {
                             content: [
                                 {
                                     type: 'component',
-                                    componentName: 'SearchInput',
+                                    componentName: 'BottomControls',
                                     isClosable: false,
-                                    title: 'SearchInput',
+                                    title: 'BottomControls',
                                     reorderEnabled: true
                                 }
                             ]
@@ -249,7 +249,7 @@ class ImportWindow {
         this.AddWidget("PathSelection", UI.Panel);
         this.AddWidget("ContentSelection", UI.UnsortedList);
         this.AddWidget("ContentInfo", UI.UnsortedList);
-        this.AddWidget("SearchInput", UI.Input);
+        this.AddWidget("BottomControls", UI.Panel);
         this.SpawnWidgets();
     }
     AddWidget(name, widgetType) {
@@ -396,18 +396,33 @@ class ImportWindow {
 		    nodeIdAttr: "guid"
 
 	    });
-        wget = scope.widgets["SearchInput"];
-        wget.el.setId("SearchInput");
-        wget.el.setValue("Search");
-        wget.data.to = false;
-        wget.el.dom.addEventListener("keyup", () => {
+        wget = scope.widgets["BottomControls"];
+        wget.el.setId("BottomControls");
+
+		let inputSearch = new UI.Input("Search");
+		inputSearch.setAttribute("placeholder", "Search");
+		inputSearch.onKeyUp(() => {
 	        if(wget.data.to) { clearTimeout(wget.data.to); }
 	        wget.data.to = setTimeout(function () {
-		        let wget = scope.widgets["SearchInput"];
-		        let v = wget.el.getValue();
+		        let v = inputSearch.getValue();
 		        scope.widgets["ContentSelection"].data.tree.filter(v, scope.filterOptions);
 	        }, 250);
         });
+		wget.el.add(inputSearch);
+
+		let buttonOK = new UI.Button("Ok");
+		buttonOK.onClick( () => {
+			console.log("ok")
+		});
+		wget.el.add(buttonOK);
+
+		let buttonCancel = new UI.Button("Cancel");
+		buttonCancel.onClick( () => {
+			console.log("Cancel")
+		});
+		wget.el.add(buttonCancel);
+
+
 
 	    wget = scope.widgets["ContentInfo"];
 	    wget.data.treeData = {

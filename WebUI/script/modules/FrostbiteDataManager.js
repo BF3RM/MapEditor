@@ -42,14 +42,15 @@ class FrostbiteDataManager {
     }
 
     _onEditorInitializing() {
-        editor.ui.RegisterWindow("ImportWindow", "Import bundle", this.window, true);
+        editor.ui.RegisterWindow("ImportWindow", "Import bundle", this.window, false);
     }
 
     _onEditorReady() {
         let scope = this;
         editor.ui.RegisterMenubarEntry(["Edit", "Import"], function () {
-            this.window.Update();
             editor.ui.OpenWindow("importwindow");
+            scope.window.dom.dispatchEvent(new Event('resize')); // fix GoldenLayout having invalid sizes
+            scope.window.Update();
         } );
     }
 
