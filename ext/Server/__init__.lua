@@ -125,8 +125,8 @@ function MapEditorServer:OnRequestProjectHeaderUpdate(p_Player)
 	EditorServer:OnRequestProjectHeaderUpdate(p_Player)
 end
 
-function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
-	EditorServer:OnRequestProjectSave(p_Player, p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles)
+function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectSaveData)
+	EditorServer:OnRequestProjectSave(p_Player, p_ProjectSaveData)
 end
 
 function MapEditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
