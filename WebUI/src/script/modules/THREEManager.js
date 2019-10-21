@@ -2,8 +2,11 @@ class THREEManager {
 	constructor() {
 		this.camera = null;
 		this.cameraControls = null;
-		this.scene = null;
-		this.renderer = null;
+		this.scene = new THREE.Scene();
+		this.renderer = new THREE.WebGLRenderer({
+			alpha: true,
+			antialias: true
+		});
 		this.control = null;
 		this.texture = null;
 
@@ -29,10 +32,6 @@ class THREEManager {
 	Initialize() {
 		let scope = this;
 
-		scope.renderer = new THREE.WebGLRenderer({
-			alpha: true,
-			antialias: true
-		});
 		scope.renderer.setPixelRatio(window.devicePixelRatio);
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
 		$('#page').append(scope.renderer.domElement);
@@ -40,7 +39,6 @@ class THREEManager {
 		this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
-		this.scene = new THREE.Scene();
         this.CreateGizmo();
 
         if(debugMode) {

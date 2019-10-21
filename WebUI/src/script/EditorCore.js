@@ -13,6 +13,8 @@ class EditorCore {
         this.lastUpdateTime = 0;
         this.deltaTime = 1.0/30.0;
 
+        this.pendingMessages = {};
+
         this._renderLoop = this.renderLoop.bind(this);
         this.renderLoop(); // first call to init loop using the requestAnimationFrame
     }
@@ -74,6 +76,9 @@ class EditorCore {
         if(this.isUpdating) {
             window.requestAnimationFrame( this._renderLoop );
         }
+    }
+    addPending(guid, message) {
+        this.pendingMessages[guid] = message;
     }
 
     onSelectedGameObject(guid, isMultiSelection, scrollTo) {

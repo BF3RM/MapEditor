@@ -1,11 +1,25 @@
 {
+  "compileOnSave": true,
+  "buildOnSave": true,
   "compilerOptions": {
     "module": "esnext",
     "target": "es5",
     "lib": ["dom", "esnext"],
     "allowJs": true,
     "outDir": "./dist",
-    "strict": true
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node"
+  },
+  "typeRoots": ["node_modules/@types"],
+  "types": [
+    "webpack-env"
+  ],
+  "paths": {
+    "@/*": [
+      "src/*"
+    ]
   },
   "include": [
     "src/**/*"

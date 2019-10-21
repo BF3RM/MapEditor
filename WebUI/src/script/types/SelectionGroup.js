@@ -1,4 +1,4 @@
-class SelectionGroup extends THREE.Object3D{
+class SelectionGroup extends GameObject {
 	constructor()
 	{
 		super( );
@@ -7,6 +7,7 @@ class SelectionGroup extends THREE.Object3D{
 		this.type = "SelectionGroup";
 		this.name = "Selection Group";
 		this.transform = new LinearTransform();
+		this.children = [];
 
 		// Update the matrix after initialization.
 		this.updateTransform();

@@ -3,31 +3,28 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-History = function ( editor ) {
+export default class History {
+	constructor(editor) {
 
-	this.editor = editor;
-	this.undos = [];
-	this.redos = [];
-	this.lastCmdTime = new Date();
-	this.idCounter = 0;
+		this.editor = editor;
+		this.undos = [];
+		this.redos = [];
+		this.lastCmdTime = new Date();
+		this.idCounter = 0;
 
-	this.historyDisabled = false;
-	this.config = editor.config;
+		this.historyDisabled = false;
+		this.config = editor.config;
 
-	//Set editor-reference in Command
+		//Set editor-reference in Command
 
-	Command( editor );
+		// signals
 
-	// signals
-
-	var scope = this;
+		var scope = this;
 
 
-};
+	}
 
-History.prototype = {
-
-	execute: function ( cmd, optionalName ) {
+	execute ( cmd, optionalName ) {
 
 		var lastCmd = this.undos[ this.undos.length - 1 ];
 		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
@@ -64,9 +61,9 @@ History.prototype = {
 		this.redos = [];
 		signals.historyChanged.dispatch( cmd );
 
-	},
+	}
 
-	undo: function () {
+	undo () {
 
 		var cmd = undefined;
 
@@ -92,9 +89,9 @@ History.prototype = {
 
 		return cmd;
 
-	},
+	}
 
-	redo: function () {
+	redo () {
 
 		var cmd = undefined;
 
@@ -120,9 +117,9 @@ History.prototype = {
 
 		return cmd;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON () {
 
 		var history = {};
 		history.undos = [];
@@ -154,9 +151,9 @@ History.prototype = {
 
 		return history;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON ( json ) {
 
 		if ( json === undefined ) return;
 
@@ -187,9 +184,9 @@ History.prototype = {
 		// Select the last executed undo-command
 		signals.historyChanged.dispatch( this.undos[ this.undos.length - 1 ] );
 
-	},
+	}
 
-	clear: function () {
+	clear () {
 
 		this.undos = [];
 		this.redos = [];
@@ -197,9 +194,9 @@ History.prototype = {
 
 		signals.historyChanged.dispatch();
 
-	},
+	}
 
-	goToState: function ( id ) {
+	goToState ( id ) {
 
 		if ( this.historyDisabled ) {
 
@@ -239,9 +236,9 @@ History.prototype = {
 
 		signals.historyChanged.dispatch( cmd );
 
-	},
+	}
 
-	enableSerialization: function ( id ) {
+	enableSerialization ( id ) {
 
 		/**
 		 * because there might be commands in this.undos and this.redos
@@ -273,3 +270,4 @@ History.prototype = {
 	}
 
 };
+

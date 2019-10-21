@@ -1,27 +1,25 @@
-const SetTransformCommand = function (gameObjectTransferData, newTransform) {
-
-	Command.call( this );
-
-	this.type = 'SetTransformCommand';
-	this.name = 'Set transform';
-	this.gameObjectTransferData = gameObjectTransferData;
-	this.newTransform = newTransform;
-};
-
-SetTransformCommand.prototype = {
-	execute: function () {
+import Command from "../libs/three/Command";
+export default class SetTransformCommand extends Command {
+	constructor (gameObjectTransferData, newTransform) {
+		super();
+		this.type = 'SetTransformCommand';
+		this.name = 'Set transform';
+		this.gameObjectTransferData = gameObjectTransferData;
+		this.newTransform = newTransform;
+	}
+	execute() {
 		let gameObjectTransferData = new GameObjectTransferData({
 			'guid': this.gameObjectTransferData.guid,
 			'transform': this.newTransform
 		});
 		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
-	},
+	}
 
-	undo: function () {
+	undo() {
 		let gameObjectTransferData = new GameObjectTransferData({
 			'guid': this.gameObjectTransferData.guid,
 			'transform': this.gameObjectTransferData.transform
 		});
 		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData))
-	},
+	}
 };

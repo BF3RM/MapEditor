@@ -9,18 +9,19 @@
  * @constructor
  */
 
-var Command = function ( editorRef ) {
+export default class Command {
+	id: number;
+	inMemory:boolean;
+	updatable:boolean;
+	type:string;
+	name:string;
 
-	this.id = - 1;
-	this.inMemory = false;
-	this.updatable = false;
-	this.type = '';
-	this.name = '';
+	constructor(name: string = '', type: string = '') {
 
-	if ( editorRef !== undefined ) {
-
-		Command.editor = editorRef;
-
+		this.id = -1;
+		this.inMemory = false;
+		this.updatable = false;
+		this.type = name;
+		this.name = type;
 	}
-	this.editor = Command.editor;
-};
+}
