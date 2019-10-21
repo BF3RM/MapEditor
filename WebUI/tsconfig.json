@@ -8,18 +8,21 @@
     "allowJs": true,
     "outDir": "./dist",
     "strict": true,
-    "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "node"
-  },
-  "typeRoots": ["node_modules/@types"],
-  "types": [
-    "webpack-env"
-  ],
-  "paths": {
-    "@/*": [
-      "src/*"
-    ]
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "typeRoots": ["node_modules/@types"],
+    "types": [
+      "webpack-env"
+    ],
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "modules/*": [
+        "srce/modules/*"
+      ]
+    },
   },
   "include": [
     "types/**/*",
