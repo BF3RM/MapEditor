@@ -8,6 +8,7 @@ import BulkCommand from "./commands/BulkCommand";
 import DestroyBlueprintCommand from "./commands/DestroyBlueprintCommand";
 import History from './libs/three/History';
 import GameContext from "./modules/GameContext";
+import VEXTInterface from "./modules/VEXT";
 
 export default class Editor {
 	config: Config;

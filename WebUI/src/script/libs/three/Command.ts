@@ -15,6 +15,7 @@ export default class Command {
 	updatable:boolean;
 	type:string;
 	name:string;
+	sender:string;
 
 	constructor(name: string = '', type: string = '') {
 
@@ -23,5 +24,6 @@ export default class Command {
 		this.updatable = false;
 		this.type = name;
 		this.name = type;
+		this.sender = '';
 	}
 }

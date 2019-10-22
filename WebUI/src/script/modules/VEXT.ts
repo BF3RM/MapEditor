@@ -1,4 +1,18 @@
-class VEXTInterface {
+import Command from "../libs/three/Command";
+
+
+export default class VEXTInterface {
+	emulator:VEXTemulator;
+	commandQueue:Command[];
+	commands:object;
+	messages:object;
+	paused:boolean;
+	executing: boolean;
+	queued:{
+		commands:Command[],
+		messages:object[];
+	};
+
 	constructor() {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
@@ -13,7 +27,7 @@ class VEXTInterface {
 			'SetVariation':		 signals.setVariation.dispatch,
 			'EnabledBlueprint':		 signals.enabledBlueprint.dispatch,
 			'DisabledBlueprint':		 signals.disabledBlueprint.dispatch,
-		}
+		};
 
 		this.messages = {
 			'SetCameraTransformMessage':			signals.setCameraTransform.dispatch,
@@ -23,7 +37,7 @@ class VEXTInterface {
 			'SetUpdateRateMessage':					signals.setUpdateRateMessage.dispatch
 			// 'SelectedGameObject':	   signals.selectedGameObject.dispatch,
 			// 'DeselectedGameObject':	signals.deselectedGameObject.dispatch,
-		}
+		};
 
 		this.paused = false;
 		this.executing = false;
@@ -52,16 +66,19 @@ class VEXTInterface {
 			this.queued.messages = [];
 		}
 	}
+
 	/*
 
 		In
 
 	 */
+
 	HideGizmo() {
 		editor.threeManager.HideGizmo();
 	}
 	ShowGizmo() {
 		editor.threeManager.ShowGizmo();
+		window.editor.threeManager.ShowGizmo()
 	}
 	/*
 
@@ -69,7 +86,7 @@ class VEXTInterface {
 
 	 */
 
-	SendCommand(command) {
+	SendCommand(command:Command) {
 		command.sender = editor.playerName;
 
 		if(this.paused) {
@@ -80,7 +97,7 @@ class VEXTInterface {
 		}
 	}
 
-	SendCommands(commands) {
+	SendCommands(commands:Command[]) {
 		if(commands.length === 0) {
 			return;
 		}
@@ -94,11 +111,12 @@ class VEXTInterface {
 			console.log(commands);
 			Log(LOGLEVEL.VERBOSE, "OUT: ");
 			Log(LOGLEVEL.VERBOSE, commands);
+			// @ts-ignore
 			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(commands));
 		}
 	}
 
-	HandleResponse(commandActionResultsString, emulator) {
+	HandleResponse(commandActionResultsString:string, emulator:boolean) {
 		console.log(commandActionResultsString);
 		let t0 = performance.now();
 
