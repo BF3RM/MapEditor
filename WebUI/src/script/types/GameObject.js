@@ -1,5 +1,5 @@
 
-class GameObject extends THREE.Object3D
+export class GameObject extends THREE.Object3D
 {
 	constructor(guid, typeName, name, transform, parentData, blueprintCtrRef, variation, gameEntities)
 	{

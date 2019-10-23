@@ -1,5 +1,5 @@
 
-class SpatialGameEntity extends THREE.Mesh
+export class SpatialGameEntity extends THREE.Mesh
 {
     constructor(instanceId, transform, aabb)
     {

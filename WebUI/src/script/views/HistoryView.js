@@ -1,4 +1,4 @@
-class HistoryView {
+export class HistoryView {
 	constructor() {
 		this.dom = this.CreateDom();
 		this.Initialize();

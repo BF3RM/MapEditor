@@ -1,5 +1,5 @@
 
-class HierarchyView {
+export class HierarchyView {
 	constructor() {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));

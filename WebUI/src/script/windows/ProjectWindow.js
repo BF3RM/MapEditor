@@ -1,4 +1,4 @@
-class ProjectWindow {
+export class ProjectWindow {
     constructor() {
         this.dom = null;
         this.topControls = this.CreateTopControls();

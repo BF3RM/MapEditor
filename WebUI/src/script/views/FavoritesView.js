@@ -1,4 +1,4 @@
-class FavoritesView {
+export class FavoritesView {
 	constructor() {
 		this.dom = null;
 		this.directory = null;

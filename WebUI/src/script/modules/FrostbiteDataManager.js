@@ -1,4 +1,4 @@
-class FrostbiteDataManager {
+export class FrostbiteDataManager {
     constructor() {
         this.window = new ImportWindow();
 
@@ -177,7 +177,7 @@ class FrostbiteDataManager {
 
 }
 
-class FBSuperBundle {
+export class FBSuperBundle {
     constructor(p_SuperBundleData) {
         this.name = p_SuperBundleData.name;
         this.chunkCount = p_SuperBundleData.chunkCount;
@@ -199,7 +199,7 @@ class FBSuperBundle {
     }
 }
 
-class FBBundle {
+export class FBBundle {
     constructor(p_BundleData) {
         this.name = p_BundleData.name;
         this.partitionCount = p_BundleData.partitionCount;
@@ -217,7 +217,7 @@ class FBBundle {
     }
 }
 
-class FBPartition {
+export class FBPartition {
     constructor(p_PartitionData) {
         this.name = p_PartitionData.name;
         this.guid = p_PartitionData.guid;

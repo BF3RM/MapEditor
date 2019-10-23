@@ -1,4 +1,4 @@
-class Camera {
+export class Camera {
 	constructor(transform, fov) {
 		this.transform = transform;
 		this.fov = fov;
@@ -15,7 +15,7 @@ class Camera {
 	}
 }
 
-class VextEvents {
+export class VextEvents {
 	constructor() {
 		this.sortedEvents = [];
 		this.events = [];

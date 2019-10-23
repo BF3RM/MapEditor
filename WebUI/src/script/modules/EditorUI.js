@@ -1,4 +1,4 @@
-class EditorUI {
+export class EditorUI {
 
 	constructor(debug) {
 		this.Initialize();

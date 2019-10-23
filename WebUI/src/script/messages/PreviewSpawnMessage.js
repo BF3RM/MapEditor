@@ -1,4 +1,4 @@
-class PreviewSpawnMessage {
+export class PreviewSpawnMessage {
 	constructor(gameObjectTransferData) {
 		this.type = "PreviewSpawnMessage";
 

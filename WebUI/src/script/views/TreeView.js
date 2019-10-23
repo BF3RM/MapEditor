@@ -1,4 +1,4 @@
-class TreeView {
+export class TreeView {
 	constructor() {
 		this.data = null;
 		this.dom = $(document.createElement("div"));

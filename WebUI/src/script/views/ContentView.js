@@ -1,4 +1,4 @@
-class ContentView {
+export class ContentView {
 	constructor() {
 		this.dom = null;
 		this.directory = null;

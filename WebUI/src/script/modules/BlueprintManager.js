@@ -4,7 +4,7 @@
 	It's responsible for verifying that the data is valid and usable.
 
  */
-class BlueprintManager {
+export class BlueprintManager {
 	constructor() {
 		this.blueprints = {};
 

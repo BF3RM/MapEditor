@@ -1,5 +1,5 @@
 
-class Vec3 extends THREE.Vector3{
+export class Vec3 extends THREE.Vector3{
 	constructor(x,y,z) {
 		super(x,y,z);
 	}
@@ -36,7 +36,7 @@ function Vec3Equals(vecA, vecB) {
 function MatrixEquals(a, b) {
 
 }
-class LinearTransform {
+export class LinearTransform {
 	constructor(left, up, forward, trans) {
 		if(!arguments.length) {
 			left = new Vec3(1, 0, 0);
@@ -128,7 +128,7 @@ class LinearTransform {
 
 }
 
-class Variation {
+export class Variation {
 	constructor(name, nameHash) {
 		this.name = name;
 		this.nameHash = nameHash;

@@ -1,4 +1,4 @@
-class SetViewModeMessage {
+export class SetViewModeMessage {
 	constructor(viewMode) {
 		this.type = "SetViewModeMessage";
 		this.viewMode = viewMode;

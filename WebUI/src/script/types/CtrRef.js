@@ -1,4 +1,4 @@
-class CtrRef {
+export class CtrRef {
     constructor(typeName, name,  partitionGuid, instanceGuid) {
         this.typeName = typeName;
         this.name = name;

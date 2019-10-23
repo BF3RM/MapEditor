@@ -1,5 +1,5 @@
 //Cursed land, do not touch.
-class ImportWindow {
+export class ImportWindow {
     constructor() {
         this.panel = new UI.Panel();
         this.dom = this.panel.dom;

@@ -21,7 +21,7 @@ const STATE = {
     TOUCH_TRUCK       :   5,
 };
 
-class CameraControls extends EventDispatcher {
+export class CameraControls extends EventDispatcher {
 
     static install( libs ) {
 

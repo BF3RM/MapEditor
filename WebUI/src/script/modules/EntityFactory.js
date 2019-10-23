@@ -5,7 +5,7 @@
 
 
  */
-class EntityFactory {
+export class EntityFactory {
 	constructor() {
 		this.gameObjects = {}; // Spawned gameObjects
 	}

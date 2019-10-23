@@ -1,4 +1,4 @@
-class DebugWindow {
+export class DebugWindow {
 	constructor() {
 		this.dom = null;;
 		this.topControls = this.CreateTopControls();

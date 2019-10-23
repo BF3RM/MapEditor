@@ -1,4 +1,4 @@
-class THREEManager {
+export class THREEManager {
 	constructor() {
 		this.camera = null;
 		this.cameraControls = null;

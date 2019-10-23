@@ -1,4 +1,4 @@
-class CommandActionResult {
+export class CommandActionResult {
     constructor(type, name, gameObjectTransferData) {
         this.type = type;
         this.sender = name;

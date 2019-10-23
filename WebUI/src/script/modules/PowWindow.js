@@ -1,4 +1,4 @@
-class PowWindow {
+export class PowWindow {
 	//Better resize-controls (They are a little small atm)
 	//Make it beautiful
 

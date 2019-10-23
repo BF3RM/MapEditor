@@ -1,6 +1,6 @@
 // based on https://github.com/mrdoob/eventdispatcher.js/
 
-class EventDispatcher {
+export class EventDispatcher {
 
     constructor() {
 

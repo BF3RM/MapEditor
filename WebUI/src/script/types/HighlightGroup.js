@@ -1,4 +1,4 @@
-class HighlightGroup extends THREE.Group{
+export class HighlightGroup extends THREE.Group{
 	constructor()
 	{
 		super( );

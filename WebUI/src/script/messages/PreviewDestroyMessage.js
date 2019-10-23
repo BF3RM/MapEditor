@@ -1,4 +1,4 @@
-class PreviewDestroyMessage {
+export class PreviewDestroyMessage {
 	constructor(gameObjectTransferData) {
 		this.type = "PreviewDestroyMessage";
 

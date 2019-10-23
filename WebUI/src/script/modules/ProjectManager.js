@@ -4,7 +4,7 @@
 
  */
 
-class ProjectManager {
+export class ProjectManager {
     constructor() {
         this.window = new ProjectWindow();
         signals.editorInitializing.add(this.onEditorInitializing.bind(this));

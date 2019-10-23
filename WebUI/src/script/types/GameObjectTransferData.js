@@ -1,5 +1,5 @@
 
-class GameObjectTransferData
+export class GameObjectTransferData
 {
     constructor(args = {})
     {

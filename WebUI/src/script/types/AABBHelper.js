@@ -1,5 +1,5 @@
 
-class AABBHelper extends THREE.LineSegments
+export class AABBHelper extends THREE.LineSegments
 {
 	constructor( box, color )
 	{

@@ -1,4 +1,4 @@
-class AABB {
+export class AABB {
     constructor(min, max, transform) {
         this.min = min;
         this.max = max;

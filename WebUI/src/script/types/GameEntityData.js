@@ -1,4 +1,4 @@
-class GameEntityData {
+export class GameEntityData {
     constructor(instanceId, indexInBlueprint, typeName, isSpatial, transform, aabb) {
         this.instanceId = instanceId;
         this.indexInBlueprint = indexInBlueprint;

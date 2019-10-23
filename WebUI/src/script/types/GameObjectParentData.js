@@ -1,5 +1,5 @@
 
-class GameObjectParentData
+export class GameObjectParentData
 {
     constructor(guid, typeName, primaryInstanceGuid, partitionGuid)
     {

@@ -1,4 +1,4 @@
-class InspectorView {
+export class InspectorView {
 	constructor() {
 		this.dom = null;
 		this.transform = null;

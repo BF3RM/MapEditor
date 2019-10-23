@@ -1,4 +1,4 @@
-class MoveObjectMessage {
+export class MoveObjectMessage {
 	constructor(gameObjectTransferData) {
 		this.type = "MoveObjectMessage";
 

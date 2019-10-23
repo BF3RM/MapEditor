@@ -1,4 +1,4 @@
-class Blueprint {
+export class Blueprint {
 	constructor(partitionGuid, instanceGuid, typeName, name, variations) {
 		this.partitionGuid = partitionGuid;
 		this.instanceGuid = instanceGuid;

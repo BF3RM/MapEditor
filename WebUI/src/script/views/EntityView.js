@@ -1,4 +1,4 @@
-class EntityView {
+export class EntityView {
     constructor() {
         this.dom = null;
         this.directory = null;

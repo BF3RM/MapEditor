@@ -1,4 +1,4 @@
-class SelectionGroup extends GameObject {
+export class SelectionGroup extends GameObject {
 	constructor()
 	{
 		super( );

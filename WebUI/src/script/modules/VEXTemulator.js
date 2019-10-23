@@ -4,7 +4,7 @@
 	This allows us to develop the UI completely in the browser.
 
  */
-class VEXTemulator {
+export class VEXTemulator {
 	constructor() {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;

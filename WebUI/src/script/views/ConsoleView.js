@@ -1,4 +1,4 @@
-class ConsoleView {
+export class ConsoleView {
 	constructor() {
 		this.dom = new UI.Panel();
 		;
