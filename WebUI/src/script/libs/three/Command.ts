@@ -10,12 +10,12 @@
  */
 
 export default class Command {
-	id: number;
-	inMemory:boolean;
-	updatable:boolean;
-	type:string;
-	name:string;
-	sender:string;
+	public id: number;
+	public inMemory: boolean;
+	public updatable: boolean;
+	public type: string;
+	public name: string;
+	public sender: string;
 
 	constructor(name: string = '', type: string = '') {
 

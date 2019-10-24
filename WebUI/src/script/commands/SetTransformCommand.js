@@ -1,5 +1,5 @@
 import Command from "../libs/three/Command";
-export default class SetTransformCommand extends Command {
+export class SetTransformCommand extends Command {
 	constructor (gameObjectTransferData, newTransform) {
 		super();
 		this.type = 'SetTransformCommand';

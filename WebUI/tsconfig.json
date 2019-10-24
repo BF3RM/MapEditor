@@ -20,7 +20,7 @@
         "src/*"
       ],
       "modules/*": [
-        "srce/modules/*"
+        "src/modules/*"
       ]
     },
   },

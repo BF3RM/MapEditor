@@ -1,43 +1,61 @@
 import * as Collections from 'typescript-collections';
 
-import {Guid} from "guid-typescript";
-import {Object3D} from "three";
-import Command from "./libs/three/Command";
-import SpawnBlueprintCommand from "./commands/SpawnBlueprintCommand";
-import BulkCommand from "./commands/BulkCommand";
-import DestroyBlueprintCommand from "./commands/DestroyBlueprintCommand";
+import {Guid} from 'guid-typescript';
+import Command from './libs/three/Command';
+import SpawnBlueprintCommand from './commands/SpawnBlueprintCommand';
+import BulkCommand from './commands/BulkCommand';
+import DestroyBlueprintCommand from './commands/DestroyBlueprintCommand';
 import History from './libs/three/History';
-import GameContext from "./modules/GameContext";
-import VEXTInterface from "./modules/VEXT";
+import GameContext from './modules/GameContext';
+import VEXTInterface from './modules/VEXT';
+
+import {GameObjectParentData} from './types/GameObjectParentData';
+import {BlueprintManager} from './modules/BlueprintManager';
+import {EditorUI} from './modules/EditorUI';
+import {SelectionGroup} from './types/SelectionGroup';
+import {Config} from './modules/Config';
+import {Blueprint} from './types/Blueprint';
+import {THREEManager} from './modules/THREEManager';
+import {EditorCore} from './EditorCore';
+import {SpatialGameEntity} from './types/SpatialGameEntity';
+import {ProjectManager} from './modules/ProjectManager';
+import {CommandActionResult} from './types/CommandActionResult';
+import {HighlightGroup} from './types/HighlightGroup';
+import {GameObjectTransferData} from './types/GameObjectTransferData';
+import {GameObject} from './types/GameObject';
+import {FrostbiteDataManager} from './modules/FrostbiteDataManager';
+import {EntityFactory} from './modules/EntityFactory';
+import {LinearTransform} from './types/primitives/LinearTransform';
+import {Vec3} from './types/primitives/Vec3';
 
 export default class Editor {
-	config: Config;
-	editorCore: EditorCore;
-	debug: boolean;
-	threeManager:THREEManager;
-	ui:EditorUI;
-	vext:VEXTInterface;
-	history:History;
-	blueprintManager:BlueprintManager;
-	entityFactory: EntityFactory;
-	gameContext: GameContext;
-	projectManager: ProjectManager;
-	fbdMan:FrostbiteDataManager;
+	public config: Config;
+	public editorCore: EditorCore;
+	public debug: boolean;
+	public threeManager: THREEManager;
+	public ui: EditorUI;
+	public vext: VEXTInterface;
+	public history: History;
+	public blueprintManager: BlueprintManager;
+	public entityFactory: EntityFactory;
+	public gameContext: GameContext;
+	public projectManager: ProjectManager;
+	public fbdMan: FrostbiteDataManager;
 
-	playerName:string;
-	gameObjects: Collections.Dictionary<Guid, GameObject>;
-	favorites: Blueprint[];
-	copy:BulkCommand | null;
+	public playerName: string;
+	public gameObjects: Collections.Dictionary<Guid, GameObject>;
+	public favorites: Blueprint[];
+	public copy: BulkCommand | null;
 
-	selectionGroup:SelectionGroup;
-	highlightGroup:HighlightGroup;
-	missingParent:Collections.Dictionary<Guid, GameObject[]>;
-
-
+	public selectionGroup: SelectionGroup;
+	public highlightGroup: HighlightGroup;
+	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
 
 
 
-	constructor(debug:boolean = false) {
+
+
+	constructor(debug: boolean = false) {
 		this.config = new Config();
 		this.editorCore = new EditorCore();
 
@@ -52,7 +70,7 @@ export default class Editor {
 		signals.setTransform.add(this.onSetTransform.bind(this));
 		signals.setVariation.add(this.onSetVariation.bind(this));
 
-		//Messages
+		// Messages
 
 		signals.objectChanged.add(this.onObjectChanged.bind(this));
 		signals.setCameraTransform.add(this.onSetCameraTransform.bind(this));
@@ -71,8 +89,8 @@ export default class Editor {
 		this.blueprintManager = new BlueprintManager();
 		this.entityFactory = new EntityFactory();
 		this.gameContext = new GameContext();
-        this.projectManager = new ProjectManager();
-        this.fbdMan = new FrostbiteDataManager();
+		this.projectManager = new ProjectManager();
+		this.fbdMan = new FrostbiteDataManager();
 
 		/*
 
@@ -81,7 +99,7 @@ export default class Editor {
 		 */
 		// this.selected = [];
 
-		this.playerName = "";
+		this.playerName = '';
 
 		this.gameObjects = new Collections.Dictionary<Guid, GameObject>();
 		this.favorites = [];
@@ -97,64 +115,64 @@ export default class Editor {
 
 	}
 
-    Initialize() {
-	    let scope = this;
-        signals.editorInitializing.dispatch(true);
-        // Adds the chrome background and debug window
-        if(this.debug === true) {
-            let imported = document.createElement('script');
-            imported.src = 'script/DebugData.js';
-            document.head.appendChild(imported);
-            this.setPlayerName("LocalPlayer");
-        }
+	public Initialize() {
+		const scope = this;
+		signals.editorInitializing.dispatch(true);
+		// Adds the chrome background and debug window
+		if (this.debug === true) {
+			const imported = document.createElement('script');
+			imported.src = 'script/DebugData.js';
+			document.head.appendChild(imported);
+			this.setPlayerName('LocalPlayer');
+		}
 
 
-        this.ui.RegisterMenubarEntry(["Edit", "Undo"],this.undo.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Redo"],this.undo.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
-        this.ui.RegisterMenubarEntry(["Edit", "Cut"],this.Cut.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Copy"],this.Copy.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Paste"],this.Paste.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
-        this.ui.RegisterMenubarEntry(["Edit", "Duplicate"], this.Duplicate.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", "Delete"], this.DeleteSelected.bind(this));
-        this.ui.RegisterMenubarEntry(["Edit", ""]); // Separator
+		this.ui.RegisterMenubarEntry(['Edit', 'Undo'], this.undo.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', 'Redo'], this.undo.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
+		this.ui.RegisterMenubarEntry(['Edit', 'Cut'], this.Cut.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', 'Copy'], this.Copy.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', 'Paste'], this.Paste.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
+		this.ui.RegisterMenubarEntry(['Edit', 'Duplicate'], this.Duplicate.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', 'Delete'], this.DeleteSelected.bind(this));
+		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
 
 
 
-        //All our UI stuff should be initialized by now.
-        // We're going to trigger a resize so the content can adapt to being done initializing.
-        // It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
-        //window.dispatchEvent(new Event('resize'));
+		// All our UI stuff should be initialized by now.
+		// We're going to trigger a resize so the content can adapt to being done initializing.
+		// It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
+		// window.dispatchEvent(new Event('resize'));
 
 
 		this.threeManager.scene.add(this.selectionGroup);
 		this.threeManager.scene.add(this.highlightGroup);
 
 
-        signals.editorReady.dispatch(true)
-    }
+		signals.editorReady.dispatch(true);
+	}
 
-	setPlayerName(name:string) {
-		if(name === undefined) {
-			LogError("Failed to set player name");
+	public setPlayerName(name: string) {
+		if (name === undefined) {
+			LogError('Failed to set player name');
 		} else {
 			this.playerName = name;
 		}
 	}
 
-	getPlayerName() {
+	public getPlayerName() {
 		return this.playerName;
 	}
 
-	AddFavorite(blueprint:Blueprint) {
+	public AddFavorite(blueprint: Blueprint) {
 		this.favorites[blueprint.instanceGuid] = blueprint;
 		blueprint.SetFavorite(true);
 		signals.favoriteAdded.dispatch(blueprint);
 		signals.favoritesChanged.dispatch();
 	}
 
-	RemoveFavorite(blueprint:Blueprint) {
+	public RemoveFavorite(blueprint: Blueprint) {
 		blueprint.SetFavorite(false);
 		delete this.favorites[blueprint.instanceGuid];
 		signals.favoriteRemoved.dispatch(blueprint);
@@ -162,25 +180,26 @@ export default class Editor {
 	}
 
 
-    Focus(guid:Guid) {
-	    let target:GameObject | undefined;
-	    if(guid) {
-	        target = this.getGameObjectByGuid(guid)
-        } else {
-	    	target = this.selectionGroup;
-	    	if(target.children.length === 0)
-	        	return; // Nothing specified, nothing selected. skip.
-        }
+		public Focus(guid: Guid) {
+		let target: GameObject | undefined;
+		if (guid) {
+			target = this.getGameObjectByGuid(guid);
+		} else {
+			target = this.selectionGroup;
+			if (target.children.length === 0) {
+				return;
+			} // Nothing specified, nothing selected. skip.
+		}
 
-        this.threeManager.Focus(target);
-        signals.objectFocused.dispatch(target);
-    }
+		this.threeManager.Focus(target);
+		signals.objectFocused.dispatch(target);
+		}
 
-	Duplicate() {
-		let scope = this;
-		let commands:Command[] = [];
+	public Duplicate() {
+		const scope = this;
+		const commands: Command[] = [];
 		this.selectionGroup.children.forEach(function(childGameObject) {
-			let gameObjectTransferData = childGameObject.getGameObjectTransferData();
+			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -189,11 +208,11 @@ export default class Editor {
 		scope.execute(new BulkCommand(commands));
 	}
 
-	Copy() {
-		let scope = this;
-		let commands:Command[] = [];
-		this.selectionGroup.children.forEach(function(childGameObject:GameObject) {
-			let gameObjectTransferData = childGameObject.getGameObjectTransferData();
+	public Copy() {
+		const scope = this;
+		const commands: Command[] = [];
+		this.selectionGroup.children.forEach((childGameObject: GameObject) => {
+			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -201,53 +220,53 @@ export default class Editor {
 		scope.copy = new BulkCommand(commands);
 	}
 
-	Paste() {
-		let scope = this;
-		if(scope.copy !== null) {
-			//Generate a new guid for each command
-			scope.copy.commands.forEach(function (command:SpawnBlueprintCommand) {
+	public Paste() {
+		const scope = this;
+		if (scope.copy !== null) {
+			// Generate a new guid for each command
+			scope.copy.commands.forEach(function(command: SpawnBlueprintCommand) {
 				command.gameObjectTransferData.guid = GenerateGuid();
 			});
 			scope.execute(scope.copy);
 		}
 	}
 
-	Cut() {
+	public Cut() {
 		this.Copy();
 		this.DeleteSelected();
 	}
 
-	SpawnBlueprint(blueprint:Blueprint, transform:LinearTransform, variation:number, parentData:GameObjectParentData) {
-		if(blueprint == null) {
-			LogError("Tried to spawn a nonexistent blueprint");
+	public SpawnBlueprint(blueprint: Blueprint, transform: LinearTransform, variation: number, parentData: GameObjectParentData) {
+		if (blueprint == null) {
+			LogError('Tried to spawn a nonexistent blueprint');
 			return false;
 		}
 
-		if(transform === undefined) {
+		if (transform === undefined) {
 			transform = this.editorCore.getRaycastTransform();
 		}
 
-		if(variation === undefined) {
+		if (variation === undefined) {
 			variation = blueprint.getDefaultVariation();
 		}
-		if(parentData === undefined) {
-			parentData = new GameObjectParentData("root", "root", "root", "root");
+		if (parentData === undefined) {
+			parentData = new GameObjectParentData('root', 'root', 'root', 'root');
 		}
 
-		//Spawn blueprint
-		Log(LOGLEVEL.VERBOSE, "Spawning blueprint: " + blueprint.instanceGuid);
-		let gameObjectTransferData = new GameObjectTransferData({
+		// Spawn blueprint
+		Log(logLevel.VERBOSE, 'Spawning blueprint: ' + blueprint.instanceGuid);
+		const gameObjectTransferData = new GameObjectTransferData({
 			guid: GenerateGuid(),
 			name: blueprint.name,
-			parentData: parentData,
+			parentData,
 			blueprintCtrRef: blueprint.getCtrRef(),
-			transform: transform,
-			variation: variation,
+			transform,
+			variation,
 			isDeleted: false,
-			isEnabled: true
+			isEnabled: true,
 		});
 
-		this.execute(new SpawnBlueprintCommand(gameObjectTransferData), );
+		this.execute(new SpawnBlueprintCommand(gameObjectTransferData) );
 	}
 
 /*	DisableSelected() {
@@ -267,44 +286,44 @@ export default class Editor {
 
 	// TODO: EnableBlueprintCommand and DisableBlueprintCommand are not invoked anywhere, but the whole lua side works.
 
-	DeleteSelected() {
-		let scope = this;
-		let commands:Command[] = [];
+	public DeleteSelected() {
+		const scope = this;
+		const commands: Command[] = [];
 		this.selectionGroup.children.forEach(function(childGameObject) {
 			if (childGameObject instanceof GameObject) {
 				commands.push(new DestroyBlueprintCommand(childGameObject.getGameObjectTransferData()));
 			}
 		});
 
-		if(commands.length > 0) {
+		if (commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
 		}
 	}
 
-	getGameObjectFromGameObjectTransferData(gameObjectTransferData: GameObjectTransferData, callerName:string) {
-		let gameObject = this.getGameObjectByGuid(gameObjectTransferData.guid);
+	public getGameObjectFromGameObjectTransferData(gameObjectTransferData: GameObjectTransferData, callerName: string) {
+		const gameObject = this.getGameObjectByGuid(gameObjectTransferData.guid);
 
-		if(gameObject === undefined) {
-			LogError(callerName + ": Couldn't find the GameObject for GameObjectTransferData. Name: " + gameObjectTransferData.name + " | Guid: " + gameObjectTransferData.guid);
+		if (gameObject === undefined) {
+			LogError(callerName + ': Couldn\'t find the GameObject for GameObjectTransferData. Name: ' + gameObjectTransferData.name + ' | Guid: ' + gameObjectTransferData.guid);
 			return;
 		}
 
 		return gameObject;
 	}
 
-	getGameObjectByGuid(guid:Guid) {
+	public getGameObjectByGuid(guid: Guid) {
 		return this.gameObjects.getValue(guid);
 	}
 
-	SetRaycastPosition(x:number, y:number, z:number){
+	public SetRaycastPosition(x: number, y: number, z: number) {
 		this.editorCore.raycastTransform.trans = new Vec3(x, y, z);
 	}
 
-	SetScreenToWorldPosition(x:number, y:number, z:number){
+	public SetScreenToWorldPosition(x: number, y: number, z: number) {
 		this.editorCore.screenToWorldTransform.trans = new Vec3(x, y, z);
 	}
 
-	setUpdating(value:boolean) {
+	public setUpdating(value: boolean) {
 		this.editorCore.setUpdating( value );
 	}
 
@@ -314,18 +333,18 @@ export default class Editor {
 
 	*/
 
-	onControlMoveStart() {
-		let scope = this;
+	public onControlMoveStart() {
+		const scope = this;
 		scope.selectionGroup.onMoveStart();
 	}
 
-	onControlMove() {
-		let scope = this;
+	public onControlMove() {
+		const scope = this;
 		scope.selectionGroup.onMove();
 	}
 
-	onControlMoveEnd() {
-		let scope = this;
+	public onControlMoveEnd() {
+		const scope = this;
 		scope.selectionGroup.onMoveEnd();
 	}
 
@@ -335,17 +354,18 @@ export default class Editor {
 
 	*/
 
-	onSetObjectName(commandActionResult:CommandActionResult) {
-		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
-		let gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, "onSetObjectName");
-		if(gameObject !== undefined)
+	public onSetObjectName(commandActionResult: CommandActionResult) {
+		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
+		if (gameObject !== undefined) {
 			gameObject.setName(gameObjectTransferData.name);
+		}
 	}
 
-	onSetTransform(commandActionResult:CommandActionResult) {
-		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
-		let gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, "onSetTransform");
-		if(gameObject !== undefined) {
+	public onSetTransform(commandActionResult: CommandActionResult) {
+		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
+		if (gameObject !== undefined) {
 			gameObject.setTransform(gameObjectTransferData.transform);
 
 			if (this.selectionGroup.children.length === 1 && gameObject === this.selectionGroup.children[0]) {
@@ -356,35 +376,37 @@ export default class Editor {
 		this.threeManager.Render();
 	}
 
-	onSetVariation(commandActionResult:CommandActionResult) {
-		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
-		let gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, "onSetVariation");
-		if(gameObject !== undefined)
+	public onSetVariation(commandActionResult: CommandActionResult) {
+		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
+		if (gameObject !== undefined) {
 			gameObject.setVariation(gameObjectTransferData.variation);
+		}
 	}
 
-	onDestroyedBlueprint(commandActionResult:CommandActionResult) {
-		let gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
+	public onDestroyedBlueprint(commandActionResult: CommandActionResult) {
+		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectGuid = gameObjectTransferData.guid;
 		this.threeManager.DeleteObject(this.gameObjects.getValue(gameObjectGuid));
 		this.gameObjects.remove(gameObjectGuid);
-		
-		if(this.selectionGroup.children.length === 0) {
-			this.threeManager.HideGizmo()
+
+		if (this.selectionGroup.children.length === 0) {
+			this.threeManager.HideGizmo();
 		}
 
 		this.threeManager.Render();
 	}
 
 	// TODO: Move logic to GameContext
-	onSpawnedBlueprint(commandActionResult:CommandActionResult) {
-		let scope = this;
-		let gameObjectTransferData = commandActionResult.gameObjectTransferData;
-		let gameObjectGuid = gameObjectTransferData.guid;
-		let parentGuid = gameObjectTransferData.parentData.guid;
+	public onSpawnedBlueprint(commandActionResult: CommandActionResult) {
+		const scope = this;
+		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectGuid = gameObjectTransferData.guid;
+		const parentGuid = gameObjectTransferData.parentData.guid;
 
 
 		// TODO: change GameObject ctor
-		let gameObject = new GameObject(gameObjectTransferData.guid,
+		const gameObject = new GameObject(gameObjectTransferData.guid,
 										gameObjectTransferData.typeName,
 										gameObjectTransferData.name,
 										gameObjectTransferData.transform,
@@ -393,12 +415,12 @@ export default class Editor {
 										gameObjectTransferData.variation,
 										gameObjectTransferData.gameEntities);
 
-		for (let key in gameObjectTransferData.gameEntities) {
-			let entityData = gameObjectTransferData.gameEntities[key];
+		for (const key in gameObjectTransferData.gameEntities) {
+			const entityData = gameObjectTransferData.gameEntities[key];
 			// UniqueID is fucking broken. this won't work online, boi.
-			if(entityData.isSpatial) {
-				let gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
-				gameObject.AddEntity(gameEntity);
+			if (entityData.isSpatial) {
+				const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
+				gameObject.add(gameEntity);
 			}
 		}
 
@@ -409,23 +431,23 @@ export default class Editor {
 		// todo: make an entry for the leveldata itself maybe?
 
 		// Allows children to be spawned before parents, and then added to the appropriate parent.
-		if(!scope.gameContext.levelData.containsKey(parentGuid)) {
-			if(this.gameObjects.containsKey(parentGuid)) {
+		if (!scope.gameContext.levelData.containsKey(parentGuid)) {
+			if (this.gameObjects.containsKey(parentGuid)) {
 				let parent = this.missingParent.getValue(parentGuid);
-				if(parent === undefined) {
+				if (parent === undefined) {
 					this.missingParent.setValue(parentGuid, []);
 					parent = this.missingParent.getValue(parentGuid);
 				}
-				if(parent !== undefined) { // hack to suppress compiler warnings.
-					parent.push(gameObject)
+				if (parent !== undefined) { // hack to suppress compiler warnings.
+					parent.push(gameObject);
 				}
 			} else {
 				THREE.SceneUtils.attach(gameObject, scope.threeManager.scene, this.gameObjects.getValue(parentGuid) );
 			}
 
-			if(this.missingParent.containsKey(gameObjectGuid)) {
-				let missingParent = this.missingParent.getValue(gameObjectGuid);
-				for(let child in missingParent) {
+			if (this.missingParent.containsKey(gameObjectGuid)) {
+				const missingParent = this.missingParent.getValue(gameObjectGuid);
+				for (const child in missingParent) {
 					THREE.SceneUtils.attach(child, scope.threeManager.scene, gameObject);
 				}
 
@@ -433,95 +455,95 @@ export default class Editor {
 			}
 		}
 
-		setTimeout(function() {scope.threeManager.scene.remove(gameObject)}, 1);
-		if(!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
+		setTimeout(function() {scope.threeManager.scene.remove(gameObject); }, 1);
+		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
-			setTimeout(function() {scope.Select(gameObjectGuid, false)}, 2);
+			setTimeout(function() {scope.Select(gameObjectGuid, false); }, 2);
 		}
 	}
 
-	onBlueprintSpawnInvoked(commandActionResult:CommandActionResult) {
-		console.log("Successfully invoke spawning of blueprint: " + commandActionResult.gameObjectTransferData.name + " | " + commandActionResult.gameObjectTransferData.guid)
+	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {
+		console.log('Successfully invoke spawning of blueprint: ' + commandActionResult.payload.name + ' | ' + commandActionResult.payload.guid);
 	}
 
-	onEnabledBlueprint(commandActionResult:CommandActionResult) {
-		let gameObject = this.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
+	public onEnabledBlueprint(commandActionResult: CommandActionResult) {
+		const gameObject = this.getGameObjectByGuid(commandActionResult.payload.guid);
 
-		if(gameObject == null) {
-			LogError("Attempted to enable a GameObject that doesn't exist");
+		if (gameObject == null) {
+			LogError('Attempted to enable a GameObject that doesn\'t exist');
 			return;
 		}
 
-		let removeFromHierarchy = commandActionResult.gameObjectTransferData.isDeleted;
-		gameObject.Enable();//removeFromHierarchy);
+		const removeFromHierarchy = commandActionResult.payload.isDeleted;
+		gameObject.Enable(); // removeFromHierarchy);
 	}
 
-	onDisabledBlueprint(commandActionResult:CommandActionResult) {
-		let gameObject = this.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
+	public onDisabledBlueprint(commandActionResult: CommandActionResult) {
+		const gameObject = this.getGameObjectByGuid(commandActionResult.payload.guid);
 
-		if(gameObject == null) {
-			LogError("Attempted to disable a GameObject that doesn't exist");
+		if (gameObject == null) {
+			LogError('Attempted to disable a GameObject that doesn\'t exist');
 			return;
 		}
 
-		let isDeletedVanillaObject = commandActionResult.gameObjectTransferData.isDeleted;
-		gameObject.Disable();//isDeletedVanillaObject:);
+		const isDeletedVanillaObject = commandActionResult.payload.isDeleted;
+		gameObject.Disable(); // isDeletedVanillaObject:);
 	}
 
-	onObjectChanged(object:GameObject) {
+	public onObjectChanged(object: GameObject) {
 		this.editorCore.addPending(object.guid, object);
 	}
 
 
-	isSelected(guid:Guid) {
-		let scope = this;
-		if(scope.selectionGroup.children.length === 0) {
-			return false
+	public isSelected(guid: Guid) {
+		const scope = this;
+		if (scope.selectionGroup.children.length === 0) {
+			return false;
 		}
-		for(let i = 0; i < scope.selectionGroup.children.length; i++) {
-			if(guid.equals(scope.selectionGroup.children[i].guid)) {
+		for (let i = 0; i < scope.selectionGroup.children.length; i++) {
+			if (guid.equals(scope.selectionGroup.children[i].guid)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	Select(guid:Guid, multi:Boolean = false, scrollTo:Boolean = true) {
+	public Select(guid: Guid, multi: Boolean = false, scrollTo: Boolean = true) {
 		this.Unhighlight(guid);
 
-		if(multi) {
-			this.editorCore.onSelectedGameObject(guid, true, scrollTo)
+		if (multi) {
+			this.editorCore.onSelectedGameObject(guid, true, scrollTo);
 		} else {
-			this.editorCore.onSelectedGameObject(guid, false, scrollTo)
+			this.editorCore.onSelectedGameObject(guid, false, scrollTo);
 		}
 	}
 
-	Deselect(guid:Guid) {
+	public Deselect(guid: Guid) {
 		this.editorCore.onDeselectedGameObject(guid);
 	}
 
-	Highlight(guid:Guid){
-		let gameObject = this.getGameObjectByGuid(guid);
+	public Highlight(guid: Guid) {
+		const gameObject = this.getGameObjectByGuid(guid);
 
-		if (gameObject === null) return;
+		if (gameObject === null) { return; }
 
 
 		this.highlightGroup.HighlightObject(gameObject);
 	}
 
-	Unhighlight(guid:Guid){
+	public Unhighlight(guid: Guid) {
 		if (guid !== null && guid !== undefined) {
-			let gameObject = this.getGameObjectByGuid(guid);
+			const gameObject = this.getGameObjectByGuid(guid);
 
-			if (gameObject === null || gameObject === undefined){
-				console.error("Tried to unhighlight an object that doesn't exist");
+			if (gameObject === null || gameObject === undefined) {
+				console.error('Tried to unhighlight an object that doesn\'t exist');
 				return;
-			}else if (!gameObject.highlighted) {
+			} else if (!gameObject.highlighted) {
 				return;
 			}
 		}
 
-		this.highlightGroup.UnhighlightCurrentObject()
+		this.highlightGroup.UnhighlightCurrentObject();
 	}
 
 	/*
@@ -530,19 +552,19 @@ export default class Editor {
 
 	 */
 
-	onSetCameraTransform(transform:LinearTransform) {
+	public onSetCameraTransform(transform: LinearTransform) {
 
 	}
-	onSetRaycastPosition(position:Vec3) {
+	public onSetRaycastPosition(position: Vec3) {
 
 	}
-	onSetPlayerName(name:string){
+	public onSetPlayerName(name: string) {
 
 	}
-	onSetScreenToWorldPosition(position:Vec3) {
+	public onSetScreenToWorldPosition(position: Vec3) {
 
 	}
-	onSetUpdateRateMessage(value:number){
+	public onSetUpdateRateMessage(value: number) {
 
 	}
 
@@ -551,22 +573,22 @@ export default class Editor {
 		History
 
 	 */
-	onHistoryChanged(cmd:Command) {
+	public onHistoryChanged(cmd: Command) {
 
 	}
 
-	execute( cmd:Command, optionalName?:string ) {
+	public execute( cmd: Command, optionalName?: string ) {
 		this.history.execute( cmd, optionalName );
 	}
 
-	undo() {
+	public undo() {
 		this.history.undo();
 	}
 
-	redo() {
+	public redo() {
 		this.history.redo();
 	}
 }
-window.addEventListener('resize', function () {
-	signals.windowResized.dispatch()
+window.addEventListener('resize', function() {
+	signals.windowResized.dispatch();
 });

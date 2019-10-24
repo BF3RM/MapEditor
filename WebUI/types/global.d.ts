@@ -1,3 +1,3 @@
-type Editor = import('../src/script/Editor').default;
+type Editor = import('@/script/Editor').default;
 
 declare var editor: Editor;

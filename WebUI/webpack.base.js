@@ -24,7 +24,11 @@ webpackConfig.resolve
     .add('.js')
     .end()
   .modules
-    .add('node_modules');
+    .add('node_modules')
+    .end()
+  .alias
+    .set("@", path.resolve(__dirname, 'src'),)
+    .end();
 
 webpackConfig.module
   .rule('ts')
