@@ -1,4 +1,6 @@
-export class Vec3 extends THREE.Vector3 {
+import {Vector3} from "three";
+
+export class Vec3 extends Vector3 {
 	constructor(x?: number, y?: number, z?: number) {
 		super(x, y, z);
 	}

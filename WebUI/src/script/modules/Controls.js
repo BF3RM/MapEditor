@@ -23,7 +23,7 @@ function EnableFreecamMovement() {
 
 
 var keysdown = {};
-
+/*
 $(document).keydown(function(e) {
 
 	if (keysdown[e.which]) {
@@ -99,3 +99,4 @@ $(document).keyup(function(e){
 		editor.threeManager.DisableGridSnap()
 	}
 });
+*/

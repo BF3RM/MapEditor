@@ -2,6 +2,8 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
+import * as THREE from "three";
+
 THREE.SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {

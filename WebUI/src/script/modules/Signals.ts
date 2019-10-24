@@ -1,7 +1,8 @@
-let Signal = signals.Signal;
-var signals = {
-    editorInitializing: new Signal(),
-    editorReady: new Signal(),
+import {Signal} from "typed-signals";
+
+export const signals = {
+	editorInitializing: new Signal(),
+	editorReady: new Signal(),
 
 	levelLoaded: new Signal(),
 	// Object actions
@@ -63,6 +64,6 @@ var signals = {
 
 	windowRegistered: new Signal(),
 
-	historyChanged: new Signal()
+	historyChanged: new Signal(),
 
 };

@@ -29,6 +29,7 @@ export class EditorUI {
 
 	// Maybe this isn't the way it's supposed to be done...
 	Initialize() {
+		/*
         $('#menubar').menu({
             position: { my: 'left top', at: 'left bottom' },
             blur: function() {
@@ -51,7 +52,7 @@ export class EditorUI {
 		$('#worldSpace').find('input').checkboxradio({
 			icon: false
 		}).on("change", UI.worldChanged);
-
+	*/
 	}
 
 	RegisterWindow(windowId, windowTitle, windowModule, visible) {

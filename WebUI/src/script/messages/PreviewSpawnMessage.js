@@ -3,7 +3,7 @@ export class PreviewSpawnMessage {
 		this.type = "PreviewSpawnMessage";
 
 		if (gameObjectTransferData === undefined) {
-			Log(LOGLEVEL.DEBUG, "PreviewSpawnMessage: Missing gameObjectTransferData");
+			window.Log(LOGLEVEL.DEBUG, "PreviewSpawnMessage: Missing gameObjectTransferData");
 			return;
 		}
 

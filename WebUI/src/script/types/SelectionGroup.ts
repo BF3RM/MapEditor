@@ -1,6 +1,7 @@
 import {GameObject} from '@/script/types/GameObject';
 import {LinearTransform} from '@/script/types/primitives/LinearTransform';
 import {Guid} from 'guid-typescript';
+import {signals} from "@/script/modules/Signals";
 
 export class SelectionGroup extends GameObject {
 	public children: GameObject[];
@@ -35,7 +36,7 @@ export class SelectionGroup extends GameObject {
 
 
 		scope.children.every((child) => child.onMove());
-		signals.selectionGroupMoved.dispatch();
+		signals.selectionGroupMoved.emit();
 	}
 
 	public onMoveEnd() {
@@ -50,7 +51,7 @@ export class SelectionGroup extends GameObject {
 		scope.children.every((child) => child.onMoveEnd());
 
 
-		signals.selectionGroupMoved.dispatch();
+		signals.selectionGroupMoved.emit();
 	}
 
 	public hasMoved() {

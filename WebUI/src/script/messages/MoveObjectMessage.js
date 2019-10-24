@@ -3,7 +3,7 @@ export class MoveObjectMessage {
 		this.type = "MoveObjectMessage";
 
 		if (gameObjectTransferData === undefined) {
-			Log(LOGLEVEL.DEBUG, "MoveObjectMessage: Missing gameObjectTransferData");
+			window.Log(LOGLEVEL.DEBUG, "MoveObjectMessage: Missing gameObjectTransferData");
 			return;
 		}
 

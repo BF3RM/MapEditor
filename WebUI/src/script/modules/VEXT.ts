@@ -1,10 +1,10 @@
 import Command from '../libs/three/Command';
 import {VEXTemulator} from '@/script/modules/VEXTemulator';
 import {CommandActionResult} from '@/script/types/CommandActionResult';
-import {LOGLEVEL} from '@/script/types/primitives/LogLevel';
 import * as Collections from 'typescript-collections';
 import {Guid} from 'guid-typescript';
 import {GameObject} from '@/script/types/GameObject';
+import {signals} from "@/script/modules/Signals";
 
 
 export default class VEXTInterface {
@@ -23,26 +23,26 @@ export default class VEXTInterface {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
 		this.commands = {
-			SpawnedBlueprint:       signals.spawnedBlueprint.dispatch,
-			BlueprintSpawnInvoked:  signals.blueprintSpawnInvoked.dispatch,
-			DestroyedBlueprint:     signals.destroyedBlueprint.dispatch,
-			CreatedGroup:           signals.createdGroup.dispatch,
-			DestroyedGroup:         signals.destroyedGroup.dispatch,
-			SetObjectName:		    signals.setObjectName.dispatch,
-			SetTransform:		    signals.setTransform.dispatch,
-			SetVariation:		    signals.setVariation.dispatch,
-			EnabledBlueprint:		signals.enabledBlueprint.dispatch,
-			DisabledBlueprint:		signals.disabledBlueprint.dispatch,
+			SpawnedBlueprint:       signals.spawnedBlueprint.emit,
+			BlueprintSpawnInvoked:  signals.blueprintSpawnInvoked.emit,
+			DestroyedBlueprint:     signals.destroyedBlueprint.emit,
+			CreatedGroup:           signals.createdGroup.emit,
+			DestroyedGroup:         signals.destroyedGroup.emit,
+			SetObjectName:		    signals.setObjectName.emit,
+			SetTransform:		    signals.setTransform.emit,
+			SetVariation:		    signals.setVariation.emit,
+			EnabledBlueprint:		signals.enabledBlueprint.emit,
+			DisabledBlueprint:		signals.disabledBlueprint.emit,
 		};
 
 		this.messages = {
-			SetCameraTransformMessage:			signals.setCameraTransform.dispatch,
-			SetRaycastTransformMessage:			signals.setRaycastPosition.dispatch,
-			SetPlayerNameMessage:	   			signals.setPlayerName.dispatch,
-			SetScreenToWorldPositionMessage:	signals.setScreenToWorldPosition.dispatch,
-			SetUpdateRateMessage:				signals.setUpdateRateMessage.dispatch,
-			// 'SelectedGameObject':	   signals.selectedGameObject.dispatch,
-			// 'DeselectedGameObject':	signals.deselectedGameObject.dispatch,
+			SetCameraTransformMessage:			signals.setCameraTransform.emit,
+			SetRaycastTransformMessage:			signals.setRaycastPosition.emit,
+			SetPlayerNameMessage:	   			signals.setPlayerName.emit,
+			SetScreenToWorldPositionMessage:	signals.setScreenToWorldPosition.emit,
+			SetUpdateRateMessage:				signals.setUpdateRateMessage.emit,
+			// 'SelectedGameObject':	   signals.selectedGameObject.emit,
+			// 'DeselectedGameObject':	signals.deselectedGameObject.emit,
 		};
 
 		this.paused = false;
@@ -110,13 +110,13 @@ export default class VEXTInterface {
 
 		const scope = this;
 		if (editor.debug) {
-			Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			Log(LOGLEVEL.VERBOSE, commands);
+			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
+			window.Log(LOGLEVEL.VERBOSE, commands);
 			scope.emulator.Receive(commands);
 		} else {
 			console.log(commands);
-			Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			Log(LOGLEVEL.VERBOSE, commands);
+			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
+			window.Log(LOGLEVEL.VERBOSE, commands);
 			// @ts-ignore
 			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(commands));
 		}
@@ -131,8 +131,8 @@ export default class VEXTInterface {
 		let commandActionResults = JSON.parse(commandActionResultsString) as CommandActionResult[];
 		let index = 0;
 
-		Log(LOGLEVEL.VERBOSE, 'IN: ');
-		Log(LOGLEVEL.VERBOSE, commandActionResults);
+		window.Log(LOGLEVEL.VERBOSE, 'IN: ');
+		window.Log(LOGLEVEL.VERBOSE, commandActionResults);
 
 		// convert commandActionResults to an array if it's an object
 		if (typeof commandActionResults === 'object') {
@@ -141,7 +141,7 @@ export default class VEXTInterface {
 
 		commandActionResults.forEach((commandActionResult: CommandActionResult) => {
 			if (scope.commands[commandActionResult.type] === undefined) {
-				LogError('Failed to call a null signal: ' + commandActionResult.type);
+				window.LogError('Failed to call a null signal: ' + commandActionResult.type);
 				return;
 			}
 			if (index === commandActionResults.length - 1) {
@@ -159,7 +159,7 @@ export default class VEXTInterface {
 		editor.threeManager.Render();
 	}
 
-	public SendEvent(eventName: string, param: any) {
+	public SendEvent(eventName: string, param?: any) {
 		if (editor.debug) {
 			console.log(eventName);
 			if (param != null) {
@@ -194,14 +194,14 @@ export default class VEXTInterface {
 		}
 		const scope = this;
 		if (editor.debug) {
-			Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			Log(LOGLEVEL.VERBOSE, messages);
+			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
+			window.Log(LOGLEVEL.VERBOSE, messages);
 			// We don't handle messages in VEXTEmulator yet
 			// scope.emulator.Receive(commands);
 		} else {
 			console.log(messages);
-			Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			Log(LOGLEVEL.VERBOSE, messages);
+			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
+			window.Log(LOGLEVEL.VERBOSE, messages);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
 		}
 	}
@@ -214,15 +214,15 @@ export default class VEXTInterface {
 			message = messageRaw;
 			emulator = true;
 		} else {
-			Log(LOGLEVEL.VERBOSE, messageRaw);
+			window.Log(LOGLEVEL.VERBOSE, messageRaw);
 			message = JSON.parse(messageRaw);
 		}
 
-		Log(LOGLEVEL.VERBOSE, 'IN: ');
-		Log(LOGLEVEL.VERBOSE, message);
+		window.Log(LOGLEVEL.VERBOSE, 'IN: ');
+		window.Log(LOGLEVEL.VERBOSE, message);
 
 		if (this.messages[message.type] === undefined) {
-			LogError('Failed to call a null signal: ' + message.type);
+			window.LogError('Failed to call a null signal: ' + message.type);
 			return;
 		}
 		if (emulator) {

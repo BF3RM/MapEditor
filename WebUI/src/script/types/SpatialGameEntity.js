@@ -1,4 +1,4 @@
-
+import * as THREE from 'three';
 export class SpatialGameEntity extends THREE.Mesh
 {
     constructor(instanceId, transform, aabb)

@@ -3,7 +3,7 @@ export class PreviewDestroyMessage {
 		this.type = "PreviewDestroyMessage";
 
 		if (gameObjectTransferData === undefined) {
-			Log(LOGLEVEL.DEBUG, "PreviewDestroyMessage: Missing gameObjectTransferData");
+			window.Log(LOGLEVEL.DEBUG, "PreviewDestroyMessage: Missing gameObjectTransferData");
 			return;
 		}
 

@@ -1,3 +1,5 @@
+import {LinearTransform} from "./types/primitives/LinearTransform";
+
 export class EditorCore {
 
 

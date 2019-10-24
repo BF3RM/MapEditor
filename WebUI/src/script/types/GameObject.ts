@@ -6,8 +6,10 @@ import {CtrRef} from '@/script/types/CtrRef';
 import {GameObjectParentData} from '@/script/types/GameObjectParentData';
 import {GameEntityData} from '@/script/types/GameEntityData';
 import {LinearTransform} from '@/script/types/primitives/LinearTransform';
+import {Object3D} from "three";
+import {signals} from "@/script/modules/Signals";
 
-export class GameObject extends THREE.Object3D {
+export class GameObject extends Object3D {
 	public guid: Guid;
 	public typeName: string;
 	public transform: LinearTransform;
@@ -152,18 +154,18 @@ export class GameObject extends THREE.Object3D {
 		}
 
 		editor.threeManager.Render();
-		signals.objectChanged.dispatch(this, 'transform', linearTransform);
+		signals.objectChanged.emit(this, 'transform', linearTransform);
 
 	}
 
 	public setName(name: string) {
 		this.name = name;
-		signals.objectChanged.dispatch(this, 'name', name);
+		signals.objectChanged.emit(this, 'name', name);
 	}
 
 	public setVariation(key: number) {
 		this.variation = key;
-		signals.objectChanged.dispatch(this, 'variation', key);
+		signals.objectChanged.emit(this, 'variation', key);
 	}
 
 	public Clone(guid: Guid) {
@@ -186,7 +188,7 @@ export class GameObject extends THREE.Object3D {
 			return;
 		}
 		const transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		signals.objectChanged.dispatch(this, 'transform', transform);
+		signals.objectChanged.emit(this, 'transform', transform);
 		// Send move message to client
 	}
 
@@ -201,7 +203,7 @@ export class GameObject extends THREE.Object3D {
 			transform: this.transform,
 		}), transform);
 		editor.execute(command);
-		signals.objectChanged.dispatch(this, 'transform', transform);
+		signals.objectChanged.emit(this, 'transform', transform);
 
 		// Send move command to server
 	}
@@ -233,7 +235,7 @@ export class GameObject extends THREE.Object3D {
 	public onSelected() {
 		console.log(this);
 		if (!this.enabled) {
-			LogError('Attempted to select a disabled gameObject');
+			window.LogError('Attempted to select a disabled gameObject');
 			return;
 		}
 		for (const key in this.children) {
@@ -247,7 +249,7 @@ export class GameObject extends THREE.Object3D {
 
 	public onDeselected() {
 		if (!this.enabled) {
-			LogError('Attempted to deselect a disabled gameObject');
+			window.LogError('Attempted to deselect a disabled gameObject');
 			return;
 		}
 		for (const key in this.children) {
@@ -270,7 +272,7 @@ export class GameObject extends THREE.Object3D {
 		}
 		this.visible = true;
 		this.enabled = true;
-		signals.objectChanged.dispatch(this, 'enabled', this.enabled);
+		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
 	public Disable() {
@@ -284,7 +286,7 @@ export class GameObject extends THREE.Object3D {
 		}
 		this.visible = false;
 		this.enabled = false;
-		signals.objectChanged.dispatch(this, 'enabled', this.enabled);
+		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
 	public getNode() {

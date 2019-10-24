@@ -1,6 +1,7 @@
 import * as Collections from 'typescript-collections';
 import {Guid} from 'guid-typescript';
 import {GameObject} from '@/script/types/GameObject';
+import {signals} from "@/script/modules/Signals";
 
 export default class GameContext {
 	public levelData: Collections.Dictionary<Guid, GameObject>;
@@ -11,7 +12,7 @@ export default class GameContext {
 	public LoadLevel(levelRaw: string) {
 		const levelData = JSON.parse(levelRaw);
 		this.levelData.setValue(levelData.instanceGuid, levelData);
-		signals.levelLoaded.dispatch(levelData);
+		signals.levelLoaded.emit(levelData);
 		// signals.levelLoaded.dispatch(this.data);
 	}
 }
