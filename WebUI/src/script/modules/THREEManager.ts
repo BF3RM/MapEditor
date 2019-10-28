@@ -6,8 +6,10 @@ import {TransformControls} from 'three/examples/jsm/controls/TransformControls';
 import {SetScreenToWorldTransformMessage} from '@/script/messages/SetScreenToWorldTransformMessage';
 import {Vec3} from '@/script/types/primitives/Vec3';
 import {Vec2} from '@/script/types/primitives/Vec2';
-import {signals} from "@/script/modules/Signals";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import {signals} from '@/script/modules/Signals';
+import OrbitControls from '@/script/libs/three/OrbitControls';
+
+
 export enum WORLDSPACE {
 	local = 'local',
 	world = 'world',
@@ -64,7 +66,7 @@ export class THREEManager {
 
 			// snip
 			const delta = clock.getDelta();
-			const hasControlsUpdated = scope.cameraControls.update( delta );
+			const hasControlsUpdated = scope.cameraControls.update(  );
 
 			requestAnimationFrame( anim );
 
@@ -77,7 +79,7 @@ export class THREEManager {
 				scope.waitingForControlEnd = false;
 			}
 		} )();
-
+/*
 		scope.cameraControls.addEventListener( 'controlstart', function( event ) {
 			editor.vext.SendEvent('controlStart');
 		} );
@@ -95,7 +97,7 @@ export class THREEManager {
 			}
 		} );
 
-
+*/
 		this.SetFov(90);
 
 	}
@@ -124,7 +126,7 @@ export class THREEManager {
 		scope.delta.multiplyScalar( distance * 4 );
 
 		const newPos = scope.center.add( scope.delta );
-		scope.cameraControls.moveTo(newPos.x, newPos.y, newPos.z, true);
+		//scope.cameraControls.moveTo(newPos.x, newPos.y, newPos.z, true);
 
 		const paddingLeft   = 0;
 		const paddingRight  = 0;
@@ -139,8 +141,8 @@ export class THREEManager {
 		const boundingDepth  = size.z;
 
 
-		distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
-		scope.cameraControls.dollyTo(distance, true);
+		//distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
+		//scope.cameraControls.dollyTo(distance, true);
 		const gameObject = target as GameObject;
 		signals.objectFocused.emit(gameObject.guid);
 
@@ -186,7 +188,7 @@ export class THREEManager {
 	}
 
 	public DeleteObject(gameObject: GameObject) {
-		if(gameObject.parent !== null) {
+		if (gameObject.parent !== null) {
 			THREE.SceneUtils.detach( gameObject, gameObject.parent, this.scene );
 		}
 		this.scene.remove( gameObject );
@@ -315,7 +317,7 @@ export class THREEManager {
 		if (scope.raycastPlacing) {
 			const direction = scope.getMouse3D(e);
 
-			const message = new SetScreenToWorldTransformMessage(direction);
+			const message = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
 			editor.vext.SendMessage(message);
 			if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
 				editor.setUpdating(true);
@@ -450,7 +452,7 @@ export class THREEManager {
 		const distance = 10;
 		const target = new Vec3(transform.trans.x + (transform.forward.x * -1 * distance), transform.trans.y + (transform.forward.y * -1 * distance), transform.trans.z + (transform.forward.z * -1 * distance));
 
-		this.cameraControls.setLookAt(transform.trans.x, transform.trans.y, transform.trans.z, target.x, target.y, target.z, false);
+		//this.cameraControls.setLookAt(transform.trans.x, transform.trans.y, transform.trans.z, target.x, target.y, target.z, false);
 		this.Render();
 		this.updatingCamera = false;
 

@@ -224,7 +224,7 @@ export default class Editor {
 		this.DeleteSelected();
 	}
 
-	public SpawnBlueprint(blueprint: Blueprint, transform: LinearTransform, variation: number, parentData: GameObjectParentData) {
+	public SpawnBlueprint(blueprint: Blueprint, transform: LinearTransform, variation: number, parentData?: GameObjectParentData) {
 		if (blueprint == null) {
 			window.LogError('Tried to spawn a nonexistent blueprint');
 			return false;
@@ -506,7 +506,7 @@ export default class Editor {
 		return false;
 	}
 
-	public Select(guid: Guid, multi: Boolean = false, scrollTo: Boolean = true) {
+	public Select(guid: Guid, multi: boolean = false, scrollTo: boolean = true) {
 		this.Unhighlight(guid);
 
 		if (multi) {
