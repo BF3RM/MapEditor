@@ -5,12 +5,12 @@
 // function DisableKeyboard() {
 // 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
 // }
-		
+
 function EnableFreecamMovement() {
-	editor.vext.SendEvent('EnableFreeCamMovement')
+	editor.vext.SendEvent('EnableFreeCamMovement');
 
 	// Hack to make sure we don't navigate the windows while in freecam.
-	document.activeElement.blur()
+	//document.activeElement.blur();
 }
 
 // function DisableFreeView() {
@@ -22,7 +22,7 @@ function EnableFreecamMovement() {
 // }
 
 
-var keysdown = {};
+let keysdown = {};
 /*
 $(document).keydown(function(e) {
 
@@ -61,7 +61,7 @@ $(document).keydown(function(e) {
 	if( keysdown[17] && e.which == 68) { // CTRL + D
 		editor.Duplicate()
 	}
-	if( keysdown[17] && e.which == 67) { // CTRL + C 
+	if( keysdown[17] && e.which == 67) { // CTRL + C
 		editor.Copy()
 	}
 	if( keysdown[17] && e.which == 86) { // CTRL + V

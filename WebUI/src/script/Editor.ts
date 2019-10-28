@@ -24,7 +24,6 @@ import {HighlightGroup} from './types/HighlightGroup';
 import {GameObjectTransferData} from './types/GameObjectTransferData';
 import {GameObject} from './types/GameObject';
 import {FrostbiteDataManager} from './modules/FrostbiteDataManager';
-import {EntityFactory} from './modules/EntityFactory';
 import {LinearTransform} from './types/primitives/LinearTransform';
 import {Vec3} from './types/primitives/Vec3';
 import {signals} from '@/script/modules/Signals';
@@ -39,7 +38,6 @@ export default class Editor {
 	public vext = new VEXTInterface();
 	public history = new History(this);
 	public blueprintManager = new BlueprintManager();
-	public entityFactory = new EntityFactory();
 	public gameContext = new GameContext();
 	public projectManager = new ProjectManager();
 	public fbdMan = new FrostbiteDataManager();

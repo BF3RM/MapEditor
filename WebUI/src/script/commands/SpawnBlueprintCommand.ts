@@ -3,8 +3,7 @@ import {GameObjectTransferData} from '@/script/types/GameObjectTransferData';
 import {VextCommand} from '@/script/types/VextCommand';
 export default class SpawnBlueprintCommand extends Command {
 	constructor(public gameObjectTransferData: GameObjectTransferData) {
-		super();
-		this.type = 'SpawnBlueprintCommand';
+		super('SpawnBlueprintCommand');
 		this.name = 'Spawn Blueprint: ' + gameObjectTransferData.name;
 	}
 

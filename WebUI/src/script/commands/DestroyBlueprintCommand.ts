@@ -4,8 +4,7 @@ import {VextCommand} from '@/script/types/VextCommand';
 
 export default class DestroyBlueprintCommand extends Command {
 	constructor(private gameObjectTransferData: GameObjectTransferData) {
-		super();
-		this.type = 'DestroyBlueprintCommand';
+		super('DestroyBlueprintCommand');
 		this.name = 'Destroy Blueprint';
 		this.gameObjectTransferData = gameObjectTransferData;
 	}
