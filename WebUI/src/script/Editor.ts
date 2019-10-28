@@ -46,7 +46,7 @@ export default class Editor {
 
 	public playerName: string;
 	public gameObjects = new Collections.Dictionary<Guid, GameObject>();
-	public favorites: Blueprint[];
+	public favorites = new Collections.Dictionary<Guid, Blueprint>();
 	public copy: SpawnBlueprintCommand[];
 
 	public selectionGroup: SelectionGroup;
@@ -89,7 +89,6 @@ export default class Editor {
 		// this.selected = [];
 
 		this.playerName = '';
-		this.favorites = [];
 
 		this.copy = [];
 
@@ -152,7 +151,7 @@ export default class Editor {
 	}
 
 	public AddFavorite(blueprint: Blueprint) {
-		this.favorites[blueprint.instanceGuid] = blueprint;
+		this.favorites.setValue(blueprint.instanceGuid, blueprint);
 		blueprint.SetFavorite(true);
 		signals.favoriteAdded.emit(blueprint);
 		signals.favoritesChanged.emit();
@@ -160,7 +159,7 @@ export default class Editor {
 
 	public RemoveFavorite(blueprint: Blueprint) {
 		blueprint.SetFavorite(false);
-		delete this.favorites[blueprint.instanceGuid];
+		this.favorites.remove(blueprint.instanceGuid);
 		signals.favoriteRemoved.emit(blueprint);
 		signals.favoritesChanged.emit();
 	}
@@ -238,7 +237,7 @@ export default class Editor {
 			variation = blueprint.getDefaultVariation();
 		}
 		if (parentData === undefined) {
-			parentData = new GameObjectParentData('root', 'root', 'root', 'root');
+			parentData = new GameObjectParentData(Guid.createEmpty(), 'root', Guid.createEmpty(), Guid.createEmpty());
 		}
 
 		// Spawn blueprint
@@ -523,7 +522,9 @@ export default class Editor {
 	public Highlight(guid: Guid) {
 		const gameObject = this.getGameObjectByGuid(guid);
 
-		if (gameObject === null) { return; }
+		if (gameObject === null || gameObject === undefined) {
+			return;
+		}
 
 
 		this.highlightGroup.HighlightObject(gameObject);
