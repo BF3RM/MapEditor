@@ -6,9 +6,9 @@
 
 export class ProjectManager {
     constructor() {
-        this.window = new ProjectWindow();
-        signals.editorInitializing.add(this.onEditorInitializing.bind(this));
-        signals.editorReady.add(this.onEditorReady.bind(this));
+        //this.window = new ProjectWindow();
+        //signals.editorInitializing.add(this.onEditorInitializing.bind(this));
+        //signals.editorReady.add(this.onEditorReady.bind(this));
     }
 
     onEditorInitializing() {

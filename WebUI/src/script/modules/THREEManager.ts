@@ -7,8 +7,7 @@ import {SetScreenToWorldTransformMessage} from '@/script/messages/SetScreenToWor
 import {Vec3} from '@/script/types/primitives/Vec3';
 import {Vec2} from '@/script/types/primitives/Vec2';
 import {signals} from '@/script/modules/Signals';
-import OrbitControls from '@/script/libs/three/OrbitControls';
-
+import CameraControls from 'camera-controls';
 
 export enum WORLDSPACE {
 	local = 'local',
@@ -20,6 +19,8 @@ export enum GIZMOMODE {
 	rotate = 'rotate',
 	scale = 'scale',
 }
+CameraControls.install( { THREE: THREE } );
+
 export class THREEManager {
 		public scene = new THREE.Scene();
 		private renderer = new THREE.WebGLRenderer({
@@ -27,7 +28,7 @@ export class THREEManager {
 			antialias: true,
 		});
 		private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
-		private cameraControls = new OrbitControls( this.camera, this.renderer.domElement );
+		private cameraControls = new CameraControls( this.camera, this.renderer.domElement );
 		private control: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
 		private worldSpace = WORLDSPACE.local;
 
@@ -66,7 +67,7 @@ export class THREEManager {
 
 			// snip
 			const delta = clock.getDelta();
-			const hasControlsUpdated = scope.cameraControls.update(  );
+			const hasControlsUpdated = scope.cameraControls.update( delta );
 
 			requestAnimationFrame( anim );
 
@@ -126,7 +127,7 @@ export class THREEManager {
 		scope.delta.multiplyScalar( distance * 4 );
 
 		const newPos = scope.center.add( scope.delta );
-		//scope.cameraControls.moveTo(newPos.x, newPos.y, newPos.z, true);
+		scope.cameraControls.moveTo(newPos.x, newPos.y, newPos.z, true);
 
 		const paddingLeft   = 0;
 		const paddingRight  = 0;
@@ -141,8 +142,8 @@ export class THREEManager {
 		const boundingDepth  = size.z;
 
 
-		//distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
-		//scope.cameraControls.dollyTo(distance, true);
+		distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
+		scope.cameraControls.dollyTo(distance, true);
 		const gameObject = target as GameObject;
 		signals.objectFocused.emit(gameObject.guid);
 
@@ -452,7 +453,7 @@ export class THREEManager {
 		const distance = 10;
 		const target = new Vec3(transform.trans.x + (transform.forward.x * -1 * distance), transform.trans.y + (transform.forward.y * -1 * distance), transform.trans.z + (transform.forward.z * -1 * distance));
 
-		//this.cameraControls.setLookAt(transform.trans.x, transform.trans.y, transform.trans.z, target.x, target.y, target.z, false);
+		this.cameraControls.setLookAt(transform.trans.x, transform.trans.y, transform.trans.z, target.x, target.y, target.z, false);
 		this.Render();
 		this.updatingCamera = false;
 

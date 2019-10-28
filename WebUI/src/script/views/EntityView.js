@@ -64,7 +64,7 @@ export class EntityView {
     }
 
 }
-var EntityViewComponent = function( container, state ) {
+export var EntityViewComponent = function( container, state ) {
     this._container = container;
     this._state = state;
     this.element = new EntityView();

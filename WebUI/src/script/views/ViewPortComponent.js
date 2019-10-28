@@ -1,4 +1,4 @@
-var ViewPortComponent = function( container, state ) {
+export var ViewPortComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
 	console.log(container.getElement().parent()[0]);

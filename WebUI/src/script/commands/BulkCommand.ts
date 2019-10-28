@@ -1,14 +1,13 @@
-import Command from "../libs/three/Command";
+import Command from '../libs/three/Command';
+import SpawnBlueprintCommand from "@/script/commands/SpawnBlueprintCommand";
 
 export default class BulkCommand extends Command {
-	constructor(commands) {
-		super();
-		this.type = 'BulkCommand';
+	constructor(public commands: Command[] | SpawnBlueprintCommand[]) {
+		super('BulkCommand');
 		this.name = 'Bulk command ' + commands[0].name;
-		this.commands = commands;
 	}
 
-	execute() {
+	public execute() {
 		editor.vext.Pause();
 		this.commands.forEach(function(command) {
 			command.execute();
@@ -16,11 +15,11 @@ export default class BulkCommand extends Command {
 		editor.vext.Resume();
 	}
 
-	undo() {
+	public undo() {
 		editor.vext.Pause();
 		this.commands.forEach(function(command) {
 			command.undo();
 		});
 		editor.vext.Resume();
 	}
-};
+}

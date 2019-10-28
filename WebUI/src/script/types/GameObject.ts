@@ -6,10 +6,10 @@ import {CtrRef} from '@/script/types/CtrRef';
 import {GameObjectParentData} from '@/script/types/GameObjectParentData';
 import {GameEntityData} from '@/script/types/GameEntityData';
 import {LinearTransform} from '@/script/types/primitives/LinearTransform';
-import {Object3D} from "three";
-import {signals} from "@/script/modules/Signals";
+import {signals} from '@/script/modules/Signals';
+import * as THREE from 'three';
 
-export class GameObject extends Object3D {
+export class GameObject extends THREE.Object3D {
 	public guid: Guid;
 	public typeName: string;
 	public transform: LinearTransform;
@@ -79,7 +79,7 @@ export class GameObject extends Object3D {
 
 	public getChanges() {
 		const scope = this;
-		const changes:any = {};
+		const changes: any = {};
 		// Add more realtime-updates here.
 		if (scope.hasMoved()) {
 			const gameObjectTransferData = new GameObjectTransferData({

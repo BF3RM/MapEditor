@@ -1,8 +1,10 @@
+import {signals} from "@/script/modules/Signals";
+
 export class HistoryView {
 	constructor() {
 		this.dom = this.CreateDom();
 		this.Initialize();
-		signals.historyChanged.add(this.onHistoryChanged.bind(this));
+		signals.historyChanged.connect(this.onHistoryChanged.bind(this));
 	}
 
 	Initialize() {
@@ -11,8 +13,8 @@ export class HistoryView {
 
 	CreateDom() {
 		let scope = this;
-		let dom = $(document.createElement("ul"));
-		dom.addClass("historyWindow");
+		let dom = document.createElement("ul");
+		dom.className += "historyWindow";
 
 		return dom;
 	}
@@ -22,9 +24,9 @@ export class HistoryView {
 		let history = editor.history;
 		scope.dom.html("");
 		for(let i = 0; i < history.undos.length; i++) {
-			let entry = $(document.createElement("li"));
-			entry.addClass("undo");
-			entry.text(history.undos[i].name);
+			let entry = document.createElement("li");
+			entry.className += "undo";
+			entry.innerText = (history.undos[i].name);
 			entry.attr('historyStep', history.undos[i].id);
 			scope.dom.append(entry);
 
@@ -34,7 +36,7 @@ export class HistoryView {
 		}
 
 		for(let i = history.redos.length -1; i >= 0 ; i--) {
-			let entry = $(document.createElement("li"));
+			let entry = document.createElement("li");
 			entry.addClass("redo");
 			entry.text(history.redos[i].name);
 			entry.attr('historyStep', history.redos[i].id);
@@ -48,7 +50,7 @@ export class HistoryView {
 	}
 }
 
-var HistoryComponent = function(container, state ) {
+export var HistoryComponent = function(container, state ) {
 	this._container = container;
 	this._state = state;
 	this._element = new HistoryView();

@@ -13,17 +13,18 @@ export default class Command {
 	public id: number;
 	public inMemory: boolean;
 	public updatable: boolean;
-	public type: string;
-	public name: string;
-	public sender: string;
 
-	constructor(name: string = '', type: string = '') {
+	constructor(public type: string = '', public name: string = '') {
 
 		this.id = -1;
 		this.inMemory = false;
 		this.updatable = false;
-		this.type = name;
-		this.name = type;
-		this.sender = '';
+	}
+
+	public execute() {
+		console.log('missing execute action');
+	}
+	public undo() {
+		console.log('missing undo action');
 	}
 }

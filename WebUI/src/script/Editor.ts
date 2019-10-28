@@ -28,6 +28,7 @@ import {EntityFactory} from './modules/EntityFactory';
 import {LinearTransform} from './types/primitives/LinearTransform';
 import {Vec3} from './types/primitives/Vec3';
 import {signals} from '@/script/modules/Signals';
+import { SceneUtils } from 'three';
 
 export default class Editor {
 	public config = new Config();
@@ -46,7 +47,7 @@ export default class Editor {
 	public playerName: string;
 	public gameObjects = new Collections.Dictionary<Guid, GameObject>();
 	public favorites: Blueprint[];
-	public copy: BulkCommand | null;
+	public copy: SpawnBlueprintCommand[];
 
 	public selectionGroup: SelectionGroup;
 	public highlightGroup: HighlightGroup;
@@ -90,15 +91,14 @@ export default class Editor {
 		this.playerName = '';
 		this.favorites = [];
 
-		this.copy = null;
+		this.copy = [];
 
 		// Creates selection and highlighting group and adds them to the scene
-		this.selectionGroup = new SelectionGroup();
+		this.selectionGroup = new SelectionGroup(false);
 		this.highlightGroup = new HighlightGroup();
 
 		this.missingParent = new Collections.Dictionary<Guid, GameObject[]>();
 		this.Initialize();
-
 	}
 
 	public Initialize() {
@@ -112,7 +112,7 @@ export default class Editor {
 			this.setPlayerName('LocalPlayer');
 		}
 
-
+/*
 		this.ui.RegisterMenubarEntry(['Edit', 'Undo'], this.undo.bind(this));
 		this.ui.RegisterMenubarEntry(['Edit', 'Redo'], this.undo.bind(this));
 		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
@@ -124,7 +124,7 @@ export default class Editor {
 		this.ui.RegisterMenubarEntry(['Edit', 'Delete'], this.DeleteSelected.bind(this));
 		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
 
-
+*/
 
 		// All our UI stuff should be initialized by now.
 		// We're going to trigger a resize so the content can adapt to being done initializing.
@@ -198,24 +198,24 @@ export default class Editor {
 
 	public Copy() {
 		const scope = this;
-		const commands: Command[] = [];
+		const commands: SpawnBlueprintCommand[] = [];
 		this.selectionGroup.children.forEach((childGameObject: GameObject) => {
 			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = GenerateGuid();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
-		scope.copy = new BulkCommand(commands);
+		scope.copy = commands;
 	}
 
 	public Paste() {
 		const scope = this;
 		if (scope.copy !== null) {
 			// Generate a new guid for each command
-			scope.copy.commands.forEach(function(command: SpawnBlueprintCommand) {
+			scope.copy.forEach(function(command: SpawnBlueprintCommand) {
 				command.gameObjectTransferData.guid = GenerateGuid();
 			});
-			scope.execute(scope.copy);
+			scope.execute(new BulkCommand(scope.copy));
 		}
 	}
 
@@ -436,7 +436,7 @@ export default class Editor {
 			} else {
 				if (!this.gameObjects.getValue(parentGuid) === undefined) {
 					const parent = this.gameObjects.getValue(parentGuid) as GameObject;
-					THREE.SceneUtils.attach(gameObject, scope.threeManager.scene, parent);
+					SceneUtils.attach(gameObject, scope.threeManager.scene, parent);
 				}
 
 			}
@@ -445,7 +445,7 @@ export default class Editor {
 				const missingParent = this.missingParent.getValue(gameObjectGuid);
 				if (missingParent !== undefined) {
 					missingParent.every( ((child) => {
-						THREE.SceneUtils.attach(child as THREE.Object3D, scope.threeManager.scene, gameObject);
+						SceneUtils.attach(child as THREE.Object3D, scope.threeManager.scene, gameObject);
 					}));
 				}
 

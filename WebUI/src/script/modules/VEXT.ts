@@ -5,6 +5,7 @@ import * as Collections from 'typescript-collections';
 import {Guid} from 'guid-typescript';
 import {GameObject} from '@/script/types/GameObject';
 import {signals} from "@/script/modules/Signals";
+import {VextCommand} from "@/script/types/VextCommand";
 
 
 export default class VEXTInterface {
@@ -15,7 +16,7 @@ export default class VEXTInterface {
 	public paused: boolean;
 	public executing: boolean;
 	public queued: {
-		commands: Command[],
+		commands: VextCommand[],
 		messages: object[];
 	};
 
@@ -92,7 +93,7 @@ export default class VEXTInterface {
 
 	 */
 
-	public SendCommand(command: Command) {
+	public SendCommand(command: VextCommand) {
 		command.sender = editor.playerName;
 
 		if (this.paused) {
@@ -103,7 +104,7 @@ export default class VEXTInterface {
 		}
 	}
 
-	public SendCommands(commands: Command[]) {
+	public SendCommands(commands: VextCommand[]) {
 		if (commands.length === 0) {
 			return;
 		}

@@ -1,14 +1,15 @@
+import {signals} from "@/script/modules/Signals";
 
 export class HierarchyView {
 	constructor() {
-		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
-		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
-		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
-		signals.deselectedGameObject.add(this.onDeselected.bind(this));
-		signals.setObjectName.add(this.onSetObjectName.bind(this));
-		signals.objectChanged.add(this.onObjectChanged.bind(this));
-		signals.levelLoaded.add(this.onLevelLoaded.bind(this));
-		signals.objectFocused.add(this.onObjectFocused.bind(this));
+		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
+		signals.destroyedBlueprint.connect(this.onDestroyedBlueprint.bind(this));
+		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
+		signals.deselectedGameObject.connect(this.onDeselected.bind(this));
+		signals.setObjectName.connect(this.onSetObjectName.bind(this));
+		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+		signals.levelLoaded.connect(this.onLevelLoaded.bind(this));
+		signals.objectFocused.connect(this.onObjectFocused.bind(this));
 
 
 		this.data = {
@@ -334,7 +335,7 @@ export class HierarchyView {
 	}
 }
 
-var HierarchyComponent = function( container, state ) {
+export var HierarchyComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
 	this.element = new HierarchyView();

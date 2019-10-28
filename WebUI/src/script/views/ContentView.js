@@ -129,7 +129,7 @@ export class ContentView {
 	}
 
 }
-var ContentViewComponent = function( container, state ) {
+export var ContentViewComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
 	this.element = new ContentView();

@@ -183,7 +183,7 @@ export class TreeView {
 	}
 }
 
-var TreeViewComponent = function( container, state ) {
+export var TreeViewComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
 	this.element = new TreeView();

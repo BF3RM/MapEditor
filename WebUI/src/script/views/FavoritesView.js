@@ -44,7 +44,7 @@ export class FavoritesView {
 		});
 	}
 }
-var FavoritesComponent = function( container, state ) {
+export var FavoritesComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
 	this.element = new FavoritesView();

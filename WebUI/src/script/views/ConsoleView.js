@@ -19,7 +19,7 @@ export class ConsoleView {
 
 }
 
-var ConsoleViewComponent = function( container, state ) {
+export var ConsoleViewComponent = function( container, state ) {
 	this._container = container;
 	this._state = state;
 	this.element = new ConsoleView();

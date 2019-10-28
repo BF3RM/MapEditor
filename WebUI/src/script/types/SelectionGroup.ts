@@ -1,12 +1,13 @@
 import {GameObject} from '@/script/types/GameObject';
 import {LinearTransform} from '@/script/types/primitives/LinearTransform';
 import {Guid} from 'guid-typescript';
-import {signals} from "@/script/modules/Signals";
+import {signals} from '@/script/modules/Signals';
+import * as THREE from 'three';
 
 export class SelectionGroup extends GameObject {
 	public children: GameObject[];
-	constructor() {
-		super( );
+	constructor(update: boolean = true) {
+		super();
 
 		this.guid = Guid.create();
 		this.type = 'SelectionGroup';
@@ -15,7 +16,9 @@ export class SelectionGroup extends GameObject {
 		this.children = [];
 
 		// Update the matrix after initialization.
-		this.updateTransform();
+		if (update) {
+			this.updateTransform();
+		}
 
 	}
 
@@ -82,13 +85,13 @@ export class SelectionGroup extends GameObject {
 
 		matrix.decompose( this.position, this.quaternion, this.scale );
 
-		editor.threeManager.Render();
+		//window.editor.threeManager.Render();
 
 		for (let i = temp.length - 1; i >= 0; i--) {
 
 			this.AttachObject(temp[i]);
 		}
-		editor.threeManager.Render();
+		//window.editor.threeManager.Render();
 
 	}
 
