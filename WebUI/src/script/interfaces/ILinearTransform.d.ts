@@ -1,4 +1,4 @@
-import {Vec3} from '@/script/types/Primitives';
+import { Vec3 } from '@/script/types/Primitives';
 
 interface ILinearTransform {
 	left: Vec3;

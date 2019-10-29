@@ -1,7 +1,7 @@
-import {Message} from '@/script/messages/Message';
+import { Message } from '@/script/messages/Message';
 
 export class SetViewModeMessage extends Message {
-	constructor(public viewMode: string) {
-		super('SetViewModeMessage');
-	}
+    constructor(public viewMode: string) {
+        super('SetViewModeMessage');
+    }
 }

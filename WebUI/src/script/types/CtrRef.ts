@@ -1,4 +1,4 @@
-import {Guid} from 'guid-typescript';
+import { Guid } from 'guid-typescript';
 
 export class CtrRef {
 	public typeName: string;
@@ -6,22 +6,22 @@ export class CtrRef {
 	public partitionGuid: Guid;
 	public instanceGuid: Guid;
 	constructor(typeName: string = '', name: string = '', partitionGuid: Guid = Guid.createEmpty(), instanceGuid: Guid = Guid.createEmpty()) {
-		this.typeName = typeName;
-		this.name = name;
-		this.partitionGuid = partitionGuid;
-		this.instanceGuid = instanceGuid;
+	    this.typeName = typeName;
+	    this.name = name;
+	    this.partitionGuid = partitionGuid;
+	    this.instanceGuid = instanceGuid;
 	}
 
 	public setFromTable(table: any) {
-		this.typeName = table.typeName;
-		this.name = table.name;
-		this.partitionGuid = table.partitionGuid;
-		this.instanceGuid = table.instanceGuid;
+	    this.typeName = table.typeName;
+	    this.name = table.name;
+	    this.partitionGuid = table.partitionGuid;
+	    this.instanceGuid = table.instanceGuid;
 
-		return this;
+	    return this;
 	}
 
 	public clone() {
-		return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
+	    return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
 	}
 }

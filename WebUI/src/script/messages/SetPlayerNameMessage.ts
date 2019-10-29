@@ -1,8 +1,8 @@
-import {Message} from '@/script/messages/Message';
+import { Message } from '@/script/messages/Message';
 
-export class SetPlayerNameMessage  extends Message {
-	constructor(public name: string) {
-		super('SetPlayerNameMessage');
-		this.name = name;
-	}
+export class SetPlayerNameMessage extends Message {
+    constructor(public name: string) {
+        super('SetPlayerNameMessage');
+        this.name = name;
+    }
 }
