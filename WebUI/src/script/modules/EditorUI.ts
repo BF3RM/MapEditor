@@ -287,6 +287,7 @@ export class EditorUI {
 			container.getElement().html( '<h2>' + state.text + '</h2>');
 		});
 		this.layout.on('componentCreated', function(component: any) {
+			/*
 			console.log(component);
 			const elem = component.container._element[0];
 			const scrollbar = elem.find('.infinite-tree-scroll');
@@ -302,7 +303,7 @@ export class EditorUI {
 			component.container.on('resize', function() {
 				component.ps.update();
 			});
-
+*/
 		});
 
 		this.layout.registerComponent( 'ViewPortComponent', ViewPortComponent);
@@ -315,7 +316,7 @@ export class EditorUI {
 		this.layout.registerComponent( 'EntityViewComponent', EntityViewComponent);
 		this.layout.registerComponent( 'ConsoleViewComponent', ConsoleViewComponent);
 
-
+/*
 		this.layout.on('initialised', function() {
 			$('.lm_content .infinite-tree-scroll').each(function(e) {
 				const scope = this;
@@ -325,6 +326,8 @@ export class EditorUI {
 				});
 			});
 		});
+
+ */
 		this.layout.init();
 	}
 

@@ -1,11 +1,13 @@
+import {signals} from "@/script/modules/Signals";
+
 export class FavoritesView {
 	constructor() {
 		this.dom = null;
 		this.directory = null;
 
-		signals.favoritesChanged.add(this.onFavoritesChanged.bind(this));
-		signals.favoriteAdded.add(this.onFavoriteAdded.bind(this));
-		signals.favoriteRemoved.add(this.onFavoriteRemoved.bind(this));
+		signals.favoritesChanged.connect(this.onFavoritesChanged.bind(this));
+		signals.favoriteAdded.connect(this.onFavoriteAdded.bind(this));
+		signals.favoriteRemoved.connect(this.onFavoriteRemoved.bind(this));
 		this.header = this.Header();
 
 		this.Initialize();

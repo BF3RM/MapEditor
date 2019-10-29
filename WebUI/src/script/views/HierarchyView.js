@@ -19,15 +19,15 @@ export class HierarchyView {
 			"Parent": "root",
 			"children": [
 			]
-		}
+		};
 
 		this.selectedNodes = [];
 
 		this.dom = this.CreateDom();
 		this.tree = this.InitializeTree();
 		console.log(this.tree);
-		this.topControls = this.CreateTopControls();
-		this.subControls = this.CreateSubControls();
+		//this.topControls = this.CreateTopControls();
+		//this.subControls = this.CreateSubControls();
 
 		this.entries = [];
 		this.existingParents = [];
@@ -294,44 +294,7 @@ export class HierarchyView {
     }
 
 	hierarchyRenderer(node, treeOptions) {
-		if(node.state.filtered === false || node.visible === false ){
-			return
-		}
-		let state = node.state;
-		let row = new UI.Row();
-		row.setAttribute("guid", node.id);
-		row.setStyle("margin-left", (state.depth * 18) +"px");
-		row.addClass("infinite-tree-item");
 
-		if(state.selected) {
-			row.addClass("infinite-tree-selected");
-		}
-		if(node.selectable !== undefined) {
-			row.setAttribute("node-selectable", node.selectable);
-		}
-
-		if(node.draggable) {
-			row.setAttribute("draggable", true);
-		}
-		if(node.droppable) {
-			row.setAttribute("droppable", true);
-		}
-		if(node.hasChildren()) {
-			row.add(new UI.Toggler(state.open));
-		}
-		row.add(new UI.Icon(node.type));
-		row.add(new UI.Text(node.name));
-		if(Object.keys(node.children).length > 0) {
-			let count = new UI.Text(Object.keys(node.children).length);
-			row.add(count);
-			count.setStyle("padding-left", "10px");
-			count.setStyle("opacity", "0.5");
-		}
-		
-		$(row).on('click', function (e) {
-			console.log(e);
-		});
-		return row.dom.outerHTML;
 	}
 }
 

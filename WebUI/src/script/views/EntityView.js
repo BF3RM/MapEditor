@@ -1,10 +1,12 @@
+import {signals} from "@/script/modules/Signals";
+
 export class EntityView {
     constructor() {
         this.dom = null;
         this.directory = null;
         this.content = [];
 
-        signals.selectedGameObject.add(this.onGameObjectSelected.bind(this));
+        signals.selectedGameObject.connect(this.onGameObjectSelected.bind(this));
         this.header = this.Header();
 
         this.Initialize();

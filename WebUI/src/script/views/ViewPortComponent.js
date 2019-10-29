@@ -5,8 +5,8 @@ export var ViewPortComponent = function( container, state ) {
 	let parents = container.getElement().parents();
 	parents.addClass("viewPort");
 	container.getElement().html( '<h2></h2>');
-
-	$(container.getElement()).droppable({
+	/*
+	container.getElement().droppable({
 		accept: '.draggable',
 		greedy:false,//this will prevent the parent droppables from receiving the droppable object
 		drop: function (event, ui) {
@@ -19,5 +19,5 @@ export var ViewPortComponent = function( container, state ) {
 			editor.editorCore.onPreviewStop();
 		},
 	});
-
+*/
 };

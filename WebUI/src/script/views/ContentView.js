@@ -1,11 +1,13 @@
+import {signals} from "@/script/modules/Signals";
+
 export class ContentView {
 	constructor() {
 		this.dom = null;
 		this.directory = null;
 		this.content = [];
 
-		signals.folderSelected.add(this.onFolderSelected.bind(this));
-		signals.folderFiltered.add(this.onFolderFiltered.bind(this));
+		signals.folderSelected.connect(this.onFolderSelected.bind(this));
+		signals.folderFiltered.connect(this.onFolderFiltered.bind(this));
 		this.header = this.Header();
 
 		this.Initialize();

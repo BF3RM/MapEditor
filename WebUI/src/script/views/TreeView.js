@@ -1,10 +1,12 @@
+import {signals} from "@/script/modules/Signals";
+
 export class TreeView {
 	constructor() {
 		this.data = null;
-		this.dom = $(document.createElement("div"));
-		this.topControls = this.CreateControls();
+		//this.dom = $(document.createElement("div"));
+		//this.topControls = this.CreateControls();
 		this.tree = null;
-		signals.blueprintsRegistered.add(this.LoadData.bind(this))
+		signals.blueprintsRegistered.connect(this.LoadData.bind(this));
 
 		this.nodes = [];
 
@@ -57,9 +59,9 @@ export class TreeView {
 			})
 		}
 		scope.data = data;
-		scope.InitializeTree();
-		scope.RegisterEvents();
-		signals.folderSelected.dispatch("/", data.content, scope.searchString);
+		//scope.InitializeTree();
+		//scope.RegisterEvents();
+		//signals.folderSelected.dispatch("/", data.content, scope.searchString);
 	}
 
 	InitializeTree() {
