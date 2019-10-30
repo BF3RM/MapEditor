@@ -1,9 +1,9 @@
 {
-  "compileOnSave": false,
-  "buildOnSave": false,
+  "compileOnSave": true,
+  "buildOnSave": true,
   "compilerOptions": {
     "module": "esnext",
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "esnext"],
     "allowJs": true,
     "outDir": "./dist",
@@ -14,8 +14,8 @@
     "typeRoots": ["node_modules/@types"],
     "types": [
       "webpack-env",
-      "jquery"
-    ],
+      "JQuery"
+     ],
     "paths": {
       "@/*": [
         "src/*"
@@ -24,12 +24,14 @@
         "src/modules/*"
       ]
     },
+    "experimentalDecorators": true
   },
   "include": [
     "types/**/*",
     "src/**/*"
   ],
   "exclude": [
-    "src/script/libs/**/*"
+    "src/script/libs/**/*",
+    "src/script/**/*.js"
   ]
 }

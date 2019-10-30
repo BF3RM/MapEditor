@@ -31,7 +31,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component({ components: { PlaceholderComponent } })
 export default class App extends Vue {
-	@Prop() title: string
+	@Prop() title: string;
 }
 </script>
 

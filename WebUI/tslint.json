@@ -5,11 +5,12 @@
   ],
   "linterOptions": {
     "exclude": [
-      "node_modules/**"
+      "node_modules/**",
+      "src/**/*.js"
     ]
   },
   "rules": {
-    "indent": [true, "tabs", 1],
+    "indent": [true, "tabs", 2],
     "interface-name": false,
     "no-consecutive-blank-lines": false,
     "object-literal-sort-keys": false,

@@ -40,7 +40,7 @@ export class GameObjectTransferData {
 		if (table.guid === undefined) {
 			LogError('Attempted to create a GameObjectTransferData without a specified GUID');
 		}
-		Object.keys(table).forEach(function (key) {
+		Object.keys(table).forEach(function(key) {
 			let value = table[key];
 
 			switch (key) {
@@ -58,7 +58,7 @@ export class GameObjectTransferData {
 				scope[key] = value;
 
 				break;
-			case 'gameEntities':
+			case 'gameEntities': {
 				const gameEntities: GameEntityData[] = [];
 				Object.keys(value).forEach(function (index) {
 					const gameEntityDataTable = value[index];
@@ -72,6 +72,7 @@ export class GameObjectTransferData {
 
 				value = gameEntities;
 				break;
+			}
 			default:
 				break;
 			}

@@ -12,7 +12,7 @@ export default class SetVariationCommand extends Command {
 	public execute() {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid,
-			variation: this.newVariationKey
+			variation: this.newVariationKey,
 		});
 
 		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
@@ -21,7 +21,7 @@ export default class SetVariationCommand extends Command {
 	public undo() {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid,
-			variation: this.gameObjectTransferData.variation
+			variation: this.gameObjectTransferData.variation,
 		});
 
 		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));

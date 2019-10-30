@@ -18,7 +18,6 @@ import { Blueprint } from './types/Blueprint';
 import { THREEManager } from './modules/THREEManager';
 import { EditorCore } from './EditorCore';
 import { SpatialGameEntity } from './types/SpatialGameEntity';
-import { ProjectManager } from './modules/ProjectManager';
 import { CommandActionResult } from './types/CommandActionResult';
 import { HighlightGroup } from './types/HighlightGroup';
 import { GameObjectTransferData } from './types/GameObjectTransferData';
@@ -39,7 +38,6 @@ export default class Editor {
 	public history = new History(this);
 	public blueprintManager = new BlueprintManager();
 	public gameContext = new GameContext();
-	public projectManager = new ProjectManager();
 	public fbdMan = new FrostbiteDataManager();
 
 	public playerName: string;
@@ -66,12 +64,6 @@ export default class Editor {
 		// Messages
 
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
-		signals.setCameraTransform.connect(this.onSetCameraTransform.bind(this));
-		signals.setRaycastPosition.connect(this.onSetRaycastPosition.bind(this));
-		signals.setPlayerName.connect(this.onSetPlayerName.bind(this));
-		signals.setScreenToWorldPosition.connect(this.onSetScreenToWorldPosition.bind(this));
-		signals.setUpdateRateMessage.connect(this.onSetUpdateRateMessage.bind(this));
-		signals.historyChanged.connect(this.onHistoryChanged.bind(this));
 
 		this.debug = debug;
 
@@ -174,9 +166,9 @@ export default class Editor {
 	public Duplicate() {
 		const scope = this;
 		const commands: Command[] = [];
-		this.selectionGroup.children.forEach(function (childGameObject) {
+		this.selectionGroup.children.forEach((childGameObject) => {
 			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
-			gameObjectTransferData.guid = GenerateGuid();
+			gameObjectTransferData.guid = Guid.create();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
@@ -189,7 +181,7 @@ export default class Editor {
 		const commands: SpawnBlueprintCommand[] = [];
 		this.selectionGroup.children.forEach((childGameObject: GameObject) => {
 			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
-			gameObjectTransferData.guid = GenerateGuid();
+			gameObjectTransferData.guid = Guid.create();
 
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
@@ -200,8 +192,8 @@ export default class Editor {
 		const scope = this;
 		if (scope.copy !== null) {
 			// Generate a new guid for each command
-			scope.copy.forEach(function (command: SpawnBlueprintCommand) {
-				command.gameObjectTransferData.guid = GenerateGuid();
+			scope.copy.forEach((command: SpawnBlueprintCommand) => {
+				command.gameObjectTransferData.guid = Guid.create();
 			});
 			scope.execute(new BulkCommand(scope.copy));
 		}
@@ -232,14 +224,14 @@ export default class Editor {
 		// Spawn blueprint
 		window.Log(LOGLEVEL.VERBOSE, 'Spawning blueprint: ' + blueprint.instanceGuid);
 		const gameObjectTransferData = new GameObjectTransferData({
-			guid: GenerateGuid(),
+			guid: Guid.create(),
 			name: blueprint.name,
 			parentData,
 			blueprintCtrRef: blueprint.getCtrRef(),
 			transform,
 			variation,
 			isDeleted: false,
-			isEnabled: true
+			isEnabled: true,
 		});
 
 		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -265,7 +257,7 @@ export default class Editor {
 	public DeleteSelected() {
 		const scope = this;
 		const commands: Command[] = [];
-		this.selectionGroup.children.forEach(function (childGameObject) {
+		this.selectionGroup.children.forEach((childGameObject) => {
 			if (childGameObject instanceof GameObject) {
 				commands.push(new DestroyBlueprintCommand(childGameObject.getGameObjectTransferData()));
 			}
@@ -394,8 +386,8 @@ export default class Editor {
 			gameObjectTransferData.variation,
 			gameObjectTransferData.gameEntities);
 
-		for (const key in gameObjectTransferData.gameEntities) {
-			const entityData = gameObjectTransferData.gameEntities[key];
+		for (const gameEntityData of gameObjectTransferData.gameEntities) {
+			const entityData = gameEntityData;
 			// UniqueID is fucking broken. this won't work online, boi.
 			if (entityData.isSpatial) {
 				const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
@@ -439,12 +431,12 @@ export default class Editor {
 			}
 		}
 
-		setTimeout(function () {
+		setTimeout( () => {
 			scope.threeManager.scene.remove(gameObject);
 		}, 1);
 		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
-			setTimeout(function () {
+			setTimeout( () => {
 				scope.Select(gameObjectGuid, false);
 			}, 2);
 		}
@@ -487,8 +479,8 @@ export default class Editor {
 		if (scope.selectionGroup.children.length === 0) {
 			return false;
 		}
-		for (let i = 0; i < scope.selectionGroup.children.length; i++) {
-			if (guid.equals(scope.selectionGroup.children[i].guid)) {
+		for (let gameObject of scope.selectionGroup.children) {
+			if (guid.equals(gameObject.guid)) {
 				return true;
 			}
 		}
@@ -536,38 +528,10 @@ export default class Editor {
 
 	/*
 
-		Messages
-
-	 */
-
-	public onSetCameraTransform(transform: LinearTransform) {
-
-	}
-
-	public onSetRaycastPosition(position: Vec3) {
-
-	}
-
-	public onSetPlayerName(name: string) {
-
-	}
-
-	public onSetScreenToWorldPosition(position: Vec3) {
-
-	}
-
-	public onSetUpdateRateMessage(value: number) {
-
-	}
-
-	/*
-
 		History
 
 	 */
-	public onHistoryChanged(cmd: Command) {
 
-	}
 
 	public execute(cmd: Command, optionalName?: string) {
 		this.history.execute(cmd, optionalName);
@@ -581,6 +545,6 @@ export default class Editor {
 		this.history.redo();
 	}
 }
-window.addEventListener('resize', function () {
+window.addEventListener('resize', () => {
 	signals.windowResized.emit();
 });

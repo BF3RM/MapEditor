@@ -5,6 +5,7 @@
   },
   "extends": [
     "plugin:vue/essential",
+    "eslint:recommended",
     "@vue/standard",
     "@vue/typescript"
   ],
@@ -17,6 +18,7 @@
     "semi": ["error", "always"],
     "indent": ["error", "tab"],
     "no-useless-constructor": 0,
+    "no-console": 0,
     "no-multi-spaces": ["error", { "exceptions": { "VariableDeclarator": false } }],
     "space-before-function-paren": ["error", {
       "anonymous": "ignore",
