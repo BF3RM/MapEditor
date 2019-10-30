@@ -1,4 +1,4 @@
-import {signals} from "@/script/modules/Signals";
+import { signals } from '@/script/modules/Signals';
 
 export class FavoritesView {
 	constructor() {
@@ -16,11 +16,10 @@ export class FavoritesView {
 	Header() {
 		let row = new UI.TableRow();
 		row.add(new UI.TableHeader());
-		row.add(new UI.TableHeader("Name"));
-		row.add(new UI.TableHeader("Type"));
+		row.add(new UI.TableHeader('Name'));
+		row.add(new UI.TableHeader('Type'));
 		return row;
 	}
-
 
 	Initialize() {
 		this.dom = new UI.Panel();
@@ -40,13 +39,14 @@ export class FavoritesView {
 	onFavoritesChanged() {
 		let scope = this;
 		scope.directory.clear();
-		Object.keys(editor.favorites).forEach(function(key) {
+		Object.keys(editor.favorites).forEach(function (key) {
 			let entry = editor.favorites[key].CreateEntry();
 			scope.directory.add(entry);
 		});
 	}
 }
-export var FavoritesComponent = function( container, state ) {
+
+export var FavoritesComponent = function (container, state) {
 	this._container = container;
 	this._state = state;
 	this.element = new FavoritesView();

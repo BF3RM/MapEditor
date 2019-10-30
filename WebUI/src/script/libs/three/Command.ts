@@ -15,7 +15,6 @@ export default class Command {
 	public updatable: boolean;
 
 	constructor(public type: string = '', public name: string = '') {
-
 		this.id = -1;
 		this.inMemory = false;
 		this.updatable = false;

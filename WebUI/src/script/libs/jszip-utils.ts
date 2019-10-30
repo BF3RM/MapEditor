@@ -1,8 +1,7 @@
 'use strict';
-/*globals Promise */
+/* globals Promise */
 
 export class JSZipUtils {
-
 	public getBinaryContent = function(path: string, options: any) {
 		let promise: any;
 		let resolve: any;
@@ -83,13 +82,12 @@ export class JSZipUtils {
 						originalEvent: e,
 						percent: e.loaded / e.total * 100,
 						loaded: e.loaded,
-						total: e.total,
+						total: e.total
 					});
 				};
 			}
 
 			xhr.send();
-
 		} catch (e) {
 			reject(new Error(e), null);
 		}
@@ -98,9 +96,6 @@ export class JSZipUtils {
 		// provided
 		return promise;
 	};
-
-
-
 }
 
 function _getBinaryFromXHR(xhr: any) {
@@ -111,25 +106,25 @@ function _getBinaryFromXHR(xhr: any) {
 function createStandardXHR() {
 	try {
 		return new window.XMLHttpRequest();
-	} catch ( e ) {}
+	} catch (e) {}
 }
 
 function createActiveXHR() {
 	try {
 		return new window.ActiveXObject('Microsoft.XMLHTTP');
-	} catch ( e ) {}
+	} catch (e) {}
 }
 
 // Create the request object
-const createXHR = (typeof window !== 'undefined' && window.ActiveXObject) ?
+const createXHR = (typeof window !== 'undefined' && window.ActiveXObject)
 	/* Microsoft failed to properly
 	 * implement the XMLHttpRequest in IE7 (can't request local files),
 	 * so we use the ActiveXObject when it is available
 	 * Additionally XMLHttpRequest can be disabled in IE7/IE8 so
 	 * we need a fallback.
 	 */
-	function() {
+	? function() {
 		return createStandardXHR() || createActiveXHR();
-	} :
+	}
 	// For all other browsers, use the standard XMLHttpRequest object
-	createStandardXHR;
+	: createStandardXHR;

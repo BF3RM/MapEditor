@@ -3,7 +3,7 @@ export class Variation {
 	private nameHash: number;
 
 	constructor(name: string, nameHash: number) {
-	    this.name = name;
-	    this.nameHash = nameHash;
+		this.name = name;
+		this.nameHash = nameHash;
 	}
 }

@@ -1,10 +1,10 @@
-export var ViewPortComponent = function( container, state ) {
+export var ViewPortComponent = function (container, state) {
 	this._container = container;
 	this._state = state;
 	console.log(container.getElement().parent()[0]);
 	let parents = container.getElement().parents();
-	parents.addClass("viewPort");
-	container.getElement().html( '<h2></h2>');
+	parents.addClass('viewPort');
+	container.getElement().html('<h2></h2>');
 	/*
 	container.getElement().droppable({
 		accept: '.draggable',

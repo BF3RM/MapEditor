@@ -9,11 +9,14 @@
     "@vue/typescript"
   ],
   "parserOptions": {
-    "parser": "@typescript-eslint/parser"
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["typescript"]
   },
   "rules": {
+    "no-tabs": 0,
     "semi": ["error", "always"],
-    "indent": ["error", 4],
+    "indent": ["error", "tab"],
+    "no-useless-constructor": 0,
     "no-multi-spaces": ["error", { "exceptions": { "VariableDeclarator": false } }],
     "space-before-function-paren": ["error", {
       "anonymous": "ignore",

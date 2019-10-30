@@ -9,54 +9,55 @@ export class FrostbiteDataManager {
 	private partitions: object;
 	private _files: object;
 	private _data: object;
+
 	constructor() {
-	    // this.window = new ImportWindow();
+		// this.window = new ImportWindow();
 
-	    this.superBundles = {
-	        all: new FBSuperBundle({
-	            name: 'all',
-	            chunkCount: 0,
-	            bundleCount: 0
-	        })
-	    };
-	    this.bundles = {
-	        all: new FBBundle({
-	            name: 'all',
-	            partitionCount: 0,
-	            size: 0
-	        })
-	    };
-	    this.partitions = {};
+		this.superBundles = {
+			all: new FBSuperBundle({
+				name: 'all',
+				chunkCount: 0,
+				bundleCount: 0
+			})
+		};
+		this.bundles = {
+			all: new FBBundle({
+				name: 'all',
+				partitionCount: 0,
+				size: 0
+			})
+		};
+		this.partitions = {};
 
-	    this._files = {};
-	    this._data = {};
+		this._files = {};
+		this._data = {};
 
-	    signals.editorInitializing.connect(this._onEditorInitializing.bind(this));
-	    signals.editorReady.connect(this._onEditorReady.bind(this));
+		signals.editorInitializing.connect(this._onEditorInitializing.bind(this));
+		signals.editorReady.connect(this._onEditorReady.bind(this));
 
-	    // this._Init();
+		// this._Init();
 	}
 
 	public _Init() {
-	    const scope = this;
-	    const jszu = new JSZipUtils();
-	    jszu.getBinaryContent('data/data.zip', function(err: any, data: any) {
-	        if (err) {
-	            throw err; // or handle err
-	        }
-	        JSZip.loadAsync(data).then(function(zip) {
-	            scope._data = zip;
-	            scope._ExtractFiles();
-	        });
-	    });
+		const scope = this;
+		const jszu = new JSZipUtils();
+		jszu.getBinaryContent('data/data.zip', function (err: any, data: any) {
+			if (err) {
+				throw err; // or handle err
+			}
+			JSZip.loadAsync(data).then(function (zip) {
+				scope._data = zip;
+				scope._ExtractFiles();
+			});
+		});
 	}
 
 	public _onEditorInitializing() {
-	    // editor.ui.RegisterWindow("ImportWindow", "Import bundle", this.window, false);
+		// editor.ui.RegisterWindow("ImportWindow", "Import bundle", this.window, false);
 	}
 
 	public _onEditorReady() {
-	    /* let scope = this;
+		/* let scope = this;
 
 		editor.ui.RegisterMenubarEntry(["Edit", "Import"], function () {
 			editor.ui.OpenWindow("importwindow");
@@ -68,7 +69,7 @@ export class FrostbiteDataManager {
 	}
 
 	public _ExtractFiles() {
-	    /*
+		/*
 		const scope = this;
 		if (scope._data === null) {
 			return false;
@@ -85,8 +86,8 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public async _HandleFile(p_FileName:string) {
-	    /*
+	public async _HandleFile(fileName: string) {
+		/*
 		p_FileName = p_FileName.toLowerCase();
 		const scope = this;
 		const file = scope._files[p_FileName];
@@ -109,13 +110,15 @@ export class FrostbiteDataManager {
 		console.log('Loaded ' + p_FileName);
 		 */
 	}
-	public getBundle(path:string) {
-	    /*
+
+	public getBundle(path: string) {
+		/*
 		return this.bundles[path];
 		 */
 	}
+
 	public getSuperBundles() {
-	    /*
+		/*
 		const scope = this;
 		const superBundles = {};
 		Object.keys(scope._files.superbundles).forEach(function(superBundleName) {
@@ -126,8 +129,8 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getBundles(p_SuperBundleName?:string) {
-	    /*
+	public getBundles(superBundleName?: string) {
+		/*
 		const scope = this;
 		const bundles = [];
 
@@ -144,22 +147,24 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getBundlesRaw(p_SuperBundleName?:string) {
-	    /*
+	public getBundlesRaw(superBundleName?: string) {
+		/*
 		const scope = this;
 		return scope._files.superbundles[p_SuperBundleName.toLowerCase()].bundles;
 
 		 */
 	}
 
-	public getPartition(p_PartitionName:string) {
-	    // return this.partitions[p_PartitionName.toLowerCase()];
+	public getPartition(partitionName: string) {
+		// return this.partitions[p_PartitionName.toLowerCase()];
 	}
-	public getSuperBundle(p_SuperBundleName:string) {
-	    // return this.superBundles[p_SuperBundleName.toLowerCase()];
+
+	public getSuperBundle(superBundleName: string) {
+		// return this.superBundles[p_SuperBundleName.toLowerCase()];
 	}
-	public getPartitions(p_BundleName?:string) {
-	    /*
+
+	public getPartitions(bundleName?: string) {
+		/*
 		const scope = this;
 		const partitions = {};
 
@@ -198,8 +203,8 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getBundlesReferencedIn(p_PartitionName:string) {
-	    /*
+	public getBundlesReferencedIn(partitionName: string) {
+		/*
 		const superBundle = this._files.partitions[p_PartitionName.toLowerCase()];
 		return superBundle.bundlesReferencedIn;
 
@@ -212,24 +217,26 @@ export class FBSuperBundle {
 	public chunkCount: number;
 	public bundleCount: number;
 
-	constructor(p_SuperBundleData: any) {
-	    this.name = p_SuperBundleData.name;
-	    this.chunkCount = p_SuperBundleData.chunkCount;
-	    this.bundleCount = p_SuperBundleData.bundleCount;
+	constructor(superBundleData: any) {
+		this.name = superBundleData.name;
+		this.chunkCount = superBundleData.chunkCount;
+		this.bundleCount = superBundleData.bundleCount;
 	}
 
 	get bundles() {
-	    const scope = this;
-	    if (this.name == 'All') {
-	        return editor.fbdMan.getBundles();
-	    }
-	    return editor.fbdMan.getBundles(this.name);
+		const scope = this;
+		if (this.name === 'All') {
+			return editor.fbdMan.getBundles();
+		}
+		return editor.fbdMan.getBundles(this.name);
 	}
+
 	get paths() {
-	    return getPaths(this.name);
+		return getPaths(this.name);
 	}
+
 	get fileName() {
-	    return getFilename(this.name);
+		return getFilename(this.name);
 	}
 }
 
@@ -237,20 +244,23 @@ export class FBBundle {
 	public name: string;
 	public partitionCount: number;
 	public size: number;
-	constructor(p_BundleData: any) {
-	    this.name = p_BundleData.name;
-	    this.partitionCount = p_BundleData.partitionCount;
-	    this.size = p_BundleData.size;
+
+	constructor(bundleData: any) {
+		this.name = bundleData.name;
+		this.partitionCount = bundleData.partitionCount;
+		this.size = bundleData.size;
 	}
 
 	get partitions() {
-	    return editor.fbdMan.getPartitions(this.name);
+		return editor.fbdMan.getPartitions(this.name);
 	}
+
 	get paths() {
-	    return getPaths(this.name);
+		return getPaths(this.name);
 	}
+
 	get fileName() {
-	    return getFilename(this.name);
+		return getFilename(this.name);
 	}
 }
 
@@ -260,21 +270,24 @@ export class FBPartition {
 	public primaryInstance: Guid;
 	public typeName: string;
 	public instanceCount: number;
-	constructor(p_PartitionData: any) {
-	    this.name = p_PartitionData.name;
-	    this.guid = p_PartitionData.guid;
-	    this.primaryInstance = p_PartitionData.primaryInstance;
-	    this.typeName = p_PartitionData.typeName;
-	    this.instanceCount = p_PartitionData.instanceCount;
+
+	constructor(partitionData: any) {
+		this.name = partitionData.name;
+		this.guid = partitionData.guid;
+		this.primaryInstance = partitionData.primaryInstance;
+		this.typeName = partitionData.typeName;
+		this.instanceCount = partitionData.instanceCount;
 	}
 
 	get bundlesReferencedIn() {
-	    return editor.fbdMan.getBundlesReferencedIn(this.name);
+		return editor.fbdMan.getBundlesReferencedIn(this.name);
 	}
+
 	get paths() {
-	    return getPaths(this.name);
+		return getPaths(this.name);
 	}
+
 	get fileName() {
-	    return getFilename(this.name);
+		return getFilename(this.name);
 	}
 }

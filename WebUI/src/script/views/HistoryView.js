@@ -1,4 +1,4 @@
-import {signals} from "@/script/modules/Signals";
+import { signals } from '@/script/modules/Signals';
 
 export class HistoryView {
 	constructor() {
@@ -13,8 +13,8 @@ export class HistoryView {
 
 	CreateDom() {
 		let scope = this;
-		let dom = document.createElement("ul");
-		dom.className += "historyWindow";
+		let dom = document.createElement('ul');
+		dom.className += 'historyWindow';
 
 		return dom;
 	}
@@ -22,35 +22,34 @@ export class HistoryView {
 	onHistoryChanged(cmd) {
 		let scope = this;
 		let history = editor.history;
-		scope.dom.html("");
-		for(let i = 0; i < history.undos.length; i++) {
-			let entry = document.createElement("li");
-			entry.className += "undo";
+		scope.dom.html('');
+		for (let i = 0; i < history.undos.length; i++) {
+			let entry = document.createElement('li');
+			entry.className += 'undo';
 			entry.innerText = (history.undos[i].name);
 			entry.attr('historyStep', history.undos[i].id);
 			scope.dom.append(entry);
 
-			entry.on('click', function(e) {
-				editor.history.goToState( parseInt( this.getAttribute('historyStep') ) )
+			entry.on('click', function (e) {
+				editor.history.goToState(parseInt(this.getAttribute('historyStep')));
 			});
 		}
 
-		for(let i = history.redos.length -1; i >= 0 ; i--) {
-			let entry = document.createElement("li");
-			entry.addClass("redo");
+		for (let i = history.redos.length - 1; i >= 0; i--) {
+			let entry = document.createElement('li');
+			entry.addClass('redo');
 			entry.text(history.redos[i].name);
 			entry.attr('historyStep', history.redos[i].id);
 			scope.dom.append(entry);
 
-			entry.on('click', function(e) {
-				editor.history.goToState( parseInt( this.getAttribute('historyStep') ) )
+			entry.on('click', function (e) {
+				editor.history.goToState(parseInt(this.getAttribute('historyStep')));
 			});
 		}
-
 	}
 }
 
-export var HistoryComponent = function(container, state ) {
+export var HistoryComponent = function (container, state) {
 	this._container = container;
 	this._state = state;
 	this._element = new HistoryView();

@@ -7,10 +7,10 @@
 // }
 
 function EnableFreecamMovement() {
-    editor.vext.SendEvent('EnableFreeCamMovement');
+	editor.vext.SendEvent('EnableFreeCamMovement');
 
-    // Hack to make sure we don't navigate the windows while in freecam.
-    // document.activeElement.blur();
+	// Hack to make sure we don't navigate the windows while in freecam.
+	// document.activeElement.blur();
 }
 
 // function DisableFreeView() {

@@ -5,23 +5,24 @@ export class CtrRef {
 	public name: string;
 	public partitionGuid: Guid;
 	public instanceGuid: Guid;
+
 	constructor(typeName: string = '', name: string = '', partitionGuid: Guid = Guid.createEmpty(), instanceGuid: Guid = Guid.createEmpty()) {
-	    this.typeName = typeName;
-	    this.name = name;
-	    this.partitionGuid = partitionGuid;
-	    this.instanceGuid = instanceGuid;
+		this.typeName = typeName;
+		this.name = name;
+		this.partitionGuid = partitionGuid;
+		this.instanceGuid = instanceGuid;
 	}
 
 	public setFromTable(table: any) {
-	    this.typeName = table.typeName;
-	    this.name = table.name;
-	    this.partitionGuid = table.partitionGuid;
-	    this.instanceGuid = table.instanceGuid;
+		this.typeName = table.typeName;
+		this.name = table.name;
+		this.partitionGuid = table.partitionGuid;
+		this.instanceGuid = table.instanceGuid;
 
-	    return this;
+		return this;
 	}
 
 	public clone() {
-	    return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
+		return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
 	}
 }

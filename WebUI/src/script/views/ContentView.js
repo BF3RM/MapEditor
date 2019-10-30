@@ -1,4 +1,4 @@
-import {signals} from "@/script/modules/Signals";
+import { signals } from '@/script/modules/Signals';
 
 export class ContentView {
 	constructor() {
@@ -16,11 +16,10 @@ export class ContentView {
 	Header() {
 		let row = new UI.TableRow();
 		row.add(new UI.TableHeader());
-		row.add(new UI.TableHeader("Name"));
-		row.add(new UI.TableHeader("Type"));
+		row.add(new UI.TableHeader('Name'));
+		row.add(new UI.TableHeader('Type'));
 		return row;
 	}
-
 
 	Initialize() {
 		this.dom = new UI.Panel();
@@ -30,16 +29,15 @@ export class ContentView {
 		this.dom.add(this.directory);
 	}
 
-
 	onFolderSelected(folderName, content, searchString) {
 		let scope = this;
 		this.content = [];
 		this.directory.clear();
-		for(let i = 0; i < content.length; i++) {
+		for (let i = 0; i < content.length; i++) {
 			let blueprint = editor.blueprintManager.getBlueprintByGuid(content[i].id);
 			let entry = scope.blueprintRenderer(blueprint, folderName);
 			this.content.push(blueprint);
-			if(scope.matches(blueprint.getName(), searchString)) {
+			if (scope.matches(blueprint.getName(), searchString)) {
 				this.directory.add(entry);
 			}
 		}
@@ -48,8 +46,8 @@ export class ContentView {
 	onFolderFiltered(searchString) {
 		let scope = this;
 		scope.directory.clear();
-		for(let i = 0; i < scope.content.length; i++) {
-			if(scope.matches(scope.content[i].getName(), searchString)) {
+		for (let i = 0; i < scope.content.length; i++) {
+			if (scope.matches(scope.content[i].getName(), searchString)) {
 				let entry = scope.blueprintRenderer(scope.content[i]);
 				scope.directory.add(entry);
 			}
@@ -59,7 +57,7 @@ export class ContentView {
 	matches(name, searchString) {
 		name = name.toLowerCase();
 		searchString = searchString.toLowerCase();
-		return (searchString === "" || searchString === undefined || name.includes(searchString));
+		return (searchString === '' || searchString === undefined || name.includes(searchString));
 	}
 
 	blueprintRenderer(blueprint, folderName) {
@@ -67,48 +65,49 @@ export class ContentView {
 		let icon = new UI.Icon(blueprint.typeName);
 
 		let cleanName;
-		if(folderName === undefined) {
+		if (folderName === undefined) {
 			cleanName = blueprint.getName();
 		} else {
 			cleanName = blueprint.name.replace(folderName, '');
 		}
 		let name = new UI.TableData(cleanName);
 
-		entry.add(icon,name,new UI.TableData(blueprint.typeName));
+		entry.add(icon, name, new UI.TableData(blueprint.typeName));
 
 		entry.setAttribute('draggable', true);
-		entry.addClass("draggable");
+		entry.addClass('draggable');
 
-		icon.addClass("jstree-icon favoritable");
-		if(blueprint.favorited)
-			icon.addClass("favorited");
+		icon.addClass('jstree-icon favoritable');
+		if (blueprint.favorited) {
+			icon.addClass('favorited');
+		}
 
-		icon.dom.addEventListener('mouseover', function(e) {
-			if(!blueprint.favorited) {
-				icon.removeClass("favorited");
+		icon.dom.addEventListener('mouseover', function (e) {
+			if (!blueprint.favorited) {
+				icon.removeClass('favorited');
 			}
 		});
 
-		icon.dom.addEventListener('click', function(e) {
-			//Unfavorite
-			if(blueprint.favorited) {
+		icon.dom.addEventListener('click', function (e) {
+			// Unfavorite
+			if (blueprint.favorited) {
 				editor.RemoveFavorite(blueprint);
-				icon.removeClass("favorited");
+				icon.removeClass('favorited');
 			} else {
-				//Favorite
+				// Favorite
 				editor.AddFavorite(blueprint);
-				icon.addClass("favorited")
+				icon.addClass('favorited');
 			}
 		});
 
-		name.dom.addEventListener('click', function(e, data) {
+		name.dom.addEventListener('click', function (e, data) {
 			editor.SpawnBlueprint(blueprint);
 		});
 
 		$(entry.dom).draggable({
-			helper : function() {
-				let helper = $(document.createElement("div"));
-				helper.addClass("dragableHelper");
+			helper: function () {
+				let helper = $(document.createElement('div'));
+				helper.addClass('dragableHelper');
 				return helper;
 			},
 			cursorAt: {
@@ -116,22 +115,22 @@ export class ContentView {
 				left: 0
 			},
 			appendTo: 'body',
-			start: function(e) {
-				editor.editorCore.onPreviewDragStart(blueprint)
+			start: function (e) {
+				editor.editorCore.onPreviewDragStart(blueprint);
 			},
-			drag: function(e) {
-				editor.editorCore.onPreviewDrag(e)
+			drag: function (e) {
+				editor.editorCore.onPreviewDrag(e);
 			},
-			stop: function(e) {
-				editor.editorCore.onPreviewDragStop()
+			stop: function (e) {
+				editor.editorCore.onPreviewDragStop();
 			}
 		});
 
 		return entry;
 	}
-
 }
-export var ContentViewComponent = function( container, state ) {
+
+export var ContentViewComponent = function (container, state) {
 	this._container = container;
 	this._state = state;
 	this.element = new ContentView();
