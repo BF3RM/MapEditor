@@ -2,7 +2,8 @@ class 'MapEditorServer'
 
 local m_Logger = Logger("MapEditorServer", true)
 
-EditorServer = require "EditorServer"
+ServerTransactionManager = require "ServerTransactionManager"
+ProjectManager = require "ProjectManager"
 DataBaseManager = require "DataBaseManager"
 
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
@@ -20,16 +21,6 @@ end
 function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
-
-	NetEvents:Subscribe('MapEditorServer:ReceiveCommand', self, self.OnReceiveCommands)
-
-	NetEvents:Subscribe('MapEditorServer:RequestProjectSave', self, self.OnRequestProjectSave)
-	NetEvents:Subscribe('MapEditorServer:RequestProjectLoad', self, self.OnRequestProjectLoad)
-	NetEvents:Subscribe('MapEditorServer:RequestProjectDelete', self, self.OnRequestProjectDelete)
-	NetEvents:Subscribe('MapEditorServer:RequestProjectData', self, self.OnRequestProjectData)
-
-	NetEvents:Subscribe('MapEditorServer:RequestUpdate', self, self.OnRequestUpdate)
-	NetEvents:Subscribe('MapEditorServer:RequestProjectHeaderUpdate', self, self.OnRequestProjectHeaderUpdate)
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
@@ -69,17 +60,19 @@ function MapEditorServer:OnChat(p_Player, p_RecipientMask, p_Message)
 	local firstPart = s_Parts[1]
 
 	if firstPart == 'save' then
-		EditorServer:OnRequestProjectSave(p_Player, "DebugProject", "XP3_Shield", "ConquestLarge0", { "levels/mp_001/mp_001", "levels/mp_001/conquest" })
+		ServerTransactionManager:OnRequestProjectSave(p_Player, "DebugProject", "XP3_Shield", "ConquestLarge0", { "levels/mp_001/mp_001", "levels/mp_001/conquest" })
 	end
 end
 
 ----------- Game functions----------------
 function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
-	EditorServer:OnUpdatePass(p_Delta, p_Pass)
+	ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
+	ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 end
 
 function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
-	EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+	--ServerTransactionManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+	ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 end
 
 function MapEditorServer:OnLevelDestroy()
@@ -97,7 +90,7 @@ function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 end
 
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, EditorServer.m_CurrentProjectHeader)
+	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
@@ -108,37 +101,7 @@ end
 ----------- Editor functions----------------
 
 function MapEditorServer:OnGameObjectReady(p_GameObject)
-	EditorServer:OnGameObjectReady(p_GameObject)
-end
-
-function MapEditorServer:OnReceiveCommands(p_Player, p_CommandsJson)
-	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
-
-	EditorServer:OnReceiveCommands(p_Player, s_Commands)
-end
-
-function MapEditorServer:OnRequestUpdate(p_Player, p_TransactionId)
-	EditorServer:OnRequestUpdate(p_Player, p_TransactionId)
-end
-
-function MapEditorServer:OnRequestProjectHeaderUpdate(p_Player)
-	EditorServer:OnRequestProjectHeaderUpdate(p_Player)
-end
-
-function MapEditorServer:OnRequestProjectSave(p_Player, p_ProjectSaveData)
-	EditorServer:OnRequestProjectSave(p_Player, p_ProjectSaveData)
-end
-
-function MapEditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
-	EditorServer:OnRequestProjectLoad(p_Player, p_ProjectName)
-end
-
-function MapEditorServer:OnRequestProjectData(p_Player, p_ProjectName)
-	EditorServer:OnRequestProjectData(p_Player, p_ProjectName)
-end
-
-function MapEditorServer:OnRequestProjectDelete(p_ProjectName)
-	EditorServer:OnRequestProjectDelete(p_ProjectName)
+	--ServerTransactionManager:OnGameObjectReady(p_GameObject)
 end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)

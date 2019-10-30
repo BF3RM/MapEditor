@@ -20,18 +20,18 @@ function MergeTables(p_Old, p_New)
 	return p_Old
 end
 
-function MergeGameObjectTransferData(p_Old, p_New)
-	if(p_Old == nil) then
-		return p_New
-	end
-	if(p_New == nil) then
-		return nil
-	end
-	for k,v in pairs(p_New) do
-		p_Old[k] = v
-	end
-	return p_Old
-end
+--function MergeGameObjectTransferData(p_Old, p_New)
+--	if(p_Old == nil) then
+--		return p_New
+--	end
+--	if(p_New == nil) then
+--		return nil
+--	end
+--	for k,v in pairs(p_New) do
+--		p_Old[k] = v
+--	end
+--	return p_Old
+--end
 
 function GetChanges(p_Old, p_New)
 	local s_Changes = {}
