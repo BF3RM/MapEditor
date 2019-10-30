@@ -8,9 +8,6 @@ import { GameObject } from '@/script/types/GameObject';
 export class BlueprintManager {
 	private blueprints = new Collections.Dictionary<Guid, Blueprint>();
 
-	constructor() {
-	}
-
 	public RegisterBlueprint(guid: Guid, blueprint: any) {
 		this.blueprints.setValue(guid, new Blueprint(Guid.parse(blueprint.instanceGuid), Guid.parse(blueprint.partitionGuid), blueprint.typeName, blueprint.name, blueprint.variations));
 	}
@@ -18,8 +15,7 @@ export class BlueprintManager {
 	public RegisterBlueprints(blueprintsRaw: string) {
 		const scope = this;
 		const blueprints = JSON.parse(blueprintsRaw);
-		for (const key in blueprints) {
-			const bp = blueprints[key];
+		for (const bp of blueprints) {
 			scope.RegisterBlueprint(Guid.parse(bp.instanceGuid), bp);
 		}
 		signals.blueprintsRegistered.emit(editor.blueprintManager.blueprints);

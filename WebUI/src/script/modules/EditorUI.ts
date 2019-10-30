@@ -138,6 +138,7 @@ export class EditorUI {
 	}
 
 	public InitializeViews() {
+		LogError('NotImplemented');
 	}
 
 	public CreateDialog(dialogElement: any, buttons: any, customCloseFn = dialogElement.dialog('close')) {
@@ -265,18 +266,6 @@ export class EditorUI {
 		}
 	*/
 
-	public onConfirmReloadProject() {
-
-	}
-
-	public onConfirmLoadProject() {
-
-	}
-
-	public onConfirmClearProject() {
-
-	}
-
 	public onSelectEntity(gameObject: GameObject) {
 		/*
 		this.hierarchy.onSelectEntity(gameObject);
@@ -301,15 +290,15 @@ export class EditorUI {
 		 */
 	}
 
-	public static toolsChanged(e: any) {
+	public toolsChanged(e: any) {
 		editor.threeManager.SetGizmoMode(e.target.id);
 	}
 
-	public static worldChanged(e: any) {
+	public worldChanged(e: any) {
 		editor.threeManager.SetWorldSpace(e.target.id);
 	}
 
-	public static worldViewChanged(e: any, ui: any) {
+	public worldViewChanged(e: any, ui: any) {
 		const message = new SetViewModeMessage(ui.item.value);
 		editor.vext.SendMessage(message);
 	}

@@ -1,6 +1,6 @@
 import * as Collections from 'typescript-collections';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
-import {LogError} from '@/script/modules/Logger';
+import { LogError } from '@/script/modules/Logger';
 
 export class VEXTemulator {
 	private commands: any;

@@ -22,7 +22,7 @@ export class EditorCore {
 	private lastUpdateTime: number;
 	private deltaTime: number;
 	private pendingUpdates = new Collections.Dictionary<Guid, GameObject>();
-	private _renderLoop: OmitThisParameter<() => void>;
+	private rl = this.renderLoop.bind(this);
 
 	constructor() {
 		this.previewBlueprint = null;
@@ -30,7 +30,6 @@ export class EditorCore {
 		this.lastUpdateTime = 0;
 		this.deltaTime = 1.0 / 30.0;
 
-		this._renderLoop = this.renderLoop.bind(this);
 		this.renderLoop(); // first call to init loop using the requestAnimationFrame
 	}
 
@@ -84,7 +83,7 @@ export class EditorCore {
 		}
 
 		if (this.isUpdating) {
-			window.requestAnimationFrame(this._renderLoop);
+			window.requestAnimationFrame(this.rl);
 		}
 	}
 

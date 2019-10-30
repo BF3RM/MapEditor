@@ -1,15 +1,15 @@
 import { signals } from '@/script/modules/Signals';
-import { Guid } from 'guid-typescript';
 import * as JSZip from 'jszip';
 import { JSZipUtils } from '@/script/libs/jszip-utils';
-import { getFilename, getPaths } from '@/script/modules/Utils';
+import { FBBundle } from '@/script/types/gameData/FBBundle';
+import { FBSuperBundle } from '@/script/types/gameData/FBSuperBundle';
 
 export class FrostbiteDataManager {
 	private superBundles: { all: FBSuperBundle };
 	private bundles: { all: FBBundle };
 	private partitions: object;
-	private _files: object;
-	private _data: object;
+	private files: object;
+	private data: object;
 
 	constructor() {
 		// this.window = new ImportWindow();
@@ -30,8 +30,8 @@ export class FrostbiteDataManager {
 		};
 		this.partitions = {};
 
-		this._files = {};
-		this._data = {};
+		this.files = {};
+		this.data = {};
 
 		signals.editorInitializing.connect(this._onEditorInitializing.bind(this));
 		signals.editorReady.connect(this._onEditorReady.bind(this));
@@ -42,12 +42,12 @@ export class FrostbiteDataManager {
 	public _Init() {
 		const scope = this;
 		const jszu = new JSZipUtils();
-		jszu.getBinaryContent('data/data.zip', function(err: any, data: any) {
+		jszu.getBinaryContent('data/data.zip', (err: any, data: any) => {
 			if (err) {
 				throw err; // or handle err
 			}
-			JSZip.loadAsync(data).then(function(zip) {
-				scope._data = zip;
+			JSZip.loadAsync(data).then((zip) => {
+				scope.data = zip;
 				scope._ExtractFiles();
 			});
 		});
@@ -210,85 +210,5 @@ export class FrostbiteDataManager {
 		return superBundle.bundlesReferencedIn;
 
 		 */
-	}
-}
-
-export class FBSuperBundle {
-	public name: string;
-	public chunkCount: number;
-	public bundleCount: number;
-
-	constructor(superBundleData: any) {
-		this.name = superBundleData.name;
-		this.chunkCount = superBundleData.chunkCount;
-		this.bundleCount = superBundleData.bundleCount;
-	}
-
-	get bundles() {
-		const scope = this;
-		if (this.name === 'All') {
-			return editor.fbdMan.getBundles();
-		}
-		return editor.fbdMan.getBundles(this.name);
-	}
-
-	get paths() {
-		return getPaths(this.name);
-	}
-
-	get fileName() {
-		return getFilename(this.name);
-	}
-}
-
-export class FBBundle {
-	public name: string;
-	public partitionCount: number;
-	public size: number;
-
-	constructor(bundleData: any) {
-		this.name = bundleData.name;
-		this.partitionCount = bundleData.partitionCount;
-		this.size = bundleData.size;
-	}
-
-	get partitions() {
-		return editor.fbdMan.getPartitions(this.name);
-	}
-
-	get paths() {
-		return getPaths(this.name);
-	}
-
-	get fileName() {
-		return getFilename(this.name);
-	}
-}
-
-export class FBPartition {
-	public name: string;
-	public guid: Guid;
-	public primaryInstance: Guid;
-	public typeName: string;
-	public instanceCount: number;
-
-	constructor(partitionData: any) {
-		this.name = partitionData.name;
-		this.guid = partitionData.guid;
-		this.primaryInstance = partitionData.primaryInstance;
-		this.typeName = partitionData.typeName;
-		this.instanceCount = partitionData.instanceCount;
-	}
-
-	get bundlesReferencedIn() {
-		return editor.fbdMan.getBundlesReferencedIn(this.name);
-	}
-
-	get paths() {
-		return getPaths(this.name);
-	}
-
-	get fileName() {
-		return getFilename(this.name);
 	}
 }
