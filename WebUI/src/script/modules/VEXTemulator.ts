@@ -1,10 +1,8 @@
-/*
+import * as Collections from 'typescript-collections';
+import { CommandActionResult } from '@/script/types/CommandActionResult';
 
-	This file emulates vext responses and returns dummy data.
-	This allows us to develop the UI completely in the browser.
-
- */
 export class VEXTemulator {
+	private commands: any;
 	constructor() {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
@@ -16,9 +14,9 @@ export class VEXTemulator {
 		this.commands['SetVariationCommand'] = this.SetVariation;
 	}
 
-	Receive(commands) {
+	Receive(commands: any[]) {
 		let scope = this;
-		let responses = [];
+		let responses:any[] = [];
 		commands.forEach(function (command) {
 			responses.push(scope.commands[command.type](command));
 		});
@@ -28,24 +26,24 @@ export class VEXTemulator {
 		}, 1);
 	}
 
-	CreateGroup(commandActionResult) {
+	CreateGroup(commandActionResult:CommandActionResult) {
 		let response = {
 			'type': 'CreatedGroup',
 			'sender': commandActionResult.sender,
 
 			'gameObjectTransferData': {
-				'guid': commandActionResult.gameObjectTransferData.guid,
-				'name': commandActionResult.gameObjectTransferData.name
+				'guid': commandActionResult.payload.guid,
+				'name': commandActionResult.payload.name
 			}
 		};
 		return response;
 	}
 
-	DestroyGroup(command) {
+	DestroyGroup(command: any) {
 
 	}
 
-	SpawnBlueprint(commandActionResult) {
+	SpawnBlueprint(commandActionResult:CommandActionResult) {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
@@ -54,8 +52,8 @@ export class VEXTemulator {
 			'sender': commandActionResult.sender,
 			'type': 'SpawnedBlueprint',
 			'gameObjectTransferData': {
-				'transform': commandActionResult.gameObjectTransferData.transform.toTable(),
-				'blueprintCtrRef': commandActionResult.gameObjectTransferData.blueprintCtrRef,
+				'transform': commandActionResult.payload.transform.toTable(),
+				'blueprintCtrRef': commandActionResult.payload.blueprintCtrRef,
 				'gameEntities': [
 					{
 						'transform': {
@@ -126,55 +124,55 @@ export class VEXTemulator {
 						'typeName': 'WhateverEntity'
 					}
 				],
-				'guid': commandActionResult.gameObjectTransferData.guid,
+				'guid': commandActionResult.payload.guid,
 				'typeName': 'ObjectBlueprint',
-				'parentData': commandActionResult.gameObjectTransferData.parentData,
-				'name': commandActionResult.gameObjectTransferData.name,
-				'variation': commandActionResult.gameObjectTransferData.variation
+				'parentData': commandActionResult.payload.parentData,
+				'name': commandActionResult.payload.name,
+				'variation': commandActionResult.payload.variation
 			}
 		};
 		return response;
 	}
 
-	SetTransform(commandActionResult) {
+	SetTransform(commandActionResult:CommandActionResult) {
 		let response = {
 			'type': 'SetTransform',
 			'gameObjectTransferData': {
-				'guid': commandActionResult.gameObjectTransferData.guid,
-				'transform': commandActionResult.gameObjectTransferData.transform.toTable()
+				'guid': commandActionResult.payload.guid,
+				'transform': commandActionResult.payload.transform.toTable()
 			}
 		};
 		return response;
 	}
 
-	DestroyBlueprint(commandActionResult) {
+	DestroyBlueprint(commandActionResult:CommandActionResult) {
 		// Delete all children of blueprint
 		let response = {
 			'type': 'DestroyedBlueprint',
 			'gameObjectTransferData': {
-				'guid': commandActionResult.gameObjectTransferData.guid
+				'guid': commandActionResult.payload.guid
 			}
 		};
 		return response;
 	}
 
-	SetObjectName(commandActionResult) {
+	SetObjectName(commandActionResult:CommandActionResult) {
 		let response = {
 			'type': 'SetObjectName',
 			'gameObjectTransferData': {
-				'guid': commandActionResult.gameObjectTransferData.guid,
-				'name': commandActionResult.gameObjectTransferData.name
+				'guid': commandActionResult.payload.guid,
+				'name': commandActionResult.payload.name
 			}
 		};
 		return response;
 	}
 
-	SetVariation(commandActionResult) {
+	SetVariation(commandActionResult:CommandActionResult) {
 		let response = {
 			'type': 'SetVariation',
 			'gameObjectTransferData': {
-				'guid': commandActionResult.gameObjectTransferData.guid,
-				'variation': commandActionResult.gameObjectTransferData.variation
+				'guid': commandActionResult.payload.guid,
+				'variation': commandActionResult.payload.variation
 			}
 		};
 		return response;

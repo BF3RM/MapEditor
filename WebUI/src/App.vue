@@ -5,14 +5,14 @@
 				<gl-col :closable="false">
 					<gl-row :closable="false">
 						<gl-col :closable="false">
-							<demo-Stack title="Hierarchy">
-							</demo-Stack>
+							<PlaceholderComponent title="Hierarchy">
+							</PlaceholderComponent>
 						</gl-col>
 
-						<demo-Stack title="ViewPort">
-						</demo-Stack>
-						<demo-Stack title="Explorer">
-						</demo-Stack>
+						<PlaceholderComponent title="ViewPort">
+						</PlaceholderComponent>
+						<PlaceholderComponent title="Explorer">
+						</PlaceholderComponent>
 					</gl-row>
 				</gl-col>
 
@@ -26,10 +26,10 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import demoStack from '@/script/components/PlaceholderComponent';
+import PlaceholderComponent from '@/script/components/PlaceholderComponent';
 import { Component, Prop } from 'vue-property-decorator';
 
-@Component({ components: { demoStack } })
+@Component({ components: { PlaceholderComponent } })
 export default class App extends Vue {
 	@Prop() title: string
 }
