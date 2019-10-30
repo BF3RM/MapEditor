@@ -4,7 +4,7 @@ import store from './store';
 
 import Editor from './script/Editor';
 
-import './style/style.css';
+import './style/style.scss';
 import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 
 import { Log, LogError } from '@/script/modules/Logger';

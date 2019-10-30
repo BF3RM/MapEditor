@@ -1,7 +1,7 @@
 <template>
 	<div id="page">
 		<div class="glHolder">
-			<golden-layout class="gl">
+			<golden-layout class="gl" @initialised="initialised">
 				<gl-col :closable="false">
 					<gl-row :closable="false">
 						<gl-col :closable="false">
@@ -9,8 +9,8 @@
 							</PlaceholderComponent>
 						</gl-col>
 
-						<PlaceholderComponent title="ViewPort">
-						</PlaceholderComponent>
+						<ViewportComponent title="ViewPort">
+						</ViewportComponent>
 						<PlaceholderComponent title="Explorer">
 						</PlaceholderComponent>
 					</gl-row>
@@ -28,10 +28,12 @@ import Vue from 'vue';
 
 import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
 import { Component, Prop } from 'vue-property-decorator';
+import ViewportComponent from '@/script/components/ViewportComponent.vue';
 
-@Component({ components: { PlaceholderComponent } })
+@Component({ components: { ViewportComponent, PlaceholderComponent } })
 export default class App extends Vue {
-	@Prop() public title: string = '';
+	@Prop()
+	public title!: string;
 }
 </script>
 

@@ -1,8 +1,9 @@
 <template>
-	<gl-component class="placeholder-component">
-		<h1>Placeholder {{title}}</h1>
+	<gl-component id="viewport-component">
+		<h1>Viewport</h1>
 	</gl-component>
 </template>
+
 <script lang="ts">
 import { Component, Inject, Model, Prop, Watch, Emit } from 'vue-property-decorator';
 import { glCustomContainer } from 'vue-golden-layout';
