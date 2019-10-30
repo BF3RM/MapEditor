@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import { GameObject } from '@/script/types/GameObject';
+import { Guid } from 'guid-typescript';
 
 export class HighlightGroup extends THREE.Group {
-	public guid: string;
+	public guid: Guid;
 
 	constructor() {
 		super();
 
-		this.guid = GenerateGuid();
-		this.type = 'HighlightGroup';
+		this.guid = Guid.create();
 		this.name = 'Highlighting Group';
 	}
 

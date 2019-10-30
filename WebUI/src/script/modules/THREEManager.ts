@@ -163,7 +163,7 @@ export class THREEManager {
 				break;
 			}
 		});
-		window.addEventListener('resize', this.onWindowResize, false);
+		// window.addEventListener('resize', this.onWindowResize, false);
 
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));

@@ -100,8 +100,6 @@ export default class Editor {
 		// Adds the chrome background and debug window
 		if (this.debug === true) {
 			const imported = document.createElement('script');
-			imported.src = 'script/DebugData.js';
-			document.head.appendChild(imported);
 			this.setPlayerName('LocalPlayer');
 		}
 
