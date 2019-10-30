@@ -125,8 +125,7 @@ export class GameObject extends THREE.Object3D {
 		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
 
 		if (updateChild) {
-			for (const key in this.children) {
-				const child = this.children[key];
+			for (const child of this.children) {
 				if (child instanceof GameObject) {
 					console.log('Updating child');
 					child.updateWorldTransform(true);
@@ -143,8 +142,7 @@ export class GameObject extends THREE.Object3D {
 		this.transform = linearTransform;
 		this.updateTransform();
 
-		for (const key in this.children) {
-			const child = this.children[key];
+		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
 				child.updateWorldTransform();
 			}
@@ -215,16 +213,16 @@ export class GameObject extends THREE.Object3D {
 	public Highlight() {
 		this.highlighted = true;
 
-		for (let i = 0; i < this.children.length; i++) {
-			this.children[i].Highlight();
+		for (const child of this.children) {
+			child.Highlight();
 		}
 	}
 
 	public Unhighlight() {
 		this.highlighted = false;
 
-		for (let i = 0; i < this.children.length; i++) {
-			this.children[i].Unhighlight();
+		for (const child of this.children) {
+			child.Unhighlight();
 		}
 	}
 
@@ -234,8 +232,7 @@ export class GameObject extends THREE.Object3D {
 			window.LogError('Attempted to select a disabled gameObject');
 			return;
 		}
-		for (const key in this.children) {
-			const child = this.children[key];
+		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
 				child.Select();
 			}
@@ -248,8 +245,7 @@ export class GameObject extends THREE.Object3D {
 			window.LogError('Attempted to deselect a disabled gameObject');
 			return;
 		}
-		for (const key in this.children) {
-			const child = this.children[key];
+		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
 				child.Deselect();
 			}
@@ -258,8 +254,7 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public Enable() {
-		for (const key in this.children) {
-			const child = this.children[key];
+		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
 				child.Enable();
 			} else {
@@ -272,8 +267,7 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public Disable() {
-		for (const key in this.children) {
-			const child = this.children[key];
+		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
 				child.Disable();
 			} else {

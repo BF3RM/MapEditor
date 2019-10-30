@@ -64,7 +64,7 @@ export class EditorUI {
 		// this.windowContainer.append(this.windows[windowId.toLowerCase()].dom)
 	}
 
-	public RegisterMenubarEntry(path: string, entryCallback: any = undefined) {
+	public RegisterMenubarEntry(path: string, entryCallback?: any) {
 		/* let menubarContainer = $('#menubar');
 		let lastEntry = this.menubar;
 

@@ -229,7 +229,7 @@ export default class VEXTInterface {
 		if (emulator) {
 			const scope = this;
 			// delay to simulate tick increase.
-			setTimeout(async function () {
+			setTimeout(async () => {
 				scope.messages[message.type](message);
 			}, 1);
 		} else {

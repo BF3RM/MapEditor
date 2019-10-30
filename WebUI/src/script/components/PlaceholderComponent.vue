@@ -10,6 +10,6 @@ import { glCustomContainer } from 'vue-golden-layout';
 
 @Component
 export default class PlaceholderComponent extends glCustomContainer {
-	@Prop() private title: string;
+	@Prop() public title: string = '';
 }
 </script>

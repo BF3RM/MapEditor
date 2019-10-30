@@ -12,15 +12,15 @@ import vgl from 'vue-golden-layout';
 
 let debugMode: boolean = false;
 // var vext = new VEXTInterface();
-if ((window as Window).location.href.indexOf('webui') === -1) {
+if ((window).location.href.indexOf('webui') === -1) {
 	debugMode = true;
 }
-(window as Window).editor = new Editor(debugMode);
-(window as Window).log = Log;
-(window as Window).logError = LogError;
+(window).editor = new Editor(debugMode);
+(window).log = Log;
+(window).logError = LogError;
 Vue.use(vgl);
 
 new Vue({
-	render: h => h(App),
+	render: (h) => h(App),
 	store
 }).$mount('#app');

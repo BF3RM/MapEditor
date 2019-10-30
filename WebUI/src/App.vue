@@ -26,12 +26,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import PlaceholderComponent from '@/script/components/PlaceholderComponent';
+import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component({ components: { PlaceholderComponent } })
 export default class App extends Vue {
-	@Prop() title: string;
+	@Prop() public title: string = '';
 }
 </script>
 

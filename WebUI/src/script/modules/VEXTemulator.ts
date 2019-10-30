@@ -1,5 +1,6 @@
 import * as Collections from 'typescript-collections';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
+import {LogError} from '@/script/modules/Logger';
 
 export class VEXTemulator {
 	private commands: any;
@@ -17,11 +18,11 @@ export class VEXTemulator {
 	public Receive(commands: any[]) {
 		const scope = this;
 		const responses: any[] = [];
-		commands.forEach(function(command) {
+		commands.forEach((command) => {
 			responses.push(scope.commands[command.type](command));
 		});
 		// Delay to simulate tick pass
-		setTimeout(async function() {
+		setTimeout(async () => {
 			editor.vext.HandleResponse(JSON.stringify(responses), true);
 		}, 1);
 	}
@@ -40,7 +41,7 @@ export class VEXTemulator {
 	}
 
 	public DestroyGroup(command: any) {
-
+		LogError('NotImplemented');
 	}
 
 	public SpawnBlueprint(commandActionResult: CommandActionResult) {

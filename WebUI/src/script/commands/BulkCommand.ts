@@ -9,7 +9,7 @@ export default class BulkCommand extends Command {
 
 	public execute() {
 		editor.vext.Pause();
-		this.commands.forEach(function (command) {
+		this.commands.forEach((command) => {
 			command.execute();
 		});
 		editor.vext.Resume();
@@ -17,7 +17,7 @@ export default class BulkCommand extends Command {
 
 	public undo() {
 		editor.vext.Pause();
-		this.commands.forEach(function (command) {
+		this.commands.forEach((command) => {
 			command.undo();
 		});
 		editor.vext.Resume();

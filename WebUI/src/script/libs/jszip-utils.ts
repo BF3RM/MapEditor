@@ -1,4 +1,4 @@
-'use strict';
+
 /* globals Promise */
 
 export class JSZipUtils {
@@ -101,7 +101,7 @@ export class JSZipUtils {
 function _getBinaryFromXHR(xhr: any) {
 	// for xhr.responseText, the 0xFF mask is applied by JSZip
 	return xhr.response || xhr.responseText;
-}1;
+}
 // taken from jQuery
 function createStandardXHR() {
 	try {

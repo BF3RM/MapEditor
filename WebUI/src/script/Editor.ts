@@ -231,7 +231,7 @@ export default class Editor {
 			transform,
 			variation,
 			isDeleted: false,
-			isEnabled: true,
+			isEnabled: true
 		});
 
 		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
@@ -431,12 +431,12 @@ export default class Editor {
 			}
 		}
 
-		setTimeout( () => {
+		setTimeout(() => {
 			scope.threeManager.scene.remove(gameObject);
 		}, 1);
 		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
-			setTimeout( () => {
+			setTimeout(() => {
 				scope.Select(gameObjectGuid, false);
 			}, 2);
 		}
@@ -479,7 +479,7 @@ export default class Editor {
 		if (scope.selectionGroup.children.length === 0) {
 			return false;
 		}
-		for (let gameObject of scope.selectionGroup.children) {
+		for (const gameObject of scope.selectionGroup.children) {
 			if (guid.equals(gameObject.guid)) {
 				return true;
 			}
@@ -531,7 +531,6 @@ export default class Editor {
 		History
 
 	 */
-
 
 	public execute(cmd: Command, optionalName?: string) {
 		this.history.execute(cmd, optionalName);

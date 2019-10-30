@@ -2,6 +2,7 @@ import { signals } from '@/script/modules/Signals';
 import { Guid } from 'guid-typescript';
 import * as JSZip from 'jszip';
 import { JSZipUtils } from '@/script/libs/jszip-utils';
+import { getFilename, getPaths } from '@/script/modules/Utils';
 
 export class FrostbiteDataManager {
 	private superBundles: { all: FBSuperBundle };
@@ -41,11 +42,11 @@ export class FrostbiteDataManager {
 	public _Init() {
 		const scope = this;
 		const jszu = new JSZipUtils();
-		jszu.getBinaryContent('data/data.zip', function (err: any, data: any) {
+		jszu.getBinaryContent('data/data.zip', function(err: any, data: any) {
 			if (err) {
 				throw err; // or handle err
 			}
-			JSZip.loadAsync(data).then(function (zip) {
+			JSZip.loadAsync(data).then(function(zip) {
 				scope._data = zip;
 				scope._ExtractFiles();
 			});

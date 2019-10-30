@@ -20,7 +20,7 @@ export enum GIZMOMODE {
 	scale = 'scale',
 }
 
-CameraControls.install({ THREE: THREE });
+CameraControls.install({ THREE });
 
 export class THREEManager {
 	public scene = new THREE.Scene();
@@ -172,7 +172,6 @@ export class THREEManager {
 		this.control.addEventListener('change', this.onControlChanged.bind(this));
 		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
 		this.control.addEventListener('mouseDown', this.onControlMouseDown.bind(this));
-		this.control.addEventListener('objectChange', this.onObjectChanged.bind(this));
 	}
 
 	public CreateGizmo() {
@@ -358,9 +357,7 @@ export class THREEManager {
 		if (intersects.length > 0) {
 			// console.log("hit "+ (intersects.length) + " objects");
 
-			for (let i = 0; i < intersects.length; i++) {
-				const element = intersects[i];
-
+			for (const element of intersects) {
 				if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 					continue;
 				}
@@ -425,9 +422,6 @@ export class THREEManager {
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.Render();
-	}
-
-	public onObjectChanged(e: any) {
 	}
 
 	public UpdateCameraTransform(transform: LinearTransform) {

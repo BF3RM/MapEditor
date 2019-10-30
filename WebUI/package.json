@@ -22,6 +22,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@fimbul/wotan": "^0.22.0-dev.20191010",
     "@types/jquery": "^3.3.31",
     "@types/jszip": "^3.1.6",
     "@types/three": "^0.103.2",
@@ -32,6 +33,7 @@
     "@vue/eslint-config-typescript": "^4.0.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "tslint-loader": "^3.5.4",
     "typescript": "~3.5.3",
     "typescript-eslint-parser": "^22.0.0",
     "vue-template-compiler": "^2.6.10",

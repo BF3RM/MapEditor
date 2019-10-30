@@ -18,14 +18,14 @@ export default class History {
 
 		// signals
 
-		var scope = this;
+		const scope = this;
 	}
 
 	execute(cmd, optionalName) {
-		var lastCmd = this.undos[ this.undos.length - 1 ];
-		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
+		const lastCmd = this.undos[ this.undos.length - 1 ];
+		const timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
 
-		var isUpdatableCmd = lastCmd &&
+		const isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
 			cmd.updatable &&
 			lastCmd.object === cmd.object &&
@@ -54,7 +54,7 @@ export default class History {
 	}
 
 	undo() {
-		var cmd = undefined;
+		var cmd;
 
 		if (this.undos.length > 0) {
 			cmd = this.undos.pop();
@@ -74,7 +74,7 @@ export default class History {
 	}
 
 	redo() {
-		var cmd = undefined;
+		var cmd;
 
 		if (this.redos.length > 0) {
 			cmd = this.redos.pop();
@@ -94,7 +94,7 @@ export default class History {
 	}
 
 	toJSON() {
-		var history = {};
+		const history = {};
 		history.undos = [];
 		history.redos = [];
 
