@@ -37,16 +37,11 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
 	-- Editor Events
-	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
-	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
 	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
 
-	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
-
 	-- WebUI events
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
-	-- Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands) -- meant for client side only commands, not used yet
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessages)
 	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
 	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
@@ -132,28 +127,12 @@ end
 
 ----------- Editor functions----------------
 
-function MapEditorClient:OnGameObjectReady(p_GameObject)
-	ClientTransactionManager:OnGameObjectReady(p_GameObject)
-end
-
 function MapEditorClient:OnSendCommandsToServer(p_CommandsJson)
 	ClientTransactionManager:OnSendCommandsToServer(p_CommandsJson)
 end
 
-function MapEditorClient:OnReceiveCommands(p_CommandsJson)
-	ClientTransactionManager:OnReceiveCommands(p_CommandsJson)
-end
-
 function MapEditorClient:OnReceiveMessages(p_Messages)
 	ClientTransactionManager:OnReceiveMessages(p_Messages)
-end
-
-function MapEditorClient:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
-	ClientTransactionManager:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
-end
-
-function MapEditorClient:OnUpdateTransactionId(p_TransactionId)
-	ClientTransactionManager:OnUpdateTransactionId(p_TransactionId)
 end
 
 function MapEditorClient:OnReceiveProjectData(p_ProjectData)

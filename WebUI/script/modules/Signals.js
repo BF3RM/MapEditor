@@ -11,14 +11,14 @@ var signals = {
 
 	spawnedBlueprint: new Signal(),
 	blueprintSpawnInvoked: new Signal(),
-	destroyedBlueprint: new Signal(),
+	deletedBlueprint: new Signal(),
 
 	enabledBlueprint: new Signal(),
 	disabledBlueprint: new Signal(),
 
 	createGroupRequested: new Signal(),
 	createdGroup: new Signal(),
-	destroyedGroup: new Signal(),
+	deletedGroup: new Signal(),
 
 	selectionGroupMoved: new Signal(),
 

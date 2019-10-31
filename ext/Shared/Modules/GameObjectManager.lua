@@ -12,7 +12,7 @@ function GameObjectManager:RegisterVars()
     self.m_VanillaBlueprintNumber = 0
 
     self.m_GameObjects = {}
-    self.m_PendingCustomBlueprintGuids = {}
+    self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
     self.m_Entities = {}
     self.m_UnresolvedGameObjects = {}
 end
@@ -37,7 +37,7 @@ function GameObjectManager:GetGameEntities(p_EntityIds)
     return s_GameEntities
 end
 
-function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation)
+function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
     if p_BlueprintPartitionGuid == nil or
         p_BlueprintInstanceGuid == nil or
         p_LinearTransform == nil then
@@ -63,7 +63,19 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
     m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
-    self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData }
+    if p_IsPreviewSpawn == false then
+        self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData }
+    else
+        local s_PreviewSpawnParentData = GameObjectParentData{
+            guid = "previewSpawn",
+            typeName = "previewSpawn",
+            primaryInstanceGuid = "previewSpawn",
+            partitionGuid = "previewSpawn",
+        }
+        m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
+        m_Logger:WriteTable(s_PreviewSpawnParentData)
+        self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData }
+    end
 
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
@@ -210,7 +222,6 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     local s_PendingInfo = self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid]
 
     if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
-
         local s_ParentData = GameObjectParentData{
             guid = s_PendingInfo.parentData.guid,
             typeName = s_PendingInfo.parentData.typeName,
@@ -219,8 +230,10 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
         }
 
         p_GameObject.parentData = s_ParentData
+        m_Logger:WriteTable(s_ParentData)
+        m_Logger:Write( "PendingInfo guid: " .. tostring(s_PendingInfo.customGuid) .. " - ParentData: " .. tostring(s_PendingInfo.parentData))
 
-        if s_ParentData.guid ~= "root" then
+        if s_ParentData.guid ~= "root" and s_ParentData.guid ~= "previewSpawn" then
             local s_ParentObject = self.m_GameObjects[s_ParentData.guid]
 
             if s_ParentObject == nil then
@@ -228,7 +241,6 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
             end
 
             table.insert(s_ParentObject.children, p_GameObject)
-
         end
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
@@ -241,8 +253,10 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
 
     self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid] = nil
 
-    -- at this point, the gameObject and all its children are fully ready to be transferred to JS -> invoke sending of CommandActionResults
-    Events:DispatchLocal("GameObjectManager:GameObjectReady", p_GameObject)
+    if p_GameObject.parentData.guid ~= "previewSpawn" then
+        -- at this point, the gameObject and all its children are fully ready to be transferred to JS -> invoke sending of CommandActionResults
+        Events:DispatchLocal("GameObjectManager:GameObjectReady", p_GameObject)
+    end
 end
 
 function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_IsVanilla, p_CustomGuid, p_CreatorName)
@@ -282,19 +296,67 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
-function GameObjectManager:DestroyGameObject(p_Guid)
+function GameObjectManager:DeleteGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]
 
     if (s_GameObject == nil) then
-        m_Logger:Error("Failed to destroy blueprint: " .. p_Guid)
+        m_Logger:Error("GameObject not found: " .. p_Guid)
         return false
     end
 
-    s_GameObject:Destroy()
+    if (s_GameObject.isDeleted == true) then
+        m_Logger:Error("GameObject was already marked as deleted: " .. p_Guid)
+        return false
+    end
+
+    if (s_GameObject.isVanilla) then
+        s_GameObject:MarkAsDeleted()
+    else
+        s_GameObject:Destroy()
+
+        self.m_GameObjects[p_Guid] = nil
+    end
 
     return true
 end
 
+function GameObjectManager:UndeleteBlueprint(p_Guid)
+    local s_GameObject = self.m_GameObjects[p_Guid]
+
+    if (s_GameObject == nil) then
+        m_Logger:Error("GameObject not found: " .. p_Guid)
+        return false
+    end
+
+    if (s_GameObject.isDeleted == false) then
+        m_Logger:Error("GameObject was not marked as deleted before undeleting: " .. p_Guid)
+        return false
+    end
+
+    if (s_GameObject.isVanilla == false) then
+        m_Logger:Error("GameObject was not a vanilla object " .. p_Guid)
+        return false
+    end
+
+    s_GameObject:MarkAsUndeleted()
+
+    return true
+end
+
+--function GameObjectManager:DestroyGameObject(p_Guid)
+--    local s_GameObject = self.m_GameObjects[p_Guid]
+--
+--    if (s_GameObject == nil) then
+--        m_Logger:Error("GameObject not found: " .. p_Guid)
+--        return false
+--    end
+--
+--    s_GameObject:Destroy()
+--
+--    self.m_GameObjects[self.guid] = nil
+--
+--    return true
+--end
 
 function GameObjectManager:EnableGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]

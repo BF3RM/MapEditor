@@ -12,7 +12,8 @@ function CommandActions:RegisterVars()
 	m_Logger:Write("Initialized vars")
 
 	self.SpawnBlueprintCommand = self.SpawnBlueprint
-	self.DestroyBlueprintCommand = self.DestroyBlueprint
+	self.DeleteBlueprintCommand = self.DeleteBlueprint
+	self.UndeleteBlueprintCommand = self.UndeleteBlueprint
 	self.SetTransformCommand = self.SetTransform
 	self.SelectGameObjectCommand = self.SelectGameObject
 	self.EnableBlueprintCommand = self.EnableBlueprint
@@ -25,15 +26,8 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	if(IsVanilla(p_Command.gameObjectTransferData.guid)) then
-		local _, s_ActionResultType = self:EnableBlueprint(p_Command, p_UpdatePass)
-
-		if (s_ActionResultType == ActionResultType.Failure) then
-			m_Logger:Error("Failed to reenable Vanilla Object upon respawning.")
-			return nil, ActionResultType.Failure
-		end
-	else
-
+	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
+		return nil, ActionResultType.Queue
 	end
 
 	local s_GameObjectTransferData = p_Command.gameObjectTransferData
@@ -44,7 +38,8 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 																s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
 																s_GameObjectTransferData.parentData,
 																s_GameObjectTransferData.transform,
-																s_GameObjectTransferData.variation)
+																s_GameObjectTransferData.variation,
+												false)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui
@@ -66,7 +61,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	return s_CommandActionResult, ActionResultType.Success
 end
 
-function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
+function CommandActions:DeleteBlueprint(p_Command, p_UpdatePass)
 	if (p_Command.gameObjectTransferData == nil) then
 		m_Logger:Error("The DestroyBlueprint needs to have a valid gameObjectTransferData set.")
 		return nil, ActionResultType.Failure
@@ -76,20 +71,11 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Queue
 	end
 
-	if(IsVanilla(p_Command.gameObjectTransferData.guid)) then
-		local _, s_ActionResultType = CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
+	local s_Result = GameObjectManager:DeleteGameObject(p_Command.gameObjectTransferData.guid)
 
-		if (s_ActionResultType == ActionResultType.Failure) then
-			m_Logger:Error("Failed to disable Vanilla Object upon deletion.")
-			return nil, ActionResultType.Failure
-		end
-	else
-		local s_Result = GameObjectManager:DestroyGameObject(p_Command.gameObjectTransferData.guid)
-
-		if(s_Result == false) then
-			m_Logger:Write("Failed to destroy entity: " .. p_Command.gameObjectTransferData.guid)
-			return nil, ActionResultType.Failure
-		end
+	if(s_Result == false) then
+		m_Logger:Write("Failed to destroy entity: " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -99,8 +85,43 @@ function CommandActions:DestroyBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "DestroyedBlueprint",
+		type = "DeletedBlueprint", -- TODO: powback rename DestroyBlueprint -> DeletedBlueprint / DestroyedBlueprint -> DeletedBlueprint
 		gameObjectTransferData = s_GameObjectTransferData
+	}
+
+	return s_CommandActionResult, ActionResultType.Success
+end
+
+function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The UndeleteBlueprint needs to have a valid gameObjectTransferData set.")
+		return
+	end
+
+	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
+		return nil, ActionResultType.Queue
+	end
+
+	if not IsVanilla(p_Command.gameObjectTransferData.guid) then
+		return CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
+	end
+
+	local s_Result = GameObjectManager:UndeleteBlueprint(p_Command.gameObjectTransferData.guid)
+
+	if(s_Result == false) then
+		m_Logger:Write("Failed to undelete blueprint: " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
+	end
+
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		isDeleted = false
+	}
+
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = "UndeletedBlueprint", -- does not exist on js
+		gameObjectTransferData =  s_GameObjectTransferData,
 	}
 
 	return s_CommandActionResult, ActionResultType.Success

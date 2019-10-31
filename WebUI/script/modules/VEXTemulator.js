@@ -8,9 +8,7 @@ class VEXTemulator {
 	constructor() {
 		this.commands = {};
 		this.commands['SpawnBlueprintCommand'] = this.SpawnBlueprint;
-		this.commands['DestroyBlueprintCommand'] = this.DestroyBlueprint;
-		this.commands['CreateGroupCommand'] = this.CreateGroup;
-		this.commands['DestroyGroupCommand'] = this.DestroyGroup;
+		this.commands['DeleteBlueprintCommand'] = this.DestroyBlueprint;
 		this.commands['SetObjectNameCommand'] = this.SetObjectName;
 		this.commands['SetTransformCommand'] = this.SetTransform;
 		this.commands['SetVariationCommand'] = this.SetVariation;
@@ -26,23 +24,6 @@ class VEXTemulator {
 		setTimeout(async function() {
 			editor.vext.HandleResponse(JSON.stringify(responses), true);
 		}, 1)
-	}
-
-	CreateGroup(commandActionResult) {
-		let response = {
-			"type": "CreatedGroup",
-			"sender": commandActionResult.sender,
-
-			"gameObjectTransferData": {
-				"guid": commandActionResult.gameObjectTransferData.guid,
-				"name": commandActionResult.gameObjectTransferData.name
-			}
-		};
-		return response;
-	}
-	DestroyGroup(command) {
-
-
 	}
 
 	SpawnBlueprint(commandActionResult) {

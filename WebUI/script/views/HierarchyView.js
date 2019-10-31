@@ -2,7 +2,7 @@
 class HierarchyView {
 	constructor() {
 		signals.spawnedBlueprint.add(this.onSpawnedBlueprint.bind(this));
-		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+		signals.deletedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.selectedGameObject.add(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.add(this.onDeselected.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));

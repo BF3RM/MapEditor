@@ -1,13 +1,13 @@
-const DestroyBlueprintCommand = function (gameObjectTransferData) {
+const DeleteBlueprintCommand = function (gameObjectTransferData) {
 
 	Command.call(this);
 
-	this.type = 'DestroyBlueprintCommand';
-	this.name = 'Destroy Blueprint';
+	this.type = 'DeleteBlueprintCommand';
+	this.name = 'Delete Blueprint';
 	this.gameObjectTransferData = gameObjectTransferData;
 };
 
-DestroyBlueprintCommand.prototype = {
+DeleteBlueprintCommand.prototype = {
 
 	execute: function () {
 		let gameObjectTransferData = new GameObjectTransferData({
@@ -17,7 +17,7 @@ DestroyBlueprintCommand.prototype = {
 	},
 
 	undo: function () {
-		editor.vext.SendCommand(new VextCommand("SpawnBlueprintCommand", this.gameObjectTransferData))
+		editor.vext.SendCommand(new VextCommand("UndeleteBlueprintCommand", this.gameObjectTransferData))
 	},
 };
 

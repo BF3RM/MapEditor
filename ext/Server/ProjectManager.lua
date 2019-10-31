@@ -117,9 +117,10 @@ function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
     local count = 0
 
     -- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
-    for l_Guid, l_GameObject in pairs(GameObjectManager.GameObjects) do
+    for l_Guid, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
         count = count + 1
-        s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObject):GetAsTable()
+        table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
+        --s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObject):GetAsTable()
     end
 
     m_Logger:Write("vvvvvvvvvvvvvvvvv")
@@ -147,7 +148,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
             if l_GameObjectSaveData.isDeleted then
                 s_Command = {
                     sender = "LoadingSaveFile",
-                    type = "DestroyBlueprintCommand",
+                    type = "DeleteBlueprintCommand",
                     gameObjectTransferData = {
                         guid = l_Guid
                     }

@@ -10,7 +10,7 @@ class Editor {
 		signals.enabledBlueprint.add(this.onEnabledBlueprint.bind(this));
 		signals.disabledBlueprint.add(this.onDisabledBlueprint.bind(this));
 
-		signals.destroyedBlueprint.add(this.onDestroyedBlueprint.bind(this));
+		signals.deletedBlueprint.add(this.onDestroyedBlueprint.bind(this));
 		signals.setObjectName.add(this.onSetObjectName.bind(this));
 		signals.setTransform.add(this.onSetTransform.bind(this));
 		signals.setVariation.add(this.onSetVariation.bind(this));
@@ -234,7 +234,7 @@ class Editor {
 		let commands = [];
 		editor.selectionGroup.children.forEach(function(childGameObject) {
 			if (childGameObject instanceof GameObject) {
-				commands.push(new DestroyBlueprintCommand(childGameObject.getGameObjectTransferData()));
+				commands.push(new DeleteBlueprintCommand(childGameObject.getGameObjectTransferData()));
 			}
 		});
 

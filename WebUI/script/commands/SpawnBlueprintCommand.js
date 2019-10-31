@@ -18,7 +18,7 @@ SpawnBlueprintCommand.prototype = {
 		let gameObjectTransferData = new GameObjectTransferData({
 			'guid': this.gameObjectTransferData.guid,
 		});
-		editor.vext.SendCommand(new VextCommand("DestroyBlueprintCommand", gameObjectTransferData))
+		editor.vext.SendCommand(new VextCommand("DeleteBlueprintCommand", gameObjectTransferData))
 	},
 };
 

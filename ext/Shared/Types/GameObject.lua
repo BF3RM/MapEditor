@@ -13,7 +13,7 @@ function GameObject:__init(arg)
     self.variation = arg.variation
     --self.gameEntities = arg.gameEntities -- we only store the Ids of the entities here
     self.isVanilla = arg.isVanilla -- never gets sent to js
-    self.isDeleted = arg.isDeleted
+    self.isDeleted = arg.isDeleted --> only vanilla objects, dont appear in the browser anymore. entities get disabled, because we cannot destroy them
     self.isEnabled = arg.isEnabled
     self.gameEntities = arg.gameEntities
     self.children = arg.children -- never gets sent to js
@@ -56,7 +56,58 @@ function GameObject:Enable()
     self.isEnabled = true
 end
 
+function GameObject:MarkAsDeleted()
+    if (self.isVanilla == false) then
+        m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
+        return
+    end
+
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:Delete()
+        end
+    end
+
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Disable()
+            end
+        end
+    end
+
+    self.isDeleted = true
+end
+
+function GameObject:MarkAsUndeleted()
+    if (self.isVanilla == false) then
+        m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
+        return
+    end
+
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:MarkAsUndeleted()
+        end
+    end
+
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Enable()
+            end
+        end
+    end
+
+    self.isDeleted = false
+end
+
 function GameObject:Destroy()
+    if (self.isVanilla == true) then
+        m_Logger:Error("Cant destroy vanilla object, use disable instead")
+        return
+    end
+
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:Destroy()
@@ -69,8 +120,6 @@ function GameObject:Destroy()
             end
         end
     end
-
-    GameObjectManager.m_GameObjects[self.guid] = nil
 end
 
 function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)

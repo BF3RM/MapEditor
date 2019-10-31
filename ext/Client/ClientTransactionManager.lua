@@ -21,7 +21,11 @@ function ClientTransactionManager:RegisterVars()
 end
 
 function ClientTransactionManager:RegisterEvents()
+    Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
+    NetEvents:Subscribe('ServerTransactionManager:UpdateTransactionId', self, self.OnUpdateTransactionId)
+    NetEvents:Subscribe('ServerTransactionManager:CommandsInvoked', self, self.OnServerCommandsInvoked)
+    NetEvents:Subscribe('ServerTransactionManager:SyncClientContext', self, self.OnSyncClientContext)
 end
 
 function ClientTransactionManager:OnEngineMessage(p_Message)
@@ -34,84 +38,115 @@ function ClientTransactionManager:OnEngineMessage(p_Message)
         end
 
         --- Client requests all updates that the server has.
-        NetEvents:SendLocal("ServerTransactionManager:RequestUpdate")
+        NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
     end
 end
 
-function ClientTransactionManager:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
-    -- TODO: Discuss with Pow
+-- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
+-- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
+function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransferDatas)
+    local s_Commands = {}
 
+    for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
+        local s_Command
+        local s_GameObject = GameObjectManager.m_GameObjects[s_Guid]
 
-    --local s_Commands = {}
-    --
-    --for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
-    --    if(self.m_GameObjectTransferDatas[s_Guid] == nil) then
-    --        local s_StringGuid = tostring(s_Guid)
-    --
-    --        --If it's a vanilla object we move it or we delete it. If not we spawn a new object.
-    --        if IsVanilla(s_StringGuid)then
-    --            local s_Command
-    --
-    --            if s_GameObject.isDeleted then
-    --                s_Command = {
-    --                    type = "DestroyBlueprintCommand",
-    --                    gameObjectTransferData = s_GameObjectTransferData
-    --                }
-    --            else
-    --                s_Command = {
-    --
-    --                    type = "SetTransformCommand",
-    --                    gameObjectTransferData = s_GameObjectTransferData
-    --                }
-    --            end
-    --
-    --            table.insert(s_Commands, s_Command)
-    --        else
-    --            local s_Command = {
-    --                type = "SpawnBlueprintCommand",
-    --                gameObjectTransferData = s_GameObjectTransferData
-    --            }
-    --
-    --            table.insert(s_Commands, s_Command)
-    --        end
-    --    else
-    --        --TODO: handle moving or whatever was done to existing objects
-    --
-    --        local s_Changes GetChanges( self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
-    --
-    --        for _, change in ipairs(s_Changes) do
-    --            local s_Command
-    --
-    --            if change == "transform" then
-    --                s_Command = {
-    --                    type = "SetTransformCommand",
-    --                    gameObjectTransferData = s_GameObjectTransferData
-    --                }
-    --            elseif change == "isEnabled" then
-    --                -- TODO: add this when enabling/disabling is implemented on lua
-    --            elseif change == "isDeleted" then
-    --                if s_GameObjectTransferData.isDeleted then
-    --                    s_Command = {
-    --                        type = "DestroyBlueprintCommand",
-    --                        gameObjectTransferData = {
-    --                            guid = s_Guid
-    --                        }
-    --                    }
-    --                end
-    --            elseif change == "parentData" then
-    --                -- TODO: add this when changing parent data is implemented
-    --            elseif change == "name" then
-    --                -- TODO: add this when changing name is implemented on lua
-    --            else
-    --                m_Logger:Error("Found an unhandled change: "..change)
-    --            end
-    --
-    --            table.insert(s_Commands, s_Command)
-    --        end
-    --    end
-    --end
-    --
-    --self:ExecuteCommands(s_Commands, nil)
+        if (s_GameObject == nil) then
+            if (s_GameObjectTransferData ~= nil and s_GameObjectTransferData.isDeleted == false) then
+                s_Command = {
+                    type = "SpawnBlueprintCommand",
+                    gameObjectTransferData = s_GameObjectTransferData
+                }
+
+                table.insert(s_Commands, s_Command)
+            else
+                m_Logger:Error("Object desynced: " .. tostring(s_Guid))
+            end
+        else
+            if (s_GameObjectTransferData == nil or s_GameObjectTransferData.isDeleted == true) then
+                s_Command = {
+                    type = "DeleteBlueprintCommand",
+                    gameObjectTransferData = {
+                        guid = s_Guid
+                    }
+                }
+
+                table.insert(s_Commands, s_Command)
+            elseif (s_GameObject.isDeleted == true and s_GameObjectTransferData.isDeleted == false) then
+                s_Command = {
+                    type = "UndeleteBlueprintCommand",
+                    gameObjectTransferData = s_GameObjectTransferData
+                }
+
+                table.insert(s_Commands, s_Command)
+            else
+                local s_ComparisonGameObjectTransferData = s_GameObject:GetGameObjectTransferData()
+                local s_Changes = GetChanges(s_ComparisonGameObjectTransferData, s_GameObjectTransferData)
+
+                for _, change in ipairs(s_Changes) do
+                    local s_Command
+
+                    if change == "transform" then
+                        s_Command = {
+                            type = "SetTransformCommand",
+                            gameObjectTransferData = s_GameObjectTransferData
+                        }
+                    elseif change == "isEnabled" then
+                        if (s_GameObjectTransferData.isEnabled) then
+                            s_Command = {
+                                type = "EnableBlueprintCommand",
+                                gameObjectTransferData = {
+                                    guid = s_Guid
+                                }
+                            }
+                        else
+                            s_Command = {
+                                type = "DisableBlueprintCommand",
+                                gameObjectTransferData = {
+                                    guid = s_Guid
+                                }
+                            }
+                        end
+                    elseif change == "variation" then
+                        s_Command = {
+                            type = "SetVariationCommand",
+                            gameObjectTransferData = {
+                                guid = s_Guid,
+                                variation = s_GameObjectTransferData.variation
+                            }
+                        }
+                    elseif change == "name" then
+                        s_Command = {
+                            type = "SetObjectNameCommand",
+                            gameObjectTransferData = {
+                                guid = s_Guid,
+                                name = s_GameObjectTransferData.name
+                            }
+                        }
+                    elseif change == "gameEntities" then
+                        m_Logger:Write("Before: ")
+                        m_Logger:WriteTable(s_ComparisonGameObjectTransferData.gameEntities)
+                        m_Logger:Write("--------------")
+
+                        m_Logger:Write("Updated Game Entities: ")
+                        m_Logger:WriteTable(s_GameObjectTransferData.gameEntities)
+                        m_Logger:Write("--------------")
+
+                    elseif change == "parentData" then
+                        -- TODO: add this when changing parent data is implemented
+                    elseif change == "name" then
+                        -- TODO: add this when changing name is implemented on lua
+                    else
+                        m_Logger:Error("Found an unhandled change: "..change)
+                    end
+
+                    table.insert(s_Commands, s_Command)
+                end
+            end
+        end
+    end
+
+    self:ExecuteCommands(s_Commands, nil)
 end
 
 function ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
@@ -146,10 +181,10 @@ function ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
     end
 end
 
-function ClientTransactionManager:OnReceiveCommands(p_CommandsJson)
+function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson)
     local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
-    ClientTransactionManager:ExecuteCommands(s_Commands, nil)
+    self:ExecuteCommands(s_Commands, nil)
 end
 
 function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
@@ -276,7 +311,7 @@ function ClientTransactionManager:OnGameObjectReady(p_GameObject)
 end
 
 function ClientTransactionManager:OnSendCommandsToServer(p_Commands)
-    NetEvents:SendLocal('ServerTransactionManager:ReceiveCommands', p_Commands)
+    NetEvents:SendLocal('ClientTransactionManager:InvokeCommands', p_Commands)
 end
 
 return ClientTransactionManager()

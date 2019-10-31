@@ -13,17 +13,7 @@ end
 function Editor:RegisterVars()
 	self.m_PendingRaycast = false
 
-	self.m_Queue = {
-        commands = {},
-        messages = {}
-    };
-
-	self.m_TransactionId = 0
-	self.m_GameObjectTransferDatas = {}
-	self.m_CommandActionResults = {}
-
 	self.m_CameraTransform = nil
-
 	self.m_LevelLoaded = false
 end
 

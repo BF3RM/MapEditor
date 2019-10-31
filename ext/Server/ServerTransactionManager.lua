@@ -9,8 +9,8 @@ function ServerTransactionManager:__init()
 end
 
 function ServerTransactionManager:RegisterEvents()
-	NetEvents:Subscribe('ServerTransactionManager:ReceiveCommands', self, self.OnReceiveCommands)
-	NetEvents:Subscribe('ServerTransactionManager:RequestUpdate', self, self.OnRequestUpdate)
+	NetEvents:Subscribe('ClientTransactionManager:InvokeCommands', self, self.OnInvokeCommands)
+	NetEvents:Subscribe('ClientTransactionManager:RequestSync', self, self.OnClientRequestSync)
 end
 
 function ServerTransactionManager:RegisterVars()
@@ -18,7 +18,7 @@ function ServerTransactionManager:RegisterVars()
 	self.m_Transactions = {}
 end
 
-function ServerTransactionManager:OnRequestUpdate(p_Player, p_TransactionId)
+function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
     if p_Player == nil then
         return
     end
@@ -43,18 +43,23 @@ function ServerTransactionManager:OnRequestUpdate(p_Player, p_TransactionId)
     for l_TransactionId = p_TransactionId + 1, #self.m_Transactions do
         local s_Guid = self.m_Transactions[l_TransactionId]
         if s_Guid ~= nil then
-            s_UpdatedGameObjectTransferDatas[s_Guid] = GameObjectManager.m_GameObjects[s_Guid]:GetGameObjectTransferData()
+			local s_GameObject = GameObjectManager.m_GameObjects[s_Guid]
+			if (s_GameObject == nil) then
+				s_UpdatedGameObjectTransferDatas[s_Guid] = nil
+			else
+				s_UpdatedGameObjectTransferDatas[s_Guid] = s_GameObject:GetGameObjectTransferData()
+			end
         else
             m_Logger:Write("Transaction not found " .. tostring(l_TransactionId))
         end
     end
 
     -- TODO: These should be on the same netevent, merge them when this vext issue is fixed: https://github.com/EmulatorNexus/VeniceUnleashed/issues/451
-    NetEvents:SendToLocal("MapEditorClient:ReceiveUpdate", p_Player, s_UpdatedGameObjectTransferDatas)
-    NetEvents:SendToLocal("MapEditorClient:UpdateTransactionId", p_Player, #self.m_Transactions)
+    NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, s_UpdatedGameObjectTransferDatas)
+    NetEvents:SendToLocal("ServerTransactionManager:UpdateTransactionId", p_Player, #self.m_Transactions)
 end
 
-function ServerTransactionManager:OnReceiveCommands(p_Player, p_CommandsJson, p_UpdatePass)
+function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson, p_UpdatePass)
 	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
 	self:ExecuteCommands(s_Commands, p_UpdatePass)
@@ -118,7 +123,7 @@ function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 	end
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
 	if (#s_CommandActionResults > 0) then
-		NetEvents:BroadcastLocal('MapEditor:ReceiveCommand', json.encode(p_Commands))
+		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(p_Commands))
 	end
 end
 
