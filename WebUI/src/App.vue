@@ -8,9 +8,10 @@
 							<PlaceholderComponent title="Hierarchy">
 							</PlaceholderComponent>
 						</gl-col>
-
-						<ViewportComponent title="ViewPort">
-						</ViewportComponent>
+						<gl-col :closable="false" id="viewport">
+							<ViewportComponent title="ViewPort">
+							</ViewportComponent>
+						</gl-col>
 						<PlaceholderComponent title="Explorer">
 						</PlaceholderComponent>
 					</gl-row>
@@ -29,12 +30,24 @@ import Vue from 'vue';
 import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import ViewportComponent from '@/script/components/ViewportComponent.vue';
+import { signals } from '@/script/modules/Signals';
 
 @Component({ components: { ViewportComponent, PlaceholderComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title!: string;
+
+	initialised() {
+		let viewport = document.getElementById('viewport-component');
+		viewport.parentElement.parentElement.setAttribute('id', 'viewport');
+		signals.editorReady.emit(true);
+	}
+	mounted() {
+		let viewport = document.getElementById('viewport-component');
+		viewport.parentElement.parentElement.setAttribute('id', 'viewport');
+	}
 }
+
 </script>
 
 <style scoped>

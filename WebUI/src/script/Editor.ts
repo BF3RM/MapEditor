@@ -91,7 +91,6 @@ export default class Editor {
 		signals.editorInitializing.emit(true);
 		// Adds the chrome background and debug window
 		if (this.debug === true) {
-			const imported = document.createElement('script');
 			this.setPlayerName('LocalPlayer');
 		}
 
@@ -116,8 +115,6 @@ export default class Editor {
 
 		this.threeManager.scene.add(this.selectionGroup);
 		this.threeManager.scene.add(this.highlightGroup);
-
-		signals.editorReady.emit(true);
 	}
 
 	public setPlayerName(name: string) {

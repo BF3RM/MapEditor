@@ -1,6 +1,5 @@
 <template>
 	<gl-component id="viewport-component">
-		<h1>Viewport</h1>
 	</gl-component>
 </template>
 
@@ -11,8 +10,15 @@ import { glCustomContainer } from 'vue-golden-layout';
 @Component
 export default class ViewportComponent extends glCustomContainer {
 	@Prop() public title!: string;
-	constructor() {
+	constructor(a:any, b:any) {
 		super();
+	}
+
+	mounted() {
+
+	}
+	created() {
+
 	}
 }
 </script>

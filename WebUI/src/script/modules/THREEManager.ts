@@ -47,16 +47,19 @@ export class THREEManager {
 	private updatingCamera = false;
 
 	constructor() {
-		this.Initialize();
+		signals.editorReady.connect(this.Initialize.bind(this));
 		this.RegisterEvents();
 	}
 
 	public Initialize() {
 		const scope = this;
-
 		scope.renderer.setPixelRatio(window.devicePixelRatio);
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
-
+		const page = document.getElementById('page');
+		if (page !== null) {
+			scope.renderer.domElement.setAttribute('id', 'viewport');
+			page.appendChild(scope.renderer.domElement);
+		}
 		this.camera.position.set(10, 10, 10);
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 		this.CreateGizmo();
@@ -165,7 +168,7 @@ export class THREEManager {
 		});
 		// window.addEventListener('resize', this.onWindowResize, false);
 
-		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+		// this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 

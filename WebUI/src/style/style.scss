@@ -1,6 +1,17 @@
-.viewport-component {
-
-  .lm_content &{
-  	background-color: red;
+.lm_goldenlayout {
+  background-color: transparent!important;
+}
+#viewport-component {
+  background: none !important;
+  pointer-events: none;
+  * {
+	background: none !important;
+	pointer-events: none;
   }
+}
+#viewport {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
 }
