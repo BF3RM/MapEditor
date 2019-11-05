@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
+import 'babel-polyfill';
 
 import Editor from './script/Editor';
 
@@ -18,6 +19,7 @@ if ((window).location.href.indexOf('webui') === -1) {
 (window).editor = new Editor(debugMode);
 (window).log = Log;
 (window).logError = LogError;
+
 Vue.use(vgl);
 
 new Vue({

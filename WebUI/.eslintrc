@@ -19,6 +19,7 @@
     "indent": ["error", "tab"],
     "no-useless-constructor": 0,
     "no-console": 0,
+    "vue/no-unused-vars": 0,
     "no-multi-spaces": ["error", { "exceptions": { "VariableDeclarator": false } }],
     "space-before-function-paren": ["error", {
       "anonymous": "ignore",
