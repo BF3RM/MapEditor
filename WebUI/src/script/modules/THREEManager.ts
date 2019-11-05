@@ -62,8 +62,7 @@ export class THREEManager {
 			scope.renderer.domElement.setAttribute('id', 'viewport');
 			page.appendChild(scope.renderer.domElement);
 		}
-		this.camera.position.set(10, 10, 10);
-		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+
 		this.CreateGizmo();
 
 		if (this.debugMode) {
@@ -109,6 +108,8 @@ export class THREEManager {
 	} );
 
 */
+		this.cameraControls.setPosition(10, 10, 10);
+		this.cameraControls.setLookAt(10, 10, 10, 0, 0, 0, false);
 		this.SetFov(90);
 		this.Render();
 	}
@@ -176,8 +177,8 @@ export class THREEManager {
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
 		// this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+		// this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+		// this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 
 		this.control.addEventListener('change', this.onControlChanged.bind(this));
 		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
