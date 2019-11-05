@@ -45,10 +45,12 @@ export class THREEManager {
 
 	private waitingForControlEnd = false;
 	private updatingCamera = false;
+	private debugMode = false;
 
-	constructor() {
+	constructor(debugMode: boolean) {
 		signals.editorReady.connect(this.Initialize.bind(this));
 		this.RegisterEvents();
+		this.debugMode = debugMode;
 	}
 
 	public Initialize() {
@@ -64,7 +66,11 @@ export class THREEManager {
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 		this.CreateGizmo();
 
-		// snip ( init three scene... )
+		if (this.debugMode) {
+			scope.scene.background = new THREE.Color(0x373737);
+			const grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);
+			scope.scene.add(grid);
+		}
 
 		const clock = new THREE.Clock();
 
@@ -167,7 +173,7 @@ export class THREEManager {
 				break;
 			}
 		});
-		// window.addEventListener('resize', this.onWindowResize, false);
+		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
 		// this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));

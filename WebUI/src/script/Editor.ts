@@ -32,7 +32,7 @@ export default class Editor {
 	public config = new Config();
 	public editorCore = new EditorCore();
 	public debug = true;
-	public threeManager = new THREEManager();
+	public threeManager = new THREEManager(this.debug);
 	public ui = new EditorUI(this.debug);
 	public vext = new VEXTInterface();
 	public history = new History(this);
