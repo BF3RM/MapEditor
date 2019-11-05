@@ -1,7 +1,7 @@
 .lm_goldenlayout {
   background-color: transparent!important;
 }
-#viewport-component {
+#viewport-container,  {
   background: none !important;
   pointer-events: none;
   * {
@@ -9,9 +9,16 @@
 	pointer-events: none;
   }
 }
+.lm_item_container, .lm_splitter, .lm_header {
+  pointer-events: auto;
+}
 #viewport {
   position: absolute;
   left: 0;
   top: 0;
   pointer-events: auto;
+}
+
+.lm_header {
+  background-color: rgba(0, 0, 0, 0.8);
 }

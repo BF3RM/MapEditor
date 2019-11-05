@@ -1,6 +1,8 @@
 <template>
 	<div id="page">
-		<div class="glHolder">
+		<div id="ViewportContainer">
+		</div>
+		<div id="glHolder">
 			<golden-layout class="gl" @initialised="initialised">
 				<gl-col :closable="false">
 					<gl-row :closable="false">
@@ -8,10 +10,8 @@
 							<PlaceholderComponent title="Hierarchy">
 							</PlaceholderComponent>
 						</gl-col>
-						<gl-col :closable="false" id="viewport">
 							<ViewportComponent title="ViewPort">
 							</ViewportComponent>
-						</gl-col>
 						<PlaceholderComponent title="Explorer">
 						</PlaceholderComponent>
 					</gl-row>
@@ -39,12 +39,16 @@ export default class App extends Vue {
 
 	initialised() {
 		let viewport = document.getElementById('viewport-component');
-		viewport.parentElement.parentElement.setAttribute('id', 'viewport');
-		signals.editorReady.emit(true);
+		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
+			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
+			signals.editorReady.emit(true);
+		}
 	}
 	mounted() {
 		let viewport = document.getElementById('viewport-component');
-		viewport.parentElement.parentElement.setAttribute('id', 'viewport');
+		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
+			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
+		}
 	}
 }
 
@@ -54,8 +58,15 @@ export default class App extends Vue {
 	.gl {
 		height: 100%;
 	}
-	.glHolder {
+	#glHolder {
 		height:100vh;
 		width:100vw;
+	}
+	#viewport-container * {
+		background: none !important;
+		pointer-events: none;
+	}
+	#glHolder {
+		pointer-events: none;
 	}
 </style>

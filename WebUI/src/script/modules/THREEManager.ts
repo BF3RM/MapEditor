@@ -55,7 +55,7 @@ export class THREEManager {
 		const scope = this;
 		scope.renderer.setPixelRatio(window.devicePixelRatio);
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
-		const page = document.getElementById('page');
+		const page = document.getElementById('ViewportContainer');
 		if (page !== null) {
 			scope.renderer.domElement.setAttribute('id', 'viewport');
 			page.appendChild(scope.renderer.domElement);
@@ -104,6 +104,7 @@ export class THREEManager {
 
 */
 		this.SetFov(90);
+		this.Render();
 	}
 
 	public Focus(target: THREE.Object3D) {
