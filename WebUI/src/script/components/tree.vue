@@ -1,13 +1,15 @@
 <template>
-	<InfiniteTree ref="tree" :data="data" :auto-open="false" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
+	<InfiniteTree ref="tree" :data="data" :auto-open="true" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
 		<template slot-scope="{ node, index, tree, active }">
 			<div :style="nodeStyle(node)" @click="clickNode($event,node,tree)">{{ node.name }}</div>
 		</template>
 	</InfiniteTree>
 </template>
 
-<script>
+<script lang="ts">
 import InfiniteTree from './infiniteTree';
+import { TreeNode } from '@/script/interfaces/TreeNode';
+// This is a tree example.
 
 const generate = (size = 1000) => {
 	const data = [];
@@ -40,7 +42,7 @@ export default {
 		this.tree = this.$refs.tree.tree;
 	},
 	methods: {
-		toggleState(node) {
+		toggleState(node: TreeNode) {
 			const hasChildren = node.hasChildren();
 			let toggleState = '';
 			if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
@@ -51,25 +53,15 @@ export default {
 			}
 			return toggleState;
 		},
-		toggleIcon(node) {
-			const hasChildren = node.hasChildren();
-			let toggleIcon = 'ios-arrow-forward';
-			if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
-				toggleIcon = 'ios-arrow-forward';
-			}
-			if (hasChildren && node.state.open) {
-				toggleIcon = 'ios-arrow-down';
-			}
-			return toggleIcon;
-		},
-		nodeStyle(node) {
+		nodeStyle(node: TreeNode) {
 			return {
 				'background': node.state.selected ? '#deecfd' : '#fff',
 				'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
 				'padding-left': (node.state.depth * 18).toString() + 'px'
 			};
 		},
-		clickNode(e, node, tree) {
+		clickNode(e:MouseEvent, node: TreeNode, tree: any) {
+			console.log(e);
 			let toggleState = this.toggleState(node);
 			if (toggleState === 'closed') {
 				tree.openNode(node);
@@ -79,31 +71,20 @@ export default {
 			tree.selectNode(node);
 			console.log('afterSelectNode' + new Date().getTime());
 		},
-		toggleClick(e, node, tree) {
-			e.stopPropagation();
-			let toggleState = this.toggleState(node);
-			if (toggleState === 'closed') {
-				tree.openNode(node);
-				tree.selectNode(node);
-			} else if (toggleState === 'opened') {
-				tree.closeNode(node);
-			}
-			console.log('afterToggleNode' + new Date().getTime());
-		},
-		loadNodes(parentNode, done) {
+		loadNodes(parentNode: TreeNode, done:boolean) {
 
 		},
-		shouldLoadNodes(node) {
+		shouldLoadNodes(node: TreeNode) {
 			return !node.hasChildren() && node.loadOnDemand;
 		},
-		shouldSelectNode(node) { // Defaults to null
+		shouldSelectNode(node:TreeNode) { // Defaults to null
 			if (!node || (node === this.$refs.tree.tree.getSelectedNode())) {
 				return false; // Prevent from deselecting the current node
 			}
 			return true;
 		},
-		onUpdate(node) {
-			// 为了及时更新dom也可以直接使用$forceUpdate
+		onUpdate(node:TreeNode) {
+			// In order to update dom in time, you can also use $forceUpdate directly.
 			this.node = node;
 		},
 		onKeyUp() {
@@ -126,25 +107,25 @@ export default {
 			console.log(this.tree);
 			this.onUpdate(this.$refs.tree.tree.getSelectedNode());
 		},
-		onOpenNode(node) {
+		onOpenNode(node: TreeNode) {
 			console.log('onOpenNode:', node);
 			this.onUpdate(node);
 		},
-		onCloseNode(node) {
+		onCloseNode(node: TreeNode) {
 			console.log('onCloseNode:', node);
 			this.onUpdate(node);
 		},
-		onSelectNode(node) {
+		onSelectNode(node: TreeNode) {
 			console.log('onSelectNode:', node);
 			this.onUpdate(node);
 		},
-		onWillOpenNode(node) {
+		onWillOpenNode(node: TreeNode) {
 			console.log('onWillOpenNode:', node);
 		},
-		onWillCloseNode(node) {
+		onWillCloseNode(node: TreeNode) {
 			console.log('onWillCloseNode:', node);
 		},
-		onWillSelectNode(node) {
+		onWillSelectNode(node: TreeNode) {
 			console.log('onWillSelectNode:', node);
 		}
 	}

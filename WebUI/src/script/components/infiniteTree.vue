@@ -63,11 +63,18 @@ export default {
 		},
 		shouldSelectNode: {
 			type: Function,
-			default: () => {}
+			default: (node) => {
+				if (!node || (node === this.tree.getSelectedNode())) {
+					return false; // Prevent from deselecting the current node
+				}
+				return true;
+			}
 		},
 		shouldLoadNodes: {
 			type: Function,
-			default: () => {}
+			default: (node) => {
+				return !node.hasChildren() && node.loadOnDemand;
+			}
 		},
 		// Callback invoked before updating the tree.
 		onContentWillUpdate: {
