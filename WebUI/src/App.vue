@@ -29,6 +29,7 @@ import ViewportComponent from '@/script/components/ViewportComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import ExplorerComponent from '@/script/components/ExplorerComponent.vue';
 
+import '@/style/reset.scss';
 @Component({ components: { ViewportComponent, PlaceholderComponent, ExplorerComponent } })
 export default class App extends Vue {
 	@Prop()
