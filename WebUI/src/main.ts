@@ -8,6 +8,7 @@ import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 
 import { Log, LogError } from '@/script/modules/Logger';
 import vgl from 'vue-golden-layout';
+import '@/script/hacks/HTMLDivElement';
 
 let debugMode: boolean = false;
 // var vext = new VEXTInterface();

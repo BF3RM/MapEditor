@@ -34,15 +34,15 @@ export default class App extends Vue {
 	@Prop()
 	public title!: string;
 
-	initialised() {
-		let viewport = document.getElementById('viewport-component');
+	private initialised() {
+		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
 			signals.editorReady.emit(true);
 		}
 	}
-	mounted() {
-		let viewport = document.getElementById('viewport-component');
+	private mounted() {
+		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
 		}
