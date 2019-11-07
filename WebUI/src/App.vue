@@ -16,11 +16,7 @@
 						</ExplorerComponent>
 					</gl-row>
 				</gl-col>
-
 			</golden-layout>
-		</div>
-		<div>
-			<h1>End</h1>
 		</div>
 	</div>
 </template>

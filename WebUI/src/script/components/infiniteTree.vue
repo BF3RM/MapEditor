@@ -3,6 +3,7 @@
                    :items="tree.nodes"
                    :item-height="rowHeight"
                    ref="virtualList"
+                   :min-item-size="20"
   >
     <div slot-scope="{ item,index }">
       <slot

@@ -1,15 +1,14 @@
 <template>
-  <InfiniteTree ref="tree" :data="data" :auto-open="false" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
-    <template slot-scope="{ node, tree }">
-      <div class="tree-node" :style="nodeStyle(node)" @click="clickNode($event,node,tree)">
-        <span class="tree-text">{{node.name}}</span>
-      </div>
-    </template>
-  </InfiniteTree>
+	<InfiniteTree ref="tree" :data="data" :auto-open="false" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
+		<template slot-scope="{ node, index, tree, active }">
+			<div :style="nodeStyle(node)" @click="clickNode($event,node,tree)">{{ node.name }}</div>
+		</template>
+	</InfiniteTree>
 </template>
 
 <script>
 import InfiniteTree from './infiniteTree';
+
 const generate = (size = 1000) => {
 	const data = [];
 	const source = '{"id":"<root>","name":"<root>","props":{"droppable":true},"children":[{"id":"alpha","name":"Alpha","props":{"droppable":true}},{"id":"bravo","name":"Bravo","props":{"droppable":true},"children":[{"id":"charlie","name":"Charlie","props":{"droppable":true},"children":[{"id":"delta","name":"Delta","props":{"droppable":true},"children":[{"id":"echo","name":"Echo","props":{"droppable":true}},{"id":"foxtrot","name":"Foxtrot","props":{"droppable":true}}]},{"id":"golf","name":"Golf","props":{"droppable":true}}]},{"id":"hotel","name":"Hotel","props":{"droppable":true},"children":[{"id":"india","name":"India","props":{"droppable":true},"children":[{"id":"juliet","name":"Juliet","props":{"droppable":true}}]}]},{"id":"kilo","name":"Kilo","loadOnDemand":true,"props":{"droppable":true}}]}]}';
@@ -31,7 +30,7 @@ export default {
 				props: {
 					droppable: true
 				},
-				children: generate(10)
+				children: generate(100)
 			} ],
 			node: null,
 			tree: null
@@ -39,22 +38,9 @@ export default {
 	},
 	mounted() {
 		this.tree = this.$refs.tree.tree;
-		/* axios.request({
-		  url: '/server-sysmanager/queryAreaAndVidByParentIdUserId',
-		  data: {
-		  areaId: 'root',
-		  deviceLabel: ''
-		  },
-		  method: 'put'
-	  }).then(res => {
-		  this.data = [...res.data.data.area, ...res.data.data.device]
-		  console.log(res.data.data)
-		  console.log(this.$refs.tree.tree)
-	  }) */
 	},
 	methods: {
 		toggleState(node) {
-			console.log(node);
 			const hasChildren = node.hasChildren();
 			let toggleState = '';
 			if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
@@ -78,7 +64,6 @@ export default {
 		},
 		nodeStyle(node) {
 			return {
-				'line-height': '30px',
 				'background': node.state.selected ? '#deecfd' : '#fff',
 				'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
 				'padding-left': (node.state.depth * 18).toString() + 'px'
@@ -106,22 +91,7 @@ export default {
 			console.log('afterToggleNode' + new Date().getTime());
 		},
 		loadNodes(parentNode, done) {
-			console.log(parentNode);
-			/* const suffix = parentNode.id.replace(/(\w)+/, '');
-		  const nodes = [
-			  {
-			  id: 'node1' + suffix,
-			  name: 'Node 1'
-			  },
-			  {
-			  id: 'node2' + suffix,
-			  name: 'Node 2'
-			  }
-		  ];
-		  setTimeout(() => {
-			  console.log('111');
-			  done(null, nodes);
-		  }, 1000); */
+
 		},
 		shouldLoadNodes(node) {
 			return !node.hasChildren() && node.loadOnDemand;
@@ -170,22 +140,6 @@ export default {
 		},
 		onWillOpenNode(node) {
 			console.log('onWillOpenNode:', node);
-			/* if (node.deviceId) return
-		  if (node.children && node.children.length > 0) return
-		  node.state.loading = true
-		  axios.request({
-		  url: '/server-sysmanager/queryAreaAndVidByParentIdUserId',
-		  data: {
-			  areaId: node.id,
-			  deviceLabel: ''
-		  },
-		  method: 'put'
-		  }).then(res => {
-		  // node.children =  [...res.data.data.area,...res.data.data.device];
-		  this.tree.addChildNodes([...res.data.data.area, ...res.data.data.device], this.tree.getSelectedNode())
-		  node.state.loading = false
-		  console.log(res.data.data)
-		  }) */
 		},
 		onWillCloseNode(node) {
 			console.log('onWillCloseNode:', node);
@@ -198,28 +152,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .tree {
-    width: 400px;
-    height: 650px;
-    border: 1px solid #ccc;
-  }
-  .tree-node{
-    cursor: default;
-    position: relative;
-    &:hover {
-      background: #f2fdff;
-    }
-  }
-  .tree-text{
-    margin-left: 2px;
-    user-select: none;
-  }
-  .icon-load{
-    animation: ani-demo-spin 1s linear infinite;
-  }
-  @keyframes ani-demo-spin {
-    from { transform: rotate(0deg);}
-    50%  { transform: rotate(180deg);}
-    to   { transform: rotate(360deg);}
-  }
+	.tree {
+		width: 100%;
+		height: 100%;
+	}
+	.tree-node{
+		cursor: default;
+		position: relative;
+		&:hover {
+			background: #f2fdff;
+		}
+	}
+	.tree-text{
+		margin-left: 2px;
+		user-select: none;
+	}
+	.icon-load{
+		animation: ani-demo-spin 1s linear infinite;
+	}
+	@keyframes ani-demo-spin {
+		from { transform: rotate(0deg);}
+		50%  { transform: rotate(180deg);}
+		to   { transform: rotate(360deg);}
+	}
 </style>
