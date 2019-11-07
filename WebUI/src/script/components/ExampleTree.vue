@@ -1,17 +1,18 @@
 <template>
-	<InfiniteTree ref="tree" :data="data" :auto-open="true" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
+	<InfiniteTreeComponent ref="tree" :data="data" :auto-open="true" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
 		<template slot-scope="{ node, index, tree, active }">
 			<div :style="nodeStyle(node)" @click="clickNode($event,node,tree)">{{ node.name }}</div>
 		</template>
-	</InfiniteTree>
+	</InfiniteTreeComponent>
 </template>
 
 <script lang="ts">
 // This is a tree example.
 
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
-import InfiniteTree from './infiniteTree.vue';
-import { TreeNode } from '@/script/interfaces/TreeNode';
+import { ITreeNode } from '@/script/interfaces/ITreeNode';
+import { InfiniteTree } from '../../../types/InfiniteTree';
+import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
 
 const generate = (size = 1000) => {
 	const data = [];
@@ -21,10 +22,9 @@ const generate = (size = 1000) => {
 	}
 	return data;
 };
-
-@Component({ components: { InfiniteTree } })
+@Component({ components: { InfiniteTreeComponent } })
 export default class ExampleTree extends Vue {
-	public tree: any;
+	public tree: InfiniteTree;
 	private data() {
 		return {
 			data: [ {
@@ -43,7 +43,7 @@ export default class ExampleTree extends Vue {
 		console.log(this);
 		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
-	private toggleState(node: TreeNode) {
+	private toggleState(node: ITreeNode) {
 		const hasChildren = node.hasChildren();
 		let toggleState = '';
 		if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
@@ -54,14 +54,14 @@ export default class ExampleTree extends Vue {
 		}
 		return toggleState;
 	}
-	private nodeStyle(node: TreeNode) {
+	private nodeStyle(node: ITreeNode) {
 		return {
 			'background': node.state.selected ? '#deecfd' : '#fff',
 			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
 			'padding-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
-	private clickNode(e: MouseEvent, node: TreeNode, tree: any) {
+	private clickNode(e: MouseEvent, node: ITreeNode, tree: any) {
 		console.log(e);
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
@@ -72,19 +72,19 @@ export default class ExampleTree extends Vue {
 		tree.selectNode(node);
 		console.log('afterSelectNode' + new Date().getTime());
 	}
-	private loadNodes(parentNode: TreeNode, done: boolean) {
+	private loadNodes(parentNode: ITreeNode, done: boolean) {
 
 	}
-	private shouldLoadNodes(node: TreeNode) {
+	private shouldLoadNodes(node: ITreeNode) {
 		return !node.hasChildren() && node.loadOnDemand;
 	}
-	private shouldSelectNode(node: TreeNode) { // Defaults to null
-		if (!node || (node === this.$refs.tree.tree.getSelectedNode())) {
+	private shouldSelectNode(node: ITreeNode) { // Defaults to null
+		if (!node || (node === (this.tree.getSelectedNode()))) {
 			return false; // Prevent from deselecting the current node
 		}
 		return true;
 	}
-	private onUpdate(node: TreeNode) {
+	private onUpdate(node: ITreeNode) {
 		// In order to update dom in time, you can also use $forceUpdate directly.
 	}
 	private onKeyUp() {
@@ -107,25 +107,25 @@ export default class ExampleTree extends Vue {
 		console.log(this.tree);
 		this.onUpdate(this.$refs.tree.tree.getSelectedNode());
 	}
-	private onOpenNode(node: TreeNode) {
+	private onOpenNode(node: ITreeNode) {
 		console.log('onOpenNode:', node);
 		this.onUpdate(node);
 	}
-	private onCloseNode(node: TreeNode) {
+	private onCloseNode(node: ITreeNode) {
 		console.log('onCloseNode:', node);
 		this.onUpdate(node);
 	}
-	private onSelectNode(node: TreeNode) {
+	private onSelectNode(node: ITreeNode) {
 		console.log('onSelectNode:', node);
 		this.onUpdate(node);
 	}
-	private onWillOpenNode(node: TreeNode) {
+	private onWillOpenNode(node: ITreeNode) {
 		console.log('onWillOpenNode:', node);
 	}
-	private onWillCloseNode(node: TreeNode) {
+	private onWillCloseNode(node: ITreeNode) {
 		console.log('onWillCloseNode:', node);
 	}
-	private onWillSelectNode(node: TreeNode) {
+	private onWillSelectNode(node: ITreeNode) {
 		console.log('onWillSelectNode:', node);
 	}
 }
