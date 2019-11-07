@@ -6,12 +6,13 @@
 			<golden-layout class="gl" @initialised="initialised">
 				<gl-col :closable="false">
 					<gl-row :closable="false">
-						<gl-col :closable="false">
-							<PlaceholderComponent title="Hierarchy">
-							</PlaceholderComponent>
+						<PlaceholderComponent title="Hierarchy">
+						</PlaceholderComponent>
+						<!-- I'm adding two columns inside eachother. This makes it so only one side resizes when you resize it. -->
+						<gl-col :closable="false" class="viewport-container">
+							<gl-col :closable="false" class="viewport-container">
+							</gl-col>
 						</gl-col>
-							<ViewportComponent title="ViewPort">
-							</ViewportComponent>
 						<ExplorerComponent title="Explorer">
 						</ExplorerComponent>
 					</gl-row>
@@ -36,17 +37,7 @@ export default class App extends Vue {
 	public title!: string;
 
 	private initialised() {
-		const viewport = document.getElementById('viewport-component');
-		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
-			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
-			signals.editorReady.emit(true);
-		}
-	}
-	private mounted() {
-		const viewport = document.getElementById('viewport-component');
-		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
-			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
-		}
+		signals.editorReady.emit(true);
 	}
 }
 
