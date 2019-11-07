@@ -117,15 +117,18 @@ function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
     local count = 0
 
     -- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
-    for l_Guid, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
-        count = count + 1
-        table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
-        --s_GameObjectSaveDatas[l_Guid] = GameObjectSaveData(l_GameObject):GetAsTable()
+    for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
+        if l_GameObject:IsUserModified() == true then
+            count = count + 1
+            table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
+        end
     end
 
     m_Logger:Write("vvvvvvvvvvvvvvvvv")
     m_Logger:Write("GameObjectSaveDatas: " .. count)
-    m_Logger:WriteTable(s_GameObjectSaveDatas)
+    for _, gameObjectSaveData in pairs(s_GameObjectSaveDatas) do
+        m_Logger:Write(tostring(gameObjectSaveData.guid) .. " | " .. gameObjectSaveData.name)
+    end
     m_Logger:Write(json.encode(s_GameObjectSaveDatas))
     m_Logger:Write("^^^^^^^^^^^^^^^^^")
 

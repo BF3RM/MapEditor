@@ -173,10 +173,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
     self:ResolveChildren(s_GameObject)
 
     if (p_Parent == nil) then -- no parent (custom spawned blueprint) -> proceed in postprocessing
-        m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
+        --m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
         self:PostProcessGameObjectAndChildren(s_GameObject)
     elseif (InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then -- top level vanilla (level data) -> proceed in postprocessing
-        m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
+        --m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
         s_GameObject.parentData = GameObjectParentData{
             guid = s_ParentPrimaryInstance,
             typeName = "LevelData",
@@ -263,6 +263,8 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     p_GameObject.guid = p_CustomGuid
     p_GameObject.isVanilla = p_IsVanilla
     p_GameObject.creatorName = p_CreatorName
+
+    m_Logger:Write(tostring(p_CustomGuid) .. " | " .. p_GameObject.name .. " | " .. tostring(p_GameObject.transform.trans))
 
     if p_GameObject.children ~= nil then
         for _, s_ChildGameObject in pairs(p_GameObject.children) do
