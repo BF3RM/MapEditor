@@ -150,12 +150,12 @@ export default {
 		this.tree.update = () => {
 			this.tree.emit('contentWillUpdate');
 			this.nodes = this.tree.nodes;
-			this.$nextTick(function () {
+			this.$nextTick(function() {
 				this.tree.emit('contentDidUpdate');
 			});
 		};
 
-		Object.keys(this.eventHandlers).forEach(key => {
+		Object.keys(this.eventHandlers).forEach((key) => {
 			if (!this[key]) {
 				return;
 			}
@@ -166,7 +166,7 @@ export default {
 		});
 	},
 	beforeDestroy() {
-		Object.keys(this.eventHandlers).forEach(key => {
+		Object.keys(this.eventHandlers).forEach((key) => {
 			if (!this.eventHandlers[key]) {
 				return;
 			}

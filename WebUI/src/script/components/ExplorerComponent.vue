@@ -1,14 +1,14 @@
 <template>
 	<gl-component id="explorer-component">
-		<tree/>
+		<ExampleTree/>
 	</gl-component>
 </template>
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import tree from './tree.vue';
+import ExampleTree from './ExampleTree.vue';
 import EditorComponent from './EditorComponent.vue';
-@Component({ components: { tree } })
+@Component({ components: { ExampleTree } })
 
 export default class ExplorerComponent extends EditorComponent {
 	@Prop() public title!: string;

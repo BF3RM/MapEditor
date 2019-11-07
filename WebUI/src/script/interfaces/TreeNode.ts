@@ -7,7 +7,7 @@ export interface TreeNode {
 	state: TreeNodeState;
 	data: any;
 	loadOnDemand: boolean;
-	hasChildren: Function;
+	hasChildren(): boolean;
 }
 
 export interface TreeNodeState {
