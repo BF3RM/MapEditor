@@ -6,11 +6,11 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { glCustomContainer } from 'vue-golden-layout';
 import tree from './tree.vue';
+import EditorComponent from './EditorComponent.vue';
 @Component({ components: { tree } })
 
-export default class ExplorerComponent extends glCustomContainer {
+export default class ExplorerComponent extends EditorComponent {
 	@Prop() public title!: string;
 
 	constructor() {
