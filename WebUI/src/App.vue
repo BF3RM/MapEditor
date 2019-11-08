@@ -4,23 +4,23 @@
 		</div>
 		<div id="glHolder">
 			<golden-layout class="gl" @initialised="onInitialised">
-				<gl-col :closable="false">
-					<gl-row :closable="false">
-						<PlaceholderComponent title="Hierarchy">
-						</PlaceholderComponent>
-						<!-- I'm adding two columns inside eachother. This makes it so only one side resizes when you resize it. -->
-						<gl-col :closable="false">
-							<gl-col :closable="false" class="viewport-container">
-							</gl-col>
-							<gl-row :closable="false" :height="10">
+				<gl-col>
+					<gl-row>
+						<gl-col>
+							<PlaceholderComponent title="Hierarchy"/>
+						</gl-col>
+						<gl-col>
+							<gl-row>
+								<ViewportComponent title="ViewPort"/>
+							</gl-row>
+							<gl-row>
 								<ConsoleComponent title="Console"></ConsoleComponent>
 							</gl-row>
-						<gl-col :closable="false">
 						</gl-col>
-							<ViewportComponent title="ViewPort">
-							</ViewportComponent>
-						<ExplorerComponent title="Explorer">
-						</ExplorerComponent>
+						<gl-col>
+							<ExplorerComponent title="Explorer">
+							</ExplorerComponent>
+						</gl-col>
 					</gl-row>
 				</gl-col>
 			</golden-layout>
@@ -38,8 +38,9 @@ import ConsoleComponent from '@/script/components/ConsoleComponent.vue';
 
 import '@/style/reset.scss';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
+import ViewportComponent from '@/script/components/ViewportComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title!: string;
