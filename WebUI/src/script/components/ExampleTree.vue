@@ -105,7 +105,7 @@ export default class ExampleTree extends Vue {
 	private onContentDidUpdate() {
 		console.log('onContentDidUpdate');
 		console.log(this.tree);
-		this.onUpdate(this.$refs.tree.tree.getSelectedNode());
+		this.onUpdate(this.tree.getSelectedNode());
 	}
 	private onOpenNode(node: ITreeNode) {
 		console.log('onOpenNode:', node);
