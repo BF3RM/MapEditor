@@ -1,4 +1,11 @@
 import { signals } from '@/script/modules/Signals';
+export enum LOGLEVEL {
+	NONE = 0,
+	ERROR = 1,
+	PROD = 2,
+	DEBUG = 3,
+	VERBOSE = 4,
+}
 
 export function LogError(message: string, info?: any): void {
 	console.error(message, info);

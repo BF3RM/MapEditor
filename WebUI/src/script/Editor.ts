@@ -27,6 +27,7 @@ import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
 import { SceneUtils } from 'three';
+import { LOGLEVEL } from '@/script/modules/Logger';
 
 export default class Editor {
 	public config = new Config();

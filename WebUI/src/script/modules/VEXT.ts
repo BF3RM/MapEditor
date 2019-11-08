@@ -6,6 +6,7 @@ import { Guid } from 'guid-typescript';
 import { GameObject } from '@/script/types/GameObject';
 import { signals } from '@/script/modules/Signals';
 import { VextCommand } from '@/script/types/VextCommand';
+import { LOGLEVEL } from '@/script/modules/Logger';
 
 export default class VEXTInterface {
 	public emulator: VEXTemulator;

@@ -24,6 +24,7 @@ import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
+import { LOGLEVEL } from '@/script/modules/Logger';
 
 interface ConsoleEntry {
 	level: LOGLEVEL;
@@ -52,7 +53,7 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 	}
 	onclick() {
-		window.log('kek');
+		window.Log(LOGLEVEL.VERBOSE, 'kek');
 		this.scrollToBottom();
 	}
 	mount() {
