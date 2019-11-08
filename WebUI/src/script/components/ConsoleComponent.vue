@@ -23,6 +23,7 @@ import { Component, Inject, Model, Prop, Watch, Emit } from 'vue-property-decora
 import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+import { signals } from '@/script/modules/Signals';
 
 interface ConsoleEntry {
 	level: LOGLEVEL;
@@ -35,21 +36,23 @@ interface ConsoleEntry {
 export default class ConsoleComponent extends EditorComponent {
 	@Prop() public title!: string;
 
-	@Prop() private data: {
+	private data: {
 		logs: ConsoleEntry[];
 	} = {
 		logs: []
 	};
+
 	constructor() {
 		super();
+		signals.onLog.connect(this.onLog.bind(this));
 		this.data.logs.push({
-			type: LOGLEVEL.DEBUG,
+			type: 3,
 			id: this.data.logs.length,
 			message: 'test'
 		} as ConsoleEntry);
 	}
 	onclick() {
-		console.log('boi');
+		window.log('kek');
 		this.scrollToBottom();
 	}
 	mount() {

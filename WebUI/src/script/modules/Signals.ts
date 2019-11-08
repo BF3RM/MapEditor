@@ -3,6 +3,7 @@ import { Signal } from 'typed-signals';
 export const signals = {
 	editorInitializing: new Signal(),
 	editorReady: new Signal(),
+	onLog: new Signal(),
 
 	levelLoaded: new Signal(),
 	// Object actions

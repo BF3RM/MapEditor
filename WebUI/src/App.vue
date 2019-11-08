@@ -13,7 +13,7 @@
 							<gl-col :closable="false" class="viewport-container">
 							</gl-col>
 							<gl-row :closable="false" :height="10">
-								<ConsoleComponent></ConsoleComponent>
+								<ConsoleComponent title="Console"></ConsoleComponent>
 							</gl-row>
 						</gl-col>
 						<ExplorerComponent title="Explorer">
@@ -42,6 +42,8 @@ export default class App extends Vue {
 	public title!: string;
 
 	private onInitialised() {
+		const ps = new PerfectScrollbar('.scrollable', {
+		});
 		signals.editorReady.emit(true);
 	}
 }
