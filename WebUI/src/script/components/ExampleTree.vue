@@ -25,7 +25,9 @@ const generate = (size = 1000) => {
 @Component({ components: { InfiniteTreeComponent } })
 export default class ExampleTree extends Vue {
 	private tree: InfiniteTree | null = null;
-
+	public mounted() {
+		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
+	}
 	private data() {
 		return {
 			data: [ {
@@ -40,9 +42,7 @@ export default class ExampleTree extends Vue {
 			tree: null
 		};
 	}
-	private mounted() {
-		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
-	}
+
 	private toggleState(node: ITreeNode) {
 		const hasChildren = node.hasChildren();
 		let toggleState = '';
@@ -73,12 +73,15 @@ export default class ExampleTree extends Vue {
 		console.log('afterSelectNode' + new Date().getTime());
 	}
 	private loadNodes(parentNode: ITreeNode, done: boolean) {
-
+		// Do something?
 	}
 	private shouldLoadNodes(node: ITreeNode) {
 		return !node.hasChildren() && node.loadOnDemand;
 	}
 	private shouldSelectNode(node: ITreeNode) { // Defaults to null
+		if (this.tree === null) {
+			return false;
+		}
 		if (!node || (node === (this.tree.getSelectedNode()))) {
 			return false; // Prevent from deselecting the current node
 		}
@@ -104,6 +107,9 @@ export default class ExampleTree extends Vue {
 	}
 	private onContentDidUpdate() {
 		console.log('onContentDidUpdate');
+		if (this.tree === null) {
+			return;
+		}
 		this.onUpdate(this.tree.getSelectedNode());
 	}
 	private onOpenNode(node: ITreeNode) {

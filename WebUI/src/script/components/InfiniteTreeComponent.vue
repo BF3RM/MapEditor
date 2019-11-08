@@ -59,7 +59,9 @@ export default {
 		},
 		loadNodes: {
 			type: Function,
-			default: () => {}
+			default: () => {
+				// Comment to stop the linter from complaining
+			}
 		},
 		shouldSelectNode: {
 			type: Function,

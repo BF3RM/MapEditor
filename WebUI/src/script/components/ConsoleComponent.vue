@@ -58,25 +58,6 @@ interface ConsoleEntry {
 @Component({ components: { DynamicScroller, DynamicScrollerItem } })
 export default class ConsoleComponent extends EditorComponent {
 	@Prop() public title!: string;
-	private data: {
-		logs: ConsoleEntry[];
-		filterLevel: LOGLEVEL;
-		shouldScrollToBottom:boolean;
-		search: string
-	} = {
-		logs: [],
-		filterLevel: LOGLEVEL.VERBOSE,
-		shouldScrollToBottom: true,
-		search: ''
-	};
-
-	private originals: {
-		warn: (message?: any, ...optionalParams: any[]) => void;
-		log: (message?: any, ...optionalParams: any[]) => void;
-		clear: () => void;
-		error: (message?: any, ...optionalParams: any[]) => void;
-		info: (message?: any, ...optionalParams: any[]) => void
-	};
 	// WTF? What's a better way to do this?
 	private logLevelDict = [
 		'NONE',
@@ -87,10 +68,45 @@ export default class ConsoleComponent extends EditorComponent {
 		'DEBUG',
 		'VERBOSE'
 	];
+	private originals: {
+		warn: (message?: any, ...optionalParams: any[]) => void;
+		log: (message?: any, ...optionalParams: any[]) => void;
+		clear: () => void;
+		error: (message?: any, ...optionalParams: any[]) => void;
+		info: (message?: any, ...optionalParams: any[]) => void
+	} = {
+		log: console.log,
+		error: console.error,
+		warn: console.warn,
+		clear: console.clear,
+		info: console.info
+	};
+	private data: {
+		logs: ConsoleEntry[];
+		filterLevel: LOGLEVEL;
+		shouldScrollToBottom: boolean;
+		search: string
+	} = {
+		logs: [],
+		filterLevel: LOGLEVEL.VERBOSE,
+		shouldScrollToBottom: true,
+		search: ''
+	};
 	constructor() {
 		super();
 		signals.onLog.connect(this.onLog.bind(this));
 	}
+
+	public mounted() {
+		window.onLog = this.onLog.bind(this);
+		console.log = this.consoleLog.bind(this);
+		console.error = this.consoleError.bind(this);
+		console.warn = this.consoleWarn.bind(this);
+		console.clear = this.consoleClear.bind(this);
+		console.info = this.consoleInfo.bind(this);
+		console.log('Initialised console');
+	}
+
 	private onClick(item: ConsoleEntry) {
 		this.data.logs[item.id].expanded = !item.expanded;
 		Object.assign(item, this.data.logs[item.id]);
@@ -114,7 +130,7 @@ export default class ConsoleComponent extends EditorComponent {
 		return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 	}
 
-	private FormatStacktrace(item:ConsoleEntry) {
+	private FormatStacktrace(item: ConsoleEntry) {
 		if (item !== undefined && item.stackTrace === undefined) {
 			return 'no stack?';
 		}
@@ -126,31 +142,16 @@ export default class ConsoleComponent extends EditorComponent {
 	private onSearch(a: any) {
 		this.data.search = a.target.value;
 	}
-	private mounted() {
-		this.originals = {
-			log: console.log,
-			error: console.error,
-			warn: console.warn,
-			clear: console.clear,
-			info: console.info
-		};
-		window.onLog = this.onLog.bind(this);
-		console.log = this.consoleLog.bind(this);
-		console.error = this.consoleError.bind(this);
-		console.warn = this.consoleWarn.bind(this);
-		console.clear = this.consoleClear.bind(this);
-		console.info = this.consoleInfo.bind(this);
-		console.log('Initialised console');
-	}
-	filteredItems() {
+
+	private filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
-		return this.data.logs.filter(i => i.message.toString().toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
+		return this.data.logs.filter((i) => i.message.toString().toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
 	}
 
 	private consoleLog(message?: any, ...optionalParams: any[]) {
 		this.originals.log(message, optionalParams);
 		this.data.logs.push({
-			message: message,
+			message,
 			id: this.data.logs.length,
 			level: LOGLEVEL.INFO,
 			time: Date.now(),
@@ -161,7 +162,7 @@ export default class ConsoleComponent extends EditorComponent {
 	private consoleError(message?: any, ...optionalParams: any[]) {
 		this.originals.error(message, optionalParams);
 		this.data.logs.push({
-			message: message,
+			message,
 			id: this.data.logs.length,
 			level: LOGLEVEL.ERROR,
 			time: Date.now(),
@@ -172,7 +173,7 @@ export default class ConsoleComponent extends EditorComponent {
 	private consoleInfo(message?: any, ...optionalParams: any[]) {
 		this.originals.info(message, optionalParams);
 		this.data.logs.push({
-			message: message,
+			message,
 			id: this.data.logs.length,
 			level: LOGLEVEL.INFO,
 			time: Date.now()
@@ -182,7 +183,7 @@ export default class ConsoleComponent extends EditorComponent {
 	private consoleWarn(message?: any, ...optionalParams: any[]) {
 		this.originals.warn(message, optionalParams);
 		this.data.logs.push({
-			message: message,
+			message,
 			id: this.data.logs.length,
 			level: LOGLEVEL.WARNING,
 			time: Date.now()
@@ -194,17 +195,17 @@ export default class ConsoleComponent extends EditorComponent {
 		this.data.logs = [];
 	}
 
-	private onLog(logLevel:LOGLEVEL, message: any, info?:any) {
+	private onLog(logLevel: LOGLEVEL, message: any, info?: any) {
 		this.data.logs.push({
 			level: logLevel,
 			id: this.data.logs.length,
-			message: message,
+			message,
 			info,
 			time: Date.now()
 		} as ConsoleEntry);
 		this.ScrollToBottom();
 	}
-	private onShouldScrollToBottom(e:any) {
+	private onShouldScrollToBottom(e: any) {
 		this.data.shouldScrollToBottom = e.target.checked;
 	}
 	private ScrollToBottom() {
@@ -214,8 +215,12 @@ export default class ConsoleComponent extends EditorComponent {
 	}
 
 	private StackTrace() {
-		let err = new Error();
-		var lines = err.stack.split('\n');
+		const err = new Error();
+		if (err.stack === undefined) {
+			return '';
+		}
+		// Is this really correct TSLinter?
+		const lines = err.stack.split('\n');
 		lines.splice(0, 3);
 		return lines.join('\n');
 	}

@@ -19,6 +19,9 @@ import { ITreeNode } from '@/script/interfaces/ITreeNode';
 
 export default class ExplorerComponent extends EditorComponent {
 	private tree: InfiniteTree | null = null;
+	public mounted() {
+		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
+	}
 	private data() {
 		return {
 			data: [ {
@@ -33,23 +36,20 @@ export default class ExplorerComponent extends EditorComponent {
 			tree: null
 		};
 	}
-	mounted() {
-		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
-	}
-	nodeStyle(node: ITreeNode) {
+	private nodeStyle(node: ITreeNode) {
 		return {
 			'background': node.state.selected ? '#deecfd' : '#fff',
 			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
 			'padding-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
-	clickNode(e:MouseEvent, node: ITreeNode, tree: InfiniteTree) {
+	private clickNode(e: MouseEvent, node: ITreeNode, tree: InfiniteTree) {
 		console.log(node);
 	}
-	onSelectNode(node:ITreeNode) {
+	private onSelectNode(node: ITreeNode) {
 		console.log(node);
 	}
-	shouldSelectNode(node:ITreeNode) {
+	private shouldSelectNode(node: ITreeNode) {
 		console.log(node);
 	}
 }
