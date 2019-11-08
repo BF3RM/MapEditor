@@ -2,10 +2,6 @@ import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
 import Editor from './script/Editor';
-
-import './style/style.scss';
-import 'golden-layout/src/css/goldenlayout-dark-theme.css';
-
 import { Log, LogError } from '@/script/modules/Logger';
 import vgl from 'vue-golden-layout';
 import '@/script/hacks/HTMLDivElement';

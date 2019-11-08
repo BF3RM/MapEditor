@@ -35,9 +35,11 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
 import ExplorerComponent from '@/script/components/ExplorerComponent.vue';
 import ConsoleComponent from '@/script/components/ConsoleComponent.vue';
-
 import '@/style/reset.scss';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
+import 'golden-layout/src/css/goldenlayout-dark-theme.css';
+import './style/style.scss';
+
 import ViewportComponent from '@/script/components/ViewportComponent.vue';
 
 @Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent } })
