@@ -16,8 +16,8 @@ if ((window).location.href.indexOf('webui') === -1) {
 	debugMode = true;
 }
 (window).editor = new Editor(debugMode);
-(window).log = Log;
-(window).logError = LogError;
+(window).Log = Log;
+(window).LogError = LogError;
 
 Vue.use(vgl);
 
