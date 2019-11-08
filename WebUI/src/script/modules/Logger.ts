@@ -3,19 +3,19 @@ export enum LOGLEVEL {
 	NONE = 0,
 	ERROR = 1,
 	PROD = 2,
-	DEBUG = 3,
-	VERBOSE = 4,
+	WARNING = 3,
+	INFO = 4,
+	DEBUG = 5,
+	VERBOSE = 6,
 }
 
 export function LogError(message: string, info?: any): void {
-	console.error(message, info);
-	signals.onLog.emit(1, message, info);
+	signals.onLog.emit(LOGLEVEL.ERROR, message, info);
 }
 
 export function Log(level: LOGLEVEL, message: string, info?: any): void {
 	const logLevel = LOGLEVEL.VERBOSE;
 	if (level <= logLevel) {
-		console.log(message, info);
 		signals.onLog.emit(level, message, info);
 	}
 }

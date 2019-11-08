@@ -13,7 +13,8 @@
 					:active="active"
 					:data-index="index"
 			>
-				<pre v-if="typeof(item.message) == 'string'" @click="onclick" class="message">{{ item.message }}</pre>
+				<pre v-if="typeof(item.message) === 'string'" @click="onclick" class="message">string [{{item.level}}] {{ item.message }}</pre>
+				<pre v-if="typeof(item.message) === 'object'" @click="onclick" class="message">object [{{item.level}}] {{ Inspect(item.message) }}</pre>
 			</DynamicScrollerItem>
 		</DynamicScroller>
 	</gl-component>
@@ -25,6 +26,7 @@ import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
 import { LOGLEVEL } from '@/script/modules/Logger';
+import { inspect } from 'util';
 
 interface ConsoleEntry {
 	level: LOGLEVEL;
@@ -43,6 +45,14 @@ export default class ConsoleComponent extends EditorComponent {
 		logs: []
 	};
 
+	private originals: {
+		warn: (message?: any, ...optionalParams: any[]) => void;
+		log: (message?: any, ...optionalParams: any[]) => void;
+		clear: () => void;
+		error: (message?: any, ...optionalParams: any[]) => void;
+		info: (message?: any, ...optionalParams: any[]) => void
+	};
+
 	constructor() {
 		super();
 		signals.onLog.connect(this.onLog.bind(this));
@@ -53,13 +63,80 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 	}
 	onclick() {
-		window.Log(LOGLEVEL.VERBOSE, 'kek');
+		console.log('kek');
 		this.scrollToBottom();
 	}
-	mount() {
-		window.onLog = this.onLog.bind(this);
+	Inspect(obj:any) {
+		if (obj == null) {
+			return 'null';
+		}
+		return inspect(obj);
 	}
-	onLog(logLevel:LOGLEVEL, message: string, info?:any) {
+	mounted() {
+		this.originals = {
+			log: console.log,
+			error: console.error,
+			warn: console.warn,
+			clear: console.clear,
+			info: console.info
+		};
+		window.onLog = this.onLog.bind(this);
+		console.log = this.consoleLog.bind(this);
+		console.error = this.consoleError.bind(this);
+		console.warn = this.consoleWarn.bind(this);
+		console.clear = this.consoleClear.bind(this);
+		console.info = this.consoleInfo.bind(this);
+		console.log('Initialised console');
+	}
+
+	consoleLog(message?: any, ...optionalParams: any[]) {
+		if (optionalParams.length === 0) {
+			optionalParams = null;
+		}		this.originals.log(message, optionalParams);
+		this.data.logs.push({
+			message: message,
+			id: this.data.logs.length,
+			level: LOGLEVEL.INFO
+		} as ConsoleEntry);
+	}
+	consoleError(message?: any, ...optionalParams: any[]) {
+		if (optionalParams.length === 0) {
+			optionalParams = null;
+		}		this.originals.error(message, optionalParams);
+		this.data.logs.push({
+			message: message,
+			id: this.data.logs.length,
+			level: LOGLEVEL.ERROR
+		} as ConsoleEntry);
+	}
+	consoleInfo(message?: any, ...optionalParams: any[]) {
+		if (optionalParams.length === 0) {
+			optionalParams = null;
+		}
+		this.originals.info(message, optionalParams);
+		this.data.logs.push({
+			message: message,
+			id: this.data.logs.length,
+			level: LOGLEVEL.INFO
+		} as ConsoleEntry);
+	}
+	consoleWarn(message?: any, ...optionalParams: any[]) {
+		if (optionalParams.length === 0) {
+			optionalParams = null;
+		}
+		this.originals.warn(message, optionalParams);
+		this.data.logs.push({
+			message: message,
+			id: this.data.logs.length,
+			level: LOGLEVEL.WARNING
+		} as ConsoleEntry);
+	}
+	consoleClear() {
+		this.originals.clear();
+		this.data.logs = [];
+	}
+
+	onLog(logLevel:LOGLEVEL, message: any, info?:any) {
 		this.data.logs.push({
 			level: logLevel,
 			id: this.data.logs.length,
