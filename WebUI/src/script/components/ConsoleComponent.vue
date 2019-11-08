@@ -47,7 +47,7 @@ export default class ConsoleComponent extends EditorComponent {
 		super();
 		signals.onLog.connect(this.onLog.bind(this));
 		this.data.logs.push({
-			type: 3,
+			type: LOGLEVEL.VERBOSE,
 			id: this.data.logs.length,
 			message: 'test'
 		} as ConsoleEntry);
@@ -64,7 +64,7 @@ export default class ConsoleComponent extends EditorComponent {
 			level: logLevel,
 			id: this.data.logs.length,
 			message: message,
-			info: info
+			info
 		} as ConsoleEntry);
 	}
 	scrollToBottom() {
