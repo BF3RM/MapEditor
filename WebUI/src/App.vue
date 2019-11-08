@@ -15,7 +15,10 @@
 							<gl-row :closable="false" :height="10">
 								<ConsoleComponent title="Console"></ConsoleComponent>
 							</gl-row>
+						<gl-col :closable="false">
 						</gl-col>
+							<ViewportComponent title="ViewPort">
+							</ViewportComponent>
 						<ExplorerComponent title="Explorer">
 						</ExplorerComponent>
 					</gl-row>
@@ -45,6 +48,17 @@ export default class App extends Vue {
 		const ps = new PerfectScrollbar('.scrollable', {
 		});
 		signals.editorReady.emit(true);
+		const viewport = document.getElementById('viewport-component');
+		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
+			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
+			signals.editorReady.emit(true);
+		}
+	}
+	private mounted() {
+		const viewport = document.getElementById('viewport-component');
+		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
+			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
+		}
 	}
 }
 
