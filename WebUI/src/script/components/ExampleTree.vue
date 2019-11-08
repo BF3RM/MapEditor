@@ -1,7 +1,7 @@
 <template>
 	<InfiniteTreeComponent class="scrollable" ref="tree" :data="data" :auto-open="true" :selectable="true" :tab-index="0" class-name="tree" :load-nodes="loadNodes" :should-load-nodes="shouldLoadNodes" :should-select-node="shouldSelectNode" :on-content-did-update="onContentDidUpdate" :on-content-will-update="onContentWillUpdate" :on-open-node="onOpenNode" :on-close-node="onCloseNode" :on-select-node="onSelectNode" :on-will-open-node="onWillOpenNode" :on-will-close-node="onWillCloseNode" :on-will-select-node="onWillSelectNode" :on-key-down="onKeyDown" :on-key-up="onKeyUp">
 		<template slot-scope="{ node, index, tree, active }">
-			<div :style="nodeStyle(node)" @click="clickNode($event,node,tree)">{{ node.name }}</div>
+			<div class="tree-node" :style="nodeStyle(node)" @click="clickNode($event,node,tree)">{{ node.name }}</div>
 		</template>
 	</InfiniteTreeComponent>
 </template>
@@ -24,7 +24,8 @@ const generate = (size = 1000) => {
 };
 @Component({ components: { InfiniteTreeComponent } })
 export default class ExampleTree extends Vue {
-	public tree: InfiniteTree;
+	private tree: InfiniteTree | null = null;
+
 	private data() {
 		return {
 			data: [ {
@@ -40,7 +41,6 @@ export default class ExampleTree extends Vue {
 		};
 	}
 	private mounted() {
-		console.log(this);
 		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
 	private toggleState(node: ITreeNode) {
@@ -62,6 +62,7 @@ export default class ExampleTree extends Vue {
 		};
 	}
 	private clickNode(e: MouseEvent, node: ITreeNode, tree: any) {
+		node.name += '#';
 		console.log(e);
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
@@ -140,20 +141,5 @@ export default class ExampleTree extends Vue {
 	.tree-node{
 		cursor: default;
 		position: relative;
-		&:hover {
-			background: #f2fdff;
-		}
-	}
-	.tree-text{
-		margin-left: 2px;
-		user-select: none;
-	}
-	.icon-load{
-		animation: ani-demo-spin 1s linear infinite;
-	}
-	@keyframes ani-demo-spin {
-		from { transform: rotate(0deg);}
-		50%  { transform: rotate(180deg);}
-		to   { transform: rotate(360deg);}
 	}
 </style>

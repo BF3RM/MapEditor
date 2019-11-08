@@ -3,7 +3,7 @@
 		<div id="ViewportContainer">
 		</div>
 		<div id="glHolder">
-			<golden-layout class="gl" @initialised="initialised">
+			<golden-layout class="gl" @initialised="onInitialised">
 				<gl-col :closable="false">
 					<gl-row :closable="false">
 						<PlaceholderComponent title="Hierarchy">
@@ -23,15 +23,14 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-
 import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import ViewportComponent from '@/script/components/ViewportComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import ExplorerComponent from '@/script/components/ExplorerComponent.vue';
+import PerfectScrollbar from 'perfect-scrollbar';
 
 import '@/style/reset.scss';
-import PerfectScrollbar from 'perfect-scrollbar';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 
 @Component({ components: { ViewportComponent, PlaceholderComponent, ExplorerComponent } })
@@ -39,7 +38,7 @@ export default class App extends Vue {
 	@Prop()
 	public title!: string;
 
-	private initialised() {
+	private onInitialised() {
 		const ps = new PerfectScrollbar('.scrollable', {
 		});
 		signals.editorReady.emit(true);
