@@ -4,12 +4,11 @@
 	</gl-component>
 </template>
 <script lang="ts">
-import { Component, Inject, Model, Prop, Watch, Emit } from 'vue-property-decorator';
-import { glCustomContainer } from 'vue-golden-layout';
+import { Component, Prop } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 
 @Component
-export default class ViewportComponent extends EditorComponent {
+export default class PlaceholderComponent extends EditorComponent {
 	@Prop() public title!: string;
 	constructor() {
 		super();

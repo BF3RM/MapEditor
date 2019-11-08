@@ -11,7 +11,7 @@
 
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
 import { ITreeNode } from '@/script/interfaces/ITreeNode';
-import { InfiniteTree } from '../../../types/InfiniteTree';
+import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
 
 const generate = (size = 1000) => {
@@ -63,7 +63,6 @@ export default class ExampleTree extends Vue {
 	}
 	private clickNode(e: MouseEvent, node: ITreeNode, tree: any) {
 		node.name += '#';
-		console.log(e);
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
 			tree.openNode(node);
@@ -105,7 +104,6 @@ export default class ExampleTree extends Vue {
 	}
 	private onContentDidUpdate() {
 		console.log('onContentDidUpdate');
-		console.log(this.tree);
 		this.onUpdate(this.tree.getSelectedNode());
 	}
 	private onOpenNode(node: ITreeNode) {

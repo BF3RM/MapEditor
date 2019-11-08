@@ -12,7 +12,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
-import { InfiniteTree } from '../../../types/InfiniteTree';
+import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import { ITreeNode } from '@/script/interfaces/ITreeNode';
 
 @Component({ components: { InfiniteTreeComponent } })
@@ -44,6 +44,12 @@ export default class ExplorerComponent extends EditorComponent {
 		};
 	}
 	clickNode(e:MouseEvent, node: ITreeNode, tree: InfiniteTree) {
+		console.log(node);
+	}
+	onSelectNode(node:ITreeNode) {
+		console.log(node);
+	}
+	shouldSelectNode(node:ITreeNode) {
 		console.log(node);
 	}
 }

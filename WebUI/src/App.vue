@@ -9,9 +9,12 @@
 						<PlaceholderComponent title="Hierarchy">
 						</PlaceholderComponent>
 						<!-- I'm adding two columns inside eachother. This makes it so only one side resizes when you resize it. -->
-						<gl-col :closable="false" class="viewport-container">
+						<gl-col :closable="false">
 							<gl-col :closable="false" class="viewport-container">
 							</gl-col>
+							<gl-row :closable="false" :height="10">
+								<ConsoleComponent></ConsoleComponent>
+							</gl-row>
 						</gl-col>
 						<ExplorerComponent title="Explorer">
 						</ExplorerComponent>
@@ -23,24 +26,22 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
 import { Component, Prop } from 'vue-property-decorator';
-import ViewportComponent from '@/script/components/ViewportComponent.vue';
 import { signals } from '@/script/modules/Signals';
-import ExplorerComponent from '@/script/components/ExplorerComponent.vue';
 import PerfectScrollbar from 'perfect-scrollbar';
+import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
+import ExplorerComponent from '@/script/components/ExplorerComponent.vue';
+import ConsoleComponent from '@/script/components/ConsoleComponent.vue';
 
 import '@/style/reset.scss';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 
-@Component({ components: { ViewportComponent, PlaceholderComponent, ExplorerComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title!: string;
 
 	private onInitialised() {
-		const ps = new PerfectScrollbar('.scrollable', {
-		});
 		signals.editorReady.emit(true);
 	}
 }
