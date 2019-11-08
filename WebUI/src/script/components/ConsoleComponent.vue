@@ -143,9 +143,8 @@ export default class ConsoleComponent extends EditorComponent {
 		console.log('Initialised console');
 	}
 	filteredItems() {
-		if (!this.data.search) return this.data.logs;
 		const lowerCaseSearch = this.data.search.toLowerCase();
-		return this.data.logs.filter(i => i.message.toString().toLowerCase().includes(lowerCaseSearch));
+		return this.data.logs.filter(i => i.message.toString().toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
 	}
 
 	private consoleLog(message?: any, ...optionalParams: any[]) {
