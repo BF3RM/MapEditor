@@ -1,1 +1,11 @@
 extends: wotan:recommended
+overrides:
+  - files: "*.vue"
+    processor: "@fimbul/ve"
+modules:
+  - '@fimbul/heimdall'
+  - '@fimbul/valtyr'
+rules:
+  # your other rules go here
+  syntaxcheck: error # could also be 'warning'
+  typecheck: error # could also be 'warning'
