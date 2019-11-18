@@ -50,7 +50,7 @@ interface InfiniteTree {
 	// @param {object} [options] The options object.
 	// @param {boolean} [options.silent] Pass true to prevent "closeNode" and "selectNode" events from being triggered.
 	// @return {boolean} Returns true on success, false otherwise.
-	closeNode(node: ITreeNode, options: object): boolean;
+	closeNode(node: ITreeNode, options?: object): boolean;
 
 	// Filters nodes. Use a string or a function to test each node of the tree. Otherwise, it will render nothing after filtering (e.g. tree.filter(), tree.filter(null), tree.flter(0), tree.filter({}), etc.).
 	// @param {string|function} predicate A keyword string, or a function to test each node of the tree. If the predicate is an empty string, all nodes will be filtered. If the predicate is a function, returns true to keep the node, false otherwise.
