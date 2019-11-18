@@ -18,7 +18,7 @@ export class BlueprintManager {
 		for (const bp of blueprints) {
 			scope.RegisterBlueprint(Guid.parse(bp.instanceGuid), bp);
 		}
-		signals.blueprintsRegistered.emit(editor.blueprintManager.blueprints);
+		signals.blueprintsRegistered.emit(this.blueprints.values());
 	}
 
 	public getBlueprintByGuid(instanceGuid: Guid) {

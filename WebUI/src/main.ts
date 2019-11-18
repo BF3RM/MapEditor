@@ -11,6 +11,7 @@ let debugMode: boolean = false;
 if ((window).location.href.indexOf('webui') === -1) {
 	debugMode = true;
 }
+window.debug = debugMode;
 (window).editor = new Editor(debugMode);
 (window).Log = Log;
 (window).LogError = LogError;

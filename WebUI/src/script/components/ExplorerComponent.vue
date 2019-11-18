@@ -14,11 +14,17 @@ import EditorComponent from './EditorComponent.vue';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
 import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import { ITreeNode } from '@/script/interfaces/ITreeNode';
+import { signals } from '@/script/modules/Signals';
+import { Blueprint } from '@/script/types/Blueprint';
 
 @Component({ components: { InfiniteTreeComponent } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private tree: InfiniteTree | null = null;
+	constructor() {
+		super();
+		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
+	}
 	public mounted() {
 		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
@@ -36,6 +42,10 @@ export default class ExplorerComponent extends EditorComponent {
 			tree: null
 		};
 	}
+	private onBlueprintRegistered(blueprints: Blueprint[]) {
+		console.log(blueprints);
+	}
+
 	private nodeStyle(node: ITreeNode) {
 		return {
 			'background': node.state.selected ? '#deecfd' : '#fff',

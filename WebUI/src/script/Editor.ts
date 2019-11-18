@@ -28,6 +28,7 @@ import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
 import { SceneUtils } from 'three';
 import { LOGLEVEL } from '@/script/modules/Logger';
+import { GenerateBlueprints } from '@/script/modules/DebugData';
 
 export default class Editor {
 	public config = new Config();
@@ -52,6 +53,7 @@ export default class Editor {
 
 	constructor(debug: boolean = false) {
 		// Commands
+		signals.editorReady.connect(this.onEditorReady.bind(this));
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.blueprintSpawnInvoked.connect(this.onBlueprintSpawnInvoked.bind(this));
 		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
@@ -116,6 +118,12 @@ export default class Editor {
 
 		this.threeManager.scene.add(this.selectionGroup);
 		this.threeManager.scene.add(this.highlightGroup);
+	}
+
+	public onEditorReady() {
+		if (this.debug) {
+			this.blueprintManager.RegisterBlueprints(JSON.stringify(GenerateBlueprints(100)));
+		}
 	}
 
 	public setPlayerName(name: string) {
