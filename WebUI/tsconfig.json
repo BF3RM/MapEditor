@@ -9,6 +9,7 @@
     "outDir": "./dist",
     "strict": true,
     "importHelpers": true,
+    "sourceMap": true,
     "moduleResolution": "node",
     "baseUrl": ".",
     "typeRoots": ["node_modules/@types"],
