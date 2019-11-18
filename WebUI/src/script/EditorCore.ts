@@ -72,7 +72,7 @@ export class EditorCore {
 					return;
 				}
 				for (const changeKey in changes) {
-					if (!changes.hasOwnProperty(changeKey)) {
+					if (!(changeKey in changes)) {
 						continue;
 					}
 					const change = changes[changeKey];
