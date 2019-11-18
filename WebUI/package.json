@@ -47,13 +47,12 @@
     "tslint-loader": "^3.5.4",
     "typescript": "~3.7.2",
     "vue-template-compiler": "^2.6.10",
-    "vue-tslint": "^0.3.2",
     "webpack": "^4.41.2"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint --fix"
+    "lint": "vue-cli-service lint --fix && wotan --fix"
   },
   "postcss": {
     "plugins": {

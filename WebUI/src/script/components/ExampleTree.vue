@@ -58,8 +58,8 @@ export default class ExampleTree extends Vue {
 
 	private nodeStyle(node: ITreeNode) {
 		return {
-			background: node.state.selected ? '#deecfd' : '#fff',
-			border: node.state.selected ? '1px solid #06c' : '1px solid #fff',
+			'background': node.state.selected ? '#deecfd' : '#fff',
+			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
 			'padding-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}

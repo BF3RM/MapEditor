@@ -41,7 +41,7 @@ export class SpatialGameEntity extends THREE.Mesh {
 
 		const geometry = new THREE.BufferGeometry();
 		geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-		geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+		geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
 		this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color }));
 		this.add(this.aabb);
