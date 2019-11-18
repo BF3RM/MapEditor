@@ -7,10 +7,8 @@ declare module 'vue-virtual-scroller' {
 		componentsPrefix?: string;
 	}
 
-	const plugin: PluginObject<PluginOptions> & { version: string };
-
-	export namespace RecycleScroller {
-		const components: {
+	export class RecycleScroller extends Vue {
+		public components: {
 			ResizeObserver: {
 				beforeDestroy: any;
 				methods: {
@@ -25,7 +23,7 @@ declare module 'vue-virtual-scroller' {
 			};
 		};
 
-		const directives: {
+		public directives: {
 			ObserveVisibility: {
 				bind: any;
 				unbind: any;
@@ -33,9 +31,9 @@ declare module 'vue-virtual-scroller' {
 			};
 		};
 
-		const name: string;
+		public name: string;
 
-		const props: {
+		public props: {
 			buffer: {
 				default: number;
 				type: any;
@@ -83,73 +81,53 @@ declare module 'vue-virtual-scroller' {
 			};
 		};
 
-		const staticRenderFns: any[];
+		public staticRenderFns: any[];
 
-		function beforeDestroy(): void;
+		public beforeDestroy(): void;
 
-		function created(): void;
+		public created(): void;
 
-		function data(): any;
+		public data(): any;
 
-		function mounted(): void;
+		public mounted(): void;
 
-		function render(): any;
+		public render(): any;
 
-		namespace computed {
-			function simpleArray(): any;
+		public simpleArray(): any;
 
-			function sizes(): any;
+		public sizes(): any;
 
-		}
+		public addListeners(): void;
 
-		namespace methods {
-			function addListeners(): void;
+		public addView(pool: any, index: any, item: any, key: any, type: any): any;
 
-			function addView(pool: any, index: any, item: any, key: any, type: any): any;
+		public applyPageMode(): void;
 
-			function applyPageMode(): void;
+		public getListenerTarget(): any;
 
-			function getListenerTarget(): any;
+		public getScroll(): any;
 
-			function getScroll(): any;
+		public handleResize(): void;
 
-			function handleResize(): void;
+		public handleScroll(event: any): void;
 
-			function handleScroll(event: any): void;
+		public handleVisibilityChange(isVisible: any, entry: any): void;
 
-			function handleVisibilityChange(isVisible: any, entry: any): void;
+		public itemsLimitError(): void;
 
-			function itemsLimitError(): void;
+		public removeListeners(): void;
 
-			function removeListeners(): void;
+		public scrollToItem(index: any): void;
 
-			function scrollToItem(index: any): void;
+		public scrollToPosition(position: any): void;
 
-			function scrollToPosition(position: any): void;
+		public unuseView(view: any, ...args: any[]): void;
 
-			function unuseView(view: any, ...args: any[]): void;
-
-			function updateVisibleItems(checkItem: any): any;
-
-		}
-
-		namespace watch {
-			function items(): void;
-
-			function pageMode(): void;
-
-			namespace sizes {
-				const deep: boolean;
-
-				function handler(): void;
-
-			}
-
-		}
+		public updateVisibleItems(checkItem: any): any;
 
 	}
-	export namespace DynamicScroller {
-		const components: {
+	export class DynamicScroller extends Vue {
+		public components: {
 			RecycleScroller: {
 				beforeDestroy: any;
 				components: {
@@ -257,11 +235,11 @@ declare module 'vue-virtual-scroller' {
 			};
 		};
 
-		const inheritAttrs: boolean;
+		public inheritAttrs: boolean;
 
-		const name: string;
+		public name: string;
 
-		const props: {
+		public props: {
 			direction: {
 				default: string;
 				type: any;
@@ -281,65 +259,46 @@ declare module 'vue-virtual-scroller' {
 			};
 		};
 
-		const staticRenderFns: any[];
+		public staticRenderFns: any[];
 
-		function activated(): void;
+		public activated(): void;
 
-		function created(): void;
+		public created(): void;
 
-		function data(): any;
+		public data(): any;
 
-		function deactivated(): void;
+		public deactivated(): void;
 
-		function provide(): any;
+		public provide(): any;
 
-		function render(): any;
+		public render(): any;
 
-		namespace computed {
-			function itemsWithSize(): any;
+		public itemsWithSize(): any;
 
-			function listeners(): any;
+		public listeners(): any;
 
-			function simpleArray(): any;
+		public simpleArray(): any;
 
-		}
 
-		namespace methods {
-			function forceUpdate(...args: any[]): void;
+		public forceUpdate(...args: any[]): void;
 
-			function getItemSize(item: any, ...args: any[]): any;
+		public getItemSize(item: any, ...args: any[]): any;
 
-			function onScrollerResize(): void;
+		public onScrollerResize(): void;
 
-			function onScrollerVisible(): void;
+		public onScrollerVisible(): void;
 
-			function scrollToBottom(): void;
+		public scrollToBottom(): void;
 
-			function scrollToItem(index: any): void;
-
-		}
-
-		namespace watch {
-			function direction(value: any): void;
-
-			function items(): void;
-
-			namespace simpleArray {
-				const immediate: boolean;
-
-				function handler(value: any): void;
-
-			}
-
-		}
+		public scrollToItem(index: any): void;
 
 	}
-	export namespace DynamicScrollerItem {
-		const inject: string[];
+	export class DynamicScrollerItem extends Vue {
+		public inject: string[];
 
-		const name: string;
+		public name: string;
 
-		const props: {
+		public props: {
 			active: {
 				required: boolean;
 				type: any;
@@ -369,51 +328,31 @@ declare module 'vue-virtual-scroller' {
 			};
 		};
 
-		function beforeDestroy(): void;
+		public beforeDestroy(): void;
 
-		function created(): any;
+		public created(): any;
 
-		function mounted(): void;
+		public mounted(): void;
 
-		function render(h: any): any;
+		public render(h: any): any;
 
-		namespace computed {
-			function id(): any;
+		public id(): any;
 
-			function size(): any;
+		public size(): any;
 
-		}
 
-		namespace methods {
-			function computeSize(id: any): void;
+		public computeSize(id: any): void;
 
-			function getBounds(): any;
+		public getBounds(): any;
 
-			function onDataUpdate(): void;
+		public onDataUpdate(): void;
 
-			function onVscrollUpdate(_ref: any): void;
+		public onVscrollUpdate(_ref: any): void;
 
-			function updateSize(): void;
+		public updateSize(): void;
 
-			function updateWatchData(): void;
-
-		}
-
-		namespace watch {
-			const watchData: string;
-
-			function active(value: any): void;
-
-			function id(): void;
-
-		}
+		public updateWatchData(): void;
 
 	}
-
-	export function IdState(options?: {
-		idProp?: (vm: any) => any;
-	}): ComponentOptions<Vue> | typeof Vue;
-
-	export default plugin;
 }
 
