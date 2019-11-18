@@ -68,6 +68,7 @@ export default class ConsoleComponent extends EditorComponent {
 		'DEBUG',
 		'VERBOSE'
 	];
+
 	private originals: {
 		warn: (message?: any, ...optionalParams: any[]) => void;
 		log: (message?: any, ...optionalParams: any[]) => void;
@@ -81,6 +82,7 @@ export default class ConsoleComponent extends EditorComponent {
 		clear: console.clear,
 		info: console.info
 	};
+
 	private data: {
 		logs: ConsoleEntry[];
 		filterLevel: LOGLEVEL;
@@ -92,6 +94,7 @@ export default class ConsoleComponent extends EditorComponent {
 		shouldScrollToBottom: true,
 		search: ''
 	};
+
 	constructor() {
 		super();
 		signals.onLog.connect(this.onLog.bind(this));
@@ -112,12 +115,14 @@ export default class ConsoleComponent extends EditorComponent {
 		Object.assign(item, this.data.logs[item.id]);
 		this.ScrollToBottom();
 	}
+
 	private Inspect(obj: any) {
 		if (obj == null) {
 			return 'null';
 		}
 		return inspect(obj);
 	}
+
 	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
 		if (type === 'since') {
 			unixTimestamp = Date.now() - unixTimestamp;
@@ -136,9 +141,11 @@ export default class ConsoleComponent extends EditorComponent {
 		}
 		return item.stackTrace.replace(/webpack-internal:\/\/\//g, '');
 	}
+
 	private onUpdateFilter(a: any) {
 		this.data.filterLevel = a.target.value;
 	}
+
 	private onSearch(a: any) {
 		this.data.search = a.target.value;
 	}
@@ -159,6 +166,7 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 		this.ScrollToBottom();
 	}
+
 	private consoleError(message?: any, ...optionalParams: any[]) {
 		this.originals.error(message, optionalParams);
 		this.data.logs.push({
@@ -170,6 +178,7 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 		this.ScrollToBottom();
 	}
+
 	private consoleInfo(message?: any, ...optionalParams: any[]) {
 		this.originals.info(message, optionalParams);
 		this.data.logs.push({
@@ -180,6 +189,7 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 		this.ScrollToBottom();
 	}
+
 	private consoleWarn(message?: any, ...optionalParams: any[]) {
 		this.originals.warn(message, optionalParams);
 		this.data.logs.push({
@@ -190,6 +200,7 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 		this.ScrollToBottom();
 	}
+
 	private consoleClear() {
 		this.originals.clear();
 		this.data.logs = [];
@@ -205,9 +216,11 @@ export default class ConsoleComponent extends EditorComponent {
 		} as ConsoleEntry);
 		this.ScrollToBottom();
 	}
+
 	private onShouldScrollToBottom(e: any) {
 		this.data.shouldScrollToBottom = e.target.checked;
 	}
+
 	private ScrollToBottom() {
 		if (this.data.shouldScrollToBottom && this.$refs.scroller !== undefined) {
 			(this.$refs.scroller as DynamicScroller).scrollToBottom();

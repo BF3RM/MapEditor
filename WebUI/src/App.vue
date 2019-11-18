@@ -57,6 +57,7 @@ export default class App extends Vue {
 			signals.editorReady.emit(true);
 		}
 	}
+
 	private mounted() {
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {

@@ -25,40 +25,46 @@ export default class ExplorerComponent extends EditorComponent {
 		super();
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
 	}
+
 	public mounted() {
 		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
+
 	private data() {
 		return {
-			data: [ {
+			data: [{
 				id: 'parent',
 				name: 'parent',
 				props: {
 					droppable: true
 				},
 				children: []
-			} ],
+			}],
 			node: null,
 			tree: null
 		};
 	}
+
 	private onBlueprintRegistered(blueprints: Blueprint[]) {
 		console.log(blueprints);
 	}
 
 	private nodeStyle(node: ITreeNode) {
 		return {
-			'background': node.state.selected ? '#deecfd' : '#fff',
-			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
+			background: node.state.selected ? '#deecfd' : '#fff',
+			border: node.state.selected ? '1px solid #06c' : '1px solid #fff',
 			'padding-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
+
 	private clickNode(e: MouseEvent, node: ITreeNode, tree: InfiniteTree) {
 		console.log(node);
 	}
+
 	private onSelectNode(node: ITreeNode) {
 		console.log(node);
 	}
+
 	private shouldSelectNode(node: ITreeNode) {
 		console.log(node);
 	}

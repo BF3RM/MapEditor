@@ -28,16 +28,17 @@ export default class ExampleTree extends Vue {
 	public mounted() {
 		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
+
 	private data() {
 		return {
-			data: [ {
+			data: [{
 				id: 'parent',
 				name: 'parent',
 				props: {
 					droppable: true
 				},
 				children: generate(100)
-			} ],
+			}],
 			node: null,
 			tree: null
 		};
@@ -54,13 +55,15 @@ export default class ExampleTree extends Vue {
 		}
 		return toggleState;
 	}
+
 	private nodeStyle(node: ITreeNode) {
 		return {
-			'background': node.state.selected ? '#deecfd' : '#fff',
-			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
+			background: node.state.selected ? '#deecfd' : '#fff',
+			border: node.state.selected ? '1px solid #06c' : '1px solid #fff',
 			'padding-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
+
 	private clickNode(e: MouseEvent, node: ITreeNode, tree: any) {
 		node.name += '#';
 		const toggleState = this.toggleState(node);
@@ -72,12 +75,15 @@ export default class ExampleTree extends Vue {
 		tree.selectNode(node);
 		console.log('afterSelectNode' + new Date().getTime());
 	}
+
 	private loadNodes(parentNode: ITreeNode, done: boolean) {
 		// Do something?
 	}
+
 	private shouldLoadNodes(node: ITreeNode) {
 		return !node.hasChildren() && node.loadOnDemand;
 	}
+
 	private shouldSelectNode(node: ITreeNode) { // Defaults to null
 		if (this.tree === null) {
 			return false;
@@ -87,24 +93,31 @@ export default class ExampleTree extends Vue {
 		}
 		return true;
 	}
+
 	private onUpdate(node: ITreeNode) {
 		// In order to update dom in time, you can also use $forceUpdate directly.
 	}
+
 	private onKeyUp() {
 		console.log('onKeyUp');
 	}
+
 	private onKeyDown() {
 		console.log('onKeyDown');
 	}
+
 	private onMouseLeave() {
 		console.log('onMouseLeave');
 	}
+
 	private onMouseEnter() {
 		console.log('onMouseEnter');
 	}
+
 	private onContentWillUpdate() {
 		console.log('onContentWillUpdate');
 	}
+
 	private onContentDidUpdate() {
 		console.log('onContentDidUpdate');
 		if (this.tree === null) {
@@ -112,24 +125,30 @@ export default class ExampleTree extends Vue {
 		}
 		this.onUpdate(this.tree.getSelectedNode());
 	}
+
 	private onOpenNode(node: ITreeNode) {
 		console.log('onOpenNode:', node);
 		this.onUpdate(node);
 	}
+
 	private onCloseNode(node: ITreeNode) {
 		console.log('onCloseNode:', node);
 		this.onUpdate(node);
 	}
+
 	private onSelectNode(node: ITreeNode) {
 		console.log('onSelectNode:', node);
 		this.onUpdate(node);
 	}
+
 	private onWillOpenNode(node: ITreeNode) {
 		console.log('onWillOpenNode:', node);
 	}
+
 	private onWillCloseNode(node: ITreeNode) {
 		console.log('onWillCloseNode:', node);
 	}
+
 	private onWillSelectNode(node: ITreeNode) {
 		console.log('onWillSelectNode:', node);
 	}

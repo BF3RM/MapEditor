@@ -1,6 +1,6 @@
 import {ITreeNode} from '@/script/interfaces/ITreeNode';
 
-declare interface InfiniteTree {
+interface InfiniteTree {
 
 	// Adds an array of new child nodes to a parent node at the specified index.
 	// * If the parent is null or undefined, inserts new childs at the specified index in the top-level.

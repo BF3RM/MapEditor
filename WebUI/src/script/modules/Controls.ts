@@ -21,7 +21,7 @@ function EnableFreecamMovement() {
 // 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:ToggleFreeview')
 // }
 
-let keysdown = {};
+const keysdown = {};
 /*
 $(document).keydown(function(e) {
 

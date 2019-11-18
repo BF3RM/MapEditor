@@ -25,6 +25,7 @@ export class Vec3 extends Vector3 {
 		this.z = Number(matrix[2]);
 		return this;
 	}
+
 	get left() {
 		return this.set(1, 0, 0);
 	}

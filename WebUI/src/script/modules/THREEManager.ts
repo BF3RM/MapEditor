@@ -28,6 +28,7 @@ export class THREEManager {
 		alpha: true,
 		antialias: true
 	});
+
 	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 	private cameraControls = new CameraControls(this.camera, this.renderer.domElement);
 	private control: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
