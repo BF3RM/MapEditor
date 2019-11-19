@@ -44,16 +44,7 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
 import { LOGLEVEL } from '@/script/modules/Logger';
 import { inspect } from 'util';
-
-interface ConsoleEntry {
-	level: LOGLEVEL;
-	id: number;
-	message: object | string;
-	info: any;
-	time: number;
-	expanded: boolean;
-	stackTrace: string;
-}
+import { ConsoleEntry, IConsoleEntry } from '@/script/types/ConsoleEntry';
 
 @Component({ components: { DynamicScroller, DynamicScrollerItem } })
 export default class ConsoleComponent extends EditorComponent {
@@ -152,52 +143,58 @@ export default class ConsoleComponent extends EditorComponent {
 
 	private filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
-		return this.data.logs.filter((i) => i.message.toString().toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
+		return this.data.logs.filter((i) => i.message.toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
 	}
 
-	private consoleLog(message?: any, ...optionalParams: any[]) {
+	private consoleLog(message: any, ...optionalParams: any[]) {
 		this.originals.log(message, optionalParams);
-		this.data.logs.push({
+		this.data.logs.push(new ConsoleEntry({
 			message,
 			id: this.data.logs.length,
 			level: LOGLEVEL.INFO,
-			time: Date.now(),
 			stackTrace: this.StackTrace()
-		} as ConsoleEntry);
+		} as IConsoleEntry));
 		this.ScrollToBottom();
 	}
 
-	private consoleError(message?: any, ...optionalParams: any[]) {
+	private consoleError(message: any, ...optionalParams: any[]) {
 		this.originals.error(message, optionalParams);
-		this.data.logs.push({
+		this.data.logs.push(new ConsoleEntry({
 			message,
 			id: this.data.logs.length,
 			level: LOGLEVEL.ERROR,
-			time: Date.now(),
 			stackTrace: this.StackTrace()
-		} as ConsoleEntry);
+		} as IConsoleEntry));
 		this.ScrollToBottom();
 	}
 
-	private consoleInfo(message?: any, ...optionalParams: any[]) {
+	private consoleInfo(message: any, ...optionalParams: any[]) {
 		this.originals.info(message, optionalParams);
-		this.data.logs.push({
+		this.data.logs.push(new ConsoleEntry({
 			message,
 			id: this.data.logs.length,
-			level: LOGLEVEL.INFO,
-			time: Date.now()
-		} as ConsoleEntry);
+			level: LOGLEVEL.INFO
+		} as IConsoleEntry));
 		this.ScrollToBottom();
 	}
 
-	private consoleWarn(message?: any, ...optionalParams: any[]) {
+	private consoleWarn(message: any, ...optionalParams: any[]) {
 		this.originals.warn(message, optionalParams);
-		this.data.logs.push({
+		this.data.logs.push(new ConsoleEntry({
 			message,
 			id: this.data.logs.length,
-			level: LOGLEVEL.WARNING,
-			time: Date.now()
-		} as ConsoleEntry);
+			level: LOGLEVEL.WARNING
+		} as IConsoleEntry));
+		this.ScrollToBottom();
+	}
+
+	private onLog(logLevel: LOGLEVEL, message: any, info?: any) {
+		this.data.logs.push(new ConsoleEntry({
+			level: logLevel,
+			id: this.data.logs.length,
+			message,
+			info
+		} as IConsoleEntry));
 		this.ScrollToBottom();
 	}
 
@@ -206,18 +203,7 @@ export default class ConsoleComponent extends EditorComponent {
 		this.data.logs = [];
 	}
 
-	private onLog(logLevel: LOGLEVEL, message: any, info?: any) {
-		this.data.logs.push({
-			level: logLevel,
-			id: this.data.logs.length,
-			message,
-			info,
-			time: Date.now()
-		} as ConsoleEntry);
-		this.ScrollToBottom();
-	}
-
-	private onShouldScrollToBottom(e: any) {
+	private onShouldScrollToBottom(e: any = 'wtf') {
 		this.data.shouldScrollToBottom = e.target.checked;
 	}
 
