@@ -49,7 +49,7 @@ export default class App extends Vue {
 
 	private onInitialised() {
 		const scrollables = document.getElementsByClassName('scrollable');
-		for (const scrollable of scrollables) {
+		for (const scrollable of scrollables as any) {
 			const ps = new PerfectScrollbar(scrollable as HTMLElement, {
 			});
 		}

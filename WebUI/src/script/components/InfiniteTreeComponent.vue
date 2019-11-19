@@ -4,7 +4,7 @@
                    :items="filteredNodes"
                    :item-height="rowHeight"
                    ref="virtualList"
-                   :min-item-size="20"
+                   :min-item-size="16"
   >
     <div slot-scope="{ item,index }">
       <slot

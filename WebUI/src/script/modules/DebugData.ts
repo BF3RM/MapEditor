@@ -1,6 +1,6 @@
 import { Guid } from 'guid-typescript';
 
-const names = ['on', 'Type', 'AI', 'Animations', 'Architecture', 'ArchitectureOLD', 'Characters', 'Decals', 'Events', 'FX', 'FromBF2', 'GameConfigurations', 'Gameplay', 'Ground', 'HavokDestruction', 'Input', 'LevelTestranges', 'Levels', 'Localization', 'Materials', 'Menu', 'Movies', 'Objects', 'OldObjects', 'Persistence', 'Props', 'Shaders', 'Sound', 'Systems', 'Test', 'Textures', 'UI', 'Vehicles', 'VisualEnvironments', 'Weapons', 'Weapons_old', 'XP2', 'XP3', 'XP4', 'XP5', 'XP_Raw', 'default', 'lodgroups', 'profile'];
+const names = ['Textures', 'UI', 'Vehicles', 'VisualEnvironments', 'Weapons', 'Weapons_old', 'XP2', 'XP3', 'XP4', 'XP5', 'XP_Raw', 'default', 'lodgroups', 'profile'];
 
 function GenerateRandomName() {
 	let out = '';

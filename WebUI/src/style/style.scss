@@ -1,5 +1,5 @@
 * {
-  font-family: Arial, sans-serif!important;
+  font-family: Arial, sans-serif;
 }
 
 #viewport-container {
@@ -38,4 +38,7 @@
   left: 0;
   top: 0;
   pointer-events: auto;
+}
+.datafont {
+  font-family: 'Overpass Mono';
 }

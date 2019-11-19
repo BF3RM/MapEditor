@@ -3,16 +3,16 @@
 		<div class="header">
 			<input type="text" v-model="search">
 		</div>
-		<InfiniteTreeComponent class="scrollable" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+		<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 			<template slot-scope="{ node, index, tree, active }">
-				<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="clickNode($event,node,tree)">
-					<div v-if="node.children.length > 0" class="expand">
-						<span v-if="node.state.open">
+				<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
+					<div class="expand" @click="ToggleNode($event,node,tree)">
+						<div v-if="node.state.open && node.children.length > 0">
 							v
-						</span>
-						<span v-if="!node.state.open">
+						</div>
+						<div v-if="!node.state.open && node.children.length > 0">
 							>
-						</span>
+						</div>
 					</div>
 					<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
 					<span v-else>
@@ -35,7 +35,7 @@ import { Blueprint } from '@/script/types/Blueprint';
 import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import { Guid } from 'guid-typescript';
 import { TreeNode } from '@/script/types/TreeNode';
-import Highlighter from '@/script/components/widgets/Highlighter';
+import Highlighter from './widgets/Highlighter.vue';
 
 @Component({ components: { InfiniteTreeComponent, Highlighter } })
 
@@ -63,13 +63,16 @@ export default class ExplorerComponent extends EditorComponent {
 		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
 
-	public clickNode(e: MouseEvent, node: TreeNode, tree: InfiniteTree) {
+	public ToggleNode(e: MouseEvent, node: TreeNode, tree: InfiniteTree) {
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
 			tree.openNode(node);
 		} else if (toggleState === 'opened') {
 			tree.closeNode(node);
 		}
+	}
+
+	public SelectNode(e: MouseEvent, node: TreeNode, tree: InfiniteTree) {
 		tree.selectNode(node);
 	}
 
@@ -119,7 +122,7 @@ export default class ExplorerComponent extends EditorComponent {
 
 	private nodeStyle(node: TreeNode) {
 		return {
-			'padding-left': (node.state.depth * 18).toString() + 'px'
+			'margin-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
 
@@ -149,8 +152,17 @@ export default class ExplorerComponent extends EditorComponent {
 	.expand {
 		display: inline;
 	}
-
 	.selected {
 		background-color: #404040;
+	}
+	.tree-node {
+		font-family: Overpass Mono, sans-serif;
+	}
+	.tree-node {
+		display: flex;
+	}
+	.expand div {
+		width: 10px;
+		color: #6d6d6d;
 	}
 </style>
