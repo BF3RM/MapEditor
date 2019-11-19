@@ -5,8 +5,5 @@ import { LOGLEVEL } from '@/script/modules/Logger';
 export class PreviewSpawnMessage extends Message {
 	constructor(public gameObjectTransferData: GameObjectTransferData) {
 		super('PreviewSpawnMessage');
-		if (gameObjectTransferData === undefined) {
-			window.Log(LOGLEVEL.DEBUG, 'PreviewSpawnMessage: Missing gameObjectTransferData');
-		}
 	}
 }

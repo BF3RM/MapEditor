@@ -115,14 +115,11 @@ export class THREEManager {
 		this.Render();
 	}
 
-	public Focus(target: THREE.Object3D) {
+	public Focus(target?: THREE.Object3D) {
 		editor.vext.SendEvent('controlStart');
 		const scope = this;
 		if (target === undefined) {
 			target = editor.selectionGroup;
-		}
-		if (target === undefined) {
-			return;
 		}
 
 		let distance;

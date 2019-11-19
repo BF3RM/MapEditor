@@ -91,10 +91,6 @@ export class SpatialGameEntity extends THREE.Mesh {
 	}
 
 	public update() {
-		if (this.box === undefined) {
-			console.warn('AABBHelper: box is undefined!');
-		}
-
 		if (this.box.isEmpty()) {
 			return;
 		}

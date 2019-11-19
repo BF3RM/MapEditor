@@ -127,7 +127,7 @@ export default class ConsoleComponent extends EditorComponent {
 	}
 
 	private FormatStacktrace(item: ConsoleEntry) {
-		if (item !== undefined && item.stackTrace === undefined) {
+		if (!item.stackTrace) {
 			return 'no stack?';
 		}
 		return item.stackTrace.replace(/webpack-internal:\/\/\//g, '');

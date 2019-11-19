@@ -25,7 +25,7 @@ export class HighlightGroup extends THREE.Group {
 
 	public UnhighlightCurrentObject() {
 		const currentObject = this.GetHighlightedGameObject();
-		if (currentObject !== undefined && currentObject !== null) {
+		if (currentObject) {
 			// console.log("Unhighlighting")
 			this.DetachObject(currentObject);
 			currentObject.Unhighlight();
@@ -39,7 +39,7 @@ export class HighlightGroup extends THREE.Group {
 		THREE.SceneUtils.detach(gameObject, this, editor.threeManager.scene);
 
 		// remove child from parent and add it to scene
-		if (gameObject.parentData.guid !== null && gameObject.parentData.guid !== undefined && gameObject.parentData.typeName !== 'LevelData') {
+		if (!gameObject.parentData.guid && gameObject.parentData.typeName !== 'LevelData') {
 			const parent = editor.getGameObjectByGuid(gameObject.parentData.guid);
 			if (parent !== null && parent !== undefined) {
 				THREE.SceneUtils.attach(gameObject, editor.threeManager.scene, parent);
@@ -78,7 +78,7 @@ export class HighlightGroup extends THREE.Group {
 		editor.threeManager.Render(); // REMOVE
 	}
 
-	public GetHighlightedGameObject(): GameObject {
+	public GetHighlightedGameObject(): GameObject | null {
 		return this.children[0] as GameObject;
 	}
 }

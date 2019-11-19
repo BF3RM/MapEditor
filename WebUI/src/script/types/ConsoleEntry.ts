@@ -4,7 +4,7 @@ import * as Util from 'util';
 export interface IConsoleEntry {
 	level: LOGLEVEL;
 	id: number;
-	message: object | string;
+	message: any;
 	info: any;
 	time: number;
 	expanded: boolean;

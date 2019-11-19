@@ -100,7 +100,7 @@ export class EditorCore {
 		}
 
 		// If the object is not in the scene we add it
-		if (gameObject.parent === null || gameObject.parent === undefined) {
+		if (!gameObject.parent) {
 			editor.threeManager.scene.add(gameObject);
 		}
 

@@ -162,7 +162,7 @@ export class GameObject extends THREE.Object3D {
 		signals.objectChanged.emit(this, 'variation', key);
 	}
 
-	public Clone(guid: Guid) {
+	public Clone(guid?: Guid) {
 		if (guid === undefined) {
 			guid = Guid.create();
 		}

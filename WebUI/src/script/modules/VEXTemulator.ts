@@ -22,7 +22,7 @@ export class VEXTemulator {
 			responses.push(scope.commands[command.type](command));
 		});
 		// Delay to simulate tick pass
-		setTimeout(async () => {
+		setTimeout(() => {
 			editor.vext.HandleResponse(JSON.stringify(responses), true);
 		}, 1);
 	}

@@ -32,7 +32,7 @@ export class Blueprint {
 	}
 
 	public hasVariation() {
-		return !(this.variations === undefined || Object.keys(this.variations).length == null || Object.keys(this.variations).length === 0);
+		return !(Object.keys(this.variations).length === 0);
 	}
 
 	public isVariationValid(variation: number) {

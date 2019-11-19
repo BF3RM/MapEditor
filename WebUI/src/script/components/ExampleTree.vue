@@ -13,7 +13,7 @@ import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
 import { TreeNode } from '@/script/types/TreeNode';
 import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
-import {ITreeNode} from '@/script/interfaces/ITreeNode';
+import { ITreeNode } from '@/script/interfaces/ITreeNode';
 
 const generate = (size = 1000) => {
 	const data = [];
@@ -58,9 +58,6 @@ export default class ExampleTree extends Vue {
 	}
 
 	private nodeStyle(node: TreeNode) {
-		if (node === null) {
-			return '';
-		}
 		return {
 			'background': node.state.selected ? '#deecfd' : '#fff',
 			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
@@ -92,7 +89,7 @@ export default class ExampleTree extends Vue {
 		if (this.tree === null) {
 			return false;
 		}
-		if (!node || (node === (this.tree.getSelectedNode()))) {
+		if (node === (this.tree.getSelectedNode())) {
 			return false; // Prevent from deselecting the current node
 		}
 		return true;

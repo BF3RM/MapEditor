@@ -129,20 +129,13 @@ export default class VEXTInterface {
 
 	public HandleResponse(commandActionResultsString: string, emulator: boolean) {
 		console.log(commandActionResultsString);
-		const t0 = performance.now();
-
 		const scope = this;
 		scope.executing = true;
-		let commandActionResults = JSON.parse(commandActionResultsString) as CommandActionResult[];
+		const commandActionResults = JSON.parse(commandActionResultsString) as CommandActionResult[];
 		let index = 0;
 
 		window.Log(LOGLEVEL.VERBOSE, 'IN: ');
 		window.Log(LOGLEVEL.VERBOSE, commandActionResults);
-
-		// convert commandActionResults to an array if it's an object
-		if (typeof commandActionResults === 'object') {
-			commandActionResults = Object.values(commandActionResults);
-		}
 
 		commandActionResults.forEach((commandActionResult: CommandActionResult) => {
 			if (scope.commands[commandActionResult.type] === undefined) {
@@ -156,9 +149,6 @@ export default class VEXTInterface {
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;
 		});
-		console.log('Done executing');
-		const t1 = performance.now();
-		console.log('Execution took ' + (t1 - t0) + ' milliseconds.');
 		editor.threeManager.Render();
 	}
 
@@ -230,7 +220,7 @@ export default class VEXTInterface {
 		if (emulator) {
 			const scope = this;
 			// delay to simulate tick increase.
-			setTimeout(async () => {
+			setTimeout(() => {
 				scope.messages[message.type](message);
 			}, 1);
 		} else {

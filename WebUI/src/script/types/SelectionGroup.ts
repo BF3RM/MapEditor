@@ -118,7 +118,7 @@ export class SelectionGroup extends GameObject {
 		THREE.SceneUtils.detach(gameObject, this, editor.threeManager.scene);
 
 		// remove child from parent and add it to its parent
-		if (gameObject.parentData.guid != null && gameObject.parentData.guid !== Guid.createEmpty() && gameObject.parentData.typeName !== 'LevelData') {
+		if (gameObject.parentData.guid !== Guid.createEmpty() && gameObject.parentData.typeName !== 'LevelData') {
 			const parent = editor.getGameObjectByGuid(gameObject.parentData.guid);
 			if (parent != null) {
 				THREE.SceneUtils.attach(gameObject, editor.threeManager.scene, parent);
