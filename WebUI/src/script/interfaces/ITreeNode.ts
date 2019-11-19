@@ -1,18 +1,21 @@
+import { TreeNode } from '@/script/types/TreeNode';
+
 export interface ITreeNode {
-	children: ITreeNode[];
-	id: string | null;
-	name: string | null;
-	parent?: ITreeNode;
+	id: string;
+	name: string;
+	type: string;
+	children?: ITreeNode[];
+	state?: ITreeNodeState;
+	content?: any[];
+	parent?: TreeNode;
 	props?: any;
-	state?: TreeNodeState;
 	data?: any;
 	loadOnDemand?: boolean;
-	hasChildren(): boolean;
 }
 
-export interface TreeNodeState {
+export interface ITreeNodeState {
 	collapsing?: boolean;
-	depth?: number;
+	depth: number;
 	expanding?: boolean;
 	open?: boolean;
 	path?: string;

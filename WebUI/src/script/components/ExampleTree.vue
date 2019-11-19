@@ -10,9 +10,10 @@
 // This is a tree example.
 
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
-import { ITreeNode } from '@/script/interfaces/ITreeNode';
+import { TreeNode } from '@/script/types/TreeNode';
 import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
+import {ITreeNode} from '@/script/interfaces/ITreeNode';
 
 const generate = (size = 1000) => {
 	const data = [];
@@ -44,8 +45,8 @@ export default class ExampleTree extends Vue {
 		};
 	}
 
-	private toggleState(node: ITreeNode) {
-		const hasChildren = node.hasChildren();
+	private toggleState(node: TreeNode) {
+		const hasChildren = node.children.length > 0;
 		let toggleState = '';
 		if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
 			toggleState = 'closed';
@@ -56,7 +57,10 @@ export default class ExampleTree extends Vue {
 		return toggleState;
 	}
 
-	private nodeStyle(node: ITreeNode) {
+	private nodeStyle(node: TreeNode) {
+		if (node === null) {
+			return '';
+		}
 		return {
 			'background': node.state.selected ? '#deecfd' : '#fff',
 			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
@@ -64,7 +68,7 @@ export default class ExampleTree extends Vue {
 		};
 	}
 
-	private clickNode(e: MouseEvent, node: ITreeNode, tree: any) {
+	private clickNode(e: MouseEvent, node: TreeNode, tree: any) {
 		node.name += '#';
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
@@ -76,15 +80,15 @@ export default class ExampleTree extends Vue {
 		console.log('afterSelectNode' + new Date().getTime());
 	}
 
-	private loadNodes(parentNode: ITreeNode, done: boolean) {
+	private loadNodes(parentNode: TreeNode, done: boolean) {
 		// Do something?
 	}
 
-	private shouldLoadNodes(node: ITreeNode) {
-		return !node.hasChildren() && node.loadOnDemand;
+	private shouldLoadNodes(node: TreeNode) {
+		return !(node.children.length > 0) && node.loadOnDemand;
 	}
 
-	private shouldSelectNode(node: ITreeNode) { // Defaults to null
+	private shouldSelectNode(node: TreeNode) { // Defaults to null
 		if (this.tree === null) {
 			return false;
 		}
@@ -126,30 +130,30 @@ export default class ExampleTree extends Vue {
 		this.onUpdate(this.tree.getSelectedNode());
 	}
 
-	private onOpenNode(node: ITreeNode) {
+	private onOpenNode(node: TreeNode) {
 		console.log('onOpenNode:', node);
 		this.onUpdate(node);
 	}
 
-	private onCloseNode(node: ITreeNode) {
+	private onCloseNode(node: TreeNode) {
 		console.log('onCloseNode:', node);
 		this.onUpdate(node);
 	}
 
-	private onSelectNode(node: ITreeNode) {
+	private onSelectNode(node: TreeNode) {
 		console.log('onSelectNode:', node);
 		this.onUpdate(node);
 	}
 
-	private onWillOpenNode(node: ITreeNode) {
+	private onWillOpenNode(node: TreeNode) {
 		console.log('onWillOpenNode:', node);
 	}
 
-	private onWillCloseNode(node: ITreeNode) {
+	private onWillCloseNode(node: TreeNode) {
 		console.log('onWillCloseNode:', node);
 	}
 
-	private onWillSelectNode(node: ITreeNode) {
+	private onWillSelectNode(node: TreeNode) {
 		console.log('onWillSelectNode:', node);
 	}
 }
