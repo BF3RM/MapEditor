@@ -48,8 +48,11 @@ export default class App extends Vue {
 	public title!: string;
 
 	private onInitialised() {
-		const ps = new PerfectScrollbar('.scrollable', {
-		});
+		const scrollables = document.getElementsByClassName('scrollable');
+		for (const scrollable of scrollables) {
+			const ps = new PerfectScrollbar(scrollable as HTMLElement, {
+			});
+		}
 		signals.editorReady.emit(true);
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {

@@ -1,5 +1,6 @@
 <template>
   <RecycleScroller :class="className"
+                   class="scrollable"
                    :items="tree.nodes"
                    :item-height="rowHeight"
                    ref="virtualList"
