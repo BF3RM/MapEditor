@@ -1,7 +1,7 @@
 <template>
   <RecycleScroller :class="className"
                    class="scrollable"
-                   :items="tree.nodes"
+                   :items="filteredNodes"
                    :item-height="rowHeight"
                    ref="virtualList"
                    :min-item-size="20"
@@ -32,6 +32,10 @@ export default {
 		RecycleScroller
 	},
 	props: {
+		search: {
+			type: String,
+			default: ''
+		},
 		className: {
 			type: String,
 			default: 'scroll-box'
@@ -157,7 +161,6 @@ export default {
 				this.tree.emit('contentDidUpdate');
 			});
 		};
-
 		Object.keys(this.eventHandlers).forEach((key) => {
 			if (!this[key]) {
 				return;
@@ -205,7 +208,12 @@ export default {
 			}
 		};
 	},
-	computed: {},
+	computed: {
+		filteredNodes() {
+			const { search, tree } = this;
+			return tree.nodes.filter(node => !node.state.filtered === false);
+		}
+	},
 	methods: {},
 	watch: {
 		data: {
@@ -213,6 +221,11 @@ export default {
 				this.tree.loadData(newValue);
 			},
 			deep: true
+		},
+		search: {
+			handler(newValue) {
+				this.tree.filter(newValue);
+			}
 		}
 	}
 };

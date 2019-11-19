@@ -82,7 +82,7 @@ interface InfiniteTree {
 	//     const filterText = node.name || '';
 	//     return filterText.toLowerCase().indexOf(keyword) >= 0;
 	// }, filterOptions);
-	filter(predicate: any, options: object): void;
+	filter(predicate: any, options?: object): void;
 
 	// Flattens all child nodes of a parent node by performing full tree traversal using child-parent link.
 	// No recursion or stack is involved.

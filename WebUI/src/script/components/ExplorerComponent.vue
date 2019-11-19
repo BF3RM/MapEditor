@@ -1,8 +1,24 @@
 <template>
 	<gl-component id="explorer-component">
-		<InfiniteTreeComponent class="scrollable" ref="tree" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+		<div class="header">
+			<input type="text" v-model="search">
+		</div>
+		<InfiniteTreeComponent class="scrollable" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 			<template slot-scope="{ node, index, tree, active }">
-				<div class="tree-node" :style="nodeStyle(node)" @click="clickNode($event,node,tree)">{{ node.name }}</div>
+				<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="clickNode($event,node,tree)">
+					<div v-if="node.children.length > 0" class="expand">
+						<span v-if="node.state.open">
+							v
+						</span>
+						<span v-if="!node.state.open">
+							>
+						</span>
+					</div>
+					<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
+					<span v-else>
+						{{ node.name }}
+					</span>
+				</div>
 			</template>
 		</InfiniteTreeComponent>
 	</gl-component>
@@ -19,8 +35,9 @@ import { Blueprint } from '@/script/types/Blueprint';
 import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import { Guid } from 'guid-typescript';
 import { TreeNode } from '@/script/types/TreeNode';
+import Highlighter from '@/script/components/widgets/Highlighter';
 
-@Component({ components: { InfiniteTreeComponent } })
+@Component({ components: { InfiniteTreeComponent, Highlighter } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private tree: InfiniteTree | null = null;
@@ -34,6 +51,8 @@ export default class ExplorerComponent extends EditorComponent {
 			'depth': 0
 		}
 	} as ITreeNode);
+
+	private search: string = '';
 
 	constructor() {
 		super();
@@ -100,8 +119,6 @@ export default class ExplorerComponent extends EditorComponent {
 
 	private nodeStyle(node: TreeNode) {
 		return {
-			'background': node.state.selected ? '#deecfd' : '#fff',
-			'border': node.state.selected ? '1px solid #06c' : '1px solid #fff',
 			'padding-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
@@ -119,11 +136,21 @@ export default class ExplorerComponent extends EditorComponent {
 	}
 
 	private onSelectNode(node: TreeNode) {
-		console.log(node);
+		console.log('onSelect');
 	}
 
 	private shouldSelectNode(node: TreeNode) {
+		console.log('ShouldSelect');
 		return true;
 	}
 }
 </script>
+<style lang="scss" scoped>
+	.expand {
+		display: inline;
+	}
+
+	.selected {
+		background-color: #404040;
+	}
+</style>

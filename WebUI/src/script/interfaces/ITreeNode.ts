@@ -14,6 +14,7 @@ export interface ITreeNode {
 }
 
 export interface ITreeNodeState {
+	filtered?: boolean;
 	collapsing?: boolean;
 	depth: number;
 	expanding?: boolean;

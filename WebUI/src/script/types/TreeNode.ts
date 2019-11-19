@@ -12,7 +12,9 @@ export class TreeNode implements ITreeNode {
 	public props: any;
 	public state: ITreeNodeState = {
 		depth: 0,
-		open: false
+		open: false,
+		selected: false,
+		filtered: true
 	};
 
 	constructor(node: ITreeNode) {
@@ -20,7 +22,10 @@ export class TreeNode implements ITreeNode {
 		this.name = node.name;
 		this.type = node.type;
 		if (node.state) {
-			this.state = node.state;
+			this.state = {
+				...this.state,
+				...node.state
+			};
 		}
 	}
 }

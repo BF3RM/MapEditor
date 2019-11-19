@@ -24,7 +24,6 @@
 					@click.native="onClick(item)"
 					:size-dependencies="[item.expanded]"
 					:min-item-size="30"
-					v-if="item.level <= data.filterLevel"
 			>
 				<div :class="'LogLevel-' + logLevelDict[item.level]">
 					<pre v-if="typeof(item.message) === 'string'" class="message">{{FormatTime(item.time)}} [{{item.level}}] {{ item.message }}</pre>
