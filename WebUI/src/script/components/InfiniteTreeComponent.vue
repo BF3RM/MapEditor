@@ -152,7 +152,6 @@ export default {
 			el: this.$refs.tree,
 			...this.$props
 		});
-
 		// Updates the tree.
 		this.tree.update = () => {
 			this.tree.emit('contentWillUpdate');
@@ -181,11 +180,13 @@ export default {
 			this.tree.removeListener(eventName, this.eventHandlers[key]);
 			this.eventHandlers[key] = null;
 		});
-
-		this.tree.destroy();
-		this.tree = null;
+		if (this.tree) {
+			this.tree.destroy();
+			this.tree = null;
+		}
 	},
 	inheritAttrs: false,
+	loaded: false,
 	data() {
 		return {
 			nodes: [],
@@ -211,14 +212,18 @@ export default {
 	computed: {
 		filteredNodes() {
 			const { search, tree } = this;
-			return tree.nodes.filter(node => !node.state.filtered === false);
+			return tree.nodes.filter((node) => !node.state.filtered === false);
 		}
 	},
 	methods: {},
 	watch: {
 		data: {
 			handler(newValue) {
-				this.tree.loadData(newValue);
+				console.log(this.data);
+				if (!this.loaded) {
+					this.tree.loadData(newValue);
+					this.loaded = true;
+				}
 			},
 			deep: true
 		},

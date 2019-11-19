@@ -10,11 +10,11 @@ export default class Highlighter extends Vue {
 	@Prop(String) private text!: string;
 	@Prop(String) private search!: string;
 
-	highlight() {
+	private highlight() {
 		if (!this.search) {
 			return this.text;
 		}
-		return this.text.replace(new RegExp(this.search, 'gi'), match => {
+		return this.text.replace(new RegExp(this.search, 'gi'), (match) => {
 			return '<span class="highlightText">' + match + '</span>';
 		});
 	}
