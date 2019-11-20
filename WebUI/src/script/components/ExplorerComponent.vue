@@ -23,7 +23,7 @@
 				</template>
 			</InfiniteTreeComponent>
 		</gl-component>
-		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']">
+		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">
 			<template slot-scope="{ item, data }">
 				<Highlighter class="td" :text="cleanPath(item.name)" :search="data.search"/><div class="td">{{item.typeName}}</div>
 			</template>
@@ -179,6 +179,13 @@ export default class ExplorerComponent extends EditorComponent {
 	private shouldSelectNode(node: TreeNode) {
 		console.log('ShouldSelect');
 		return true;
+	}
+
+	private SpawnBlueprint(blueprint: Blueprint) {
+		if (!blueprint) {
+			return;
+		}
+		window.editor.SpawnBlueprint(blueprint);
 	}
 }
 </script>

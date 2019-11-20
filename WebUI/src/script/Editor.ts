@@ -210,7 +210,7 @@ export default class Editor {
 		this.DeleteSelected();
 	}
 
-	public SpawnBlueprint(blueprint: Blueprint, transform: LinearTransform, variation: number, parentData?: GameObjectParentData) {
+	public SpawnBlueprint(blueprint: Blueprint, transform?: LinearTransform, variation?: number, parentData?: GameObjectParentData) {
 		if (blueprint == null) {
 			window.LogError('Tried to spawn a nonexistent blueprint');
 			return false;

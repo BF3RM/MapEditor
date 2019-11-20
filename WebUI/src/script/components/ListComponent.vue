@@ -20,6 +20,7 @@
 						:active="active"
 						:size-dependencies="[item.expanded]"
 						:min-item-size="30"
+						@click.native="onClick(item)"
 				>
 				<slot :item="item" :data="data">
 				</slot>
@@ -40,6 +41,7 @@ export default class ListComponent extends EditorComponent {
 	@Prop(Array) public list: Array<{name: string}>;
 	@Prop(String) public keyField: string;
 	@Prop(Array) public headers: string[];
+	@Prop(Function) public click: void;
 	public data: {
 		search: string,
 	} = {
@@ -48,6 +50,12 @@ export default class ListComponent extends EditorComponent {
 
 	constructor() {
 		super();
+	}
+
+	private onClick(item: any) {
+		if (this.click !== undefined) {
+			this.click(item);
+		}
 	}
 
 	private onSearch(a: any) {
