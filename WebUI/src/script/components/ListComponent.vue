@@ -38,10 +38,10 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 @Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem } })
 export default class ListComponent extends EditorComponent {
 	@Prop() public title!: string;
-	@Prop(Array) public list: Array<{name: string}>;
-	@Prop(String) public keyField: string;
-	@Prop(Array) public headers: string[];
-	@Prop(Function) public click: void;
+	@Prop(Array) public list!: Array<{name: string}>;
+	@Prop(String) public keyField!: string;
+	@Prop(Array) public headers!: string[];
+	@Prop(Function) public click!: void;
 	public data: {
 		search: string,
 	} = {
@@ -54,6 +54,7 @@ export default class ListComponent extends EditorComponent {
 
 	private onClick(item: any) {
 		if (this.click !== undefined) {
+			// @ts-ignore
 			this.click(item);
 		}
 	}
@@ -62,7 +63,7 @@ export default class ListComponent extends EditorComponent {
 		this.data.search = a.target.value;
 	}
 
-	filteredItems() {
+	private filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
 		return this.list.filter((i) => i.name.toLowerCase().includes(lowerCaseSearch));
 	}

@@ -8,7 +8,7 @@ export class CommandActionResult {
 	constructor(type: string, name: string, payload: any) {
 		this.type = type;
 		this.sender = name;
-		this.gameObjectTransferData = new GameObjectTransferData().setFromTable(payload);;
+		this.gameObjectTransferData = new GameObjectTransferData().setFromTable(payload);
 	}
 
 	public setFromTable(table: any) {

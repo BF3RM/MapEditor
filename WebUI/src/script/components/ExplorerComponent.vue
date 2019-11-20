@@ -61,8 +61,8 @@ export default class ExplorerComponent extends EditorComponent {
 		}
 	} as ITreeNode);
 
-	private list:Blueprint[] = [];
-	private selected: TreeNode | null;
+	private list: Blueprint[] = [];
+	private selected!: TreeNode | null;
 
 	private search: string = '';
 
@@ -161,7 +161,7 @@ export default class ExplorerComponent extends EditorComponent {
 		this.list = this.getBlueprintsRecursive(node);
 	}
 
-	private getBlueprintsRecursive(node:TreeNode):Blueprint[] {
+	private getBlueprintsRecursive(node: TreeNode): Blueprint[] {
 		let list: Blueprint[] = node.content;
 		node.children.forEach((child) => {
 			list = list.concat(this.getBlueprintsRecursive(child));
