@@ -14,19 +14,19 @@
 								<ViewportComponent title="ViewPort"/>
 							</gl-row>
 							<gl-row>
-								<ConsoleComponent title="Console"></ConsoleComponent>
+								<ConsoleComponent title="Console"/>
 							</gl-row>
 						</gl-col>
 						<gl-col>
-							<ExplorerComponent title="Explorer">
-							</ExplorerComponent>
+							<ExplorerComponent title="Explorer"/>
+							<ListComponent ref="" title="Explorer data"/>
 						</gl-col>
 					</gl-row>
 				</gl-col>
 			</golden-layout>
 		</div>
 	</div>
-</template>
+</template> TabNine::config
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
@@ -41,11 +41,14 @@ import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 import './style/style.scss';
 
 import ViewportComponent from '@/script/components/ViewportComponent.vue';
+import ListComponent from '@/script/components/ListComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, ListComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title!: string;
+
+	private selectedNode:any = null;
 
 	private onInitialised() {
 		const scrollables = document.getElementsByClassName('scrollable');
@@ -68,7 +71,6 @@ export default class App extends Vue {
 		}
 	}
 }
-
 </script>
 
 <style scoped>

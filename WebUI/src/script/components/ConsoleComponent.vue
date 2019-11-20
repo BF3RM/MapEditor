@@ -103,7 +103,6 @@ export default class ConsoleComponent extends EditorComponent {
 	private onClick(item: ConsoleEntry) {
 		this.data.logs[item.id].expanded = !item.expanded;
 		Object.assign(item, this.data.logs[item.id]);
-		this.ScrollToBottom();
 	}
 
 	private Inspect(obj: any) {
