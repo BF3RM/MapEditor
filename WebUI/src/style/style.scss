@@ -42,3 +42,20 @@
 .datafont {
   font-family: 'Overpass Mono';
 }
+.tr {
+  display: flex;
+  width: 100%;
+}
+.th,
+.td {
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+  margin-right: 30px;
+}
+.vue-recycle-scroller__slot .th:first-child,
+.vue-recycle-scroller__item-view .td:first-child {
+  flex: 1;
+}

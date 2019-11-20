@@ -3,6 +3,9 @@
 		<div class="header">
 			<input type="input" :value="data.search" @input="onSearch" placeholder="search">
 		</div>
+		<div class="header" v-if="headers">
+			<div class="th" v-for="header in headers" :key="header">{{header}}</div>
+		</div>
 		<DynamicScroller
 				ref="scroller"
 				:items="filteredItems()"
@@ -10,18 +13,17 @@
 				:min-item-size="30"
 				:key-field="keyField"
 		>
-			<DynamicScrollerItem
-					class="consoleEntry"
-					slot-scope="{ item, index, active }"
-					:item="item"
-					:active="active"
-					:size-dependencies="[item.expanded]"
-					:min-item-size="30"
-			>
-				<slot :item="item">
-					{{ item.name }}
+				<DynamicScrollerItem
+						class="tr"
+						slot-scope="{ item, index, active }"
+						:item="item"
+						:active="active"
+						:size-dependencies="[item.expanded]"
+						:min-item-size="30"
+				>
+				<slot :item="item" :data="data">
 				</slot>
-			</DynamicScrollerItem>
+				</DynamicScrollerItem>
 		</DynamicScroller>
 	</gl-component>
 </template>
@@ -37,6 +39,7 @@ export default class ListComponent extends EditorComponent {
 	@Prop() public title!: string;
 	@Prop(Array) public list: Array<{name: string}>;
 	@Prop(String) public keyField: string;
+	@Prop(Array) public headers: string[];
 	public data: {
 		search: string,
 	} = {
@@ -48,7 +51,6 @@ export default class ListComponent extends EditorComponent {
 	}
 
 	private onSearch(a: any) {
-		console.log(this.key);
 		this.data.search = a.target.value;
 	}
 
@@ -64,5 +66,6 @@ export default class ListComponent extends EditorComponent {
 	}
 	.scrollable {
 		height: 100%;
+		width: 100%;
 	}
 </style>

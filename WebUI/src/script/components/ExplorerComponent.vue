@@ -23,9 +23,9 @@
 				</template>
 			</InfiniteTreeComponent>
 		</gl-component>
-		<ListComponent title="Explorer data" :list="list" :keyField="'instanceGuid'">
-			<template slot-scope="{ item, index }">
-				{{cleanPath(item.name)}} {{ index }}
+		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']">
+			<template slot-scope="{ item, data }">
+				<Highlighter class="td" :text="cleanPath(item.name)" :search="data.search"/><div class="td">{{item.typeName}}</div>
 			</template>
 		</ListComponent>
 	</gl-col>
