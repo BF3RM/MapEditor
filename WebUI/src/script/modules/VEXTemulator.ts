@@ -33,8 +33,8 @@ export class VEXTemulator {
 			sender: commandActionResult.sender,
 
 			gameObjectTransferData: {
-				guid: commandActionResult.payload.guid,
-				name: commandActionResult.payload.name
+				guid: commandActionResult.gameObjectTransferData.guid,
+				name: commandActionResult.gameObjectTransferData.name
 			}
 		};
 		return response;
@@ -53,8 +53,8 @@ export class VEXTemulator {
 			sender: commandActionResult.sender,
 			type: 'SpawnedBlueprint',
 			gameObjectTransferData: {
-				transform: commandActionResult.payload.transform.toTable(),
-				blueprintCtrRef: commandActionResult.payload.blueprintCtrRef,
+				transform: commandActionResult.gameObjectTransferData.transform.toTable(),
+				blueprintCtrRef: commandActionResult.gameObjectTransferData.blueprintCtrRef,
 				gameEntities: [
 					{
 						transform: {
@@ -125,11 +125,11 @@ export class VEXTemulator {
 						typeName: 'WhateverEntity'
 					}
 				],
-				guid: commandActionResult.payload.guid,
+				guid: commandActionResult.gameObjectTransferData.guid,
 				typeName: 'ObjectBlueprint',
-				parentData: commandActionResult.payload.parentData,
-				name: commandActionResult.payload.name,
-				variation: commandActionResult.payload.variation
+				parentData: commandActionResult.gameObjectTransferData.parentData,
+				name: commandActionResult.gameObjectTransferData.name,
+				variation: commandActionResult.gameObjectTransferData.variation
 			}
 		};
 		return response;
@@ -139,8 +139,8 @@ export class VEXTemulator {
 		const response = {
 			type: 'SetTransform',
 			gameObjectTransferData: {
-				guid: commandActionResult.payload.guid,
-				transform: commandActionResult.payload.transform.toTable()
+				guid: commandActionResult.gameObjectTransferData.guid,
+				transform: commandActionResult.gameObjectTransferData.transform.toTable()
 			}
 		};
 		return response;
@@ -151,7 +151,7 @@ export class VEXTemulator {
 		const response = {
 			type: 'DestroyedBlueprint',
 			gameObjectTransferData: {
-				guid: commandActionResult.payload.guid
+				guid: commandActionResult.gameObjectTransferData.guid
 			}
 		};
 		return response;
@@ -161,8 +161,8 @@ export class VEXTemulator {
 		const response = {
 			type: 'SetObjectName',
 			gameObjectTransferData: {
-				guid: commandActionResult.payload.guid,
-				name: commandActionResult.payload.name
+				guid: commandActionResult.gameObjectTransferData.guid,
+				name: commandActionResult.gameObjectTransferData.name
 			}
 		};
 		return response;
@@ -172,8 +172,8 @@ export class VEXTemulator {
 		const response = {
 			type: 'SetVariation',
 			gameObjectTransferData: {
-				guid: commandActionResult.payload.guid,
-				variation: commandActionResult.payload.variation
+				guid: commandActionResult.gameObjectTransferData.guid,
+				variation: commandActionResult.gameObjectTransferData.variation
 			}
 		};
 		return response;

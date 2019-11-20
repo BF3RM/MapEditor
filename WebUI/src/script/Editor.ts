@@ -329,7 +329,7 @@ export default class Editor {
 	*/
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
 		if (gameObject !== undefined) {
 			gameObject.setName(gameObjectTransferData.name);
@@ -337,7 +337,7 @@ export default class Editor {
 	}
 
 	public onSetTransform(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
 			gameObject.setTransform(gameObjectTransferData.transform);
@@ -351,7 +351,7 @@ export default class Editor {
 	}
 
 	public onSetVariation(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
 		if (gameObject !== undefined) {
 			gameObject.setVariation(gameObjectTransferData.variation);
@@ -359,7 +359,7 @@ export default class Editor {
 	}
 
 	public onDestroyedBlueprint(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const gameObject = this.gameObjects.getValue(gameObjectGuid);
 		if (gameObject === undefined) {
@@ -378,7 +378,7 @@ export default class Editor {
 	// TODO: Move logic to GameContext
 	public onSpawnedBlueprint(commandActionResult: CommandActionResult) {
 		const scope = this;
-		const gameObjectTransferData = commandActionResult.payload as GameObjectTransferData;
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const parentGuid = gameObjectTransferData.parentData.guid;
 
@@ -449,30 +449,30 @@ export default class Editor {
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {
-		console.log('Successfully invoke spawning of blueprint: ' + commandActionResult.payload.name + ' | ' + commandActionResult.payload.guid);
+		console.log('Successfully invoke spawning of blueprint: ' + commandActionResult.gameObjectTransferData.name + ' | ' + commandActionResult.gameObjectTransferData.guid);
 	}
 
 	public onEnabledBlueprint(commandActionResult: CommandActionResult) {
-		const gameObject = this.getGameObjectByGuid(commandActionResult.payload.guid);
+		const gameObject = this.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
 
 		if (gameObject == null) {
 			window.LogError('Attempted to enable a GameObject that doesn\'t exist');
 			return;
 		}
 
-		const removeFromHierarchy = commandActionResult.payload.isDeleted;
+		const removeFromHierarchy = commandActionResult.gameObjectTransferData.isDeleted;
 		gameObject.Enable(); // removeFromHierarchy);
 	}
 
 	public onDisabledBlueprint(commandActionResult: CommandActionResult) {
-		const gameObject = this.getGameObjectByGuid(commandActionResult.payload.guid);
+		const gameObject = this.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
 
 		if (gameObject == null) {
 			window.LogError('Attempted to disable a GameObject that doesn\'t exist');
 			return;
 		}
 
-		const isDeletedVanillaObject = commandActionResult.payload.isDeleted;
+		const isDeletedVanillaObject = commandActionResult.gameObjectTransferData.isDeleted;
 		gameObject.Disable(); // isDeletedVanillaObject:);
 	}
 

@@ -1,7 +1,7 @@
 import { Guid } from 'guid-typescript';
 
 const names = ['Textures', 'UI', 'Vehicles', 'VisualEnvironments', 'Weapons', 'Weapons_old', 'XP2', 'XP3', 'XP4', 'XP5', 'XP_Raw', 'default', 'lodgroups', 'profile'];
-const BlueprintTypes = ['ObjectBlueprint', 'PrefabBlueprint', 'EffectBlueprint', 'VisualEnvironmentBlueprint', 'SpatialPrefabBlueprint'];
+const blueprintTypes = ['ObjectBlueprint', 'PrefabBlueprint', 'EffectBlueprint', 'VisualEnvironmentBlueprint', 'SpatialPrefabBlueprint'];
 function randomName() {
 	let out = '';
 	for (let i = 0; i < 6; i++) {
@@ -10,11 +10,7 @@ function randomName() {
 	return out;
 }
 function randomBlueprintType() {
-	let out = '';
-	for (let i = 0; i < 6; i++) {
-		out += names[Math.floor(Math.random() * names.length)] + '/';
-	}
-	return out;
+	return names[Math.floor(Math.random() * blueprintTypes.length)];
 }
 
 export function GenerateBlueprints(count: number) {
