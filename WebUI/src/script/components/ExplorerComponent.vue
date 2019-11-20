@@ -1,27 +1,34 @@
 <template>
-	<gl-component id="explorer-component">
-		<div class="header">
-			<input type="text" v-model="search">
-		</div>
-		<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-			<template slot-scope="{ node, index, tree, active }">
-				<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
-					<div class="expand" @click="ToggleNode($event,node,tree)">
-						<div v-if="node.state.open && node.children.length > 0">
-							v
+	<gl-col>
+		<gl-component id="explorer-component">
+			<div class="header">
+				<input type="text" v-model="search">
+			</div>
+			<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+				<template slot-scope="{ node, index, tree, active }">
+					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
+						<div class="expand" @click="ToggleNode($event,node,tree)">
+							<div v-if="node.state.open && node.children.length > 0">
+								v
+							</div>
+							<div v-if="!node.state.open && node.children.length > 0">
+								>
+							</div>
 						</div>
-						<div v-if="!node.state.open && node.children.length > 0">
-							>
-						</div>
+						<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
+						<span v-else>
+							{{ node.name }} - {{ node.content.length }}
+						</span>
 					</div>
-					<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
-					<span v-else>
-						{{ node.name }}
-					</span>
-				</div>
+				</template>
+			</InfiniteTreeComponent>
+		</gl-component>
+		<ListComponent title="Explorer data" :list="list" :keyField="'instanceGuid'">
+			<template slot-scope="{ item, index }">
+				{{cleanPath(item.name)}} {{ index }}
 			</template>
-		</InfiniteTreeComponent>
-	</gl-component>
+		</ListComponent>
+	</gl-col>
 </template>
 
 <script lang="ts">
@@ -36,8 +43,9 @@ import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modu
 import { Guid } from 'guid-typescript';
 import { TreeNode } from '@/script/types/TreeNode';
 import Highlighter from './widgets/Highlighter.vue';
+import ListComponent from '@/script/components/ListComponent.vue';
 
-@Component({ components: { InfiniteTreeComponent, Highlighter } })
+@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private tree: InfiniteTree | null = null;
@@ -45,12 +53,16 @@ export default class ExplorerComponent extends EditorComponent {
 		'type': 'folder',
 		'name': 'Venice',
 		'id': 'Venice',
+		'path': '/',
 		'state': {
 			'opened': true,
 			'selected': true,
 			'depth': 0
 		}
 	} as ITreeNode);
+
+	private list:Blueprint[] = [];
+	private selected: TreeNode | null;
 
 	private search: string = '';
 
@@ -81,9 +93,9 @@ export default class ExplorerComponent extends EditorComponent {
 			'id': 'root',
 			'type': 'folder',
 			'name': 'Venice',
+			'path': '/',
 			'state': {
 				'opened': true,
-				'selected': true,
 				'depth': 0
 			}
 		} as ITreeNode);
@@ -93,13 +105,16 @@ export default class ExplorerComponent extends EditorComponent {
 			const paths = getPaths(path);
 			let parentPath: TreeNode = data;
 			const fileName = getFilename(path);
+			let currentPath = '';
 			paths.forEach((subPath) => {
+				currentPath += subPath + '/';
 				const parentIndex = parentPath.children.find((x) => x.name.toLowerCase() === subPath.toLowerCase());
 				if (parentIndex === undefined) {
 					const a = parentPath.children.push(new TreeNode({
 						'id': Guid.create().toString(),
 						'name': subPath,
-						'type': 'folder'
+						'type': 'folder',
+						'path': currentPath
 					} as ITreeNode));
 					parentPath = parentPath.children[a - 1];
 				} else {
@@ -111,11 +126,7 @@ export default class ExplorerComponent extends EditorComponent {
 					}
 				}
 			});
-			parentPath.content.push(new TreeNode({
-				'id': instance.instanceGuid.toString(),
-				'name': fileName,
-				'type': 'file'
-			} as ITreeNode));
+			parentPath.content.push(instance);
 		}
 		this.data = data;
 	}
@@ -140,6 +151,29 @@ export default class ExplorerComponent extends EditorComponent {
 
 	private onSelectNode(node: TreeNode) {
 		console.log('onSelect');
+
+		if (node === null) {
+			this.list = [];
+			this.selected = null;
+			return;
+		}
+		this.selected = node;
+		this.list = this.getBlueprintsRecursive(node);
+	}
+
+	private getBlueprintsRecursive(node:TreeNode):Blueprint[] {
+		let list: Blueprint[] = node.content;
+		node.children.forEach((child) => {
+			list = list.concat(this.getBlueprintsRecursive(child));
+		});
+		return list;
+	}
+
+	private cleanPath(path: string) {
+		if (!this.selected) {
+			return path;
+		}
+		return path.replace(this.selected.path, '');
 	}
 
 	private shouldSelectNode(node: TreeNode) {

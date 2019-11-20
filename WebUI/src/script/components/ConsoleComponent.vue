@@ -20,7 +20,7 @@
 					slot-scope="{ item, index, active }"
 					:item="item"
 					:active="active"
-					:data-index="index"
+
 					@click.native="onClick(item)"
 					:size-dependencies="[item.expanded]"
 					:min-item-size="30"

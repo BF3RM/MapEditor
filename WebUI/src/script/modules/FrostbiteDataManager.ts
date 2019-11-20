@@ -33,8 +33,8 @@ export class FrostbiteDataManager {
 		this.files = {};
 		this.data = {};
 
-		signals.editorInitializing.connect(this._onEditorInitializing.bind(this));
-		signals.editorReady.connect(this._onEditorReady.bind(this));
+		signals.editor.Initializing.connect(this._onEditorInitializing.bind(this));
+		signals.editor.Ready.connect(this._onEditorReady.bind(this));
 
 		// this._Init();
 	}

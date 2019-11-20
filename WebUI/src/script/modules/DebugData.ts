@@ -4,7 +4,7 @@ const names = ['Textures', 'UI', 'Vehicles', 'VisualEnvironments', 'Weapons', 'W
 
 function GenerateRandomName() {
 	let out = '';
-	for (let i = 0; i < 3; i++) {
+	for (let i = 0; i < 6; i++) {
 		out += names[Math.floor(Math.random() * names.length)] + '/';
 	}
 	return out;

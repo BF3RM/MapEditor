@@ -53,7 +53,7 @@ export default class Editor {
 
 	constructor(debug: boolean = false) {
 		// Commands
-		signals.editorReady.connect(this.onEditorReady.bind(this));
+		signals.editor.Ready.connect(this.onEditorReady.bind(this));
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.blueprintSpawnInvoked.connect(this.onBlueprintSpawnInvoked.bind(this));
 		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
@@ -91,7 +91,7 @@ export default class Editor {
 
 	public Initialize() {
 		const scope = this;
-		signals.editorInitializing.emit(true);
+		signals.editor.Initializing.emit(true);
 		// Adds the chrome background and debug window
 		if (this.debug === true) {
 			this.setPlayerName('LocalPlayer');

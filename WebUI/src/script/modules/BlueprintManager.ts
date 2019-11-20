@@ -3,13 +3,16 @@ import { Blueprint } from '@/script/types/Blueprint';
 import { LogError } from '@/script/modules/Logger';
 import * as Collections from 'typescript-collections';
 import { Guid } from 'guid-typescript';
-import { GameObject } from '@/script/types/GameObject';
+import { IBlueprint } from '@/script/interfaces/IBlueprint';
 
 export class BlueprintManager {
 	private blueprints = new Collections.Dictionary<Guid, Blueprint>();
 
-	public RegisterBlueprint(guid: Guid, blueprint: any) {
-		this.blueprints.setValue(guid, new Blueprint(Guid.parse(blueprint.instanceGuid), Guid.parse(blueprint.partitionGuid), blueprint.typeName, blueprint.name, blueprint.variations));
+	public RegisterBlueprint(guid: Guid, blueprint: IBlueprint) {
+		const instanceGuid = Guid.parse(blueprint.instanceGuid as string);
+		const partitionGuid = Guid.parse(blueprint.partitionGuid as string);
+		const bp = new Blueprint(instanceGuid, partitionGuid, blueprint.typeName, blueprint.name, blueprint.variations);
+		this.blueprints.setValue(guid, bp);
 	}
 
 	public RegisterBlueprints(blueprintsRaw: string) {

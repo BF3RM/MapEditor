@@ -1,6 +1,5 @@
 <template>
 	<gl-component>
-		{{ list }}
 		<div class="header">
 			<input type="input" :value="data.search" @input="onSearch" placeholder="search">
 		</div>
@@ -9,20 +8,19 @@
 				:items="filteredItems()"
 				class="scrollable"
 				:min-item-size="30"
+				:key-field="keyField"
 		>
 			<DynamicScrollerItem
-					class="listEntry"
+					class="consoleEntry"
 					slot-scope="{ item, index, active }"
 					:item="item"
 					:active="active"
-					:data-index="index"
-					@click.native="onClick(item)"
 					:size-dependencies="[item.expanded]"
 					:min-item-size="30"
 			>
-				<div>
+				<slot :item="item">
 					{{ item.name }}
-				</div>
+				</slot>
 			</DynamicScrollerItem>
 		</DynamicScroller>
 	</gl-component>
@@ -31,17 +29,16 @@
 <script lang="ts">
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
-import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
-import { TreeNode } from '../types/TreeNode';
 
-@Component({ components: { DynamicScroller, DynamicScrollerItem } })
+@Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem } })
 export default class ListComponent extends EditorComponent {
 	@Prop() public title!: string;
-	public list: any = [];
-
-	private data: {
-		search: string
+	@Prop(Array) public list: Array<{name: string}>;
+	@Prop(String) public keyField: string;
+	public data: {
+		search: string,
 	} = {
 		search: ''
 	};
@@ -50,24 +47,14 @@ export default class ListComponent extends EditorComponent {
 		super();
 	}
 
-	public mounted() {
-	}
-
-	private onClick(item: TreeNode) {
-		Object.assign(item, this.list[item.id]);
-	}
-
-	private onUpdateFilter(a: any) {
-		this.list = a.target.value;
-	}
-
 	private onSearch(a: any) {
+		console.log(this.key);
 		this.data.search = a.target.value;
 	}
 
-	private filteredItems() {
+	filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
-		return this.list; // .filter((i) => i.name.toLowerCase().includes(lowerCaseSearch));
+		return this.list.filter((i) => i.name.toLowerCase().includes(lowerCaseSearch));
 	}
 }
 </script>

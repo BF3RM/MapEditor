@@ -49,7 +49,7 @@ export class THREEManager {
 	private debugMode = false;
 
 	constructor(debugMode: boolean) {
-		signals.editorReady.connect(this.Initialize.bind(this));
+		signals.editor.Ready.connect(this.Initialize.bind(this));
 		this.RegisterEvents();
 		this.debugMode = debugMode;
 	}

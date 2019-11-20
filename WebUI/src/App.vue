@@ -19,7 +19,6 @@
 						</gl-col>
 						<gl-col>
 							<ExplorerComponent title="Explorer"/>
-							<ListComponent ref="" title="Explorer data"/>
 						</gl-col>
 					</gl-row>
 				</gl-col>
@@ -43,12 +42,10 @@ import './style/style.scss';
 import ViewportComponent from '@/script/components/ViewportComponent.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, ListComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title!: string;
-
-	private selectedNode:any = null;
 
 	private onInitialised() {
 		const scrollables = document.getElementsByClassName('scrollable');
@@ -56,11 +53,10 @@ export default class App extends Vue {
 			const ps = new PerfectScrollbar(scrollable as HTMLElement, {
 			});
 		}
-		signals.editorReady.emit(true);
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
-			signals.editorReady.emit(true);
+			signals.editor.Ready.emit(true);
 		}
 	}
 

@@ -1,14 +1,15 @@
 import { Guid } from 'guid-typescript';
 import { CtrRef } from '@/script/types/CtrRef';
 import { LogError } from '@/script/modules/Logger';
+import { IBlueprint } from '@/script/interfaces/IBlueprint';
 
-export class Blueprint {
-	public partitionGuid: Guid;
+export class Blueprint implements IBlueprint {
 	public instanceGuid: Guid;
-	public typeName: string;
 	public name: string;
-	private variations: any;
-	private favorited = false;
+	public partitionGuid: Guid;
+	public typeName: string;
+	public variations: any;
+	public favorited = false;
 
 	constructor(partitionGuid: Guid, instanceGuid: Guid, typeName: string, name: string, variations: any) {
 		this.partitionGuid = partitionGuid;

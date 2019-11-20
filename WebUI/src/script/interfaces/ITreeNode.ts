@@ -4,6 +4,7 @@ export interface ITreeNode {
 	id: string;
 	name: string;
 	type: string;
+	path: string;
 	children?: ITreeNode[];
 	state?: ITreeNodeState;
 	content?: any[];
