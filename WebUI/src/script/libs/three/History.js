@@ -3,6 +3,8 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { signals } from '../../modules/Signals';
+
 export default class History {
 	constructor(editor) {
 		this.editor = editor;
@@ -50,7 +52,7 @@ export default class History {
 		// clearing all the redo-commands
 
 		this.redos = [];
-		signals.historyChanged.dispatch(cmd);
+		signals.historyChanged.emit(cmd);
 	}
 
 	undo() {
@@ -67,7 +69,7 @@ export default class History {
 		if (cmd !== undefined) {
 			cmd.undo();
 			this.redos.push(cmd);
-			signals.historyChanged.dispatch(cmd);
+			signals.historyChanged.emit(cmd);
 		}
 
 		return cmd;
@@ -87,7 +89,7 @@ export default class History {
 		if (cmd !== undefined) {
 			cmd.execute();
 			this.undos.push(cmd);
-			signals.historyChanged.dispatch(cmd);
+			signals.historyChanged.emit(cmd);
 		}
 
 		return cmd;
@@ -141,7 +143,7 @@ export default class History {
 		}
 
 		// Select the last executed undo-command
-		signals.historyChanged.dispatch(this.undos[ this.undos.length - 1 ]);
+		signals.historyChanged.emit(this.undos[ this.undos.length - 1 ]);
 	}
 
 	clear() {
@@ -149,7 +151,7 @@ export default class History {
 		this.redos = [];
 		this.idCounter = 0;
 
-		signals.historyChanged.dispatch();
+		signals.historyChanged.emit();
 	}
 
 	goToState(id) {
@@ -179,7 +181,7 @@ export default class History {
 
 		signals.historyChanged.active = true;
 
-		signals.historyChanged.dispatch(cmd);
+		signals.historyChanged.emit(cmd);
 	}
 
 	enableSerialization(id) {
