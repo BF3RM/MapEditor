@@ -7,7 +7,7 @@
 				<gl-col>
 					<gl-row>
 						<gl-col>
-							<PlaceholderComponent title="Hierarchy"/>
+							<HierarchyComponent title="Hierarchy"/>
 						</gl-col>
 						<gl-col>
 							<gl-row>
@@ -41,8 +41,9 @@ import './style/style.scss';
 
 import ViewportComponent from '@/script/components/ViewportComponent.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
+import HierarchyComponent from '@/script/components/HierarchyComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title!: string;
