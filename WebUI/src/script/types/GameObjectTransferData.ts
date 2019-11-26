@@ -86,7 +86,17 @@ export class GameObjectTransferData {
 				scope[key] = value;
 				break;
 			}
+			case 'typeName':
+			case 'name':
+				scope[key] = value as string;
+				break;
+			case 'variation':
+				scope[key] = value as number;
+				break;
 			default:
+				// Sue me
+				console.log('Unhandled: ' + key);
+				(scope as any)[key] = value;
 				break;
 			}
 		});
