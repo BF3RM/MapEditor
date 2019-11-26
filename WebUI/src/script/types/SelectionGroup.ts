@@ -65,15 +65,15 @@ export class SelectionGroup extends GameObject {
 	public updateTransform() {
 		const matrix = new THREE.Matrix4();
 		matrix.set(
-			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x, 0,
-			this.transform.left.y, this.transform.up.y, this.transform.forward.y, this.transform.trans.y, 0,
-			this.transform.left.z, this.transform.up.z, this.transform.forward.z, this.transform.trans.z, 0,
-			1);
+			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x,
+			this.transform.left.y, this.transform.up.y, this.transform.forward.y, this.transform.trans.y,
+			this.transform.left.z, this.transform.up.z, this.transform.forward.z, this.transform.trans.z,
+			0, 0, 0, 1);
 
 		// To move the group without moving the children we have to detach them first
 		const temp = [];
 
-		for (let i = this.children.length - 1; i >= 0; i--) {
+S		for (let i = this.children.length - 1; i >= 0; i--) {
 			// TODO: matrix should be calculated here doing the average of all children's positions, maybe
 			temp[i] = this.children[i];
 			this.DetachObject(this.children[i]);
