@@ -46,7 +46,7 @@ import HierarchyComponent from '@/script/components/HierarchyComponent.vue';
 @Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent } })
 export default class App extends Vue {
 	@Prop()
-	public title!: string;
+	public title: string;
 
 	private onInitialised() {
 		const scrollables = document.getElementsByClassName('scrollable');

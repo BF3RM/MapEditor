@@ -9,7 +9,7 @@ import EditorComponent from './EditorComponent.vue';
 
 @Component
 export default class PlaceholderComponent extends EditorComponent {
-	@Prop() public title!: string;
+	@Prop() public title: string;
 	constructor() {
 		super();
 	}

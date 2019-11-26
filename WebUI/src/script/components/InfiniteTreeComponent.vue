@@ -22,91 +22,65 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import Vue from 'vue';
-import InfiniteTree from 'infinite-tree';
-import Node from 'flattree';
+import { InfiniteTree } from 'infinite-tree';
+import { Node } from 'flattree';
 
-const lcfirst = (str) => {
+const lcfirst = (str: string) => {
 	str += '';
 	return str.charAt(0).toLowerCase() + str.substr(1);
 };
 
 @Component({ components: { RecycleScroller } })
 export default class InfiniteTreeComponent extends Vue {
-	@Prop() search;
-	@Prop({ default: 'scroll-box' }) className;
-	@Prop() autoOpen:boolean;
-	@Prop() selectable;
-	@Prop({ default: 1 }) tabIndex;
-	@Prop([Array, Object]) data;
-	@Prop({ default: 32 }) rowHeight;
-	@Prop(Function) loadNodes;
+	get filteredNodes() {
+		const scope = (this as InfiniteTreeComponent);
+		if (scope.tree === undefined || scope.tree.nodes === undefined) {
+			return [];
+		}
+		return scope.tree.nodes.filter((node) => !node.state.filtered === false);
+	}
+
+	@Prop() search: string;
+	@Prop({ default: 'scroll-box' }) className: string;
+	@Prop() autoOpen: boolean;
+	@Prop() selectable: boolean;
+	@Prop({ default: 1 }) tabIndex: number;
+	@Prop([Array, Object]) data: any;
+	@Prop({ default: 32 }) rowHeight: number;
+	@Prop(Function) loadNodes: boolean;
 
 	@Prop({
 		type: Function,
-		default: (node) => (node) => {
-			if (!node || (node === this.tree.getSelectedNode())) {
+		default: (node:Node) => () => {
+			if (!node || (node === (this as InfiniteTreeComponent).tree.getSelectedNode())) {
 				return false; // Prevent from deselecting the current node
 			}
 			return true;
 		}
 	})
-	shouldSelectNode: Function;
-
-	get filteredNodes() {
-		if (this.tree === undefined || this.tree.nodes === undefined) {
-			return [];
-		}
-		return this.tree.nodes.filter((node) => !node.state.filtered === false);
-	}
+	shouldSelectNode: void;
 
 	// Callback invoked before updating the tree.
-	@Prop(Function) onContentWillUpdate;
+	@Prop(Function) onContentWillUpdate: void;
 
 	// Callback invoked when the tree is updated.
-	@Prop(Function) onContentDidUpdate;
+	@Prop(Function) onContentDidUpdate: void;
 	// Callback invoked when a node is opened.
-	@Prop(Function) onOpenNode;
+	@Prop(Function) onOpenNode: void;
 	// Callback invoked when a node is closed.
-	@Prop(Function) onCloseNode;
+	@Prop(Function) onCloseNode: void;
 	// Callback invoked when a node is selected or deselected.
-	@Prop(Function) onSelectNode;
+	@Prop(Function) onSelectNode: void;
 	// Callback invoked before opening a node.
-	@Prop(Function) onWillOpenNode;
+	@Prop(Function) onWillOpenNode: void;
 	// Callback invoked before closing a node.
-	@Prop(Function) onWillCloseNode;
+	@Prop(Function) onWillCloseNode: void;
 	// Callback invoked before selecting or deselecting a node.
-	@Prop(Function) onWillSelectNode;
-	@Prop(Function) onKeyUp;
-	@Prop(Function) onKeyDown;
-	@Prop(Function) onMouseLeave;
-	@Prop(Function) onMouseEnter;
-
-	@Prop({
-		default: () => () => {
-			return true;
-		}
-	})
-
-	@Prop({ default: [] }) data: Node[];
-
-	@Watch('data', {
-		deep: true
-	})
-
-	onDataChage(newData: Node) {
-		console.log('sup');
-		if (!this.loaded) {
-			this.tree.loadData(newData);
-			this.loaded = true;
-		}
-	}
-
-	@Watch('search', {
-		deep: false,
-		default: (searchString: string) => {
-			this.tree.filter(searchString);
-		}
-	})
+	@Prop(Function) onWillSelectNode: void;
+	@Prop(Function) onKeyUp: void;
+	@Prop(Function) onKeyDown: void;
+	@Prop(Function) onMouseLeave: void;
+	@Prop(Function) onMouseEnter: void;
 
 	tree: InfiniteTree = new InfiniteTree({
 		el: this.$refs.tree,
@@ -130,6 +104,26 @@ export default class InfiniteTreeComponent extends Vue {
 
 	inheritAttrs: boolean = false;
 	loaded: boolean = false;
+
+	@Watch('data', {
+		deep: true
+	})
+
+	onDataChage(newData: Node) {
+		console.log('sup');
+		if (!this.loaded) {
+			this.tree.loadData(newData);
+			this.loaded = true;
+		}
+	}
+
+	@Watch('search', {
+		deep: false
+	})
+	onSearch(searchString: string) {
+		console.log(searchString);
+		this.tree.filter(searchString);
+	}
 
 	mounted() {
 		// Updates the tree.		  this.tree.update = () => {
@@ -168,6 +162,7 @@ export default class InfiniteTreeComponent extends Vue {
 		}
 	}
 }
+
 </script>
 <style scoped>
   .scroll-box {

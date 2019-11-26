@@ -7,8 +7,8 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 @Component
 export default class Highlighter extends Vue {
-	@Prop(String) private text!: string;
-	@Prop(String) private search!: string;
+	@Prop(String) private text: string;
+	@Prop(String) private search: string;
 
 	private highlight() {
 		if (!this.search) {

@@ -37,11 +37,11 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 @Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem } })
 export default class ListComponent extends EditorComponent {
-	@Prop() public title!: string;
-	@Prop(Array) public list!: Array<{name: string}>;
-	@Prop(String) public keyField!: string;
-	@Prop(Array) public headers!: string[];
-	@Prop(Function) public click!: void;
+	@Prop() public title: string;
+	@Prop(Array) public list: Array<{name: string}>;
+	@Prop(String) public keyField: string;
+	@Prop(Array) public headers: string[];
+	@Prop(Function) public click: void;
 	public data: {
 		search: string,
 	} = {

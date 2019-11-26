@@ -4,6 +4,10 @@
     "tslint:recommended"
   ],
   "linterOptions": {
+    "include": [
+      "src//*.ts",
+      "src//*.vue"
+    ],
     "exclude": [
       "node_modules/**",
       "src/**/*.js",
@@ -22,6 +26,7 @@
     "no-var-requires": false,
     "max-line-length": false,
     "trailing-comma": false,
-    "quote-props": false
+    "quote-props": false,
+    "member-access": false
   }
 }

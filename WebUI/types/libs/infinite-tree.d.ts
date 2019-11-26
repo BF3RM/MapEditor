@@ -1,7 +1,7 @@
 /// <reference types="node" />
 declare module 'infinite-tree' {
 	import { Node } from 'flattree';
-	export default class InfiniteTree {
+	export class InfiniteTree {
 		public options: IInfiniteTreeOptions;
 		public nodes: Node[];
 		public rows: any[];

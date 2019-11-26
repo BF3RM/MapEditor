@@ -62,7 +62,7 @@ export default class HierarchyComponent extends EditorComponent {
 	} as ITreeNode);
 
 	private list: Blueprint[] = [];
-	private selected!: TreeNode | null;
+	private selected: TreeNode | null;
 
 	private search: string = '';
 
