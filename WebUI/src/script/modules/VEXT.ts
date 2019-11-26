@@ -130,7 +130,11 @@ export default class VEXTInterface {
 	public HandleResponse(commandActionResultsString: string, emulator: boolean) {
 		const scope = this;
 		scope.executing = true;
-		const commandActionResults = JSON.parse(commandActionResultsString) as CommandActionResult[];
+		const CARR = JSON.parse(commandActionResultsString) as object[];
+		const commandActionResults = [] as CommandActionResult[];
+		CARR.forEach((obj:Object) => {
+			commandActionResults.push(CommandActionResult.FromObject(obj));
+		});
 		let index = 0;
 
 		window.Log(LOGLEVEL.VERBOSE, 'IN: ');

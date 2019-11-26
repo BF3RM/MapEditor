@@ -5,17 +5,17 @@ export class CommandActionResult {
 	public sender: string;
 	public gameObjectTransferData: any;
 
-	constructor(type: string, name: string, payload: any) {
+	constructor(type: string, name: string, gameObjectTransferData: GameObjectTransferData) {
 		this.type = type;
 		this.sender = name;
-		this.gameObjectTransferData = new GameObjectTransferData().setFromTable(payload);
+		this.gameObjectTransferData = gameObjectTransferData;
 	}
 
-	public setFromTable(table: any) {
-		this.type = table.type;
-		this.sender = table.sender;
-		this.gameObjectTransferData = new GameObjectTransferData().setFromTable(table.gameObjectTransferData);
+	public static FromObject(table: any) {
+		const type = table.type;
+		const sender = table.sender;
+		const gameObjectTransferData = new GameObjectTransferData().setFromTable(table.gameObjectTransferData);
 
-		return this;
+		return new CommandActionResult(type, sender, gameObjectTransferData);
 	}
 }

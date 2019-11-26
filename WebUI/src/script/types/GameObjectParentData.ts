@@ -13,12 +13,12 @@ export class GameObjectParentData {
 		this.partitionGuid = partitionGuid;
 	}
 
-	public setFromTable(table: any) {
-		this.guid = table.guid;
-		this.typeName = table.typeName;
-		this.primaryInstanceGuid = table.primaryInstanceGuid;
-		this.partitionGuid = table.partitionGuid;
+	public static FromTable(table: any) {
+		const guid = Guid.parse(table.guid);
+		const typeName = table.typeName;
+		const primaryInstanceGuid = Guid.parse(table.primaryInstanceGuid);
+		const partitionGuid = Guid.parse(table.partitionGuid);
 
-		return this;
+		return new GameObjectParentData(guid, typeName, primaryInstanceGuid, partitionGuid);
 	}
 }

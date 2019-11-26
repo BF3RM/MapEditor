@@ -4,7 +4,7 @@ import { GameObjectParentData } from '@/script/types/GameObjectParentData';
 import { GameEntityData } from '@/script/types/GameEntityData';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { Guid } from 'guid-typescript';
-import { AABB } from '@/script/types/AABB';
+import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 
 export class GameObjectTransferData {
 	public guid: any;
@@ -44,6 +44,10 @@ export class GameObjectTransferData {
 			let value = table[key];
 
 			switch (key) {
+			case 'guid':
+				value = Guid.parse(value);
+				scope[key] = value;
+				break;
 			case 'blueprintCtrRef':
 				value = new CtrRef().setFromTable(value);
 				scope[key] = value;
@@ -54,7 +58,7 @@ export class GameObjectTransferData {
 
 				break;
 			case 'parentData':
-				value = new GameObjectParentData(table.guid, table.typeName, Guid.parse(table.primaryInstanceGuid), Guid.parse(table.partitionGuid));
+				value = GameObjectParentData.FromTable(table.parentData);
 				scope[key] = value;
 
 				break;
@@ -62,15 +66,24 @@ export class GameObjectTransferData {
 				const gameEntities: GameEntityData[] = [];
 				Object.keys(value).forEach((index) => {
 					const gameEntityDataTable = value[index];
+					let transform = gameEntityDataTable.transform;
+					if (transform !== undefined) {
+						transform = new LinearTransform().setFromTable(gameEntityDataTable.transform);
+					}
+					let AABB = gameEntityDataTable.aabb;
+					if (AABB !== undefined) {
+						AABB = AxisAlignedBoundingBox.FromTable(AABB);
+					}
 					gameEntities.push(new GameEntityData(gameEntityDataTable.instanceId,
 						gameEntityDataTable.indexInBlueprint,
 						gameEntityDataTable.typeName,
 						gameEntityDataTable.isSpatial,
-						new LinearTransform().setFromTable(gameEntityDataTable.transform),
-						new AABB(gameEntityDataTable.aabb.min, gameEntityDataTable.aabb.max, gameEntityDataTable.aabb.transform)));
+						transform,
+						AABB));
 				});
 
 				value = gameEntities;
+				scope[key] = value;
 				break;
 			}
 			default:

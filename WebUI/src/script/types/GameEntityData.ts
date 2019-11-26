@@ -1,5 +1,5 @@
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
-import { AABB } from '@/script/types/AABB';
+import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 
 export class GameEntityData {
 	public instanceId: number;
@@ -7,7 +7,7 @@ export class GameEntityData {
 	public typeName: string;
 	public isSpatial: boolean;
 	public transform: LinearTransform;
-	public aabb: AABB;
+	public aabb: AxisAlignedBoundingBox;
 
 	constructor(instanceId: number, indexInBlueprint: number, typeName: string, isSpatial: boolean, transform: LinearTransform, aabb: AABB) {
 		this.instanceId = instanceId;
@@ -25,7 +25,7 @@ export class GameEntityData {
 		this.isSpatial = table.isSpatial;
 		if (table.isSpatial) {
 			this.transform = new LinearTransform().setFromTable(table.transform);
-			this.aabb = new AABB(table.aabb.min, table.aabb.max, table.aabb.transform);
+			this.aabb = AxisAlignedBoundingBox.FromTable(table.aabb);
 		}
 		return this;
 	}

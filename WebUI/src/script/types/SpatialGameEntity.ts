@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { AABB } from '@/script/types/AABB';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 
 export class SpatialGameEntity extends THREE.Mesh {
 	private aabb: THREE.LineSegments;
@@ -8,7 +8,7 @@ export class SpatialGameEntity extends THREE.Mesh {
 	private transform: LinearTransform;
 	private box: THREE.Box3;
 
-	constructor(instanceId: number, transform: LinearTransform, aabb: AABB) {
+	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox) {
 		const pointsGeom = new THREE.Geometry();
 		pointsGeom.vertices.push(
 			aabb.min,
