@@ -1,11 +1,11 @@
 <template>
 	<gl-col>
-		<gl-component id="explorer-component">
+		<gl-component id="explorer-component" :title="title">
 			<div class="header">
-				<input type="text" v-model="search">
+				<input type="text" v-model="search" placeholder="Search">
 			</div>
 			<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-				<template slot-scope="{ node, index, tree, active }">
+				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
 					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
 						<div class="expand" @click="ToggleNode($event,node,tree)">
 							<div v-if="node.state.open && node.children.length > 0">
@@ -17,7 +17,7 @@
 						</div>
 						<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
 						<span v-else>
-							{{ node.name }} - {{ node.content.length }}
+							{{ node.name }}
 						</span>
 					</div>
 				</template>
@@ -25,7 +25,7 @@
 		</gl-component>
 		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">
 			<template slot-scope="{ item, data }">
-				<Highlighter class="td" :text="cleanPath(item.name)" :search="data.search"/><div class="td">{{item.typeName}}</div>
+				<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
 			</template>
 		</ListComponent>
 	</gl-col>
@@ -35,46 +35,39 @@
 import { Component, Prop } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
-import { ITreeNode } from '../interfaces/ITreeNode';
-import { signals } from '../modules/Signals';
-import { Blueprint } from '../types/Blueprint';
-import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '../modules/Utils';
+import { signals } from '@/script/modules/Signals';
+import { Blueprint } from '@/script/types/Blueprint';
+import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import { Guid } from 'guid-typescript';
-import { TreeNode } from '../types/TreeNode';
 import Highlighter from './widgets/Highlighter.vue';
-import ListComponent from './ListComponent.vue';
-import { InfiniteTree } from 'infinite-tree';
+import ListComponent from '@/script/components/ListComponent.vue';
+import { InfiniteTree, Node, INode } from 'infinite-tree';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 
 export default class HierarchyComponent extends EditorComponent {
-	private tree: InfiniteTree | null = null;
-	private data: TreeNode = new TreeNode({
+	@Prop() public title: string;
+	private data: INode = {
 		'type': 'folder',
 		'name': 'Venice',
 		'id': 'Venice',
-		'path': '/',
-		'state': {
-			'opened': true,
-			'selected': true,
-			'depth': 0
-		}
-	} as ITreeNode);
+		'children': []
+	};
 
 	private list: Blueprint[] = [];
-	private selected: TreeNode | null;
+	private selected: Node | null;
 
 	private search: string = '';
 
 	constructor() {
 		super();
+		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
 	}
 
 	public mounted() {
-		this.tree = (this.$refs.tree as any).tree as InfiniteTree;
 	}
 
-	public ToggleNode(e: MouseEvent, node: TreeNode, tree: InfiniteTree) {
+	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
 			tree.openNode(node);
@@ -83,41 +76,47 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 	}
 
-	public SelectNode(e: MouseEvent, node: TreeNode, tree: InfiniteTree) {
+	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		tree.selectNode(node);
 	}
 
 	private onBlueprintRegistered(blueprints: Blueprint[]) {
-		const data: TreeNode = new TreeNode({
+		const data: INode = {
 			'id': 'root',
 			'type': 'folder',
 			'name': 'Venice',
-			'path': '/',
-			'state': {
-				'opened': true,
-				'depth': 0
-			},
-			'children:': []
-		} as ITreeNode);
+			'children': []
+		};
 		// TODO: Make sure this works after the new blueprint shit.
 		for (const instance of blueprints) {
 			const path = instance.name;
 			const paths = getPaths(path);
-			let parentPath: TreeNode = data;
+			let parentPath: INode = data;
 			const fileName = getFilename(path);
 			let currentPath = '';
 			paths.forEach((subPath) => {
 				currentPath += subPath + '/';
+				if (parentPath === undefined) {
+					console.error('Missing parent path?');
+				}
+				if (parentPath.children === undefined) {
+					console.error('Missing child field?');
+					return;
+				}
 				const parentIndex = parentPath.children.find((x) => x.name.toLowerCase() === subPath.toLowerCase());
 				if (parentIndex === undefined) {
-					const a = parentPath.children.push(new TreeNode({
+					const a = parentPath.children.push({
 						'id': Guid.create().toString(),
 						'name': subPath,
 						'type': 'folder',
-						'path': currentPath,
-						'children': []
-					} as ITreeNode));
-					parentPath = parentPath.children[a - 1];
+						'children': [],
+						'path': currentPath
+					});
+					if (parentPath.children[a - 1] !== undefined) {
+						parentPath = parentPath.children[a - 1];
+					} else {
+						console.error('Missing parent path');
+					}
 				} else {
 					parentPath = parentIndex;
 					// Sometimes the object is referenced lowercase. If we have a string that has uppercase letters, we can assume it's correct.
@@ -127,18 +126,24 @@ export default class HierarchyComponent extends EditorComponent {
 					}
 				}
 			});
+			if (parentPath.content === undefined) {
+				parentPath.content = [];
+			}
 			parentPath.content.push(instance);
 		}
 		this.data = data;
 	}
 
-	private nodeStyle(node: TreeNode) {
+	private nodeStyle(node: Node) {
+		if (node.state === undefined) {
+			console.error('Missing node state: ' + node);
+		}
 		return {
 			'margin-left': (node.state.depth * 18).toString() + 'px'
 		};
 	}
 
-	private toggleState(node: TreeNode) {
+	private toggleState(node: Node) {
 		const hasChildren = node.children.length > 0;
 		let toggleState = '';
 		if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
@@ -150,7 +155,7 @@ export default class HierarchyComponent extends EditorComponent {
 		return toggleState;
 	}
 
-	private onSelectNode(node: TreeNode) {
+	private onSelectNode(node: Node) {
 		console.log('onSelect');
 
 		if (node === null) {
@@ -158,12 +163,22 @@ export default class HierarchyComponent extends EditorComponent {
 			this.selected = null;
 			return;
 		}
-		this.selected = node;
 		this.list = this.getBlueprintsRecursive(node);
+		if (this.selected) {
+			this.selected.state.selected = false;
+		}
+		this.selected = node;
+		this.selected.state.selected = true;
+		this.$set(node.state, 'enabled', true);
+		console.log(node);
 	}
 
-	private getBlueprintsRecursive(node: TreeNode): Blueprint[] {
-		let list: Blueprint[] = node.content;
+	private getBlueprintsRecursive(node: Node): Blueprint[] {
+		let list: Blueprint[] = node.content as Blueprint[];
+		if (list === undefined) {
+			list = [];
+		}
+
 		node.children.forEach((child) => {
 			list = list.concat(this.getBlueprintsRecursive(child));
 		});
@@ -177,7 +192,7 @@ export default class HierarchyComponent extends EditorComponent {
 		return path.replace(this.selected.path, '');
 	}
 
-	private shouldSelectNode(node: TreeNode) {
+	private shouldSelectNode(node: Node) {
 		console.log('ShouldSelect');
 		return true;
 	}

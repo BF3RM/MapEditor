@@ -1,6 +1,69 @@
-/// <reference types="node" />
 declare module 'infinite-tree' {
-	import { Node } from 'flattree';
+	export interface INode {
+		id: string;
+		type: string;
+		name: string;
+		state?: INodeState;
+		children?: INode[];
+		content?: any[];
+		path?: string;
+	}
+	export interface INodeState {
+		selected: boolean;
+		depth: number;
+		open: boolean;
+		path: string;
+		prefixMask: string;
+		total: number;
+		filtered: boolean;
+	}
+
+	export class Node implements INode {
+		public id: string;
+		public type: string;
+		public name: string;
+		public parent: Node;
+		public children: Node[];
+		public state: INodeState;
+		public loadOnDemand: boolean;
+		public content: any[];
+		public path: string;
+
+		constructor(node: INode);
+
+		public contains(node: Partial<Node>): boolean;
+
+		public getChildAt(index: number): Node;
+
+		public getChildren(): Node;
+
+		public getFirstChild(): Node;
+
+		public getLastChild(): Node;
+
+		public getNextSibling(): Node;
+
+		public getParent(): Node;
+
+		public getPreviousSibling(): Node;
+
+		public hasChildren(): boolean;
+
+		public isLastChild(): boolean;
+
+	}
+	export interface IInfiniteTreeOptions {
+		autoOpen: boolean;
+		droppable: boolean;
+		shouldLoadNodes: boolean;
+		loadNodes: boolean;
+		selectable: boolean;
+		shouldSelectNode: boolean;
+
+		// When el is not specified, the tree will run in the stealth mode
+		el: any;
+	}
+
 	export class InfiniteTree {
 		public options: IInfiniteTreeOptions;
 		public nodes: Node[];
@@ -238,18 +301,6 @@ declare module 'infinite-tree' {
 
 		// Destroys the tree
 		public destroy(): void;
-	}
-
-	export interface IInfiniteTreeOptions {
-		autoOpen: boolean;
-		droppable: boolean;
-		shouldLoadNodes: boolean;
-		loadNodes: boolean;
-		selectable: boolean;
-		shouldSelectNode: boolean;
-
-		// When el is not specified, the tree will run in the stealth mode
-		el: any;
 	}
 }
 

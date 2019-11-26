@@ -65,6 +65,9 @@ export default class ListComponent extends EditorComponent {
 
 	private filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
+		if (this.list === undefined) {
+			return [];
+		}
 		return this.list.filter((i) => i.name.toLowerCase().includes(lowerCaseSearch));
 	}
 }
