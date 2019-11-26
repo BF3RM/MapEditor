@@ -227,7 +227,6 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public onSelected() {
-		console.log(this);
 		if (!this.enabled) {
 			window.LogError('Attempted to select a disabled gameObject');
 			return;

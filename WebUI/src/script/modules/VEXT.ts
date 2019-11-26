@@ -128,7 +128,6 @@ export default class VEXTInterface {
 	}
 
 	public HandleResponse(commandActionResultsString: string, emulator: boolean) {
-		console.log(commandActionResultsString);
 		const scope = this;
 		scope.executing = true;
 		const commandActionResults = JSON.parse(commandActionResultsString) as CommandActionResult[];

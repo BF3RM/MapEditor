@@ -75,7 +75,9 @@ export class SpatialGameEntity extends THREE.Mesh {
 		const parent = this.parent;
 
 		// remove child from parent and add it to scene
-		editor.threeManager.scene.attach(this);
+		if (parent !== null) {
+			editor.threeManager.scene.attach(this);
+		}
 
 		matrix.decompose(this.position, this.quaternion, this.scale);
 
