@@ -17,149 +17,130 @@
   </RecycleScroller>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+import Vue from 'vue';
 import InfiniteTree from 'infinite-tree';
+import Node from 'flattree';
 
 const lcfirst = (str) => {
 	str += '';
 	return str.charAt(0).toLowerCase() + str.substr(1);
 };
-export default {
-	name: 'InfiniteTreeComponent',
-	components: {
-		RecycleScroller
-	},
-	props: {
-		search: {
-			type: String,
-			default: ''
-		},
-		className: {
-			type: String,
-			default: 'scroll-box'
-		},
-		autoOpen: {
-			type: Boolean,
-			default: false
-		},
-		selectable: {
-			type: Boolean,
-			default: true
-		},
-		tabIndex: {
-			type: Number,
-			default: 1
-		},
-		data: {
-			type: [Array, Object],
-			default: () => {
-				return [];
+
+@Component({ components: { RecycleScroller } })
+export default class InfiniteTreeComponent extends Vue {
+	@Prop() search;
+	@Prop({ default: 'scroll-box' }) className;
+	@Prop() autoOpen:boolean;
+	@Prop() selectable;
+	@Prop({ default: 1 }) tabIndex;
+	@Prop([Array, Object]) data;
+	@Prop({ default: 32 }) rowHeight;
+	@Prop(Function) loadNodes;
+
+	@Prop({
+		type: Function,
+		default: (node) => (node) => {
+			if (!node || (node === this.tree.getSelectedNode())) {
+				return false; // Prevent from deselecting the current node
 			}
-		},
-		rowHeight: {
-			type: Number,
-			default: 32
-		},
-		loadNodes: {
-			type: Function,
-			default: () => {
-				// Comment to stop the linter from complaining
-			}
-		},
-		shouldSelectNode: {
-			type: Function,
-			default: (node) => {
-				if (!node || (node === this.tree.getSelectedNode())) {
-					return false; // Prevent from deselecting the current node
-				}
-				return true;
-			}
-		},
-		shouldLoadNodes: {
-			type: Function,
-			default: (node) => {
-				return !node.hasChildren() && node.loadOnDemand;
-			}
-		},
-		// Callback invoked before updating the tree.
-		onContentWillUpdate: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked when the tree is updated.
-		onContentDidUpdate: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked when a node is opened.
-		onOpenNode: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked when a node is closed.
-		onCloseNode: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked when a node is selected or deselected.
-		onSelectNode: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked before opening a node.
-		onWillOpenNode: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked before closing a node.
-		onWillCloseNode: {
-			type: Function,
-			default: null
-		},
-
-		// Callback invoked before selecting or deselecting a node.
-		onWillSelectNode: {
-			type: Function,
-			default: null
-		},
-		onKeyUp: {
-			type: Function,
-			default: null
-		},
-		onKeyDown: {
-			type: Function,
-			default: null
-		},
-		onMouseLeave: {
-			type: Function,
-			default: null
-		},
-		onMouseEnter: {
-			type: Function,
-			default: null
+			return true;
 		}
-	},
+	})
+	shouldSelectNode: Function;
+
+	get filteredNodes() {
+		if (this.tree === undefined || this.tree.nodes === undefined) {
+			return [];
+		}
+		return this.tree.nodes.filter((node) => !node.state.filtered === false);
+	}
+
+	// Callback invoked before updating the tree.
+	@Prop(Function) onContentWillUpdate;
+
+	// Callback invoked when the tree is updated.
+	@Prop(Function) onContentDidUpdate;
+	// Callback invoked when a node is opened.
+	@Prop(Function) onOpenNode;
+	// Callback invoked when a node is closed.
+	@Prop(Function) onCloseNode;
+	// Callback invoked when a node is selected or deselected.
+	@Prop(Function) onSelectNode;
+	// Callback invoked before opening a node.
+	@Prop(Function) onWillOpenNode;
+	// Callback invoked before closing a node.
+	@Prop(Function) onWillCloseNode;
+	// Callback invoked before selecting or deselecting a node.
+	@Prop(Function) onWillSelectNode;
+	@Prop(Function) onKeyUp;
+	@Prop(Function) onKeyDown;
+	@Prop(Function) onMouseLeave;
+	@Prop(Function) onMouseEnter;
+
+	@Prop({
+		default: () => () => {
+			return true;
+		}
+	})
+
+	@Prop({ default: [] }) data: Node[];
+
+	@Watch('data', {
+		deep: true
+	})
+
+	onDataChage(newData: Node) {
+		console.log('sup');
+		if (!this.loaded) {
+			this.tree.loadData(newData);
+			this.loaded = true;
+		}
+	}
+
+	@Watch('search', {
+		deep: false,
+		default: (searchString: string) => {
+			this.tree.filter(searchString);
+		}
+	})
+
+	tree: InfiniteTree = new InfiniteTree({
+		el: this.$refs.tree,
+		...this.$props
+	});
+
+	eventHandlers = {
+		onContentWillUpdate: null,
+		onContentDidUpdate: null,
+		onOpenNode: null,
+		onCloseNode: null,
+		onSelectNode: null,
+		onWillOpenNode: null,
+		onWillCloseNode: null,
+		onWillSelectNode: null,
+		onKeyUp: null,
+		onKeyDown: null,
+		onMouseEnter: null,
+		onMouseLeave: null
+	};
+
+	inheritAttrs: boolean = false;
+	loaded: boolean = false;
+
 	mounted() {
+		// Updates the tree.		  this.tree.update = () => {
 		this.tree = new InfiniteTree({
 			el: this.$refs.tree,
 			...this.$props
 		});
-		// Updates the tree.
-		this.tree.update = () => {
-			this.tree.emit('contentWillUpdate');
-			this.nodes = this.tree.nodes;
-			this.$nextTick(function() {
-				this.tree.emit('contentDidUpdate');
-			});
-		};
+		this.tree.emit('contentWillUpdate');
+		this.$nextTick(function() {
+			this.tree.emit('contentDidUpdate');
+		});
 		Object.keys(this.eventHandlers).forEach((key) => {
 			if (!this[key]) {
 				return;
@@ -169,7 +150,8 @@ export default {
 			this.eventHandlers[key] = this[key];
 			this.tree.on(eventName, this.eventHandlers[key]);
 		});
-	},
+	}
+
 	beforeDestroy() {
 		Object.keys(this.eventHandlers).forEach((key) => {
 			if (!this.eventHandlers[key]) {
@@ -184,56 +166,8 @@ export default {
 			this.tree.destroy();
 			this.tree = null;
 		}
-	},
-	inheritAttrs: false,
-	loaded: false,
-	data() {
-		return {
-			nodes: [],
-			tree: {
-				nodes: []
-			},
-			eventHandlers: {
-				onContentWillUpdate: null,
-				onContentDidUpdate: null,
-				onOpenNode: null,
-				onCloseNode: null,
-				onSelectNode: null,
-				onWillOpenNode: null,
-				onWillCloseNode: null,
-				onWillSelectNode: null,
-				onKeyUp: null,
-				onKeyDown: null,
-				onMouseEnter: null,
-				onMouseLeave: null
-			}
-		};
-	},
-	computed: {
-		filteredNodes() {
-			const { search, tree } = this;
-			return tree.nodes.filter((node) => !node.state.filtered === false);
-		}
-	},
-	methods: {},
-	watch: {
-		data: {
-			handler(newValue) {
-				console.log(this.data);
-				if (!this.loaded) {
-					this.tree.loadData(newValue);
-					this.loaded = true;
-				}
-			},
-			deep: true
-		},
-		search: {
-			handler(newValue) {
-				this.tree.filter(newValue);
-			}
-		}
 	}
-};
+}
 </script>
 <style scoped>
   .scroll-box {

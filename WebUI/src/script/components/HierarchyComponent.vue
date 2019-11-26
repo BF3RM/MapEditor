@@ -43,7 +43,7 @@ import { Guid } from 'guid-typescript';
 import { TreeNode } from '../types/TreeNode';
 import Highlighter from './widgets/Highlighter.vue';
 import ListComponent from './ListComponent.vue';
-import { InfiniteTree } from '../../../types/libs/InfiniteTree';
+import { InfiniteTree } from 'infinite-tree';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 

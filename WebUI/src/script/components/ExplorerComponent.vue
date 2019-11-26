@@ -35,7 +35,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
-import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import { ITreeNode } from '@/script/interfaces/ITreeNode';
 import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
@@ -44,6 +43,7 @@ import { Guid } from 'guid-typescript';
 import { TreeNode } from '@/script/types/TreeNode';
 import Highlighter from './widgets/Highlighter.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
+import { InfiniteTree } from 'infinite-tree';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 

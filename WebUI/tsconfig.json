@@ -12,7 +12,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "baseUrl": ".",
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": ["node_modules/@types", "types"],
     "types": [
       "webpack-env",
       "JQuery"

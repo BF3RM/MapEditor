@@ -11,9 +11,9 @@
 
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
 import { TreeNode } from '@/script/types/TreeNode';
-import { InfiniteTree } from '../../../types/libs/InfiniteTree';
 import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
 import { ITreeNode } from '@/script/interfaces/ITreeNode';
+import { InfiniteTree } from 'infinite-tree';
 
 const generate = (size = 1000) => {
 	const data = [];
