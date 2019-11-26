@@ -26,7 +26,6 @@ import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
-import { SceneUtils } from 'three';
 import { LOGLEVEL } from '@/script/modules/Logger';
 import { GenerateBlueprints } from '@/script/modules/DebugData';
 
@@ -421,7 +420,7 @@ export default class Editor {
 			} else {
 				if (!this.gameObjects.getValue(parentGuid) === undefined) {
 					const parent = this.gameObjects.getValue(parentGuid) as GameObject;
-					SceneUtils.attach(gameObject, scope.threeManager.scene, parent);
+					parent.attach(gameObject);
 				}
 			}
 
@@ -429,7 +428,7 @@ export default class Editor {
 				const missingParent = this.missingParent.getValue(gameObjectGuid);
 				if (missingParent !== undefined) {
 					missingParent.every((child) => {
-						SceneUtils.attach(child as THREE.Object3D, scope.threeManager.scene, gameObject);
+						gameObject.attach(child);
 					});
 				}
 

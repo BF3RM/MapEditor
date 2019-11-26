@@ -195,7 +195,7 @@ export class THREEManager {
 
 	public DeleteObject(gameObject: GameObject) {
 		if (gameObject.parent !== null) {
-			THREE.SceneUtils.detach(gameObject, gameObject.parent, this.scene);
+			this.scene.attach(gameObject);
 		}
 		this.scene.remove(gameObject);
 

@@ -1,4 +1,5 @@
 import { Signal } from 'typed-signals';
+import { CommandActionResult } from '@/script/types/CommandActionResult';
 
 export const signals = {
 	editor: {
@@ -14,7 +15,7 @@ export const signals = {
 
 	spawnBlueprintRequested: new Signal(),
 
-	spawnedBlueprint: new Signal(),
+	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),
 	blueprintSpawnInvoked: new Signal(),
 	destroyedBlueprint: new Signal(),
 

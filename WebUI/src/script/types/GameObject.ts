@@ -110,14 +110,14 @@ export class GameObject extends THREE.Object3D {
 
 		// remove child from parent and add it to scene
 		if (parent !== null) {
-			THREE.SceneUtils.detach(this, parent, editor.threeManager.scene);
+			editor.threeManager.scene.attach(this);
 		}
 
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
 		// remove child from scene and add it to parent
 		if (parent !== null) {
-			THREE.SceneUtils.attach(this, editor.threeManager.scene, parent);
+			parent.attach(this);
 		}
 	}
 
