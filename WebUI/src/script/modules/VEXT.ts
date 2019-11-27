@@ -131,7 +131,7 @@ export default class VEXTInterface {
 		const scope = this;
 		scope.executing = true;
 		const CARR = JSON.parse(commandActionResultsString) as object[];
-		const commandActionResults = [] as CommandActionResult[];
+		const commandActionResults: CommandActionResult[] = [];
 		CARR.forEach((obj:Object) => {
 			commandActionResults.push(CommandActionResult.FromObject(obj));
 		});

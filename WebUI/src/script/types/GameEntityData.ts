@@ -9,7 +9,7 @@ export class GameEntityData {
 	public transform: LinearTransform;
 	public aabb: AxisAlignedBoundingBox;
 
-	constructor(instanceId: number, indexInBlueprint: number, typeName: string, isSpatial: boolean, transform: LinearTransform, aabb: AABB) {
+	constructor(instanceId: number, indexInBlueprint: number, typeName: string, isSpatial: boolean, transform: LinearTransform, aabb: AxisAlignedBoundingBox) {
 		this.instanceId = instanceId;
 		this.indexInBlueprint = indexInBlueprint;
 		this.typeName = typeName;
@@ -18,15 +18,20 @@ export class GameEntityData {
 		this.aabb = aabb;
 	}
 
-	public setFromTable(table: any) {
-		this.instanceId = table.instanceId;
-		this.indexInBlueprint = table.indexInBlueprint;
-		this.typeName = table.typeName;
-		this.isSpatial = table.isSpatial;
-		if (table.isSpatial) {
-			this.transform = new LinearTransform().setFromTable(table.transform);
-			this.aabb = AxisAlignedBoundingBox.FromTable(table.aabb);
+	public static FromTable(gameEntityDataTable: any) {
+		let transform = gameEntityDataTable.transform;
+		if (transform !== undefined) {
+			transform = new LinearTransform().setFromTable(gameEntityDataTable.transform);
 		}
-		return this;
+		let AABB = gameEntityDataTable.aabb;
+		if (AABB !== undefined) {
+			AABB = AxisAlignedBoundingBox.FromTable(AABB);
+		}
+		return new GameEntityData(gameEntityDataTable.instanceId,
+			gameEntityDataTable.indexInBlueprint,
+			gameEntityDataTable.typeName,
+			gameEntityDataTable.isSpatial,
+			transform,
+			AABB);
 	}
 }

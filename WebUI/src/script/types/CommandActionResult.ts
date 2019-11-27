@@ -14,7 +14,7 @@ export class CommandActionResult {
 	public static FromObject(table: any) {
 		const type = table.type;
 		const sender = table.sender;
-		const gameObjectTransferData = new GameObjectTransferData().setFromTable(table.gameObjectTransferData);
+		const gameObjectTransferData = GameObjectTransferData.FromTable(table.gameObjectTransferData);
 
 		return new CommandActionResult(type, sender, gameObjectTransferData);
 	}

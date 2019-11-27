@@ -27,6 +27,7 @@
     "max-line-length": false,
     "trailing-comma": false,
     "quote-props": false,
-    "member-access": false
+    "member-access": false,
+    "member-ordering": false
   }
 }

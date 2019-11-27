@@ -35,72 +35,42 @@ export class GameObjectTransferData {
 		this.isEnabled = args.isEnabled;
 	}
 
-	public setFromTable(table: any) {
-		const scope = this;
+	public static FromTable(table: any) {
 		if (table.guid === undefined) {
 			LogError('Attempted to create a GameObjectTransferData without a specified GUID');
 		}
+		const gameEntities = [] as GameEntityData[];
+		const args: any[string] = [];
 		Object.keys(table).forEach((key) => {
 			let value = table[key];
 
 			switch (key) {
 			case 'guid':
 				value = Guid.parse(value);
-				scope[key] = value;
 				break;
 			case 'blueprintCtrRef':
 				value = new CtrRef().setFromTable(value);
-				scope[key] = value;
 				break;
 			case 'transform':
 				value = new LinearTransform().setFromTable(value);
-				scope[key] = value;
-
 				break;
 			case 'parentData':
 				value = GameObjectParentData.FromTable(table.parentData);
-				scope[key] = value;
-
 				break;
-			case 'gameEntities': {
-				const gameEntities: GameEntityData[] = [];
+			case 'gameEntities':
 				Object.keys(value).forEach((index) => {
 					const gameEntityDataTable = value[index];
-					let transform = gameEntityDataTable.transform;
-					if (transform !== undefined) {
-						transform = new LinearTransform().setFromTable(gameEntityDataTable.transform);
-					}
-					let AABB = gameEntityDataTable.aabb;
-					if (AABB !== undefined) {
-						AABB = AxisAlignedBoundingBox.FromTable(AABB);
-					}
-					gameEntities.push(new GameEntityData(gameEntityDataTable.instanceId,
-						gameEntityDataTable.indexInBlueprint,
-						gameEntityDataTable.typeName,
-						gameEntityDataTable.isSpatial,
-						transform,
-						AABB));
+					gameEntities.push(GameEntityData.FromTable(gameEntityDataTable));
 				});
-
 				value = gameEntities;
-				scope[key] = value;
-				break;
-			}
-			case 'typeName':
-			case 'name':
-				scope[key] = value as string;
-				break;
-			case 'variation':
-				scope[key] = value as number;
 				break;
 			default:
-				// Sue me
-				console.log('Unhandled: ' + key);
-				(scope as any)[key] = value;
 				break;
 			}
+
+			(args as any)[key] = value;
 		});
 
-		return this;
+		return new GameObjectTransferData(args);
 	}
 }
