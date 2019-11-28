@@ -2,7 +2,7 @@ import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
 import { LogError } from '@/script/modules/Logger';
 import * as Collections from 'typescript-collections';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { IBlueprint } from '@/script/interfaces/IBlueprint';
 
 export class BlueprintManager {

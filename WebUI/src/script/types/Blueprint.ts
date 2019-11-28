@@ -1,4 +1,4 @@
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { CtrRef } from '@/script/types/CtrRef';
 import { LogError } from '@/script/modules/Logger';
 import { IBlueprint } from '@/script/interfaces/IBlueprint';

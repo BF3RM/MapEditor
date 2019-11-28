@@ -1,5 +1,5 @@
 import * as Collections from 'typescript-collections';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
 import { signals } from '@/script/modules/Signals';
 

@@ -2,7 +2,7 @@ import Command from '../libs/three/Command';
 import { VEXTemulator } from '@/script/modules/VEXTemulator';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import * as Collections from 'typescript-collections';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
 import { signals } from '@/script/modules/Signals';
 import { VextCommand } from '@/script/types/VextCommand';
@@ -134,7 +134,7 @@ export default class VEXTInterface {
 		scope.executing = true;
 		const CARR = JSON.parse(commandActionResultsString) as object[];
 		const commandActionResults: CommandActionResult[] = [];
-		CARR.forEach((obj: Object) => {
+		CARR.forEach((obj: object) => {
 			console.log((obj as any));
 			commandActionResults.push(CommandActionResult.FromObject(obj));
 		});

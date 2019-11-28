@@ -1,4 +1,4 @@
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 
 export class GameObjectParentData {
 	public guid: Guid;

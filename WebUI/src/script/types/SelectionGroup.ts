@@ -1,6 +1,6 @@
 import { GameObject } from '@/script/types/GameObject';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 

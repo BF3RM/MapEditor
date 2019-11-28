@@ -38,7 +38,7 @@ import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
 import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import Highlighter from './widgets/Highlighter.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
 import { InfiniteTree, Node, INode } from 'infinite-tree';

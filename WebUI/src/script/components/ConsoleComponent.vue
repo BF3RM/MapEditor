@@ -92,12 +92,14 @@ export default class ConsoleComponent extends EditorComponent {
 
 	public mounted() {
 		window.onLog = this.onLog.bind(this);
+		/*
 		console.log = this.consoleLog.bind(this);
 		console.error = this.consoleError.bind(this);
 		console.warn = this.consoleWarn.bind(this);
 		console.clear = this.consoleClear.bind(this);
 		console.info = this.consoleInfo.bind(this);
 		console.log('Initialised console');
+		 */
 	}
 
 	private onClick(item: ConsoleEntry) {

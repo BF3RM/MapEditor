@@ -1,7 +1,7 @@
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { CtrRef } from '@/script/types/CtrRef';
 import { GameObjectParentData } from '@/script/types/GameObjectParentData';
 import { GameEntityData } from '@/script/types/GameEntityData';
@@ -55,6 +55,7 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public getCleanName() {
+		console.log(this.name);
 		return this.name.replace(/^.*[\\/]/, '');
 	}
 

@@ -1,4 +1,4 @@
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 
 export interface IBlueprint {
 	partitionGuid: Guid | string;

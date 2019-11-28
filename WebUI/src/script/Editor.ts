@@ -1,6 +1,6 @@
 import * as Collections from 'typescript-collections';
 
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import Command from './libs/three/Command';
 import SpawnBlueprintCommand from './commands/SpawnBlueprintCommand';
 import BulkCommand from './commands/BulkCommand';
@@ -496,9 +496,9 @@ export default class Editor {
 		this.Unhighlight(guid);
 
 		if (multi) {
-			this.editorCore.onSelectedGameObject(guid, true, scrollTo);
+			return this.editorCore.SelectGameObject(guid, true, scrollTo);
 		} else {
-			this.editorCore.onSelectedGameObject(guid, false, scrollTo);
+			return this.editorCore.SelectGameObject(guid, false, scrollTo);
 		}
 	}
 

@@ -11,6 +11,7 @@
         v-bind="{
           node: item,
           tree: tree,
+          index: index
         }"
       />
     </div>
@@ -150,7 +151,6 @@ export default {
 	},
 	mounted() {
 		this.tree = new InfiniteTree({
-			el: this.$refs.tree,
 			...this.$props
 		});
 
@@ -211,6 +211,11 @@ export default {
 			}
 		};
 	},
+	scrollTo(guid) {
+		const nodeIndex = this.filteredNodes().findIndex((i) => i.guid === guid.toString());
+		this.$refs.tree.$el.scrollTo({ left: 0, top: nodeIndex * this.rowHeight });
+		console.log('fuck yeah?' + nodeIndex);
+	},
 	computed: {
 		filteredNodes() {
 			const { search, tree } = this;
@@ -224,7 +229,7 @@ export default {
 			handler(newValue) {
 				this.tree.loadData(newValue);
 			},
-			deep: true
+			deep: false
 		},
 		search: {
 			handler(newValue) {

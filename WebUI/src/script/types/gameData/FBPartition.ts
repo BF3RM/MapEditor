@@ -1,4 +1,4 @@
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { getFilename, getPaths } from '@/script/modules/Utils';
 
 export class FBPartition {

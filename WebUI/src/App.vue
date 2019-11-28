@@ -61,7 +61,7 @@ export default class App extends Vue {
 		}
 	}
 
-	private mounted() {
+	public mounted() {
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');

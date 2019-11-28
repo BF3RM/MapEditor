@@ -3,7 +3,7 @@ import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { PreviewDestroyMessage } from './messages/PreviewDestroyMessage';
 import { Blueprint } from '@/script/types/Blueprint';
 import * as Collections from 'typescript-collections';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
 import { Message } from '@/script/messages/Message';
 import { LogError } from '@/script/modules/Logger';
@@ -91,12 +91,12 @@ export class EditorCore {
 		this.pendingUpdates.setValue(guid, gameObject);
 	}
 
-	public onSelectedGameObject(guid: Guid, isMultiSelection: boolean, scrollTo: boolean) {
+	public SelectGameObject(guid: Guid, isMultiSelection: boolean, scrollTo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid);
 
 		if (gameObject === undefined) {
 			LogError('Failed to select gameobject: ' + guid);
-			return;
+			return false;
 		}
 
 		// If the object is not in the scene we add it
@@ -107,12 +107,12 @@ export class EditorCore {
 		// If the object is already in this group and it's a multiselection we deselect it
 		if (gameObject.parent === editor.selectionGroup && isMultiSelection) {
 			editor.Deselect(guid);
-			return;
+			return false;
 		}
 
 		// If we are selecting an object already selected (single selection)
 		if (gameObject.parent === editor.selectionGroup && !isMultiSelection && editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === gameObject) {
-			return;
+			return false;
 		}
 
 		// Clear selection group when it's a single selection
@@ -135,7 +135,7 @@ export class EditorCore {
 			editor.threeManager.ShowGizmo();
 		}
 		editor.threeManager.AttachGizmoTo(editor.selectionGroup);
-		editor.threeManager.Render();
+		return true;
 	}
 
 	public onDeselectedGameObject(guid: Guid) {

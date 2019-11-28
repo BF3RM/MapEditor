@@ -3,7 +3,7 @@ import { CtrRef } from '@/script/types/CtrRef';
 import { GameObjectParentData } from '@/script/types/GameObjectParentData';
 import { GameEntityData } from '@/script/types/GameEntityData';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 
 export class GameObjectTransferData {
@@ -46,7 +46,7 @@ export class GameObjectTransferData {
 
 			switch (key) {
 			case 'guid':
-				value = Guid.parse(value.value);
+				value = Guid.parse(value);
 				break;
 			case 'blueprintCtrRef':
 				value = new CtrRef().setFromTable(value);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GameObject } from '@/script/types/GameObject';
-import { Guid } from 'guid-typescript';
+import { Guid } from '@/script/types/Guid';
 
 export class HighlightGroup extends THREE.Group {
 	public guid: Guid;

@@ -82,7 +82,7 @@ declare module 'infinite-tree' {
 		// @param {Node} parentNode The Node object that defines the parent node.
 		// @return {boolean} Returns true on success, false otherwise.
 
-		public addChildNodes(newNodes: Node[], index: number, parentNode: Node): boolean;
+		public addChildNodes(newNodes: INode[], index?: number, parentNode?: Node): boolean;
 
 		// Adds a new child node to the end of the list of children of a specified parent node.
 		// * If the parent is null or undefined, inserts the child at the specified index in the top-level.
@@ -91,7 +91,7 @@ declare module 'infinite-tree' {
 		// @param {object} newNode The new child node.
 		// @param {Node} parentNode The Node object that defines the parent node.
 		// @return {boolean} Returns true on success, false otherwise.
-		public appendChildNode(newNode: Node, parentNode: Node): boolean;
+		public appendChildNode(newNode: INode, parentNode: Node): boolean;
 
 		// Checks or unchecks a node.
 		// @param {Node} node The Node object.
