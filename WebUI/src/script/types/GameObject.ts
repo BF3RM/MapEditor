@@ -277,19 +277,4 @@ export class GameObject extends THREE.Object3D {
 		this.enabled = false;
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
-
-	public getNode() {
-		return {
-			id: this.guid,
-			name: this.getCleanName(),
-			type: this.typeName,
-			parentGuid: this.parentData.guid,
-			draggable: true,
-			droppable: true,
-			children: [],
-			state: {
-				filtered: this.enabled
-			}
-		};
-	}
 }

@@ -3,6 +3,7 @@ declare module 'infinite-tree' {
 		id: string;
 		type: string;
 		name: string;
+		data?: any;
 		state?: INodeState;
 		children?: INode[];
 		content?: any[];

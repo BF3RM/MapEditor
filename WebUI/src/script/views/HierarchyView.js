@@ -42,12 +42,13 @@ export class HierarchyView {
 	}
 
 	onSpawnedBlueprint(commandActionResult) {
+		console.log(commandActionResult);
 		let scope = this;
 		let gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
 		let gameObject = editor.getGameObjectByGuid(gameObjectGuid);
 
 		let currentEntry = gameObject.getNode();
-		scope.entries[gameObjectGuid] = currentEntry;
+		this.entries[gameObjectGuid] = currentEntry;
 		this.queue[currentEntry.id] = currentEntry;
 
 		if (!editor.vext.executing) {

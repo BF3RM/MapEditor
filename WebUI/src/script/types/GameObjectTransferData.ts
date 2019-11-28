@@ -46,7 +46,7 @@ export class GameObjectTransferData {
 
 			switch (key) {
 			case 'guid':
-				value = Guid.parse(value);
+				value = Guid.parse(value.value);
 				break;
 			case 'blueprintCtrRef':
 				value = new CtrRef().setFromTable(value);

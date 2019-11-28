@@ -42,6 +42,8 @@ import { Guid } from 'guid-typescript';
 import Highlighter from './widgets/Highlighter.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
 import { InfiniteTree, Node, INode } from 'infinite-tree';
+import { CommandActionResult } from '@/script/types/CommandActionResult';
+import { GameObject } from '@/script/types/GameObject';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 
@@ -59,12 +61,72 @@ export default class HierarchyComponent extends EditorComponent {
 
 	private search: string = '';
 
+	private entries: INode[Guid] = [];
+	private queue: INode[Guid] = [];
+	private existingParents: INode[Guid] = [];
+
 	constructor() {
 		super();
-		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
 	}
 
 	public mounted() {
+		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
+	}
+
+	private createNode(gameObject: GameObject): INode {
+		return {
+			id: gameObject.guid.toString(),
+			name: gameObject.getCleanName(),
+			type: gameObject.typeName,
+			children: [],
+			data: {
+				parentGuid: gameObject.parentData.guid
+			}
+		};
+	}
+
+	onSpawnedBlueprint(commandActionResult: CommandActionResult) {
+		const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
+		console.log(gameObjectGuid);
+		const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
+
+		const currentEntry = this.createNode(gameObject);
+		this.entries[gameObjectGuid] = currentEntry;
+		this.queue[currentEntry.id] = currentEntry;
+
+		if (!(window as any).editor.vext.executing) {
+			console.log('Drawing');
+			console.log(Object.keys(this.queue).length);
+
+			const updatedNodes = {};
+
+			for (const entryGuid in this.queue) {
+				const entry = this.queue[entryGuid];
+				// Check if the parent is in the queue
+				if (this.queue[entry.data.parentGuid] != null) {
+					this.queue[entry.data.parentGuid].children.push(entry);
+					// Check if the parent node is already spawned
+				} else if ((this.$refs.tree as InfiniteTreeComponent).tree.getNodeById(entry.parentGuid) != null) {
+					if (this.existingParents[entry.parentGuid] == null) {
+						this.existingParents[entry.parentGuid] = [];
+					}
+					console.log('Existing' + entry.name);
+					this.existingParents[entry.parentGuid].push(entry);
+				} else {
+					if (this.existingParents.root == null) {
+						this.existingParents.root = [];
+					}
+					console.log('Root');
+
+					this.existingParents.root.push(entry);
+				}
+			}
+			for (const parentNodeId in this.existingParents) {
+				(this.$refs.tree as InfiniteTreeComponent).tree.addChildNodes(this.existingParents[parentNodeId], undefined, (this.$refs.tree as InfiniteTreeComponent).tree.getNodeById(parentNodeId));
+				delete this.existingParents[parentNodeId];
+			}
+			this.queue = [];
+		}
 	}
 
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
@@ -78,60 +140,6 @@ export default class HierarchyComponent extends EditorComponent {
 
 	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		tree.selectNode(node);
-	}
-
-	private onBlueprintRegistered(blueprints: Blueprint[]) {
-		const data: INode = {
-			'id': 'root',
-			'type': 'folder',
-			'name': 'Venice',
-			'children': []
-		};
-		// TODO: Make sure this works after the new blueprint shit.
-		for (const instance of blueprints) {
-			const path = instance.name;
-			const paths = getPaths(path);
-			let parentPath: INode = data;
-			const fileName = getFilename(path);
-			let currentPath = '';
-			paths.forEach((subPath) => {
-				currentPath += subPath + '/';
-				if (parentPath === undefined) {
-					console.error('Missing parent path?');
-				}
-				if (parentPath.children === undefined) {
-					console.error('Missing child field?');
-					return;
-				}
-				const parentIndex = parentPath.children.find((x) => x.name.toLowerCase() === subPath.toLowerCase());
-				if (parentIndex === undefined) {
-					const a = parentPath.children.push({
-						'id': Guid.create().toString(),
-						'name': subPath,
-						'type': 'folder',
-						'children': [],
-						'path': currentPath
-					});
-					if (parentPath.children[a - 1] !== undefined) {
-						parentPath = parentPath.children[a - 1];
-					} else {
-						console.error('Missing parent path');
-					}
-				} else {
-					parentPath = parentIndex;
-					// Sometimes the object is referenced lowercase. If we have a string that has uppercase letters, we can assume it's correct.
-					// Replace lowercase paths with the actual case.
-					if (hasUpperCase(subPath) && hasLowerCase(parentPath.name)) {
-						parentPath.name = subPath;
-					}
-				}
-			});
-			if (parentPath.content === undefined) {
-				parentPath.content = [];
-			}
-			parentPath.content.push(instance);
-		}
-		this.data = data;
 	}
 
 	private nodeStyle(node: Node) {
