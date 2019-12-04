@@ -116,7 +116,7 @@ export class SelectionGroup extends GameObject {
 			console.error('Tried to detach a children that is no longer in this group');
 		}
 		// remove child from parent and add it to its parent
-		if (gameObject.parentData.guid === Guid.createEmpty() && gameObject.parentData.typeName !== 'LevelData') {
+		if (gameObject.parentData.guid.equals(Guid.createEmpty()) && gameObject.parentData.typeName !== 'root') {
 			const parent = editor.getGameObjectByGuid(gameObject.parentData.guid);
 			if (parent != null) {
 				parent.attach(gameObject);
@@ -124,8 +124,6 @@ export class SelectionGroup extends GameObject {
 				console.error('Object parent doesn\'t exist');
 			}
 		}
-
-		editor.threeManager.Render(); // REMOVE
 	}
 
 	public AttachObject(gameObject: GameObject) {

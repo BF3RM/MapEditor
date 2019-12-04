@@ -152,7 +152,6 @@ export class EditorCore {
 		if (scope.selectionGroup.children.length === 0) {
 			scope.threeManager.HideGizmo();
 		}
-		scope.threeManager.Render();
 	}
 
 	public onPreviewDragStart(blueprint: Blueprint) {
