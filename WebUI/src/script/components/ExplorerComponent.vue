@@ -4,7 +4,7 @@
 			<div class="header">
 				<input type="text" v-model="search" placeholder="Search">
 			</div>
-			<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+			<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
 					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
 						<div class="expand" @click="ToggleNode($event,node,tree)">
@@ -33,21 +33,22 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import EditorComponent from './EditorComponent.vue';
-import InfiniteTreeComponent from './InfiniteTreeComponent.vue';
+import EditorComponent from '@/script/components/EditorComponent.vue';
+import InfiniteTreeComponent from '@/script/components/InfiniteTreeComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
 import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import { Guid } from '@/script/types/Guid';
-import Highlighter from './widgets/Highlighter.vue';
+import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
-import { InfiniteTree, Node, INode } from 'infinite-tree';
+import InfiniteTree, { Node, INode } from 'infinite-tree';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 
 export default class ExplorerComponent extends EditorComponent {
 	@Prop() public title: string;
-	private data: INode = {
+
+	private treeData: INode = {
 		'type': 'folder',
 		'name': 'Venice',
 		'id': 'Venice',
@@ -131,7 +132,7 @@ export default class ExplorerComponent extends EditorComponent {
 			}
 			parentPath.content.push(instance);
 		}
-		this.data = data;
+		this.treeData = data;
 	}
 
 	private nodeStyle(node: Node) {

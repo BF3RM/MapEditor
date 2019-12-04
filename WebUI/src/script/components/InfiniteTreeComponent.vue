@@ -18,7 +18,7 @@
   </RecycleScroller>
 </template>
 
-<script>
+<script lang="ts">
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import InfiniteTree from 'infinite-tree';
@@ -156,6 +156,7 @@ export default {
 
 		// Updates the tree.
 		this.tree.update = () => {
+			console.log('update?');
 			this.tree.emit('contentWillUpdate');
 			this.nodes = this.tree.nodes;
 			this.$nextTick(function() {
@@ -213,8 +214,7 @@ export default {
 	},
 	scrollTo(guid) {
 		const nodeIndex = this.filteredNodes().findIndex((i) => i.guid === guid.toString());
-		this.$refs.tree.$el.scrollTo({ left: 0, top: nodeIndex * this.rowHeight });
-		console.log('fuck yeah?' + nodeIndex);
+		// this.$refs.tree.$el.scrollTo({ left: 0, top: nodeIndex * this.rowHeight });
 	},
 	computed: {
 		filteredNodes() {

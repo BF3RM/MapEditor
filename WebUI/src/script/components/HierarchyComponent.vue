@@ -17,7 +17,7 @@
 						</div>
 						<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
 						<span v-else>
-							{{ node.name }}
+							{{ node.name }} {{node.children.length}}
 						</span>
 					</div>
 				</template>
@@ -40,7 +40,7 @@ import { Blueprint } from '@/script/types/Blueprint';
 import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import Highlighter from './widgets/Highlighter.vue';
 import ListComponent from '@/script/components/ListComponent.vue';
-import { InfiniteTree, Node, INode } from 'infinite-tree';
+import InfiniteTree, { Node, INode } from 'infinite-tree';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
@@ -56,15 +56,15 @@ export default class HierarchyComponent extends EditorComponent {
 		'children': []
 	};
 
-	private tree: InfiniteTree;
+	private tree: InfiniteTree = null;
 	private list: Blueprint[] = [];
 	private selected: Node | null;
 
 	private search: string = '';
 
-	private entries: Node[] = [];
-	private queue: INode[] = [];
-	private existingParents: INode[] = [];
+	private entries = new Map<Guid, INode>();
+	private queue = new Map<String, INode>();
+	private existingParents = new Map<String, Array<INode>>();
 
 	constructor() {
 		super();
@@ -72,6 +72,7 @@ export default class HierarchyComponent extends EditorComponent {
 
 	public mounted() {
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
+		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		this.tree = (this.$refs.tree as InfiniteTreeComponent).tree;
 	}
 
@@ -82,7 +83,7 @@ export default class HierarchyComponent extends EditorComponent {
 			type: gameObject.typeName,
 			children: [],
 			data: {
-				parentGuid: gameObject.parentData.guid.toString()
+				parentGuid: gameObject.parentData.guid
 			}
 		};
 	}
@@ -93,8 +94,8 @@ export default class HierarchyComponent extends EditorComponent {
 		const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
 
 		const currentEntry = this.createNode(gameObject);
-		this.entries[gameObjectGuid] = currentEntry as Node;
-		this.queue[currentEntry.id] = currentEntry;
+		this.entries.set(gameObjectGuid, currentEntry);
+		this.queue.set(currentEntry.id, currentEntry);
 
 		if (!(window as any).editor.vext.executing) {
 			console.log('Drawing');
@@ -102,35 +103,38 @@ export default class HierarchyComponent extends EditorComponent {
 
 			const updatedNodes = {};
 
-			for (const entryGuid in this.queue) {
-				const entry = this.queue[entryGuid];
+			for (const entry of this.queue.values()) {
+				console.log(entry);
 				// Check if the parent is in the queue
-				if (this.queue[entry.data.parentGuid]) {
-					this.queue[entry.data.parentGuid].children.push(entry);
+				const parentId = entry.data.parentGuid.toString();
+				if (this.queue.has(parentId)) {
+					this.queue.get(parentId).children.push(entry);
 					// Check if the parent node is already spawned
-				} else if ((this.$refs.tree as InfiniteTreeComponent).tree.getNodeById(entry.data.parentGuid) != null) {
-					if (this.existingParents[entry.data.parentGuid] == null) {
-						this.existingParents[entry.data.parentGuid] = [];
+				} else if (this.tree.getNodeById(parentId) !== null) {
+					if (!this.existingParents.has(parentId)) {
+						this.existingParents.set(parentId, []);
 					}
 					console.log('Existing' + entry.name);
-					this.existingParents[entry.data.parentGuid].push(entry);
+					this.existingParents.get(parentId).push(entry);
 				} else {
-					if ((this.existingParents as any).root == null) {
-						(this.existingParents as any).root = [];
+					// Entry does not have a parent.
+					if (!this.existingParents.has('root')) {
+						this.existingParents.set('root', []);
 					}
 					console.log('Root');
-					(this.existingParents as any).root.push(entry);
+					this.existingParents.get('root').push(entry);
 				}
 			}
-			for (const parentNode of this.existingParents) {
-				if (this.entries[parentNode.id] === undefined) {
+			for (const parentNodeId of this.existingParents.keys()) {
+				const parentNode = this.tree.getNodeById(parentNodeId);
+				if (parentNode === null) {
 					console.error('Missing parent node');
 				} else {
-					this.tree.addChildNodes(this.existingParents[parentNode.id], undefined, this.entries[parentNode.id]);
+					this.tree.addChildNodes(this.existingParents.get(parentNodeId), undefined, parentNode);
 				}
-				delete this.existingParents[parentNode.id];
+				this.existingParents.delete(parentNodeId);
 			}
-			this.queue = [];
+			this.queue.clear();
 		}
 	}
 
@@ -169,13 +173,20 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	onSelectedGameObject(guid: Guid, isMultipleSelection?: boolean, scrollTo?: boolean) {
+		console.log(guid);
 		const currentNode = this.tree.getNodeById(guid.toString());
-
 		currentNode.state.selected = true;
-		this.tree.updateNode(currentNode, {}, { shallowRendering: false });
-		if (scrollTo) {
-			(this.$refs.tree as InfiniteTreeComponent).scrollTo(currentNode);
+		if (guid.equals(Guid.createEmpty())) {
+			this.list = [];
+			this.selected = null;
+			return;
 		}
+		if (this.selected) {
+			this.selected.state.selected = false;
+		}
+		this.selected = currentNode;
+		this.selected.state.selected = true;
+		this.$set(currentNode.state, 'enabled', true);
 	}
 
 	private onSelectNode(node: Node) {
