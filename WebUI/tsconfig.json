@@ -13,7 +13,9 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "baseUrl": ".",
-    "typeRoots": ["node_modules/@types", "types"],
+    "typeRoots": ["node_modules/@types",
+      "typings"
+    ],
     "types": [
       "webpack-env",
       "JQuery"
@@ -29,7 +31,7 @@
     "experimentalDecorators": true
   },
   "include": [
-    "types/**/*",
+    "typings/**/*",
     "src/**/*"
   ],
   "exclude": [

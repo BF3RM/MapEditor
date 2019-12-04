@@ -1,5 +1,5 @@
-declare module 'infinite-tree' {
-	export interface INode {
+declare namespace InfiniteTree {
+	interface INode {
 		id: string;
 		type: string;
 		name: string;
@@ -9,7 +9,7 @@ declare module 'infinite-tree' {
 		content?: any[];
 		path?: string;
 	}
-	export interface INodeState {
+	interface INodeState {
 		selected: boolean;
 		depth: number;
 		open: boolean;
@@ -19,6 +19,26 @@ declare module 'infinite-tree' {
 		filtered: boolean;
 	}
 
+	interface IInfiniteTreeOptions {
+		autoOpen: boolean;
+		droppable: boolean;
+		shouldLoadNodes: boolean;
+		loadNodes: boolean;
+		selectable: boolean;
+		shouldSelectNode: boolean;
+
+		// When el is not specified, the tree will run in the stealth mode
+		el: any;
+	}
+}
+
+declare module 'infinite-tree' {
+	import events = require('events');
+	import INode = InfiniteTree.INode;
+	import INodeState = InfiniteTree.INodeState;
+	import IInfiniteTreeOptions = InfiniteTree.IInfiniteTreeOptions;
+
+	export { INode, INodeState, IInfiniteTreeOptions };
 	export class Node implements INode {
 		public id: string;
 		public type: string;
@@ -53,19 +73,8 @@ declare module 'infinite-tree' {
 		public isLastChild(): boolean;
 
 	}
-	export interface IInfiniteTreeOptions {
-		autoOpen: boolean;
-		droppable: boolean;
-		shouldLoadNodes: boolean;
-		loadNodes: boolean;
-		selectable: boolean;
-		shouldSelectNode: boolean;
 
-		// When el is not specified, the tree will run in the stealth mode
-		el: any;
-	}
-
-	export class InfiniteTree {
+	export default class InfiniteTree extends events.EventEmitter {
 		public options: IInfiniteTreeOptions;
 		public nodes: Node[];
 		public rows: any[];
@@ -291,17 +300,7 @@ declare module 'infinite-tree' {
 		// @param {boolean} [options.shallowRendering] True to render only the parent node, false to render the parent node and all expanded child nodes. Defaults to false.
 		public updateNode(node: Node, data: any, options?: object): boolean;
 
-		// Emits an event
-		public emit(event: string, options?: object): void;
-
-		// Emits an event
-		public on(event: string, callback: void): void;
-
-		// Removes an event listener
-		public removeListener(event: string, callback: void): void;
-
 		// Destroys the tree
 		public destroy(): void;
 	}
 }
-
