@@ -4,7 +4,7 @@
 			<div class="header">
 				<input type="text" v-model="search" placeholder="Search">
 			</div>
-			<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+			<InfiniteTreeComponent class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
 					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
 						<div class="expand" @click="ToggleNode($event,node,tree)">
@@ -56,7 +56,7 @@ export default class HierarchyComponent extends EditorComponent {
 		'children': []
 	};
 
-	private tree: InfiniteTree = null;
+	private tree: InfiniteTree;
 	private list: Blueprint[] = [];
 	private selected: Node | null;
 
@@ -71,9 +71,10 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	public mounted() {
+		console.log('Mounted');
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
-		this.tree = (this.$refs.tree as InfiniteTreeComponent).tree;
+		this.tree = (this.$refs.infiniteTreeComponent as InfiniteTreeComponent).tree as InfiniteTree;
 	}
 
 	private createNode(gameObject: GameObject): INode {
@@ -89,8 +90,8 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	onSpawnedBlueprint(commandActionResult: CommandActionResult) {
+		console.log('Spawning:' + commandActionResult.gameObjectTransferData.guid.value);
 		const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
-		console.log(gameObjectGuid);
 		const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
 
 		const currentEntry = this.createNode(gameObject);
@@ -98,13 +99,9 @@ export default class HierarchyComponent extends EditorComponent {
 		this.queue.set(currentEntry.id, currentEntry);
 
 		if (!(window as any).editor.vext.executing) {
-			console.log('Drawing');
-			console.log(Object.keys(this.queue).length);
-
 			const updatedNodes = {};
 
 			for (const entry of this.queue.values()) {
-				console.log(entry);
 				// Check if the parent is in the queue
 				const parentId = entry.data.parentGuid.toString();
 				if (this.queue.has(parentId)) {
@@ -173,8 +170,8 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	onSelectedGameObject(guid: Guid, isMultipleSelection?: boolean, scrollTo?: boolean) {
-		console.log(guid);
 		const currentNode = this.tree.getNodeById(guid.toString());
+
 		currentNode.state.selected = true;
 		if (guid.equals(Guid.createEmpty())) {
 			this.list = [];
@@ -187,36 +184,11 @@ export default class HierarchyComponent extends EditorComponent {
 		this.selected = currentNode;
 		this.selected.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
+		(this.$refs.infiniteTreeComponent as InfiniteTree).scrollToNode(currentNode);
 	}
 
 	private onSelectNode(node: Node) {
 		console.log('onSelect');
-
-		if (node === null) {
-			this.list = [];
-			this.selected = null;
-			return;
-		}
-		this.list = this.getBlueprintsRecursive(node);
-		if (this.selected) {
-			this.selected.state.selected = false;
-		}
-		this.selected = node;
-		this.selected.state.selected = true;
-		this.$set(node.state, 'enabled', true);
-		console.log(node);
-	}
-
-	private getBlueprintsRecursive(node: Node): Blueprint[] {
-		let list: Blueprint[] = node.content as Blueprint[];
-		if (list === undefined) {
-			list = [];
-		}
-
-		node.children.forEach((child) => {
-			list = list.concat(this.getBlueprintsRecursive(child));
-		});
-		return list;
 	}
 
 	private cleanPath(path: string) {
@@ -227,7 +199,6 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	private shouldSelectNode(node: Node) {
-		console.log('ShouldSelect');
 		return window.editor.Select(Guid.parse(node.id));
 	}
 

@@ -117,8 +117,6 @@ export default class VEXTInterface {
 		if (editor.debug) {
 			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
 			window.Log(LOGLEVEL.VERBOSE, commands);
-			console.log(commands[0].gameObjectTransferData.guid);
-
 			scope.emulator.Receive(commands);
 		} else {
 			console.log(commands);
@@ -135,14 +133,12 @@ export default class VEXTInterface {
 		const CARR = JSON.parse(commandActionResultsString) as object[];
 		const commandActionResults: CommandActionResult[] = [];
 		CARR.forEach((obj: object) => {
-			console.log((obj as any));
 			commandActionResults.push(CommandActionResult.FromObject(obj));
 		});
 		let index = 0;
 
 		window.Log(LOGLEVEL.VERBOSE, 'IN: ');
 		window.Log(LOGLEVEL.VERBOSE, commandActionResults);
-		console.log(commandActionResults[0].gameObjectTransferData.guid);
 
 		commandActionResults.forEach((commandActionResult: CommandActionResult) => {
 			if (scope.commands[commandActionResult.type] === undefined) {

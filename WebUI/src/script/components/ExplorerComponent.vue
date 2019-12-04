@@ -4,7 +4,7 @@
 			<div class="header">
 				<input type="text" v-model="search" placeholder="Search">
 			</div>
-			<InfiniteTreeComponent class="scrollable datafont" ref="tree" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+			<InfiniteTreeComponent class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
 					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
 						<div class="expand" @click="ToggleNode($event,node,tree)">
@@ -157,8 +157,6 @@ export default class ExplorerComponent extends EditorComponent {
 	}
 
 	private onSelectNode(node: Node) {
-		console.log('onSelect');
-
 		if (node === null) {
 			this.list = [];
 			this.selected = null;
@@ -171,7 +169,6 @@ export default class ExplorerComponent extends EditorComponent {
 		this.selected = node;
 		this.selected.state.selected = true;
 		this.$set(node.state, 'enabled', true);
-		console.log(node);
 	}
 
 	private getBlueprintsRecursive(node: Node): Blueprint[] {

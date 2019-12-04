@@ -3,7 +3,7 @@
                    class="scrollable"
                    :items="filteredNodes"
                    :item-height="rowHeight"
-                   ref="virtualList"
+                   ref="scroller"
                    :min-item-size="16"
   >
     <div slot-scope="{ item,index }">
@@ -21,12 +21,14 @@
 <script lang="ts">
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
-import InfiniteTree from 'infinite-tree';
+import InfiniteTree, { INode, Node } from 'infinite-tree';
 
 const lcfirst = (str) => {
 	str += '';
 	return str.charAt(0).toLowerCase() + str.substr(1);
 };
+let self = null;
+
 export default {
 	name: 'InfiniteTreeComponent',
 	components: {
@@ -68,6 +70,21 @@ export default {
 			default: () => {
 				console.log('loading');
 				// Comment to stop the linter from complaining
+			}
+		},
+		getNodeById: {
+			type: Function,
+			default: (id: string) => () => {
+				return this.tree.getNodeById(id);
+			}
+		},
+		scrollToNode: {
+			type: Function,
+			default: (node: Node) => {
+				const nodeIndex = self.filteredNodes.findIndex((i) => i.id === node.id.toString());
+				console.log(self.$refs.virtualList);
+
+				(self.$refs.scroller as RecycleScroller).scrollToItem(nodeIndex);
 			}
 		},
 		shouldSelectNode: {
@@ -150,13 +167,13 @@ export default {
 		}
 	},
 	mounted() {
+		self = this;
 		this.tree = new InfiniteTree({
 			...this.$props
 		});
 
 		// Updates the tree.
 		this.tree.update = () => {
-			console.log('update?');
 			this.tree.emit('contentWillUpdate');
 			this.nodes = this.tree.nodes;
 			this.$nextTick(function() {
@@ -211,10 +228,6 @@ export default {
 				onMouseLeave: null
 			}
 		};
-	},
-	scrollTo(guid) {
-		const nodeIndex = this.filteredNodes().findIndex((i) => i.guid === guid.toString());
-		// this.$refs.tree.$el.scrollTo({ left: 0, top: nodeIndex * this.rowHeight });
 	},
 	computed: {
 		filteredNodes() {
