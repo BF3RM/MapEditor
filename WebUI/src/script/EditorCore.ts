@@ -121,11 +121,10 @@ export class EditorCore {
 				editor.Deselect(editor.selectionGroup.children[i].guid);
 			}
 		}
-
+		editor.threeManager.scene.attach(gameObject);
 		if (editor.selectionGroup.children.length === 0) {
 			editor.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
 		}
-
 		editor.selectionGroup.AttachObject(gameObject);
 
 		signals.selectedGameObject.emit(guid, isMultiSelection, scrollTo);
@@ -135,6 +134,7 @@ export class EditorCore {
 			editor.threeManager.ShowGizmo();
 		}
 		editor.threeManager.AttachGizmoTo(editor.selectionGroup);
+		editor.threeManager.Render();
 		return true;
 	}
 

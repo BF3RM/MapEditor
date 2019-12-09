@@ -311,7 +311,7 @@ export default class Editor {
 		scope.selectionGroup.onMoveStart();
 	}
 
-	public onControlMove(e: MouseEvent) {
+	public onControlMove() {
 		const scope = this;
 		scope.selectionGroup.onMove();
 	}

@@ -16,7 +16,7 @@ export class LinearTransform {
 	}
 
 	public toMatrix() {
-		return new Matrix4().set(this.left.x, this.left.y, this.left.z, 0, this.up.x, this.up.y, this.up.z, 0, this.forward.x, this.forward.y, this.forward.z, 0, this.trans.x, this.trans.y, this.trans.z, 1);
+		return new Matrix4().set(this.left.x, this.left.y, this.left.z, this.trans.x, this.up.x, this.up.y, this.up.z, this.trans.y, this.forward.x, this.forward.y, this.forward.z, this.trans.z, 0, 0, 0, 1);
 	}
 
 	public toString() {

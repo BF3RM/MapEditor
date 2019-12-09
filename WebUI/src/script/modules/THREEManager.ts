@@ -358,7 +358,7 @@ export class THREEManager {
 		const raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(mousePos, this.camera);
 
-		const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects), true);
+		const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
 		const dir = new THREE.Vector3(1, 2, 0);
 
 		// normalize the direction vector (convert to vector of length 1)
@@ -416,13 +416,13 @@ export class THREEManager {
 		}
 	}
 
-	public onControlChanged(e: MouseEvent) {
+	public onControlChanged() {
 		// moving
-		editor.onControlMove(e);
+		editor.onControlMove();
 		editor.threeManager.Render();
 	}
 
-	public onControlMouseUp(e: any) {
+	public onControlMouseUp() {
 		this.controlSelected = false;
 		editor.setUpdating(false);
 		editor.onControlMoveEnd();

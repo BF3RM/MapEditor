@@ -38,13 +38,13 @@ export class GameObject extends THREE.Object3D {
 		this.gameEntities = gameEntities;
 
 		this.selected = false;
-		this.matrixAutoUpdate = false;
+		this.matrixAutoUpdate = true;
+		this.matrixWorldAutoUpdate = true;
 		this.visible = true;
 		this.enabled = true;
 		this.highlighted = false;
 
 		this.completeBoundingBox = new THREE.Box3();
-
 		// Update the matrix after initialization.
 		this.updateTransform();
 		this.updateMatrix();
@@ -99,12 +99,7 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public updateTransform() {
-		const matrix = new THREE.Matrix4();
-		matrix.set(
-			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x,
-			this.transform.left.y, this.transform.up.y, this.transform.forward.y, this.transform.trans.y,
-			this.transform.left.z, this.transform.up.z, this.transform.forward.z, this.transform.trans.z,
-			0, 0, 0, 1);
+		const matrix = this.transform.toMatrix();
 
 		// As the position is local, we have to detach the object from its parent first
 		const parent = this.parent;

@@ -68,7 +68,7 @@ export class GameObjectTransferData {
 				break;
 			}
 
-			(args as any)[key] = value;
+			(args)[key] = value;
 		});
 
 		return new GameObjectTransferData(args);

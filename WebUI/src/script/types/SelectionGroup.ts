@@ -61,12 +61,7 @@ export class SelectionGroup extends GameObject {
 	}
 
 	public updateTransform() {
-		const matrix = new THREE.Matrix4();
-		matrix.set(
-			this.transform.left.x, this.transform.up.x, this.transform.forward.x, this.transform.trans.x,
-			this.transform.left.y, this.transform.up.y, this.transform.forward.y, this.transform.trans.y,
-			this.transform.left.z, this.transform.up.z, this.transform.forward.z, this.transform.trans.z,
-			0, 0, 0, 1);
+		const matrix = this.transform.toMatrix();
 
 		// To move the group without moving the children we have to detach them first
 		const temp = [];
@@ -135,6 +130,9 @@ export class SelectionGroup extends GameObject {
 	}
 
 	public Center() {
+		if (this.children.length === 1) {
+			return;
+		}
 		const temp = [];
 		let x = 0;
 		let z = 0;
