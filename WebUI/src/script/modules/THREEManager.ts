@@ -181,6 +181,9 @@ export class THREEManager {
 		this.control.addEventListener('change', this.onControlChanged.bind(this));
 		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
 		this.control.addEventListener('mouseDown', this.onControlMouseDown.bind(this));
+		this.control.addEventListener('dragging-changed', (event) => {
+			this.cameraControls.enabled = !event.value;
+		});
 	}
 
 	public CreateGizmo() {
