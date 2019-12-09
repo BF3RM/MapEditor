@@ -15,6 +15,7 @@ export class SelectionGroup extends GameObject {
 		this.name = 'Selection Group';
 		this.transform = new LinearTransform();
 		this.children = [];
+		this.matrixAutoUpdate = true;
 
 		// Update the matrix after initialization.
 		if (update) {
@@ -25,11 +26,9 @@ export class SelectionGroup extends GameObject {
 	// We move the children but not the group, as it's not synced.
 
 	public onMoveStart() {
-		// console.log("move start");
 	}
 
 	public onMove() {
-		// console.log("moving");
 		const scope = this;
 		if (!scope.hasMoved()) {
 			return;
@@ -41,7 +40,6 @@ export class SelectionGroup extends GameObject {
 	}
 
 	public onMoveEnd() {
-		// console.log("move end");
 		const scope = this;
 		if (!scope.hasMoved()) {
 			return; // No position change

@@ -35,7 +35,7 @@ export class THREEManager {
 	private worldSpace = WORLDSPACE.local;
 
 	private gridSnap = false;
-	private highlightingEnabled = true;
+	private highlightingEnabled = false;
 	private raycastPlacing = false;
 	private controlSelected = false;
 	private lastRaycastTime = new Date();
@@ -90,25 +90,23 @@ export class THREEManager {
 				scope.waitingForControlEnd = false;
 			}
 		})();
-		/*
-	scope.cameraControls.addEventListener( 'controlstart', function( event ) {
-		editor.vext.SendEvent('controlStart');
-	} );
-	scope.cameraControls.addEventListener( 'controlend', function( event ) {
-		scope.waitingForControlEnd = true;
-	} );
-	scope.cameraControls.addEventListener( 'update', function( event ) {
-		if (!scope.updatingCamera) {
 
-			// lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
-			const transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld.elements);
-			editor.vext.SendEvent('controlUpdate', {
-				transform,
-			});
-		}
-	} );
+		scope.cameraControls.addEventListener('controlstart', function(event) {
+			editor.vext.SendEvent('controlStart');
+		});
+		scope.cameraControls.addEventListener('controlend', function(event) {
+			scope.waitingForControlEnd = true;
+		});
+		scope.cameraControls.addEventListener('update', function(event) {
+			if (!scope.updatingCamera) {
+				// lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
+				const transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld);
+				editor.vext.SendEvent('controlUpdate', {
+					transform
+				});
+			}
+		});
 
-*/
 		this.cameraControls.setPosition(10, 10, 10);
 		this.cameraControls.setLookAt(10, 10, 10, 0, 0, 0, false);
 		this.SetFov(90);
@@ -174,9 +172,9 @@ export class THREEManager {
 		});
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
-		// this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-		// this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-		// this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 
 		this.control.addEventListener('change', this.onControlChanged.bind(this));
 		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
@@ -407,6 +405,8 @@ export class THREEManager {
 		if (e.target === null) {
 			return;
 		}
+		// TODO: Check for shift key using new controls system
+		// TODO: new Controls system
 		if (e.target.mode === 'translate' && e.target.axis === 'XYZ') {
 			const event = document.createEvent('HTMLEvents');
 			event.initEvent('mouseup', true, true); // The custom event that will be created
@@ -416,9 +416,9 @@ export class THREEManager {
 		}
 	}
 
-	public onControlChanged() {
+	public onControlChanged(e: MouseEvent) {
 		// moving
-		editor.onControlMove();
+		editor.onControlMove(e);
 		editor.threeManager.Render();
 	}
 
