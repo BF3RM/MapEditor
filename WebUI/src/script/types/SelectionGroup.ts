@@ -113,6 +113,7 @@ export class SelectionGroup extends GameObject {
 		if (gameObject.parent !== this) {
 			console.error('Tried to detach a children that is no longer in this group');
 		}
+		editor.threeManager.scene.attach(gameObject);
 		// remove child from parent and add it to its parent
 		if (gameObject.parentData.guid.equals(Guid.createEmpty()) && gameObject.parentData.typeName !== 'root') {
 			const parent = editor.getGameObjectByGuid(gameObject.parentData.guid);
