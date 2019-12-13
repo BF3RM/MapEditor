@@ -27,7 +27,6 @@ const lcfirst = (str) => {
 	str += '';
 	return str.charAt(0).toLowerCase() + str.substr(1);
 };
-let self = null;
 
 export default {
 	name: 'InfiniteTreeComponent',
@@ -80,11 +79,8 @@ export default {
 		},
 		scrollToNode: {
 			type: Function,
-			default: (node: Node) => {
-				const nodeIndex = self.filteredNodes.findIndex((i) => i.id === node.id.toString());
-				console.log(self.$refs.virtualList);
-
-				(self.$refs.scroller as RecycleScroller).scrollToItem(nodeIndex);
+			default: function(node: Node) {
+				return this.scrollTo(node);
 			}
 		},
 		shouldSelectNode: {
@@ -167,7 +163,6 @@ export default {
 		}
 	},
 	mounted() {
-		self = this;
 		this.tree = new InfiniteTree({
 			...this.$props
 		});
@@ -236,7 +231,17 @@ export default {
 			return out;
 		}
 	},
-	methods: {},
+	methods: {
+		scrollTo: function(node: Node) {
+			const nodeIndex = this.filteredNodes.findIndex((i) => {
+				console.log(i.id === node.id);
+				return i.id === node.id;
+			});
+			console.log((this.$refs as any).scroller);
+
+			(this.$refs.scroller as RecycleScroller).scrollToItem(nodeIndex);
+		}
+	},
 	watch: {
 		data: {
 			handler(newValue) {
