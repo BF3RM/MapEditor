@@ -77,11 +77,8 @@ export default {
 				return this.tree.getNodeById(id);
 			}
 		},
-		scrollToNode: {
-			type: Function,
-			default: function(node: Node) {
-				return this.scrollTo(node);
-			}
+		scrollToNode: function(node: Node) {
+			return this.scrollTo(node);
 		},
 		shouldSelectNode: {
 			type: Function,
@@ -244,19 +241,18 @@ export default {
 	},
 	watch: {
 		data: {
-			handler(newValue) {
+			handler(newValue: any) {
 				this.tree.loadData(newValue);
 			},
 			deep: false
 		},
 		search: {
-			handler(newValue) {
+			handler(newValue: string) {
 				console.log('Search: ' + newValue);
 				if (newValue === '') {
-					this.tree.unfilter();
+					(this.tree as InfiniteTree).unfilter();
 				}
-				this.tree.filter(newValue);
-				console.log(this.tree.nodes);
+				(this.tree as InfiniteTree).filter(newValue);
 			}
 		}
 	}
