@@ -26,6 +26,7 @@ export class SelectionGroup extends GameObject {
 	// We move the children but not the group, as it's not synced.
 
 	public onMoveStart() {
+		// Do we need to do anything here?
 	}
 
 	public onMove() {

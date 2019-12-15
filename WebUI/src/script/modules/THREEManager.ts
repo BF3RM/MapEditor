@@ -91,13 +91,13 @@ export class THREEManager {
 			}
 		})();
 
-		scope.cameraControls.addEventListener('controlstart', function(event) {
+		scope.cameraControls.addEventListener('controlstart', (event: any) => {
 			editor.vext.SendEvent('controlStart');
 		});
-		scope.cameraControls.addEventListener('controlend', function(event) {
+		scope.cameraControls.addEventListener('controlend', (event: any) => {
 			scope.waitingForControlEnd = true;
 		});
-		scope.cameraControls.addEventListener('update', function(event) {
+		scope.cameraControls.addEventListener('update', (event: any) => {
 			if (!scope.updatingCamera) {
 				// lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
 				const transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld);

@@ -65,9 +65,6 @@ export default class ExplorerComponent extends EditorComponent {
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
 	}
 
-	public mounted() {
-	}
-
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {

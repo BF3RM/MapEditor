@@ -39,8 +39,8 @@ export default class InfiniteTreeComponent extends Vue {
 	@Prop({ type: Number, default: 32 }) rowHeight: number;
 	@Prop({ type: Function, default(node: Node) { return true; } }) loadNodes: boolean;
 	@Prop({ type: Function, default(id: string) { return true; } }) getNodeById: Node;
-	@Prop({ type: Function, default(node: Node) { return (this as any).scrollTo(node); } }) scrollToNode: boolean;
-	@Prop({ type: Function, default(node: Node) { console.log('ShouldLoadNodes'); return !node.children.length > 0 && node.loadOnDemand; } }) shouldLoadNodes: boolean;
+	@Prop({ type: Function, default(node: Node) { return (this as any).scrollTo(node); } }) public scrollToNode: Function;
+	@Prop({ type: Function, default(node: Node) { console.log('ShouldLoadNodes'); return !(node.children.length > 0) && node.loadOnDemand; } }) shouldLoadNodes: boolean;
 	@Prop({
 		type: Function,
 		default(node: Node) {

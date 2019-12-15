@@ -2,7 +2,7 @@
 	<gl-col>
 		<gl-component id="explorer-component" :title="title">
 			<div class="header">
-				<input type="text" v-model="search" placeholder="Search">
+				<Search v-model="search"/>
 			</div>
 			<InfiniteTreeComponent class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
@@ -44,8 +44,9 @@ import InfiniteTree, { Node, INode } from 'infinite-tree';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
+import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
+@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class HierarchyComponent extends EditorComponent {
 	@Prop() public title: string;
@@ -63,8 +64,8 @@ export default class HierarchyComponent extends EditorComponent {
 	private search: string = '';
 
 	private entries = new Map<Guid, INode>();
-	private queue = new Map<String, INode>();
-	private existingParents = new Map<String, Array<INode>>();
+	private queue = new Map<string, INode>();
+	private existingParents = new Map<string, INode[]>();
 
 	constructor() {
 		super();
@@ -74,7 +75,7 @@ export default class HierarchyComponent extends EditorComponent {
 		console.log('Mounted');
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
-		this.tree = (this.$refs.infiniteTreeComponent as InfiniteTreeComponent).tree as InfiniteTree;
+		this.tree = (this.$refs.infiniteTreeComponent as any).tree as InfiniteTree;
 	}
 
 	private createNode(gameObject: GameObject): INode {
@@ -127,7 +128,7 @@ export default class HierarchyComponent extends EditorComponent {
 				if (parentNode === null) {
 					console.error('Missing parent node');
 				} else {
-					this.tree.addChildNodes(this.existingParents.get(parentNodeId), undefined, parentNode);
+					this.tree.addChildNodes(this.existingParents.get(parentNodeId) as INode[], undefined, parentNode);
 				}
 				this.existingParents.delete(parentNodeId);
 			}
@@ -184,7 +185,7 @@ export default class HierarchyComponent extends EditorComponent {
 		this.selected = currentNode;
 		this.selected.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
-		(this.$refs.infiniteTreeComponent as InfiniteTree).scrollToNode(currentNode);
+		(this.$refs.infiniteTreeComponent as InfiniteTreeComponent).scrollToNode(currentNode);
 	}
 
 	private onSelectNode(node: Node) {
