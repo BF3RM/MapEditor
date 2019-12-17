@@ -1,22 +1,59 @@
 class 'GameObject'
 
 local m_Logger = Logger("GameObject", true)
+local m_TraceableField_Suffix = "_original_value"
 
 function GameObject:__init(arg)
     self.guid = arg.guid
     self.creatorName = arg.creatorName -- never gets sent to js
-    self.name = arg.name
     self.typeName = arg.typeName
     self.blueprintCtrRef = arg.blueprintCtrRef
-    self.parentData = arg.parentData
-    self.transform = arg.transform  -- world transform
-    self.variation = arg.variation
-    --self.gameEntities = arg.gameEntities -- we only store the Ids of the entities here
     self.isVanilla = arg.isVanilla -- never gets sent to js
-    self.isDeleted = arg.isDeleted
-    self.isEnabled = arg.isEnabled
-    self.gameEntities = arg.gameEntities
+    self.gameEntities = arg.gameEntities or { }
     self.children = arg.children -- never gets sent to js
+    self.isClientOnly = arg.isClientOnly
+    self.isUserModified = true
+    self.userModifiedFields = {}
+    --self.name = arg.name
+    --self.parentData = arg.parentData
+    --self.transform = arg.transform  -- world transform
+    --self.variation = arg.variation
+    --self.isDeleted = arg.isDeleted --> only vanilla objects, dont appear in the browser anymore. entities get disabled, because we cannot destroy them
+    --self.isEnabled = arg.isEnabled
+    self:RegisterUserModifiableField("name", arg.name)
+    self:RegisterUserModifiableField("parentData", arg.parentData)
+    self:RegisterUserModifiableField("transform", arg.transform)
+    self:RegisterUserModifiableField("variation", arg.variation)
+    self:RegisterUserModifiableField("isDeleted", arg.isDeleted)
+    self:RegisterUserModifiableField("isEnabled", arg.isEnabled)
+end
+
+function GameObject:RegisterUserModifiableField(p_FieldName, p_DefaultValue)
+    self[p_FieldName] = p_DefaultValue
+    self[p_FieldName .. m_TraceableField_Suffix] = p_DefaultValue
+end
+
+function GameObject:SetField(p_FieldName, p_NewValue)
+    self[p_FieldName] = p_NewValue
+    local originalValue = self[p_FieldName .. m_TraceableField_Suffix]
+    local newValue = self[p_FieldName]
+
+    self.userModifiedFields[p_FieldName] = newValue ~= originalValue
+end
+
+function GameObject:IsUserModified()
+    if (self.isVanilla == false) then
+        return true
+    end
+
+    for fieldName, isUserModified in pairs(self.userModifiedFields) do
+        if isUserModified == true then
+            m_Logger:Write("GameObject: " .. self.name .. " has modified field: " .. fieldName .. " - original value: " .. tostring(self[fieldName .. m_TraceableField_Suffix]) .. " | new value: " .. tostring(self[fieldName]))
+            return true
+        end
+    end
+
+    return false
 end
 
 function GameObject:Disable()
@@ -32,10 +69,9 @@ function GameObject:Disable()
                 l_GameEntity:Disable()
             end
         end
-
     end
 
-    self.isEnabled = false
+    self:SetField("isEnabled", false)
 end
 
 function GameObject:Enable()
@@ -53,15 +89,67 @@ function GameObject:Enable()
         end
     end
 
-    self.isEnabled = true
+    self:SetField("isEnabled", true)
 end
 
-function GameObject:Destroy()
+function GameObject:MarkAsDeleted()
+    if (self.isVanilla == false) then
+        m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
+        return
+    end
+
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:MarkAsDeleted()
+        end
+    end
+
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Disable()
+            end
+        end
+    end
+
+    self:SetField("isDeleted", true)
+end
+
+function GameObject:MarkAsUndeleted()
+    if (self.isVanilla == false) then
+        m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
+        return
+    end
+
+    if self.children ~= nil then
+        for _, l_ChildGameObject in pairs(self.children) do
+            l_ChildGameObject:MarkAsUndeleted()
+        end
+    end
+
+    if self.gameEntities ~= nil then
+        for _, l_GameEntity in pairs(self.gameEntities) do
+            if l_GameEntity ~= nil then
+                l_GameEntity:Enable()
+            end
+        end
+    end
+
+    self:SetField("isDeleted", false)
+end
+
+function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
+    if (self.isVanilla == true) then
+        m_Logger:Error("Cant destroy vanilla object, use disable instead")
+        return
+    end
+
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:Destroy()
         end
     end
+
     if self.gameEntities ~= nil then
         for _, l_GameEntity in pairs(self.gameEntities) do
             if l_GameEntity ~= nil then
@@ -69,8 +157,6 @@ function GameObject:Destroy()
             end
         end
     end
-
-    GameObjectManager.m_GameObjects[self.guid] = nil
 end
 
 function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
@@ -110,7 +196,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
         end
     end
 
-    self.transform = LinearTransform(p_LinearTransform)
+    self:SetField("transform", LinearTransform(p_LinearTransform))
 
     return true
 end
@@ -126,6 +212,10 @@ function GameObject:GetGameObjectTransferData()
         variation = self.variation,
         isEnabled = self.isEnabled,
         isDeleted = self.isDeleted,
+        creatorName = self.creatorName,
+        isVanilla = self.isVanilla,
+        isClientOnly = self.isClientOnly,
+        isUserModified = self.isUserModified
         -- entities have to be set externally
     }
 

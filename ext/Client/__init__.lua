@@ -6,6 +6,7 @@ FreeCam = require "Freecam"
 Editor = require "Editor"
 UIManager = require "UIManager"
 MessageActions = require "MessageActions"
+ClientTransactionManager = require "ClientTransactionManager"
 
 EditorCommon = EditorCommon(Realm.Realm_Client)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
@@ -36,17 +37,12 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 
 	-- Editor Events
-	NetEvents:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands)
-	NetEvents:Subscribe('MapEditorClient:ReceiveUpdate', self, self.OnReceiveUpdate)
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
 	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
 
-	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
-
 	-- WebUI events
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
-	-- Events:Subscribe('MapEditor:ReceiveCommand', self, self.OnReceiveCommands) -- meant for client side only commands, not used yet
-	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessage)
+	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessages)
 	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
 	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
 	Events:Subscribe('MapEditor:RequestProjectDelete', self, self.OnRequestProjectDelete)
@@ -82,16 +78,17 @@ function MapEditorClient:OnLoaded()
 end
 
 function MapEditorClient:OnExtensionUnloading()
-	Editor:OnExtensionUnloading()
+	--Editor:OnExtensionUnloading() -- TODO: this was never implemented?
 end
 
 function MapEditorClient:OnPartitionLoaded(p_Partition)
-	Editor:OnPartitionLoaded(p_Partition)
+	InstanceParser:OnPartitionLoaded(p_Partition)
 	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 
-function MapEditorClient:OnEngineMessage(p_Message) 
-	Editor:OnEngineMessage(p_Message) 
+function MapEditorClient:OnEngineMessage(p_Message)
+	ClientTransactionManager:OnEngineMessage(p_Message)
+	Editor:OnEngineMessage(p_Message)
 end
 
 function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
@@ -108,7 +105,7 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 end
 
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
-	Editor:OnUpdatePass(p_Delta, p_Pass)
+	ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 end
 
 function MapEditorClient:OnLevelDestroy()
@@ -130,61 +127,42 @@ end
 
 ----------- Editor functions----------------
 
-function MapEditorClient:OnGameObjectReady(p_GameObject)
-	Editor:OnGameObjectReady(p_GameObject)
-end
-
 function MapEditorClient:OnSendCommandsToServer(p_CommandsJson)
-	Editor:OnSendCommandsToServer(p_CommandsJson)
+	ClientTransactionManager:OnSendCommandsToServer(p_CommandsJson)
 end
 
-function MapEditorClient:OnReceiveCommands(p_CommandsJson)
-	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
-
-	Editor:OnReceiveCommands(s_Commands, nil)
-end
-
-function MapEditorClient:OnReceiveMessage(p_Message)
-	Editor:OnReceiveMessage(p_Message)
-end
-
-function MapEditorClient:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
-	Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
-end
-
-function MapEditorClient:OnUpdateTransactionId(p_TransactionId)
-	Editor:OnUpdateTransactionId(p_TransactionId)
+function MapEditorClient:OnReceiveMessages(p_Messages)
+	ClientTransactionManager:OnReceiveMessages(p_Messages)
 end
 
 function MapEditorClient:OnReceiveProjectData(p_ProjectData)
-	Editor:OnReceiveProjectData(p_ProjectData)
+	-- TODO: Handle properly in the project admin view
 end
 
 function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
-	Editor:OnReceiveCurrentProjectHeader(p_ProjectHeader)
+	-- TODO: set project header
 end
-
--- function MapEditorClient:OnReceiveSave(p_SaveFile)
--- 	Editor:OnReceiveSave(p_SaveFile)
--- end
 
 ----------- WebUI functions----------------
 
 function MapEditorClient:OnRequestProjectSave(p_ProjectSaveDataJson)
 	local s_ProjectSaveData = DecodeParams(json.decode(p_ProjectSaveDataJson))
-	Editor:OnRequestProjectSave(s_ProjectSaveData)
+	NetEvents:SendLocal("ProjectManager:RequestProjectSave", s_ProjectSaveData)
 end
 
 function MapEditorClient:OnRequestProjectLoad(p_ProjectName)
-	Editor:OnRequestProjectLoad(p_ProjectName)
+	m_Logger:Write("Load requested: " .. p_ProjectName)
+	NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_ProjectName)
 end
 
 function MapEditorClient:OnRequestProjectDelete(p_ProjectName)
-	Editor:OnRequestProjectDelete(p_ProjectName)
+	m_Logger:Write("Delete requested: " .. p_ProjectName)
+	NetEvents:SendLocal("ProjectManager:RequestProjectDelete", p_ProjectName)
 end
 
 function MapEditorClient:OnRequestProjectData(p_ProjectName)
-	Editor:OnRequestProjectData(p_ProjectName)
+	m_Logger:Write("Project Data requested: " .. p_ProjectName)
+	NetEvents:SendLocal("ProjectManager:RequestProjectData", p_ProjectName)
 end
 
 function MapEditorClient:OnEnableFreeCamMovement()

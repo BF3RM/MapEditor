@@ -42,7 +42,7 @@ function FreeCam:SetCameraMode(p_Mode)
         self:UpdateFreeCamVars()
     end
 
-	m_Logger:Write("Setting FreeCam mode to "..p_Mode)
+	--m_Logger:Write("Setting FreeCam mode to "..p_Mode)
 
     self.m_Mode = p_Mode
 end

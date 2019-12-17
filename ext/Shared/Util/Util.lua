@@ -20,18 +20,18 @@ function MergeTables(p_Old, p_New)
 	return p_Old
 end
 
-function MergeGameObjectTransferData(p_Old, p_New)
-	if(p_Old == nil) then
-		return p_New
-	end
-	if(p_New == nil) then
-		return nil
-	end
-	for k,v in pairs(p_New) do
-		p_Old[k] = v
-	end
-	return p_Old
-end
+--function MergeGameObjectTransferData(p_Old, p_New)
+--	if(p_Old == nil) then
+--		return p_New
+--	end
+--	if(p_New == nil) then
+--		return nil
+--	end
+--	for k,v in pairs(p_New) do
+--		p_Old[k] = v
+--	end
+--	return p_Old
+--end
 
 function GetChanges(p_Old, p_New)
 	local s_Changes = {}
@@ -221,12 +221,8 @@ function GenerateCustomGuid()
     return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
--- Generates a guid based on a given number. Used for vanilla objects.
-function GenerateVanillaGuid(n)
-	return Guid(VANILLA_GUID_PREFIX.."-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
-end
 
-function GetFilledNumberAsString(n, stringLength)
+function GetPaddedNumberAsString(n, stringLength)
 	local n_string = tostring(n)
 	local prefix = ""
 
@@ -237,4 +233,22 @@ function GetFilledNumberAsString(n, stringLength)
 	end
 
 	return (prefix..n_string)
+end
+
+function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
+	local intHash = MathUtils:FNVHash(p_Name .. tostring(p_Transform))
+
+	intHash = intHash + p_Increment
+
+	local hashAsString = tostring(intHash)
+	hashAsString = hashAsString:gsub('-', '1')
+
+	--print("created hash" .. hashAsString)
+
+	return PadAndCreateGuid(hashAsString)
+end
+
+-- Generates a guid based on a given number. Used for vanilla objects.
+function PadAndCreateGuid(p_Hash)
+	return Guid(VANILLA_GUID_PREFIX .. "-0000-0000-0000-".. GetPaddedNumberAsString(p_Hash, 12), "D")
 end

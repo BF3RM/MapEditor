@@ -54,17 +54,20 @@ function MessageActions:SetScreenToWorldPosition(p_Message)
 end
 
 function MessageActions:PreviewSpawn(p_Message, p_Arguments)
-    local s_gameObjectTransferData = p_Message.gameObjectTransferData
+    local s_GameObjectTransferData = p_Message.gameObjectTransferData
 
-    if (s_gameObjectTransferData == nil) then
+    if (s_GameObjectTransferData == nil) then
         m_Logger:Error("gameObjectTransferData must be set on PreviewSpawn")
     end
 
-    local _, s_Result = ObjectManager:SpawnBlueprint(s_gameObjectTransferData.guid,
-                                                    s_gameObjectTransferData.blueprintCtrRef.partitionGuid,
-                                                    s_gameObjectTransferData.blueprintCtrRef.instanceGuid,
-                                                    s_gameObjectTransferData.transform,
-                                                    s_gameObjectTransferData.variation)
+    local s_Result = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
+                                                               "previewSpawn",
+                                                               s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
+                                                               s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
+                                                               nil,
+                                                               s_GameObjectTransferData.transform,
+                                                               s_GameObjectTransferData.variation,
+                                                                true)
 
     if s_Result == false then
         return ActionResultType.Failure
@@ -84,7 +87,7 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
         m_Logger:Error("gameObjectTransferData must be set on PreviewDestroy")
     end
 
-    local s_Result = ObjectManager:DestroyEntity(s_gameObjectTransferData.guid)
+    local s_Result = GameObjectManager:DeleteGameObject(s_gameObjectTransferData.guid)
 
     if s_Result == false then
         return ActionResultType.Failure
@@ -100,7 +103,7 @@ function MessageActions:PreviewMove(p_Message)
         m_Logger:Error("gameObjectTransferData must be set on PreviewMove")
     end
 
-    local s_Result = ObjectManager:SetTransform(s_gameObjectTransferData.guid, s_gameObjectTransferData.transform, false)
+    local s_Result = GameObjectManager:SetTransform(gameObjectTransferData.guid, s_gameObjectTransferData.transform, false)
 
     if s_Result == false then
         return ActionResultType.Failure

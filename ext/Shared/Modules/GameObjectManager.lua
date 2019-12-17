@@ -4,21 +4,29 @@ local m_Logger = Logger("GameObjectManager", true)
 
 function GameObjectManager:__init(p_Realm)
     m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
-    self.m_Realm = p_Realm;
+    self.m_Realm = p_Realm
     self:RegisterVars()
+    self:RegisterEvents()
 end
 
 function GameObjectManager:RegisterVars()
-    self.m_VanillaBlueprintNumber = 0
+    --self.m_VanillaBlueprintNumber = 0
 
     self.m_GameObjects = {}
-    self.m_PendingCustomBlueprintGuids = {}
+    self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
     self.m_Entities = {}
     self.m_UnresolvedGameObjects = {}
+    self.m_UnresolvedClientOnlyChildren = {}
 end
 
 function GameObjectManager:OnLevelDestroy()
     self:RegisterVars()
+end
+
+function GameObjectManager:RegisterEvents()
+    NetEvents:Subscribe("GameObjectManager:SendClientOnlyObjectGuid", self, self.OnClientOnlyObjectGuidReceived)
+    NetEvents:Subscribe("GameObjectManager:RequestClientOnlyGameObject", self, self.OnRequestClientOnlyGameObject)
+    NetEvents:Subscribe("GameObjectManager:SendClientOnlyObject", self, self.OnClientOnlyGameObjectReceived)
 end
 
 function GameObjectManager:GetGameEntities(p_EntityIds)
@@ -37,7 +45,7 @@ function GameObjectManager:GetGameEntities(p_EntityIds)
     return s_GameEntities
 end
 
-function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation)
+function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
     if p_BlueprintPartitionGuid == nil or
         p_BlueprintInstanceGuid == nil or
         p_LinearTransform == nil then
@@ -47,7 +55,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     end
 
     if self.m_Entities[p_GameObjectGuid] ~= nil then
-        m_Logger:Write('Object with id ' .. p_GameObjectGuid .. ' already existed as a spawned entity!')
+        m_Logger:Warning('Object with id ' .. p_GameObjectGuid .. ' already existed as a spawned entity!')
         return false
     end
 
@@ -63,7 +71,19 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
     local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
     m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
-    self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData }
+    if p_IsPreviewSpawn == false then
+        self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData }
+    else
+        local s_PreviewSpawnParentData = GameObjectParentData{
+            guid = "previewSpawn",
+            typeName = "previewSpawn",
+            primaryInstanceGuid = "previewSpawn",
+            partitionGuid = "previewSpawn",
+        }
+        m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
+        m_Logger:WriteTable(s_PreviewSpawnParentData)
+        self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData }
+    end
 
     local s_Params = EntityCreationParams()
     s_Params.transform = p_LinearTransform
@@ -87,7 +107,7 @@ end
 
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
     -- We dont load vanilla objects if the flag is active
-    if not ME_CONFIG.LOAD_VANILLA and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+    if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
         return
     end
 
@@ -158,13 +178,15 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         instanceGuid = s_BlueprintInstanceGuid
     }
 
+    s_GameObject.isClientOnly = self:IsClientOnlyBlueprintType(p_Blueprint.typeInfo.name)
+
     self:ResolveChildren(s_GameObject)
 
     if (p_Parent == nil) then -- no parent (custom spawned blueprint) -> proceed in postprocessing
-        m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
+        --m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
         self:PostProcessGameObjectAndChildren(s_GameObject)
     elseif (InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then -- top level vanilla (level data) -> proceed in postprocessing
-        m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
+        --m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
         s_GameObject.parentData = GameObjectParentData{
             guid = s_ParentPrimaryInstance,
             typeName = "LevelData",
@@ -210,7 +232,6 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     local s_PendingInfo = self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid]
 
     if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
-
         local s_ParentData = GameObjectParentData{
             guid = s_PendingInfo.parentData.guid,
             typeName = s_PendingInfo.parentData.typeName,
@@ -219,8 +240,10 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
         }
 
         p_GameObject.parentData = s_ParentData
+        m_Logger:WriteTable(s_ParentData)
+        m_Logger:Write( "PendingInfo guid: " .. tostring(s_PendingInfo.customGuid) .. " - ParentData: " .. tostring(s_PendingInfo.parentData))
 
-        if s_ParentData.guid ~= "root" then
+        if s_ParentData.guid ~= "root" and s_ParentData.guid ~= "previewSpawn" then
             local s_ParentObject = self.m_GameObjects[s_ParentData.guid]
 
             if s_ParentObject == nil then
@@ -228,21 +251,22 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
             end
 
             table.insert(s_ParentObject.children, p_GameObject)
-
         end
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
     else
-        self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
-        local s_VanillaGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
+        --self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
+        local s_VanillaGuid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, true, s_VanillaGuid, "VanillaHook")
     end
 
     self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid] = nil
 
-    -- at this point, the gameObject and all its children are fully ready to be transferred to JS -> invoke sending of CommandActionResults
-    Events:DispatchLocal("GameObjectManager:GameObjectReady", p_GameObject)
+    if p_GameObject.parentData.guid ~= "previewSpawn" then
+        -- at this point, the gameObject and all its children are fully ready to be transferred to JS -> invoke sending of CommandActionResults
+        Events:DispatchLocal("GameObjectManager:GameObjectReady", p_GameObject)
+    end
 end
 
 function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_IsVanilla, p_CustomGuid, p_CreatorName)
@@ -250,14 +274,15 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     p_GameObject.isVanilla = p_IsVanilla
     p_GameObject.creatorName = p_CreatorName
 
+
     if p_GameObject.children ~= nil then
         for _, s_ChildGameObject in pairs(p_GameObject.children) do
             local s_ChildGuid
 
             if (p_IsVanilla == true) then
-                self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
+                --self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
 
-                s_ChildGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
+                s_ChildGuid = self:GetVanillaGuid(s_ChildGameObject.name, s_ChildGameObject.transform.trans)
             else
                 s_ChildGuid = GenerateCustomGuid()
             end
@@ -269,7 +294,8 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
             --s_ChildGameObject.parentData.partitionGuid = p_GameObject.blueprintCtrRef.partitionGuid
 
             self:SetGuidAndAddGameObjectRecursively(s_ChildGameObject, p_IsVanilla, s_ChildGuid, p_CreatorName)
-	        self.m_GameObjects[tostring(s_ChildGameObject.guid)] = s_ChildGameObject
+	        --self.m_GameObjects[tostring(s_ChildGameObject.guid)] = s_ChildGameObject
+            --self:AddGameObjectToTable(s_ChildGameObject)
         end
     end
 
@@ -279,22 +305,184 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
         end
     end
 
-    self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
+    self:AddGameObjectToTable(p_GameObject)
+
+    if (p_GameObject.isClientOnly == true) then
+        self:NotifyServerAboutClientOnlyObject(p_GameObject.guid)
+    end
+    --self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
-function GameObjectManager:DestroyGameObject(p_Guid)
+-- CLIENT v v v v --
+function GameObjectManager:NotifyServerAboutClientOnlyObject(p_GameObjectGuid)
+    NetEvents:SendLocal("GameObjectManager:SendClientOnlyObjectGuid", p_GameObjectGuid)
+end
+
+function GameObjectManager:OnRequestClientOnlyGameObject(p_GameObjectGuid)
+    local s_GameObject = self.m_GameObjects[tostring(p_GameObjectGuid)]
+
+    if (s_GameObject ~= nil) then
+        --m_Logger:Write("Server requested client only object: " ..  tostring(s_GameObject.guid))
+        NetEvents:SendLocal("GameObjectManager:SendClientOnlyObject", s_GameObject:GetGameObjectTransferData())
+    else
+        m_Logger:Error("Couldnt find client only gameobject requested by the server. guid: " .. tostring(p_GameObjectGuid))
+    end
+end
+-- CLIENT ^ ^ ^ ^ --
+
+-- SERVER v v v v --
+function GameObjectManager:OnClientOnlyObjectGuidReceived(p_Player, p_GameObjectGuid)
+    if (self.m_GameObjects[tostring(p_GameObjectGuid)] == nil) then -- clientonly object doesnt exist on server yet
+        NetEvents:SendToLocal("GameObjectManager:RequestClientOnlyGameObject", p_Player, p_GameObjectGuid)
+    end
+end
+
+
+function GameObjectManager:OnClientOnlyGameObjectReceived(p_Player, p_GameObjectTransferData)
+    local s_GameObject = GameObjectTransferData(p_GameObjectTransferData):GetGameObject()
+    local s_GuidString = tostring(s_GameObject.guid)
+
+    if (self.m_GameObjects[s_GuidString] ~= nil) then
+        m_Logger:Warning("Already had a client only object received with the same guid")
+        return
+    end
+
+    if (s_GameObject.parentData ~= nil) then
+        local parentGuidString = tostring(s_GameObject.parentData.guid)
+        local parent = self.m_GameObjects[parentGuidString]
+
+        if (parent ~= nil) then
+            --m_Logger:Write("Resolved child " .. tostring(s_GameObject.guid) .. " with parent " .. tostring(parent.guid))
+
+            table.insert(parent.children, s_GameObject)
+        else
+            if (self.m_UnresolvedClientOnlyChildren[parentGuidString] == nil) then
+                self.m_UnresolvedClientOnlyChildren[parentGuidString] = { }
+            end
+
+            table.insert(self.m_UnresolvedClientOnlyChildren[parentGuidString], tostring(s_GameObject.guid))
+        end
+    end
+
+    if (self.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
+        #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
+
+        for _, childGameObjectGuidString in pairs(self.m_UnresolvedClientOnlyChildren[s_GuidString]) do
+            table.insert(s_GameObject.children, self.m_GameObjects[childGameObjectGuidString])
+            --m_Logger:Write("Resolved child " .. childGameObjectGuidString .. " with parent " .. s_GuidString)
+        end
+
+        self.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
+    end
+
+    self:AddGameObjectToTable(s_GameObject)
+    --m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
+end
+-- SERVER ^ ^ ^ ^ --
+
+function GameObjectManager:AddGameObjectToTable(p_GameObject)
+    local guidAsString = tostring(p_GameObject.guid)
+
+    if (self.m_GameObjects[guidAsString] ~= nil) then
+        m_Logger:Warning("GAMEOBJECT WITH SAME GUID ALREADY EXISTS: " ..  guidAsString)
+    end
+
+    m_Logger:Write(tostring(p_GameObject.guid) .. " | " .. p_GameObject.name .. " | " .. tostring(p_GameObject.transform.trans))
+
+    self.m_GameObjects[guidAsString] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
+end
+
+function GameObjectManager:GetVanillaGuid(p_Name, p_Transform)
+    local s_VanillaGuid = GenerateVanillaGuid(p_Name, p_Transform, 0)
+    local s_Increment = 1
+
+    --m_Logger:Write("Generated Vanilla Guid: " .. tostring(s_VanillaGuid))
+
+    while (self.m_GameObjects[tostring(s_VanillaGuid)] ~= nil) do
+        --m_Logger:Write(tostring(s_VanillaGuid) .. " already existed, creating new increment with increment == " .. s_Increment)
+
+        s_VanillaGuid = GenerateVanillaGuid(p_Name, p_Transform, s_Increment)
+
+        --m_Logger:Write("Incremented guid: " .. tostring(s_VanillaGuid))
+
+        s_Increment = s_Increment + 1
+    end
+
+    return s_VanillaGuid
+end
+
+function GameObjectManager:IsClientOnlyBlueprintType(p_BlueprintTypeInfoName)
+    if (p_BlueprintTypeInfoName == "VisualEnvironmentBlueprint" or
+        p_BlueprintTypeInfoName == "EffectBlueprint") then
+        --m_Logger:Write("Found client only blueprint: " .. p_BlueprintTypeInfoName)
+
+        return true
+    end
+
+    return false
+end
+
+function GameObjectManager:DeleteGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]
 
     if (s_GameObject == nil) then
-        m_Logger:Error("Failed to destroy blueprint: " .. p_Guid)
+        m_Logger:Error("GameObject not found: " .. p_Guid)
         return false
     end
 
-    s_GameObject:Destroy()
+    if (s_GameObject.isDeleted == true) then
+        m_Logger:Error("GameObject was already marked as deleted: " .. p_Guid)
+        return false
+    end
+
+    if (s_GameObject.isVanilla) then
+        s_GameObject:MarkAsDeleted()
+    else
+        s_GameObject:Destroy()
+
+        self.m_GameObjects[p_Guid] = nil
+    end
 
     return true
 end
 
+function GameObjectManager:UndeleteBlueprint(p_Guid)
+    local s_GameObject = self.m_GameObjects[p_Guid]
+
+    if (s_GameObject == nil) then
+        m_Logger:Error("GameObject not found: " .. p_Guid)
+        return false
+    end
+
+    if (s_GameObject.isDeleted == false) then
+        m_Logger:Error("GameObject was not marked as deleted before undeleting: " .. p_Guid)
+        return false
+    end
+
+    if (s_GameObject.isVanilla == false) then
+        m_Logger:Error("GameObject was not a vanilla object " .. p_Guid)
+        return false
+    end
+
+    s_GameObject:MarkAsUndeleted()
+
+    return true
+end
+
+--function GameObjectManager:DestroyGameObject(p_Guid)
+--    local s_GameObject = self.m_GameObjects[p_Guid]
+--
+--    if (s_GameObject == nil) then
+--        m_Logger:Error("GameObject not found: " .. p_Guid)
+--        return false
+--    end
+--
+--    s_GameObject:Destroy()
+--
+--    self.m_GameObjects[self.guid] = nil
+--
+--    return true
+--end
 
 function GameObjectManager:EnableGameObject(p_Guid)
     local s_GameObject = self.m_GameObjects[p_Guid]

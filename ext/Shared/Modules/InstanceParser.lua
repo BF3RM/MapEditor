@@ -57,7 +57,7 @@ end
 --TODO: Redo this whole fucking thing.
 
 function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
-	m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
+	--m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
 	local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGUID(
 		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid), 
 		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid)))
@@ -183,10 +183,10 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
 function InstanceParser:FillVariations()
-	m_Logger:Write("FILL")
-    m_Logger:Write(#self.m_MeshVariationDatabases)
-    m_Logger:Write(#self.m_Blueprints)
-    m_Logger:Write(#self.m_BlueprintInstances)
+	--m_Logger:Write("FILL")
+    --m_Logger:Write(#self.m_MeshVariationDatabases)
+    --m_Logger:Write(#self.m_Blueprints)
+    --m_Logger:Write(#self.m_BlueprintInstances)
 
 	for _, database in pairs(self.m_MeshVariationDatabases) do
 		local s_Instance = database
