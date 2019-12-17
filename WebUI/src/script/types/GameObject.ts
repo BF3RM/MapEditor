@@ -8,6 +8,8 @@ import { GameEntityData } from '@/script/types/GameEntityData';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
+import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
+import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 
 export class GameObject extends THREE.Object3D {
 	public guid: Guid;
@@ -20,7 +22,7 @@ export class GameObject extends THREE.Object3D {
 	public gameEntities: GameEntityData[];
 
 	public selected: boolean;
-	public enabled: boolean;
+	public _enabled: boolean;
 	public highlighted: boolean;
 	private completeBoundingBox: THREE.Box3;
 
@@ -41,7 +43,7 @@ export class GameObject extends THREE.Object3D {
 		this.matrixAutoUpdate = true;
 		this.matrixWorldAutoUpdate = true;
 		this.visible = true;
-		this.enabled = true;
+		this._enabled = true;
 		this.highlighted = false;
 
 		this.completeBoundingBox = new THREE.Box3();
@@ -223,7 +225,7 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public onSelected() {
-		if (!this.enabled) {
+		if (!this._enabled) {
 			window.LogError('Attempted to select a disabled gameObject');
 			return;
 		}
@@ -236,7 +238,7 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public onDeselected() {
-		if (!this.enabled) {
+		if (!this._enabled) {
 			window.LogError('Attempted to deselect a disabled gameObject');
 			return;
 		}
@@ -257,7 +259,7 @@ export class GameObject extends THREE.Object3D {
 			}
 		}
 		this.visible = true;
-		this.enabled = true;
+		this._enabled = true;
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
@@ -270,7 +272,19 @@ export class GameObject extends THREE.Object3D {
 			}
 		}
 		this.visible = false;
-		this.enabled = false;
+		this._enabled = false;
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
+	}
+
+	set enabled(value: boolean) {
+		if (value) {
+			window.editor.execute(new EnableBlueprintCommand(this.getGameObjectTransferData()));
+		} else {
+			window.editor.execute(new DisableBlueprintCommand(this.getGameObjectTransferData()));
+		}
+	}
+
+	get enabled(): boolean {
+		return this._enabled;
 	}
 }

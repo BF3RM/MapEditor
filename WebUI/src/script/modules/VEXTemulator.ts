@@ -12,13 +12,19 @@ export class VEXTemulator {
 		this.commands.SetObjectNameCommand = this.SetObjectName;
 		this.commands.SetTransformCommand = this.SetTransform;
 		this.commands.SetVariationCommand = this.SetVariation;
+		this.commands.EnableBlueprintCommand = this.EnableBlueprint;
+		this.commands.DisableBlueprintCommand = this.DisableBlueprint;
 	}
 
 	public Receive(commands: any[]) {
 		const scope = this;
 		const responses: any[] = [];
 		commands.forEach((command) => {
-			responses.push(scope.commands[command.type](command));
+			if (scope.commands[command.type] === undefined) {
+				console.error('NotImplemented: ' + command.type);
+			} else {
+				responses.push(scope.commands[command.type](command));
+			}
 		});
 		// Delay to simulate tick pass
 		setTimeout(() => {
@@ -26,7 +32,7 @@ export class VEXTemulator {
 		}, 1);
 	}
 
-	public CreateGroup(commandActionResult: CommandActionResult) {
+	private CreateGroup(commandActionResult: CommandActionResult) {
 		const response = {
 			type: 'CreatedGroup',
 			sender: commandActionResult.sender,
@@ -39,11 +45,11 @@ export class VEXTemulator {
 		return response;
 	}
 
-	public DestroyGroup(command: any) {
+	private DestroyGroup(command: any) {
 		LogError('NotImplemented');
 	}
 
-	public SpawnBlueprint(commandActionResult: CommandActionResult) {
+	private SpawnBlueprint(commandActionResult: CommandActionResult) {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
@@ -134,7 +140,7 @@ export class VEXTemulator {
 		return response;
 	}
 
-	public SetTransform(commandActionResult: CommandActionResult) {
+	private SetTransform(commandActionResult: CommandActionResult) {
 		const response = {
 			type: 'SetTransform',
 			gameObjectTransferData: {
@@ -145,7 +151,7 @@ export class VEXTemulator {
 		return response;
 	}
 
-	public DestroyBlueprint(commandActionResult: CommandActionResult) {
+	private DestroyBlueprint(commandActionResult: CommandActionResult) {
 		// Delete all children of blueprint
 		const response = {
 			type: 'DestroyedBlueprint',
@@ -156,7 +162,7 @@ export class VEXTemulator {
 		return response;
 	}
 
-	public SetObjectName(commandActionResult: CommandActionResult) {
+	private SetObjectName(commandActionResult: CommandActionResult) {
 		const response = {
 			type: 'SetObjectName',
 			gameObjectTransferData: {
@@ -167,12 +173,32 @@ export class VEXTemulator {
 		return response;
 	}
 
-	public SetVariation(commandActionResult: CommandActionResult) {
+	private SetVariation(commandActionResult: CommandActionResult) {
 		const response = {
 			type: 'SetVariation',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid,
 				variation: commandActionResult.gameObjectTransferData.variation
+			}
+		};
+		return response;
+	}
+
+	private EnableBlueprint(commandActionResult: CommandActionResult) {
+		const response = {
+			type: 'EnabledBlueprint',
+			gameObjectTransferData: {
+				guid: commandActionResult.gameObjectTransferData.guid
+			}
+		};
+		return response;
+	}
+
+	private DisableBlueprint(commandActionResult: CommandActionResult) {
+		const response = {
+			type: 'DisabledBlueprint',
+			gameObjectTransferData: {
+				guid: commandActionResult.gameObjectTransferData.guid
 			}
 		};
 		return response;

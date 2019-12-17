@@ -1,5 +1,6 @@
 import { Signal } from 'typed-signals';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
+import { Guid } from '@/script/types/Guid';
 
 export const signals = {
 	editor: {
@@ -28,7 +29,7 @@ export const signals = {
 
 	selectionGroupMoved: new Signal(),
 
-	selectedGameObject: new Signal(),
+	selectedGameObject: new Signal<(guid: Guid, isMultiSelection: boolean, scrollTo: boolean) => void>(),
 	deselectedGameObject: new Signal(),
 
 	setTransform: new Signal(),
