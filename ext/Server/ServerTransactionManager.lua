@@ -25,7 +25,7 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
 
     --- Client up to date
     if p_TransactionId == #self.m_Transactions then
-        m_Logger:Write("Client up to date")
+        --m_Logger:Write("Client up to date")
 
         return
     --- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.

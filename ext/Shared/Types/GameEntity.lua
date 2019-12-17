@@ -28,10 +28,12 @@ end
 
 function GameEntity:Disable()
     self.entity:FireEvent("Disable")
+    self.entity:FireEvent("Stop")
 end
 
 function GameEntity:Enable()
     self.entity:FireEvent("Enable")
+    self.entity:FireEvent("Start")
 end
 
 function GameEntity:Destroy()

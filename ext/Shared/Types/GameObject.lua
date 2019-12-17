@@ -9,9 +9,9 @@ function GameObject:__init(arg)
     self.typeName = arg.typeName
     self.blueprintCtrRef = arg.blueprintCtrRef
     self.isVanilla = arg.isVanilla -- never gets sent to js
-    self.gameEntities = arg.gameEntities
+    self.gameEntities = arg.gameEntities or { }
     self.children = arg.children -- never gets sent to js
-
+    self.isClientOnly = arg.isClientOnly
     self.isUserModified = true
     self.userModifiedFields = {}
     --self.name = arg.name
@@ -100,7 +100,7 @@ function GameObject:MarkAsDeleted()
 
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
-            l_ChildGameObject:Delete()
+            l_ChildGameObject:MarkAsDeleted()
         end
     end
 
@@ -212,6 +212,10 @@ function GameObject:GetGameObjectTransferData()
         variation = self.variation,
         isEnabled = self.isEnabled,
         isDeleted = self.isDeleted,
+        creatorName = self.creatorName,
+        isVanilla = self.isVanilla,
+        isClientOnly = self.isClientOnly,
+        isUserModified = self.isUserModified
         -- entities have to be set externally
     }
 

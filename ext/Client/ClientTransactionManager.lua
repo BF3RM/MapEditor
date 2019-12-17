@@ -297,11 +297,11 @@ end
 
 
 function ClientTransactionManager:OnGameObjectReady(p_GameObject)
-    m_Logger:Write("ClientTransactionManager:OnGameObjectReady(p_GameObject)")
+    --m_Logger:Write("ClientTransactionManager:OnGameObjectReady(p_GameObject)")
     self:CreateCommandActionResultsRecursively(p_GameObject)
 
     if(#self.m_CommandActionResults > 0) then
-        m_Logger:Write("Sending stuff to JS")
+        --m_Logger:Write("Sending stuff to JS")
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_CommandActionResults)))
     else
         m_Logger:Error("OnGameObjectReady: No results were yielded for some reason")
