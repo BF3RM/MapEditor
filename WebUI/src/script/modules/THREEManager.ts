@@ -182,6 +182,8 @@ export class THREEManager {
 		this.control.addEventListener('dragging-changed', (event) => {
 			this.cameraControls.enabled = !event.value;
 		});
+
+		signals.objectChanged.connect(this.Render.bind(this)); // Object changed? Render!
 	}
 
 	public CreateGizmo() {
