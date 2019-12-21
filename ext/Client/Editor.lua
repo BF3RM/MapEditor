@@ -20,14 +20,7 @@ end
 function Editor:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLevelFinalizedMessage then
 		InstanceParser:FillVariations()
-		local s_LevelDatas = InstanceParser:GetLevelDatas()
-
-		for _, v in pairs(s_LevelDatas) do
-			WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
-		end
-
-		WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
-		self.m_LevelLoaded = true
+		self:InitializeUIData()
     end
 
 	if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
@@ -94,7 +87,7 @@ function Editor:Raycast()
 		WebUI:ExecuteJS(string.format('editor.SetScreenToWorldPosition(%s, %s, %s)',
 				s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
 	end
-			
+
 	self.m_PendingRaycast = false
 end
 
@@ -120,6 +113,17 @@ function Editor:SetPendingRaycast(p_Type, p_Direction)
 		type = p_Type,
 		direction = p_Direction
 	}
+end
+
+function Editor:InitializeUIData()
+	local s_LevelDatas = InstanceParser:GetLevelDatas()
+
+	for _, v in pairs(s_LevelDatas) do
+		WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
+	end
+
+	WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
+	self.m_LevelLoaded = true
 end
 
 return Editor()

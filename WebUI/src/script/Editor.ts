@@ -123,6 +123,9 @@ export default class Editor {
 	public onEditorReady() {
 		if (this.debug) {
 			this.blueprintManager.RegisterBlueprints(JSON.stringify(GenerateBlueprints(100)));
+		} else {
+			this.vext.SendEvent('UIReloaded');
+			console.log('Sent event');
 		}
 	}
 

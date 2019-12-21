@@ -438,14 +438,23 @@ export class THREEManager {
 		this.Render();
 	}
 
-	public UpdateCameraTransform(transform: LinearTransform) {
+	public UpdateCameraTransform(lx: number, ly: number, lz: number, ux: number, uy: number, uz: number, fx: number, fy: number, fz: number, x: number, y: number, z: number) {
 		this.updatingCamera = true;
 
-		this.camera.setRotationFromMatrix(transform.toMatrix());
-		const distance = 10;
-		const target = new Vec3(transform.trans.x + (transform.forward.x * -1 * distance), transform.trans.y + (transform.forward.y * -1 * distance), transform.trans.z + (transform.forward.z * -1 * distance));
+		this.updatingCamera = true;
+		const m = new THREE.Matrix4();
 
-		this.cameraControls.setLookAt(transform.trans.x, transform.trans.y, transform.trans.z, target.x, target.y, target.z, false);
+		m.set(lx, ux, fx, 0,
+			ly, uy, fy, 0,
+			lz, uz, fz, 0,
+			0, 0, 0, 0);
+
+		this.camera.setRotationFromMatrix(m);
+		this.camera.position.set(x, y, z);
+		const distance = 10;
+		const target = new Vec3(x + (fx * -1 * distance), y + (fy * -1 * distance), z + (fz * -1 * distance));
+
+		this.cameraControls.setLookAt(x, y, z, target.x, target.y, target.z, false);
 		this.Render();
 		this.updatingCamera = false;
 	}

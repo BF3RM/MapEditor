@@ -41,13 +41,14 @@ function MapEditorClient:RegisterEvents()
 	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
 
 	-- WebUI events
+	Events:Subscribe('MapEditor:UIReloaded', self, self.OnUIReloaded)
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessages)
 	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
 	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
 	Events:Subscribe('MapEditor:RequestProjectDelete', self, self.OnRequestProjectDelete)
 	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
-	
+
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
 	Events:Subscribe('MapEditor:DisableFreeCam', self, self.OnDisableFreeCam)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
@@ -58,7 +59,7 @@ function MapEditorClient:RegisterEvents()
     Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
     Hooks:Install('ClientEntityFactory:Create', 999, self, self.OnEntityCreate)
 
-	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles) 
+	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
@@ -144,6 +145,10 @@ function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
 end
 
 ----------- WebUI functions----------------
+
+function MapEditorClient:OnUIReloaded()
+	Editor:InitializeUIData(p_Message)
+end
 
 function MapEditorClient:OnRequestProjectSave(p_ProjectSaveDataJson)
 	local s_ProjectSaveData = DecodeParams(json.decode(p_ProjectSaveDataJson))

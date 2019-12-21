@@ -8006,10 +8006,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vextpack@^0.1.1:
+"vextpack@https://github.com/Powback/VextPack":
   version "0.1.1"
-  resolved "https://registry.yarnpkg.com/vextpack/-/vextpack-0.1.1.tgz#209bce32339630cb6bb3f22154aaade04ce0ad37"
-  integrity sha512-CszhuR4484jFDle5XK0/nuXpvgkL+xaNKp22b4nCyHXDud5Nd6l0ZuU/tmqTJbpls0AES0LW0/1vHGkx7sjOlw==
+  resolved "https://github.com/Powback/VextPack#5f7c9703be5d5fc35ded7b903543aa0aa7f40d7d"
 
 vm-browserify@^1.0.1:
   version "1.1.2"
