@@ -116,9 +116,8 @@ function Editor:SetPendingRaycast(p_Type, p_Direction)
 end
 
 function Editor:InitializeUIData(p_CommandActionResults)
-	if(p_CommandActionResults == nil) then
-		print("No CommandActionResult")
-		return
+	if(p_CommandActionResults == null) then
+		p_CommandActionResults = {}
 	end
 	local s_LevelDatas = InstanceParser:GetLevelDatas()
 
