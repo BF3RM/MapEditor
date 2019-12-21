@@ -9,7 +9,9 @@ import '@/script/hacks/HTMLDivElement';
 let debugMode: boolean = false;
 // var vext = new VEXTInterface();
 if ((window).location.protocol.indexOf('webui') === -1) {
-	debugMode = true;
+	if (window.location.ancestorOrigins[0] !== 'webui://main') {
+		debugMode = true;
+	}
 }
 window.debug = debugMode;
 (window).editor = new Editor(debugMode);
