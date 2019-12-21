@@ -61,10 +61,10 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
     p_Variation = p_Variation or 0
 
-    local s_Blueprint = ResourceManager:FindInstanceByGUID(Guid(p_BlueprintPartitionGuid), Guid(p_BlueprintInstanceGuid))
+    local s_Blueprint = ResourceManager:FindInstanceByGUID(Guid(tostring(p_BlueprintPartitionGuid)), Guid(tostring(p_BlueprintInstanceGuid)))
 
     if s_Blueprint == nil then
-        m_Logger:Error("Couldn't find the specified instance")
+        m_Logger:Error("Couldn't find the specified instance: Partition: " .. tostring(p_BlueprintPartitionGuid) .. " | Instance: " .. tostring(p_BlueprintInstanceGuid))
         return false
     end
 
@@ -243,7 +243,7 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
         m_Logger:WriteTable(s_ParentData)
         m_Logger:Write( "PendingInfo guid: " .. tostring(s_PendingInfo.customGuid) .. " - ParentData: " .. tostring(s_PendingInfo.parentData))
 
-        if s_ParentData.guid ~= "root" and s_ParentData.guid ~= "previewSpawn" then
+        if s_ParentData.guid ~= "root" and s_ParentData.guid ~= "00000000-0000-0000-0000-000000000000" and s_ParentData.guid ~= "previewSpawn" then
             local s_ParentObject = self.m_GameObjects[s_ParentData.guid]
 
             if s_ParentObject == nil then

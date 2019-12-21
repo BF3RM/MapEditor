@@ -11,7 +11,7 @@ export class BlueprintManager {
 	public RegisterBlueprint(guid: Guid, blueprint: IBlueprint) {
 		const instanceGuid = Guid.parse(blueprint.instanceGuid as string);
 		const partitionGuid = Guid.parse(blueprint.partitionGuid as string);
-		const bp = new Blueprint(instanceGuid, partitionGuid, blueprint.typeName, blueprint.name, blueprint.variations);
+		const bp = new Blueprint(partitionGuid, instanceGuid, blueprint.typeName, blueprint.name, blueprint.variations);
 		this.blueprints.setValue(guid, bp);
 	}
 
