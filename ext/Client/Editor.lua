@@ -130,6 +130,7 @@ function Editor:InitializeUIData(p_CommandActionResults)
 	for _,v in pairs(p_CommandActionResults) do
 		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", v))
 	end
+	self:UpdateCameraTransform()
 end
 
 return Editor()
