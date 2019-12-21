@@ -147,7 +147,7 @@ end
 ----------- WebUI functions----------------
 
 function MapEditorClient:OnUIReloaded()
-	Editor:InitializeUIData(p_Message)
+	Editor:InitializeUIData(ClientTransactionManager:GetExecutedCommandActions())
 end
 
 function MapEditorClient:OnRequestProjectSave(p_ProjectSaveDataJson)

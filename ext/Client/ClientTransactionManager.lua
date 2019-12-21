@@ -18,6 +18,7 @@ function ClientTransactionManager:RegisterVars()
     self.m_TransactionId = 0
     --self.m_GameObjectTransferDatas = {}
     self.m_CommandActionResults = {}
+    self.m_ExecutedCommandActions = {}
 end
 
 function ClientTransactionManager:RegisterEvents()
@@ -227,9 +228,12 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 
     if(#s_CommandActionResults > 0) then
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_CommandActionResults)))
+        table.insert(self.m_ExecutedCommandActions, json.encode(s_CommandActionResults))
     end
 end
-
+function ClientTransactionManager:GetExecutedCommandActions()
+	return self.m_ExecutedCommandActions
+end
 function ClientTransactionManager:OnReceiveMessages(p_Messages)
     self:ExecuteMessages(p_Messages, nil, nil)
 end
@@ -303,6 +307,7 @@ function ClientTransactionManager:OnGameObjectReady(p_GameObject)
     if(#self.m_CommandActionResults > 0) then
         --m_Logger:Write("Sending stuff to JS")
         WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_CommandActionResults)))
+		table.insert(self.m_ExecutedCommandActions, json.encode(self.m_CommandActionResults))
     else
         m_Logger:Error("OnGameObjectReady: No results were yielded for some reason")
     end

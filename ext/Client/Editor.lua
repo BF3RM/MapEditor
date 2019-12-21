@@ -115,7 +115,11 @@ function Editor:SetPendingRaycast(p_Type, p_Direction)
 	}
 end
 
-function Editor:InitializeUIData()
+function Editor:InitializeUIData(p_CommandActionResults)
+	if(p_CommandActionResults == nil) then
+		print("No CommandActionResult")
+		return
+	end
 	local s_LevelDatas = InstanceParser:GetLevelDatas()
 
 	for _, v in pairs(s_LevelDatas) do
@@ -123,7 +127,9 @@ function Editor:InitializeUIData()
 	end
 
 	WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
-	self.m_LevelLoaded = true
+	for _,v in pairs(p_CommandActionResults) do
+		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", v))
+	end
 end
 
 return Editor()
