@@ -73,9 +73,9 @@ export default class InfiniteTreeComponent extends Vue {
 	onSearchChange(newValue: string) {
 		console.log('Search: ' + newValue);
 		if (newValue === '') {
-			(this.tree as InfiniteTree).unfilter();
+			(this.tree).unfilter();
 		}
-		(this.tree as InfiniteTree).filter(newValue);
+		(this.tree).filter(newValue);
 	}
 
 	@Prop({
@@ -147,7 +147,7 @@ export default class InfiniteTreeComponent extends Vue {
 	}
 
 	scrollTo(node: Node) {
-		const nodeIndex = (this.filteredNodes as Node[]).findIndex((i) => {
+		const nodeIndex = (this.filteredNodes).findIndex((i) => {
 			console.log(i.id === node.id);
 			return i.id === node.id;
 		});

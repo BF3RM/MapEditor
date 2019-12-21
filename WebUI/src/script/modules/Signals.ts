@@ -18,7 +18,7 @@ export const signals = {
 
 	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),
 	blueprintSpawnInvoked: new Signal(),
-	deletedBlueprint: new Signal(),
+	destroyedBlueprint: new Signal(),
 
 	enabledBlueprint: new Signal(),
 	disabledBlueprint: new Signal(),

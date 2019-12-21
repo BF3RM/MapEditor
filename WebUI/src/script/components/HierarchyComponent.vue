@@ -106,21 +106,21 @@ export default class HierarchyComponent extends EditorComponent {
 				// Check if the parent is in the queue
 				const parentId = entry.data.parentGuid.toString();
 				if (this.queue.has(parentId)) {
-					this.queue.get(parentId).children.push(entry);
+					this.queue.get(parentId)!.children!.push(entry);
 					// Check if the parent node is already spawned
 				} else if (this.tree.getNodeById(parentId) !== null) {
 					if (!this.existingParents.has(parentId)) {
 						this.existingParents.set(parentId, []);
 					}
 					console.log('Existing' + entry.name);
-					this.existingParents.get(parentId).push(entry);
+					this.existingParents.get(parentId)!.push(entry);
 				} else {
 					// Entry does not have a parent.
 					if (!this.existingParents.has('root')) {
 						this.existingParents.set('root', []);
 					}
 					console.log('Root');
-					this.existingParents.get('root').push(entry);
+					this.existingParents.get('root')!.push(entry);
 				}
 			}
 			for (const parentNodeId of this.existingParents.keys()) {

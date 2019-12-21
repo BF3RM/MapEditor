@@ -24,7 +24,7 @@ import DraggableInput from '@/script/components/widgets/DraggableInput.vue';
 @Component({ components: { DraggableInput } })
 export default class InspectorComponent extends EditorComponent {
 	@Prop() title: string;
-	@PropSync('gameObject') syncedGameObject!: GameObject;
+	@PropSync('gameObject') syncedGameObject: GameObject;
 
 	private gameObject: GameObject;
 	constructor() {
@@ -33,15 +33,20 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onSelectedGameObject(guid: Guid) {
-		this.gameObject = window.editor.getGameObjectByGuid(guid);
+		const go = window.editor.getGameObjectByGuid(guid);
+		if (go) {
+			this.gameObject = go;
+		}
 	}
 
 	private onEnableChange(e: Event) {
-		this.$refs.enabled.checked = this.gameObject.enabled;
+		(this.$refs.enabled as any).checked = this.gameObject.enabled;
 	}
 
 	private onNameChange(e: InputEvent) {
-		window.editor.execute(new SetObjectNameCommand(this.gameObject.getGameObjectTransferData(), e.target.value));
+		if ((e.target as any).value) {
+			window.editor.execute(new SetObjectNameCommand(this.gameObject.getGameObjectTransferData(), (e.target as any).value));
+		}
 	}
 }
 </script>

@@ -8,7 +8,7 @@ import '@/script/hacks/HTMLDivElement';
 
 let debugMode: boolean = false;
 // var vext = new VEXTInterface();
-if ((window).location.href.indexOf('webui') === -1) {
+if ((window).location.protocol.indexOf('webui') === -1) {
 	debugMode = true;
 }
 window.debug = debugMode;

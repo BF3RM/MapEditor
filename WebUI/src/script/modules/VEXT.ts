@@ -28,7 +28,6 @@ export default class VEXTInterface {
 			BlueprintSpawnInvoked: signals.blueprintSpawnInvoked.emit,
 			DestroyedBlueprint: signals.destroyedBlueprint.emit,
 			CreatedGroup: signals.createdGroup.emit,
-			DestroyedGroup: signals.destroyedGroup.emit,
 			SetObjectName: signals.setObjectName.emit,
 			SetTransform: signals.setTransform.emit,
 			SetVariation: signals.setVariation.emit,
