@@ -18,9 +18,8 @@ export class BlueprintManager {
 	public RegisterBlueprints(blueprintsRaw: string) {
 		const scope = this;
 		const blueprints = JSON.parse(blueprintsRaw);
-		console.log(blueprints);
-		for (const guid of Object.keys(blueprints)) {
-			scope.RegisterBlueprint(Guid.parse(guid), blueprints[guid]);
+		for (const bp of blueprints) {
+			scope.RegisterBlueprint(Guid.parse(bp.instanceGuid), bp);
 		}
 		signals.blueprintsRegistered.emit(this.blueprints.values());
 	}
