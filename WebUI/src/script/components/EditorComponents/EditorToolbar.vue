@@ -3,66 +3,163 @@
 		<div id="toolbarLeft">
 			<ul id="menubar">
 			</ul>
-			<div id="tools">
-				<input type="radio" name="tools" id="select" checked="">
-				<label for="select"><i class="selectIcon" @click="editor.threeManager.SetGizmoMode('select')"></i></label>
-				<input type="radio" name="tools" id="translate">
-				<label for="translate"><i class="translateIcon" @click="editor.threeManager.SetGizmoMode('translate')"></i></label>
-				<input type="radio" name="tools" id="rotate">
-				<label for="rotate"><i class="rotateIcon" @click="editor.threeManager.SetGizmoMode('rotate')"></i></label>
-				<input type="radio" name="tools" id="scale">
-				<label for="scale"><i class="scaleIcon" @click="editor.threeManager.SetGizmoMode('scale')"></i></label>
-			</div>
-
-			<div id="worldSpace">
-				<input type="radio" name="worldSpace" id="local" checked="">
-				<label for="local"><i class="cubeIcon"></i>Local</label>
-				<input type="radio" name="worldSpace" id="world">
-				<label for="world"><i class="globeIcon"></i>World</label>
-			</div>
+			<el-radio-group v-model="tool" size="mini" id="tools">
+				<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
+			</el-radio-group>
+			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace">
+				<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
+			</el-radio-group>
 		</div>
 		<div id="toolbarCenter">
 		</div>
 		<div id="toolbarRight">
-			<select name="WorldView" id="worldView">
-				<option value="0" selected="selected">Default</option>
-				<option value="1">Raw Linear</option>
-				<option value="2">Raw Linear Alpha</option>
-				<option value="3">Diffuse</option>
-				<option value="4">Specular</option>
-				<option value="5">Emissive</option>
-				<option value="6">Normal</option>
-				<option value="7">Smoothness</option>
-				<option value="8">Material</option>
-				<option value="9">Light</option>
-				<option value="10">Light Diffuse</option>
-				<option value="11">Light Specular</option>
-				<option value="12">Light Indirect</option>
-				<option value="13">Light Translucency</option>
-				<option value="14">Light Overdraw</option>
-				<option value="15">Sky Visibility</option>
-				<option value="16">Sky Visibility Raw</option>
-				<option value="17">Overdraw</option>
-				<option value="18">Dynamic AO</option>
-				<option value="19">Occluders</option>
-				<option value="20">Radiosity Light Maps</option>
-				<option value="21">Radiosity Diffuse Color</option>
-				<option value="22">Radiosity Target UV</option>
-				<option value="23">Velocity Vector</option>
-				<option value="24">Distortion Vector</option>
-			</select>
+			<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini">
+				<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
+			</el-select>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
+
 @Component
 export default class EditorToolbar extends Vue {
-	mounted() {
-	}
+	private worldView = 0;
+	private tool = 'Select';
+	private worldSpace = 'World';
+
+	private worldSpaces = ['Local', 'World'];
+	private tools = ['Select', 'Translate', 'Rotate', 'Scale'];
+
+	private worldViews = [{
+		value: 0,
+		label: 'Default'
+	},
+	{
+		value: 1,
+		label: 'Raw Linear'
+	},
+	{
+		value: 2,
+		label: 'Raw Linear Alpha'
+	},
+	{
+		value: 3,
+		label: 'Diffuse'
+	},
+	{
+		value: 4,
+		label: 'Specular'
+	},
+	{
+		value: 5,
+		label: 'Emissive'
+	},
+	{
+		value: 6,
+		label: 'Normal'
+	},
+	{
+		value: 7,
+		label: 'Smoothness'
+	},
+	{
+		value: 8,
+		label: 'Material'
+	},
+	{
+		value: 9,
+		label: 'Light'
+	},
+	{
+		value: 10,
+		label: 'Light Diffuse'
+	},
+	{
+		value: 11,
+		label: 'Light Specular'
+	},
+	{
+		value: 12,
+		label: 'Light Indirect'
+	},
+	{
+		value: 13,
+		label: 'Light Translucency'
+	},
+	{
+		value: 14,
+		label: 'Light Overdraw'
+	},
+	{
+		value: 15,
+		label: 'Sky Visibility'
+	},
+	{
+		value: 16,
+		label: 'Sky Visibility Raw'
+	},
+	{
+		value: 17,
+		label: 'Overdraw'
+	},
+	{
+		value: 18,
+		label: 'Dynamic AO'
+	},
+	{
+		value: 19,
+		label: 'Occluders'
+	},
+	{
+		value: 20,
+		label: 'Radiosity Light Maps'
+	},
+	{
+		value: 21,
+		label: 'Radiosity Diffuse Color'
+	},
+	{
+		value: 22,
+		label: 'Radiosity Target UV'
+	},
+	{
+		value: 23,
+		label: 'Velocity Vector'
+	},
+	{
+		value: 24,
+		label: 'Distortion Vector'
+	}]
 }
 </script>
+<style lang="scss">
+#tools input+span, #worldSpace input+span {
+	font-size: 0!important;
+	height: 30px;
+	width: 30px;
+}
+#tools input[value="Select"]+span {
+	-webkit-mask: url(../../../icons/editor/cursor-default-outline.svg) no-repeat center;
+}
+#tools input[value="Translate"]+span {
+	-webkit-mask: url(../../../icons/editor/cursor-move.svg) no-repeat center;
+}
+#tools input[value="Rotate"]+span {
+	-webkit-mask: url(../../../icons/editor/rotate-3d.svg) no-repeat center;
+}
+#tools input[value="Scale"]+span {
+	-webkit-mask: url(../../../icons/editor/arrow-expand.svg) no-repeat center;
+}
+
+#worldSpace input[value="Local"]+span {
+	-webkit-mask: url(../../../icons/editor/cube-outline.svg) no-repeat center;
+}
+#worldSpace input[value="World"]+span {
+	-webkit-mask: url(../../../icons/editor/earth.svg) no-repeat center;
+}
+</style>
 <style lang="scss" scoped>
 #toolbar {
 	z-index: 2147483647;
@@ -76,24 +173,18 @@ export default class EditorToolbar extends Vue {
 	border-bottom: 2px solid black;
 	position: relative;
 }
+.el-radio-group {
+	background-color: #ffffff36;
+	border-radius: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
 div#worldSpace {
 	margin-left: 10px;
 }
 div#tools {
 	margin-left: 10px;
 }
-#tools label {
-	padding: 0;
-	padding-top: 5px;
-}
-#worldSpace label {
-	padding: 0;
-	padding-left: 2px;
-	padding-right: 2px;
-	margin-left: 5px;
-	padding-top: 5px;
-}
-
 #toolbarLeft, #toolbarCenter, #toolbarRight {
 	display: flex;
 }
@@ -102,19 +193,6 @@ div#tools {
 }
 button#playButton {
 	margin: auto;
-}
-#worldView-button {
-	margin-left: calc(100% - 14em);
-}
-#tools li {
-	height: 25px;
-	width: 25px;
-	text-align: center;
-	background-color: #f6f6f6;
-	border-radius: 5px;
-	border: 1px solid #c5c5c5;
-	line-height: 21px;
-	margin-left: 10px;
 }
 #menubar.ui-menu { list-style:none; padding: 2px; margin: 0; display:block; outline: none; background-color: rgba(34, 34, 34, 0.8); color: #999; }
 #menubar.ui-menu .ui-menu { margin-top: -3px; position: absolute; display: grid;}
