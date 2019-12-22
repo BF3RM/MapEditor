@@ -1,7 +1,7 @@
 <template>
 	<gl-component>
 		<div class="header">
-			<input type="input" :value="data.search" @input="onSearch" placeholder="search">
+			<Search v-model="data.search" @search="onSearch"/>
 		</div>
 		<div class="header" v-if="headers">
 			<div class="th" v-for="header in headers" :key="header">{{header}}</div>
@@ -34,8 +34,9 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem } })
+@Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem, Search } })
 export default class ListComponent extends EditorComponent {
 	@Prop(Array) public list: Array<{name: string}>;
 	@Prop(String) public keyField: string;

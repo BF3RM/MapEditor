@@ -2,7 +2,7 @@
 	<gl-col>
 		<gl-component id="explorer-component" :title="title">
 			<div class="header">
-				<input type="text" v-model="search" placeholder="Search">
+				<Search v-model="search"/>
 			</div>
 			<InfiniteTreeComponent class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
@@ -42,8 +42,9 @@ import { Guid } from '@/script/types/Guid';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import ListComponent from '@/script/components/EditorComponents/ListComponent.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
+import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
+@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private treeData: INode = {

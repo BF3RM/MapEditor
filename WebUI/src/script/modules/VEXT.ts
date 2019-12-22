@@ -161,7 +161,6 @@ export default class VEXTInterface {
 				console.log(param);
 			}
 		} else {
-			console.log('MapEditor:' + eventName);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSON.stringify(param));
 		}
 	}
@@ -194,9 +193,6 @@ export default class VEXTInterface {
 			// We don't handle messages in VEXTEmulator yet
 			// scope.emulator.Receive(commands);
 		} else {
-			console.log(messages);
-			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			window.Log(LOGLEVEL.VERBOSE, messages);
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
 		}
 	}
@@ -211,9 +207,6 @@ export default class VEXTInterface {
 			window.Log(LOGLEVEL.VERBOSE, messageRaw);
 			message = JSON.parse(messageRaw);
 		}
-
-		window.Log(LOGLEVEL.VERBOSE, 'IN: ');
-		window.Log(LOGLEVEL.VERBOSE, message);
 
 		if (this.messages[message.type] === undefined) {
 			window.LogError('Failed to call a null signal: ' + message.type);

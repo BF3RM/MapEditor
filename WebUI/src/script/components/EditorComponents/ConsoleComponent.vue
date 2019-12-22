@@ -7,7 +7,7 @@
 			<label for="shouldScrollToBottom">
 				Scroll to bottom?
 			</label>
-			<input type="input" :value="data.search" @input="onSearch" placeholder="search">
+			<Search @search="onSearch"/>
 		</div>
 		<DynamicScroller
 				ref="scroller"
@@ -44,8 +44,9 @@ import { signals } from '@/script/modules/Signals';
 import { LOGLEVEL } from '@/script/modules/Logger';
 import { inspect } from 'util';
 import { ConsoleEntry, IConsoleEntry } from '@/script/types/ConsoleEntry';
+import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { DynamicScroller, DynamicScrollerItem } })
+@Component({ components: { DynamicScroller, DynamicScrollerItem, Search } })
 export default class ConsoleComponent extends EditorComponent {
 	// WTF? What's a better way to do this?
 	private logLevelDict = [
