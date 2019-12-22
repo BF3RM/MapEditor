@@ -1,5 +1,6 @@
 * {
   font-family: sans-serif;
+  box-shadow: none;
 }
 
 #viewport-container {
@@ -58,4 +59,11 @@
 .vue-recycle-scroller__slot .th:first-child,
 .vue-recycle-scroller__item-view .td:first-child {
   flex: 1;
+}
+.lm_header .lm_tab.lm_active, .lm_header .lm_tab {
+  box-shadow: none;
+}
+
+input[type=search]::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
 }

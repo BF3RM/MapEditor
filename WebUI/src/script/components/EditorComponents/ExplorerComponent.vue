@@ -33,14 +33,14 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import EditorComponent from '@/script/components/EditorComponent.vue';
+import EditorComponent from '@/script/components/EditorComponents/EditorComponent.vue';
 import InfiniteTreeComponent from '@/script/components/InfiniteTreeComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
 import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import { Guid } from '@/script/types/Guid';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
-import ListComponent from '@/script/components/ListComponent.vue';
+import ListComponent from '@/script/components/EditorComponents/ListComponent.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })

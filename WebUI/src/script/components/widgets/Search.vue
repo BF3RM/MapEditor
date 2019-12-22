@@ -1,5 +1,5 @@
 <template>
-	<input class="search" placeholder="Search..." v-model="search"/>
+	<input class="search" type="search" placeholder="Search..." v-model="search"/>
 </template>
 
 <script lang="ts">
@@ -11,8 +11,15 @@ export default class Search extends Vue {
 }
 </script>
 
-<style lang="scss">
-	input {
-		height: 20px;
-	}
+<style lang="scss" scoped>
+input {
+	height: 20px;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	background-color: rgba(0, 0, 0, 0.4) !important;
+	color: #fff;
+}
+
 </style>

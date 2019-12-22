@@ -1,5 +1,6 @@
 <template>
 	<div id="page">
+		<EditorToolbar></EditorToolbar>
 		<div id="ViewportContainer">
 		</div>
 		<div id="glHolder">
@@ -31,19 +32,21 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { signals } from '@/script/modules/Signals';
 import PerfectScrollbar from 'perfect-scrollbar';
-import PlaceholderComponent from '@/script/components/PlaceholderComponent.vue';
-import ExplorerComponent from '@/script/components/ExplorerComponent.vue';
-import ConsoleComponent from '@/script/components/ConsoleComponent.vue';
+import PlaceholderComponent from '@/script/components/EditorComponents/PlaceholderComponent.vue';
+import ExplorerComponent from '@/script/components/EditorComponents/ExplorerComponent.vue';
+import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
 import '@/style/reset.scss';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 import './style/style.scss';
+import './style/icons.scss';
 
-import ViewportComponent from '@/script/components/ViewportComponent.vue';
-import ListComponent from '@/script/components/ListComponent.vue';
-import HierarchyComponent from '@/script/components/HierarchyComponent.vue';
+import ViewportComponent from '@/script/components/EditorComponents/ViewportComponent.vue';
+import ListComponent from '@/script/components/EditorComponents/ListComponent.vue';
+import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
+import EditorToolbar from '@/script/components/EditorComponents/EditorToolbar.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar } })
 export default class App extends Vue {
 	@Prop()
 	public title: string;
