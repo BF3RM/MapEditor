@@ -1,6 +1,7 @@
 import { Signal } from 'typed-signals';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { Guid } from '@/script/types/Guid';
+import { GIZMOMODE, WORLDSPACE } from '@/script/modules/THREEManager';
 
 export const signals = {
 	editor: {
@@ -15,7 +16,8 @@ export const signals = {
 	windowResized: new Signal(),
 
 	spawnBlueprintRequested: new Signal(),
-
+	gizmoModeChanged: new Signal<(mode: GIZMOMODE) => void>(),
+	worldSpaceChanged: new Signal<(mode: WORLDSPACE) => void>(),
 	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),
 	blueprintSpawnInvoked: new Signal(),
 	destroyedBlueprint: new Signal(),

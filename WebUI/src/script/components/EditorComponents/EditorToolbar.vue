@@ -3,7 +3,7 @@
 		<div id="toolbarLeft">
 			<ul id="menubar">
 			</ul>
-			<el-radio-group v-model="tool" size="mini" id="tools">
+			<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
 				<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
 			</el-radio-group>
 			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace">
@@ -22,116 +22,141 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
+import { GIZMOMODE, WORLDSPACE } from '@/script/modules/THREEManager';
+import { signals } from '@/script/modules/Signals';
 
 @Component
 export default class EditorToolbar extends Vue {
 	private worldView = 0;
-	private tool = 'Select';
-	private worldSpace = 'World';
+	private tool = (window).editor.threeManager.gizmoMode;
+	private worldSpace = (window).editor.threeManager.worldSpace;
 
-	private worldSpaces = ['Local', 'World'];
-	private tools = ['Select', 'Translate', 'Rotate', 'Scale'];
+	private worldSpaces = ['local', 'world'];
+	private tools = ['select', 'translate', 'rotate', 'scale'];
 
-	private worldViews = [{
-		value: 0,
-		label: 'Default'
-	},
-	{
-		value: 1,
-		label: 'Raw Linear'
-	},
-	{
-		value: 2,
-		label: 'Raw Linear Alpha'
-	},
-	{
-		value: 3,
-		label: 'Diffuse'
-	},
-	{
-		value: 4,
-		label: 'Specular'
-	},
-	{
-		value: 5,
-		label: 'Emissive'
-	},
-	{
-		value: 6,
-		label: 'Normal'
-	},
-	{
-		value: 7,
-		label: 'Smoothness'
-	},
-	{
-		value: 8,
-		label: 'Material'
-	},
-	{
-		value: 9,
-		label: 'Light'
-	},
-	{
-		value: 10,
-		label: 'Light Diffuse'
-	},
-	{
-		value: 11,
-		label: 'Light Specular'
-	},
-	{
-		value: 12,
-		label: 'Light Indirect'
-	},
-	{
-		value: 13,
-		label: 'Light Translucency'
-	},
-	{
-		value: 14,
-		label: 'Light Overdraw'
-	},
-	{
-		value: 15,
-		label: 'Sky Visibility'
-	},
-	{
-		value: 16,
-		label: 'Sky Visibility Raw'
-	},
-	{
-		value: 17,
-		label: 'Overdraw'
-	},
-	{
-		value: 18,
-		label: 'Dynamic AO'
-	},
-	{
-		value: 19,
-		label: 'Occluders'
-	},
-	{
-		value: 20,
-		label: 'Radiosity Light Maps'
-	},
-	{
-		value: 21,
-		label: 'Radiosity Diffuse Color'
-	},
-	{
-		value: 22,
-		label: 'Radiosity Target UV'
-	},
-	{
-		value: 23,
-		label: 'Velocity Vector'
-	},
-	{
-		value: 24,
-		label: 'Distortion Vector'
-	}]
+	private worldViews = [
+		{
+			value: 0,
+			label: 'Default'
+		},
+		{
+			value: 1,
+			label: 'Raw Linear'
+		},
+		{
+			value: 2,
+			label: 'Raw Linear Alpha'
+		},
+		{
+			value: 3,
+			label: 'Diffuse'
+		},
+		{
+			value: 4,
+			label: 'Specular'
+		},
+		{
+			value: 5,
+			label: 'Emissive'
+		},
+		{
+			value: 6,
+			label: 'Normal'
+		},
+		{
+			value: 7,
+			label: 'Smoothness'
+		},
+		{
+			value: 8,
+			label: 'Material'
+		},
+		{
+			value: 9,
+			label: 'Light'
+		},
+		{
+			value: 10,
+			label: 'Light Diffuse'
+		},
+		{
+			value: 11,
+			label: 'Light Specular'
+		},
+		{
+			value: 12,
+			label: 'Light Indirect'
+		},
+		{
+			value: 13,
+			label: 'Light Translucency'
+		},
+		{
+			value: 14,
+			label: 'Light Overdraw'
+		},
+		{
+			value: 15,
+			label: 'Sky Visibility'
+		},
+		{
+			value: 16,
+			label: 'Sky Visibility Raw'
+		},
+		{
+			value: 17,
+			label: 'Overdraw'
+		},
+		{
+			value: 18,
+			label: 'Dynamic AO'
+		},
+		{
+			value: 19,
+			label: 'Occluders'
+		},
+		{
+			value: 20,
+			label: 'Radiosity Light Maps'
+		},
+		{
+			value: 21,
+			label: 'Radiosity Diffuse Color'
+		},
+		{
+			value: 22,
+			label: 'Radiosity Target UV'
+		},
+		{
+			value: 23,
+			label: 'Velocity Vector'
+		},
+		{
+			value: 24,
+			label: 'Distortion Vector'
+		}
+	];
+
+	private mounted() {
+		signals.gizmoModeChanged.connect(this.onGizmoModeChanged.bind(this));
+		signals.worldSpaceChanged.connect(this.onWorldSpaceChanged.bind(this));
+	}
+
+	private onWorldSpaceChanged(mode: WORLDSPACE) {
+		this.worldSpace = mode;
+	}
+
+	private onGizmoModeChanged(mode: GIZMOMODE) {
+		this.tool = mode;
+	}
+
+	private onToolChange(newTool: string) {
+		if (this.tools.indexOf(newTool) !== -1) {
+			(window).editor.threeManager.SetGizmoMode(newTool.toLowerCase() as GIZMOMODE);
+		} else {
+			console.error('Attempted to select a tool that does not exist: ' + newTool);
+		}
+	}
 }
 </script>
 <style lang="scss">
@@ -140,23 +165,23 @@ export default class EditorToolbar extends Vue {
 	height: 30px;
 	width: 30px;
 }
-#tools input[value="Select"]+span {
+#tools input[value="select"]+span {
 	-webkit-mask: url(../../../icons/editor/cursor-default-outline.svg) no-repeat center;
 }
-#tools input[value="Translate"]+span {
+#tools input[value="translate"]+span {
 	-webkit-mask: url(../../../icons/editor/cursor-move.svg) no-repeat center;
 }
-#tools input[value="Rotate"]+span {
+#tools input[value="rotate"]+span {
 	-webkit-mask: url(../../../icons/editor/rotate-3d.svg) no-repeat center;
 }
-#tools input[value="Scale"]+span {
+#tools input[value="scale"]+span {
 	-webkit-mask: url(../../../icons/editor/arrow-expand.svg) no-repeat center;
 }
 
-#worldSpace input[value="Local"]+span {
+#worldSpace input[value="local"]+span {
 	-webkit-mask: url(../../../icons/editor/cube-outline.svg) no-repeat center;
 }
-#worldSpace input[value="World"]+span {
+#worldSpace input[value="world"]+span {
 	-webkit-mask: url(../../../icons/editor/earth.svg) no-repeat center;
 }
 </style>

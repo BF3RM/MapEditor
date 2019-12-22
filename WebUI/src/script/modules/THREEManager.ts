@@ -32,7 +32,7 @@ export class THREEManager {
 	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 	private cameraControls = new CameraControls(this.camera, this.renderer.domElement);
 	private control: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
-	private worldSpace = WORLDSPACE.local;
+	public worldSpace = WORLDSPACE.local;
 
 	private gridSnap = false;
 	private highlightingEnabled = false;
@@ -47,6 +47,7 @@ export class THREEManager {
 	private waitingForControlEnd = false;
 	private updatingCamera = false;
 	private debugMode = false;
+	public gizmoMode = GIZMOMODE.select;
 
 	constructor(debugMode: boolean) {
 		signals.editor.Ready.connect(this.Initialize.bind(this));
@@ -246,7 +247,9 @@ export class THREEManager {
 			this.ShowGizmo();
 		}
 		this.control.setMode(mode);
+		this.gizmoMode = mode;
 		console.log('Changed gizmo mode to ' + mode);
+		signals.gizmoModeChanged.emit(mode);
 		this.Render();
 	}
 
