@@ -23,7 +23,6 @@ import DraggableInput from '@/script/components/widgets/DraggableInput.vue';
 
 @Component({ components: { DraggableInput } })
 export default class InspectorComponent extends EditorComponent {
-	@Prop() title: string;
 	@PropSync('gameObject') syncedGameObject: GameObject;
 
 	private gameObject: GameObject;

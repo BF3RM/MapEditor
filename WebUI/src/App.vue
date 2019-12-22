@@ -3,21 +3,21 @@
 		<div id="ViewportContainer">
 		</div>
 		<div id="glHolder">
-			<golden-layout class="gl" @initialised="onInitialised">
+			<golden-layout class="gl" @initialised="onInitialised" ref="gl">
 				<gl-col>
 					<gl-row>
-						<gl-col>
+						<gl-col width="15">
 							<HierarchyComponent title="Hierarchy"/>
 						</gl-col>
 						<gl-col>
-							<gl-row>
-								<ViewportComponent title="ViewPort"/>
+							<gl-row ref="viewport" height=80>
+								<ViewportComponent reorderEnabled="false" title="ViewPort"/>
 							</gl-row>
-							<gl-row>
-								<ConsoleComponent title="Console"/>
+							<gl-row height=20>
+								<ConsoleComponent title="Console" />
 							</gl-row>
 						</gl-col>
-						<gl-col>
+						<gl-col width=15>
 							<ExplorerComponent title="Explorer"/>
 						</gl-col>
 					</gl-row>
@@ -66,6 +66,13 @@ export default class App extends Vue {
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
 		}
+		window.onload = () => {
+			// Component height is set the tick before it's actually rendered, so it gets set to 0.
+			// So we wait a tick and trigger a resize event on the now rendered layout.
+			setTimeout(() => {
+				(this.$refs.gl as any).layout.onResize();
+			}, 1);
+		};
 	}
 }
 </script>

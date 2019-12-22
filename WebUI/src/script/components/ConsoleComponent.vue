@@ -47,7 +47,6 @@ import { ConsoleEntry, IConsoleEntry } from '@/script/types/ConsoleEntry';
 
 @Component({ components: { DynamicScroller, DynamicScrollerItem } })
 export default class ConsoleComponent extends EditorComponent {
-	@Prop() public title: string;
 	// WTF? What's a better way to do this?
 	private logLevelDict = [
 		'NONE',

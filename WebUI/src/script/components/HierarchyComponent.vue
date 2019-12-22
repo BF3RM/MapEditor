@@ -49,7 +49,6 @@ import Search from '@/script/components/widgets/Search.vue';
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class HierarchyComponent extends EditorComponent {
-	@Prop() public title: string;
 	private data: INode = {
 		'type': 'folder',
 		'name': 'root',
@@ -219,7 +218,7 @@ export default class HierarchyComponent extends EditorComponent {
 		background-color: #404040;
 	}
 	.tree-node {
-		font-family: Overpass Mono, sans-serif;
+		font-family: sans-serif;
 	}
 	.tree-node {
 		display: flex;

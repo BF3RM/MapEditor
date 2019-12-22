@@ -46,8 +46,6 @@ import InfiniteTree, { Node, INode } from 'infinite-tree';
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter } })
 
 export default class ExplorerComponent extends EditorComponent {
-	@Prop() public title: string;
-
 	private treeData: INode = {
 		'type': 'folder',
 		'name': 'Venice',
@@ -208,7 +206,7 @@ export default class ExplorerComponent extends EditorComponent {
 		background-color: #404040;
 	}
 	.tree-node {
-		font-family: Overpass Mono, sans-serif;
+		font-family: sans-serif;
 	}
 	.tree-node {
 		display: flex;
