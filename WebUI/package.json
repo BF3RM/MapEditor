@@ -43,6 +43,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-vue": "^6.0.1",
     "node-sass": "^4.13.0",
+    "sass": "^1.24.0",
     "sass-loader": "^8.0.0",
     "tslint": "^5.20.1",
     "tslint-loader": "^3.5.4",
