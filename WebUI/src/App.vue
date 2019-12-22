@@ -52,11 +52,6 @@ export default class App extends Vue {
 	public title: string;
 
 	private onInitialised() {
-		const scrollables = document.getElementsByClassName('scrollable');
-		for (const scrollable of scrollables as any) {
-			const ps = new PerfectScrollbar(scrollable as HTMLElement, {
-			});
-		}
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
@@ -74,6 +69,11 @@ export default class App extends Vue {
 			// So we wait a tick and trigger a resize event on the now rendered layout.
 			setTimeout(() => {
 				(this.$refs.gl as any).layout.onResize();
+				const scrollables = document.getElementsByClassName('scrollable');
+				for (const scrollable of scrollables as any) {
+					const ps = new PerfectScrollbar(scrollable as HTMLElement, {
+					});
+				}
 			}, 1);
 		};
 	}
