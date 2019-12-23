@@ -4,7 +4,7 @@
 			<div class="header">
 				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
 				<input :value="gameObject.name" @change="onNameChange">
-				<DraggableInput></DraggableInput>
+				<DraggableNumberInput></DraggableNumberInput>
 			</div>
 		</div>
 	</gl-component>
@@ -19,9 +19,9 @@ import { signals } from '@/script/modules/Signals';
 import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
-import DraggableInput from '@/script/components/widgets/DraggableInput.vue';
+import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 
-@Component({ components: { DraggableInput } })
+@Component({ components: { DraggableNumberInput } })
 export default class InspectorComponent extends EditorComponent {
 	@PropSync('gameObject') syncedGameObject: GameObject;
 

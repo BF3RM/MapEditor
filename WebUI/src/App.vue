@@ -5,28 +5,29 @@
 		</div>
 		<div id="glHolder">
 			<golden-layout :showPopoutIcon=false :showCloseIcon=false class="gl" @initialised="onInitialised" ref="gl" @stackCreated="onStackCreated">
-				<gl-col>
-					<gl-row height=80>
-						<gl-col>
-							<HierarchyComponent title="Hierarchy"/>
-						</gl-col>
-						<gl-col>
-							<gl-row ref="viewport" height=80>
+				<gl-row>
+					<gl-col :width="80">
+						<gl-row :height="80">
+							<gl-col :width="20">
+								<HierarchyComponent title="Hierarchy"/>
+							</gl-col>
+							<gl-col width="80">
 								<ViewportComponent :showHeader="false" title="ViewPort"/>
-							</gl-row>
-						</gl-col>
-					</gl-row>
-					<gl-row height=20>
-						<gl-stack>
-							<ExplorerComponent title="Project"/>
-							<ConsoleComponent title="Console" />
-						</gl-stack>
-					</gl-row>
-				</gl-col>
+							</gl-col>
+						</gl-row>
+						<gl-row :height="20">
+							<ExplorerComponent :width="70" title="Project"/>
+							<ConsoleComponent :width="30" title="Console" />
+						</gl-row>
+					</gl-col>
+					<gl-col :width="20">
+						<InspectorComponent title="Inspector"/>
+					</gl-col>
+				</gl-row>
 			</golden-layout>
 		</div>
 	</div>
-</template> TabNine::config
+</template>
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
@@ -45,8 +46,9 @@ import ViewportComponent from '@/script/components/EditorComponents/ViewportComp
 import ListComponent from '@/script/components/EditorComponents/ListComponent.vue';
 import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
 import EditorToolbar from '@/script/components/EditorComponents/EditorToolbar.vue';
+import InspectorComponent from '@/script/components/EditorComponents/InspectorComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar, InspectorComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title: string;
