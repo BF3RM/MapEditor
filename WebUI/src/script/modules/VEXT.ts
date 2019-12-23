@@ -188,8 +188,8 @@ export default class VEXTInterface {
 		}
 		const scope = this;
 		if (editor.debug) {
-			// window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			// window.Log(LOGLEVEL.VERBOSE, messages);
+			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
+			window.Log(LOGLEVEL.VERBOSE, messages);
 			// We don't handle messages in VEXTEmulator yet
 			// scope.emulator.Receive(commands);
 		} else {
