@@ -41,7 +41,6 @@ export class GameObject extends THREE.Object3D {
 
 		this.selected = false;
 		this.matrixAutoUpdate = true;
-		this.matrixWorldAutoUpdate = true;
 		this.visible = true;
 		this._enabled = true;
 		this.highlighted = false;

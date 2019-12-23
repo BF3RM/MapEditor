@@ -3,5 +3,5 @@ export default interface IMenuEntry {
 	children: IMenuEntry[];
 	entries?: Map<string, IMenuEntry>;
 	label?: string;
-	callback?: Function;
-};
+	callback?: () => void;
+}
