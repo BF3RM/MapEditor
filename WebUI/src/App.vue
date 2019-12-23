@@ -96,8 +96,8 @@ export default class App extends Vue {
 		height: 100%;
 	}
 	#glHolder {
-		height:100vh;
-		width:100vw;
+		height: calc(100vh - 35px);
+		width: 100vw;
 	}
 	#viewport-container * {
 		background: none !important;

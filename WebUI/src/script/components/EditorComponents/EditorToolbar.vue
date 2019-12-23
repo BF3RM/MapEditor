@@ -2,6 +2,7 @@ import { RecycleScroller } from "vue-virtual-scroller";
 <template>
 	<div id="toolbar">
 		<div id="toolbarLeft">
+			<span id="logo">VeniceEditor</span>
 			<ul id="menubar">
 				<el-menu class="el-menu" mode="horizontal" size="mini" @select="onSelectMenu" :show-timeout="10">
 					<el-menu-item v-for="(item, index) in menuBar.children" :key="index">
@@ -394,5 +395,12 @@ label i {
 }
 #toolbar input[type="radio"]:checked+label i{
 	background-color: #111;
- }
+}
+
+#logo {
+	color: #fff;
+	font-weight: bolder;
+	font-size: 20px;
+	padding: 5px;
+}
 </style>
