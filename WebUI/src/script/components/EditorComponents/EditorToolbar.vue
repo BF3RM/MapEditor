@@ -286,7 +286,7 @@ li.el-menu-item.separator {
 	position: relative;
 	margin: 0;
 	padding-left: 0;
-	background-color: #545454!important;
+	background-color: #2e2e2e!important;
 }
 
 .is-opened .el-submenu__title, .is-opened .el-submenu-item, .el-submenu__title:hover, .el-menu-item:hover{
@@ -299,12 +299,12 @@ li.el-menu-item.separator {
 	border-bottom: 0!important;
 }
 .el-menu.el-menu--horizontal {
-	background: #545454;
+	background: #2e2e2e;
 	border-radius: 5px;
 	overflow: hidden;
 }
 .el-menu--horizontal .el-menu .el-menu-item, .el-menu--horizontal .el-menu .el-submenu__title {
-	background-color: #545454;
+	background-color: #2e2e2e;
 	float: none;
 	height: 36px;
 	line-height: 36px;
@@ -312,10 +312,10 @@ li.el-menu-item.separator {
 	color: #fff;
 }
 .el-menu-item, .el-submenu__title {
-	background-color: #545454!important;
+	background-color: #2e2e2e!important;
 }
 .el-menu.el-menu--horizontal {
-	background: #545454;
+	background: #2e2e2e;
 	border-radius: 5px;
 }
 .el-menu--horizontal>.el-menu-item {
@@ -331,26 +331,55 @@ li.el-menu-item.separator {
 	transition: border-color .1s,background-color .1s,color .1s;
 	box-sizing: border-box;
 }
+.el-select-dropdown {
+	border: 1px solid #4a4a4a;
+	border-radius: 5px;
+	background-color: #262626;
+}
+.el-select-dropdown__item.selected {
+	color: #ffffff;
+	font-weight: 700;
+}
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
+	background-color: #444;
+}
+input#worldView {
+	border: 0;
+	background-color: #3e3e3e !important;
+	color: #fff;
+}
+.el-select-dropdown {
+	border: 1px solid #4a4a4a!important;
+	border-radius: 5px!important;
+	background-color: #262626!important;
+}
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
+	background-color: #444!important;
+}
+.el-select-dropdown__item.selected {
+	color: #fff!important;
+	font-weight: 700!important;
+}
+.el-select-dropdown__item {
+	color: #fff!important;
+}
 </style>
 <style lang="scss" scoped>
-
 #toolbar {
 	z-index: 2147483647;
 	left: 0;
 	top: 0;
 	width: 100%;
 	height: 30px;
-	background-color: rgba(34, 34, 34, 0.8);
+	background-color: #1d1d1d;
 	display: flex;
 	justify-content: space-between;
 	border-bottom: 2px solid black;
 	position: relative;
 }
 .el-radio-group {
-	background-color: #ffffff36;
+	background-color: #2e2e2e;
 	border-radius: 5px;
-	padding-left: 5px;
-	padding-right: 5px;
 }
 div#worldSpace {
 	margin-left: 10px;
@@ -402,5 +431,10 @@ label i {
 	font-weight: bolder;
 	font-size: 20px;
 	padding: 5px;
+}
+
+label.is-active {
+	background: #444;
+	border-radius: 5px;
 }
 </style>
