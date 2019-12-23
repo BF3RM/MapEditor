@@ -73,6 +73,7 @@ export default class HierarchyComponent extends EditorComponent {
 	public mounted() {
 		console.log('Mounted');
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
+		signals.destroyedBlueprint.connect(this.onDestroyedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		this.tree = (this.$refs.infiniteTreeComponent as any).tree as InfiniteTree;
 	}
@@ -87,6 +88,12 @@ export default class HierarchyComponent extends EditorComponent {
 				parentGuid: gameObject.parentData.guid
 			}
 		};
+	}
+
+	onDestroyedBlueprint(commandActionResult: CommandActionResult) {
+		console.log();
+		const node = this.tree.getNodeById(commandActionResult.gameObjectTransferData.guid.toString());
+		this.tree.removeNode(node, {});
 	}
 
 	onSpawnedBlueprint(commandActionResult: CommandActionResult) {

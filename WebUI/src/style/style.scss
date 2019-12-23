@@ -14,6 +14,9 @@
 .lm_item_container, .lm_splitter, .lm_header {
   pointer-events: auto;
 }
+.lm_splitter {
+  opacity: 0.5;
+}
 .lm_content {
   background: rgba(34, 34, 34, 0.8)!important;
   color: #999;
