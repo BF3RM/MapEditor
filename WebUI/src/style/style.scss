@@ -37,6 +37,10 @@
   background-color: rgba(0, 0, 0, 0.8)!important;
 }
 
+.lm_header > .lm_items:has(div.noHeader) {
+  display: none;
+}
+
 #viewport {
   position: absolute;
   left: 0;

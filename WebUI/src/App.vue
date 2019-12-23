@@ -4,23 +4,23 @@
 		<div id="ViewportContainer">
 		</div>
 		<div id="glHolder">
-			<golden-layout :showPopoutIcon=false :showCloseIcon=false class="gl" @initialised="onInitialised" ref="gl">
+			<golden-layout :showPopoutIcon=false :showCloseIcon=false class="gl" @initialised="onInitialised" ref="gl" @stackCreated="onStackCreated">
 				<gl-col>
-					<gl-row>
-						<gl-col width="15">
+					<gl-row height=80>
+						<gl-col>
 							<HierarchyComponent title="Hierarchy"/>
 						</gl-col>
 						<gl-col>
 							<gl-row ref="viewport" height=80>
-								<ViewportComponent title="ViewPort"/>
-							</gl-row>
-							<gl-row height=20>
-								<ConsoleComponent title="Console" />
+								<ViewportComponent :showHeader="false" title="ViewPort"/>
 							</gl-row>
 						</gl-col>
-						<gl-col width=15>
-							<ExplorerComponent title="Explorer"/>
-						</gl-col>
+					</gl-row>
+					<gl-row height=20>
+						<gl-stack>
+							<ExplorerComponent title="Project"/>
+							<ConsoleComponent title="Console" />
+						</gl-stack>
 					</gl-row>
 				</gl-col>
 			</golden-layout>
@@ -87,6 +87,19 @@ export default class App extends Vue {
 				}
 			}, 1);
 		};
+	}
+
+	private onStackCreated(stack: any) {
+		if (stack.contentItems.length > 0) {
+			console.log(stack.contentItems);
+			setTimeout(() => {
+				console.log(stack.contentItems[0].vueObject.$vnode.context.showHeader);
+				if (stack.contentItems[0].vueObject.$vnode.context.showHeader === false) {
+					console.log(stack);
+					stack.header.position(false);
+				}
+			}, 1);
+		}
 	}
 }
 </script>

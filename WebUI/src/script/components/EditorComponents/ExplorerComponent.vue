@@ -1,34 +1,38 @@
 <template>
-	<gl-col>
-		<gl-component id="explorer-component" :title="title">
-			<div class="header">
-				<Search v-model="search"/>
-			</div>
-			<InfiniteTreeComponent class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
-					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
-						<div class="expand" @click="ToggleNode($event,node,tree)">
-							<div v-if="node.state.open && node.children.length > 0">
-								v
+	<gl-row>
+		<gl-col>
+			<EditorComponent id="explorer-component" title="Explorer">
+				<div class="header">
+					<Search v-model="search"/>
+				</div>
+				<InfiniteTreeComponent class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+					<template slot-scope="{ node, index, tree, active }" selected="node.selected">
+						<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
+							<div class="expand" @click="ToggleNode($event,node,tree)">
+								<div v-if="node.state.open && node.children.length > 0">
+									v
+								</div>
+								<div v-if="!node.state.open && node.children.length > 0">
+									>
+								</div>
 							</div>
-							<div v-if="!node.state.open && node.children.length > 0">
-								>
-							</div>
+							<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
+							<span v-else>
+								{{ node.name }}
+							</span>
 						</div>
-						<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
-						<span v-else>
-							{{ node.name }}
-						</span>
-					</div>
+					</template>
+				</InfiniteTreeComponent>
+			</EditorComponent>
+		</gl-col>
+		<gl-col>
+			<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">
+				<template slot-scope="{ item, data }">
+					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
 				</template>
-			</InfiniteTreeComponent>
-		</gl-component>
-		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">
-			<template slot-scope="{ item, data }">
-				<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
-			</template>
-		</ListComponent>
-	</gl-col>
+			</ListComponent>
+		</gl-col>
+	</gl-row>
 </template>
 
 <script lang="ts">
@@ -44,7 +48,7 @@ import ListComponent from '@/script/components/EditorComponents/ListComponent.vu
 import InfiniteTree, { Node, INode } from 'infinite-tree';
 import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search } })
+@Component({ components: { EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private treeData: INode = {
@@ -62,6 +66,10 @@ export default class ExplorerComponent extends EditorComponent {
 	constructor() {
 		super();
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
+		signals.editor.Ready.connect(this.onEditorReady.bind(this));
+	}
+
+	public onEditorReady() {
 	}
 
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
