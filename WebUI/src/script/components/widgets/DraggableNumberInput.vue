@@ -69,14 +69,14 @@ export default class DraggableNumberInput extends Vue {
 		let newVal;
 
 		if (val instanceof MouseEvent) {
-			newVal = this.dragDirection === 'Y' ? -val.movementY : val.movementX;
+			newVal = this.dragDirection === 'Y' ? -val.movementY * this.step : val.movementX * this.step;
 			newVal = Number(this.value + newVal);
 		} else { newVal = Number(val); }
 
 		if (!isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
 		if (!isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
 
-		return newVal;
+		return Math.round((newVal * 100)) / 100;
 	}
 
 	private dragEnd(): void {

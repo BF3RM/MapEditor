@@ -1,10 +1,10 @@
 <template>
 	<gl-component>
-		<div v-if="syncedGameObject">
+		<div v-if="gameObject">
 			<div class="header">
 				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
-				<input :value="gameObject.name" @change="onNameChange">
-				<DraggableNumberInput></DraggableNumberInput>
+				<label for="name">Name:</label><input :value="gameObject.name" @input="onNameChange" id="name">
+				<LinearTransformControl v-model="gameObject.matrixWorld" @input="onChange"></LinearTransformControl>
 			</div>
 		</div>
 	</gl-component>
@@ -19,32 +19,55 @@ import { signals } from '@/script/modules/Signals';
 import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
-import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
+import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
+import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
 
-@Component({ components: { DraggableNumberInput } })
+@Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
-	@PropSync('gameObject') syncedGameObject: GameObject;
+	private gameObject: GameObject | null = null;
 
-	private gameObject: GameObject;
+	private position: Vector3;
+	private rotation: Vector3;
+	private scale: Vector3;
+
 	constructor() {
 		super();
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
+		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+		this.gameObject = window.editor.selectionGroup;
+	}
+
+	private onChange(e: Matrix4) {
+		console.log(e);
+		const pos = new Vector3();
+		const rot = new Quaternion();
+		const scale = new Vector3();
+		e.decompose(pos, rot, scale);
+		const eulerRot = new Euler().setFromQuaternion(rot);
+		this.gameObject!.position.set(pos.x, pos.y, pos.z);
+		this.gameObject!.rotation.set(eulerRot.x, eulerRot.y, eulerRot.z);
+		this.gameObject!.scale.set(scale.x, scale.y, scale.z);
+		window.editor.threeManager.Render();
+	}
+
+	private onObjectChanged(guid: Guid) {
+		this.$forceUpdate();
 	}
 
 	private onSelectedGameObject(guid: Guid) {
-		const go = window.editor.getGameObjectByGuid(guid);
-		if (go) {
-			this.gameObject = go;
-		}
+		// const go = window.editor.getGameObjectByGuid(guid);
+		// if (go) {
+		//	this.gameObject = go;
+		// }
 	}
 
 	private onEnableChange(e: Event) {
-		(this.$refs.enabled as any).checked = this.gameObject.enabled;
+		(this.$refs.enabled as any).checked = this.gameObject!.enabled;
 	}
 
 	private onNameChange(e: InputEvent) {
 		if ((e.target as any).value) {
-			window.editor.execute(new SetObjectNameCommand(this.gameObject.getGameObjectTransferData(), (e.target as any).value));
+			window.editor.execute(new SetObjectNameCommand(this.gameObject!.getGameObjectTransferData(), (e.target as any).value));
 		}
 	}
 }
