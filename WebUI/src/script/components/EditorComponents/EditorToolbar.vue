@@ -167,7 +167,7 @@ export default class EditorToolbar extends Vue {
 		}
 		console.log(key);
 		console.log(keyPath);
-		const paths = keyPath[1].split('-');
+		const paths = keyPath[keyPath.length - 1].split('-');
 		let lastPath = this.menuBar;
 		for (const k of paths) {
 			console.log(k);
