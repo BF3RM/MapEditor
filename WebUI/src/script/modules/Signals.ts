@@ -9,6 +9,7 @@ export const signals = {
 		Ready: new Signal()
 	},
 
+	menuRegistered: new Signal(),
 	onLog: new Signal(),
 
 	levelLoaded: new Signal(),

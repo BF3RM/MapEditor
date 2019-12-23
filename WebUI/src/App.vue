@@ -4,7 +4,7 @@
 		<div id="ViewportContainer">
 		</div>
 		<div id="glHolder">
-			<golden-layout class="gl" @initialised="onInitialised" ref="gl">
+			<golden-layout :showPopoutIcon=false :showCloseIcon=false class="gl" @initialised="onInitialised" ref="gl">
 				<gl-col>
 					<gl-row>
 						<gl-col width="15">
@@ -12,7 +12,7 @@
 						</gl-col>
 						<gl-col>
 							<gl-row ref="viewport" height=80>
-								<ViewportComponent reorderEnabled="false" title="ViewPort"/>
+								<ViewportComponent title="ViewPort"/>
 							</gl-row>
 							<gl-row height=20>
 								<ConsoleComponent title="Console" />
@@ -60,6 +60,17 @@ export default class App extends Vue {
 	}
 
 	public mounted() {
+		console.log(this.$refs.gl);
+		(this.$refs.gl as any).layout.config.settings = {
+			hasHeaders: true,
+			reorderEnabled: true,
+			selectionEnabled: true,
+			popoutWholeStack: true,
+			closePopoutsOnUnload: false,
+			showPopoutIcon: false,
+			showMaximiseIcon: true,
+			showCloseIcon: false
+		};
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');

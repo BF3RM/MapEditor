@@ -97,20 +97,6 @@ export default class Editor {
 			this.setPlayerName('LocalPlayer');
 		}
 
-		/*
-		this.ui.RegisterMenubarEntry(['Edit', 'Undo'], this.undo.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', 'Redo'], this.undo.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
-		this.ui.RegisterMenubarEntry(['Edit', 'Cut'], this.Cut.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', 'Copy'], this.Copy.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', 'Paste'], this.Paste.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
-		this.ui.RegisterMenubarEntry(['Edit', 'Duplicate'], this.Duplicate.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', 'Delete'], this.DeleteSelected.bind(this));
-		this.ui.RegisterMenubarEntry(['Edit', '']); // Separator
-
-*/
-
 		// All our UI stuff should be initialized by now.
 		// We're going to trigger a resize so the content can adapt to being done initializing.
 		// It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
@@ -121,12 +107,31 @@ export default class Editor {
 	}
 
 	public onEditorReady() {
+		signals.menuRegistered.emit(['File', 'New'], this.NotImplemented.bind(this));
+		signals.menuRegistered.emit(['File', 'Open'], this.NotImplemented.bind(this));
+		signals.menuRegistered.emit(['File', 'Import', 'From file'], this.NotImplemented.bind(this));
+		signals.menuRegistered.emit(['File', 'Import', 'From level'], this.NotImplemented.bind(this));
+
+		signals.menuRegistered.emit(['Edit', 'Undo'], this.undo.bind(this));
+		signals.menuRegistered.emit(['Edit', 'Redo'], this.redo.bind(this));
+		signals.menuRegistered.emit(['Edit', '']); // Separator
+		signals.menuRegistered.emit(['Edit', 'Cut'], this.Cut.bind(this));
+		signals.menuRegistered.emit(['Edit', 'Copy'], this.Copy.bind(this));
+		signals.menuRegistered.emit(['Edit', 'Paste'], this.Paste.bind(this));
+		signals.menuRegistered.emit(['Edit', '']); // Separator
+		signals.menuRegistered.emit(['Edit', 'Duplicate'], this.Duplicate.bind(this));
+		signals.menuRegistered.emit(['Edit', 'Delete'], this.DeleteSelected.bind(this));
+		signals.menuRegistered.emit(['Edit', '']); // Separator
 		if (this.debug) {
 			this.blueprintManager.RegisterBlueprints(JSON.stringify(GenerateBlueprints(100)));
 		} else {
 			this.vext.SendEvent('UIReloaded');
 			console.log('Sent event');
 		}
+	}
+
+	private NotImplemented() {
+		console.error('Not implemented');
 	}
 
 	public setPlayerName(name: string) {
