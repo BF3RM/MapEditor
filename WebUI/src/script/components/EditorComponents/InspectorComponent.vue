@@ -4,7 +4,7 @@
 			<div class="header">
 				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
 				<label for="name">Name:</label><input :value="gameObject.name" @input="onNameChange" id="name">
-				<LinearTransformControl v-model="gameObject.matrixWorld" @input="onChange"></LinearTransformControl>
+				<LinearTransformControl v-model="transform" @input="onChange"></LinearTransformControl>
 			</div>
 		</div>
 	</gl-component>
@@ -21,10 +21,13 @@ import { Guid } from '@/script/types/Guid';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
 import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
+import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
 	private gameObject: GameObject | null = null;
+
+	private transform: LinearTransform = new LinearTransform();
 
 	private position: Vector3;
 	private rotation: Vector3;
@@ -34,31 +37,23 @@ export default class InspectorComponent extends EditorComponent {
 		super();
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
-		this.gameObject = window.editor.selectionGroup;
 	}
 
-	private onChange(e: Matrix4) {
-		console.log(e);
-		const pos = new Vector3();
-		const rot = new Quaternion();
-		const scale = new Vector3();
-		e.decompose(pos, rot, scale);
-		const eulerRot = new Euler().setFromQuaternion(rot);
-		this.gameObject!.position.set(pos.x, pos.y, pos.z);
-		this.gameObject!.rotation.set(eulerRot.x, eulerRot.y, eulerRot.z);
-		this.gameObject!.scale.set(scale.x, scale.y, scale.z);
+	private onChange(e: LinearTransform) {
+		(window as any).editor.selectionGroup.setTransform(e, true);
 		window.editor.threeManager.Render();
 	}
 
 	private onObjectChanged(guid: Guid) {
-		this.$forceUpdate();
+		this.transform = this.gameObject.transform.clone();
 	}
 
 	private onSelectedGameObject(guid: Guid) {
-		// const go = window.editor.getGameObjectByGuid(guid);
-		// if (go) {
-		//	this.gameObject = go;
-		// }
+		const go = window.editor.getGameObjectByGuid(guid);
+		if (go) {
+			this.gameObject = go;
+			this.transform = go.transform.clone();
+		}
 	}
 
 	private onEnableChange(e: Event) {

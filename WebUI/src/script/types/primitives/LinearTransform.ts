@@ -1,4 +1,4 @@
-import { Matrix4 } from 'three';
+import { Euler, Matrix4, Quaternion } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
 export class LinearTransform {
@@ -6,6 +6,8 @@ export class LinearTransform {
 	public left: Vec3;
 	public trans: Vec3;
 	public up: Vec3;
+	public _rotation: Quaternion = new Quaternion();
+	public _scale: Vec3 = new Vec3(1, 1, 1);
 
 	constructor(left: Vec3 = new Vec3().left, up: Vec3 = new Vec3().up, forward: Vec3 = new Vec3().forward, trans: Vec3 = new Vec3()) {
 		this.left = left;
@@ -89,5 +91,48 @@ export class LinearTransform {
 
 	public clone() {
 		return new LinearTransform(this.left.clone(), this.up.clone(), this.forward.clone(), this.trans.clone());
+	}
+
+	get position(): Vec3 {
+		return this.trans;
+	}
+
+	set position(value: Vec3) {
+		this.trans = value;
+	}
+
+	get scale(): Vec3 {
+		return this._scale;
+	}
+
+	set scale(value: Vec3) {
+		console.log('Set scale');
+		const matrix = new Matrix4();
+		this._scale = value;
+		this.setFromMatrix(matrix.compose(this.trans, this.rotation, this.scale));
+	}
+
+	get rotation(): Quaternion {
+		return this._rotation;
+	}
+
+	set rotation(value: Quaternion) {
+		const matrix = new Matrix4();
+		const pos = this.trans;
+		const scale = this.scale;
+		const rot = value;
+		this.setFromMatrix(matrix.compose(pos, rot, scale));
+		this._rotation = rot;
+	}
+
+	get elements(): Object[] {
+		const matrix = this.toMatrix();
+		return matrix.decompose();
+	}
+
+	set elements(value: Object[]) {
+		this.position = value[0] as Vec3;
+		this.rotation = (value[1] as Quaternion);
+		this.scale = value[2] as Vec3;
 	}
 }

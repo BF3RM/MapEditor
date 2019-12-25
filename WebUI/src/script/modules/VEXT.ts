@@ -116,6 +116,7 @@ export default class VEXTInterface {
 		if (editor.debug) {
 			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
 			window.Log(LOGLEVEL.VERBOSE, commands);
+			console.log(commands[0].gameObjectTransferData.transform);
 			scope.emulator.Receive(commands);
 		} else {
 			console.log(commands);
@@ -147,6 +148,7 @@ export default class VEXTInterface {
 			if (index === commandActionResults.length - 1) {
 				scope.executing = false;
 			}
+			console.log(commandActionResult.gameObjectTransferData.transform);
 
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;
@@ -188,8 +190,8 @@ export default class VEXTInterface {
 		}
 		const scope = this;
 		if (editor.debug) {
-			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			window.Log(LOGLEVEL.VERBOSE, messages);
+			// window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
+			// window.Log(LOGLEVEL.VERBOSE, messages);
 			// We don't handle messages in VEXTEmulator yet
 			// scope.emulator.Receive(commands);
 		} else {

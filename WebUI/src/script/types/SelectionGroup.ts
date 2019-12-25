@@ -15,7 +15,6 @@ export class SelectionGroup extends GameObject {
 		this.name = 'Selection Group';
 		this.transform = new LinearTransform();
 		this.children = [];
-		this.matrixAutoUpdate = true;
 
 		// Update the matrix after initialization.
 		if (update) {
@@ -46,8 +45,11 @@ export class SelectionGroup extends GameObject {
 			return; // No position change
 		}
 		scope.transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-
-		scope.children.every((child) => child.onMoveEnd());
+		editor.threeManager.Render();
+		scope.children.every((child) => {
+			child.updateWorldTransform(true);
+			child.onMoveEnd();
+		});
 
 		signals.selectionGroupMoved.emit();
 	}
@@ -56,29 +58,30 @@ export class SelectionGroup extends GameObject {
 		return !this.transform.toMatrix().equals(this.matrixWorld);
 	}
 
-	public setTransform(linearTransform: LinearTransform) {
+	public setTransform(linearTransform: LinearTransform, moveChildren: boolean = false) {
 		this.transform = linearTransform;
-		this.updateTransform();
+		this.updateTransform(moveChildren);
 	}
 
-	public updateTransform() {
+	public updateTransform(moveChildren: boolean = false) {
 		const matrix = this.transform.toMatrix();
 
 		// To move the group without moving the children we have to detach them first
-		const temp = [];
+		if (moveChildren === false) {
+			const temp = [];
+			for (let i = this.children.length - 1; i >= 0; i--) {
+				// TODO: matrix should be calculated here doing the average of all children's positions, maybe
+				temp[i] = this.children[i];
+				this.DetachObject(this.children[i]);
+			}
 
-		for (let i = this.children.length - 1; i >= 0; i--) {
-			// TODO: matrix should be calculated here doing the average of all children's positions, maybe
-			temp[i] = this.children[i];
-			this.DetachObject(this.children[i]);
-		}
+			matrix.decompose(this.position, this.quaternion, this.scale);
 
-		matrix.decompose(this.position, this.quaternion, this.scale);
-
-		// window.editor.threeManager.Render();
-
-		for (let i = temp.length - 1; i >= 0; i--) {
-			this.AttachObject(temp[i]);
+			for (let i = temp.length - 1; i >= 0; i--) {
+				this.AttachObject(temp[i]);
+			}
+		} else {
+			matrix.decompose(this.position, this.quaternion, this.scale);
 		}
 		// window.editor.threeManager.Render();
 	}

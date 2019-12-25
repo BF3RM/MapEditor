@@ -12,7 +12,7 @@ const locale = require('element-ui/lib/locale/lang/en');
 let debugMode: boolean = false;
 // var vext = new VEXTInterface();
 if ((window).location.protocol.indexOf('webui') === -1) {
-	if (window.location.ancestorOrigins[0] !== 'webui://main') {
+	if (window.location.ancestorOrigins === undefined || window.location.ancestorOrigins[0] !== 'webui://main') {
 		debugMode = true;
 	}
 }
