@@ -51,13 +51,10 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public getCleanName() {
-		console.log(this.name);
 		return this.name.replace(/^.*[\\/]/, '');
 	}
 
 	public hasMoved() {
-		console.log(this.transform.toMatrix());
-		console.log(this.matrixWorld);
 		return !this.transform.toMatrix().equals(this.matrixWorld);
 	}
 
@@ -99,7 +96,6 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public onMoveStart() {
-		console.log('move start');
 		// TODO: Validate that the object exists
 	}
 
@@ -116,13 +112,10 @@ export class GameObject extends THREE.Object3D {
 	public onMoveEnd(force: boolean = false) {
 		const scope = this;
 		if (!scope.hasMoved() && !force) {
-			console.log('No movement');
 			return; // No position change
 		}
 		this.updateMatrixWorld(true);
-		console.log(scope.matrixWorld);
 		const transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		console.log(transform);
 		const command = new SetTransformCommand(new GameObjectTransferData({
 			guid: this.guid,
 			transform: this.transform

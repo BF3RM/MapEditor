@@ -165,25 +165,19 @@ export default class EditorToolbar extends Vue {
 		if (keyPath[1] === undefined) {
 			return;
 		}
-		console.log(key);
-		console.log(keyPath);
 		const paths = keyPath[keyPath.length - 1].split('-');
 		let lastPath = this.menuBar;
 		for (const k of paths) {
-			console.log(k);
-			console.log(lastPath.children);
 			if (lastPath.children[Number(k)] !== undefined) {
 				lastPath = lastPath.children[Number(k)];
 			}
 		}
 		if (lastPath !== undefined && lastPath.callback !== undefined) {
 			lastPath.callback();
-			console.log(lastPath.callback);
 		}
 	}
 
 	private onMenuRegistered(path: string[], entryCallback?: any) {
-		console.log('OnMenuRegistered');
 		let lastEntry = this.menuBar;
 
 		for (let i = 0; i < path.length; i++) {

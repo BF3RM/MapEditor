@@ -62,7 +62,6 @@ export default class App extends Vue {
 	}
 
 	public mounted() {
-		console.log(this.$refs.gl);
 		(this.$refs.gl as any).layout.config.settings = {
 			hasHeaders: true,
 			reorderEnabled: true,
@@ -93,11 +92,8 @@ export default class App extends Vue {
 
 	private onStackCreated(stack: any) {
 		if (stack.contentItems.length > 0) {
-			console.log(stack.contentItems);
 			setTimeout(() => {
-				console.log(stack.contentItems[0].vueObject.$vnode.context.showHeader);
 				if (stack.contentItems[0].vueObject.$vnode.context.showHeader === false) {
-					console.log(stack);
 					stack.header.position(false);
 				}
 			}, 1);

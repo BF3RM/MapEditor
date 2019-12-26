@@ -32,7 +32,6 @@ export default class GizmoWrapper extends TransformControls {
 		for (const guid of editor.selectedGameObjects) {
 			signals.objectChanged.emit(guid);
 		}
-		console.log('update');
 		editor.editorCore.RequestUpdate();
 	}
 
