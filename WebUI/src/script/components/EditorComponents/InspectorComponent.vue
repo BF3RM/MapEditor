@@ -4,7 +4,7 @@
 			<div class="header">
 				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
 				<label for="name">Name:</label><input :value="gameObject.name" @input="onNameChange" id="name">
-				<LinearTransformControl v-model="transform" @input="onInput" @endDrag="onEndDrag "></LinearTransformControl>
+				<LinearTransformControl v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "></LinearTransformControl>
 			</div>
 		</div>
 	</gl-component>
@@ -30,6 +30,8 @@ export default class InspectorComponent extends EditorComponent {
 
 	private transform: LinearTransform = new LinearTransform();
 
+	private dragging = false;
+
 	constructor() {
 		super();
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
@@ -41,13 +43,18 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.threeManager.Render();
 	}
 
+	private onStartDrag() {
+		this.dragging = true;
+	}
+
 	private onEndDrag() {
 		console.log('Drag end');
 		this.gameObject.onMoveEnd(true);
+		this.dragging = false;
 	}
 
 	private onObjectChanged(gameObject: GameObject) {
-		if (this.gameObject !== null && gameObject === this.gameObject) {
+		if (this.gameObject !== null && gameObject === this.gameObject && !this.dragging) {
 			this.transform = new LinearTransform().setFromMatrix(gameObject.matrix);
 		}
 	}

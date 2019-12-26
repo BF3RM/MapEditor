@@ -20,6 +20,9 @@ import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import { Euler, Quaternion } from 'three';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
+import { _Math } from 'three/src/math/Math';
+import RAD2DEG = _Math.RAD2DEG;
+import DEG2RAD = _Math.DEG2RAD;
 
 @Component({ components: { DraggableNumberInput } })
 export default class QuatControl extends Vec3Control {
@@ -30,12 +33,18 @@ export default class QuatControl extends Vec3Control {
 
 	private euler = new Euler().setFromQuaternion(this.value);
 
+	@Watch('value')
+	onValueChange(newValue: Quaternion) {
+		const euler = new Euler().setFromQuaternion(newValue);
+		this.euler = new Euler(euler.x * RAD2DEG, euler.y * RAD2DEG, euler.z * RAD2DEG);
+	}
+
 	onChangeValue() {
 		console.log(this.value);
 		if (this.mode === 'Vec4') {
 			this.$emit('input', this.value);
 		} else {
-			this.value = this.value.setFromEuler(this.euler);
+			this.value = this.value.setFromEuler(new Euler(this.euler.x * DEG2RAD, this.euler.y * DEG2RAD, this.euler.z * DEG2RAD));
 			this.$emit('input', this.value);
 		}
 	}

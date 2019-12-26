@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<Vec3Control v-model="value.position" label="Pos" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<QuatControl v-model="value.rotation" label="Rot" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
-		<Vec3Control v-model="value.scale" label="Scale" :step=0.14 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<QuatControl v-model="value.rotation" label="Rot" :step=0.14 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+		<Vec3Control v-model="value.scale" label="Scale" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 	</div>
 </template>
 
