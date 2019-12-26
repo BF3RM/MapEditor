@@ -154,6 +154,7 @@ export class EditorCore {
 		editor.threeManager.Render();
 		*/
 		this.RequestUpdate();
+		signals.selectedGameObject.emit(gameObject.guid);
 		return true;
 	}
 

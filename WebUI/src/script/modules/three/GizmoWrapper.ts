@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GameObject } from '@/script/types/GameObject';
 import { WORLDSPACE } from '@/script/modules/THREEManager';
 import { signals } from '@/script/modules/Signals';
+import { LOGLEVEL } from '@/script/modules/Logger';
 
 export default class GizmoWrapper extends TransformControls {
 	public visible = false;
@@ -28,6 +29,10 @@ export default class GizmoWrapper extends TransformControls {
 
 	public onControlChanged() {
 		// moving
+		for (const guid of editor.selectedGameObjects) {
+			signals.objectChanged.emit(guid);
+		}
+		console.log('update');
 		editor.editorCore.RequestUpdate();
 	}
 

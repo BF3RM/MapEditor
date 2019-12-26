@@ -56,6 +56,8 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	public hasMoved() {
+		console.log(this.transform.toMatrix());
+		console.log(this.matrixWorld);
 		return !this.transform.toMatrix().equals(this.matrixWorld);
 	}
 
@@ -85,8 +87,6 @@ export class GameObject extends THREE.Object3D {
 		if (parent.type !== 'Scene') {
 			editor.threeManager.AddToScene(this);
 		}
-		console.log(this.matrixWorld.elements);
-		console.log(this.transform.toMatrix().elements);
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
 	}
@@ -95,7 +95,6 @@ export class GameObject extends THREE.Object3D {
 		this.transform = linearTransform;
 		this.updateTransform();
 		editor.threeManager.Render();
-		console.log(linearTransform);
 		signals.objectChanged.emit(this, 'transform', linearTransform);
 	}
 
@@ -104,7 +103,7 @@ export class GameObject extends THREE.Object3D {
 		// TODO: Validate that the object exists
 	}
 
-	public onMove() {
+	public onMove(force: boolean = false) {
 		const scope = this;
 		if (!scope.hasMoved()) {
 			return;
@@ -114,9 +113,10 @@ export class GameObject extends THREE.Object3D {
 		// Send move message to client
 	}
 
-	public onMoveEnd() {
+	public onMoveEnd(force: boolean = false) {
 		const scope = this;
-		if (!scope.hasMoved()) {
+		if (!scope.hasMoved() && !force) {
+			console.log('No movement');
 			return; // No position change
 		}
 		this.updateMatrixWorld(true);
@@ -131,5 +131,9 @@ export class GameObject extends THREE.Object3D {
 		signals.objectChanged.emit(this, 'transform', transform);
 
 		// Send move command to server
+	}
+
+	public getLinearTransform() {
+		new LinearTransform().setFromMatrix(this.matrixWorld);
 	}
 }

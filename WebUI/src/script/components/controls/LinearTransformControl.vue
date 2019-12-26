@@ -18,16 +18,17 @@ export default class InspectorComponent extends Vue {
 	@Prop(LinearTransform) value: LinearTransform;
 
 	onChangeValue() {
-		console.log(this.value);
 		this.$emit('input', this.value);
 	}
 
 	onStartDrag() {
+		this.$emit('startDrag');
 		return true;
 	}
 
 	onEndDrag() {
 		this.onChangeValue();
+		this.$emit('endDrag');
 		return true;
 	}
 

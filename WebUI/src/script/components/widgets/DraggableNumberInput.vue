@@ -15,13 +15,13 @@
 				:min="min"
 				:name="inputName"
 				:step="step"
-				:value="value"
+				:value="formattedValue"
 				@input="adjustValue($event.target.value)">
 	</div>
 </template>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component
 export default class DraggableNumberInput extends Vue {
@@ -64,6 +64,8 @@ export default class DraggableNumberInput extends Vue {
 	@Prop({ required: true, type: Number })
 	private value!: number;
 
+	private formattedValue: number = 0;
+
 	@Emit('input')
 	private adjustValue(val: number | string | MouseEvent): number {
 		let newVal;
@@ -76,7 +78,12 @@ export default class DraggableNumberInput extends Vue {
 		if (!isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
 		if (!isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
 
-		return Math.round((newVal * 100)) / 100;
+		return Number(newVal.toFixed(2));
+	}
+
+	@Watch('value')
+	onChangeValue() {
+		this.formattedValue = Number(this.value.toFixed(2));
 	}
 
 	private dragEnd(): void {

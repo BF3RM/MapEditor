@@ -334,10 +334,6 @@ export default class Editor {
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
 			gameObject.setTransform(gameObjectTransferData.transform);
-
-			if (this.selectionGroup.children.length === 1 && gameObject === this.selectionGroup.children[0]) {
-				this.selectionGroup.setTransform(gameObject.transform);
-			}
 		}
 
 		this.threeManager.Render();

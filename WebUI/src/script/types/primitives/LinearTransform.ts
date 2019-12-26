@@ -57,11 +57,11 @@ export class LinearTransform {
 			Number(matrix[9]),
 			Number(matrix[10]),
 			Number(matrix[11]));
+		this.UpdateMeta();
 		return this;
 	}
 
 	public setFromMatrix(matrix: Matrix4) {
-		console.log(matrix.elements);
 		this.left = new Vec3(
 			matrix.elements[0],
 			matrix.elements[1],
@@ -81,6 +81,14 @@ export class LinearTransform {
 			matrix.elements[12],
 			matrix.elements[13],
 			matrix.elements[14]);
+		this.UpdateMeta();
+		return this;
+	}
+
+	public set(linearTransform: LinearTransform) {
+		this.left = linearTransform.left;
+		this.up = linearTransform.up;
+		this.forward = linearTransform.forward;
 		return this;
 	}
 
@@ -89,11 +97,16 @@ export class LinearTransform {
 		this.up = new Vec3(table.up.x, table.up.y, table.up.z);
 		this.forward = new Vec3(table.forward.x, table.forward.y, table.forward.z);
 		this.trans = new Vec3(table.trans.x, table.trans.y, table.trans.z);
+		this.UpdateMeta();
 		return this;
 	}
 
 	public clone() {
 		return new LinearTransform(this.left.clone(), this.up.clone(), this.forward.clone(), this.trans.clone());
+	}
+
+	public UpdateMeta() {
+		this.toMatrix().decompose(this.position, this._rotation, this._scale);
 	}
 
 	get position(): Vec3 {
@@ -109,10 +122,9 @@ export class LinearTransform {
 	}
 
 	set scale(value: Vec3) {
-		console.log('Set scale');
 		const matrix = new Matrix4();
 		this._scale = value;
-		this.setFromMatrix(matrix.compose(this.trans, this.rotation, this.scale));
+		this.setFromMatrix(matrix.compose(this.trans, this.rotation, this._scale));
 	}
 
 	get rotation(): Quaternion {
@@ -125,6 +137,7 @@ export class LinearTransform {
 		const scale = this.scale;
 		const rot = value;
 		this.setFromMatrix(matrix.compose(pos, rot, scale));
+		this._scale = scale;
 		this._rotation = rot;
 	}
 

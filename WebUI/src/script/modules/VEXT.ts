@@ -100,6 +100,7 @@ export default class VEXTInterface {
 		command.sender = editor.playerName;
 
 		if (this.paused) {
+			window.Log(LOGLEVEL.VERBOSE, 'Out: ' + command.type);
 			this.queued.commands.push(command);
 		} else {
 			// Sending this individual command as an array of commands
@@ -114,14 +115,8 @@ export default class VEXTInterface {
 
 		const scope = this;
 		if (editor.debug) {
-			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			window.Log(LOGLEVEL.VERBOSE, commands);
-			console.log(commands[0].gameObjectTransferData.transform);
 			scope.emulator.Receive(commands);
 		} else {
-			console.log(commands);
-			window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
-			window.Log(LOGLEVEL.VERBOSE, commands);
 			// @ts-ignore
 			WebUI.Call('DispatchEventLocal', 'MapEditor:SendToServer', JSON.stringify(commands));
 		}
@@ -137,9 +132,6 @@ export default class VEXTInterface {
 		});
 		let index = 0;
 
-		window.Log(LOGLEVEL.VERBOSE, 'IN: ');
-		window.Log(LOGLEVEL.VERBOSE, commandActionResults);
-
 		commandActionResults.forEach((commandActionResult: CommandActionResult) => {
 			if (scope.commands[commandActionResult.type] === undefined) {
 				window.LogError('Failed to call a null signal: ' + commandActionResult.type);
@@ -148,7 +140,7 @@ export default class VEXTInterface {
 			if (index === commandActionResults.length - 1) {
 				scope.executing = false;
 			}
-			console.log(commandActionResult.gameObjectTransferData.transform);
+			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type);
 
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;

@@ -4,7 +4,7 @@
 			<div class="header">
 				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
 				<label for="name">Name:</label><input :value="gameObject.name" @input="onNameChange" id="name">
-				<LinearTransformControl v-model="transform" @input="onChange"></LinearTransformControl>
+				<LinearTransformControl v-model="transform" @input="onInput" @endDrag="onEndDrag "></LinearTransformControl>
 			</div>
 		</div>
 	</gl-component>
@@ -22,6 +22,7 @@ import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
 import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { LOGLEVEL } from '@/script/modules/Logger';
 
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
@@ -29,30 +30,33 @@ export default class InspectorComponent extends EditorComponent {
 
 	private transform: LinearTransform = new LinearTransform();
 
-	private position: Vector3;
-	private rotation: Vector3;
-	private scale: Vector3;
-
 	constructor() {
 		super();
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
 	}
 
-	private onChange(e: LinearTransform) {
-		(window as any).editor.selectionGroup.setTransform(e, true);
+	private onInput(e: LinearTransform) {
+		this.gameObject.setTransform(e);
 		window.editor.threeManager.Render();
 	}
 
-	private onObjectChanged(guid: Guid) {
-		this.transform = this.gameObject.transform.clone();
+	private onEndDrag() {
+		console.log('Drag end');
+		this.gameObject.onMoveEnd(true);
+	}
+
+	private onObjectChanged(gameObject: GameObject) {
+		if (this.gameObject !== null && gameObject === this.gameObject) {
+			this.transform = new LinearTransform().setFromMatrix(gameObject.matrix);
+		}
 	}
 
 	private onSelectedGameObject(guid: Guid) {
 		const go = window.editor.getGameObjectByGuid(guid);
 		if (go) {
 			this.gameObject = go;
-			this.transform = go.transform.clone();
+			this.transform = go.transform;
 		}
 	}
 

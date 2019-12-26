@@ -2,6 +2,7 @@ import { Signal } from 'typed-signals';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { Guid } from '@/script/types/Guid';
 import { GIZMOMODE, WORLDSPACE } from '@/script/modules/THREEManager';
+import { GameObject } from '@/script/types/GameObject';
 
 export const signals = {
 	editor: {
@@ -19,6 +20,7 @@ export const signals = {
 	spawnBlueprintRequested: new Signal(),
 	gizmoModeChanged: new Signal<(mode: GIZMOMODE) => void>(),
 	worldSpaceChanged: new Signal<(mode: WORLDSPACE) => void>(),
+	objectChanged: new Signal<(gameObject: GameObject) => void>(),
 	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),
 	blueprintSpawnInvoked: new Signal(),
 	destroyedBlueprint: new Signal(),
@@ -32,7 +34,7 @@ export const signals = {
 
 	selectionGroupMoved: new Signal(),
 
-	selectedGameObject: new Signal<(guid: Guid, isMultiSelection: boolean, scrollTo: boolean) => void>(),
+	selectedGameObject: new Signal<(guid: Guid) => void>(),
 	deselectedGameObject: new Signal(),
 
 	setTransform: new Signal(),
@@ -49,7 +51,6 @@ export const signals = {
 	objectFocused: new Signal(),
 
 	objectAdded: new Signal(),
-	objectChanged: new Signal(),
 	objectRemoved: new Signal(),
 
 	favoriteAdded: new Signal(),

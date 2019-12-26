@@ -19,7 +19,6 @@ export default class Vec3Control extends Vue {
 	@Prop(Object) value: Vector3;
 
 	onChangeValue() {
-		console.log(this.value);
 		this.$emit('input', this.value);
 	}
 
