@@ -7,8 +7,8 @@ import { LOGLEVEL } from '@/script/modules/Logger';
 
 export default class GizmoWrapper extends TransformControls {
 	public visible = false;
+	public selected = false;
 
-	private controlSelected = false;
 	private placeholderObject = new THREE.Object3D();
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
 		super(camera, element);
@@ -37,7 +37,7 @@ export default class GizmoWrapper extends TransformControls {
 	}
 
 	public onControlMouseUp() {
-		this.controlSelected = false;
+		this.selected = false;
 		editor.setUpdating(false);
 		// Stop Moving
 		for (const gameObject of editor.selectedGameObjects) {
@@ -47,7 +47,7 @@ export default class GizmoWrapper extends TransformControls {
 
 	public onControlMouseDown(e: any) {
 		// Stop moving
-		this.controlSelected = true;
+		this.selected = true;
 		editor.Unhighlight();
 
 		editor.setUpdating(true);

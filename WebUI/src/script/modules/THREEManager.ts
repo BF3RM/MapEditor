@@ -35,7 +35,6 @@ export class THREEManager {
 	private gridSnap = false;
 	private highlightingEnabled = false;
 	private raycastPlacing = false;
-	private controlSelected = false;
 	private lastRaycastTime = new Date();
 
 	private delta = new THREE.Vector3();
@@ -271,7 +270,7 @@ export class THREEManager {
 		if (scope.raycastPlacing) {
 			scope.cameraControls.enabled = false;
 			editor.onControlMoveStart();
-		} else if (this.controlSelected) {
+		} else if (this.control.selected) {
 			console.log('Control selected');
 		} else if (e.which === 1) {
 			const guid = this.RaycastSelection(e);
