@@ -1,17 +1,15 @@
 <template>
 	<div>
 		<b>{{label}}</b>
-		<div v-if="mode === 'Vec4'">
-			<DraggableNumberInput dragDirection="X" v-model="value.x" label="X" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput dragDirection="X" v-model="value.y" label="Y" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput dragDirection="X" v-model="value.z" label="Z" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput dragDirection="X" v-model="value.w" label="W" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		</div>
-		<div v-else>
-			<DraggableNumberInput dragDirection="X" v-model="euler.x" label="X" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput dragDirection="X" v-model="euler.y" label="Y" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput dragDirection="X" v-model="euler.z" label="Z" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		</div>
+		<template v-if="mode === 'Vec4'">
+			<DraggableNumberInput :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		</template>
+		<template v-else>
+			<Vec3Control :hideLabel="hideLabel" v-model="euler" label="" :step=step @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		</template>
 	</div>
 </template>
 
@@ -24,12 +22,13 @@ import { _Math } from 'three/src/math/Math';
 import RAD2DEG = _Math.RAD2DEG;
 import DEG2RAD = _Math.DEG2RAD;
 
-@Component({ components: { DraggableNumberInput } })
+@Component({ components: { DraggableNumberInput, Vec3Control } })
 export default class QuatControl extends Vec3Control {
 	@Prop(String) label: string;
 	@Prop({ default: 0.014 }) step: number;
 	@Prop(Object) value: Quaternion;
 	@Prop({ default: 'Vec4' }) mode: string;
+	@Prop(Boolean) hideLabel: Boolean;
 
 	private euler = new Euler().setFromQuaternion(this.value);
 

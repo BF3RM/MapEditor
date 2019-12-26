@@ -2,7 +2,15 @@
   font-family: sans-serif;
   box-shadow: none;
 }
-
+input {
+  height: 20px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  color: #fff;
+}
 #viewport-container {
   background: none !important;
   pointer-events: none;

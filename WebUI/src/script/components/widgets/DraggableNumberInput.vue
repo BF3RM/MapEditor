@@ -47,7 +47,7 @@ export default class DraggableNumberInput extends Vue {
 	private dragDirection!: 'X' | 'Y';
 
 	@Prop({ default: false, type: Boolean })
-	private hideLabel: boolean = false;
+	private hideLabel: boolean;
 
 	@Prop({ required: true, type: String })
 	private label!: string;

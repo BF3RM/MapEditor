@@ -12,14 +12,4 @@ export default class Search extends Vue {
 </script>
 
 <style lang="scss" scoped>
-input {
-	height: 20px;
-	width: 100%;
-	padding: 0;
-	margin: 0;
-	border: 0;
-	background-color: rgba(0, 0, 0, 0.4) !important;
-	color: #fff;
-}
-
 </style>
