@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObject } from '@/script/types/GameObject';
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { signals } from '@/script/modules/Signals';
-import CameraControls from 'camera-controls';
+import CameraControlWrapper from '@/script/modules/three/CameraControlWrapper';
+import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 
 export enum WORLDSPACE {
 	local = 'local',
@@ -20,18 +20,16 @@ export enum GIZMOMODE {
 	scale = 'scale',
 }
 
-CameraControls.install({ THREE });
-
 export class THREEManager {
-	public scene = new THREE.Scene();
+	private scene = new THREE.Scene();
 	private renderer = new THREE.WebGLRenderer({
 		alpha: true,
 		antialias: true
 	});
 
 	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
-	private cameraControls = new CameraControls(this.camera, this.renderer.domElement);
-	private control: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
+	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
+	private control: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement);
 	public worldSpace = WORLDSPACE.local;
 
 	private gridSnap = false;
@@ -65,8 +63,6 @@ export class THREEManager {
 			page.appendChild(scope.renderer.domElement);
 		}
 
-		this.CreateGizmo();
-
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
 			const grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);
@@ -92,26 +88,37 @@ export class THREEManager {
 			}
 		})();
 
-		scope.cameraControls.addEventListener('controlstart', (event: any) => {
-			editor.vext.SendEvent('controlStart');
-		});
-		scope.cameraControls.addEventListener('controlend', (event: any) => {
-			scope.waitingForControlEnd = true;
-		});
-		scope.cameraControls.addEventListener('update', (event: any) => {
-			if (!scope.updatingCamera) {
-				// lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
-				const transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld);
-				editor.vext.SendEvent('controlUpdate', {
-					transform
-				});
-			}
-		});
-
-		this.cameraControls.setPosition(10, 10, 10);
-		this.cameraControls.setLookAt(10, 10, 10, 0, 0, 0, false);
 		this.SetFov(90);
 		this.Render();
+	}
+
+	public RegisterEvents() {
+		this.renderer.domElement.addEventListener('mouseDown', (event: any) => {
+			switch (event.which) {
+			case 1: // Left mouse
+				break;
+			case 2: // middle mouse
+				break;
+			case 3: // right mouse
+				EnableFreecamMovement();
+				this.highlightingEnabled = false;
+				break;
+			default:
+				// alert('You have a strange Mouse!');
+				break;
+			}
+		});
+		window.addEventListener('resize', this.onWindowResize.bind(this), false);
+
+		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+
+		signals.objectChanged.connect(this.Render.bind(this)); // Object changed? Render!
+	}
+
+	public AddToScene(gameObject: THREE.Object3D): void {
+		this.scene.add(gameObject);
 	}
 
 	public Focus(target?: THREE.Object3D) {
@@ -155,48 +162,6 @@ export class THREEManager {
 		scope.Render();
 	}
 
-	public RegisterEvents() {
-		this.renderer.domElement.addEventListener('mouseDown', (event: any) => {
-			switch (event.which) {
-			case 1: // Left mouse
-				break;
-			case 2: // middle mouse
-				break;
-			case 3: // right mouse
-				EnableFreecamMovement();
-				this.highlightingEnabled = false;
-				break;
-			default:
-				// alert('You have a strange Mouse!');
-				break;
-			}
-		});
-		window.addEventListener('resize', this.onWindowResize.bind(this), false);
-
-		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
-
-		this.control.addEventListener('change', this.onControlChanged.bind(this));
-		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
-		this.control.addEventListener('mouseDown', this.onControlMouseDown.bind(this));
-		this.control.addEventListener('dragging-changed', (event) => {
-			this.cameraControls.enabled = !event.value;
-		});
-
-		signals.objectChanged.connect(this.Render.bind(this)); // Object changed? Render!
-	}
-
-	public CreateGizmo() {
-		this.control.setSpace(WORLDSPACE.local as string);
-
-		this.scene.add(this.control);
-
-		this.HideGizmo();
-
-		// this.Render();
-	}
-
 	public DeleteObject(gameObject: GameObject) {
 		if (gameObject.parent !== null) {
 			this.scene.attach(gameObject);
@@ -206,9 +171,8 @@ export class THREEManager {
 		// this.Render();
 	}
 
-	public AttachGizmoTo(gameObject: GameObject) {
-		this.control.attach(gameObject);
-		// this.Render();
+	public onSelectGameObject(gameObject: GameObject) {
+		this.control.Select(gameObject);
 	}
 
 	public HideGizmo() {
@@ -243,14 +207,13 @@ export class THREEManager {
 			return;
 		}
 
-		if (this.control.visible === false) {
+		if (!this.control.visible && editor.selectedGameObjects.length !== 0) {
 			this.ShowGizmo();
 		}
 		this.control.setMode(mode);
 		this.gizmoMode = mode;
 		console.log('Changed gizmo mode to ' + mode);
 		signals.gizmoModeChanged.emit(mode);
-		this.Render();
 	}
 
 	public SetWorldSpace(space: WORLDSPACE) {
@@ -313,7 +276,7 @@ export class THREEManager {
 		} else if (e.which === 1) {
 			const guid = this.RaycastSelection(e);
 			if (guid !== null) {
-				editor.Select(guid, undefined, true);
+				editor.Select(guid);
 			}
 		}
 	}
@@ -400,65 +363,10 @@ export class THREEManager {
 		return raycaster.ray.direction;
 	}
 
-	public onControlMouseDown(e: any) {
-		// Stop moving
-		this.controlSelected = true;
-		editor.Unhighlight();
-		editor.onControlMoveStart();
-
-		editor.setUpdating(true);
-		if (e.target === null) {
-			return;
-		}
-		// TODO: Check for shift key using new controls system
-		// TODO: new Controls system
-		if (e.target.mode === 'translate' && e.target.axis === 'XYZ') {
-			const event = document.createEvent('HTMLEvents');
-			event.initEvent('mouseup', true, true); // The custom event that will be created
-			editor.threeManager.raycastPlacing = true;
-			editor.threeManager.renderer.domElement.dispatchEvent(event);
-			editor.threeManager.HideGizmo();
-		}
-	}
-
-	public onControlChanged() {
-		// moving
-		editor.onControlMove();
-		editor.threeManager.Render();
-	}
-
-	public onControlMouseUp() {
-		this.controlSelected = false;
-		editor.setUpdating(false);
-		editor.onControlMoveEnd();
-		// Stop Moving
-	}
-
 	public onWindowResize() {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.Render();
-	}
-
-	public UpdateCameraTransform(lx: number, ly: number, lz: number, ux: number, uy: number, uz: number, fx: number, fy: number, fz: number, x: number, y: number, z: number) {
-		this.updatingCamera = true;
-
-		this.updatingCamera = true;
-		const m = new THREE.Matrix4();
-
-		m.set(lx, ux, fx, 0,
-			ly, uy, fy, 0,
-			lz, uz, fz, 0,
-			0, 0, 0, 0);
-
-		this.camera.setRotationFromMatrix(m);
-		this.camera.position.set(x, y, z);
-		const distance = 10;
-		const target = new Vec3(x + (fx * -1 * distance), y + (fy * -1 * distance), z + (fz * -1 * distance));
-
-		this.cameraControls.setLookAt(x, y, z, target.x, target.y, target.z, false);
-		this.Render();
-		this.updatingCamera = false;
 	}
 }

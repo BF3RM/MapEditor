@@ -26,7 +26,7 @@ import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
-import { LOGLEVEL } from '@/script/modules/Logger';
+import { LogError, LOGLEVEL } from '@/script/modules/Logger';
 import { GenerateBlueprints } from '@/script/modules/DebugData';
 
 export default class Editor {
@@ -49,6 +49,8 @@ export default class Editor {
 	public selectionGroup: SelectionGroup;
 	public highlightGroup: HighlightGroup;
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
+
+	public selectedGameObjects: GameObject[] = [];
 
 	constructor(debug: boolean = false) {
 		// Commands
@@ -282,17 +284,6 @@ export default class Editor {
 		}
 	}
 
-	public getGameObjectFromGameObjectTransferData(gameObjectTransferData: GameObjectTransferData, callerName: string) {
-		const gameObject = this.getGameObjectByGuid(gameObjectTransferData.guid);
-
-		if (gameObject === undefined) {
-			window.LogError(callerName + ': Couldn\'t find the GameObject for GameObjectTransferData. Name: ' + gameObjectTransferData.name + ' | Guid: ' + gameObjectTransferData.guid);
-			return;
-		}
-
-		return gameObject;
-	}
-
 	public getGameObjectByGuid(guid: Guid) {
 		return this.gameObjects.getValue(guid);
 	}
@@ -311,34 +302,28 @@ export default class Editor {
 
 	/*
 
-	Controls
-
-	*/
-
-	public onControlMoveStart() {
-		const scope = this;
-		scope.selectionGroup.onMoveStart();
-	}
-
-	public onControlMove() {
-		const scope = this;
-		scope.selectionGroup.onMove();
-	}
-
-	public onControlMoveEnd() {
-		const scope = this;
-		scope.selectionGroup.onMoveEnd();
-	}
-
-	/*
-
 		Commands
 
 	*/
+	public Select(guid: Guid) {
+		const gameObject = this.gameObjects.getValue(guid);
+
+		if (gameObject === undefined) {
+			LogError('Failed to select gameobject: ' + guid);
+			return false;
+		}
+		this.selectedGameObjects.push(gameObject);
+		this.threeManager.SetGizmoMode(GIZMOMODE.translate);
+		return this.editorCore.onSelectGameObject(gameObject);
+	}
+
+	public Deselect(guid: Guid) {
+		this.editorCore.onDeselectedGameObject(guid);
+	}
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
 		if (gameObject !== undefined) {
 			gameObject.setName(gameObjectTransferData.name);
 		}
@@ -346,7 +331,7 @@ export default class Editor {
 
 	public onSetTransform(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
 			gameObject.setTransform(gameObjectTransferData.transform);
 
@@ -360,7 +345,7 @@ export default class Editor {
 
 	public onSetVariation(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObject = this.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
 		if (gameObject !== undefined) {
 			gameObject.setVariation(gameObjectTransferData.variation);
 		}
@@ -444,16 +429,13 @@ export default class Editor {
 				this.missingParent.remove(gameObjectGuid);
 			}
 		}
-
-		setTimeout(() => {
-			scope.threeManager.scene.remove(gameObject);
-		}, 1);
 		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(() => {
 				scope.Select(gameObjectGuid, false);
 			}, 2);
 		}
+		// We only add the GameObject to the scene when we're accessing it.
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {
@@ -499,21 +481,6 @@ export default class Editor {
 			}
 		}
 		return false;
-	}
-
-	public Select(guid: Guid, multi: boolean = false, scrollTo: boolean = true) {
-		this.Unhighlight(guid);
-		this.threeManager.SetGizmoMode(GIZMOMODE.translate);
-
-		if (multi) {
-			return this.editorCore.SelectGameObject(guid, true, scrollTo);
-		} else {
-			return this.editorCore.SelectGameObject(guid, false, scrollTo);
-		}
-	}
-
-	public Deselect(guid: Guid) {
-		this.editorCore.onDeselectedGameObject(guid);
 	}
 
 	public Highlight(guid: Guid) {

@@ -21,8 +21,9 @@ export class EditorCore {
 	private isUpdating = false;
 	private lastUpdateTime: number;
 	private deltaTime: number;
-	private pendingUpdates = new Collections.Dictionary<Guid, GameObject>();
+	private pendingUpdates = new Map<Guid, GameObject>();
 	private rl = this.renderLoop.bind(this);
+	private updateRequested = false;
 
 	constructor() {
 		this.previewBlueprint = null;
@@ -42,6 +43,11 @@ export class EditorCore {
 		if (value) {
 			this.renderLoop();
 		}
+	}
+
+	public RequestUpdate() {
+		this.updateRequested = true;
+		this.setUpdating(true);
 	}
 
 	public renderLoop() {
@@ -66,7 +72,7 @@ export class EditorCore {
 			}
 			*/
 
-			this.pendingUpdates.forEach((guid, gameObject) => {
+			this.pendingUpdates.forEach((gameObject, guid) => {
 				const changes = gameObject.getChanges();
 				if (!changes) {
 					return;
@@ -81,28 +87,39 @@ export class EditorCore {
 			});
 			this.pendingUpdates.clear();
 		}
-
+		// An update was requested outside of the usual ThreeJS render loop, this probably means some command has been executed.
+		if (this.updateRequested) {
+			editor.threeManager.Render();
+			this.updateRequested = false;
+		}
+		// TODO: Add an FPS and rendering indecator.
 		if (this.isUpdating) {
 			window.requestAnimationFrame(this.rl);
 		}
 	}
 
 	public addPending(guid: Guid, gameObject: GameObject) {
-		this.pendingUpdates.setValue(guid, gameObject);
+		this.pendingUpdates.set(guid, gameObject);
 	}
 
-	public SelectGameObject(guid: Guid, isMultiSelection: boolean, scrollTo: boolean) {
-		const gameObject = editor.gameObjects.getValue(guid);
+	public getGameObjectFromGameObjectTransferData(gameObjectTransferData: GameObjectTransferData, callerName: string) {
+		const gameObject = editor.getGameObjectByGuid(gameObjectTransferData.guid);
 
 		if (gameObject === undefined) {
-			LogError('Failed to select gameobject: ' + guid);
-			return false;
+			window.LogError(callerName + ': Couldn\'t find the GameObject for GameObjectTransferData. Name: ' + gameObjectTransferData.name + ' | Guid: ' + gameObjectTransferData.guid);
+			return;
 		}
+		return gameObject;
+	}
 
+	public onSelectGameObject(gameObject: GameObject) {
 		// If the object is not in the scene we add it
 		if (!gameObject.parent) {
-			editor.threeManager.scene.add(gameObject);
+			editor.threeManager.AddToScene(gameObject);
 		}
+
+		editor.threeManager.onSelectGameObject(gameObject);
+		/*
 
 		// If the object is already in this group and it's a multiselection we deselect it
 		if (gameObject.parent === editor.selectionGroup && isMultiSelection) {
@@ -135,6 +152,8 @@ export class EditorCore {
 		}
 		editor.threeManager.AttachGizmoTo(editor.selectionGroup);
 		editor.threeManager.Render();
+		*/
+		this.RequestUpdate();
 		return true;
 	}
 

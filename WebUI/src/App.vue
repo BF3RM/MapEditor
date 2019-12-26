@@ -21,7 +21,6 @@
 						</gl-row>
 					</gl-col>
 					<gl-col :width="20">
-						<InspectorComponent title="Inspector"/>
 					</gl-col>
 				</gl-row>
 			</golden-layout>
