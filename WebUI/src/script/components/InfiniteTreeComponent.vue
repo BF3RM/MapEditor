@@ -147,11 +147,11 @@ export default class InfiniteTreeComponent extends Vue {
 	}
 
 	scrollTo(node: Node) {
-		const nodeIndex = (this.filteredNodes).findIndex((i) => {
-			console.log(i.id === node.id);
-			return i.id === node.id;
-		});
-		(this.$refs.scroller as RecycleScroller).scrollToItem(nodeIndex);
+		// const nodeIndex = (this.filteredNodes).findIndex((i) => {
+		// 	console.log(i.id === node.id);
+		// 	return i.id === node.id;
+		// });
+		// (this.$refs.scroller as RecycleScroller).scrollToItem(nodeIndex);
 	}
 }
 /*

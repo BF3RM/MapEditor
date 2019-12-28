@@ -103,7 +103,7 @@ function Editor:UpdateCameraTransform()
 	local up = s_Transform.up
 	local forward = s_Transform.forward
 
-	WebUI:ExecuteJS(string.format('editor.threeManager.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+	WebUI:ExecuteJS(string.format('editor.threeManager.cameraControls.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
 		left.x, left.y, left.z, up.x, up.y, up.z, forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
 	self.m_CameraTransform = s_Transform
 end

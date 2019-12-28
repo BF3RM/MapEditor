@@ -20,7 +20,7 @@ export const signals = {
 	spawnBlueprintRequested: new Signal(),
 	gizmoModeChanged: new Signal<(mode: GIZMOMODE) => void>(),
 	worldSpaceChanged: new Signal<(mode: WORLDSPACE) => void>(),
-	objectChanged: new Signal<(gameObject: GameObject) => void>(),
+	objectChanged: new Signal<(gameObject: GameObject, field: string, value: any) => void>(),
 	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),
 	blueprintSpawnInvoked: new Signal(),
 	destroyedBlueprint: new Signal(),

@@ -113,11 +113,6 @@ export class EditorCore {
 	}
 
 	public onSelectGameObject(gameObject: GameObject) {
-		// If the object is not in the scene we add it
-		if (!gameObject.parent) {
-			editor.threeManager.AddToScene(gameObject);
-		}
-
 		editor.threeManager.onSelectGameObject(gameObject);
 		/*
 

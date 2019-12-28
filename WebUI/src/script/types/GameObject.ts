@@ -58,6 +58,17 @@ export class GameObject extends THREE.Object3D {
 		return !this.transform.toMatrix().equals(this.matrixWorld);
 	}
 
+	public getGameObjectTransferData() {
+		return new GameObjectTransferData({
+			guid: this.guid,
+			name: this.name,
+			blueprintCtrRef: this.blueprintCtrRef,
+			parentData: this.parentData,
+			transform: this.transform,
+			variation: this.variation
+		});
+	}
+
 	public getChanges() {
 		const scope = this;
 		const changes: any = {};
@@ -81,7 +92,7 @@ export class GameObject extends THREE.Object3D {
 	public updateTransform() {
 		const matrix = this.transform.toMatrix();
 		const parent = this.parent;
-		if (parent.type !== 'Scene') {
+		if (parent !== null && parent.type !== 'Scene') {
 			editor.threeManager.AddToScene(this);
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
@@ -93,20 +104,6 @@ export class GameObject extends THREE.Object3D {
 		this.updateTransform();
 		editor.threeManager.Render();
 		signals.objectChanged.emit(this, 'transform', linearTransform);
-	}
-
-	public onMoveStart() {
-		// TODO: Validate that the object exists
-	}
-
-	public onMove(force: boolean = false) {
-		const scope = this;
-		if (!scope.hasMoved()) {
-			return;
-		}
-		const transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		signals.objectChanged.emit(this, 'transform', transform);
-		// Send move message to client
 	}
 
 	public onMoveEnd(force: boolean = false) {
@@ -126,7 +123,59 @@ export class GameObject extends THREE.Object3D {
 		// Send move command to server
 	}
 
+	public setName(name: string) {
+		this.name = name;
+		signals.objectChanged.emit(this, 'name', name);
+	}
+
+	public setVariation(key: number) {
+		this.variation = key;
+		signals.objectChanged.emit(this, 'variation', key);
+	}
+
 	public getLinearTransform() {
 		new LinearTransform().setFromMatrix(this.matrixWorld);
+	}
+
+	public Enable() {
+		for (const child of this.children) {
+			if (child.constructor.name === 'GameObject') {
+				child.Enable();
+			} else {
+				child.visible = true;
+			}
+		}
+		this.visible = true;
+		this._enabled = true;
+		signals.objectChanged.emit(this, 'enabled', this.enabled);
+	}
+
+	public Disable() {
+		for (const child of this.children) {
+			if (child.constructor.name === 'GameObject') {
+				child.Disable();
+			} else {
+				child.visible = false;
+			}
+		}
+		this.visible = false;
+		this._enabled = false;
+		signals.objectChanged.emit(this, 'enabled', this.enabled);
+	}
+
+	set enabled(value: boolean) {
+		if (value) {
+			window.editor.execute(new EnableBlueprintCommand(this.getGameObjectTransferData()));
+		} else {
+			window.editor.execute(new DisableBlueprintCommand(this.getGameObjectTransferData()));
+		}
+	}
+
+	onSelected() {
+		// this.visible = true;
+	}
+
+	onDeselected() {
+		// this.visible = false;
 	}
 }

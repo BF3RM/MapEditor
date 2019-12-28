@@ -98,14 +98,6 @@ export default class Editor {
 		if (this.debug === true) {
 			this.setPlayerName('LocalPlayer');
 		}
-
-		// All our UI stuff should be initialized by now.
-		// We're going to trigger a resize so the content can adapt to being done initializing.
-		// It's stupid, I know, but it beats trying to manually fix all instances of broken containers.
-		// window.dispatchEvent(new Event('resize'));
-
-		this.threeManager.scene.add(this.selectionGroup);
-		this.threeManager.scene.add(this.highlightGroup);
 	}
 
 	public onEditorReady() {
@@ -312,7 +304,12 @@ export default class Editor {
 			LogError('Failed to select gameobject: ' + guid);
 			return false;
 		}
+		for (const go of this.selectedGameObjects.values()) {
+			go.onDeselected();
+		}
+		this.selectedGameObjects = [];
 		this.selectedGameObjects.push(gameObject);
+		gameObject.onSelected();
 		this.threeManager.SetGizmoMode(GIZMOMODE.translate);
 		return this.editorCore.onSelectGameObject(gameObject);
 	}
@@ -325,7 +322,7 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
 		if (gameObject !== undefined) {
-			gameObject.setName(gameObjectTransferData.name);
+			(gameObject as GameObject).setName(gameObjectTransferData.name);
 		}
 	}
 
@@ -333,7 +330,7 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
-			gameObject.setTransform(gameObjectTransferData.transform);
+			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
 		}
 
 		this.threeManager.Render();
@@ -343,7 +340,7 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
 		if (gameObject !== undefined) {
-			gameObject.setVariation(gameObjectTransferData.variation);
+			(gameObject as GameObject).setVariation(gameObjectTransferData.variation);
 		}
 	}
 
@@ -380,7 +377,8 @@ export default class Editor {
 			gameObjectTransferData.blueprintCtrRef,
 			gameObjectTransferData.variation,
 			gameObjectTransferData.gameEntities);
-
+		editor.threeManager.AddToScene(gameObject);
+		gameObject.updateTransform();
 		for (const gameEntityData of gameObjectTransferData.gameEntities) {
 			const entityData = gameEntityData;
 			// UniqueID is fucking broken. this won't work online, boi.
@@ -389,8 +387,6 @@ export default class Editor {
 				gameObject.add(gameEntity);
 			}
 		}
-
-		gameObject.updateMatrixWorld();
 
 		this.gameObjects.setValue(gameObjectGuid, gameObject);
 		// If the parent is the leveldata, ignore all this
@@ -428,7 +424,7 @@ export default class Editor {
 		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(() => {
-				scope.Select(gameObjectGuid, false);
+				scope.Select(gameObjectGuid);
 			}, 2);
 		}
 		// We only add the GameObject to the scene when we're accessing it.
@@ -464,44 +460,6 @@ export default class Editor {
 
 	public onObjectChanged(object: GameObject) {
 		this.editorCore.addPending(object.guid, object);
-	}
-
-	public isSelected(guid: Guid) {
-		const scope = this;
-		if (scope.selectionGroup.children.length === 0) {
-			return false;
-		}
-		for (const gameObject of scope.selectionGroup.children) {
-			if (guid.equals(gameObject.guid)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public Highlight(guid: Guid) {
-		const gameObject = this.getGameObjectByGuid(guid);
-
-		if (gameObject === null || gameObject === undefined) {
-			return;
-		}
-
-		this.highlightGroup.HighlightObject(gameObject);
-	}
-
-	public Unhighlight(guid?: Guid) {
-		if (guid !== null && guid !== undefined) {
-			const gameObject = this.getGameObjectByGuid(guid);
-
-			if (gameObject === null || gameObject === undefined) {
-				console.error('Tried to unhighlight an object that doesn\'t exist');
-				return;
-			} else if (!gameObject.highlighted) {
-				return;
-			}
-		}
-
-		this.highlightGroup.UnhighlightCurrentObject();
 	}
 
 	/*

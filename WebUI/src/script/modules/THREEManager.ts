@@ -117,7 +117,7 @@ export class THREEManager {
 	}
 
 	public AddToScene(gameObject: THREE.Object3D): void {
-		this.scene.add(gameObject);
+		this.scene.attach(gameObject);
 	}
 
 	public Focus(target?: THREE.Object3D) {
@@ -260,8 +260,6 @@ export class THREEManager {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
 			scope.cameraControls.enabled = true;
-			editor.onControlMoveEnd();
-			scope.Render();
 		}
 	}
 
@@ -269,7 +267,6 @@ export class THREEManager {
 		const scope = this;
 		if (scope.raycastPlacing) {
 			scope.cameraControls.enabled = false;
-			editor.onControlMoveStart();
 		} else if (this.control.selected) {
 			console.log('Control selected');
 		} else if (e.which === 1) {
@@ -285,7 +282,7 @@ export class THREEManager {
 	}
 
 	public onMouseMove(e: MouseEvent) {
-		const scope = this;
+		/* const scope = this;
 		if (scope.raycastPlacing) {
 			const direction = scope.getMouse3D(e);
 
@@ -294,10 +291,6 @@ export class THREEManager {
 			if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
 				editor.setUpdating(true);
 				const trans = editor.editorCore.screenToWorldTransform.trans;
-
-				editor.selectionGroup.position.set(trans.x, trans.y, trans.z);
-				editor.onControlMove();
-				scope.Render();
 			}
 			// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		} else if (this.highlightingEnabled && e.which !== 1) {
@@ -315,6 +308,7 @@ export class THREEManager {
 				this.lastRaycastTime = now;
 			}
 		}
+	 */
 	}
 
 	public RaycastSelection(e: MouseEvent) {

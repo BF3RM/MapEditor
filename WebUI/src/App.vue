@@ -17,7 +17,6 @@
 						</gl-row>
 						<gl-row :height="20">
 							<ExplorerComponent :width="70" title="Project"/>
-							<ConsoleComponent :width="30" title="Console" />
 						</gl-row>
 					</gl-col>
 					<gl-col :width="20">

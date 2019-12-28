@@ -47,8 +47,6 @@ export default class GizmoWrapper extends TransformControls {
 	public onControlMouseDown(e: any) {
 		// Stop moving
 		this.selected = true;
-		editor.Unhighlight();
-
 		editor.setUpdating(true);
 	}
 
