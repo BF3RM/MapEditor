@@ -159,9 +159,7 @@ export class EditorCore {
 		if (gameObject === undefined) {
 			return;
 		}
-		scope.selectionGroup.DeselectObject(gameObject);
-
-		scope.threeManager.scene.remove(gameObject);
+		scope.threeManager.RemoveFromScene(gameObject);
 
 		signals.deselectedGameObject.emit(guid);
 		if (scope.selectionGroup.children.length === 0) {

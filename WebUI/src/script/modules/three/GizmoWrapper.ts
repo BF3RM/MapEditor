@@ -29,8 +29,8 @@ export default class GizmoWrapper extends TransformControls {
 
 	public onControlChanged() {
 		// moving
-		for (const guid of editor.selectedGameObjects) {
-			signals.objectChanged.emit(guid);
+		for (const go of editor.selectedGameObjects) {
+			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		editor.editorCore.RequestUpdate();
 	}

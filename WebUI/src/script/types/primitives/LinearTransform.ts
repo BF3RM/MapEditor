@@ -141,12 +141,12 @@ export class LinearTransform {
 		this._rotation = rot;
 	}
 
-	get elements(): Object[] {
+	get elements(): object[] {
 		const matrix = this.toMatrix();
 		return matrix.decompose();
 	}
 
-	set elements(value: Object[]) {
+	set elements(value: object[]) {
 		this.position = value[0] as Vec3;
 		this.rotation = (value[1] as Quaternion);
 		this.scale = value[2] as Vec3;

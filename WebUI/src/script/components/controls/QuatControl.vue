@@ -23,12 +23,12 @@ import RAD2DEG = _Math.RAD2DEG;
 import DEG2RAD = _Math.DEG2RAD;
 
 @Component({ components: { DraggableNumberInput, Vec3Control } })
-export default class QuatControl extends Vec3Control {
+export default class QuatControl extends Vue {
 	@Prop(String) label: string;
 	@Prop({ default: 0.014 }) step: number;
 	@Prop(Object) value: Quaternion;
 	@Prop({ default: 'Vec4' }) mode: string;
-	@Prop(Boolean) hideLabel: Boolean;
+	@Prop({ default: false }) hideLabel: boolean;
 
 	private euler = new Euler().setFromQuaternion(this.value);
 

@@ -22,7 +22,6 @@ export class GameObject extends THREE.Object3D {
 	public gameEntities: GameEntityData[];
 
 	public selected: boolean;
-	public _enabled: boolean;
 	public highlighted: boolean;
 	private completeBoundingBox: THREE.Box3;
 

@@ -66,10 +66,6 @@ export default class ExplorerComponent extends EditorComponent {
 	constructor() {
 		super();
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
-		signals.editor.Ready.connect(this.onEditorReady.bind(this));
-	}
-
-	public onEditorReady() {
 	}
 
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {

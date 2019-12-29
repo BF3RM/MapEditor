@@ -120,6 +120,10 @@ export class THREEManager {
 		this.scene.attach(gameObject);
 	}
 
+	public RemoveFromScene(gameObject: THREE.Object3D): void {
+		this.scene.remove(gameObject);
+	}
+
 	public Focus(target?: THREE.Object3D) {
 		editor.vext.SendEvent('controlStart');
 		const scope = this;

@@ -39,8 +39,10 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onInput(e: LinearTransform) {
-		this.gameObject.setTransform(e);
-		window.editor.threeManager.Render();
+		if (this.gameObject !== null) {
+			this.gameObject.setTransform(e);
+			window.editor.threeManager.Render();
+		}
 	}
 
 	private onStartDrag() {
@@ -49,8 +51,10 @@ export default class InspectorComponent extends EditorComponent {
 
 	private onEndDrag() {
 		console.log('Drag end');
-		this.gameObject.onMoveEnd(true);
-		this.dragging = false;
+		if (this.gameObject) {
+			this.gameObject.onMoveEnd(true);
+			this.dragging = false;
+		}
 	}
 
 	private onObjectChanged(gameObject: GameObject) {

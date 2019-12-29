@@ -22,7 +22,7 @@ import QuatControl from '@/script/components/controls/QuatControl.vue';
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
 export default class InspectorComponent extends Vue {
 	@Prop(LinearTransform) value: LinearTransform;
-	@Prop(Boolean) hideLabel: Boolean;
+	@Prop({ default: false }) hideLabel: boolean;
 
 	onChangeValue() {
 		this.$emit('input', this.value);
@@ -37,9 +37,6 @@ export default class InspectorComponent extends Vue {
 		this.onChangeValue();
 		this.$emit('endDrag');
 		return true;
-	}
-
-	onValueChange() {
 	}
 }
 </script>

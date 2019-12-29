@@ -18,7 +18,7 @@ export default class Vec3Control extends Vue {
 	@Prop({ default: 0.014 }) step: number;
 	@Prop(Object) value: Vector3;
 	@Prop(Number) min: number;
-	@Prop(Boolean) hideLabel: Boolean;
+	@Prop({ default: false }) hideLabel: boolean;
 
 	onChangeValue() {
 		this.$emit('input', this.value);
