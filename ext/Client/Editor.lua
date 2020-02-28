@@ -14,7 +14,7 @@ function Editor:RegisterVars()
 	self.m_PendingRaycast = false
 
 	self.m_CameraTransform = nil
-	self.m_LevelLoaded = false
+	--self.m_LevelLoaded = false
 end
 
 function Editor:OnEngineMessage(p_Message)
@@ -39,7 +39,7 @@ end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
-	if(self.m_LevelLoaded and FreeCam:GetCameraMode() == CameraMode.FreeCam and self:CameraHasMoved() == true) then
+	if( FreeCam:GetCameraMode() == CameraMode.FreeCam and self:CameraHasMoved() == true) then
 		self:UpdateCameraTransform()
 	end
 
@@ -97,14 +97,7 @@ end
 
 function Editor:UpdateCameraTransform()
 	local s_Transform = ClientUtils:GetCameraTransform()
-	local pos = s_Transform.trans
-
-	local left = s_Transform.left
-	local up = s_Transform.up
-	local forward = s_Transform.forward
-
-	WebUI:ExecuteJS(string.format('editor.threeManager.UpdateCameraTransform(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
-		left.x, left.y, left.z, up.x, up.y, up.z, forward.x, forward.y, forward.z, pos.x, pos.y, pos.z))
+	WebUI:ExecuteJS(string.format('editor.threeManager.UpdateCameraTransform(%s);', json.encode(s_Transform)))
 	self.m_CameraTransform = s_Transform
 end
 

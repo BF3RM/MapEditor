@@ -32,7 +32,7 @@ import { RecycleScroller } from "vue-virtual-scroller";
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
-import { GIZMOMODE, WORLDSPACE } from '@/script/modules/THREEManager';
+import { GIZMO_MODE, WORLD_SPACE } from '@/script/modules/THREEManager';
 import { signals } from '@/script/modules/Signals';
 import IMenuEntry from '@/script/interfaces/IMenuEntry';
 import RecursiveMenubar from '@/script/components/widgets/RecursiveMenubar.vue';
@@ -217,17 +217,17 @@ export default class EditorToolbar extends Vue {
 		}
 	}
 
-	private onWorldSpaceChanged(mode: WORLDSPACE) {
+	private onWorldSpaceChanged(mode: WORLD_SPACE) {
 		this.worldSpace = mode;
 	}
 
-	private onGizmoModeChanged(mode: GIZMOMODE) {
+	private onGizmoModeChanged(mode: GIZMO_MODE) {
 		this.tool = mode;
 	}
 
 	private onToolChange(newTool: string) {
 		if (this.tools.indexOf(newTool) !== -1) {
-			(window).editor.threeManager.SetGizmoMode(newTool.toLowerCase() as GIZMOMODE);
+			(window).editor.threeManager.SetGizmoMode(newTool.toLowerCase() as GIZMO_MODE);
 		} else {
 			console.error('Attempted to select a tool that does not exist: ' + newTool);
 		}

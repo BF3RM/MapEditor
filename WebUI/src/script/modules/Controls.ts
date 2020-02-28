@@ -1,4 +1,4 @@
-import { GIZMOMODE } from '@/script/modules/THREEManager';
+import { GIZMO_MODE } from '@/script/modules/THREEManager';
 import * as THREE from 'three';
 export enum KEYCODES {
 	P = 80,
@@ -24,16 +24,16 @@ export class Controls {
 			// }
 			// keysdown[e.which] = true;
 			if (event.which === KEYCODES.Q) {
-				editor.threeManager.SetGizmoMode(GIZMOMODE.select);
+				editor.threeManager.SetGizmoMode(GIZMO_MODE.select);
 			}
 			if (event.which === KEYCODES.W) {
-				editor.threeManager.SetGizmoMode(GIZMOMODE.translate);
+				editor.threeManager.SetGizmoMode(GIZMO_MODE.translate);
 			}
 			if (event.which === KEYCODES.E) {
-				editor.threeManager.SetGizmoMode(GIZMOMODE.rotate);
+				editor.threeManager.SetGizmoMode(GIZMO_MODE.rotate);
 			}
 			if (event.which === KEYCODES.R) {
-				editor.threeManager.SetGizmoMode(GIZMOMODE.scale);
+				editor.threeManager.SetGizmoMode(GIZMO_MODE.scale);
 			}
 			if (event.which === KEYCODES.F) {
 				editor.threeManager.Focus();

@@ -15,7 +15,7 @@ import { EditorUI } from './modules/EditorUI';
 import { SelectionGroup } from './types/SelectionGroup';
 import { Config } from './modules/Config';
 import { Blueprint } from './types/Blueprint';
-import { GIZMOMODE, THREEManager } from './modules/THREEManager';
+import { GIZMO_MODE, THREEManager } from './modules/THREEManager';
 import { EditorCore } from './EditorCore';
 import { SpatialGameEntity } from './types/SpatialGameEntity';
 import { CommandActionResult } from './types/CommandActionResult';
@@ -503,7 +503,7 @@ export default class Editor {
 
 	public Select(guid: Guid, multi: boolean = false, scrollTo: boolean = true) {
 		this.Unhighlight(guid);
-		this.threeManager.SetGizmoMode(GIZMOMODE.translate);
+		this.threeManager.SetGizmoMode(GIZMO_MODE.translate);
 
 		if (multi) {
 			return this.editorCore.SelectGameObject(guid, true, scrollTo);

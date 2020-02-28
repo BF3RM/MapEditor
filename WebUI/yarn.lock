@@ -1387,10 +1387,10 @@ camelcase@^5.0.0, camelcase@^5.3.1:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
-camera-controls@^1.15.0:
-  version "1.16.2"
-  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.16.2.tgz#d96c84f5594f9960ed8feae2018b8100f11ca74a"
-  integrity sha512-LSU0Okcjq813AA/AZY5zPYjPiEQddjJ1rVs0TEB6fiJCOnoz3gjsjL2IqxptCCvtyMJN+U/CkdRuqNAst8Vu5g==
+camera-controls@^1.18.0:
+  version "1.19.0"
+  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.19.0.tgz#f4e95b020310302949baac7d99cf0f4952b348f9"
+  integrity sha512-iCO/+HCfPzbK+simc3vH+yFZJviTuTZxEh0glVAXaP3McXRngO/SHhoqAy57uTc5notRWbW93FuixoMZxQB4dQ==
 
 caniuse-api@^3.0.0:
   version "3.0.0"
@@ -7624,10 +7624,10 @@ thread-loader@^2.1.3:
     loader-utils "^1.1.0"
     neo-async "^2.6.0"
 
-three@^0.110.0:
-  version "0.110.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.110.0.tgz#8719591de1336269113ee79f4268ba247b2324f8"
-  integrity sha512-wlurH8XBO9Sd5VIw8nBa+taLR20kqaI4e9FiuMh6tqK8eOS2q2R+ZoUyufbyDTVTHhs8GiTbv0r2CMLkwerFJg==
+three@^0.113.2:
+  version "0.113.2"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.113.2.tgz#04791d491fe4359330f9dbe7b767db18bfb35d67"
+  integrity sha512-x3vrKW41/UtbWbWduWKGlfIc043SvHWr3YltehYq+UGb9YglQ2oztNGvl2eut05JtNSmP11Mh3t6Xak5/0e+Fg==
 
 throttle-debounce@^1.0.1:
   version "1.1.0"

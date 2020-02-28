@@ -21,7 +21,7 @@ export class GameEntityData {
 	public static FromTable(gameEntityDataTable: any) {
 		let transform = gameEntityDataTable.transform;
 		if (transform !== undefined) {
-			transform = new LinearTransform().setFromTable(gameEntityDataTable.transform);
+			transform = LinearTransform.setFromTable(gameEntityDataTable.transform);
 		}
 		let AABB = gameEntityDataTable.aabb;
 		if (AABB !== undefined) {

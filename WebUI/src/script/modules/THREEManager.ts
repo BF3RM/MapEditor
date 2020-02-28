@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { IJSONLinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObject } from '@/script/types/GameObject';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
@@ -9,12 +9,12 @@ import { signals } from '@/script/modules/Signals';
 import CameraControls from 'camera-controls';
 import { Controls } from '@/script/modules/Controls';
 
-export enum WORLDSPACE {
+export enum WORLD_SPACE {
 	local = 'local',
 	world = 'world',
 }
 
-export enum GIZMOMODE {
+export enum GIZMO_MODE {
 	select = 'select',
 	translate = 'translate',
 	rotate = 'rotate',
@@ -34,7 +34,7 @@ export class THREEManager {
 	private cameraControls = new CameraControls(this.camera, this.renderer.domElement);
 	private controls = new Controls();
 	private transformControl: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
-	public worldSpace = WORLDSPACE.local;
+	public worldSpace = WORLD_SPACE.local;
 
 	private gridSnap = false;
 	private highlightingEnabled = false;
@@ -49,7 +49,7 @@ export class THREEManager {
 	private waitingForControlEnd = false;
 	private updatingCamera = false;
 	private debugMode = false;
-	public gizmoMode = GIZMOMODE.select;
+	public gizmoMode = GIZMO_MODE.select;
 
 	constructor(debugMode: boolean) {
 		signals.editor.Ready.connect(this.Initialize.bind(this));
@@ -196,7 +196,7 @@ export class THREEManager {
 	}
 
 	public CreateGizmo() {
-		this.transformControl.setSpace(WORLDSPACE.local as string);
+		this.transformControl.setSpace(WORLD_SPACE.local as string);
 
 		this.scene.add(this.transformControl);
 
@@ -244,10 +244,10 @@ export class THREEManager {
 		this.camera.updateProjectionMatrix();
 	}
 
-	public SetGizmoMode(mode: GIZMOMODE) {
+	public SetGizmoMode(mode: GIZMO_MODE) {
 		console.log('Changing gizmo mode to ' + mode);
 
-		if (mode === GIZMOMODE.select) {
+		if (mode === GIZMO_MODE.select) {
 			this.HideGizmo();
 			this.Render();
 			this.gizmoMode = mode;
@@ -266,8 +266,8 @@ export class THREEManager {
 		this.Render();
 	}
 
-	public SetWorldSpace(space: WORLDSPACE) {
-		if (space === WORLDSPACE.local || space === WORLDSPACE.world) {
+	public SetWorldSpace(space: WORLD_SPACE) {
+		if (space === WORLD_SPACE.local || space === WORLD_SPACE.world) {
 			this.transformControl.setSpace(space);
 			console.log('Changed worldspace to ' + space);
 			this.worldSpace = space;
@@ -277,10 +277,10 @@ export class THREEManager {
 	}
 
 	public ToggleWorldSpace() {
-		if (this.worldSpace === WORLDSPACE.world) {
-			this.SetWorldSpace(WORLDSPACE.local);
+		if (this.worldSpace === WORLD_SPACE.world) {
+			this.SetWorldSpace(WORLD_SPACE.local);
 		} else {
-			this.SetWorldSpace(WORLDSPACE.world);
+			this.SetWorldSpace(WORLD_SPACE.world);
 		}
 	}
 
@@ -454,24 +454,16 @@ export class THREEManager {
 		this.Render();
 	}
 
-	public UpdateCameraTransform(lx: number, ly: number, lz: number, ux: number, uy: number, uz: number, fx: number, fy: number, fz: number, x: number, y: number, z: number) {
-		this.updatingCamera = true;
-
-		this.updatingCamera = true;
-		const m = new THREE.Matrix4();
-
-		m.set(lx, ux, fx, 0,
-			ly, uy, fy, 0,
-			lz, uz, fz, 0,
-			0, 0, 0, 0);
-
-		this.camera.setRotationFromMatrix(m);
-		this.camera.position.set(x, y, z);
+	public UpdateCameraTransform(transform: IJSONLinearTransform) {
+		const linearTransform = LinearTransform.setFromTable(transform);
 		const distance = 10;
-		const target = new Vec3(x + (fx * -1 * distance), y + (fy * -1 * distance), z + (fz * -1 * distance));
+		const target = new Vec3(
+			linearTransform.trans.x + (linearTransform.forward.x * -1 * distance),
+			linearTransform.trans.y + (linearTransform.forward.y * -1 * distance),
+			linearTransform.trans.z + (linearTransform.forward.z * -1 * distance)
+		);
 
-		this.cameraControls.setLookAt(x, y, z, target.x, target.y, target.z, false);
+		this.cameraControls.setLookAt(linearTransform.trans.x, linearTransform.trans.y, linearTransform.trans.z, target.x, target.y, target.z, false);
 		this.Render();
-		this.updatingCamera = false;
 	}
 }

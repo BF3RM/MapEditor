@@ -52,7 +52,7 @@ export class GameObjectTransferData {
 				value = new CtrRef().setFromTable(value);
 				break;
 			case 'transform':
-				value = new LinearTransform().setFromTable(value);
+				value = LinearTransform.setFromTable(value);
 				break;
 			case 'parentData':
 				value = GameObjectParentData.FromTable(table.parentData);
