@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync } from 'vue-property-decorator';
+import { Component, Prop, PropSync, Ref } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
@@ -25,6 +25,9 @@ import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
 	private gameObject: GameObject | null = null;
+
+	@Ref('enabled')
+	enabled!: HTMLInputElement;
 
 	private position: Vector3;
 	private rotation: Vector3;
@@ -62,7 +65,7 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onEnableChange(e: Event) {
-		(this.$refs.enabled as any).checked = this.gameObject!.enabled;
+		this.enabled.checked = this.gameObject!.enabled;
 	}
 
 	private onNameChange(e: InputEvent) {

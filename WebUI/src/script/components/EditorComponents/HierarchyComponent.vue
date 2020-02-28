@@ -4,8 +4,8 @@
 			<div class="header">
 				<Search v-model="search"/>
 			</div>
-			<InfiniteTreeComponent class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-				<template slot-scope="{ node, index, tree, active }" selected="node.selected">
+			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+				<template slot-scope="{ node, index, tree, active }" :selected="node.selected">
 					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
 						<div class="expand" @click="ToggleNode($event,node,tree)">
 							<div v-if="node.state.open && node.children.length > 0">
@@ -21,7 +21,7 @@
 						</span>
 					</div>
 				</template>
-			</InfiniteTreeComponent>
+			</infinite-tree-component>
 		</gl-component>
 		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">
 			<template slot-scope="{ item, data }">
@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 import EditorComponent from '@/script/components/EditorComponents/EditorComponent.vue';
 import InfiniteTreeComponent from '@/script/components/InfiniteTreeComponent.vue';
 import { signals } from '@/script/modules/Signals';
@@ -66,6 +66,9 @@ export default class HierarchyComponent extends EditorComponent {
 	private queue = new Map<string, INode>();
 	private existingParents = new Map<string, INode[]>();
 
+	@Ref('infiniteTreeComponent')
+	infiniteTreeComponent!: any;
+
 	constructor() {
 		super();
 	}
@@ -75,7 +78,7 @@ export default class HierarchyComponent extends EditorComponent {
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.destroyedBlueprint.connect(this.onDestroyedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
-		this.tree = (this.$refs.infiniteTreeComponent as any).tree as InfiniteTree;
+		this.tree = (this.infiniteTreeComponent as any).tree as InfiniteTree;
 	}
 
 	private createNode(gameObject: GameObject): INode {
@@ -191,7 +194,7 @@ export default class HierarchyComponent extends EditorComponent {
 		this.selected = currentNode;
 		this.selected.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
-		(this.$refs.infiniteTreeComponent as InfiniteTreeComponent).scrollToNode(currentNode);
+		this.infiniteTreeComponent.scrollTo(currentNode);
 	}
 
 	private onSelectNode(node: Node) {

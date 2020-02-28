@@ -7,6 +7,7 @@ import { Vec3 } from '@/script/types/primitives/Vec3';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { signals } from '@/script/modules/Signals';
 import CameraControls from 'camera-controls';
+import { Controls } from '@/script/modules/Controls';
 
 export enum WORLDSPACE {
 	local = 'local',
@@ -31,7 +32,8 @@ export class THREEManager {
 
 	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 	private cameraControls = new CameraControls(this.camera, this.renderer.domElement);
-	private control: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
+	private controls = new Controls();
+	private transformControl: TransformControls = new TransformControls(this.camera, this.renderer.domElement);
 	public worldSpace = WORLDSPACE.local;
 
 	private gridSnap = false;
@@ -81,6 +83,10 @@ export class THREEManager {
 			const hasControlsUpdated = scope.cameraControls.update(delta);
 
 			requestAnimationFrame(anim);
+
+			scope.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+			scope.cameraControls.mouseButtons.right = CameraControls.ACTION.NONE;
+			scope.cameraControls.mouseButtons.middle = CameraControls.ACTION.TRUCK;
 
 			// you can skip this condition to render though
 			if (hasControlsUpdated) {
@@ -156,31 +162,33 @@ export class THREEManager {
 	}
 
 	public RegisterEvents() {
-		this.renderer.domElement.addEventListener('mouseDown', (event: any) => {
+		const scope = this;
+
+		this.renderer.domElement.onmousedown = function (event: any) {
 			switch (event.which) {
 			case 1: // Left mouse
 				break;
 			case 2: // middle mouse
 				break;
 			case 3: // right mouse
-				EnableFreecamMovement();
-				this.highlightingEnabled = false;
+				scope.controls.EnableFreecamMovement();
+				scope.highlightingEnabled = false;
 				break;
 			default:
 				// alert('You have a strange Mouse!');
 				break;
 			}
-		});
+		};
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 
-		this.control.addEventListener('change', this.onControlChanged.bind(this));
-		this.control.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
-		this.control.addEventListener('mouseDown', this.onControlMouseDown.bind(this));
-		this.control.addEventListener('dragging-changed', (event) => {
+		this.transformControl.addEventListener('change', this.onControlChanged.bind(this));
+		this.transformControl.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
+		this.transformControl.addEventListener('mouseDown', this.onControlMouseDown.bind(this));
+		this.transformControl.addEventListener('dragging-changed', (event) => {
 			this.cameraControls.enabled = !event.value;
 		});
 
@@ -188,9 +196,9 @@ export class THREEManager {
 	}
 
 	public CreateGizmo() {
-		this.control.setSpace(WORLDSPACE.local as string);
+		this.transformControl.setSpace(WORLDSPACE.local as string);
 
-		this.scene.add(this.control);
+		this.scene.add(this.transformControl);
 
 		this.HideGizmo();
 
@@ -207,18 +215,18 @@ export class THREEManager {
 	}
 
 	public AttachGizmoTo(gameObject: GameObject) {
-		this.control.attach(gameObject);
+		this.transformControl.attach(gameObject);
 		// this.Render();
 	}
 
 	public HideGizmo() {
-		this.control.visible = false;
+		this.transformControl.visible = false;
 		// this.mesh.visible = false;
 		// this.Render();
 	}
 
 	public ShowGizmo() {
-		this.control.visible = true;
+		this.transformControl.visible = true;
 		// this.mesh.visible = true;
 
 		// this.Render();
@@ -237,25 +245,30 @@ export class THREEManager {
 	}
 
 	public SetGizmoMode(mode: GIZMOMODE) {
+		console.log('Changing gizmo mode to ' + mode);
+
 		if (mode === GIZMOMODE.select) {
 			this.HideGizmo();
 			this.Render();
+			this.gizmoMode = mode;
+			signals.gizmoModeChanged.emit(mode);
 			return;
 		}
 
-		if (this.control.visible === false) {
+		if (this.transformControl.visible === false) {
 			this.ShowGizmo();
 		}
-		this.control.setMode(mode);
+
+		this.transformControl.setMode(mode);
 		this.gizmoMode = mode;
-		console.log('Changed gizmo mode to ' + mode);
+
 		signals.gizmoModeChanged.emit(mode);
 		this.Render();
 	}
 
 	public SetWorldSpace(space: WORLDSPACE) {
 		if (space === WORLDSPACE.local || space === WORLDSPACE.world) {
-			this.control.setSpace(space);
+			this.transformControl.setSpace(space);
 			console.log('Changed worldspace to ' + space);
 			this.worldSpace = space;
 		} else {
@@ -273,14 +286,14 @@ export class THREEManager {
 
 	public EnableGridSnap() {
 		this.gridSnap = true;
-		this.control.setTranslationSnap(0.5);
-		this.control.setRotationSnap(THREE.Math.degToRad(15));
+		this.transformControl.setTranslationSnap(0.5);
+		this.transformControl.setRotationSnap(THREE.MathUtils.degToRad(15));
 	}
 
 	public DisableGridSnap() {
 		this.gridSnap = false;
-		this.control.translationSnap = null;
-		this.control.rotationSnap = null;
+		this.transformControl.translationSnap = null;
+		this.transformControl.rotationSnap = null;
 	}
 
 	public ToggleGridSnap() {

@@ -49,7 +49,7 @@ export default class InspectorComponent extends Vue {
 
 	@Watch('rotation', { deep: true })
 	onChangeRotation(a: Euler, b: Euler) {
-		this.value.setRotation(a);
+		this.value.makeRotationFromEuler(a);
 	}
 
 	@Watch('scale', { deep: true })
