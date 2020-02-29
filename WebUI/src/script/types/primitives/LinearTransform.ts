@@ -1,6 +1,13 @@
 import { Euler, Matrix4, Quaternion } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
+export interface IJSONLinearTransform {
+	forward: { x: number, y: number, z: number };
+	left: { x: number, y: number, z: number };
+	trans: { x: number, y: number, z: number };
+	up: { x: number, y: number, z: number };
+}
+
 export class LinearTransform {
 	public forward: Vec3;
 	public left: Vec3;
@@ -14,6 +21,7 @@ export class LinearTransform {
 		this.up = up;
 		this.forward = forward;
 		this.trans = trans;
+		this.UpdateMeta();
 		return this;
 	}
 
@@ -92,13 +100,12 @@ export class LinearTransform {
 		return this;
 	}
 
-	public setFromTable(table: { left: { x: number, y: number, z: number }, up: { x: number, y: number, z: number }, forward: { x: number, y: number, z: number }, trans: { x: number, y: number, z: number } }) {
-		this.left = new Vec3(table.left.x, table.left.y, table.left.z);
-		this.up = new Vec3(table.up.x, table.up.y, table.up.z);
-		this.forward = new Vec3(table.forward.x, table.forward.y, table.forward.z);
-		this.trans = new Vec3(table.trans.x, table.trans.y, table.trans.z);
-		this.UpdateMeta();
-		return this;
+	public static setFromTable(table: IJSONLinearTransform) {
+		const left = new Vec3(table.left.x, table.left.y, table.left.z);
+		const up = new Vec3(table.up.x, table.up.y, table.up.z);
+		const forward = new Vec3(table.forward.x, table.forward.y, table.forward.z);
+		const trans = new Vec3(table.trans.x, table.trans.y, table.trans.z);
+		return new this(left, up, forward, trans);
 	}
 
 	public clone() {
@@ -141,10 +148,10 @@ export class LinearTransform {
 		this._rotation = rot;
 	}
 
-	get elements(): object[] {
-		const matrix = this.toMatrix();
-		return matrix.decompose();
-	}
+	// get elements(): object[] {
+	// 	const matrix = this.toMatrix();
+	// 	return matrix.decompose();
+	// }
 
 	set elements(value: object[]) {
 		this.position = value[0] as Vec3;

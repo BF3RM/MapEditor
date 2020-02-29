@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync } from 'vue-property-decorator';
+import { Component, Prop, PropSync, Ref } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
@@ -27,10 +27,11 @@ import { LOGLEVEL } from '@/script/modules/Logger';
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
 	private gameObject: GameObject | null = null;
-
 	private transform: LinearTransform = new LinearTransform();
-
 	private dragging = false;
+
+	@Ref('enabled')
+	enabled!: HTMLInputElement;
 
 	constructor() {
 		super();
@@ -72,7 +73,7 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onEnableChange(e: Event) {
-		(this.$refs.enabled as any).checked = this.gameObject!.enabled;
+		this.enabled.checked = this.gameObject!.enabled;
 	}
 
 	private onNameChange(e: InputEvent) {

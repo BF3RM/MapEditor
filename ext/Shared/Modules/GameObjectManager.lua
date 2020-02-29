@@ -1,6 +1,6 @@
 class 'GameObjectManager'
 
-local m_Logger = Logger("GameObjectManager", true)
+local m_Logger = Logger("GameObjectManager", false)
 
 function GameObjectManager:__init(p_Realm)
     m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))

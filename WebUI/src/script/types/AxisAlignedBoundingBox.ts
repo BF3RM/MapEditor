@@ -3,9 +3,9 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 export class AxisAlignedBoundingBox {
 	public static FromTable(table: any) {
-		const min = new Vec3().setFromTable(table.min);
-		const max = new Vec3().setFromTable(table.max);
-		const transform = new LinearTransform().setFromTable(table.transform);
+		const min = Vec3.setFromTable(table.min);
+		const max = Vec3.setFromTable(table.max);
+		const transform = LinearTransform.setFromTable(table.transform);
 		return new AxisAlignedBoundingBox(min, max, transform);
 	}
 

@@ -1,28 +1,28 @@
 <template>
-  <RecycleScroller :class="className"
-                   class="scrollable"
-                   :items="filteredNodes"
-                   :item-height="rowHeight"
-                   ref="scroller"
-                   :min-item-size="16"
-  >
-    <div slot-scope="{ item,index }">
-      <slot
-        v-bind="{
-          node: item,
-          tree: tree,
-          index: index
-        }"
-      />
-    </div>
-  </RecycleScroller>
+	<RecycleScroller :class="className"
+					class="scrollable"
+					:items="filteredNodes"
+					:item-height="rowHeight"
+					ref="scroller"
+					:min-item-size="16"
+	>
+		<div slot-scope="{ item,index }">
+			<slot
+				v-bind="{
+					node: item,
+					tree: tree,
+					index: index
+				}"
+			/>
+		</div>
+	</RecycleScroller>
 </template>
 
 <script lang="ts">
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import InfiniteTree, { INode, Node } from 'infinite-tree';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 
 const lcfirst = (str: string) => {
 	str += '';
@@ -30,17 +30,52 @@ const lcfirst = (str: string) => {
 };
 @Component({ components: { RecycleScroller } })
 export default class InfiniteTreeComponent extends Vue {
-	@Prop(String) search: string;
-	@Prop({ type: String, default: 'scroll-box' }) className: string;
-	@Prop({ type: Boolean, default: true }) autoOpen: boolean;
-	@Prop({ type: Boolean, default: true }) selectable: boolean;
-	@Prop({ type: Number, default: 0 }) tabIndex: number;
-	@Prop({ type: Object, default: [] }) data: object[];
-	@Prop({ type: Number, default: 32 }) rowHeight: number;
-	@Prop({ type: Function, default(node: Node) { return true; } }) loadNodes: boolean;
-	@Prop({ type: Function, default(id: string) { return true; } }) getNodeById: Node;
-	@Prop({ type: Function, default(node: Node) { return (this as any).scrollTo(node); } }) public scrollToNode: (node: Node) => void;
-	@Prop({ type: Function, default(node: Node) { console.log('ShouldLoadNodes'); return !(node.children.length > 0) && node.loadOnDemand; } }) shouldLoadNodes: boolean;
+	@Ref('scroller')
+	scroller!: RecycleScroller;
+
+	@Prop()
+	search: string;
+
+	@Prop({ default: 'scroll-box' })
+	className: string;
+
+	@Prop({ default: true })
+	autoOpen: boolean;
+
+	@Prop({ default: true })
+	selectable: boolean;
+
+	@Prop({ default: 0 })
+	tabIndex: number;
+
+	@Prop({ type: Object, default: [] })
+	data: object[];
+
+	@Prop({ default: 32 })
+	rowHeight: number;
+
+	@Prop({ default: true })
+	loadNodes: boolean;
+
+	@Prop({ type: Function, default(node: Node) { return true; } })
+	getNodeById: (node: Node) => boolean;
+
+	@Prop({
+		type: Function,
+		default(node: Node) {
+			return (this as any).scrollTo(node);
+		}
+	})
+	public scrollToNode: (node: Node) => void;
+
+	@Prop({
+		type: Function,
+		default(node: Node) {
+			console.log('ShouldLoadNodes');
+			return !(node.children.length > 0) && node.loadOnDemand;
+		}
+	}) shouldLoadNodes: boolean;
+
 	@Prop({
 		type: Function,
 		default(node: Node) {
@@ -63,6 +98,7 @@ export default class InfiniteTreeComponent extends Vue {
 	@Prop({ type: Function }) onKeyDown: void;
 	@Prop({ type: Function }) onMouseLeave: void;
 	@Prop({ type: Function }) onMouseEnter: void;
+
 	@Watch('data')
 	onDataChange(newValue: any) {
 		console.log('datachange');
@@ -87,6 +123,14 @@ export default class InfiniteTreeComponent extends Vue {
 			});
 		}
 	}) tree: InfiniteTree;
+
+	public scrollTo(node: Node) {
+		const nodeIndex = (this.filteredNodes).findIndex((i) => {
+			console.log(i.id === node.id);
+			return i.id === node.id;
+		});
+		this.scroller.scrollToItem(nodeIndex);
+	}
 
 	private get filteredNodes() {
 		const search = this.search;
@@ -145,14 +189,6 @@ export default class InfiniteTreeComponent extends Vue {
 			this.eventHandlers[key] = null;
 		});
 	}
-
-	scrollTo(node: Node) {
-		// const nodeIndex = (this.filteredNodes).findIndex((i) => {
-		// 	console.log(i.id === node.id);
-		// 	return i.id === node.id;
-		// });
-		// (this.$refs.scroller as RecycleScroller).scrollToItem(nodeIndex);
-	}
 }
 /*
 export default {
@@ -182,9 +218,9 @@ export default {
 */
 </script>
 <style scoped>
-  .scroll-box {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-  }
+	.scroll-box {
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+	}
 </style>

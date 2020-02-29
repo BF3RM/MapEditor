@@ -15,7 +15,7 @@ import { EditorUI } from './modules/EditorUI';
 import { SelectionGroup } from './types/SelectionGroup';
 import { Config } from './modules/Config';
 import { Blueprint } from './types/Blueprint';
-import { GIZMOMODE, THREEManager } from './modules/THREEManager';
+import { GIZMO_MODE, THREEManager } from './modules/THREEManager';
 import { EditorCore } from './EditorCore';
 import { SpatialGameEntity } from './types/SpatialGameEntity';
 import { CommandActionResult } from './types/CommandActionResult';
@@ -310,7 +310,7 @@ export default class Editor {
 		this.selectedGameObjects = [];
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelected();
-		this.threeManager.SetGizmoMode(GIZMOMODE.translate);
+		this.threeManager.SetGizmoMode(GIZMO_MODE.translate);
 		return this.editorCore.onSelectGameObject(gameObject);
 	}
 

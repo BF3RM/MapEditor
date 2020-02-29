@@ -9,21 +9,15 @@ export class Vec3 extends Vector3 {
 		return new Vec3(this.x, this.y, this.z);
 	}
 
-	public setFromTable(object: {x: number, y: number, z: number}) {
-		this.x = Number(object.x);
-		this.y = Number(object.y);
-		this.z = Number(object.z);
-		return this;
+	public static setFromTable(object: {x: number, y: number, z: number}) {
+		return new this(Number(object.x), Number(object.y), Number(object.z));
 	}
 
-	public setFromString(matrixString: string) {
+	public static setFromString(matrixString: string) {
 		matrixString = matrixString.replace(/[(]/g, '');
 		matrixString = matrixString.replace(/[)]/g, ', ');
 		const matrix = matrixString.split(',');
-		this.x = Number(matrix[0]);
-		this.y = Number(matrix[1]);
-		this.z = Number(matrix[2]);
-		return this;
+		return new this(Number(matrix[0]), Number(matrix[1]), Number(matrix[3]));
 	}
 
 	get left() {
