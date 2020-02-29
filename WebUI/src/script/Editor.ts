@@ -377,7 +377,7 @@ export default class Editor {
 			gameObjectTransferData.blueprintCtrRef,
 			gameObjectTransferData.variation,
 			gameObjectTransferData.gameEntities);
-		editor.threeManager.AddToScene(gameObject);
+		editor.threeManager.AttachToScene(gameObject);
 		gameObject.updateTransform();
 		for (const gameEntityData of gameObjectTransferData.gameEntities) {
 			const entityData = gameEntityData;

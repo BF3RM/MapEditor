@@ -52,7 +52,7 @@ export default class GizmoWrapper extends TransformControls {
 
 	private onEditorReady() {
 		this.setSpace(WORLDSPACE.local as string);
-		editor.threeManager.AddToScene(this);
-		editor.threeManager.AddToScene(this.placeholderObject);
+		editor.threeManager.AttachToScene(this);
+		editor.threeManager.AttachToScene(this.placeholderObject);
 	}
 }

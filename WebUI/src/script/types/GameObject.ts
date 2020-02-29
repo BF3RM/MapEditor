@@ -24,6 +24,7 @@ export class GameObject extends THREE.Object3D {
 	public selected: boolean;
 	public highlighted: boolean;
 	private completeBoundingBox: THREE.Box3;
+	private _enabled: boolean;
 
 	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject', transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(), blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = []) {
 		super();
@@ -92,7 +93,7 @@ export class GameObject extends THREE.Object3D {
 		const matrix = this.transform.toMatrix();
 		const parent = this.parent;
 		if (parent !== null && parent.type !== 'Scene') {
-			editor.threeManager.AddToScene(this);
+			editor.threeManager.AttachToScene(this);
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();

@@ -116,7 +116,7 @@ export class THREEManager {
 		signals.objectChanged.connect(this.Render.bind(this)); // Object changed? Render!
 	}
 
-	public AddToScene(gameObject: THREE.Object3D): void {
+	public AttachToScene(gameObject: THREE.Object3D): void {
 		this.scene.attach(gameObject);
 	}
 
