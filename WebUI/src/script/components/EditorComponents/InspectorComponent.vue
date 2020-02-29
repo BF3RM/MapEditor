@@ -4,7 +4,7 @@
 			<div class="header">
 				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
 				<label for="name">Name:</label><input :value="gameObject.name" @input="onNameChange" id="name">
-				<LinearTransformControl :hideLabel="true" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "></LinearTransformControl>
+				<linear-transform-control :hideLabel="true" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "/>
 			</div>
 		</div>
 	</gl-component>
@@ -46,11 +46,11 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
-	private onStartDrag() {
+	onStartDrag() {
 		this.dragging = true;
 	}
 
-	private onEndDrag() {
+	onEndDrag() {
 		console.log('Drag end');
 		if (this.gameObject) {
 			this.gameObject.onMoveEnd(true);

@@ -24,14 +24,16 @@ export default class Vec3Control extends Vue {
 		this.$emit('input', this.value);
 	}
 
-	onStartDrag() {
+	@Emit('startDrag')
+	onStartDrag(event: Event) {
 		this.onChangeValue();
-		this.$emit('startDrag');
+		return event;
 	}
 
-	onEndDrag() {
+	@Emit('endDrag')
+	onEndDrag(event: Event) {
 		this.onChangeValue();
-		this.$emit('endDrag');
+		return event;
 	}
 }
 </script>

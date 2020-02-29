@@ -48,6 +48,7 @@ export default class Editor {
 
 	public selectionGroup: SelectionGroup;
 	public highlightGroup: HighlightGroup;
+	public highlightedObjectGuid: Guid | null = null;
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
 
 	public selectedGameObjects: GameObject[] = [];
@@ -298,7 +299,7 @@ export default class Editor {
 
 	*/
 	public Select(guid: Guid) {
-		const gameObject = this.gameObjects.getValue(guid);
+		const gameObject = this.gameObjects.getValue(guid) as GameObject;
 
 		if (gameObject === undefined) {
 			LogError('Failed to select gameobject: ' + guid);
@@ -316,6 +317,35 @@ export default class Editor {
 
 	public Deselect(guid: Guid) {
 		this.editorCore.onDeselectedGameObject(guid);
+	}
+
+	public Highlight(guid: Guid) {
+		// Ignore if already highlighted
+		if (this.highlightedObjectGuid === guid) {
+			return;
+		}
+		const gameObject = this.gameObjects.getValue(guid) as GameObject;
+		// Ignore if selected
+		if (gameObject.selected) {
+			return;
+		}
+
+		if (!gameObject) {
+			LogError('Failed to highlight gameobject: ' + guid);
+			return false;
+		}
+		this.UnHighlight();
+		gameObject.onHighlight();
+		this.highlightedObjectGuid = guid;
+	}
+
+	public UnHighlight() {
+		if (this.highlightedObjectGuid == null) return;
+		const gameObject = this.gameObjects.getValue(this.highlightedObjectGuid) as GameObject;
+		if (gameObject) {
+			gameObject.onUnHighlight();
+		}
+		this.highlightedObjectGuid = null;
 	}
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
@@ -368,15 +398,7 @@ export default class Editor {
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const parentGuid = gameObjectTransferData.parentData.guid;
 
-		// TODO: change GameObject ctor
-		const gameObject = new GameObject(gameObjectTransferData.guid,
-			gameObjectTransferData.typeName,
-			gameObjectTransferData.name,
-			gameObjectTransferData.transform,
-			gameObjectTransferData.parentData,
-			gameObjectTransferData.blueprintCtrRef,
-			gameObjectTransferData.variation,
-			gameObjectTransferData.gameEntities);
+		const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
 		editor.threeManager.AttachToScene(gameObject);
 		gameObject.updateTransform();
 		for (const gameEntityData of gameObjectTransferData.gameEntities) {

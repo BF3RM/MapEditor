@@ -30,6 +30,16 @@ export default class QuatControl extends Vue {
 	@Prop({ default: 'Vec4' }) mode: string;
 	@Prop({ default: false }) hideLabel: boolean;
 
+	@Emit('startDrag')
+	onStartDrag(event: Event) {
+		return event;
+	}
+
+	@Emit('endDrag')
+	onEndDrag(event: Event) {
+		return event;
+	}
+
 	private euler = new Euler().setFromQuaternion(this.value);
 
 	@Watch('value')

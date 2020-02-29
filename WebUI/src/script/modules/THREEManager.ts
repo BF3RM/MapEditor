@@ -1,8 +1,6 @@
 import * as THREE from 'three';
-import { IJSONLinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { IJSONLinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObject } from '@/script/types/GameObject';
-import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
-import { Vec3 } from '@/script/types/primitives/Vec3';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { signals } from '@/script/modules/Signals';
 
@@ -10,6 +8,7 @@ import CameraControlWrapper from '@/script/modules/three/CameraControlWrapper';
 import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
+import { Guid } from '@/script/types/Guid';
 
 export enum WORLD_SPACE {
 	local = 'local',
@@ -38,7 +37,7 @@ export class THREEManager {
 	public worldSpace = WORLD_SPACE.local;
 
 	private gridSnap = false;
-	private highlightingEnabled = false;
+	private highlightingEnabled = true;
 	private raycastPlacing = false;
 	private lastRaycastTime = new Date();
 
@@ -259,10 +258,10 @@ export class THREEManager {
 		}
 	}
 
-	public onMouseUp(e: MouseEvent) {
+	public onMouseUp(event: MouseEvent) {
 		const scope = this;
 
-		if (e.which === 1 && editor.threeManager.raycastPlacing) {
+		if (event.button === 0 && editor.threeManager.raycastPlacing) {
 			editor.threeManager.ShowGizmo();
 			editor.threeManager.raycastPlacing = false;
 			scope.cameraControls.enabled = true;
@@ -297,38 +296,40 @@ export class THREEManager {
 		}
 	}
 
+	/**
+	* Called from Lua when freecam is disabled.
+	* */
 	public MouseEnabled() {
 		this.highlightingEnabled = true;
 	}
 
 	public onMouseMove(e: MouseEvent) {
-		/* const scope = this;
-		if (scope.raycastPlacing) {
-			const direction = scope.getMouse3D(e);
-
-			const message = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
-			editor.vext.SendMessage(message);
-			if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
-				editor.setUpdating(true);
-				const trans = editor.editorCore.screenToWorldTransform.trans;
-			}
-			// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
-		} else if (this.highlightingEnabled && e.which !== 1) {
+		const scope = this;
+		// if (scope.raycastPlacing) {
+		// 	const direction = scope.getMouse3D(e);
+		//
+		// 	const message = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
+		// 	editor.vext.SendMessage(message);
+		// 	if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
+		// 		editor.setUpdating(true);
+		// 		const trans = editor.editorCore.screenToWorldTransform.trans;
+		// 	}
+		// 	// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
+		// } else
+		if (this.highlightingEnabled && e.buttons === 0) {
 			const now = new Date();
 
 			if (now.getTime() - this.lastRaycastTime.getTime() >= 100) {
-				const guid = scope.RaycastSelection(e);
-
+				const guid = scope.RaycastSelection(e) as Guid;
 				if (guid !== null) {
 					editor.Highlight(guid);
 				} else {
-					editor.Unhighlight();
+					editor.UnHighlight();
 				}
 
 				this.lastRaycastTime = now;
 			}
 		}
-	 */
 	}
 
 	public RaycastSelection(e: MouseEvent) {
@@ -346,7 +347,7 @@ export class THREEManager {
 		dir.normalize();
 
 		if (intersects.length > 0) {
-			// console.log("hit "+ (intersects.length) + " objects");
+			// console.log('hit ' + (intersects.length) + ' objects');
 
 			for (const element of intersects) {
 				if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {

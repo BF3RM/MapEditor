@@ -33,7 +33,7 @@ export class EntityView {
 		this.content = [];
 		this.directory.clear();
 		let go = editor.getGameObjectByGuid(guid);
-		go.gameEntities.forEach(function (child) {
+		go.gameEntitiesData.forEach(function (child) {
 			let entry = scope.entityRenderer(child);
 			scope.content.push(entry);
 			scope.directory.add(entry);

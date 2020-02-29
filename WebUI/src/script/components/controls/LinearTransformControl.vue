@@ -28,15 +28,15 @@ export default class InspectorComponent extends Vue {
 		this.$emit('input', this.value);
 	}
 
-	onStartDrag() {
-		this.$emit('startDrag');
-		return true;
+	@Emit('startDrag')
+	onStartDrag(event: Event) {
+		return event;
 	}
 
-	onEndDrag() {
+	@Emit('endDrag')
+	onEndDrag(event: Event) {
 		this.onChangeValue();
-		this.$emit('endDrag');
-		return true;
+		return event;
 	}
 }
 </script>

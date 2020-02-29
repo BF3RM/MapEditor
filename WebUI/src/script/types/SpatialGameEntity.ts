@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
+import { IGameEntity } from '@/script/interfaces/IGameEntity';
 
-export class SpatialGameEntity extends THREE.Mesh {
+export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	private aabb: THREE.LineSegments;
 	private instanceId: number;
 	private transform: LinearTransform;
@@ -148,16 +149,24 @@ export class SpatialGameEntity extends THREE.Mesh {
 		// this.aabb.geometry.computeBoundingBox();
 	}
 
-	public Highlight() {
+	public onHighlight() {
 		this.SetColor(0x999999);
 	}
 
-	public Unhighlight() {
+	public onUnHighlight() {
+		// this.SetColor(0x999999);
+	}
+
+	public onDeselected() {
+		// this.SetColor(0x999999);
+	}
+
+	public onSelected() {
 		this.SetColor(0xFF0000);
 	}
 
-	public SetColor(color: any) {
-		// this.aabb.material.color.setHex(color);
+	public SetColor(color: number) {
+		(this.aabb.material as THREE.LineBasicMaterial).color.setHex(color);
 		editor.threeManager.Render();
 	}
 }

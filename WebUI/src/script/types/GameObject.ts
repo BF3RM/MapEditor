@@ -10,23 +10,26 @@ import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
+import { IGameEntity } from '@/script/interfaces/IGameEntity';
 
-export class GameObject extends THREE.Object3D {
+export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
 	public typeName: string;
 	public transform: LinearTransform;
 	public parentData: GameObjectParentData;
 	public blueprintCtrRef: CtrRef;
 	public variation: number;
-	public children: GameObject[];
-	public gameEntities: GameEntityData[];
+	public children: IGameEntity[];
+	public gameEntitiesData: GameEntityData[];
 
 	public selected: boolean;
 	public highlighted: boolean;
 	private completeBoundingBox: THREE.Box3;
 	private _enabled: boolean;
 
-	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject', transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(), blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = []) {
+	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject',
+		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
+		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = []) {
 		super();
 
 		this.guid = guid;
@@ -37,17 +40,30 @@ export class GameObject extends THREE.Object3D {
 		this.blueprintCtrRef = blueprintCtrRef;
 		this.variation = variation;
 		this.children = [];
-		this.gameEntities = gameEntities;
+		this.gameEntitiesData = gameEntities;
 
 		this.selected = false;
 		this.matrixAutoUpdate = true;
-		this.visible = true;
+		this.visible = false;
 		this._enabled = true;
 		this.highlighted = false;
 
 		this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
+	}
+
+	public static CreateWithTransferData(gameObjectTransferData: GameObjectTransferData) {
+		return new this(
+			gameObjectTransferData.guid,
+			gameObjectTransferData.typeName,
+			gameObjectTransferData.name,
+			gameObjectTransferData.transform,
+			gameObjectTransferData.parentData,
+			gameObjectTransferData.blueprintCtrRef,
+			gameObjectTransferData.variation,
+			gameObjectTransferData.gameEntities
+		);
 	}
 
 	public getCleanName() {
@@ -172,10 +188,26 @@ export class GameObject extends THREE.Object3D {
 	}
 
 	onSelected() {
-		// this.visible = true;
+		this.visible = true;
+		this.selected = true;
+		this.children.forEach(go => go.onSelected());
 	}
 
 	onDeselected() {
-		// this.visible = false;
+		this.visible = false;
+		this.selected = false;
+		this.children.forEach(go => go.onDeselected());
+	}
+
+	onHighlight() {
+		this.visible = true;
+		this.highlighted = true;
+		this.children.forEach(go => go.onHighlight());
+	}
+
+	onUnHighlight() {
+		this.visible = false;
+		this.highlighted = false;
+		this.children.forEach(go => go.onUnHighlight());
 	}
 }
