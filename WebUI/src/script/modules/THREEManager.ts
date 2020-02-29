@@ -8,7 +8,7 @@ import { signals } from '@/script/modules/Signals';
 
 import CameraControlWrapper from '@/script/modules/three/CameraControlWrapper';
 import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
-import { Controls } from '@/script/modules/Controls';
+import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
 
 export enum WORLD_SPACE {
@@ -34,7 +34,7 @@ export class THREEManager {
 
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
 	private gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement);
-	private controls = new Controls();
+	private inputControls = new InputControls(this.renderer.domElement);
 	public worldSpace = WORLD_SPACE.local;
 
 	private gridSnap = false;
@@ -97,21 +97,6 @@ export class THREEManager {
 	}
 
 	public RegisterEvents() {
-		this.renderer.domElement.addEventListener('mouseDown', (event: any) => {
-			switch (event.which) {
-			case 1: // Left mouse
-				break;
-			case 2: // middle mouse
-				break;
-			case 3: // right mouse
-				this.controls.EnableFreecamMovement();
-				this.highlightingEnabled = false;
-				break;
-			default:
-				// alert('You have a strange Mouse!');
-				break;
-			}
-		});
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
@@ -119,6 +104,13 @@ export class THREEManager {
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 
 		signals.objectChanged.connect(this.Render.bind(this)); // Object changed? Render!
+	}
+
+	private EnableFreecamMovement() {
+		editor.vext.SendEvent('EnableFreeCamMovement');
+
+		// Hack to make sure we don't navigate the windows while in freecam.
+		// document.activeElement.blur();
 	}
 
 	public AttachToScene(gameObject: THREE.Object3D): void {
@@ -277,14 +269,28 @@ export class THREEManager {
 		}
 	}
 
-	public onMouseDown(e: MouseEvent) {
+	public onMouseDown(event: MouseEvent) {
 		const scope = this;
+		switch (event.button) {
+		case 0: // Left mouse
+			break;
+		case 1: // middle mouse
+			break;
+		case 2: // right mouse
+			this.EnableFreecamMovement();
+			this.highlightingEnabled = false;
+			break;
+		default:
+			// alert('You have a strange Mouse!');
+			break;
+		}
+
 		if (scope.raycastPlacing) {
 			scope.cameraControls.enabled = false;
 		} else if (this.gizmoControls.selected) {
 			console.log('Control selected');
-		} else if (e.which === 1) {
-			const guid = this.RaycastSelection(e);
+		} else if (event.button === 0) {
+			const guid = this.RaycastSelection(event);
 			if (guid !== null) {
 				editor.Select(guid);
 			}
@@ -375,5 +381,9 @@ export class THREEManager {
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.Render();
+	}
+
+	public UpdateCameraTransform(transform: IJSONLinearTransform) {
+		this.cameraControls.UpdateCameraTransform(transform);
 	}
 }

@@ -5,7 +5,6 @@ import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, WORLD_SPACE } from '@/script/modules/THREEManager';
 import { GameObject } from '@/script/types/GameObject';
 
-
 export const signals = {
 	editor: {
 		Initializing: new Signal(),

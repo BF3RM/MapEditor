@@ -13,8 +13,8 @@ export enum KEYCODES {
 	F2 = 113
 }
 
-export class Controls {
-	constructor() {
+export class InputControls {
+	constructor(element: HTMLCanvasElement) {
 		window.addEventListener('keydown', (event: any) => {
 			// if (keysdown[e.which]) {
 			// 	return;
@@ -81,13 +81,6 @@ export class Controls {
 				editor.vext.SendEvent('DisableFreecam');
 			}
 		});
-	}
-
-	EnableFreecamMovement() {
-		editor.vext.SendEvent('EnableFreeCamMovement');
-
-		// Hack to make sure we don't navigate the windows while in freecam.
-		// document.activeElement.blur();
 	}
 }
 
