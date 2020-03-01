@@ -1,7 +1,7 @@
 import { Euler, Matrix4, Quaternion } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
-export interface IJSONLinearTransform {
+export interface ILinearTransform {
 	forward: { x: number, y: number, z: number };
 	left: { x: number, y: number, z: number };
 	trans: { x: number, y: number, z: number };
@@ -100,7 +100,7 @@ export class LinearTransform {
 		return this;
 	}
 
-	public static setFromTable(table: IJSONLinearTransform) {
+	public static setFromTable(table: ILinearTransform) {
 		const left = new Vec3(table.left.x, table.left.y, table.left.z);
 		const up = new Vec3(table.up.x, table.up.y, table.up.z);
 		const forward = new Vec3(table.forward.x, table.forward.y, table.forward.z);

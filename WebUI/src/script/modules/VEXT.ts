@@ -1,12 +1,12 @@
 import Command from '../libs/three/Command';
 import { VEXTemulator } from '@/script/modules/VEXTemulator';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
-import * as Collections from 'typescript-collections';
-import { Guid } from '@/script/types/Guid';
-import { GameObject } from '@/script/types/GameObject';
 import { signals } from '@/script/modules/Signals';
 import { VextCommand } from '@/script/types/VextCommand';
 import { LOGLEVEL } from '@/script/modules/Logger';
+import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
+import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
+import { IBlueprint } from '@/script/interfaces/IBlueprint';
 
 export default class VEXTInterface {
 	public emulator: VEXTemulator;
@@ -20,7 +20,7 @@ export default class VEXTInterface {
 		messages: object[];
 	};
 
-	constructor() {
+	constructor(debug: boolean) {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
 		this.commands = {
@@ -52,6 +52,12 @@ export default class VEXTInterface {
 			commands: [],
 			messages: []
 		};
+		console.log('UI is ready');
+		if (!debug) {
+			console.log('Sending to lua');
+
+			WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
+		}
 	}
 
 	/*
@@ -216,5 +222,45 @@ export default class VEXTInterface {
 			this.commands[message.type](message);
 		}
 		editor.threeManager.setPendingRender();
+	}
+
+	public SetPlayerName(name: string) {
+		editor.setPlayerName(name);
+	}
+
+	public SetRaycastPosition(pos: IVec3) {
+		editor.setRaycastPosition(Vec3.setFromTable(pos));
+	}
+
+	public SetScreenToWorldPosition(pos: IVec3) {
+		editor.setScreenToWorldPosition(Vec3.setFromTable(pos));
+	}
+
+	public UpdateCameraTransform(transform: ILinearTransform) {
+		editor.threeManager.updateCameraTransform(transform);
+	}
+
+	public LoadLevel(levelRaw: string) {
+		const levelData = JSON.parse(levelRaw);
+		editor.gameContext.loadLevel(levelData);
+	}
+
+	// TODO Fool: remove duplicates for those functions that allow it.
+	public WebUpdateBatch(updates: any[]) {
+		console.log('[VEXT] WebUpdateBatch');
+		updates.forEach((obj: any) => {
+			console.log('Path: ' + obj.path + ', payload:');
+			console.log(obj.payload);
+			(this as any)[obj.path](obj.payload);
+		});
+	}
+
+	public RegisterBlueprints(blueprintsRaw: string) {
+		const blueprints = JSON.parse(blueprintsRaw);
+		editor.blueprintManager.registerBlueprints(Object.values(blueprints) as IBlueprint[]);
+	}
+
+	public MouseEnabled() {
+		editor.threeManager.mouseEnabled();
 	}
 }

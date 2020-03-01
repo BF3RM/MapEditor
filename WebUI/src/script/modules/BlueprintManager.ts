@@ -32,6 +32,21 @@ export class BlueprintManager {
 		signals.blueprintsRegistered.emit(this.blueprints.values());
 	}
 
+	public registerBlueprints(blueprints: IBlueprint[]) {
+		const scope = this;
+
+		if (blueprints.length === 0) {
+			return;
+		}
+
+		for (const bp of blueprints) {
+			if (bp !== undefined) {
+				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp);
+			}
+		}
+		signals.blueprintsRegistered.emit(this.blueprints.values());
+	}
+
 	public getBlueprintByGuid(instanceGuid: Guid) {
 		const bp = this.blueprints.getValue(instanceGuid);
 		if (!bp) {

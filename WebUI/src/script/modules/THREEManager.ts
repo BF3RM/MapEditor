@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { IJSONLinearTransform } from '@/script/types/primitives/LinearTransform';
+import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObject } from '@/script/types/GameObject';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { signals } from '@/script/modules/Signals';
@@ -310,7 +310,7 @@ export class THREEManager {
 	/**
 	* Called from Lua when freecam is disabled.
 	* */
-	public MouseEnabled() {
+	public mouseEnabled() {
 		this.highlightingEnabled = true;
 	}
 
@@ -411,7 +411,7 @@ export class THREEManager {
 		this.setPendingRender();
 	}
 
-	public UpdateCameraTransform(transform: IJSONLinearTransform) {
-		this.cameraControls.UpdateCameraTransform(transform);
+	public updateCameraTransform(transform: ILinearTransform) {
+		this.cameraControls.updateCameraTransform(transform);
 	}
 }

@@ -1,6 +1,6 @@
 import CameraControls from 'camera-controls';
 import * as THREE from 'three';
-import { IJSONLinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { ILinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
 CameraControls.install({ THREE });
@@ -36,7 +36,7 @@ export default class CameraControlWrapper extends CameraControls {
 		this.setLookAt(10, 10, 10, 0, 0, 0, false);
 	}
 
-	public UpdateCameraTransform(transform: IJSONLinearTransform) {
+	public updateCameraTransform(transform: ILinearTransform) {
 		const linearTransform = LinearTransform.setFromTable(transform);
 		const distance = 10;
 		const target = new Vec3(

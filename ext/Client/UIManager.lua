@@ -64,7 +64,7 @@ function UIManager:DisableFreeCamMovement()
 	if FreeCam:GetCameraMode() == CameraMode.FreeCam then
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
-		WebUI:ExecuteJS('editor.threeManager.MouseEnabled()')
+		WebUpdater:AddUpdate('MouseEnabled')
 	end
 end
 

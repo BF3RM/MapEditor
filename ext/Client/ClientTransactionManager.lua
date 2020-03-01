@@ -227,8 +227,9 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
     end
 
     if(#s_CommandActionResults > 0) then
-        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(s_CommandActionResults)))
-        table.insert(self.m_ExecutedCommandActions, json.encode(s_CommandActionResults))
+        local s_CommandActionResultsEncoded = json.encode(s_CommandActionResults)
+        WebUpdater:AddUpdate('HandleResponse', s_CommandActionResultsEncoded)
+        table.insert(self.m_ExecutedCommandActions, s_CommandActionResultsEncoded)
     end
 end
 function ClientTransactionManager:GetExecutedCommandActions()
@@ -299,15 +300,15 @@ function ClientTransactionManager:CreateCommandActionResultsRecursively(p_GameOb
     table.insert(self.m_CommandActionResults, s_CommandActionResult)
 end
 
-
 function ClientTransactionManager:OnGameObjectReady(p_GameObject)
     --m_Logger:Write("ClientTransactionManager:OnGameObjectReady(p_GameObject)")
     self:CreateCommandActionResultsRecursively(p_GameObject)
 
     if(#self.m_CommandActionResults > 0) then
         --m_Logger:Write("Sending stuff to JS")
-        WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", json.encode(self.m_CommandActionResults)))
-		table.insert(self.m_ExecutedCommandActions, json.encode(self.m_CommandActionResults))
+        local s_CommandActionResultsEncoded = json.encode(self.m_CommandActionResults)
+        WebUpdater:AddUpdate('HandleResponse', s_CommandActionResultsEncoded)
+		table.insert(self.m_ExecutedCommandActions, json.encode(s_CommandActionResultsEncoded))
     else
         m_Logger:Error("OnGameObjectReady: No results were yielded for some reason")
     end

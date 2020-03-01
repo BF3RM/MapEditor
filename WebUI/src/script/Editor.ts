@@ -32,10 +32,10 @@ import { GenerateBlueprints } from '@/script/modules/DebugData';
 export default class Editor {
 	public config = new Config();
 	public editorCore = new EditorCore();
-	public debug = false;
+	public debug: boolean;
 	public threeManager: THREEManager;
-	public ui = new EditorUI(this.debug);
-	public vext = new VEXTInterface();
+	public ui: EditorUI;
+	public vext: VEXTInterface;
 	public history = new History(this);
 	public blueprintManager = new BlueprintManager();
 	public gameContext = new GameContext();
@@ -53,6 +53,11 @@ export default class Editor {
 	public selectedGameObjects: GameObject[] = [];
 
 	constructor(debug: boolean = false) {
+		this.debug = debug;
+		this.ui = new EditorUI(debug);
+		this.vext = new VEXTInterface(debug);
+		this.threeManager = new THREEManager(debug);
+
 		// Commands
 		signals.editor.Ready.connect(this.onEditorReady.bind(this));
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
@@ -68,9 +73,6 @@ export default class Editor {
 		// Messages
 
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
-
-		this.debug = debug;
-		this.threeManager = new THREEManager(debug);
 
 		/*
 
@@ -95,7 +97,7 @@ export default class Editor {
 		const scope = this;
 		signals.editor.Initializing.emit(true);
 		// Adds the chrome background and debug window
-		if (this.debug === true) {
+		if (this.debug) {
 			this.setPlayerName('LocalPlayer');
 		}
 	}
@@ -117,7 +119,7 @@ export default class Editor {
 		signals.menuRegistered.emit(['Edit', 'Delete'], this.DeleteSelected.bind(this));
 		signals.menuRegistered.emit(['Edit', '']); // Separator
 		if (this.debug) {
-			this.blueprintManager.RegisterBlueprints(JSON.stringify(GenerateBlueprints(100)));
+			this.blueprintManager.registerBlueprints(GenerateBlueprints(100));
 		} else {
 			this.vext.SendEvent('UIReloaded');
 			console.log('Sent event');
@@ -280,12 +282,12 @@ export default class Editor {
 		return this.gameObjects.getValue(guid);
 	}
 
-	public SetRaycastPosition(x: number, y: number, z: number) {
-		this.editorCore.raycastTransform.trans = new Vec3(x, y, z);
+	public setRaycastPosition(pos: Vec3) {
+		this.editorCore.raycastTransform.trans = pos;
 	}
 
-	public SetScreenToWorldPosition(x: number, y: number, z: number) {
-		this.editorCore.screenToWorldTransform.trans = new Vec3(x, y, z);
+	public setScreenToWorldPosition(pos: Vec3) {
+		this.editorCore.screenToWorldTransform.trans = pos;
 	}
 
 	public setUpdating(value: boolean) {

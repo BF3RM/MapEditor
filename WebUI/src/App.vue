@@ -71,6 +71,7 @@ export default class App extends Vue {
 			showMaximiseIcon: true,
 			showCloseIcon: false
 		};
+
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');

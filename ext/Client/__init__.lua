@@ -1,7 +1,7 @@
 class 'MapEditorClient'
 
 local m_Logger = Logger("MapEditorClient", true)
-
+WebUpdater = require "WebUpdater"
 FreeCam = require "Freecam"
 Editor = require "Editor"
 UIManager = require "UIManager"
@@ -67,6 +67,7 @@ end
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	Editor:OnUpdate(p_Delta, p_SimulationDelta)
+	WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)

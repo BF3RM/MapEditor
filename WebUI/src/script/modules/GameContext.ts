@@ -10,8 +10,7 @@ export default class GameContext {
 		this.levelData = new Collections.Dictionary<Guid, GameObject>();
 	}
 
-	public LoadLevel(levelRaw: string) {
-		const levelData = JSON.parse(levelRaw);
+	public loadLevel(levelData: any) {
 		this.levelData.setValue(levelData.instanceGuid, levelData);
 		signals.levelLoaded.emit(levelData);
 		// signals.levelLoaded.dispatch(this.data);

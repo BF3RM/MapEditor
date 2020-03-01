@@ -33,7 +33,7 @@ function Editor:OnEngineMessage(p_Message)
 
 		--- Client requests all updates that the server has.
 		NetEvents:SendLocal("ProjectManager:RequestProjectHeaderUpdate") -- Todo: move this to other class
-		WebUI:ExecuteJS(string.format("editor.setPlayerName('%s')", s_LocalPlayer.name))
+		WebUpdater:AddUpdate('SetPlayerName', s_LocalPlayer.name)
 	end
 end
 
@@ -80,12 +80,10 @@ function Editor:Raycast()
 							s_Transform.trans.z + (s_Direction.z * FALLBACK_DISTANCE))
 	end
 	if(self.m_PendingRaycast.type == RaycastType.Camera) then
-		WebUI:ExecuteJS(string.format('editor.SetRaycastPosition(%s, %s, %s)',
-				s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
+		WebUpdater:AddUpdate('SetRaycastPosition', s_Transform.trans)
 	end
 	if(self.m_PendingRaycast.type == RaycastType.Mouse) then
-		WebUI:ExecuteJS(string.format('editor.SetScreenToWorldPosition(%s, %s, %s)',
-				s_Transform.trans.x, s_Transform.trans.y, s_Transform.trans.z))
+		WebUpdater:AddUpdate('SetScreenToWorldPosition', s_Transform.trans)
 	end
 
 	self.m_PendingRaycast = false
@@ -97,7 +95,7 @@ end
 
 function Editor:UpdateCameraTransform()
 	local s_Transform = ClientUtils:GetCameraTransform()
-	WebUI:ExecuteJS(string.format('editor.threeManager.UpdateCameraTransform(%s);', json.encode(s_Transform)))
+	WebUpdater:AddUpdate('UpdateCameraTransform', s_Transform)
 	self.m_CameraTransform = s_Transform
 end
 
@@ -114,13 +112,14 @@ function Editor:InitializeUIData(p_CommandActionResults)
 	end
 	local s_LevelDatas = InstanceParser:GetLevelDatas()
 
-	for _, v in pairs(s_LevelDatas) do
-		WebUI:ExecuteJS(string.format("editor.gameContext.LoadLevel('%s')", json.encode(v)))
+	for _, l_LevelData in pairs(s_LevelDatas) do
+		WebUpdater:AddUpdate('LoadLevel', json.encode(l_LevelData))
 	end
 
-	WebUI:ExecuteJS(string.format("editor.blueprintManager.RegisterBlueprints('%s')", json.encode(InstanceParser.m_Blueprints)))
-	for _,v in pairs(p_CommandActionResults) do
-		WebUI:ExecuteJS(string.format("editor.vext.HandleResponse('%s')", v))
+	WebUpdater:AddUpdate('RegisterBlueprints', json.encode(InstanceParser.m_Blueprints))
+
+	for _, l_CommandActionResult in pairs(p_CommandActionResults) do
+		WebUpdater:AddUpdate('HandleResponse', json.encode(l_CommandActionResult))
 	end
 	self:UpdateCameraTransform()
 end

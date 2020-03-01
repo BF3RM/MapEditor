@@ -1,5 +1,11 @@
 import { Vector3 } from 'three';
 
+export interface IVec3 {
+	x: number,
+	y: number,
+	z: number
+}
+
 export class Vec3 extends Vector3 {
 	constructor(x?: number, y?: number, z?: number) {
 		super(x, y, z);
@@ -9,7 +15,7 @@ export class Vec3 extends Vector3 {
 		return new Vec3(this.x, this.y, this.z);
 	}
 
-	public static setFromTable(object: {x: number, y: number, z: number}) {
+	public static setFromTable(object: IVec3) {
 		return new this(Number(object.x), Number(object.y), Number(object.z));
 	}
 
