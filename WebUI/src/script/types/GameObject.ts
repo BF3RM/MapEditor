@@ -19,7 +19,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public parentData: GameObjectParentData;
 	public blueprintCtrRef: CtrRef;
 	public variation: number;
-	public children: IGameEntity[];
 	public gameEntitiesData: GameEntityData[];
 
 	public selected: boolean;
@@ -109,7 +108,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const matrix = this.transform.toMatrix();
 		const parent = this.parent;
 		if (parent !== null && parent.type !== 'Scene') {
-			editor.threeManager.AttachToScene(this);
+			editor.threeManager.AttachToScene(this as GameObject);
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
@@ -156,9 +155,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Enable() {
 		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
-				child.Enable();
+				(child as GameObject).Enable();
 			} else {
-				child.visible = true;
+				(child as GameObject).visible = true;
 			}
 		}
 		this.visible = true;
@@ -169,9 +168,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Disable() {
 		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
-				child.Disable();
+				(child as GameObject).Disable();
 			} else {
-				child.visible = false;
+				(child as GameObject).visible = false;
 			}
 		}
 		this.visible = false;
@@ -187,27 +186,27 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
-	onSelected() {
+	onSelect() {
 		this.visible = true;
 		this.selected = true;
-		this.children.forEach(go => go.onSelected());
+		this.children.forEach(go => (go as GameObject).onSelect());
 	}
 
-	onDeselected() {
+	onDeselect() {
 		this.visible = false;
 		this.selected = false;
-		this.children.forEach(go => go.onDeselected());
+		this.children.forEach(go => (go as GameObject).onDeselect());
 	}
 
 	onHighlight() {
 		this.visible = true;
 		this.highlighted = true;
-		this.children.forEach(go => go.onHighlight());
+		this.children.forEach(go => (go as GameObject).onHighlight());
 	}
 
-	onUnHighlight() {
+	onUnhighlight() {
 		this.visible = false;
 		this.highlighted = false;
-		this.children.forEach(go => go.onUnHighlight());
+		this.children.forEach(go => (go as GameObject).onUnhighlight());
 	}
 }

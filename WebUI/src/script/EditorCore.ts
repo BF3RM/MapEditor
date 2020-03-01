@@ -12,6 +12,7 @@ import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToW
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
+import { GIZMO_MODE } from '@/script/modules/THREEManager';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -24,6 +25,7 @@ export class EditorCore {
 	private pendingUpdates = new Map<Guid, GameObject>();
 	private rl = this.renderLoop.bind(this);
 	private updateRequested = false;
+	public highlightedObjectGuid: Guid | null = null;
 
 	constructor() {
 		this.previewBlueprint = null;
@@ -226,5 +228,54 @@ export class EditorCore {
 		editor.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = false;
 		this.previewBlueprint = null;
+	}
+
+	public select(guid: Guid) {
+		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+		if (this.highlightedObjectGuid === guid) {
+			this.unhighlight();
+		}
+
+		if (gameObject === undefined) {
+			LogError('Failed to select gameobject: ' + guid);
+			return false;
+		}
+		for (const go of editor.selectedGameObjects.values()) {
+			go.onDeselect();
+		}
+		editor.selectedGameObjects = [];
+		editor.selectedGameObjects.push(gameObject);
+		gameObject.onSelect();
+		editor.threeManager.SetGizmoMode(GIZMO_MODE.translate);
+		return editor.editorCore.onSelectGameObject(gameObject);
+	}
+
+	public highlight(guid: Guid) {
+		// Ignore if already highlighted
+		if (this.highlightedObjectGuid === guid) {
+			return;
+		}
+		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+		// Ignore if selected
+		if (gameObject.selected) {
+			return;
+		}
+
+		if (!gameObject) {
+			LogError('Failed to highlight gameobject: ' + guid);
+			return false;
+		}
+		this.unhighlight();
+		gameObject.onHighlight();
+		this.highlightedObjectGuid = guid;
+	}
+
+	public unhighlight() {
+		if (this.highlightedObjectGuid == null) return;
+		const gameObject = editor.gameObjects.getValue(this.highlightedObjectGuid) as GameObject;
+		if (gameObject) {
+			gameObject.onUnhighlight();
+		}
+		this.highlightedObjectGuid = null;
 	}
 }

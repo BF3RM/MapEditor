@@ -71,7 +71,7 @@ export default class InfiniteTreeComponent extends Vue {
 	@Prop({
 		type: Function,
 		default(node: Node) {
-			console.log('ShouldLoadNodes');
+			// console.log('ShouldLoadNodes');
 			return !(node.children.length > 0) && node.loadOnDemand;
 		}
 	}) shouldLoadNodes: boolean;
@@ -126,7 +126,7 @@ export default class InfiniteTreeComponent extends Vue {
 
 	public scrollTo(node: Node) {
 		const nodeIndex = (this.filteredNodes).findIndex((i) => {
-			console.log(i.id === node.id);
+			// console.log(i.id === node.id);
 			return i.id === node.id;
 		});
 		this.scroller.scrollToItem(nodeIndex);

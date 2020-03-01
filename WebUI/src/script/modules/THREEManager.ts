@@ -322,9 +322,9 @@ export class THREEManager {
 			if (now.getTime() - this.lastRaycastTime.getTime() >= 100) {
 				const guid = scope.RaycastSelection(e) as Guid;
 				if (guid !== null) {
-					editor.Highlight(guid);
+					editor.editorCore.highlight(guid);
 				} else {
-					editor.UnHighlight();
+					editor.editorCore.unhighlight();
 				}
 
 				this.lastRaycastTime = now;

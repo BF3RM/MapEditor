@@ -4,7 +4,7 @@ import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 
 export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
-	private aabb: THREE.LineSegments;
+	private readonly aabb: THREE.LineSegments;
 	private instanceId: number;
 	private transform: LinearTransform;
 	private box: THREE.Box3;
@@ -153,15 +153,11 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		this.SetColor(0x999999);
 	}
 
-	public onUnHighlight() {
-		// this.SetColor(0x999999);
-	}
+	public onUnhighlight() {}
 
-	public onDeselected() {
-		// this.SetColor(0x999999);
-	}
+	public onDeselect() {}
 
-	public onSelected() {
+	public onSelect() {
 		this.SetColor(0xFF0000);
 	}
 

@@ -48,7 +48,6 @@ export default class Editor {
 
 	public selectionGroup: SelectionGroup;
 	public highlightGroup: HighlightGroup;
-	public highlightedObjectGuid: Guid | null = null;
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
 
 	public selectedGameObjects: GameObject[] = [];
@@ -299,53 +298,11 @@ export default class Editor {
 
 	*/
 	public Select(guid: Guid) {
-		const gameObject = this.gameObjects.getValue(guid) as GameObject;
-
-		if (gameObject === undefined) {
-			LogError('Failed to select gameobject: ' + guid);
-			return false;
-		}
-		for (const go of this.selectedGameObjects.values()) {
-			go.onDeselected();
-		}
-		this.selectedGameObjects = [];
-		this.selectedGameObjects.push(gameObject);
-		gameObject.onSelected();
-		this.threeManager.SetGizmoMode(GIZMO_MODE.translate);
-		return this.editorCore.onSelectGameObject(gameObject);
+		this.editorCore.select(guid);
 	}
 
 	public Deselect(guid: Guid) {
 		this.editorCore.onDeselectedGameObject(guid);
-	}
-
-	public Highlight(guid: Guid) {
-		// Ignore if already highlighted
-		if (this.highlightedObjectGuid === guid) {
-			return;
-		}
-		const gameObject = this.gameObjects.getValue(guid) as GameObject;
-		// Ignore if selected
-		if (gameObject.selected) {
-			return;
-		}
-
-		if (!gameObject) {
-			LogError('Failed to highlight gameobject: ' + guid);
-			return false;
-		}
-		this.UnHighlight();
-		gameObject.onHighlight();
-		this.highlightedObjectGuid = guid;
-	}
-
-	public UnHighlight() {
-		if (this.highlightedObjectGuid == null) return;
-		const gameObject = this.gameObjects.getValue(this.highlightedObjectGuid) as GameObject;
-		if (gameObject) {
-			gameObject.onUnHighlight();
-		}
-		this.highlightedObjectGuid = null;
 	}
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {

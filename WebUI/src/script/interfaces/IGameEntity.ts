@@ -2,5 +2,5 @@ export interface IGameEntity {
 	onSelect: () => void;
 	onDeselect: () => void;
 	onHighlight: () => void;
-	onUnHighlight: () => void;
+	onUnhighlight: () => void;
 }
