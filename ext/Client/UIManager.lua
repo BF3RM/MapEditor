@@ -95,6 +95,5 @@ function UIManager:DisableFreeCam()
 	self:EnableFreeCamMovement()
 end
 
-
 return UIManager()
 

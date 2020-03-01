@@ -119,7 +119,7 @@ function Editor:InitializeUIData(p_CommandActionResults)
 	WebUpdater:AddUpdate('RegisterBlueprints', json.encode(InstanceParser.m_Blueprints))
 
 	for _, l_CommandActionResult in pairs(p_CommandActionResults) do
-		WebUpdater:AddUpdate('HandleResponse', json.encode(l_CommandActionResult))
+		WebUpdater:AddUpdate('HandleResponse', json.decode(l_CommandActionResult))
 	end
 	self:UpdateCameraTransform()
 end

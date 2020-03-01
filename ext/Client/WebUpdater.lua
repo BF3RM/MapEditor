@@ -26,8 +26,7 @@ function WebUpdater:OnUIReady()
 end
 
 function WebUpdater:AddUpdate(p_Path, p_Payload)
-	print('Added update. path: '..p_Path..', payload: ')
-	--print(p_Payload)
+	m_Logger:Write('Added update. Path: '..p_Path)
 	table.insert(self.m_WebUpdateStack, {
 		path = p_Path,
 		payload = p_Payload
@@ -43,7 +42,6 @@ function WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 	if self.m_ElapsedTime > UI_UPDATE_TIME then
 		self.m_ElapsedTime = 0
 		if self.m_WebUpdateStack ~= nil and #self.m_WebUpdateStack > 0 then
-			--print(self.m_WebUpdateStack)
 			WebUI:ExecuteJS(string.format("editor.vext.WebUpdateBatch(%s)", json.encode(self.m_WebUpdateStack)))
 			self.m_WebUpdateStack = {}
 		end
