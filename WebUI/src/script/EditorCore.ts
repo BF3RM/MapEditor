@@ -91,7 +91,7 @@ export class EditorCore {
 		}
 		// An update was requested outside of the usual ThreeJS render loop, this probably means some command has been executed.
 		if (this.updateRequested) {
-			editor.threeManager.Render();
+			editor.threeManager.setPendingRender();
 			this.updateRequested = false;
 		}
 		// TODO: Add an FPS and rendering indecator.
@@ -148,25 +148,11 @@ export class EditorCore {
 			editor.threeManager.ShowGizmo();
 		}
 		editor.threeManager.AttachGizmoTo(editor.selectionGroup);
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 		*/
 		this.RequestUpdate();
 		signals.selectedGameObject.emit(gameObject.guid);
 		return true;
-	}
-
-	public onDeselectedGameObject(guid: Guid) {
-		const scope = editor;
-		const gameObject = scope.gameObjects.getValue(guid);
-		if (gameObject === undefined) {
-			return;
-		}
-		scope.threeManager.RemoveFromScene(gameObject);
-
-		signals.deselectedGameObject.emit(guid);
-		if (scope.selectionGroup.children.length === 0) {
-			scope.threeManager.HideGizmo();
-		}
 	}
 
 	public onPreviewDragStart(blueprint: Blueprint) {
@@ -248,6 +234,20 @@ export class EditorCore {
 		gameObject.onSelect();
 		editor.threeManager.SetGizmoMode(GIZMO_MODE.translate);
 		return editor.editorCore.onSelectGameObject(gameObject);
+	}
+
+	public deselect(guid: Guid) {
+		const scope = editor;
+		const gameObject = scope.gameObjects.getValue(guid);
+		if (gameObject === undefined) {
+			return;
+		}
+		scope.threeManager.RemoveFromScene(gameObject);
+
+		signals.deselectedGameObject.emit(guid);
+		if (scope.selectionGroup.children.length === 0) {
+			scope.threeManager.HideGizmo();
+		}
 	}
 
 	public highlight(guid: Guid) {

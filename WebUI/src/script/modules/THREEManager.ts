@@ -40,6 +40,8 @@ export class THREEManager {
 	private highlightingEnabled = true;
 	private raycastPlacing = false;
 	private lastRaycastTime = new Date();
+	private pendingRaycast = false;
+	private pendingRender = true;
 
 	private delta = new THREE.Vector3();
 	private box = new THREE.Box3();
@@ -82,9 +84,10 @@ export class THREEManager {
 			requestAnimationFrame(anim);
 
 			// you can skip this condition to render though
-			if (hasControlsUpdated) {
-				scope.Render();
+			if (hasControlsUpdated || scope.pendingRender) {
+				scope.render();
 			}
+
 			if (scope.waitingForControlEnd && !scope.updatingCamera && !hasControlsUpdated) {
 				editor.vext.SendEvent('controlEnd');
 				scope.waitingForControlEnd = false;
@@ -92,7 +95,7 @@ export class THREEManager {
 		})();
 
 		this.SetFov(90);
-		this.Render();
+		this.setPendingRender();
 	}
 
 	public RegisterEvents() {
@@ -102,7 +105,7 @@ export class THREEManager {
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
 
-		signals.objectChanged.connect(this.Render.bind(this)); // Object changed? Render!
+		signals.objectChanged.connect(this.setPendingRender.bind(this)); // Object changed? setPendingRender!
 	}
 
 	private EnableFreecamMovement() {
@@ -158,7 +161,7 @@ export class THREEManager {
 		const gameObject = target as GameObject;
 		signals.objectFocused.emit(gameObject.guid);
 
-		scope.Render();
+		scope.setPendingRender();
 	}
 
 	public DeleteObject(gameObject: GameObject) {
@@ -167,7 +170,7 @@ export class THREEManager {
 		}
 		this.scene.remove(gameObject);
 
-		// this.Render();
+		// this.setPendingRender();
 	}
 
 	public onSelectGameObject(gameObject: GameObject) {
@@ -177,21 +180,28 @@ export class THREEManager {
 	public HideGizmo() {
 		this.gizmoControls.visible = false;
 		// this.mesh.visible = false;
-		// this.Render();
+		// this.setPendingRender();
 	}
 
 	public ShowGizmo() {
 		this.gizmoControls.visible = true;
 		// this.mesh.visible = true;
 
-		// this.Render();
+		// this.setPendingRender();
 	}
 
-	public Render() {
-		if (!editor.vext.executing) {
-			this.renderer.clear();
-			this.renderer.render(this.scene, this.camera);
-		}
+	public setPendingRender() {
+		this.pendingRender = true;
+		// if (!editor.vext.executing) {
+		// 	// this.renderer.clear();
+		// 	this.renderer.render(this.scene, this.camera);
+		// }
+	}
+
+	private render() {
+		if (editor.vext.executing) return;
+		this.renderer.render(this.scene, this.camera);
+		this.pendingRender = false;
 	}
 
 	public SetFov(fov: number) {
@@ -204,7 +214,7 @@ export class THREEManager {
 
 		if (mode === GIZMO_MODE.select) {
 			this.HideGizmo();
-			this.Render();
+			this.setPendingRender();
 			this.gizmoMode = mode;
 			signals.gizmoModeChanged.emit(mode);
 			return;
@@ -288,11 +298,12 @@ export class THREEManager {
 			scope.cameraControls.enabled = false;
 		} else if (this.gizmoControls.selected) {
 			console.log('Control selected');
-		} else if (event.button === 0) {
-			const guid = this.RaycastSelection(event);
-			if (guid !== null) {
-				editor.Select(guid);
-			}
+		} else if (event.buttons === 1) {
+			this.SelectWithRaycast(this.getMousePos(event));
+			// const guid = this.RaycastSelection(event);
+			// if (guid !== null) {
+			// 	editor.Select(guid);
+			// }
 		}
 	}
 
@@ -301,6 +312,13 @@ export class THREEManager {
 	* */
 	public MouseEnabled() {
 		this.highlightingEnabled = true;
+	}
+
+	private getMousePos(event: MouseEvent): Vec2 {
+		const mousePos = new Vec2();
+		mousePos.x = (event.clientX / window.innerWidth) * 2 - 1;
+		mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		return mousePos;
 	}
 
 	public onMouseMove(e: MouseEvent) {
@@ -317,26 +335,35 @@ export class THREEManager {
 		// 	// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		// } else
 		if (this.highlightingEnabled && e.buttons === 0) {
-			const now = new Date();
-
-			if (now.getTime() - this.lastRaycastTime.getTime() >= 100) {
-				const guid = scope.RaycastSelection(e) as Guid;
-				if (guid !== null) {
-					editor.editorCore.highlight(guid);
-				} else {
-					editor.editorCore.unhighlight();
-				}
-
-				this.lastRaycastTime = now;
-			}
+			scope.HighlightWithRaycast(this.getMousePos(e));
 		}
 	}
 
-	public RaycastSelection(e: MouseEvent) {
-		const mousePos = new Vec2();
-		mousePos.x = (e.clientX / window.innerWidth) * 2 - 1;
-		mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
+	private async SelectWithRaycast(mousePos: Vec2) {
+		const guid = await this.RaycastSelection(mousePos) as Guid;
 
+		if (guid !== null) {
+			editor.Select(guid);
+		}
+	}
+
+	private async HighlightWithRaycast(mousePos: Vec2) {
+		const now = new Date();
+		if ((now.getTime() - this.lastRaycastTime.getTime() >= 100) && !this.pendingRaycast) {
+			this.pendingRaycast = true;
+			const guid = this.RaycastSelection(mousePos) as Guid;
+			if (guid !== null) {
+				editor.editorCore.highlight(guid);
+			} else {
+				editor.editorCore.unhighlight();
+			}
+			this.lastRaycastTime = now;
+			this.pendingRaycast = false;
+			this.setPendingRender();
+		}
+	}
+
+	public RaycastSelection(mousePos: Vec2) {
 		const raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(mousePos, this.camera);
 
@@ -381,7 +408,7 @@ export class THREEManager {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.Render();
+		this.setPendingRender();
 	}
 
 	public UpdateCameraTransform(transform: IJSONLinearTransform) {

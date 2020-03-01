@@ -4,9 +4,11 @@ import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 
 export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
+	private static SELECTED_COLOR: number = 0xFF0000;
+	private static HIGHLIGHTED_COLOR: number = 0x999999;
 	private readonly aabb: THREE.LineSegments;
 	private instanceId: number;
-	private transform: LinearTransform;
+	public transform: LinearTransform;
 	private box: THREE.Box3;
 
 	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox) {
@@ -30,12 +32,12 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		boxGeom.translate(center.x, center.y, center.z);
 
 		super(boxGeom, new THREE.MeshBasicMaterial({
-			color: 0x999999,
+			color: SpatialGameEntity.SELECTED_COLOR,
 			wireframe: true,
 			visible: false
 		}));
 
-		const color = 0xFF0000;
+		const color = SpatialGameEntity.SELECTED_COLOR;
 
 		const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
 		const positions = new Float32Array(8 * 3);
@@ -50,10 +52,6 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		this.instanceId = instanceId;
 		this.transform = transform;
 		this.matrixAutoUpdate = false;
-		this.updateMatrix();
-		// Update the matrix after initialization.
-		this.updateTransform();
-		this.updateMatrix();
 
 		this.box = new THREE.Box3(
 			aabb.min,
@@ -61,7 +59,6 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		this.matrixAutoUpdate = false;
 		this.updateMatrix();
 		this.update();
-		this.updateMatrix();
 	}
 
 	public updateTransform() {
@@ -82,13 +79,13 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 		matrix.decompose(this.position, this.quaternion, this.scale);
 
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 
 		// remove child from scene and add it to parent
 		if (parent !== null) {
 			parent.attach(this);
 		}
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 	}
 
 	public update() {
@@ -150,7 +147,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	}
 
 	public onHighlight() {
-		this.SetColor(0x999999);
+		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
 	}
 
 	public onUnhighlight() {}
@@ -158,11 +155,11 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	public onDeselect() {}
 
 	public onSelect() {
-		this.SetColor(0xFF0000);
+		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
 	}
 
 	public SetColor(color: number) {
 		(this.aabb.material as THREE.LineBasicMaterial).color.setHex(color);
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 	}
 }

@@ -51,7 +51,7 @@ export class HighlightGroup extends THREE.Group {
 			editor.threeManager.RemoveFromScene(gameObject);
 		}
 
-		editor.threeManager.Render(); // REMOVE
+		editor.threeManager.setPendingRender(); // REMOVE
 	}
 
 	public AttachObject(gameObject: GameObject) {
@@ -75,7 +75,7 @@ export class HighlightGroup extends THREE.Group {
 		// remove child from scene and add it to parent
 		this.attach(gameObject);
 
-		editor.threeManager.Render(); // REMOVE
+		editor.threeManager.setPendingRender(); // REMOVE
 	}
 
 	public GetHighlightedGameObject(): GameObject | null {

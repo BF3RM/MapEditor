@@ -145,7 +145,7 @@ export default class VEXTInterface {
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;
 		});
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 	}
 
 	public SendEvent(eventName: string, param?: any) {
@@ -215,6 +215,6 @@ export default class VEXTInterface {
 		} else {
 			this.commands[message.type](message);
 		}
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 	}
 }

@@ -71,7 +71,7 @@ export default class InfiniteTreeComponent extends Vue {
 	@Prop({
 		type: Function,
 		default(node: Node) {
-			// console.log('ShouldLoadNodes');
+			console.log('ShouldLoadNodes');
 			return !(node.children.length > 0) && node.loadOnDemand;
 		}
 	}) shouldLoadNodes: boolean;
@@ -86,18 +86,18 @@ export default class InfiniteTreeComponent extends Vue {
 		}
 	}) shouldSelectNode: boolean;
 
-	@Prop({ type: Function }) onContentWillUpdate: void;
-	@Prop({ type: Function }) onContentDidUpdate: void;
-	@Prop({ type: Function }) onOpenNode: void;
-	@Prop({ type: Function }) onCloseNode: void;
+	// @Prop({ type: Function }) onContentWillUpdate: void;
+	// @Prop({ type: Function }) onContentDidUpdate: void;
+	// @Prop({ type: Function }) onOpenNode: void;
+	// @Prop({ type: Function }) onCloseNode: void;
 	@Prop({ type: Function }) onSelectNode: void;
-	@Prop({ type: Function }) onWillOpenNode: void;
-	@Prop({ type: Function }) onWillCloseNode: void;
-	@Prop({ type: Function }) onWillSelectNode: void;
-	@Prop({ type: Function }) onKeyUp: void;
-	@Prop({ type: Function }) onKeyDown: void;
-	@Prop({ type: Function }) onMouseLeave: void;
-	@Prop({ type: Function }) onMouseEnter: void;
+	// @Prop({ type: Function }) onWillOpenNode: void;
+	// @Prop({ type: Function }) onWillCloseNode: void;
+	// @Prop({ type: Function }) onWillSelectNode: void;
+	// @Prop({ type: Function }) onKeyUp: void;
+	// @Prop({ type: Function }) onKeyDown: void;
+	// @Prop({ type: Function }) onMouseLeave: void;
+	// @Prop({ type: Function }) onMouseEnter: void;
 
 	@Watch('data')
 	onDataChange(newValue: any) {
@@ -126,7 +126,7 @@ export default class InfiniteTreeComponent extends Vue {
 
 	public scrollTo(node: Node) {
 		const nodeIndex = (this.filteredNodes).findIndex((i) => {
-			// console.log(i.id === node.id);
+			console.log(i.id === node.id);
 			return i.id === node.id;
 		});
 		this.scroller.scrollToItem(nodeIndex);
@@ -145,18 +145,18 @@ export default class InfiniteTreeComponent extends Vue {
 
 	private nodes: Node[] = [];
 	private eventHandlers = {
-		onContentWillUpdate: null,
-		onContentDidUpdate: null,
-		onOpenNode: null,
-		onCloseNode: null,
-		onSelectNode: null,
-		onWillOpenNode: null,
-		onWillCloseNode: null,
-		onWillSelectNode: null,
-		onKeyUp: null,
-		onKeyDown: null,
-		onMouseEnter: null,
-		onMouseLeave: null
+		// onContentWillUpdate: null,
+		// onContentDidUpdate: null,
+		// onOpenNode: null,
+		// onCloseNode: null,
+		onSelectNode: null
+		// onWillOpenNode: null,
+		// onWillCloseNode: null,
+		// onWillSelectNode: null,
+		// onKeyUp: null,
+		// onKeyDown: null,
+		// onMouseEnter: null,
+		// onMouseLeave: null
 	} as any;
 
 	mounted() {

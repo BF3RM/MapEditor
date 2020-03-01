@@ -1,11 +1,11 @@
 <template>
 	<gl-row>
 		<gl-col>
-			<EditorComponent id="explorer-component" title="Explorer">
+			<editor-component id="explorer-component" title="Explorer">
 				<div class="header">
 					<Search v-model="search"/>
 				</div>
-				<InfiniteTreeComponent class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+				<infinite-tree-component class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 					<template slot-scope="{ node, index, tree, active }" selected="node.selected">
 						<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
 							<div class="expand" @click="ToggleNode($event,node,tree)">
@@ -22,8 +22,8 @@
 							</span>
 						</div>
 					</template>
-				</InfiniteTreeComponent>
-			</EditorComponent>
+				</infinite-tree-component>
+			</editor-component>
 		</gl-col>
 		<gl-col>
 			<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">

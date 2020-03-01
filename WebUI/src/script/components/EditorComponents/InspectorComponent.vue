@@ -42,7 +42,7 @@ export default class InspectorComponent extends EditorComponent {
 	private onInput(e: LinearTransform) {
 		if (this.gameObject !== null) {
 			this.gameObject.setTransform(e);
-			window.editor.threeManager.Render();
+			window.editor.threeManager.setPendingRender();
 		}
 	}
 

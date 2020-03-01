@@ -302,7 +302,7 @@ export default class Editor {
 	}
 
 	public Deselect(guid: Guid) {
-		this.editorCore.onDeselectedGameObject(guid);
+		this.editorCore.deselect(guid);
 	}
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
@@ -320,7 +320,7 @@ export default class Editor {
 			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
 		}
 
-		this.threeManager.Render();
+		this.threeManager.setPendingRender();
 	}
 
 	public onSetVariation(commandActionResult: CommandActionResult) {
@@ -345,7 +345,7 @@ export default class Editor {
 			this.threeManager.HideGizmo();
 		}
 
-		this.threeManager.Render();
+		this.threeManager.setPendingRender();
 	}
 
 	// TODO: Move logic to GameContext

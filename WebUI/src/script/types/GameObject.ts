@@ -117,7 +117,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public setTransform(linearTransform: LinearTransform) {
 		this.transform = linearTransform;
 		this.updateTransform();
-		editor.threeManager.Render();
+		editor.threeManager.setPendingRender();
 		signals.objectChanged.emit(this, 'transform', linearTransform);
 	}
 
