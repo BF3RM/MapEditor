@@ -2,7 +2,7 @@ class "WebUpdater"
 
 local m_Logger = Logger("WebUpdater", true)
 
-local UI_UPDATE_TIME = 0.16
+local UI_UPDATE_TIME = 0.016667 -- 60 fps
 
 function WebUpdater:__init()
 	m_Logger:Write("Initializing WebUpdater")

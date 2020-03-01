@@ -15,7 +15,7 @@ export enum KEYCODES {
 
 export class InputControls {
 	constructor(element: HTMLCanvasElement) {
-		window.addEventListener('keydown', (event: any) => {
+		element.addEventListener('keydown', (event: any) => {
 			// if (keysdown[e.which]) {
 			// 	return;
 			// }

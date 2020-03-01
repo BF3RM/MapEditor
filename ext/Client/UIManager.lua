@@ -29,7 +29,6 @@ function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGrap
 		s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
 		s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
 
-
 		p_Hook:Return(nil)
 	end
 end
@@ -65,6 +64,7 @@ function UIManager:DisableFreeCamMovement()
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
 		WebUpdater:AddUpdate('MouseEnabled')
+		WebUI:BringToFront()
 	end
 end
 

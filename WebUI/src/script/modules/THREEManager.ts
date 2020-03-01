@@ -66,6 +66,8 @@ export class THREEManager {
 		if (page !== null) {
 			scope.renderer.domElement.setAttribute('id', 'viewport');
 			page.appendChild(scope.renderer.domElement);
+			scope.renderer.domElement.setAttribute('tabindex', '0');
+			scope.renderer.domElement.focus();
 		}
 
 		if (this.debugMode) {
@@ -77,13 +79,12 @@ export class THREEManager {
 		const clock = new THREE.Clock();
 
 		(function anim() {
-			// snip
 			const delta = clock.getDelta();
 			const hasControlsUpdated = scope.cameraControls.update(delta);
 
 			requestAnimationFrame(anim);
 
-			// you can skip this condition to render though
+			// We render only when needed.
 			if (hasControlsUpdated || scope.pendingRender) {
 				scope.render();
 			}
@@ -280,10 +281,14 @@ export class THREEManager {
 
 	public onMouseDown(event: MouseEvent) {
 		const scope = this;
-		switch (event.button) {
-		case 0: // Left mouse
+
+		// Focus on canvas again
+		scope.renderer.domElement.focus();
+
+		switch (event.buttons) {
+		case 1: // Left mouse
 			break;
-		case 1: // middle mouse
+		case 4: // middle mouse
 			break;
 		case 2: // right mouse
 			this.EnableFreecamMovement();
@@ -299,11 +304,7 @@ export class THREEManager {
 		} else if (this.gizmoControls.selected) {
 			console.log('Control selected');
 		} else if (event.buttons === 1) {
-			this.SelectWithRaycast(this.getMousePos(event));
-			// const guid = this.RaycastSelection(event);
-			// if (guid !== null) {
-			// 	editor.Select(guid);
-			// }
+			this.selectWithRaycast(this.getMousePos(event));
 		}
 	}
 
@@ -312,6 +313,8 @@ export class THREEManager {
 	* */
 	public mouseEnabled() {
 		this.highlightingEnabled = true;
+		// Focus on canvas again
+		this.renderer.domElement.focus();
 	}
 
 	private getMousePos(event: MouseEvent): Vec2 {
@@ -335,11 +338,11 @@ export class THREEManager {
 		// 	// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
 		// } else
 		if (this.highlightingEnabled && e.buttons === 0) {
-			scope.HighlightWithRaycast(this.getMousePos(e));
+			scope.highlightWithRaycast(this.getMousePos(e));
 		}
 	}
 
-	private async SelectWithRaycast(mousePos: Vec2) {
+	private async selectWithRaycast(mousePos: Vec2) {
 		const guid = await this.RaycastSelection(mousePos) as Guid;
 
 		if (guid !== null) {
@@ -347,11 +350,11 @@ export class THREEManager {
 		}
 	}
 
-	private async HighlightWithRaycast(mousePos: Vec2) {
+	private async highlightWithRaycast(mousePos: Vec2) {
 		const now = new Date();
 		if ((now.getTime() - this.lastRaycastTime.getTime() >= 100) && !this.pendingRaycast) {
 			this.pendingRaycast = true;
-			const guid = this.RaycastSelection(mousePos) as Guid;
+			const guid = await this.RaycastSelection(mousePos) as Guid;
 			if (guid !== null) {
 				editor.editorCore.highlight(guid);
 			} else {

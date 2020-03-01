@@ -246,10 +246,9 @@ export default class VEXTInterface {
 
 	// TODO Fool: remove duplicates for those functions that allow it.
 	public WebUpdateBatch(updates: any[]) {
-		console.log('[VEXT] WebUpdateBatch');
+		// console.log('[VEXT] WebUpdateBatch');
+		// console.log(updates);
 		updates.forEach((obj: any) => {
-			console.log('Path: ' + obj.path + ', payload:');
-			console.log(obj.payload);
 			(this as any)[obj.path](obj.payload);
 		});
 	}

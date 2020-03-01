@@ -28,7 +28,7 @@ export class VEXTemulator {
 		});
 		// Delay to simulate tick pass
 		setTimeout(() => {
-			editor.vext.HandleResponse(JSON.stringify(responses), true);
+			editor.vext.HandleResponse(responses, true);
 		}, 1);
 	}
 
