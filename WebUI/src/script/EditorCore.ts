@@ -145,7 +145,7 @@ export class EditorCore {
 
 		editor.selectionGroup.Select();
 		if (editor.selectionGroup.children.length !== 0) {
-			editor.threeManager.ShowGizmo();
+			editor.threeManager.showGizmo();
 		}
 		editor.threeManager.AttachGizmoTo(editor.selectionGroup);
 		editor.threeManager.setPendingRender();
@@ -232,7 +232,7 @@ export class EditorCore {
 		editor.selectedGameObjects = [];
 		editor.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
-		editor.threeManager.SetGizmoMode(GIZMO_MODE.translate);
+		editor.threeManager.setGizmoMode(GIZMO_MODE.translate);
 		return editor.editorCore.onSelectGameObject(gameObject);
 	}
 
@@ -242,11 +242,11 @@ export class EditorCore {
 		if (gameObject === undefined) {
 			return;
 		}
-		scope.threeManager.RemoveFromScene(gameObject);
+		scope.threeManager.removeFromScene(gameObject);
 
 		signals.deselectedGameObject.emit(guid);
 		if (scope.selectionGroup.children.length === 0) {
-			scope.threeManager.HideGizmo();
+			scope.threeManager.hideGizmo();
 		}
 	}
 

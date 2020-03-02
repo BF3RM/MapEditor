@@ -88,12 +88,12 @@ export default class VEXTInterface {
 	 */
 
 	public HideGizmo() {
-		editor.threeManager.HideGizmo();
+		editor.threeManager.hideGizmo();
 	}
 
 	public ShowGizmo() {
-		editor.threeManager.ShowGizmo();
-		window.editor.threeManager.ShowGizmo();
+		editor.threeManager.showGizmo();
+		window.editor.threeManager.showGizmo();
 	}
 
 	/*

@@ -12,7 +12,7 @@ export default class CameraControlWrapper extends CameraControls {
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
 		super(camera, element);
 
-		this.mouseButtons.left = CameraControls.ACTION.ROTATE;
+		this.mouseButtons.left = CameraControls.ACTION.NONE;
 		this.mouseButtons.right = CameraControls.ACTION.NONE;
 		this.mouseButtons.middle = CameraControls.ACTION.TRUCK;
 

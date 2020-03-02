@@ -36,7 +36,7 @@ export class HighlightGroup extends THREE.Group {
 		if (gameObject.parent !== this) {
 			console.error('Tried to detach a children that is no longer in this group');
 		}
-		editor.threeManager.AttachToScene(gameObject);
+		editor.threeManager.attachToScene(gameObject);
 
 		// remove child from parent and add it to scene
 		if (!gameObject.parentData.guid && gameObject.parentData.typeName !== 'LevelData') {
@@ -44,11 +44,11 @@ export class HighlightGroup extends THREE.Group {
 			if (parent !== null && parent !== undefined) {
 				parent.attach(gameObject);
 			} else {
-				editor.threeManager.RemoveFromScene(gameObject);
+				editor.threeManager.removeFromScene(gameObject);
 				console.error('Object parent doesn\'t exist.');
 			}
 		} else {
-			editor.threeManager.RemoveFromScene(gameObject);
+			editor.threeManager.removeFromScene(gameObject);
 		}
 
 		editor.threeManager.setPendingRender(); // REMOVE
@@ -66,10 +66,10 @@ export class HighlightGroup extends THREE.Group {
 		}
 
 		if (gameObject.parent === null) {
-			editor.threeManager.AttachToScene(gameObject);
+			editor.threeManager.attachToScene(gameObject);
 		} else {
 			// remove child from parent and add it to scene
-			editor.threeManager.AttachToScene(gameObject);
+			editor.threeManager.attachToScene(gameObject);
 		}
 
 		// remove child from scene and add it to parent

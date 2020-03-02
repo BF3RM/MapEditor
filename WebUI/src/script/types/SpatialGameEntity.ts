@@ -74,7 +74,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 		// remove child from parent and add it to scene
 		if (parent !== null) {
-			editor.threeManager.AttachToScene(this);
+			editor.threeManager.attachToScene(this);
 		}
 
 		matrix.decompose(this.position, this.quaternion, this.scale);

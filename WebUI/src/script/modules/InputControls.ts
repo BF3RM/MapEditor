@@ -1,6 +1,17 @@
 import { GIZMO_MODE } from '@/script/modules/THREEManager';
-import * as THREE from 'three';
-export enum KEYCODES {
+import CameraControls from 'camera-controls';
+import { Vec2 } from '@/script/types/primitives/Vec2';
+
+// TODO Fool: add config keymap
+
+export enum MOUSE_BUTTONS {
+	NONE = 0,
+	LEFT_CLICK = 1,
+	RIGHT_CLICK = 2,
+	MIDDLE_CLICK = 4
+}
+
+export enum KEYCODE {
 	P = 80,
 	Q = 81,
 	W = 87,
@@ -15,72 +26,140 @@ export enum KEYCODES {
 
 export class InputControls {
 	constructor(element: HTMLCanvasElement) {
-		element.addEventListener('keydown', (event: any) => {
-			// if (keysdown[e.which]) {
-			// 	return;
-			// }
-			// if($(document.activeElement)[0].tagName == "INPUT") {
-			// 	return;
-			// }
-			// keysdown[e.which] = true;
-			if (event.which === KEYCODES.Q) {
-				editor.threeManager.SetGizmoMode(GIZMO_MODE.select);
-			}
-			if (event.which === KEYCODES.W) {
-				editor.threeManager.SetGizmoMode(GIZMO_MODE.translate);
-			}
-			if (event.which === KEYCODES.E) {
-				editor.threeManager.SetGizmoMode(GIZMO_MODE.rotate);
-			}
-			if (event.which === KEYCODES.R) {
-				editor.threeManager.SetGizmoMode(GIZMO_MODE.scale);
-			}
-			if (event.which === KEYCODES.F) {
-				editor.threeManager.Focus();
-			}
-			// if(event.which == 71) { // G
-			//
-			// }
-			// if(event.which == 112) { // F1
-			//
-			// }
-			// if(event.which === KEYCODES.P) { // P
-			// 	// editor.SelectParent();
-			// }
-			// if( keysdown[17] && e.which == 68) { // CTRL + D
-			// 	editor.Duplicate()
-			// }
-			// if( keysdown[17] && e.which == 67) { // CTRL + C
-			// 	editor.Copy()
-			// }
-			// if( keysdown[17] && e.which == 86) { // CTRL + V
-			// 	editor.Paste(); // Paste entity
-			// }
-			// if( keysdown[17] && e.which == 88) { // CTRL + X
-			// 	editor.Cut(); // Paste entity
-			// }
+		element.addEventListener('keydown', this.onKeyDown.bind(this));
+		element.addEventListener('keyup', this.onKeyUp.bind(this));
+		element.addEventListener('mousemove', this.onMouseMove.bind(this));
+		element.addEventListener('mouseup', this.onMouseUp.bind(this));
+		element.addEventListener('mousedown', this.onMouseDown.bind(this));
+	}
 
-			// if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
-			// 	editor.redo();
-			// 	return false;
-			// } else if( keysdown[17] && e.which == 90) { // CTRL + z
-			// 	editor.undo();
-			// 	return false;
-			// }
+	private static getMousePos(event: MouseEvent): Vec2 {
+		const mousePos = new Vec2();
+		mousePos.x = (event.clientX / window.innerWidth) * 2 - 1;
+		mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		return mousePos;
+	}
 
-			if (event.which === KEYCODES.CTRL) {
-				editor.threeManager.EnableGridSnap();
-			}
-			if (event.which === KEYCODES.X) {
-				editor.threeManager.ToggleWorldSpace();
-			}
-			if (event.which === KEYCODES.DEL) {
-				editor.DeleteSelected();
-			}
-			if (event.which === KEYCODES.F2) {
-				editor.vext.SendEvent('DisableFreecam');
-			}
-		});
+	onMouseDown(event: MouseEvent) {
+		switch (event.buttons) {
+		case MOUSE_BUTTONS.LEFT_CLICK:
+			break;
+		case MOUSE_BUTTONS.MIDDLE_CLICK:
+			break;
+		case MOUSE_BUTTONS.RIGHT_CLICK:
+			editor.threeManager.enableFreecamMovement();
+			break;
+		default:
+			// alert('You have a strange Mouse!');
+			break;
+		}
+
+		const selectionEnabled = event.buttons === MOUSE_BUTTONS.LEFT_CLICK && !event.ctrlKey;
+		editor.threeManager.onMouseDown(selectionEnabled, InputControls.getMousePos(event));
+	}
+
+	onMouseUp(event: MouseEvent) {
+		const scope = this;
+
+		if (event.button === 0) {
+			console.log(event.button);
+			editor.threeManager.enableCameraControls();
+		}
+	}
+
+	onMouseMove(event: MouseEvent) {
+		// TODO Fool: reimplement
+		// if (scope.raycastPlacing) {
+		// 	const direction = scope.getMouse3D(e);
+		//
+		// 	const message = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
+		// 	editor.vext.SendMessage(message);
+		// 	if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
+		// 		editor.setUpdating(true);
+		// 		const trans = editor.editorCore.screenToWorldTransform.trans;
+		// 	}
+		// 	// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
+		// } else
+		// if (scope.highlightingEnabled && event.buttons === 0) {
+		if (event.buttons === 0) {
+			editor.threeManager.highlight(InputControls.getMousePos(event));
+		}
+	}
+
+	onKeyUp(event: KeyboardEvent) {
+		if (event.which === KEYCODE.CTRL) {
+			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
+		}
+	}
+
+	onKeyDown(event: KeyboardEvent) {
+		// if (keysdown[e.which]) {
+		// 	return;
+		// }
+		// if($(document.activeElement)[0].tagName == "INPUT") {
+		// 	return;
+		// }
+		// keysdown[e.which] = true;
+		if (event.which === KEYCODE.CTRL) {
+			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+		}
+		if (event.which === KEYCODE.Q) {
+			editor.threeManager.setGizmoMode(GIZMO_MODE.select);
+		}
+		if (event.which === KEYCODE.W) {
+			editor.threeManager.setGizmoMode(GIZMO_MODE.translate);
+		}
+		if (event.which === KEYCODE.E) {
+			editor.threeManager.setGizmoMode(GIZMO_MODE.rotate);
+		}
+		if (event.which === KEYCODE.R) {
+			editor.threeManager.setGizmoMode(GIZMO_MODE.scale);
+		}
+		if (event.which === KEYCODE.F) {
+			editor.threeManager.focus();
+		}
+		// if(event.which == 71) { // G
+		//
+		// }
+		// if(event.which == 112) { // F1
+		//
+		// }
+		// if(event.which === KEYCODE.P) { // P
+		// 	// editor.SelectParent();
+		// }
+		// if( keysdown[17] && e.which == 68) { // CTRL + D
+		// 	editor.Duplicate()
+		// }
+		// if( keysdown[17] && e.which == 67) { // CTRL + C
+		// 	editor.Copy()
+		// }
+		// if( keysdown[17] && e.which == 86) { // CTRL + V
+		// 	editor.Paste(); // Paste entity
+		// }
+		// if( keysdown[17] && e.which == 88) { // CTRL + X
+		// 	editor.Cut(); // Paste entity
+		// }
+
+		// if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
+		// 	editor.redo();
+		// 	return false;
+		// } else if( keysdown[17] && e.which == 90) { // CTRL + z
+		// 	editor.undo();
+		// 	return false;
+		// }
+
+		if (event.which === KEYCODE.CTRL) {
+			editor.threeManager.enableGridSnap();
+		}
+		if (event.which === KEYCODE.X) {
+			editor.threeManager.toggleWorldSpace();
+		}
+		if (event.which === KEYCODE.DEL) {
+			editor.DeleteSelected();
+		}
+		if (event.which === KEYCODE.F2) {
+			editor.vext.SendEvent('DisableFreecam');
+		}
 	}
 }
 
@@ -101,79 +180,11 @@ export class InputControls {
 // }
 
 /*
-$(document).keydown(function(e) {
-
-	if (keysdown[e.which]) {
-		return;
-	}
-	if($(document.activeElement)[0].tagName == "INPUT") {
-		return;
-	}
-	console.log(e.which);
-	keysdown[e.which] = true;
-	if(e.which == 81) { // Q
-		editor.threeManager.SetGizmoMode("select")
-	}
-	if(e.which == 87) { // W
-		editor.threeManager.SetGizmoMode("translate")
-	}
-	if(e.which == 69) { // E
-		editor.threeManager.SetGizmoMode("rotate")
-	}
-	if(e.which == 82) { // R
-		editor.threeManager.SetGizmoMode("scale")
-	}
-	if(e.which == 70) { // F
-        editor.Focus();
-	}
-	if(e.which == 71) { // G
-
-	}
-	if(e.which == 112) { // F1
-
-	}
-	if(e.which == 80) { // P
-		editor.SelectParent();
-	}
-	if( keysdown[17] && e.which == 68) { // CTRL + D
-		editor.Duplicate()
-	}
-	if( keysdown[17] && e.which == 67) { // CTRL + C
-		editor.Copy()
-	}
-	if( keysdown[17] && e.which == 86) { // CTRL + V
-		editor.Paste(); // Paste entity
-	}
-	if( keysdown[17] && e.which == 88) { // CTRL + X
-		editor.Cut(); // Paste entity
-	}
-
-	if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
-		editor.redo();
-		return false;
-	} else if( keysdown[17] && e.which == 90) { // CTRL + z
-		editor.undo();
-		return false;
-	}
-	if(e.which == 17) { // CTRL
-		editor.threeManager.EnableGridSnap()
-	}
-	if(e.which == 88) { // X
-		editor.threeManager.ToggleWorldSpace();
-	}
-	if(e.which == 46) { // DEL
-		editor.DeleteSelected();
-	}
-	if(e.which == 112) { // F1
-		editor.vext.SendEvent('DisableFreecam');
-	}
-});
-
 $(document).keyup(function(e){
 	// Remove this key from the map
 	delete keysdown[e.which];
 	if(e.which == 17) { // CTRL
-		editor.threeManager.DisableGridSnap()
+		editor.threeManager.disableGridSnap()
 	}
 });
 */

@@ -108,7 +108,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const matrix = this.transform.toMatrix();
 		const parent = this.parent;
 		if (parent !== null && parent.type !== 'Scene') {
-			editor.threeManager.AttachToScene(this as GameObject);
+			editor.threeManager.attachToScene(this as GameObject);
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();

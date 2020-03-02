@@ -169,7 +169,7 @@ export default class Editor {
 		if (target === undefined) {
 			return;
 		}
-		this.threeManager.Focus(target);
+		this.threeManager.focus(target);
 		signals.objectFocused.emit(target);
 	}
 
@@ -340,11 +340,11 @@ export default class Editor {
 		if (gameObject === undefined) {
 			return;
 		}
-		this.threeManager.DeleteObject(gameObject);
+		this.threeManager.deleteObject(gameObject);
 		this.gameObjects.remove(gameObjectGuid);
 
 		if (this.selectionGroup.children.length === 0) {
-			this.threeManager.HideGizmo();
+			this.threeManager.hideGizmo();
 		}
 
 		this.threeManager.setPendingRender();
@@ -358,7 +358,7 @@ export default class Editor {
 		const parentGuid = gameObjectTransferData.parentData.guid;
 
 		const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
-		editor.threeManager.AttachToScene(gameObject);
+		editor.threeManager.attachToScene(gameObject);
 		gameObject.updateTransform();
 		for (const gameEntityData of gameObjectTransferData.gameEntities) {
 			const entityData = gameEntityData;

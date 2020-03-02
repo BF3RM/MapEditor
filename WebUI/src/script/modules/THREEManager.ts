@@ -53,12 +53,12 @@ export class THREEManager {
 	public gizmoMode = GIZMO_MODE.select;
 
 	constructor(debugMode: boolean) {
-		signals.editor.Ready.connect(this.Initialize.bind(this));
-		this.RegisterEvents();
+		signals.editor.Ready.connect(this.initialize.bind(this));
+		this.registerEvents();
 		this.debugMode = debugMode;
 	}
 
-	public Initialize() {
+	public initialize() {
 		const scope = this;
 		scope.renderer.setPixelRatio(window.devicePixelRatio);
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -95,36 +95,32 @@ export class THREEManager {
 			}
 		})();
 
-		this.SetFov(90);
+		this.setFov(90);
 		this.setPendingRender();
 	}
 
-	public RegisterEvents() {
+	public registerEvents() {
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
-
-		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
-
 		signals.objectChanged.connect(this.setPendingRender.bind(this)); // Object changed? setPendingRender!
 	}
 
-	private EnableFreecamMovement() {
+	public enableFreecamMovement() {
+		this.highlightingEnabled = false;
 		editor.vext.SendEvent('EnableFreeCamMovement');
 
 		// Hack to make sure we don't navigate the windows while in freecam.
 		// document.activeElement.blur();
 	}
 
-	public AttachToScene(gameObject: THREE.Object3D): void {
+	public attachToScene(gameObject: THREE.Object3D): void {
 		this.scene.attach(gameObject);
 	}
 
-	public RemoveFromScene(gameObject: THREE.Object3D): void {
+	public removeFromScene(gameObject: THREE.Object3D): void {
 		this.scene.remove(gameObject);
 	}
 
-	public Focus(target?: THREE.Object3D) {
+	public focus(target?: THREE.Object3D) {
 		editor.vext.SendEvent('controlStart');
 		const scope = this;
 		if (target === undefined) {
@@ -165,7 +161,7 @@ export class THREEManager {
 		scope.setPendingRender();
 	}
 
-	public DeleteObject(gameObject: GameObject) {
+	public deleteObject(gameObject: GameObject) {
 		if (gameObject.parent !== null) {
 			this.scene.attach(gameObject);
 		}
@@ -178,13 +174,13 @@ export class THREEManager {
 		this.gizmoControls.Select(gameObject);
 	}
 
-	public HideGizmo() {
+	public hideGizmo() {
 		this.gizmoControls.visible = false;
 		// this.mesh.visible = false;
 		// this.setPendingRender();
 	}
 
-	public ShowGizmo() {
+	public showGizmo() {
 		this.gizmoControls.visible = true;
 		// this.mesh.visible = true;
 
@@ -193,10 +189,6 @@ export class THREEManager {
 
 	public setPendingRender() {
 		this.pendingRender = true;
-		// if (!editor.vext.executing) {
-		// 	// this.renderer.clear();
-		// 	this.renderer.render(this.scene, this.camera);
-		// }
 	}
 
 	private render() {
@@ -205,16 +197,16 @@ export class THREEManager {
 		this.pendingRender = false;
 	}
 
-	public SetFov(fov: number) {
+	public setFov(fov: number) {
 		this.camera.fov = fov;
 		this.camera.updateProjectionMatrix();
 	}
 
-	public SetGizmoMode(mode: GIZMO_MODE) {
+	public setGizmoMode(mode: GIZMO_MODE) {
 		console.log('Changing gizmo mode to ' + mode);
 
 		if (mode === GIZMO_MODE.select) {
-			this.HideGizmo();
+			this.hideGizmo();
 			this.setPendingRender();
 			this.gizmoMode = mode;
 			signals.gizmoModeChanged.emit(mode);
@@ -222,7 +214,7 @@ export class THREEManager {
 		}
 
 		if (!this.gizmoControls.visible && editor.selectedGameObjects.length !== 0) {
-			this.ShowGizmo();
+			this.showGizmo();
 		}
 
 		this.gizmoControls.setMode(mode);
@@ -231,7 +223,7 @@ export class THREEManager {
 		signals.gizmoModeChanged.emit(mode);
 	}
 
-	public SetWorldSpace(space: WORLD_SPACE) {
+	public setWorldSpace(space: WORLD_SPACE) {
 		if (space === WORLD_SPACE.local || space === WORLD_SPACE.world) {
 			this.gizmoControls.setSpace(space);
 			console.log('Changed worldspace to ' + space);
@@ -241,21 +233,21 @@ export class THREEManager {
 		}
 	}
 
-	public ToggleWorldSpace() {
+	public toggleWorldSpace() {
 		if (this.worldSpace === WORLD_SPACE.world) {
-			this.SetWorldSpace(WORLD_SPACE.local);
+			this.setWorldSpace(WORLD_SPACE.local);
 		} else {
-			this.SetWorldSpace(WORLD_SPACE.world);
+			this.setWorldSpace(WORLD_SPACE.world);
 		}
 	}
 
-	public EnableGridSnap() {
+	public enableGridSnap() {
 		this.gridSnap = true;
 		this.gizmoControls.setTranslationSnap(0.5);
 		this.gizmoControls.setRotationSnap(MathUtils.degToRad(15));
 	}
 
-	public DisableGridSnap() {
+	public disableGridSnap() {
 		this.gridSnap = false;
 		this.gizmoControls.translationSnap = null;
 		this.gizmoControls.rotationSnap = null;
@@ -263,48 +255,32 @@ export class THREEManager {
 
 	public ToggleGridSnap() {
 		if (this.gridSnap) {
-			this.DisableGridSnap();
+			this.disableGridSnap();
 		} else {
-			this.EnableGridSnap();
+			this.enableGridSnap();
 		}
 	}
 
-	public onMouseUp(event: MouseEvent) {
-		const scope = this;
-
-		if (event.button === 0 && editor.threeManager.raycastPlacing) {
-			editor.threeManager.ShowGizmo();
-			editor.threeManager.raycastPlacing = false;
-			scope.cameraControls.enabled = true;
+	public enableCameraControls() {
+		if (this.raycastPlacing) {
+			this.showGizmo();
+			this.raycastPlacing = false;
+			this.cameraControls.enabled = true;
 		}
 	}
 
-	public onMouseDown(event: MouseEvent) {
+	public onMouseDown(selectionEnabled: boolean, mousePos: Vec2) {
 		const scope = this;
 
-		// Focus on canvas again
+		// focus on canvas again
 		scope.renderer.domElement.focus();
-
-		switch (event.buttons) {
-		case 1: // Left mouse
-			break;
-		case 4: // middle mouse
-			break;
-		case 2: // right mouse
-			this.EnableFreecamMovement();
-			this.highlightingEnabled = false;
-			break;
-		default:
-			// alert('You have a strange Mouse!');
-			break;
-		}
 
 		if (scope.raycastPlacing) {
 			scope.cameraControls.enabled = false;
 		} else if (this.gizmoControls.selected) {
 			console.log('Control selected');
-		} else if (event.buttons === 1) {
-			this.selectWithRaycast(this.getMousePos(event));
+		} else if (selectionEnabled) {
+			this.selectWithRaycast(mousePos);
 		}
 	}
 
@@ -313,7 +289,7 @@ export class THREEManager {
 	* */
 	public mouseEnabled() {
 		this.highlightingEnabled = true;
-		// Focus on canvas again
+		// focus on canvas again
 		this.renderer.domElement.focus();
 	}
 
@@ -324,29 +300,17 @@ export class THREEManager {
 		return mousePos;
 	}
 
-	public onMouseMove(e: MouseEvent) {
-		const scope = this;
-		// if (scope.raycastPlacing) {
-		// 	const direction = scope.getMouse3D(e);
-		//
-		// 	const message = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
-		// 	editor.vext.SendMessage(message);
-		// 	if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
-		// 		editor.setUpdating(true);
-		// 		const trans = editor.editorCore.screenToWorldTransform.trans;
-		// 	}
-		// 	// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
-		// } else
-		if (this.highlightingEnabled && e.buttons === 0) {
-			scope.highlightWithRaycast(this.getMousePos(e));
-		}
-	}
-
 	private async selectWithRaycast(mousePos: Vec2) {
-		const guid = await this.RaycastSelection(mousePos) as Guid;
+		const guid = await this.raycastSelection(mousePos) as Guid;
 
 		if (guid !== null) {
 			editor.Select(guid);
+		}
+	}
+
+	public highlight(mousePos: Vec2) {
+		if (this.highlightingEnabled) {
+			this.highlightWithRaycast(mousePos);
 		}
 	}
 
@@ -354,7 +318,7 @@ export class THREEManager {
 		const now = new Date();
 		if ((now.getTime() - this.lastRaycastTime.getTime() >= 100) && !this.pendingRaycast) {
 			this.pendingRaycast = true;
-			const guid = await this.RaycastSelection(mousePos) as Guid;
+			const guid = await this.raycastSelection(mousePos) as Guid;
 			if (guid !== null) {
 				editor.editorCore.highlight(guid);
 			} else {
@@ -366,7 +330,7 @@ export class THREEManager {
 		}
 	}
 
-	public RaycastSelection(mousePos: Vec2) {
+	public raycastSelection(mousePos: Vec2) {
 		const raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(mousePos, this.camera);
 

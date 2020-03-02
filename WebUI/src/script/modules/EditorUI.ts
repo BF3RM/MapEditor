@@ -291,11 +291,11 @@ export class EditorUI {
 	}
 
 	public toolsChanged(e: any) {
-		editor.threeManager.SetGizmoMode(e.target.id);
+		editor.threeManager.setGizmoMode(e.target.id);
 	}
 
 	public worldChanged(e: any) {
-		editor.threeManager.SetWorldSpace(e.target.id);
+		editor.threeManager.setWorldSpace(e.target.id);
 	}
 
 	public worldViewChanged(e: any, ui: any) {
