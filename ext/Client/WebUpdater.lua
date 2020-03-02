@@ -25,8 +25,18 @@ function WebUpdater:OnUIReady()
 	self.m_IsUIReady = true
 end
 
-function WebUpdater:AddUpdate(p_Path, p_Payload)
+function WebUpdater:AddUpdate(p_Path, p_Payload, p_RemoveDuplicates)
 	m_Logger:Write('Added update. Path: '..p_Path)
+
+	if p_RemoveDuplicates then
+		for i, l_WebUpdate in pairs(self.m_WebUpdateStack) do
+			if l_WebUpdate.path == p_Path then
+				self.m_WebUpdateStack[i].payload = p_Payload
+				return
+			end
+		end
+	end
+
 	table.insert(self.m_WebUpdateStack, {
 		path = p_Path,
 		payload = p_Payload

@@ -95,7 +95,7 @@ end
 
 function Editor:UpdateCameraTransform()
 	local s_Transform = ClientUtils:GetCameraTransform()
-	WebUpdater:AddUpdate('UpdateCameraTransform', s_Transform)
+	WebUpdater:AddUpdate('UpdateCameraTransform', s_Transform, true)
 	self.m_CameraTransform = s_Transform
 end
 
