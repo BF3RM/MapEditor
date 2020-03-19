@@ -221,7 +221,7 @@ export default class EditorToolbar extends Vue {
 
 	private onToolChange(newTool: string) {
 		if (this.tools.indexOf(newTool) !== -1) {
-			(window).editor.threeManager.SetGizmoMode(newTool.toLowerCase() as GIZMO_MODE);
+			(window).editor.threeManager.setGizmoMode(newTool.toLowerCase() as GIZMO_MODE);
 		} else {
 			console.error('Attempted to select a tool that does not exist: ' + newTool);
 		}

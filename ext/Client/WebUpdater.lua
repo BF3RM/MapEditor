@@ -1,6 +1,6 @@
 class "WebUpdater"
 
-local m_Logger = Logger("WebUpdater", true)
+local m_Logger = Logger("WebUpdater", false)
 
 local UI_UPDATE_TIME = 0.016667 -- 60 fps
 

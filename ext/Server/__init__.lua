@@ -27,6 +27,7 @@ function MapEditorServer:RegisterEvents()
     Events:Subscribe('Server:LevelLoaded', self, self.OnLevelLoaded)
     Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Events:Subscribe('Player:Chat', self, self.OnChat)
+	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
@@ -91,6 +92,10 @@ end
 
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
+end
+
+function MapEditorServer:OnPlayerAuthenticated(p_Player)
+	GameObjectManager:OnPlayerAuthenticated(p_Player)
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)

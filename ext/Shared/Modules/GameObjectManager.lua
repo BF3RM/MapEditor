@@ -1,6 +1,6 @@
 class 'GameObjectManager'
 
-local m_Logger = Logger("GameObjectManager", false)
+local m_Logger = Logger("GameObjectManager", true)
 
 function GameObjectManager:__init(p_Realm)
     m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
@@ -10,13 +10,12 @@ function GameObjectManager:__init(p_Realm)
 end
 
 function GameObjectManager:RegisterVars()
-    --self.m_VanillaBlueprintNumber = 0
-
     self.m_GameObjects = {}
     self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
     self.m_Entities = {}
     self.m_UnresolvedGameObjects = {}
     self.m_UnresolvedClientOnlyChildren = {}
+    self.m_ServerVanillaGameObjectGuids = {}
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -24,9 +23,11 @@ function GameObjectManager:OnLevelDestroy()
 end
 
 function GameObjectManager:RegisterEvents()
-    NetEvents:Subscribe("GameObjectManager:SendClientOnlyObjectGuid", self, self.OnClientOnlyObjectGuidReceived)
-    NetEvents:Subscribe("GameObjectManager:RequestClientOnlyGameObject", self, self.OnRequestClientOnlyGameObject)
-    NetEvents:Subscribe("GameObjectManager:SendClientOnlyObject", self, self.OnClientOnlyGameObjectReceived)
+    -- Client events:
+    NetEvents:Subscribe("GameObjectManager:ServerGameObjectsGuids", self, self.OnServerGameObjectsGuidsReceived)
+
+    -- Server events:
+    NetEvents:Subscribe("GameObjectManager:ClientOnlyObjectFound", self, self.OnClientOnlyObjectFound)
 end
 
 function GameObjectManager:GetGameEntities(p_EntityIds)
@@ -168,17 +169,16 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         isDeleted = false,
         isEnabled = true,
         gameEntities = s_GameEntities,
-        children = {}
+        children = {},
+        realm = Realm.Realm_ClientAndServer
     }
 
     s_GameObject.blueprintCtrRef = CtrRef {
-        typeName = s_Blueprint.typeInfo.name,
+        typeName = p_Blueprint.typeInfo.name,
         name = s_Blueprint.name,
         partitionGuid = s_BlueprintPartitionGuid,
         instanceGuid = s_BlueprintInstanceGuid
     }
-
-    s_GameObject.isClientOnly = self:IsClientOnlyBlueprintType(p_Blueprint.typeInfo.name)
 
     self:ResolveChildren(s_GameObject)
 
@@ -256,7 +256,8 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
     else
         --self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
-        local s_VanillaGuid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
+
+        local s_VanillaGuid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans, p_GameObject.typeName)
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, true, s_VanillaGuid, "VanillaHook")
     end
@@ -273,8 +274,7 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     p_GameObject.guid = p_CustomGuid
     p_GameObject.isVanilla = p_IsVanilla
     p_GameObject.creatorName = p_CreatorName
-
-
+    
     if p_GameObject.children ~= nil then
         for _, s_ChildGameObject in pairs(p_GameObject.children) do
             local s_ChildGuid
@@ -282,7 +282,7 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
             if (p_IsVanilla == true) then
                 --self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
 
-                s_ChildGuid = self:GetVanillaGuid(s_ChildGameObject.name, s_ChildGameObject.transform.trans)
+                s_ChildGuid = self:GetVanillaGuid(s_ChildGameObject.name, s_ChildGameObject.transform.trans, s_ChildGameObject.typeName)
             else
                 s_ChildGuid = GenerateCustomGuid()
             end
@@ -307,38 +307,46 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
 
     self:AddGameObjectToTable(p_GameObject)
 
-    if (p_GameObject.isClientOnly == true) then
-        self:NotifyServerAboutClientOnlyObject(p_GameObject.guid)
+    local s_GuidString = tostring(p_GameObject.guid)
+    if p_IsVanilla then
+        if m_Realm == Realm.Realm_Server then
+            table.insert(m_ServerVanillaGameObjectGuids, s_GuidString)
+        elseif m_Realm == Realm.Realm_Client then
+            self:CheckIfClientOnly(s_GuidString, p_GameObject)
+        end
     end
+
+    --if m_Realm == Realm.Realm_Client and p_IsVanilla then
+    --    --self:NotifyServerAboutVanillaObject(p_GameObject.guid)
+    --end
+
+    --if (p_GameObject.isClientOnly == true) then
+    --    self:NotifyServerAboutClientOnlyObject(p_GameObject.guid)
+    --end
     --self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
--- CLIENT v v v v --
-function GameObjectManager:NotifyServerAboutClientOnlyObject(p_GameObjectGuid)
-    NetEvents:SendLocal("GameObjectManager:SendClientOnlyObjectGuid", p_GameObjectGuid)
-end
-
-function GameObjectManager:OnRequestClientOnlyGameObject(p_GameObjectGuid)
-    local s_GameObject = self.m_GameObjects[tostring(p_GameObjectGuid)]
-
-    if (s_GameObject ~= nil) then
-        --m_Logger:Write("Server requested client only object: " ..  tostring(s_GameObject.guid))
-        NetEvents:SendLocal("GameObjectManager:SendClientOnlyObject", s_GameObject:GetGameObjectTransferData())
-    else
-        m_Logger:Error("Couldnt find client only gameobject requested by the server. guid: " .. tostring(p_GameObjectGuid))
-    end
-end
--- CLIENT ^ ^ ^ ^ --
-
--- SERVER v v v v --
-function GameObjectManager:OnClientOnlyObjectGuidReceived(p_Player, p_GameObjectGuid)
-    if (self.m_GameObjects[tostring(p_GameObjectGuid)] == nil) then -- clientonly object doesnt exist on server yet
-        NetEvents:SendToLocal("GameObjectManager:RequestClientOnlyGameObject", p_Player, p_GameObjectGuid)
+function GameObjectManager:CheckIfClientOnly(p_GuidString, p_GameObject)
+    for _, l_Guid in pairs(m_ServerVanillaGameObjectGuids) do
+        if l_Guid == p_GuidString then
+            -- Client only, tell server
+            NetEvents:SendLocal("GameObjectManager:ClientOnlyObjectFound", p_GameObject:GetGameObjectTransferData())
+            return
+        end
     end
 end
 
+--- CLIENT v v v v
 
-function GameObjectManager:OnClientOnlyGameObjectReceived(p_Player, p_GameObjectTransferData)
+function GameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsGuids)
+    m_ServerVanillaGameObjectGuids = p_GameObjectsGuids
+end
+
+--- CLIENT ^ ^ ^ ^ --
+
+--- SERVER v v v v --
+
+function GameObjectManager:OnClientOnlyObjectFound(p_Player, p_GameObjectTransferData)
     local s_GameObject = GameObjectTransferData(p_GameObjectTransferData):GetGameObject()
     local s_GuidString = tostring(s_GameObject.guid)
 
@@ -365,7 +373,7 @@ function GameObjectManager:OnClientOnlyGameObjectReceived(p_Player, p_GameObject
     end
 
     if (self.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
-        #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
+            #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
 
         for _, childGameObjectGuidString in pairs(self.m_UnresolvedClientOnlyChildren[s_GuidString]) do
             table.insert(s_GameObject.children, self.m_GameObjects[childGameObjectGuidString])
@@ -376,9 +384,14 @@ function GameObjectManager:OnClientOnlyGameObjectReceived(p_Player, p_GameObject
     end
 
     self:AddGameObjectToTable(s_GameObject)
-    --m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
+    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
 end
--- SERVER ^ ^ ^ ^ --
+
+function GameObjectManager:OnPlayerAuthenticated(p_Player)
+    -- TODO Fool: select first player that joins
+    NetEvents:SendToLocal("GameObjectManager:ServerGameObjectsGuids")
+end
+--- SERVER ^ ^ ^ ^ --
 
 function GameObjectManager:AddGameObjectToTable(p_GameObject)
     local guidAsString = tostring(p_GameObject.guid)
@@ -392,34 +405,25 @@ function GameObjectManager:AddGameObjectToTable(p_GameObject)
     self.m_GameObjects[guidAsString] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
-function GameObjectManager:GetVanillaGuid(p_Name, p_Transform)
+function GameObjectManager:GetVanillaGuid(p_Name, p_Transform, p_TypeName)
     local s_VanillaGuid = GenerateVanillaGuid(p_Name, p_Transform, 0)
     local s_Increment = 1
 
-    --m_Logger:Write("Generated Vanilla Guid: " .. tostring(s_VanillaGuid))
 
     while (self.m_GameObjects[tostring(s_VanillaGuid)] ~= nil) do
-        --m_Logger:Write(tostring(s_VanillaGuid) .. " already existed, creating new increment with increment == " .. s_Increment)
 
         s_VanillaGuid = GenerateVanillaGuid(p_Name, p_Transform, s_Increment)
-
-        --m_Logger:Write("Incremented guid: " .. tostring(s_VanillaGuid))
 
         s_Increment = s_Increment + 1
     end
 
+    --if p_IsClientOnly then
+    --    m_Logger:Write(tostring(s_VanillaGuid) .. " - " .. p_TypeName .. " - CLIENT ONLY")
+    --else
+    --    m_Logger:Write(tostring(s_VanillaGuid) .. " - " .. p_TypeName)
+    --end
+    
     return s_VanillaGuid
-end
-
-function GameObjectManager:IsClientOnlyBlueprintType(p_BlueprintTypeInfoName)
-    if (p_BlueprintTypeInfoName == "VisualEnvironmentBlueprint" or
-        p_BlueprintTypeInfoName == "EffectBlueprint") then
-        --m_Logger:Write("Found client only blueprint: " .. p_BlueprintTypeInfoName)
-
-        return true
-    end
-
-    return false
 end
 
 function GameObjectManager:DeleteGameObject(p_Guid)
