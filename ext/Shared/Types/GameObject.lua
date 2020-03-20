@@ -11,7 +11,7 @@ function GameObject:__init(arg)
     self.isVanilla = arg.isVanilla -- never gets sent to js
     self.gameEntities = arg.gameEntities or { }
     self.children = arg.children -- never gets sent to js
-    self.isClientOnly = arg.isClientOnly
+    self.realm = arg.realm
     self.isUserModified = true
     self.userModifiedFields = {}
     --self.name = arg.name
@@ -214,7 +214,7 @@ function GameObject:GetGameObjectTransferData()
         isDeleted = self.isDeleted,
         creatorName = self.creatorName,
         isVanilla = self.isVanilla,
-        isClientOnly = self.isClientOnly,
+        realm = self.realm,
         isUserModified = self.isUserModified
         -- entities have to be set externally
     }

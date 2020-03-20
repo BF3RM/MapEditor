@@ -13,6 +13,7 @@ function GameObjectTransferData:__init(arg)
     self.gameEntities = arg.gameEntities
     self.isDeleted = arg.isDeleted
     self.isEnabled = arg.isEnabled
+    self.realm = arg.realm
     self.creatorName = arg.creatorName
     self.isVanilla = arg.isVanilla
     self.isUserModified = arg.isUserModified
@@ -31,7 +32,7 @@ function GameObjectTransferData:GetGameObject()
         isDeleted = self.isDeleted,
         creatorName = self.creatorName,
         isVanilla = self.isVanilla,
-        isClientOnly = self.isClientOnly,
+        realm = self.realm,
         isUserModified = self.isUserModified,
     }
 

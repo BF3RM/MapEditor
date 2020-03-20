@@ -2,6 +2,8 @@ class 'ClientTransactionManager'
 
 local m_Logger = Logger("ClientTransactionManager", true)
 
+local CLIENT_READY_DELAY = 5
+
 function ClientTransactionManager:__init()
     m_Logger:Write("Initializing ClientTransactionManager")
 
@@ -19,6 +21,8 @@ function ClientTransactionManager:RegisterVars()
     --self.m_GameObjectTransferDatas = {}
     self.m_CommandActionResults = {}
     self.m_ExecutedCommandActions = {}
+    self.m_ClientReadyDelta = 0
+    self.m_ClientReady = false
 end
 
 function ClientTransactionManager:RegisterEvents()
@@ -38,13 +42,13 @@ function ClientTransactionManager:OnEngineMessage(p_Message)
             return
         end
 
-        --- Client requests all updates that the server has.
-        NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
+        self.m_ClientReady = true
+
     end
 end
 
--- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
--- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
+--- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
+--- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
 function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransferDatas)
     local s_Commands = {}
 
@@ -85,7 +89,6 @@ function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransfe
                 local s_Changes = GetChanges(s_ComparisonGameObjectTransferData, s_GameObjectTransferData)
 
                 for _, change in ipairs(s_Changes) do
-                    local s_Command
 
                     if change == "transform" then
                         s_Command = {
@@ -150,7 +153,23 @@ function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransfe
     self:ExecuteCommands(s_Commands, nil)
 end
 
+function ClientTransactionManager:UpdatePlayerReadyTimer(p_Delta)
+    if not self.m_ClientReady then
+        return
+    end
+
+    self.m_ClientReadyDelta = self.m_ClientReadyDelta + p_Delta
+
+    if self.m_ClientReadyDelta > CLIENT_READY_DELAY then
+        --- Client requests all updates that the server has.
+        NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
+        self.m_ClientReady = false -- We disable it as we dont care about this flag anymore. This way the timer stops increasing.
+    end
+end
+
 function ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
+    self:UpdatePlayerReadyTimer(p_Delta)
+
     if(p_Pass ~= UpdatePass.UpdatePass_PreSim or (#self.m_Queue.commands == 0 and #self.m_Queue.messages == 0)) then
         return
     end

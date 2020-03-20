@@ -77,7 +77,7 @@ function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
     end
 
 	GameObjectManager:AddGameObjectToTable(s_GameObject)
-    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
+    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString..", realm: ".. s_GameObject.realm)
 end
 
 return ServerGameObjectManager()

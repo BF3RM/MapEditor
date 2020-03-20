@@ -6,7 +6,6 @@ function GameObjectManager:__init(p_Realm)
     m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
     self.m_Realm = p_Realm
     self:RegisterVars()
-    self:RegisterEvents()
 end
 
 function GameObjectManager:RegisterVars()
@@ -20,14 +19,6 @@ end
 
 function GameObjectManager:OnLevelDestroy()
     self:RegisterVars()
-end
-
-function GameObjectManager:RegisterEvents()
-    ---- Client events:
-    --NetEvents:Subscribe("GameObjectManager:ServerGameObjectsGuids", self, self.OnServerGameObjectsGuidsReceived)
-    --
-    ---- Server events:
-    --NetEvents:Subscribe("GameObjectManager:ClientOnlyObjectFound", self, self.OnClientOnlyObjectFound)
 end
 
 function GameObjectManager:GetGameEntities(p_EntityIds)
@@ -311,81 +302,11 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     if p_IsVanilla then
         table.insert(self.m_VanillaGameObjectGuids, tostring(p_GameObject.guid))
     end
-
-    return p_GameObject
-    --
-    --    --if m_Realm == Realm.Realm_Server then
-    --    --elseif m_Realm == Realm.Realm_Client then
-    --    --    self:CheckIfClientOnly(s_GuidString, p_GameObject)
-    --    --end
-
-
-    --if m_Realm == Realm.Realm_Client and p_IsVanilla then
-    --    --self:NotifyServerAboutVanillaObject(p_GameObject.guid)
-    --end
-
-    --if (p_GameObject.isClientOnly == true) then
-    --    self:NotifyServerAboutClientOnlyObject(p_GameObject.guid)
-    --end
-    --self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
 function GameObjectManager:GetVanillaGameObjectsGuids()
     return self.m_VanillaGameObjectGuids
 end
-
------ CLIENT v v v v
---
---function GameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsGuids)
---    m_VanillaGameObjectGuids = p_GameObjectsGuids
---end
---
------ CLIENT ^ ^ ^ ^ --
---
------ SERVER v v v v --
---
---function GameObjectManager:OnClientOnlyObjectFound(p_Player, p_GameObjectTransferData)
---    local s_GameObject = GameObjectTransferData(p_GameObjectTransferData):GetGameObject()
---    local s_GuidString = tostring(s_GameObject.guid)
---
---    if (self.m_GameObjects[s_GuidString] ~= nil) then
---        m_Logger:Warning("Already had a client only object received with the same guid")
---        return
---    end
---
---    if (s_GameObject.parentData ~= nil) then
---        local parentGuidString = tostring(s_GameObject.parentData.guid)
---        local parent = self.m_GameObjects[parentGuidString]
---
---        if (parent ~= nil) then
---            --m_Logger:Write("Resolved child " .. tostring(s_GameObject.guid) .. " with parent " .. tostring(parent.guid))
---
---            table.insert(parent.children, s_GameObject)
---        else
---            if (self.m_UnresolvedClientOnlyChildren[parentGuidString] == nil) then
---                self.m_UnresolvedClientOnlyChildren[parentGuidString] = { }
---            end
---
---            table.insert(self.m_UnresolvedClientOnlyChildren[parentGuidString], tostring(s_GameObject.guid))
---        end
---    end
---
---    if (self.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
---            #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
---
---        for _, childGameObjectGuidString in pairs(self.m_UnresolvedClientOnlyChildren[s_GuidString]) do
---            table.insert(s_GameObject.children, self.m_GameObjects[childGameObjectGuidString])
---            --m_Logger:Write("Resolved child " .. childGameObjectGuidString .. " with parent " .. s_GuidString)
---        end
---
---        self.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
---    end
---
---    self:AddGameObjectToTable(s_GameObject)
---    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
---end
-
---- SERVER ^ ^ ^ ^ --
 
 function GameObjectManager:AddGameObjectToTable(p_GameObject)
     local guidAsString = tostring(p_GameObject.guid)
@@ -411,12 +332,8 @@ function GameObjectManager:GetVanillaGuid(p_Name, p_Transform, p_TypeName)
         s_Increment = s_Increment + 1
     end
 
-    --if p_IsClientOnly then
-    --    m_Logger:Write(tostring(s_VanillaGuid) .. " - " .. p_TypeName .. " - CLIENT ONLY")
-    --else
-    --    m_Logger:Write(tostring(s_VanillaGuid) .. " - " .. p_TypeName)
-    --end
-    
+    --m_Logger:Write(tostring(s_VanillaGuid) .. " - " .. p_TypeName)
+
     return s_VanillaGuid
 end
 
