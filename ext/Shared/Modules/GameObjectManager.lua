@@ -15,7 +15,7 @@ function GameObjectManager:RegisterVars()
     self.m_Entities = {}
     self.m_UnresolvedGameObjects = {}
     self.m_UnresolvedClientOnlyChildren = {}
-    self.m_ServerVanillaGameObjectGuids = {}
+    self.m_VanillaGameObjectGuids = {}
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -23,11 +23,11 @@ function GameObjectManager:OnLevelDestroy()
 end
 
 function GameObjectManager:RegisterEvents()
-    -- Client events:
-    NetEvents:Subscribe("GameObjectManager:ServerGameObjectsGuids", self, self.OnServerGameObjectsGuidsReceived)
-
-    -- Server events:
-    NetEvents:Subscribe("GameObjectManager:ClientOnlyObjectFound", self, self.OnClientOnlyObjectFound)
+    ---- Client events:
+    --NetEvents:Subscribe("GameObjectManager:ServerGameObjectsGuids", self, self.OnServerGameObjectsGuidsReceived)
+    --
+    ---- Server events:
+    --NetEvents:Subscribe("GameObjectManager:ClientOnlyObjectFound", self, self.OnClientOnlyObjectFound)
 end
 
 function GameObjectManager:GetGameEntities(p_EntityIds)
@@ -307,14 +307,18 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
 
     self:AddGameObjectToTable(p_GameObject)
 
-    local s_GuidString = tostring(p_GameObject.guid)
+    -- Save guid if its a vanilla object
     if p_IsVanilla then
-        if m_Realm == Realm.Realm_Server then
-            table.insert(m_ServerVanillaGameObjectGuids, s_GuidString)
-        elseif m_Realm == Realm.Realm_Client then
-            self:CheckIfClientOnly(s_GuidString, p_GameObject)
-        end
+        table.insert(self.m_VanillaGameObjectGuids, tostring(p_GameObject.guid))
     end
+
+    return p_GameObject
+    --
+    --    --if m_Realm == Realm.Realm_Server then
+    --    --elseif m_Realm == Realm.Realm_Client then
+    --    --    self:CheckIfClientOnly(s_GuidString, p_GameObject)
+    --    --end
+
 
     --if m_Realm == Realm.Realm_Client and p_IsVanilla then
     --    --self:NotifyServerAboutVanillaObject(p_GameObject.guid)
@@ -326,71 +330,61 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     --self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
-function GameObjectManager:CheckIfClientOnly(p_GuidString, p_GameObject)
-    for _, l_Guid in pairs(m_ServerVanillaGameObjectGuids) do
-        if l_Guid == p_GuidString then
-            -- Client only, tell server
-            NetEvents:SendLocal("GameObjectManager:ClientOnlyObjectFound", p_GameObject:GetGameObjectTransferData())
-            return
-        end
-    end
+function GameObjectManager:GetVanillaGameObjectsGuids()
+    return self.m_VanillaGameObjectGuids
 end
 
---- CLIENT v v v v
+----- CLIENT v v v v
+--
+--function GameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsGuids)
+--    m_VanillaGameObjectGuids = p_GameObjectsGuids
+--end
+--
+----- CLIENT ^ ^ ^ ^ --
+--
+----- SERVER v v v v --
+--
+--function GameObjectManager:OnClientOnlyObjectFound(p_Player, p_GameObjectTransferData)
+--    local s_GameObject = GameObjectTransferData(p_GameObjectTransferData):GetGameObject()
+--    local s_GuidString = tostring(s_GameObject.guid)
+--
+--    if (self.m_GameObjects[s_GuidString] ~= nil) then
+--        m_Logger:Warning("Already had a client only object received with the same guid")
+--        return
+--    end
+--
+--    if (s_GameObject.parentData ~= nil) then
+--        local parentGuidString = tostring(s_GameObject.parentData.guid)
+--        local parent = self.m_GameObjects[parentGuidString]
+--
+--        if (parent ~= nil) then
+--            --m_Logger:Write("Resolved child " .. tostring(s_GameObject.guid) .. " with parent " .. tostring(parent.guid))
+--
+--            table.insert(parent.children, s_GameObject)
+--        else
+--            if (self.m_UnresolvedClientOnlyChildren[parentGuidString] == nil) then
+--                self.m_UnresolvedClientOnlyChildren[parentGuidString] = { }
+--            end
+--
+--            table.insert(self.m_UnresolvedClientOnlyChildren[parentGuidString], tostring(s_GameObject.guid))
+--        end
+--    end
+--
+--    if (self.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
+--            #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
+--
+--        for _, childGameObjectGuidString in pairs(self.m_UnresolvedClientOnlyChildren[s_GuidString]) do
+--            table.insert(s_GameObject.children, self.m_GameObjects[childGameObjectGuidString])
+--            --m_Logger:Write("Resolved child " .. childGameObjectGuidString .. " with parent " .. s_GuidString)
+--        end
+--
+--        self.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
+--    end
+--
+--    self:AddGameObjectToTable(s_GameObject)
+--    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
+--end
 
-function GameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsGuids)
-    m_ServerVanillaGameObjectGuids = p_GameObjectsGuids
-end
-
---- CLIENT ^ ^ ^ ^ --
-
---- SERVER v v v v --
-
-function GameObjectManager:OnClientOnlyObjectFound(p_Player, p_GameObjectTransferData)
-    local s_GameObject = GameObjectTransferData(p_GameObjectTransferData):GetGameObject()
-    local s_GuidString = tostring(s_GameObject.guid)
-
-    if (self.m_GameObjects[s_GuidString] ~= nil) then
-        m_Logger:Warning("Already had a client only object received with the same guid")
-        return
-    end
-
-    if (s_GameObject.parentData ~= nil) then
-        local parentGuidString = tostring(s_GameObject.parentData.guid)
-        local parent = self.m_GameObjects[parentGuidString]
-
-        if (parent ~= nil) then
-            --m_Logger:Write("Resolved child " .. tostring(s_GameObject.guid) .. " with parent " .. tostring(parent.guid))
-
-            table.insert(parent.children, s_GameObject)
-        else
-            if (self.m_UnresolvedClientOnlyChildren[parentGuidString] == nil) then
-                self.m_UnresolvedClientOnlyChildren[parentGuidString] = { }
-            end
-
-            table.insert(self.m_UnresolvedClientOnlyChildren[parentGuidString], tostring(s_GameObject.guid))
-        end
-    end
-
-    if (self.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
-            #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
-
-        for _, childGameObjectGuidString in pairs(self.m_UnresolvedClientOnlyChildren[s_GuidString]) do
-            table.insert(s_GameObject.children, self.m_GameObjects[childGameObjectGuidString])
-            --m_Logger:Write("Resolved child " .. childGameObjectGuidString .. " with parent " .. s_GuidString)
-        end
-
-        self.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
-    end
-
-    self:AddGameObjectToTable(s_GameObject)
-    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString)
-end
-
-function GameObjectManager:OnPlayerAuthenticated(p_Player)
-    -- TODO Fool: select first player that joins
-    NetEvents:SendToLocal("GameObjectManager:ServerGameObjectsGuids")
-end
 --- SERVER ^ ^ ^ ^ --
 
 function GameObjectManager:AddGameObjectToTable(p_GameObject)
@@ -513,7 +507,6 @@ function GameObjectManager:DisableGameObject(p_Guid)
 
     return true
 end
-
 
 function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
     local s_GameObject = self.m_GameObjects[p_Guid]

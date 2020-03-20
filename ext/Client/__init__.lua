@@ -7,11 +7,11 @@ Editor = require "Editor"
 UIManager = require "UIManager"
 MessageActions = require "MessageActions"
 ClientTransactionManager = require "ClientTransactionManager"
+ClientGameObjectManager = require "ClientGameObjectManager"
+GameObjectManager = GameObjectManager(Realm.Realm_Client)
 
 EditorCommon = EditorCommon(Realm.Realm_Client)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
---ObjectManager = ObjectManager(Realm.Realm_Client)
-GameObjectManager = GameObjectManager(Realm.Realm_ClientAndServer)
 CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
 

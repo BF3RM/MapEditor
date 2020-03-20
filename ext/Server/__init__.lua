@@ -5,11 +5,10 @@ local m_Logger = Logger("MapEditorServer", true)
 ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"
 DataBaseManager = require "DataBaseManager"
-
+ServerGameObjectManager = require "ServerGameObjectManager"
+GameObjectManager = GameObjectManager(Realm.Realm_Server)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
---ObjectManager = ObjectManager(Realm.Realm_ClientAndServer)
-GameObjectManager = GameObjectManager(Realm.Realm_ClientAndServer)
 CommandActions = CommandActions(Realm.Realm_ClientAndServer)
 EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
 
@@ -95,7 +94,7 @@ function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 end
 
 function MapEditorServer:OnPlayerAuthenticated(p_Player)
-	GameObjectManager:OnPlayerAuthenticated(p_Player)
+
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)

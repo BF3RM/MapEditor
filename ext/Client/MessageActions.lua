@@ -26,7 +26,7 @@ function MessageActions:MoveObject(p_Message)
         return
     end
 
-    local s_Result = GameObjectManager:SetTransform(gameObjectTransferData.guid, gameObjectTransferData.transform, false)
+    local s_Result = ClientGameObjectManager:SetTransform(gameObjectTransferData.guid, gameObjectTransferData.transform, false)
 
     if s_Result == true then
         return ActionResultType.Success
@@ -60,7 +60,7 @@ function MessageActions:PreviewSpawn(p_Message, p_Arguments)
         m_Logger:Error("gameObjectTransferData must be set on PreviewSpawn")
     end
 
-    local s_Result = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
+    local s_Result = ClientGameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
                                                                "previewSpawn",
                                                                s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
                                                                s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
@@ -87,7 +87,7 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
         m_Logger:Error("gameObjectTransferData must be set on PreviewDestroy")
     end
 
-    local s_Result = GameObjectManager:DeleteGameObject(s_gameObjectTransferData.guid)
+    local s_Result = ClientGameObjectManager:DeleteGameObject(s_gameObjectTransferData.guid)
 
     if s_Result == false then
         return ActionResultType.Failure
@@ -103,7 +103,7 @@ function MessageActions:PreviewMove(p_Message)
         m_Logger:Error("gameObjectTransferData must be set on PreviewMove")
     end
 
-    local s_Result = GameObjectManager:SetTransform(gameObjectTransferData.guid, s_gameObjectTransferData.transform, false)
+    local s_Result = ClientGameObjectManager:SetTransform(gameObjectTransferData.guid, s_gameObjectTransferData.transform, false)
 
     if s_Result == false then
         return ActionResultType.Failure

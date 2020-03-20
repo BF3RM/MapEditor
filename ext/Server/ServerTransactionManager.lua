@@ -23,6 +23,8 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
         return
     end
 
+	ServerGameObjectManager:ClientReady(p_Player)
+
     --- Client up to date
     if p_TransactionId == #self.m_Transactions then
         --m_Logger:Write("Client up to date")
