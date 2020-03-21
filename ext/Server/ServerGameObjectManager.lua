@@ -27,11 +27,12 @@ function ServerGameObjectManager:ClientReady(p_Player)
 end
 
 function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
-	self.m_FirstPlayerLoaded = true
+	-- Might not be needed, havent found server-only objects yet
 	m_Logger:Write("Received ".. #p_Guids .." server-only gameobjects")
 end
 
 function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p_TransferDatas)
+	self.m_FirstPlayerLoaded = true
 	m_Logger:Write("Received ".. #p_TransferDatas .." client-only gameobjects")
 
 	for _, l_TransferData in pairs(p_TransferDatas) do
@@ -77,7 +78,7 @@ function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
     end
 
 	GameObjectManager:AddGameObjectToTable(s_GameObject)
-    m_Logger:Write("Added client only gameobject on server (without gameEntities). guid: " .. s_GuidString..", realm: ".. s_GameObject.realm)
+    --m_Logger:Write("Added client only gameobject on server (without gameEntities), guid: " .. s_GuidString)
 end
 
 return ServerGameObjectManager()

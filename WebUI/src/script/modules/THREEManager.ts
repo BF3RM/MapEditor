@@ -9,6 +9,7 @@ import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
+import { SelectionGroup } from '@/script/types/SelectionGroup';
 
 export enum WORLD_SPACE {
 	local = 'local',
@@ -171,7 +172,7 @@ export class THREEManager {
 	}
 
 	public onSelectGameObject(gameObject: GameObject) {
-		this.gizmoControls.Select(gameObject);
+		// this.gizmoControls.Select(gameObject);
 	}
 
 	public hideGizmo() {
@@ -213,7 +214,7 @@ export class THREEManager {
 			return;
 		}
 
-		if (!this.gizmoControls.visible && editor.selectedGameObjects.length !== 0) {
+		if (!this.gizmoControls.visible && editor.selectionGroup.selectedGameObjects.length !== 0) {
 			this.showGizmo();
 		}
 
@@ -269,7 +270,7 @@ export class THREEManager {
 		}
 	}
 
-	public onMouseDown(selectionEnabled: boolean, mousePos: Vec2) {
+	public onMouseDown(selectionEnabled: boolean, multiSelection: boolean, mousePos: Vec2) {
 		const scope = this;
 
 		// focus on canvas again
@@ -280,7 +281,7 @@ export class THREEManager {
 		} else if (this.gizmoControls.selected) {
 			console.log('Control selected');
 		} else if (selectionEnabled) {
-			this.selectWithRaycast(mousePos);
+			this.selectWithRaycast(mousePos, multiSelection);
 		}
 	}
 
@@ -300,17 +301,17 @@ export class THREEManager {
 		return mousePos;
 	}
 
-	private async selectWithRaycast(mousePos: Vec2) {
-		const guid = await this.raycastSelection(mousePos) as Guid;
-
-		if (guid !== null) {
-			editor.Select(guid);
-		}
-	}
-
 	public highlight(mousePos: Vec2) {
 		if (this.highlightingEnabled) {
 			this.highlightWithRaycast(mousePos);
+		}
+	}
+
+	private async selectWithRaycast(mousePos: Vec2, multiSelection: boolean) {
+		const guid = await this.raycastSelection(mousePos) as Guid;
+
+		if (guid !== null) {
+			editor.Select(guid, multiSelection);
 		}
 	}
 
@@ -331,34 +332,36 @@ export class THREEManager {
 	}
 
 	public raycastSelection(mousePos: Vec2) {
-		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera(mousePos, this.camera);
+		return new Promise(resolve => {
+			const raycaster = new THREE.Raycaster();
+			raycaster.setFromCamera(mousePos, this.camera);
 
-		const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
-		const dir = new THREE.Vector3(1, 2, 0);
+			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
+			const dir = new THREE.Vector3(1, 2, 0);
 
-		// normalize the direction vector (convert to vector of length 1)
-		dir.normalize();
+			// normalize the direction vector (convert to vector of length 1)
+			dir.normalize();
 
-		if (intersects.length > 0) {
-			// console.log('hit ' + (intersects.length) + ' objects');
+			if (intersects.length > 0) {
+				// console.log('hit ' + (intersects.length) + ' objects');
 
-			for (const element of intersects) {
-				if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
-					continue;
+				for (const element of intersects) {
+					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
+						continue;
+					}
+					// TODO: More raycast logic. Select prefab, then select child if prefab is already selected?
+					if (element.object.parent.constructor.name === 'GameObject') {
+						const parent = element.object.parent as GameObject;
+						// console.log("first hit is: "+element.object.parent.guid)
+						resolve(parent.guid);
+					}
 				}
-				// TODO: More raycast logic. Select prefab, then select child if prefab is already selected?
-				if (element.object.parent.constructor.name === 'GameObject') {
-					const parent = element.object.parent as GameObject;
-					// console.log("first hit is: "+element.object.parent.guid)
-					return parent.guid;
-				}
+			} else {
+				// console.log("no hit")
+				resolve(null);
 			}
-		} else {
-			// console.log("no hit")
-			return null;
-		}
-		return null;
+			resolve(null);
+		});
 	}
 
 	public getMouse3D(e: MouseEvent) {

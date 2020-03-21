@@ -8,7 +8,6 @@ export default class GizmoWrapper extends TransformControls {
 	public visible = false;
 	public selected = false;
 
-	private placeholderObject = new THREE.Object3D();
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
 		super(camera, element);
 		this.addEventListener('change', this.onControlChanged.bind(this));
@@ -20,15 +19,15 @@ export default class GizmoWrapper extends TransformControls {
 		signals.editor.Ready.connect(this.onEditorReady.bind(this));
 	}
 
-	public Select(gameObject: GameObject) {
-		// TODO: Multiselection using PlaceholderGameobject
-		this.attach(gameObject);
-		this.visible = true;
-	}
+	// public Select(gameObject: GameObject) {
+	// 	// TODO: Multiselection using PlaceholderGameobject
+	// 	this.attach(gameObject);
+	// 	this.visible = true;
+	// }
 
 	public onControlChanged() {
 		// moving
-		for (const go of editor.selectedGameObjects) {
+		for (const go of editor.selectionGroup.selectedGameObjects) {
 			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		editor.editorCore.RequestUpdate();
@@ -38,7 +37,7 @@ export default class GizmoWrapper extends TransformControls {
 		this.selected = false;
 		editor.setUpdating(false);
 		// Stop Moving
-		for (const gameObject of editor.selectedGameObjects) {
+		for (const gameObject of editor.selectionGroup.selectedGameObjects) {
 			gameObject.onMoveEnd();
 		}
 	}
@@ -52,6 +51,6 @@ export default class GizmoWrapper extends TransformControls {
 	private onEditorReady() {
 		this.setSpace(WORLD_SPACE.local as string);
 		editor.threeManager.attachToScene(this);
-		editor.threeManager.attachToScene(this.placeholderObject);
+		this.attach(editor.selectionGroup);
 	}
 }

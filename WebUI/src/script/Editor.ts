@@ -47,10 +47,9 @@ export default class Editor {
 	public copy: SpawnBlueprintCommand[];
 
 	public selectionGroup: SelectionGroup;
-	public highlightGroup: HighlightGroup;
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
 
-	public selectedGameObjects: GameObject[] = [];
+	// public selectedGameObjects: GameObject[] = [];
 
 	constructor(debug: boolean = false) {
 		this.debug = debug;
@@ -85,9 +84,9 @@ export default class Editor {
 
 		this.copy = [];
 
-		// Creates selection and highlighting group and adds them to the scene
-		this.selectionGroup = new SelectionGroup(false);
-		this.highlightGroup = new HighlightGroup();
+		// Creates selection group and adds them to the scene
+		this.selectionGroup = new SelectionGroup();
+		this.threeManager.attachToScene(this.selectionGroup);
 
 		this.missingParent = new Collections.Dictionary<Guid, GameObject[]>();
 		this.Initialize();
@@ -174,28 +173,28 @@ export default class Editor {
 	}
 
 	public Duplicate() {
-		const scope = this;
-		const commands: Command[] = [];
-		this.selectionGroup.children.forEach((childGameObject) => {
-			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
-			gameObjectTransferData.guid = Guid.create();
-
-			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
-		});
-		console.log(commands);
-		scope.execute(new BulkCommand(commands));
+		// const scope = this;
+		// const commands: Command[] = [];
+		// this.selectionGroup.children.forEach((childGameObject) => {
+		// 	const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+		// 	gameObjectTransferData.guid = Guid.create();
+		//
+		// 	commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+		// });
+		// console.log(commands);
+		// scope.execute(new BulkCommand(commands));
 	}
 
 	public Copy() {
-		const scope = this;
-		const commands: SpawnBlueprintCommand[] = [];
-		this.selectionGroup.children.forEach((childGameObject: GameObject) => {
-			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
-			gameObjectTransferData.guid = Guid.create();
-
-			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
-		});
-		scope.copy = commands;
+		// const scope = this;
+		// const commands: SpawnBlueprintCommand[] = [];
+		// this.selectionGroup.children.forEach((childGameObject: GameObject) => {
+		// 	const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+		// 	gameObjectTransferData.guid = Guid.create();
+		//
+		// 	commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+		// });
+		// scope.copy = commands;
 	}
 
 	public Paste() {
@@ -299,8 +298,8 @@ export default class Editor {
 		Commands
 
 	*/
-	public Select(guid: Guid) {
-		this.editorCore.select(guid);
+	public Select(guid: Guid, multiSelection: boolean) {
+		this.editorCore.select(guid, multiSelection);
 	}
 
 	public Deselect(guid: Guid) {
@@ -405,10 +404,9 @@ export default class Editor {
 		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
 			// Make selection happen after all signals have been handled
 			setTimeout(() => {
-				scope.Select(gameObjectGuid);
+				scope.Select(gameObjectGuid, false);
 			}, 2);
 		}
-		// We only add the GameObject to the scene when we're accessing it.
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {

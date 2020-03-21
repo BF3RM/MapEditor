@@ -216,7 +216,7 @@ export class EditorCore {
 		this.previewBlueprint = null;
 	}
 
-	public select(guid: Guid) {
+	public select(guid: Guid, multiSelection: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 		if (this.highlightedObjectGuid === guid) {
 			this.unhighlight();
@@ -226,13 +226,16 @@ export class EditorCore {
 			LogError('Failed to select gameobject: ' + guid);
 			return false;
 		}
-		for (const go of editor.selectedGameObjects.values()) {
-			go.onDeselect();
-		}
-		editor.selectedGameObjects = [];
-		editor.selectedGameObjects.push(gameObject);
-		gameObject.onSelect();
-		editor.threeManager.setGizmoMode(GIZMO_MODE.translate);
+
+		editor.selectionGroup.select(gameObject, multiSelection);
+		// for (const go of editor.selectedGameObjects.values()) {
+		// 	go.onDeselect();
+		// }
+		// editor.selectedGameObjects = [];
+		// editor.selectedGameObjects.push(gameObject);
+
+		// gameObject.onSelect();
+		editor.threeManager.setGizmoMode(GIZMO_MODE.translate); // should it?
 		return editor.editorCore.onSelectGameObject(gameObject);
 	}
 

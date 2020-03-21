@@ -19,6 +19,7 @@ export enum KEYCODE {
 	R = 82,
 	F = 70,
 	CTRL = 17,
+	LEFT_ALT = 18,
 	X = 88,
 	DEL = 46,
 	F2 = 113
@@ -41,8 +42,13 @@ export class InputControls {
 	}
 
 	onMouseDown(event: MouseEvent) {
+		let selectionEnabled = false;
+		let multiSelection = false;
+
 		switch (event.buttons) {
 		case MOUSE_BUTTONS.LEFT_CLICK:
+			selectionEnabled = !event.altKey; // Alt key is used for rotating camera
+			multiSelection = event.ctrlKey;
 			break;
 		case MOUSE_BUTTONS.MIDDLE_CLICK:
 			break;
@@ -54,8 +60,7 @@ export class InputControls {
 			break;
 		}
 
-		const selectionEnabled = event.buttons === MOUSE_BUTTONS.LEFT_CLICK && !event.ctrlKey;
-		editor.threeManager.onMouseDown(selectionEnabled, InputControls.getMousePos(event));
+		editor.threeManager.onMouseDown(selectionEnabled, multiSelection, InputControls.getMousePos(event));
 	}
 
 	onMouseUp(event: MouseEvent) {
@@ -87,7 +92,8 @@ export class InputControls {
 	}
 
 	onKeyUp(event: KeyboardEvent) {
-		if (event.which === KEYCODE.CTRL) {
+		// Disable camera rotation
+		if (event.which === KEYCODE.LEFT_ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
 		}
 	}
@@ -100,7 +106,9 @@ export class InputControls {
 		// 	return;
 		// }
 		// keysdown[e.which] = true;
-		if (event.which === KEYCODE.CTRL) {
+
+		// Enable camera rotation
+		if (event.which === KEYCODE.LEFT_ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
 		}
 		if (event.which === KEYCODE.Q) {

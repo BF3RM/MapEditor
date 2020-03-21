@@ -54,7 +54,7 @@ function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransfe
 
     for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
         local s_Command
-        local s_GameObject = ClientGameObjectManager:GetGameObject(s_Guid)
+        local s_GameObject = GameObjectManager:GetGameObject(s_Guid)
 
         if (s_GameObject == nil) then
             if (s_GameObjectTransferData ~= nil and s_GameObjectTransferData.isDeleted == false) then

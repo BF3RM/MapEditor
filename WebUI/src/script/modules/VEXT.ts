@@ -60,11 +60,10 @@ export default class VEXTInterface {
 		}
 	}
 
-	/*
+	/**
+	 * 	Internal
+	 * */
 
-		Internal
-
-	 */
 	public Pause() {
 		this.paused = true;
 	}
@@ -81,26 +80,14 @@ export default class VEXTInterface {
 		}
 	}
 
-	/*
-
-		In
-
-	 */
-
-	public HideGizmo() {
-		editor.threeManager.hideGizmo();
-	}
-
-	public ShowGizmo() {
-		editor.threeManager.showGizmo();
-		window.editor.threeManager.showGizmo();
-	}
-
-	/*
-
-		out
-
-	 */
+	// public HideGizmo() {
+	// 	editor.threeManager.hideGizmo();
+	// }
+	//
+	// public ShowGizmo() {
+	// 	editor.threeManager.showGizmo();
+	// 	window.editor.threeManager.showGizmo();
+	// }
 
 	public SendCommand(command: VextCommand) {
 		command.sender = editor.playerName;
@@ -196,6 +183,18 @@ export default class VEXTInterface {
 		}
 	}
 
+	/**
+	* 	Functions called from VEXT
+	* */
+
+	public WebUpdateBatch(updates: any[]) {
+		// console.log('[VEXT] WebUpdateBatch');
+		// console.log(updates);
+		updates.forEach((obj: any) => {
+			(this as any)[obj.path](obj.payload);
+		});
+	}
+
 	public HandleMessage(messageRaw: any) {
 		let message: any;
 		let emulator = false;
@@ -242,15 +241,6 @@ export default class VEXTInterface {
 	public LoadLevel(levelRaw: string) {
 		const levelData = JSON.parse(levelRaw);
 		editor.gameContext.loadLevel(levelData);
-	}
-
-	// TODO Fool: remove duplicates for those functions that allow it.
-	public WebUpdateBatch(updates: any[]) {
-		// console.log('[VEXT] WebUpdateBatch');
-		// console.log(updates);
-		updates.forEach((obj: any) => {
-			(this as any)[obj.path](obj.payload);
-		});
 	}
 
 	public RegisterBlueprints(blueprintsRaw: string) {
