@@ -209,7 +209,8 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	private shouldSelectNode(node: Node) {
-		return window.editor.Select(Guid.parse(node.id));
+		// TODO Fool: check if ctrl key is pressed for multi-selection
+		return window.editor.Select(Guid.parse(node.id), false);
 	}
 
 	private SpawnBlueprint(blueprint: Blueprint) {

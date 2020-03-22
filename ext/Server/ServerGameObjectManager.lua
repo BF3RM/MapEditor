@@ -27,12 +27,18 @@ function ServerGameObjectManager:ClientReady(p_Player)
 end
 
 function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
-	-- Might not be needed, havent found server-only objects yet
+	-- Might not be needed, haven't found server-only objects yet
 	m_Logger:Write("Received ".. #p_Guids .." server-only gameobjects")
 end
 
 function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p_TransferDatas)
+	-- Check just in case if server has already received client-only objects from another client (shouldn't happen unless two clients join at the same time).
+	if self.m_FirstPlayerLoaded then
+		return
+	end
+
 	self.m_FirstPlayerLoaded = true
+
 	m_Logger:Write("Received ".. #p_TransferDatas .." client-only gameobjects")
 
 	for _, l_TransferData in pairs(p_TransferDatas) do

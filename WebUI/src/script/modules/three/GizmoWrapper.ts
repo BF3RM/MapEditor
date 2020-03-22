@@ -19,16 +19,17 @@ export default class GizmoWrapper extends TransformControls {
 		signals.editor.Ready.connect(this.onEditorReady.bind(this));
 	}
 
-	// public Select(gameObject: GameObject) {
-	// 	// TODO: Multiselection using PlaceholderGameobject
-	// 	this.attach(gameObject);
-	// 	this.visible = true;
-	// }
-
 	public onControlChanged() {
 		// moving
+		editor.selectionGroup.updateTransform();
+		// let a = editor.selectionGroup.matrixWorld;
+
 		for (const go of editor.selectionGroup.selectedGameObjects) {
-			signals.objectChanged.emit(go, 'transform', go.transform);
+			console.log('----');
+			console.log(editor.selectionGroup.transform.trans.x);
+			console.log(go.transform.trans.x);
+			// go.setTransform(editor.selectionGroup.transform);
+			// signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		editor.editorCore.RequestUpdate();
 	}
@@ -52,5 +53,6 @@ export default class GizmoWrapper extends TransformControls {
 		this.setSpace(WORLD_SPACE.local as string);
 		editor.threeManager.attachToScene(this);
 		this.attach(editor.selectionGroup);
+		this.visible = true;
 	}
 }

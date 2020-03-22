@@ -94,7 +94,7 @@ export class EditorCore {
 			editor.threeManager.setPendingRender();
 			this.updateRequested = false;
 		}
-		// TODO: Add an FPS and rendering indecator.
+		// TODO: Add an FPS and rendering indicator.
 		if (this.isUpdating) {
 			window.requestAnimationFrame(this.rl);
 		}
@@ -245,10 +245,11 @@ export class EditorCore {
 		if (gameObject === undefined) {
 			return;
 		}
-		scope.threeManager.removeFromScene(gameObject);
-
+		// scope.threeManager.removeFromScene(gameObject);
+		editor.selectionGroup.deselect(gameObject);
+		// TODO
 		signals.deselectedGameObject.emit(guid);
-		if (scope.selectionGroup.children.length === 0) {
+		if (scope.selectionGroup.selectedGameObjects.length === 0) {
 			scope.threeManager.hideGizmo();
 		}
 	}

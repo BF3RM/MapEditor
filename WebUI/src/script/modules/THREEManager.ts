@@ -33,7 +33,7 @@ export class THREEManager {
 	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
-	private gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement);
+	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement);
 	private inputControls = new InputControls(this.renderer.domElement);
 	public worldSpace = WORLD_SPACE.local;
 

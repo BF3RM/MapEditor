@@ -161,7 +161,7 @@ export default class Editor {
 			target = this.getGameObjectByGuid(guid);
 		} else {
 			target = this.selectionGroup;
-			if (target.children.length === 0) {
+			if ((target as SelectionGroup).selectedGameObjects.length === 0) {
 				return;
 			} // Nothing specified, nothing selected. skip.
 		}
@@ -266,9 +266,9 @@ export default class Editor {
 	public DeleteSelected() {
 		const scope = this;
 		const commands: Command[] = [];
-		this.selectionGroup.children.forEach((childGameObject) => {
-			if (childGameObject instanceof GameObject) {
-				commands.push(new DestroyBlueprintCommand(childGameObject.getGameObjectTransferData()));
+		this.selectionGroup.selectedGameObjects.forEach((selectedGameObject) => {
+			if (selectedGameObject) {
+				commands.push(new DestroyBlueprintCommand(selectedGameObject.getGameObjectTransferData()));
 			}
 		});
 
@@ -342,7 +342,7 @@ export default class Editor {
 		this.threeManager.deleteObject(gameObject);
 		this.gameObjects.remove(gameObjectGuid);
 
-		if (this.selectionGroup.children.length === 0) {
+		if (this.selectionGroup.selectedGameObjects.length === 0) {
 			this.threeManager.hideGizmo();
 		}
 
