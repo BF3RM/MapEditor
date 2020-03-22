@@ -1,6 +1,8 @@
 import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
 import * as THREE from 'three';
+import { signals } from '@/script/modules/Signals';
+import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 export class SelectionGroup extends GameObject {
 	public selectedGameObjects: GameObject[] = [];
@@ -18,15 +20,31 @@ export class SelectionGroup extends GameObject {
 		this.visible = true;
 	}
 
+	public updateSelectedGameObjects() {
+		// Calculate the transform matrix
+		const oldMatrix = this.transform.toMatrix();
+		const newMatrix = this.matrixWorld;
+		const transformMatrix = oldMatrix.getInverse(oldMatrix, false).multiply(newMatrix);
+
+		for (const go of this.selectedGameObjects) {
+			// multiply the gameObject matrix with the selectionGroup's transform matrix.
+			go.matrix = go.matrix.multiply(transformMatrix);
+			go.matrixAutoUpdate = false;
+			signals.objectChanged.emit(go, 'transform', go.transform);
+		}
+
+		// Update the saved transform to the new matrix.
+		this.transform = new LinearTransform().setFromMatrix(newMatrix);
+	}
+
 	public select(gameObject: GameObject, multiSelection: boolean) {
 		if (gameObject === null || gameObject === undefined) {
 			return;
 		}
 
 		// If first object move group to its position
-		if (this.selectedGameObjects.length === 0) {
-			this.setTransform(gameObject.transform);
-			console.log('first object');
+		if (this.selectedGameObjects.length === 0 || !multiSelection) {
+			this.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
 		}
 
 		if (multiSelection) {

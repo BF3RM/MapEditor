@@ -21,16 +21,7 @@ export default class GizmoWrapper extends TransformControls {
 
 	public onControlChanged() {
 		// moving
-		editor.selectionGroup.updateTransform();
-		// let a = editor.selectionGroup.matrixWorld;
-
-		for (const go of editor.selectionGroup.selectedGameObjects) {
-			console.log('----');
-			console.log(editor.selectionGroup.transform.trans.x);
-			console.log(go.transform.trans.x);
-			// go.setTransform(editor.selectionGroup.transform);
-			// signals.objectChanged.emit(go, 'transform', go.transform);
-		}
+		editor.selectionGroup.updateSelectedGameObjects();
 		editor.editorCore.RequestUpdate();
 	}
 

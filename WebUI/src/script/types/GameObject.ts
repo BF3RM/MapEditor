@@ -118,7 +118,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.transform = linearTransform;
 		this.updateTransform();
 		editor.threeManager.setPendingRender();
-		// signals.objectChanged.emit(this, 'transform', linearTransform);
+		signals.objectChanged.emit(this, 'transform', linearTransform);
 	}
 
 	public onMoveEnd(force: boolean = false) {
@@ -133,19 +133,19 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			transform: this.transform
 		}), transform);
 		editor.execute(command);
-		// signals.objectChanged.emit(this, 'transform', transform);
+		signals.objectChanged.emit(this, 'transform', transform);
 
 		// Send move command to server
 	}
 
 	public setName(name: string) {
 		this.name = name;
-		// signals.objectChanged.emit(this, 'name', name);
+		signals.objectChanged.emit(this, 'name', name);
 	}
 
 	public setVariation(key: number) {
 		this.variation = key;
-		// signals.objectChanged.emit(this, 'variation', key);
+		signals.objectChanged.emit(this, 'variation', key);
 	}
 
 	public getLinearTransform() {
@@ -162,7 +162,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 		this.visible = true;
 		this._enabled = true;
-		// signals.objectChanged.emit(this, 'enabled', this.enabled);
+		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
 	public Disable() {
@@ -175,7 +175,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 		this.visible = false;
 		this._enabled = false;
-		// signals.objectChanged.emit(this, 'enabled', this.enabled);
+		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
 	set enabled(value: boolean) {
