@@ -332,7 +332,7 @@ export class THREEManager {
 	}
 
 	public raycastSelection(mousePos: Vec2) {
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			const raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mousePos, this.camera);
 
