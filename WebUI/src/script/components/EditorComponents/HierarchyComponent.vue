@@ -5,27 +5,14 @@
 				<Search v-model="search"/>
 			</div>
 			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-				<template slot-scope="{ node, index, tree, active }" :selected="node.selected">
-					<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
-						<div class="expand" @click="ToggleNode($event,node,tree)">
-							<div v-if="node.state.open && node.children.length > 0">
-								v
-							</div>
-							<div v-if="!node.state.open && node.children.length > 0">
-								>
-							</div>
-						</div>
-						<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
-						<span v-else>
-							{{ node.name }} {{node.children.length}}
-						</span>
-					</div>
-				</template>
+				<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name + ' ' + node.children.length"/>
 			</infinite-tree-component>
 		</gl-component>
-		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['name', 'type']" :click="SpawnBlueprint">
+		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 			<template slot-scope="{ item, data }">
-				<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
+				<div class="slot-scope">
+					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
+				</div>
 			</template>
 		</ListComponent>
 	</gl-col>
@@ -45,8 +32,9 @@ import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
 import Search from '@/script/components/widgets/Search.vue';
+import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
 
-@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search } })
+@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot } })
 
 export default class HierarchyComponent extends EditorComponent {
 	private data: INode = {
@@ -145,40 +133,6 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 	}
 
-	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
-		const toggleState = this.toggleState(node);
-		if (toggleState === 'closed') {
-			tree.openNode(node);
-		} else if (toggleState === 'opened') {
-			tree.closeNode(node);
-		}
-	}
-
-	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
-		tree.selectNode(node);
-	}
-
-	private nodeStyle(node: Node) {
-		if (node.state === undefined) {
-			console.error('Missing node state: ' + node);
-		}
-		return {
-			'margin-left': (node.state.depth * 18).toString() + 'px'
-		};
-	}
-
-	private toggleState(node: Node) {
-		const hasChildren = node.children.length > 0;
-		let toggleState = '';
-		if ((!hasChildren && node.loadOnDemand) || (hasChildren && !node.state.open)) {
-			toggleState = 'closed';
-		}
-		if (hasChildren && node.state.open) {
-			toggleState = 'opened';
-		}
-		return toggleState;
-	}
-
 	onSelectedGameObject(guid: Guid, isMultipleSelection?: boolean, scrollTo?: boolean) {
 		const currentNode = this.tree.getNodeById(guid.toString());
 
@@ -229,13 +183,39 @@ export default class HierarchyComponent extends EditorComponent {
 		background-color: #404040;
 	}
 	.tree-node {
-		font-family: sans-serif;
-	}
-	.tree-node {
 		display: flex;
+		font-family: sans-serif;
+		user-select: none;
+		&:hover {
+			background-color: #343434;
+		}
+
+		.slot-text {
+			margin: 0.1vmin;
+		}
 	}
-	.expand div {
-		width: 10px;
+	.expand-container {
+		width: 1.5vmin;
+		height: 1.5vmin;
 		color: #6d6d6d;
+
+		img {
+			max-width: 1.5vmin;
+			max-height: 1.5vmin;
+
+			&.expanded {
+				transform: rotate(90deg);
+			}
+		}
+	}
+	.td {
+
+	}
+	.slot-scope{
+		width: 100%;
+
+		&:hover {
+			background-color: #343434;
+		}
 	}
 </style>

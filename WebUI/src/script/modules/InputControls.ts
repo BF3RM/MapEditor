@@ -73,19 +73,6 @@ export class InputControls {
 	}
 
 	onMouseMove(event: MouseEvent) {
-		// TODO Fool: reimplement
-		// if (scope.raycastPlacing) {
-		// 	const direction = scope.getMouse3D(e);
-		//
-		// 	const message = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
-		// 	editor.vext.SendMessage(message);
-		// 	if (editor.editorCore.screenToWorldTransform.trans !== new Vec3(0, 0, 0)) {
-		// 		editor.setUpdating(true);
-		// 		const trans = editor.editorCore.screenToWorldTransform.trans;
-		// 	}
-		// 	// editor.RequestMoveObjectWithRaycast(new THREE.Vector2(mousePos.x, mousePos.y))
-		// } else
-		// if (scope.highlightingEnabled && event.buttons === 0) {
 		if (event.buttons === 0) {
 			editor.threeManager.highlight(InputControls.getMousePos(event));
 		}
@@ -95,6 +82,9 @@ export class InputControls {
 		// Disable camera rotation
 		if (event.which === KEYCODE.LEFT_ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
+		}
+		if (event.which === KEYCODE.CTRL) {
+			editor.threeManager.disableGridSnap();
 		}
 	}
 

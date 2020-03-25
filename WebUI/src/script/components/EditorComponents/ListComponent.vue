@@ -1,5 +1,5 @@
 <template>
-	<gl-component>
+	<gl-component class="list-component">
 		<div class="header">
 			<Search v-model="data.search" @search="onSearch"/>
 		</div>
@@ -72,12 +72,19 @@ export default class ListComponent extends EditorComponent {
 	}
 }
 </script>
-<style scoped>
-	.header {
-		display:flex;
-	}
-	.scrollable {
-		height: 100%;
-		width: 100%;
+<style scoped lang="scss">
+	.list-component {
+		user-select: none;
+
+		.header {
+			font-weight: bold;
+			display:flex;
+			padding: 0.2vmin;
+			border-bottom: solid 1px #4a4a4a;
+		}
+		.scrollable {
+			height: 100%;
+			width: 100%;
+		}
 	}
 </style>

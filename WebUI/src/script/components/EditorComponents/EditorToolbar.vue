@@ -360,6 +360,7 @@ input#worldView {
 </style>
 <style lang="scss" scoped>
 #toolbar {
+	user-select: none;
 	z-index: 2147483647;
 	left: 0;
 	top: 0;
