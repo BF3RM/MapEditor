@@ -5,7 +5,8 @@
 				<Search v-model="search"/>
 			</div>
 			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-				<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name + ' ' + node.children.length"/>
+				<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name + ' (' + node.children.length + ')'"
+									:selected="node.state.selected"/>
 			</infinite-tree-component>
 		</gl-component>
 		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
@@ -179,9 +180,6 @@ export default class HierarchyComponent extends EditorComponent {
 	.expand {
 		display: inline;
 	}
-	.selected {
-		background-color: #404040;
-	}
 	.tree-node {
 		display: flex;
 		font-family: sans-serif;
@@ -192,30 +190,6 @@ export default class HierarchyComponent extends EditorComponent {
 
 		.slot-text {
 			margin: 0.1vmin;
-		}
-	}
-	.expand-container {
-		width: 1.5vmin;
-		height: 1.5vmin;
-		color: #6d6d6d;
-
-		img {
-			max-width: 1.5vmin;
-			max-height: 1.5vmin;
-
-			&.expanded {
-				transform: rotate(90deg);
-			}
-		}
-	}
-	.td {
-
-	}
-	.slot-scope{
-		width: 100%;
-
-		&:hover {
-			background-color: #343434;
 		}
 	}
 </style>

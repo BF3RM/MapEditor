@@ -6,7 +6,7 @@
 					<Search v-model="search"/>
 				</div>
 				<infinite-tree-component class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
-					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name"/>
+					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
 			</editor-component>
 		</gl-col>
@@ -116,11 +116,16 @@ export default class ExplorerComponent extends EditorComponent {
 		}
 		this.list = this.getBlueprintsRecursive(node);
 		if (this.selected) {
+			console.log('setting selected to false');
+			console.log(this.selected);
 			this.selected.state.selected = false;
+
+			console.log('selected node id ' + this.selected.id);
 		}
 		this.selected = node;
-		this.selected.state.selected = true;
+		// this.selected.state.selected = true;
 		this.$set(node.state, 'enabled', true);
+		this.$set(node.state, 'selected', true);
 	}
 
 	private getBlueprintsRecursive(node: Node): Blueprint[] {
@@ -159,9 +164,6 @@ export default class ExplorerComponent extends EditorComponent {
 	.expand {
 		display: inline;
 	}
-	.selected {
-		background-color: #404040;
-	}
 	.tree-node {
 		display: flex;
 		font-family: sans-serif;
@@ -172,25 +174,6 @@ export default class ExplorerComponent extends EditorComponent {
 
 		.slot-text {
 			margin: 0.1vmin;
-		}
-	}
-	.expand-container {
-		width: 1.5vmin;
-		height: 1.5vmin;
-		color: #6d6d6d;
-
-		img {
-			max-width: 1.5vmin;
-			max-height: 1.5vmin;
-
-			&.expanded {
-				transform: rotate(90deg);
-			}
-		}
-	}
-	.td{
-		&:hover {
-			background-color: #343434;
 		}
 	}
 </style>

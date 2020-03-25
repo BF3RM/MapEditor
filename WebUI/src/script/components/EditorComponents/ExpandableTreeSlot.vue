@@ -1,16 +1,19 @@
-<template >
-	<div class="tree-node" :style="nodeStyle(node)" :class="node.state.selected ? 'selected' : 'unselected'" @click="SelectNode($event, node, tree)">
+<template>
+	<div class="tree-node" :style="nodeStyle(node)" :class="{ selected: selected }">
 		<div class="expand-container" @click="ToggleNode($event,node,tree)">
-			<img v-if="node.children.length > 0" :class="{ expanded: node.state.open }" :src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
+			<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
+				:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
 		</div>
-		<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
-		<span class="slot-text" v-else>
-			{{ nodeText }}
-		</span>
+		<div class="text-container" @click="SelectNode($event, node, tree)">
+			<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
+			<span class="slot-text" v-else>
+				{{ nodeText }}
+			</span>
+		</div>
 	</div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
 
@@ -28,6 +31,9 @@ export default class ExpandableTreeSlot extends Vue {
 	@Prop()
 	nodeText: String;
 
+	@Prop()
+	selected: boolean;
+
 	private nodeStyle(node: Node) {
 		if (node.state === undefined) {
 			console.error('Missing node state: ' + node);
@@ -38,6 +44,7 @@ export default class ExpandableTreeSlot extends Vue {
 	}
 
 	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		console.log('slot: node id ' + node.id);
 		tree.selectNode(node);
 	}
 
@@ -72,15 +79,22 @@ export default class ExpandableTreeSlot extends Vue {
 		img {
 			max-width: 1.5vmin;
 			max-height: 1.5vmin;
+			transition: transform 0.1s;
 
 			&.expanded {
 				transform: rotate(90deg);
 			}
 		}
 	}
+	.text-container {
+		width: 100%;
+	}
 	.td{
 		&:hover {
 			background-color: #343434;
 		}
+	}
+	.selected {
+		background-color: #404040;
 	}
 </style>
