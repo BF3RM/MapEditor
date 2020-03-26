@@ -38,6 +38,8 @@ export default class Vec3Control extends Vue {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+	.x, .y, .z {
+		margin-top: 1vmin;
+	}
 </style>

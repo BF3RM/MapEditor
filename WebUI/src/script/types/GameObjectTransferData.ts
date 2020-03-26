@@ -17,6 +17,7 @@ export class GameObjectTransferData {
 	public gameEntities: GameEntityData[];
 	public isDeleted: boolean;
 	public isEnabled: boolean;
+	public isVanilla: boolean;
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {
@@ -33,6 +34,7 @@ export class GameObjectTransferData {
 		this.gameEntities = args.gameEntities;
 		this.isDeleted = args.isDeleted;
 		this.isEnabled = args.isEnabled;
+		this.isVanilla = args.isVanilla;
 	}
 
 	public static FromTable(table: any) {

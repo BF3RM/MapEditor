@@ -60,6 +60,5 @@ export default class QuatControl extends Vue {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
 </style>

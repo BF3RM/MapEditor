@@ -1,10 +1,15 @@
 <template>
-	<gl-component>
+	<gl-component class="inspector-component">
 		<div v-if="gameObject">
 			<div class="header">
-				<label for="enabled">Enabled:</label><input type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
-				<label for="name">Name:</label><input :value="gameObject.name" @input="onNameChange" id="name">
-				<linear-transform-control :hideLabel="true" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "/>
+				<div class="enable-container">
+					<label class="enable-label" for="enabled">Enabled:</label>
+					<input class="enable-input" type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
+				</div>
+				<div>
+					<label class="name-label" for="name">Name:</label><input class="name-input" :value="gameObject.name" @input="onNameChange" id="name">
+					<linear-transform-control class="lt-control" :hideLabel="false" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "/>
+				</div>
 			</div>
 		</div>
 	</gl-component>
@@ -83,9 +88,37 @@ export default class InspectorComponent extends EditorComponent {
 	}
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 	.transformControls::v-deep input {
 		width: 100%;
 		max-width: 100%;
+	}
+	.inspector-component {
+		margin: 1vmin;
+
+		.enable-container {
+			display: flex;
+			flex-direction: row;
+			align-content: center;
+			.enable-label {
+				margin: 1vmin 0;
+				font-weight: bold;
+			}
+
+			.enable-input {
+				height: 1.5vmin;
+				margin: 1vmin 0;
+			}
+
+		}
+
+		.name-label {
+			margin: 1vmin 0;
+			font-weight: bold;
+		}
+
+		.name-input {
+			margin: 1vmin 0;
+		}
 	}
 </style>

@@ -97,6 +97,7 @@ export default class ExpandableTreeSlot extends Vue {
 		}
 		&.selected {
 			background-color: #404040;
+			color: #409EFF;
 		}
 
 		.slot-text {

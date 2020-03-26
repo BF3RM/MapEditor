@@ -50,8 +50,6 @@ export default class Editor {
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
 	public test: number = 0;
 
-	// public selectedGameObjects: GameObject[] = [];
-
 	constructor(debug: boolean = false) {
 		this.debug = debug;
 		this.ui = new EditorUI(debug);
@@ -403,8 +401,7 @@ export default class Editor {
 				this.missingParent.remove(gameObjectGuid);
 			}
 		}
-		// TODO Fool: select it if its not vanilla
-		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
+		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
 			// Make selection happen after all signals have been handled
 			setTimeout(() => {
 				scope.Select(gameObjectGuid, false);

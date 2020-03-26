@@ -2,10 +2,11 @@
 	<div
 			class="vue-draggable-number-container"
 			:class="inputName"
-			@mousedown="dragStart">
+			>
 		<label
 				:for="inputName"
 				:style="{ cursor: cursorDirection }"
+				@mousedown="dragStart"
 				v-if="!hideLabel">
 			{{ label }}
 		</label>
@@ -110,5 +111,18 @@ export default class DraggableNumberInput extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	.vue-draggable-number-container {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		label {
+			margin: 0 1vmin;
+		}
+		input {
+			margin: 0 1vmin;
+			border-radius: 0.5vmin;
+			padding-left: 0.5vmin;
+		}
+	}
 </style>

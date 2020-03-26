@@ -25,6 +25,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public blueprintCtrRef: CtrRef;
 	public variation: number;
 	public gameEntitiesData: GameEntityData[];
+	public isVanilla: boolean;
 
 	public selected: boolean;
 	public highlighted: boolean;
@@ -33,7 +34,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
-		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = []) {
+		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false) {
 		super();
 
 		this.guid = guid;
@@ -45,6 +46,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.variation = variation;
 		this.children = [];
 		this.gameEntitiesData = gameEntities;
+		this.isVanilla = isVanilla;
 
 		this.selected = false;
 		this.matrixAutoUpdate = true;
@@ -66,7 +68,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.parentData,
 			gameObjectTransferData.blueprintCtrRef,
 			gameObjectTransferData.variation,
-			gameObjectTransferData.gameEntities
+			gameObjectTransferData.gameEntities,
+			gameObjectTransferData.isVanilla
 		);
 	}
 

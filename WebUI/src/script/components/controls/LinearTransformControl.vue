@@ -1,12 +1,12 @@
 <template>
 	<div class="transformControls">
-		<div class="Pos">
-			<Vec3Control :hideLabel="hideLabel" v-model="value.position" label="Pos" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<div class="pos-control">
+			<Vec3Control :hideLabel="hideLabel" v-model="value.position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
-		<div class="Rot">
-			<QuatControl :hideLabel="hideLabel" v-model="value.rotation" label="Rot" :step=0.14 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+		<div class="rot-control">
+			<QuatControl :hideLabel="hideLabel" v-model="value.rotation" label="Rotation" :step=0.14 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
 		</div>
-		<div class="Scale">
+		<div class="scale-control">
 			<Vec3Control :hideLabel="hideLabel" v-model="value.scale" label="Scale" :min=0.01 :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 	</div>
@@ -52,7 +52,6 @@ export default class InspectorComponent extends Vue {
 	.transformControls::v-deep b{
 		grid-row: 1;
 		font-weight: bold;
-		opacity: 0.5;
 	}
 	.transformControls::v-deep .x{
 		grid-column: 1;
@@ -72,5 +71,9 @@ export default class InspectorComponent extends Vue {
 	}
 	.transformControls::v-deep input {
 		border: 0;
+	}
+
+	.pos-control, .rot-control, .scale-control {
+		margin: 0.5vmin 0;
 	}
 </style>

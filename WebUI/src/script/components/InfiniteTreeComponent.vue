@@ -8,6 +8,7 @@
 	>
 		<div slot-scope="{ item,index }">
 			<slot
+				class="text-slot"
 				v-bind="{
 					node: item,
 					tree: tree,
@@ -131,7 +132,10 @@ export default class InfiniteTreeComponent extends Vue {
 		});
 		this.openParentNodes(node);
 		// TODO: dont scroll if the item is in view (item.active) fuck if i know how to access the item tho.
+
+		// setTimeout(() => {
 		this.scroller.scrollToItem(nodeIndex);
+		// }, 1000);
 	}
 
 	private openParentNodes(node: Node) {
@@ -200,32 +204,6 @@ export default class InfiniteTreeComponent extends Vue {
 		});
 	}
 }
-/*
-export default {
-	name: 'InfiniteTreeComponent',
-	components: {
-		RecycleScroller
-	},
-	props: {
-	},
-
-	,
-	inheritAttrs: false,
-	,
-	computed: {
-
-	},
-	methods: {
-
-	},
-	watch: {
-
-		search: {
-
-		}
-	}
-};
-*/
 </script>
 <style scoped>
 	.scroll-box {
