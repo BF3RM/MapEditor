@@ -126,7 +126,7 @@ export default class InfiniteTreeComponent extends Vue {
 
 	public scrollTo(node: Node) {
 		const nodeIndex = (this.filteredNodes).findIndex((i) => {
-			console.log(i.id === node.id);
+			// console.log(i.id === node.id);
 			return i.id === node.id;
 		});
 		this.openParentNodes(node);

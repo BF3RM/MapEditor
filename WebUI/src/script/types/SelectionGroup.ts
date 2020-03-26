@@ -1,15 +1,14 @@
 import { GameObject } from '@/script/types/GameObject';
-import { Guid } from '@/script/types/Guid';
 import * as THREE from 'three';
 import { signals } from '@/script/modules/Signals';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
-export class SelectionGroup extends GameObject {
+export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
+	private transform: LinearTransform = new LinearTransform();
 
 	constructor() {
 		super();
-		this.guid = Guid.create();
 		this.type = 'SelectionGroup';
 		this.name = 'Selection Group';
 		this.visible = true;
@@ -45,18 +44,23 @@ export class SelectionGroup extends GameObject {
 			// If there is no parent, the local matrix is the world matrix
 			if (go.parent == null) {
 				console.warn('Found GameObject without parent, this should never happen. Guid: ' + go.guid.toString());
-				go.matrix = childWorldNew;
+				go.matrix = childWorldNew.clone();
 			// If it has a parent, calculate the local matrix relative to it
 			} else {
 				parentWorldInverse.getInverse(go.parent.matrixWorld, false);
 				go.matrix.multiplyMatrices(childWorldNew, parentWorldInverse);
 			}
 			go.matrixAutoUpdate = false;
-
 			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
-		// Update the saved transform to the new matrix.
+		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
+	}
+
+	private setMatrix(matrix: THREE.Matrix4) {
+		this.transform = new LinearTransform().setFromMatrix(matrix);
+		matrix.decompose(this.position, this.quaternion, this.scale);
+		this.updateMatrix();
 	}
 
 	public select(gameObject: GameObject, multiSelection: boolean) {
@@ -64,9 +68,17 @@ export class SelectionGroup extends GameObject {
 			return;
 		}
 
+		if (!multiSelection) {
+			// Deselect all selected GameObjects.
+			for (const go of this.selectedGameObjects) {
+				(go as GameObject).onDeselect();
+			}
+			this.selectedGameObjects = [];
+		}
+
 		// If first object move group to its position
-		if (this.selectedGameObjects.length === 0 || !multiSelection) {
-			this.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
+		if (this.selectedGameObjects.length === 0) {
+			this.setMatrix(gameObject.matrixWorld);
 		}
 
 		if (multiSelection) {
@@ -75,17 +87,10 @@ export class SelectionGroup extends GameObject {
 				this.deselect(gameObject);
 				return;
 			}
-		} else {
-			// Deselect all selected GameObjects.
-			for (const go of this.selectedGameObjects) {
-				(go as GameObject).onDeselect();
-			}
-			this.selectedGameObjects = [];
 		}
 
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
-		console.log('select');
 	}
 
 	/**

@@ -157,7 +157,7 @@ export default class Editor {
 	}
 
 	public Focus(guid: Guid) {
-		let target: GameObject | undefined;
+		let target: GameObject | SelectionGroup | undefined;
 		if (guid) {
 			target = this.getGameObjectByGuid(guid);
 		} else {
@@ -403,12 +403,13 @@ export default class Editor {
 				this.missingParent.remove(gameObjectGuid);
 			}
 		}
-		// if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
-		// 	// Make selection happen after all signals have been handled
-		// 	setTimeout(() => {
-		// 		scope.Select(gameObjectGuid, false);
-		// 	}, 2);
-		// }
+		// TODO Fool: select it if its not vanilla
+		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
+			// Make selection happen after all signals have been handled
+			setTimeout(() => {
+				scope.Select(gameObjectGuid, false);
+			}, 2);
+		}
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {
