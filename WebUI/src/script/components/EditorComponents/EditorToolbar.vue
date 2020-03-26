@@ -16,7 +16,7 @@ import { RecycleScroller } from "vue-virtual-scroller";
 			<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
 				<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
 			</el-radio-group>
-			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace">
+			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChanged">
 				<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
 			</el-radio-group>
 		</div>
@@ -211,12 +211,21 @@ export default class EditorToolbar extends Vue {
 		}
 	}
 
-	private onWorldSpaceChanged(mode: WORLD_SPACE) {
+	private onWorldSpaceChange(mode: WORLD_SPACE) {
+		console.log('world space changed');
 		this.worldSpace = mode;
 	}
 
 	private onGizmoModeChanged(mode: GIZMO_MODE) {
 		this.tool = mode;
+	}
+
+	private onWorldSpaceChanged(mode: string) {
+		if (this.worldSpaces.indexOf(mode) !== -1) {
+			(window).editor.threeManager.setWorldSpace(mode.toLowerCase() as WORLD_SPACE);
+		} else {
+			console.error('Attempted to select a world space that does not exist: ' + mode);
+		}
 	}
 
 	private onToolChange(newTool: string) {
