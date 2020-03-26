@@ -9,12 +9,6 @@ export class SelectionGroup extends GameObject {
 
 	constructor() {
 		super();
-
-		const geometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-		const cube = new THREE.Mesh(geometry, material);
-		this.add(cube); // Temporary, just to see where the selection group centre is
-
 		this.guid = Guid.create();
 		this.type = 'SelectionGroup';
 		this.name = 'Selection Group';

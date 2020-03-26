@@ -48,6 +48,7 @@ export default class Editor {
 
 	public selectionGroup: SelectionGroup;
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
+	public test: number = 0;
 
 	// public selectedGameObjects: GameObject[] = [];
 
@@ -374,6 +375,7 @@ export default class Editor {
 
 		// Allows children to be spawned before parents, and then added to the appropriate parent.
 		if (!scope.gameContext.levelData.containsKey(parentGuid)) {
+			// Parent doesnt exists yet
 			if (!this.gameObjects.containsKey(parentGuid)) {
 				let parent = this.missingParent.getValue(parentGuid);
 				if (parent === undefined) {
@@ -384,8 +386,9 @@ export default class Editor {
 					parent.push(gameObject);
 				}
 			} else {
-				if (!this.gameObjects.getValue(parentGuid) === undefined) {
-					const parent = this.gameObjects.getValue(parentGuid) as GameObject;
+				// Parent already exists
+				const parent = this.gameObjects.getValue(parentGuid);
+				if (parent !== undefined) {
 					parent.attach(gameObject);
 				}
 			}
@@ -393,20 +396,19 @@ export default class Editor {
 			if (this.missingParent.containsKey(gameObjectGuid)) {
 				const missingParent = this.missingParent.getValue(gameObjectGuid);
 				if (missingParent !== undefined) {
-					missingParent.every((child) => {
+					missingParent.forEach((child) => {
 						gameObject.attach(child);
 					});
 				}
-
 				this.missingParent.remove(gameObjectGuid);
 			}
 		}
-		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
-			// Make selection happen after all signals have been handled
-			setTimeout(() => {
-				scope.Select(gameObjectGuid, false);
-			}, 2);
-		}
+		// if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName()) {
+		// 	// Make selection happen after all signals have been handled
+		// 	setTimeout(() => {
+		// 		scope.Select(gameObjectGuid, false);
+		// 	}, 2);
+		// }
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {

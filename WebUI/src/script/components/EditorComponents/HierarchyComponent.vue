@@ -83,7 +83,6 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	onDestroyedBlueprint(commandActionResult: CommandActionResult) {
-		console.log();
 		const node = this.tree.getNodeById(commandActionResult.gameObjectTransferData.guid.toString());
 		this.tree.removeNode(node, {});
 	}
@@ -179,17 +178,5 @@ export default class HierarchyComponent extends EditorComponent {
 <style lang="scss" scoped>
 	.expand {
 		display: inline;
-	}
-	.tree-node {
-		display: flex;
-		font-family: sans-serif;
-		user-select: none;
-		&:hover {
-			background-color: #343434;
-		}
-
-		.slot-text {
-			margin: 0.1vmin;
-		}
 	}
 </style>

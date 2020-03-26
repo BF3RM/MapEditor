@@ -12,6 +12,11 @@ import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 
+/**
+ * GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
+ * their GameEntities to visible = false. GameObjects should always be visible as we want to render their children even
+ * when the parent is hidden. Renderer ignores an object if its visible flag is false, so it would ignore their children.
+ * */
 export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
 	public typeName: string;
@@ -43,7 +48,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 		this.selected = false;
 		this.matrixAutoUpdate = true;
-		this.visible = false;
+		this.visible = true;
 		this._enabled = true;
 		this.highlighted = false;
 
@@ -152,6 +157,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		new LinearTransform().setFromMatrix(this.matrixWorld);
 	}
 
+	// TODO: Reimplement
 	public Enable() {
 		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
@@ -165,6 +171,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
+	// TODO: Reimplement
 	public Disable() {
 		for (const child of this.children) {
 			if (child.constructor.name === 'GameObject') {
@@ -187,25 +194,22 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	onSelect() {
-		this.visible = true;
 		this.selected = true;
+		this.children.forEach(go => (go as GameObject).onSelect());
 		this.children.forEach(go => (go as GameObject).onSelect());
 	}
 
 	onDeselect() {
-		this.visible = false;
 		this.selected = false;
 		this.children.forEach(go => (go as GameObject).onDeselect());
 	}
 
 	onHighlight() {
-		this.visible = true;
 		this.highlighted = true;
 		this.children.forEach(go => (go as GameObject).onHighlight());
 	}
 
 	onUnhighlight() {
-		this.visible = false;
 		this.highlighted = false;
 		this.children.forEach(go => (go as GameObject).onUnhighlight());
 	}

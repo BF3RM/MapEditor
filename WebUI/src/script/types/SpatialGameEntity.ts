@@ -53,6 +53,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		this.transform = transform;
 		this.matrixAutoUpdate = false;
 
+		this.visible = false;
 		this.box = new THREE.Box3(
 			aabb.min,
 			aabb.max);
@@ -148,14 +149,20 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 	public onHighlight() {
 		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
+		this.visible = true;
 	}
 
-	public onUnhighlight() {}
+	public onUnhighlight() {
+		this.visible = false;
+	}
 
-	public onDeselect() {}
+	public onDeselect() {
+		this.visible = false;
+	}
 
 	public onSelect() {
 		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
+		this.visible = true;
 	}
 
 	public SetColor(color: number) {

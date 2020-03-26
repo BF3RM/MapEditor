@@ -44,7 +44,6 @@ export default class ExpandableTreeSlot extends Vue {
 	}
 
 	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
-		console.log('slot: node id ' + node.id);
 		tree.selectNode(node);
 	}
 
@@ -89,12 +88,20 @@ export default class ExpandableTreeSlot extends Vue {
 	.text-container {
 		width: 100%;
 	}
-	.td{
+	.tree-node {
+		display: flex;
+		font-family: sans-serif;
+		user-select: none;
 		&:hover {
 			background-color: #343434;
 		}
+		&.selected {
+			background-color: #404040;
+		}
+
+		.slot-text {
+			margin: 0.1vmin;
+		}
 	}
-	.selected {
-		background-color: #404040;
-	}
+
 </style>

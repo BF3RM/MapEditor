@@ -116,11 +116,7 @@ export default class ExplorerComponent extends EditorComponent {
 		}
 		this.list = this.getBlueprintsRecursive(node);
 		if (this.selected) {
-			console.log('setting selected to false');
-			console.log(this.selected);
 			this.selected.state.selected = false;
-
-			console.log('selected node id ' + this.selected.id);
 		}
 		this.selected = node;
 		// this.selected.state.selected = true;
@@ -164,16 +160,5 @@ export default class ExplorerComponent extends EditorComponent {
 	.expand {
 		display: inline;
 	}
-	.tree-node {
-		display: flex;
-		font-family: sans-serif;
-		user-select: none;
-		&:hover {
-			background-color: #343434;
-		}
 
-		.slot-text {
-			margin: 0.1vmin;
-		}
-	}
 </style>

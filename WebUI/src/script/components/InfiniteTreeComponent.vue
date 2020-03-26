@@ -129,7 +129,17 @@ export default class InfiniteTreeComponent extends Vue {
 			console.log(i.id === node.id);
 			return i.id === node.id;
 		});
+		this.openParentNodes(node);
+		// TODO: dont scroll if the item is in view (item.active) fuck if i know how to access the item tho.
 		this.scroller.scrollToItem(nodeIndex);
+	}
+
+	private openParentNodes(node: Node) {
+		const parent = node.getParent();
+		if (parent && parent.id != null && parent.id.length !== 0) {
+			this.openParentNodes(parent);
+			this.tree.openNode(parent);
+		}
 	}
 
 	private get filteredNodes() {
