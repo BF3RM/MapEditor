@@ -4,7 +4,7 @@ import { Guid } from '@/script/types/Guid';
 import Command from './libs/three/Command';
 import SpawnBlueprintCommand from './commands/SpawnBlueprintCommand';
 import BulkCommand from './commands/BulkCommand';
-import DestroyBlueprintCommand from './commands/DestroyBlueprintCommand';
+import DeleteBlueprintCommand from './commands/DeleteBlueprintCommand';
 import History from './libs/three/History';
 import GameContext from './modules/GameContext';
 import VEXTInterface from './modules/VEXT';
@@ -63,7 +63,7 @@ export default class Editor {
 		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
 		signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
 
-		signals.destroyedBlueprint.connect(this.onDestroyedBlueprint.bind(this));
+		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
 		signals.setObjectName.connect(this.onSetObjectName.bind(this));
 		signals.setTransform.connect(this.onSetTransform.bind(this));
 		signals.setVariation.connect(this.onSetVariation.bind(this));
@@ -267,7 +267,7 @@ export default class Editor {
 		const commands: Command[] = [];
 		this.selectionGroup.selectedGameObjects.forEach((selectedGameObject) => {
 			if (selectedGameObject) {
-				commands.push(new DestroyBlueprintCommand(selectedGameObject.getGameObjectTransferData()));
+				commands.push(new DeleteBlueprintCommand(selectedGameObject.getGameObjectTransferData()));
 			}
 		});
 
@@ -331,7 +331,7 @@ export default class Editor {
 		}
 	}
 
-	public onDestroyedBlueprint(commandActionResult: CommandActionResult) {
+	public onDeletedBlueprint(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const gameObject = this.gameObjects.getValue(gameObjectGuid);

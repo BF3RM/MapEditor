@@ -85,7 +85,7 @@ function CommandActions:DeleteBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "DeletedBlueprint", -- TODO: powback rename DestroyBlueprint -> DeletedBlueprint / DestroyedBlueprint -> DeletedBlueprint
+		type = "DeletedBlueprint", -- TODO: powback rename DestroyBlueprint -> DeletedBlueprint / DeletedBlueprint -> DeletedBlueprint
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 

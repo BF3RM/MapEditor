@@ -16,6 +16,6 @@ export default class SpawnBlueprintCommand extends Command {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid
 		});
-		editor.vext.SendCommand(new VextCommand('DestroyBlueprintCommand', gameObjectTransferData));
+		editor.vext.SendCommand(new VextCommand('DeleteBlueprintCommand', gameObjectTransferData));
 	}
 }

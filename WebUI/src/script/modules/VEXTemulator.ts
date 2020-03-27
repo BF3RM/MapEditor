@@ -6,7 +6,7 @@ export class VEXTemulator {
 	constructor() {
 		this.commands = {};
 		this.commands.SpawnBlueprintCommand = this.SpawnBlueprint;
-		this.commands.DestroyBlueprintCommand = this.DestroyBlueprint;
+		this.commands.DeleteBlueprintCommand = this.DestroyBlueprint;
 		this.commands.CreateGroupCommand = this.CreateGroup;
 		this.commands.DestroyGroupCommand = this.DestroyGroup;
 		this.commands.SetObjectNameCommand = this.SetObjectName;
@@ -154,7 +154,7 @@ export class VEXTemulator {
 	private DestroyBlueprint(commandActionResult: CommandActionResult) {
 		// Delete all children of blueprint
 		const response = {
-			type: 'DestroyedBlueprint',
+			type: 'DeletedBlueprint',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid
 			}

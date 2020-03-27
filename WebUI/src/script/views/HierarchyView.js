@@ -3,7 +3,7 @@ import { signals } from '@/script/modules/Signals';
 export class HierarchyView {
 	constructor() {
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
-		signals.destroyedBlueprint.connect(this.onDestroyedBlueprint.bind(this));
+		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselected.bind(this));
 		signals.setObjectName.connect(this.onSetObjectName.bind(this));
@@ -90,7 +90,7 @@ export class HierarchyView {
 		return this.entries[guid];
 	}
 
-	onDestroyedBlueprint(commandActionResult) {
+	onDeletedBlueprint(commandActionResult) {
 		let scope = this;
 
 		// TODO: remove parent's reference in parent.children once groups are implemented

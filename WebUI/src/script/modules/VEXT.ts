@@ -26,7 +26,7 @@ export default class VEXTInterface {
 		this.commands = {
 			SpawnedBlueprint: signals.spawnedBlueprint.emit,
 			BlueprintSpawnInvoked: signals.blueprintSpawnInvoked.emit,
-			DestroyedBlueprint: signals.destroyedBlueprint.emit,
+			DeletedBlueprint: signals.deletedBlueprint.emit,
 			CreatedGroup: signals.createdGroup.emit,
 			SetObjectName: signals.setObjectName.emit,
 			SetTransform: signals.setTransform.emit,
