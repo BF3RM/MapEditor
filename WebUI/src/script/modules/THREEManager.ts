@@ -311,7 +311,7 @@ export class THREEManager {
 		const guid = await this.raycastSelection(mousePos) as Guid;
 
 		if (guid !== null) {
-			editor.Select(guid, multiSelection);
+			editor.Select(guid, multiSelection, true);
 		}
 	}
 
@@ -354,7 +354,6 @@ export class THREEManager {
 							if (!parent.selected && parent.constructor.name === 'GameObject' &&
 								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint')) {
 								resolve(parent.guid);
-								// console.log(parent.typeName);
 							}
 						}
 						// Else we select the GameObject.

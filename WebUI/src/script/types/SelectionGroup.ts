@@ -57,11 +57,10 @@ export class SelectionGroup extends THREE.Object3D {
 				go.matrix.multiplyMatrices(childWorldNew, parentWorldInverse);
 			}
 			go.matrixAutoUpdate = false;
-			signals.objectChanged.emit(go, 'transform', go.transform);
+			// signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
-		// this.setMatrix(selectionGroupWorldNew);
 	}
 
 	private onObjectChanged(gameObject: GameObject) {
@@ -69,7 +68,7 @@ export class SelectionGroup extends THREE.Object3D {
 			return;
 		}
 		if (gameObject.guid === this.selectedGameObjects[0].guid) {
-			// this.setMatrix(gameObject.matrixWorld);
+			this.setMatrix(gameObject.matrixWorld);
 		}
 	}
 
@@ -80,7 +79,7 @@ export class SelectionGroup extends THREE.Object3D {
 		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
 	}
 
-	public select(gameObject: GameObject, multiSelection: boolean) {
+	public select(gameObject: GameObject, multiSelection: boolean, moveGizmo: boolean) {
 		if (gameObject === null || gameObject === undefined) {
 			return;
 		}
@@ -94,7 +93,7 @@ export class SelectionGroup extends THREE.Object3D {
 		}
 
 		// If first object move group to its position
-		if (this.selectedGameObjects.length === 0) {
+		if (this.selectedGameObjects.length === 0 || moveGizmo) {
 			this.setMatrix(gameObject.matrixWorld);
 		}
 

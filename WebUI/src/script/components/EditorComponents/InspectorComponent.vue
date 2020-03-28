@@ -4,7 +4,7 @@
 			<div class="header">
 				<div class="enable-container">
 					<label class="enable-label" for="enabled">Enabled:</label>
-					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enabled" v-model="test" @change="onEnableChange">
+					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 				</div>
 				<div>
 					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
@@ -32,10 +32,10 @@ export default class InspectorComponent extends EditorComponent {
 	private group: SelectionGroup | null = null;
 	private transform: LinearTransform = new LinearTransform();
 	private dragging = false;
-	private test = false;
+	private enabled = true;
 
-	@Ref('enabled')
-	enabled!: HTMLInputElement;
+	@Ref('enableInput')
+	enableInput!: HTMLInputElement;
 
 	constructor() {
 		super();
@@ -106,28 +106,16 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
-	// private onObjectChanged(group: GameObject) {
-	// 	if (this.group !== null && group === this.group && !this.dragging) {
-	// 		this.transform = new LinearTransform().setFromMatrix(group.matrix);
-	// 	}
-	// }
-
-	// private onSelectedGameObject(guid: Guid) {
-	// 	const go = window.editor.getGameObjectByGuid(guid);
-	// 	if (go) {
-	// 		this.group = go;
-	// 		this.transform = go.transform;
-	// 	}
-	// }
-
-	// TODO Fool
-	private onEnableChange(e: Event) {
-		// this.enabled.checked = this.group!.enabled;
+	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
+		// this.enableInput.checked = this.group.enabled;
 	}
 
 	private onNameChange(e: InputEvent) {
+		if (!this.group || this.isEmpty) {
+			return;
+		}
 		if ((e.target as any).value) {
-			// window.editor.execute(new SetObjectNameCommand(this.group!.getGameObjectTransferData(), (e.target as any).value));
+			window.editor.execute(new SetObjectNameCommand(this.group.selectedGameObjects[0].getGameObjectTransferData(), (e.target as any).value));
 		}
 	}
 }

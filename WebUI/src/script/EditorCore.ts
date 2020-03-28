@@ -216,7 +216,7 @@ export class EditorCore {
 		this.previewBlueprint = null;
 	}
 
-	public select(guid: Guid, multiSelection: boolean) {
+	public select(guid: Guid, multiSelection: boolean, moveGizmo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 		if (this.highlightedObjectGuid === guid) {
 			this.unhighlight();
@@ -227,14 +227,7 @@ export class EditorCore {
 			return false;
 		}
 
-		editor.selectionGroup.select(gameObject, multiSelection);
-		// for (const go of editor.selectedGameObjects.values()) {
-		// 	go.onDeselect();
-		// }
-		// editor.selectedGameObjects = [];
-		// editor.selectedGameObjects.push(gameObject);
-
-		// gameObject.onSelect();
+		editor.selectionGroup.select(gameObject, multiSelection, moveGizmo);
 		editor.threeManager.setGizmoMode(GIZMO_MODE.translate); // should it?
 		return editor.editorCore.onSelectGameObject(gameObject);
 	}

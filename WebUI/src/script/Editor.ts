@@ -297,8 +297,8 @@ export default class Editor {
 		Commands
 
 	*/
-	public Select(guid: Guid, multiSelection: boolean) {
-		this.editorCore.select(guid, multiSelection);
+	public Select(guid: Guid, multiSelection: boolean, moveGizmo: boolean = false) {
+		this.editorCore.select(guid, multiSelection, moveGizmo);
 	}
 
 	public Deselect(guid: Guid) {
