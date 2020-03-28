@@ -70,28 +70,32 @@ export default class ExpandableTreeSlot extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-	.expand-container {
-		width: 1.5vmin;
-		height: 1.5vmin;
-		color: #6d6d6d;
-
-		img {
-			max-width: 1.5vmin;
-			max-height: 1.5vmin;
-			transition: transform 0.1s;
-
-			&.expanded {
-				transform: rotate(90deg);
-			}
-		}
-	}
-	.text-container {
-		width: 100%;
-	}
 	.tree-node {
 		display: flex;
 		font-family: sans-serif;
+		/*font-size: 1.3vmin;*/
 		user-select: none;
+		align-content: center;
+		height: 1.5vmin;
+		white-space: nowrap;
+		.text-container {
+			width: 100%;
+		}
+		.expand-container {
+			width: 1.5vmin;
+			height: 100%;
+			color: #6d6d6d;
+
+			img {
+				max-width: 1.5vmin;
+				max-height: 100%;
+				transition: transform 0.1s;
+
+				&.expanded {
+					transform: rotate(90deg);
+				}
+			}
+		}
 		&:hover {
 			background-color: #343434;
 		}
@@ -101,8 +105,7 @@ export default class ExpandableTreeSlot extends Vue {
 		}
 
 		.slot-text {
-			margin: 0.1vmin;
+			margin: 0.4vmin;
 		}
 	}
-
 </style>

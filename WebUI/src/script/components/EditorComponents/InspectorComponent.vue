@@ -1,13 +1,13 @@
 <template>
 	<gl-component class="inspector-component">
-		<div v-if="gameObject">
+		<div v-if="!isEmpty">
 			<div class="header">
 				<div class="enable-container">
 					<label class="enable-label" for="enabled">Enabled:</label>
-					<input class="enable-input" type="checkbox" id="enabled" ref="enabled" v-model="gameObject.enabled" @change="onEnableChange">
+					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enabled" v-model="test" @change="onEnableChange">
 				</div>
 				<div>
-					<label class="name-label" for="name">Name:</label><input class="name-input" :value="gameObject.name" @input="onNameChange" id="name">
+					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 					<linear-transform-control class="lt-control" :hideLabel="false" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "/>
 				</div>
 			</div>
@@ -18,36 +18,67 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Ref } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
-import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
 import { GameObject } from '@/script/types/GameObject';
-import { Guid } from '@/script/types/Guid';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
-import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { LOGLEVEL } from '@/script/modules/Logger';
+import { SelectionGroup } from '@/script/types/SelectionGroup';
 
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
-	private gameObject: GameObject | null = null;
+	private group: SelectionGroup | null = null;
 	private transform: LinearTransform = new LinearTransform();
 	private dragging = false;
+	private test = false;
 
 	@Ref('enabled')
 	enabled!: HTMLInputElement;
 
 	constructor() {
 		super();
-		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
-		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+		signals.selectionGroupChanged.connect(this.onSelectionGroupChanged.bind(this));
 	}
 
-	private onInput(e: LinearTransform) {
-		if (this.gameObject !== null) {
-			this.gameObject.setTransform(e);
+	private onInput(linearTransform: LinearTransform) {
+		console.log('oninput');
+		if (this.group !== null) {
+			// Move selection group to the new position.
+			const matrix = linearTransform.toMatrix();
+			matrix.decompose(this.group.position, this.group.quaternion, this.group.scale);
+			this.group.updateMatrix();
+			// Update inspector transform.
+			this.transform = linearTransform;
+			// Update children.
+			this.group.updateSelectedGameObjects();
 			window.editor.threeManager.setPendingRender();
+		}
+	}
+
+	get isEmpty() {
+		if (this.group) {
+			return (this.group.selectedGameObjects.length === 0);
+		}
+		return true;
+	}
+
+	get multiSelection() {
+		if (this.group) {
+			return (this.group.selectedGameObjects.length > 1);
+		}
+		return false;
+	}
+
+	get displayName() {
+		if (!this.group || this.isEmpty) {
+			return '';
+		}
+		if (this.multiSelection) {
+			return 'Multiselection';
+		} else {
+			return this.group.selectedGameObjects[0].name;
 		}
 	}
 
@@ -57,33 +88,46 @@ export default class InspectorComponent extends EditorComponent {
 
 	onEndDrag() {
 		console.log('Drag end');
-		if (this.gameObject) {
-			this.gameObject.onMoveEnd(true);
+		if (this.group) {
+			this.group.selectedGameObjects.forEach((go: GameObject) => {
+				go.onMoveEnd(true);
+			});
 			this.dragging = false;
 		}
 	}
 
-	private onObjectChanged(gameObject: GameObject) {
-		if (this.gameObject !== null && gameObject === this.gameObject && !this.dragging) {
-			this.transform = new LinearTransform().setFromMatrix(gameObject.matrix);
+	private onSelectionGroupChanged(group: SelectionGroup) {
+		if (!this.group) {
+			this.group = group;
+		}
+		if (!this.dragging) {
+			// Update inspector transform.
+			this.transform = this.group.transform;
 		}
 	}
 
-	private onSelectedGameObject(guid: Guid) {
-		const go = window.editor.getGameObjectByGuid(guid);
-		if (go) {
-			this.gameObject = go;
-			this.transform = go.transform;
-		}
-	}
+	// private onObjectChanged(group: GameObject) {
+	// 	if (this.group !== null && group === this.group && !this.dragging) {
+	// 		this.transform = new LinearTransform().setFromMatrix(group.matrix);
+	// 	}
+	// }
 
+	// private onSelectedGameObject(guid: Guid) {
+	// 	const go = window.editor.getGameObjectByGuid(guid);
+	// 	if (go) {
+	// 		this.group = go;
+	// 		this.transform = go.transform;
+	// 	}
+	// }
+
+	// TODO Fool
 	private onEnableChange(e: Event) {
-		this.enabled.checked = this.gameObject!.enabled;
+		// this.enabled.checked = this.group!.enabled;
 	}
 
 	private onNameChange(e: InputEvent) {
 		if ((e.target as any).value) {
-			window.editor.execute(new SetObjectNameCommand(this.gameObject!.getGameObjectTransferData(), (e.target as any).value));
+			// window.editor.execute(new SetObjectNameCommand(this.group!.getGameObjectTransferData(), (e.target as any).value));
 		}
 	}
 }
@@ -94,8 +138,7 @@ export default class InspectorComponent extends EditorComponent {
 		max-width: 100%;
 	}
 	.inspector-component {
-		margin: 1vmin;
-
+		padding: 1vmin;
 		.enable-container {
 			display: flex;
 			flex-direction: row;
@@ -119,6 +162,8 @@ export default class InspectorComponent extends EditorComponent {
 
 		.name-input {
 			margin: 1vmin 0;
+			border-radius: 0.5vmin;
+			padding-left: 0.5vmin;
 		}
 	}
 </style>

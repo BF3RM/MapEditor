@@ -344,11 +344,21 @@ export class THREEManager {
 					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 						continue;
 					}
-					// TODO: More raycast logic. Select prefab, then select child if prefab is already selected?
 					if (element.object.parent.constructor.name === 'GameObject') {
-						const parent = element.object.parent as GameObject;
-						// console.log('first hit is: ' + parent.guid);
-						resolve(parent.guid);
+						const gameObject = element.object.parent as GameObject;
+
+						// Select its parent if possible.
+						if (gameObject.parent != null) {
+							const parent = gameObject.parent as GameObject;
+
+							if (!parent.selected && parent.constructor.name === 'GameObject' &&
+								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint')) {
+								resolve(parent.guid);
+								// console.log(parent.typeName);
+							}
+						}
+						// Else we select the GameObject.
+						resolve(gameObject.guid);
 					}
 				}
 			} else {

@@ -21,7 +21,7 @@ export default class GizmoWrapper extends TransformControls {
 
 	public onControlChanged() {
 		// moving
-		editor.selectionGroup.updateSelectedGameObjects();
+		editor.selectionGroup.onMove();
 		editor.editorCore.RequestUpdate();
 	}
 

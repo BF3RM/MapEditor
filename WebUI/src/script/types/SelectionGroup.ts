@@ -5,13 +5,19 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
-	private transform: LinearTransform = new LinearTransform();
+	public transform: LinearTransform = new LinearTransform();
 
 	constructor() {
 		super();
 		this.type = 'SelectionGroup';
 		this.name = 'Selection Group';
 		this.visible = true;
+		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+	}
+
+	public onMove() {
+		this.updateSelectedGameObjects();
+		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
 	}
 
 	/**
@@ -55,12 +61,23 @@ export class SelectionGroup extends THREE.Object3D {
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
+		// this.setMatrix(selectionGroupWorldNew);
 	}
 
-	private setMatrix(matrix: THREE.Matrix4) {
+	private onObjectChanged(gameObject: GameObject) {
+		if (this.selectedGameObjects.length === 0 || gameObject == null) {
+			return;
+		}
+		if (gameObject.guid === this.selectedGameObjects[0].guid) {
+			// this.setMatrix(gameObject.matrixWorld);
+		}
+	}
+
+	public setMatrix(matrix: THREE.Matrix4) {
 		this.transform = new LinearTransform().setFromMatrix(matrix);
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
+		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
 	}
 
 	public select(gameObject: GameObject, multiSelection: boolean) {

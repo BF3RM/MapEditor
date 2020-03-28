@@ -35,10 +35,10 @@ export const signals = {
 	createdGroup: new Signal(),
 	deletedGroup: new Signal(),
 
-	selectionGroupMoved: new Signal(),
-
 	selectedGameObject: new Signal<(guid: Guid) => void>(),
 	deselectedGameObject: new Signal(),
+
+	selectionGroupChanged: new Signal(),
 
 	setTransform: new Signal(),
 	folderSelected: new Signal(),
