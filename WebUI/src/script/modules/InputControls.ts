@@ -15,9 +15,13 @@ export enum KEYCODE {
 	P = 80,
 	Q = 81,
 	W = 87,
+	D = 68,
 	E = 69,
 	R = 82,
 	F = 70,
+	Z = 90,
+	C = 67,
+	V = 86,
 	CTRL = 17,
 	LEFT_ALT = 18,
 	X = 88,
@@ -89,14 +93,6 @@ export class InputControls {
 	}
 
 	onKeyDown(event: KeyboardEvent) {
-		// if (keysdown[e.which]) {
-		// 	return;
-		// }
-		// if($(document.activeElement)[0].tagName == "INPUT") {
-		// 	return;
-		// }
-		// keysdown[e.which] = true;
-
 		// Enable camera rotation
 		if (event.which === KEYCODE.LEFT_ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
@@ -116,36 +112,29 @@ export class InputControls {
 		if (event.which === KEYCODE.F) {
 			editor.threeManager.focus();
 		}
-		// if(event.which == 71) { // G
-		//
-		// }
-		// if(event.which == 112) { // F1
-		//
-		// }
-		// if(event.which === KEYCODE.P) { // P
-		// 	// editor.SelectParent();
-		// }
-		// if( keysdown[17] && e.which == 68) { // CTRL + D
-		// 	editor.Duplicate()
-		// }
-		// if( keysdown[17] && e.which == 67) { // CTRL + C
-		// 	editor.Copy()
-		// }
-		// if( keysdown[17] && e.which == 86) { // CTRL + V
-		// 	editor.Paste(); // Paste entity
-		// }
-		// if( keysdown[17] && e.which == 88) { // CTRL + X
-		// 	editor.Cut(); // Paste entity
-		// }
+		if (event.which === KEYCODE.P) {
+			editor.selectionGroup.selectParent();
+		}
+		if (event.which === KEYCODE.Z && event.ctrlKey && event.shiftKey) { // CTRL + Shift + Z
+			editor.redo();
+			return false;
+		} else if (event.which === KEYCODE.Z && event.ctrlKey) { // CTRL + z
+			editor.undo();
+			return false;
+		}
 
-		// if( keysdown[17] && keysdown[16] && e.which == 90) { // CTRL + Shift + Z
-		// 	editor.redo();
-		// 	return false;
-		// } else if( keysdown[17] && e.which == 90) { // CTRL + z
-		// 	editor.undo();
-		// 	return false;
-		// }
-
+		if (event.which === KEYCODE.D && event.ctrlKey) { // CTRL + D
+			editor.Duplicate();
+		}
+		if (event.which === KEYCODE.C && event.ctrlKey) { // CTRL + C
+			editor.Copy();
+		}
+		if (event.which === KEYCODE.V && event.ctrlKey) { // CTRL + V
+			editor.Paste();
+		}
+		if (event.which === KEYCODE.X && event.ctrlKey) { // CTRL + X
+			editor.Cut();
+		}
 		if (event.which === KEYCODE.CTRL) {
 			editor.threeManager.enableGridSnap();
 		}
@@ -160,29 +149,3 @@ export class InputControls {
 		}
 	}
 }
-
-// function EnableKeyboard() {
-// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:EnableKeyboard')
-// }
-
-// function DisableKeyboard() {
-// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableKeyboard')
-// }
-
-// function DisableFreeView() {
-// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:DisableFreeview')
-// }
-
-// function ToggleFreeView() {
-// 	editor.vext.SendEvent('DispatchEventLocal', 'MapEditor:ToggleFreeview')
-// }
-
-/*
-$(document).keyup(function(e){
-	// Remove this key from the map
-	delete keysdown[e.which];
-	if(e.which == 17) { // CTRL
-		editor.threeManager.disableGridSnap()
-	}
-});
-*/

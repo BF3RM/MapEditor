@@ -125,7 +125,10 @@ export class THREEManager {
 		editor.vext.SendEvent('controlStart');
 		const scope = this;
 		if (target === undefined) {
-			target = editor.selectionGroup;
+			if (editor.selectionGroup.selectedGameObjects.length !== 1) {
+				return;
+			}
+			target = editor.selectionGroup.selectedGameObjects[0];
 		}
 
 		let distance;
@@ -148,8 +151,8 @@ export class THREEManager {
 		const paddingTop = 0;
 
 		const boundingBox: THREE.Box3 = new THREE.Box3().setFromObject(target);
-
-		const size = boundingBox.getSize(target.position);
+		const position = new THREE.Vector3(target.position.x, target.position.y, target.position.z);
+		const size = boundingBox.getSize(position);
 		const boundingWidth = size.x + paddingLeft + paddingRight;
 		const boundingHeight = size.y + paddingTop + paddingBottom;
 		const boundingDepth = size.z;

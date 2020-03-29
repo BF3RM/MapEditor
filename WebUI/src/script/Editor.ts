@@ -185,15 +185,15 @@ export default class Editor {
 	}
 
 	public Copy() {
-		// const scope = this;
-		// const commands: SpawnBlueprintCommand[] = [];
-		// this.selectionGroup.children.forEach((childGameObject: GameObject) => {
-		// 	const gameObjectTransferData = childGameObject.getGameObjectTransferData();
-		// 	gameObjectTransferData.guid = Guid.create();
-		//
-		// 	commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
-		// });
-		// scope.copy = commands;
+		const scope = this;
+		const commands: SpawnBlueprintCommand[] = [];
+		this.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
+			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+			gameObjectTransferData.guid = Guid.create();
+
+			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+		});
+		scope.copy = commands;
 	}
 
 	public Paste() {

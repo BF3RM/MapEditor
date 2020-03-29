@@ -160,5 +160,10 @@ export default class ExplorerComponent extends EditorComponent {
 	.expand {
 		display: inline;
 	}
-
+	.td {
+		padding: 0.3vmin;
+		&:hover {
+			background-color: #343434;
+		}
+	}
 </style>

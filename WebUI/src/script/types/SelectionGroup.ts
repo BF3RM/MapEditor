@@ -2,6 +2,9 @@ import { GameObject } from '@/script/types/GameObject';
 import * as THREE from 'three';
 import { signals } from '@/script/modules/Signals';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
+import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
+import BulkCommand from '@/script/commands/BulkCommand';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -12,7 +15,7 @@ export class SelectionGroup extends THREE.Object3D {
 		this.type = 'SelectionGroup';
 		this.name = 'Selection Group';
 		this.visible = true;
-		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+		// signals.objectChanged.connect(this.onObjectChanged.bind(this));
 	}
 
 	public onMove() {
@@ -57,7 +60,7 @@ export class SelectionGroup extends THREE.Object3D {
 				go.matrix.multiplyMatrices(childWorldNew, parentWorldInverse);
 			}
 			go.matrixAutoUpdate = false;
-			// signals.objectChanged.emit(go, 'transform', go.transform);
+			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
@@ -68,8 +71,20 @@ export class SelectionGroup extends THREE.Object3D {
 			return;
 		}
 		if (gameObject.guid === this.selectedGameObjects[0].guid) {
-			this.setMatrix(gameObject.matrixWorld);
+			// this.setMatrix(gameObject.matrixWorld);
 		}
+	}
+
+	public onMoveEnd() {
+		const commands: SetTransformCommand[] = [];
+		this.selectedGameObjects.forEach((go: GameObject) => {
+			const command = new SetTransformCommand(new GameObjectTransferData({
+				guid: go.guid,
+				transform: go.transform
+			}), go.transform);
+			commands.push(command);
+		});
+		editor.execute(new BulkCommand(commands));
 	}
 
 	public setMatrix(matrix: THREE.Matrix4) {
@@ -85,11 +100,7 @@ export class SelectionGroup extends THREE.Object3D {
 		}
 
 		if (!multiSelection) {
-			// Deselect all selected GameObjects.
-			for (const go of this.selectedGameObjects) {
-				(go as GameObject).onDeselect();
-			}
-			this.selectedGameObjects = [];
+			this.deselectAll();
 		}
 
 		// If first object move group to its position
@@ -109,6 +120,13 @@ export class SelectionGroup extends THREE.Object3D {
 		gameObject.onSelect();
 	}
 
+	private deselectAll() {
+		for (const go of this.selectedGameObjects) {
+			(go as GameObject).onDeselect();
+		}
+		this.selectedGameObjects = [];
+	}
+
 	/**
 	 * Find game object, deselect it and remove it from array.
 	 * */
@@ -120,6 +138,17 @@ export class SelectionGroup extends THREE.Object3D {
 				this.selectedGameObjects.splice(i, 1);
 				return;
 			}
+		}
+	}
+
+	public selectParent() {
+		if (this.selectedGameObjects.length !== 1) {
+			return;
+		}
+
+		const go = this.selectedGameObjects[0] as GameObject;
+		if (go.parent != null && go.parent.constructor.name === 'GameObject') {
+			this.select(go.parent as GameObject, false, true);
 		}
 	}
 }

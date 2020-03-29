@@ -88,10 +88,12 @@ export default class InspectorComponent extends EditorComponent {
 
 	onEndDrag() {
 		console.log('Drag end');
+
 		if (this.group) {
-			this.group.selectedGameObjects.forEach((go: GameObject) => {
-				go.onMoveEnd(true);
-			});
+			this.group.onMoveEnd();
+			// this.group.selectedGameObjects.forEach((go: GameObject) => {
+			// 	go.onMoveEnd(true);
+			// });
 			this.dragging = false;
 		}
 	}
