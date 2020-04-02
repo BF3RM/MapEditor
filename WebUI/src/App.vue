@@ -9,7 +9,7 @@
 					<gl-col :width="80">
 						<gl-row :height="80">
 							<gl-col :width="20">
-								<HierarchyComponent title="Hierarchy"/>
+                                <HierarchyComponent title="Scene Instances"/>
 							</gl-col>
 							<gl-col width="80">
 								<ViewportComponent :showHeader="false" title="ViewPort"/>
@@ -20,7 +20,10 @@
 						</gl-row>
 					</gl-col>
 					<gl-col :width="20">
-						<InspectorComponent title="Inspector"/>
+                        <gl-stack>
+                            <InspectorComponent title="Inspector"/>
+                            <HistoryComponent title="History"/>
+                        </gl-stack>
 					</gl-col>
 				</gl-row>
 			</golden-layout>
@@ -46,8 +49,9 @@ import ListComponent from '@/script/components/EditorComponents/ListComponent.vu
 import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
 import EditorToolbar from '@/script/components/EditorComponents/EditorToolbar.vue';
 import InspectorComponent from '@/script/components/EditorComponents/InspectorComponent.vue';
+import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar, InspectorComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar, InspectorComponent, HistoryComponent } })
 export default class App extends Vue {
 	@Prop()
 	public title: string;
