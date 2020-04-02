@@ -12,11 +12,11 @@ import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 
-/**
- * GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
- * their GameEntities to visible = false. GameObjects should always be visible as we want to render their children even
- * when the parent is hidden. Renderer ignores an object if its visible flag is false, so it would ignore their children.
- * */
+/*
+	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
+	their GameEntities to visible = false. GameObjects should always be visible as we want to render their children even
+	when the parent is hidden. Renderer ignores an object if its visible flag is false, so it would ignore their children.
+*/
 export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
 	public typeName: string;

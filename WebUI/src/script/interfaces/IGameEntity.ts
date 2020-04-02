@@ -1,4 +1,4 @@
-import { LinearTransform } from "@/script/types/primitives/LinearTransform";
+import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 export interface IGameEntity {
 	transform: LinearTransform

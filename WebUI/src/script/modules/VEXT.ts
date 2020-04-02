@@ -60,9 +60,7 @@ export default class VEXTInterface {
 		}
 	}
 
-	/**
-	 * 	Internal
-	 * */
+	// Internal
 
 	public Pause() {
 		this.paused = true;
@@ -183,9 +181,7 @@ export default class VEXTInterface {
 		}
 	}
 
-	/**
-	* 	Functions called from VEXT
-	* */
+	// Functions called from VEXT
 
 	public WebUpdateBatch(updates: any[]) {
 		// console.log('[VEXT] WebUpdateBatch');

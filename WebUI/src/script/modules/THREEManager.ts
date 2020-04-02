@@ -288,9 +288,7 @@ export class THREEManager {
 		}
 	}
 
-	/**
-	* Called from Lua when freecam is disabled.
-	* */
+	// Called from Lua when freecam is disabled.
 	public mouseEnabled() {
 		this.highlightingEnabled = true;
 		// focus on canvas again

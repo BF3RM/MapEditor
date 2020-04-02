@@ -38,7 +38,7 @@ import Search from '@/script/components/widgets/Search.vue';
 
 @Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem, Search } })
 export default class ListComponent extends EditorComponent {
-	@Prop(Array) public list: Array<{name: string}>;
+	@Prop(Array) public list: {name: string}[];
 	@Prop(String) public keyField: string;
 	@Prop(Array) public headers: string[];
 	@Prop(Function) public click: void;

@@ -29,7 +29,7 @@ export default class ExpandableTreeSlot extends Vue {
 	search: any;
 
 	@Prop()
-	nodeText: String;
+	nodeText: string;
 
 	@Prop()
 	selected: boolean;

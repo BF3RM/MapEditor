@@ -23,12 +23,12 @@ export class SelectionGroup extends THREE.Object3D {
 		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
 	}
 
-	/**
-	 * Moves all selected objects relative to the selection group. As SelectionGroup doesn't add the selected objects as
-	 * children, we have to manually calculate their new matrices. First we calc the SelectionGroup's transformation
-	 * matrix with the new and old SelectionGroup's matrices. Then we calc each GameObject transform relative to SelectionGroup
-	 * so we can now apply the transformation matrix to get their new matrices.
-	 * */
+	/*
+	 Moves all selected objects relative to the selection group. As SelectionGroup doesn't add the selected objects as
+	 children, we have to manually calculate their new matrices. First we calc the SelectionGroup's transformation
+	 matrix with the new and old SelectionGroup's matrices. Then we calc each GameObject transform relative to SelectionGroup
+	 so we can now apply the transformation matrix to get their new matrices.
+	 */
 	public updateSelectedGameObjects() {
 		const selectionGroupWorld = this.transform.toMatrix();
 		const selectionGroupWorldNew = this.matrixWorld;
@@ -37,7 +37,7 @@ export class SelectionGroup extends THREE.Object3D {
 			this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
 			return;
 		}
-		const oldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld, false);
+		const oldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld);
 		const transformMatrix = new THREE.Matrix4().multiplyMatrices(selectionGroupWorldNew, oldMatrixInverse);
 
 		const childLocal = new THREE.Matrix4();
@@ -56,7 +56,7 @@ export class SelectionGroup extends THREE.Object3D {
 				go.matrix = childWorldNew.clone();
 			// If it has a parent, calculate the local matrix relative to it
 			} else {
-				parentWorldInverse.getInverse(go.parent.matrixWorld, false);
+				parentWorldInverse.getInverse(go.parent.matrixWorld);
 				go.matrix.multiplyMatrices(childWorldNew, parentWorldInverse);
 			}
 			go.matrixAutoUpdate = false;
@@ -127,9 +127,7 @@ export class SelectionGroup extends THREE.Object3D {
 		this.selectedGameObjects = [];
 	}
 
-	/**
-	 * Find game object, deselect it and remove it from array.
-	 * */
+	// Find game object, deselect it and remove it from array.
 
 	public deselect(gameObject: GameObject) {
 		for (let i = 0; i < this.selectedGameObjects.length; i++) {
