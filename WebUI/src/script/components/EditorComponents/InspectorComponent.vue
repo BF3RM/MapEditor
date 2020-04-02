@@ -6,7 +6,7 @@
 					<label class="enable-label" for="enabled">Enabled:</label>
 					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 				</div>
-				<div>
+				<div class="transform-container">
 					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 					<linear-transform-control class="lt-control" :hideLabel="false" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "/>
 				</div>
@@ -125,10 +125,8 @@ export default class InspectorComponent extends EditorComponent {
 <style lang="scss" scoped>
 	.transformControls::v-deep input {
 		width: 100%;
-		max-width: 100%;
 	}
 	.inspector-component {
-		padding: 1vmin;
 		.enable-container {
 			display: flex;
 			flex-direction: row;
@@ -142,7 +140,6 @@ export default class InspectorComponent extends EditorComponent {
 				height: 1.5vmin;
 				margin: 1vmin 0;
 			}
-
 		}
 
 		.name-label {
@@ -152,8 +149,7 @@ export default class InspectorComponent extends EditorComponent {
 
 		.name-input {
 			margin: 1vmin 0;
-			border-radius: 0.5vmin;
-			padding-left: 0.5vmin;
+			border-radius: 0.1vmin;
 		}
 	}
 </style>

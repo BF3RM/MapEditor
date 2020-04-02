@@ -117,11 +117,11 @@ export default class DraggableNumberInput extends Vue {
 		flex-direction: row;
 		align-items: center;
 		label {
-			margin: 0 1vmin;
+			padding: 0 1vmin;
 		}
 		input {
-			margin: 0 1vmin;
-			border-radius: 0.5vmin;
+			padding: 0 1vmin;
+			border-radius: 0.3vmin;
 			padding-left: 0.5vmin;
 		}
 	}
