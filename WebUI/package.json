@@ -24,7 +24,6 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
-    "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
     "@fimbul/valtyr": "^0.21.0",
     "@fimbul/ve": "^0.21.0",
     "@fimbul/wotan": "^0.21.1",
