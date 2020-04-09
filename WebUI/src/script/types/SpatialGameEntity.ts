@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
+import { Vector3 } from 'three';
+import { Vec3 } from '@/script/types/primitives/Vec3';
 
 export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	private static SELECTED_COLOR: number = 0xFF0000;
@@ -20,7 +22,10 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 		const center = new THREE.Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
 
-		const vmax = aabb.max;
+		let vmax = aabb.max;
+		if (vmax.x > 100000 || vmax.y > 100000 || vmax.z > 10000) {
+			vmax = new Vec3(1, 1, 1);
+		}
 		const vmin = aabb.min;
 
 		const boxGeom = new THREE.BoxGeometry(

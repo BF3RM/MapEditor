@@ -95,7 +95,11 @@ end
 
 function Editor:UpdateCameraTransform()
 	local s_Transform = ClientUtils:GetCameraTransform()
-	WebUpdater:AddUpdate('UpdateCameraTransform', s_Transform, true)
+	--WebUpdater:AddUpdate('UpdateCameraTransform', s_Transform, true)
+	--[[
+		JSON encoded so it's faster to parse
+	--]]
+	WebUI:ExecuteJS(string.format('editor.threeManager.updateCameraTransform(JSON.parse(\'%s\'))', json.encode(s_Transform)))
 	self.m_CameraTransform = s_Transform
 end
 
