@@ -50,11 +50,32 @@ import HierarchyComponent from '@/script/components/EditorComponents/HierarchyCo
 import EditorToolbar from '@/script/components/EditorComponents/EditorToolbar.vue';
 import InspectorComponent from '@/script/components/EditorComponents/InspectorComponent.vue';
 import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
+import Editor from '@/script/Editor';
+import { Log, LogError } from '@/script/modules/Logger';
 
 @Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar, InspectorComponent, HistoryComponent } })
 export default class App extends Vue {
+	constructor() {
+		super();
+		let debugMode: boolean = false;
+		if (!navigator.userAgent.includes('VeniceUnleashed')) {
+			if (window.location.ancestorOrigins === undefined || window.location.ancestorOrigins[0] !== 'webui://main') {
+				debugMode = true;
+			}
+		}
+
+		window.debug = debugMode;
+		(window).editor = new Editor(debugMode);
+		(window).Log = Log;
+		(window).LogError = LogError;
+	}
+
 	@Prop()
 	public title: string;
+
+	get editor() {
+		return window.editor;
+	}
 
 	private onInitialised() {
 		const viewport = document.getElementById('viewport-component');
