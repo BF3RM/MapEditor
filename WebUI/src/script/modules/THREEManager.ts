@@ -341,7 +341,7 @@ export class THREEManager {
 
 			if (intersects.length > 0) {
 				// console.log('hit ' + (intersects.length) + ' objects');
-				for (const element of intersects) {
+				for (const element of intersects.reverse()) {
 					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 						continue;
 					}
@@ -353,7 +353,8 @@ export class THREEManager {
 							const parent = gameObject.parent as GameObject;
 
 							if (!parent.selected && parent.constructor.name === 'GameObject' &&
-								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint')) {
+								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint') &&
+								!editor.selectionGroup.isSelected(parent)) {
 								resolve(parent.guid);
 							}
 						}

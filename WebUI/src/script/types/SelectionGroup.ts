@@ -5,6 +5,7 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
+import { Guid } from '@/script/types/Guid';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -148,5 +149,9 @@ export class SelectionGroup extends THREE.Object3D {
 		if (go.parent != null && go.parent.constructor.name === 'GameObject') {
 			this.select(go.parent as GameObject, false, true);
 		}
+	}
+
+	public isSelected(go: GameObject) {
+		return this.selectedGameObjects.includes(go);
 	}
 }

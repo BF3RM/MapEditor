@@ -26,8 +26,10 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		if (vmax.x > 100000 || vmax.y > 100000 || vmax.z > 10000) {
 			vmax = new Vec3(1, 1, 1);
 		}
-		const vmin = aabb.min;
-
+		let vmin = aabb.min;
+		if (vmin.x > 100000 || vmin.y > 100000 || vmin.z > 10000) {
+			vmin = new Vec3(0, 0, 0);
+		}
 		const boxGeom = new THREE.BoxGeometry(
 			vmax.x - vmin.x,
 			vmax.y - vmin.y,
