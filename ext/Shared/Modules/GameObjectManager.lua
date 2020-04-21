@@ -119,10 +119,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
     end
 
-    local s_SpawnedEntities = p_Hook:Call()
+    local s_EntiyBus = p_Hook:Call()
     local s_GameEntities = {}
-
-    for l_Index, l_Entity in ipairs(s_SpawnedEntities) do
+    for l_Index, l_Entity in ipairs(s_EntiyBus.entities) do
 
         if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
             local s_GameEntity = GameEntity{
@@ -265,7 +264,7 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
     p_GameObject.guid = p_CustomGuid
     p_GameObject.isVanilla = p_IsVanilla
     p_GameObject.creatorName = p_CreatorName
-    
+
     if p_GameObject.children ~= nil then
         for _, s_ChildGameObject in pairs(p_GameObject.children) do
             local s_ChildGuid
