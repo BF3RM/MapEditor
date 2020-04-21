@@ -54,6 +54,8 @@ export class THREEManager {
 	public gizmoMode = GIZMO_MODE.select;
 
 	constructor(debugMode: boolean) {
+		this.scene.matrixAutoUpdate = false;
+		this.scene.autoUpdate = false;
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;

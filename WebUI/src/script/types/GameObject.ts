@@ -49,8 +49,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.isVanilla = isVanilla;
 
 		this.selected = false;
-		this.matrixAutoUpdate = true;
-		this.visible = true;
+		this.matrixAutoUpdate = false;
+		this.visible = false;
 		this._enabled = true;
 		this.highlighted = false;
 
@@ -198,11 +198,13 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	onSelect() {
 		this.selected = true;
+		this.visible = true;
 		this.children.forEach(go => (go as GameObject).onSelect());
 	}
 
 	onDeselect() {
 		this.selected = false;
+		this.visible = false;
 		this.children.forEach(go => (go as GameObject).onDeselect());
 	}
 

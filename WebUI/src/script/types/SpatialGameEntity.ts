@@ -35,13 +35,12 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 			vmax.y - vmin.y,
 			vmax.z - vmin.z
 		);
-
 		boxGeom.translate(center.x, center.y, center.z);
 
 		super(boxGeom, new THREE.MeshBasicMaterial({
 			color: SpatialGameEntity.SELECTED_COLOR,
 			wireframe: true,
-			visible: false
+			visible: true
 		}));
 
 		const color = SpatialGameEntity.SELECTED_COLOR;
@@ -53,8 +52,8 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		geometry.setIndex(new THREE.BufferAttribute(indices, 1));
 		geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-		this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color }));
-		this.add(this.aabb);
+		// this.aabb = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color }));
+		// this.add(this.aabb);
 
 		this.instanceId = instanceId;
 		this.transform = transform;
@@ -64,7 +63,6 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		this.box = new THREE.Box3(
 			aabb.min,
 			aabb.max);
-		this.matrixAutoUpdate = false;
 		this.updateMatrix();
 		this.update();
 	}
@@ -119,7 +117,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		7: max.x, min.y, min.z
 		*/
 
-		if (!(this.aabb.geometry instanceof THREE.Geometry)) {
+		/* if (!(this.aabb.geometry instanceof THREE.Geometry)) {
 			const position = this.aabb.geometry.attributes.position;
 			const array = position.array as any[];
 
@@ -150,6 +148,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 			// position.needsUpdate = true;
 		}
+		 */
 
 		// this.aabb.geometry.computeBoundingBox();
 	}
@@ -173,7 +172,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	}
 
 	public SetColor(color: number) {
-		(this.aabb.material as THREE.LineBasicMaterial).color.setHex(color);
+		// (this.aabb.material as THREE.LineBasicMaterial).color.setHex(color);
 		editor.threeManager.setPendingRender();
 	}
 }
