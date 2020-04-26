@@ -1,26 +1,25 @@
-class 'Freecam'
+class 'FreeCam'
 
-require "__shared/Enums"
+local m_Logger = Logger("FreeCam", true)
+local m_RotationHelper = require "__shared/Util/RotationHelper"
 
-function Freecam:__init()
-	print("function Freecam:__init()")
+function FreeCam:__init()
+	m_Logger:Write("Initializing FreeCam module")
 
 	self:RegisterVars()
-
-
 end
 
-function Freecam:RegisterVars()
-	self.m_Freecam = false
-	self.mode = CameraMode.FirstPerson
+function FreeCam:RegisterVars()
+	self.m_FreeCam = false
+	self.m_Mode = CameraMode.FirstPerson
+	self.m_EditorControlled = false
 
-	self.camera = nil
-	self.cameraData = CameraEntityData()
-	self.lastTransform = nil
+	self.m_Camera = nil
+	self.m_CameraData = CameraEntityData()
+	self.m_LastTransform = nil
 
-	self.yaw = 0.0
-	self.pitch = 0.0
-	self.roll = 0.0
+	self.m_MoveYaw = 0.0
+	self.m_MovePitch = 0.0
 
 	self.m_MoveX = 0.0
 	self.m_MoveY = 0.0
@@ -38,70 +37,113 @@ function Freecam:RegisterVars()
 	self.m_LastSpectatedPlayer = 0
 end
 
-function Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-	if (self.camera ~= nil and self.m_Freecam == true) then
+function FreeCam:SetCameraMode(p_Mode)
+    if self.m_Mode == CameraMode.Editor then
+        self:UpdateFreeCamVars()
+    end
 
-		self.yaw   = self.yaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		self.pitch = self.pitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		--self.roll  = self.roll  - p_Cache:GetLevel([InputConceptIdentifiers.ConceptRoll) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-	end
+	--m_Logger:Write("Setting FreeCam mode to "..p_Mode)
+
+    self.m_Mode = p_Mode
 end
 
 
-function Freecam:Create()
-	print("function Freecam:Create()")
-	local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
+function FreeCam:GetCameraMode()
+    return self.m_Mode
+end
+
+function FreeCam:OnControlStart()
+    self:SetCameraMode(CameraMode.Editor)
+end
+
+function FreeCam:OnControlEnd()
+    self:SetCameraMode(CameraMode.FreeCam)
+end
+
+function FreeCam:OnControlUpdate(p_Transform)
+	self:UpdateEditor(p_Transform)
+end
+
+function FreeCam:OnEnableFreeCamMovement()
+    self:SetCameraMode(CameraMode.FreeCam)
+end
+
+function FreeCam:UpdateFreeCamVars()
+
+    local s_Yaw, s_Pitch, s_Roll = m_RotationHelper:GetYPRfromLUF(
+			self.m_CameraData.transform.left,
+			self.m_CameraData.transform.up,
+			self.m_CameraData.transform.forward)
+
+	self.m_MoveYaw = s_Yaw - math.pi
+	self.m_MovePitch = -(s_Pitch - math.pi)
+
+    self.m_LastTransform = self.m_CameraData.transform.trans
+end
+
+function FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
+
+	if self.m_Camera ~= nil and self.m_FreeCam and self.m_Mode == CameraMode.FreeCam then
+
+		local s_NewYaw   = self.m_MoveYaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		local s_NewPitch = self.m_MovePitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+
+		self.m_MoveYaw = s_NewYaw
+
+		if (math.abs(s_NewPitch)* 2 < math.pi) then
+			self.m_MovePitch = s_NewPitch
+		end
+	end
+end
+
+function FreeCam:Create()
+	local s_Entity = EntityManager:CreateEntity(self.m_CameraData, LinearTransform())
 	if s_Entity == nil then
-		print("Could not spawn camera")
+		m_Logger:Error("Could not spawn camera")
 		return
 	end
 	s_Entity:Init(Realm.Realm_Client, true);
 
 	-- local s_Spatial = SpatialEntity(s_Entity)
-	self.cameraData.transform = ClientUtils:GetCameraTransform()
-	self.cameraData.fov = 90
-	self.camera = s_Entity
+	self.m_CameraData.transform = ClientUtils:GetCameraTransform()
+	self.m_CameraData.fov = 90
+	self.m_Camera = s_Entity
 end
 
-function Freecam:TakeControl()
-	print("function Freecam:TakeControl()")
-	if(self.camera ~= nil) then
-		self.camera:FireEvent("TakeControl")
+function FreeCam:TakeControl()
+	if(self.m_Camera ~= nil) then
+		self.m_Camera:FireEvent("TakeControl")
 	end
 end
 
-function Freecam:ReleaseControl()
-	print("function Freecam:ReleaseControl()")
-	if(self.camera ~= nil) then
-		self.camera:FireEvent("ReleaseControl")
+function FreeCam:ReleaseControl()
+	if(self.m_Camera ~= nil) then
+		self.m_Camera:FireEvent("ReleaseControl")
 	end
 end
 
-function Freecam:Enable()
-	print("function Freecam:Enable()")
-	if(self.camera == nil) then
+function FreeCam:Enable()
+	if(self.m_Camera == nil) then
 		self:Create()
 	end
-	print(tostring(self.camera))
-	if(self.lastTransform ~= nil) then
-		print("lastTransform")
-		self.cameraData.transform = self.lastTransform
+
+	if(self.m_lastTransform ~= nil) then
+		self.m_CameraData.transform = self.m_LastTransform
 	end
-	self.mode = CameraMode.FreeCam
+
+    self:SetCameraMode(CameraMode.FreeCam)
 	self:TakeControl()
-	self.m_Freecam = true
+	self.m_FreeCam = true
 end
 
-function Freecam:Disable()
-	print("function Freecam:Disable()")
-	self.lastTransform = self.cameraData.transform
-	self.mode = CameraMode.FirstPerson
+function FreeCam:Disable()
+	self.m_LastTransform = self.m_CameraData.transform
+    self:SetCameraMode(CameraMode.FirstPerson)
 	self:ReleaseControl()
-	self.m_Freecam = false
+	self.m_FreeCam = false
 end
 
-function Freecam:RotateX(p_Transform, p_Vector)
-	print("function Freecam:RotateX(p_Transform, p_Vector)")
+function FreeCam:RotateX(p_Transform, p_Vector)
 	return Vec3(
 			p_Transform.left.x * p_Vector.x,
 			p_Transform.left.y * p_Vector.x,
@@ -117,36 +159,33 @@ function Freecam:RotateX(p_Transform, p_Vector)
 	)
 end
 
-function Freecam:Update(p_Delta, p_SimDelta)
+function FreeCam:Update(p_Delta, p_SimDelta)
 	self.m_SimTickCount = self.m_SimTickCount + 1
 	self.m_InverseTick = 1.0 / self.m_SimTickCount
 end
 
-function Freecam:OnUpdateInput(p_Delta)
-	if self.mode == CameraMode.FirstPerson then
+function FreeCam:OnUpdateInput(p_Delta)
+	if self.m_Mode == CameraMode.FirstPerson or self.m_Mode == CameraMode.Editor then
 		return
 	end
-
-
 
 	-- Update the controls.
 	self:UpdateCameraControls(p_Delta)
 
 	-- Update FreeCam (or ThirdPerson.)
-	if self.mode == CameraMode.FreeCam then
+	if self.m_Mode == CameraMode.FreeCam then
 		self:UpdateFreeCamera(p_Delta)
-	elseif self.mode == CameraMode.ORBITAL then
+	elseif self.m_Mode == CameraMode.ORBITAL then
 		self:UpdateThirdPerson(p_Delta)
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
-		print("Reseting camera")
-		self.cameraData.transform.left = Vec3(1,0,0)
-		self.cameraData.transform.up = Vec3(0,1,0)
-		self.cameraData.transform.forward = Vec3(0,0,1)
-		self.yaw = 0.0
-		self.pitch = 0.0
-		self.roll = 0.0
+		--m_Logger:Write("Reseting camera")
+		self.m_CameraData.transform.left = Vec3(1,0,0)
+		self.m_CameraData.transform.up = Vec3(0,1,0)
+		self.m_CameraData.transform.forward = Vec3(0,0,1)
+		self.m_MoveYaw = 0.0
+		self.m_MovePitch = 0.0
 		self.m_CameraDistance = 1.0
 		self.m_ThirdPersonRotX = 0.0
 		self.m_ThirdPersonRotY = 0.0
@@ -159,15 +198,12 @@ function Freecam:OnUpdateInput(p_Delta)
 	self.m_MoveZ = 0.0
 	self.m_SimTickCount = 0
 	self.m_InverseTick = 0.0
-
-
 end
 
-function Freecam:UpdateCameraControls(p_Delta)
-	if self.mode == CameraMode.FirstPerson then
+function FreeCam:UpdateCameraControls(p_Delta)
+	if self.m_Mode == CameraMode.FirstPerson then
 		return
 	end
-
 
 	local s_MoveX = InputManager:GetLevel(InputConceptIdentifiers.ConceptMoveLR)
 	local s_MoveY = 0.0
@@ -181,12 +217,12 @@ function Freecam:UpdateCameraControls(p_Delta)
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_PageDown) then
 		self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier + 1
-		print(self.m_RotationSpeedMultiplier)
+		--m_Logger:Write(self.m_RotationSpeedMultiplier)
 	elseif InputManager:WentKeyDown(InputDeviceKeys.IDK_PageUp ) then
 		if self.m_RotationSpeedMultiplier > 1 then
 			self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier - 1
 		end
-		print(self.m_RotationSpeedMultiplier)
+		--m_Logger:Write(self.m_RotationSpeedMultiplier)
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
@@ -201,7 +237,7 @@ function Freecam:UpdateCameraControls(p_Delta)
 
 	local s_MouseWheel = InputManager:GetLevel(InputConceptIdentifiers.ConceptFreeCameraSwitchSpeed)
 
-	if self.mode  == CameraMode.FreeCam then
+	if self.m_Mode == CameraMode.FreeCam then
 		self.m_SpeedMultiplier = self.m_SpeedMultiplier + (s_MouseWheel * 0.2)
 
 		if self.m_SpeedMultiplier < 0.05 then
@@ -215,27 +251,30 @@ function Freecam:UpdateCameraControls(p_Delta)
 		end
 	end
 end
+function FreeCam:UpdateEditor(p_Transform)
+	if(self.m_Mode == CameraMode.Editor) then
+		self.m_CameraData.transform = p_Transform
+	end
+end
 
+function FreeCam:UpdateFreeCamera(p_Delta)
 
-function Freecam:UpdateFreeCamera(p_Delta)
+	local s_Transform = self.m_CameraData.transform
 
-	local s_Transform = self.cameraData.transform
+	local forward = Vec3( math.sin(self.m_MoveYaw)*math.cos(self.m_MovePitch),
+			math.sin(self.m_MovePitch),
+			math.cos(self.m_MoveYaw)*math.cos(self.m_MovePitch))
 
-	local forward = Vec3( math.sin(self.yaw)*math.cos(self.pitch),
-			math.sin(self.pitch),
-			math.cos(self.yaw)*math.cos(self.pitch))
+	local up = Vec3( -(math.sin(self.m_MoveYaw)*math.sin(self.m_MovePitch)),
+			math.cos(self.m_MovePitch),
+			-(math.cos(self.m_MoveYaw)*math.sin(self.m_MovePitch)) )
 
-
-
-	local up = Vec3( -(math.sin(self.yaw)*math.sin(self.pitch)*math.cos(self.roll) + math.cos(self.yaw)*math.sin(self.roll)),
-			math.cos(self.pitch)*math.cos(self.roll),
-			-(math.cos(self.yaw)*math.sin(self.pitch)*math.cos(self.roll) - math.sin(self.yaw)*math.sin(self.roll)) )
 
 	local left = forward:Cross(Vec3(up.x * -1, up.y * -1, up.z * -1))
 
-	self.cameraData.transform.left = left
-	self.cameraData.transform.up = up
-	self.cameraData.transform.forward = forward
+	self.m_CameraData.transform.left = left
+	self.m_CameraData.transform.up = up
+	self.m_CameraData.transform.forward = forward
 
 	-- Calculate new transform.
 	if self.m_MoveX ~= 0.0 then
@@ -276,11 +315,11 @@ function Freecam:UpdateFreeCamera(p_Delta)
 
 end
 
-function Freecam:UpdateThirdPerson(p_Delta)
+function FreeCam:UpdateThirdPerson(p_Delta)
 	-- Get the spectated player.
 	local s_SpectatedPlayer = SpectatorManager:GetSpectatedPlayer()
 
-	-- Player not found; switch to freecam.
+	-- Player not found; switch to freeCam.
 	if s_SpectatedPlayer == nil then
 		SpectatorManager:SetCameraMode(SpectatorCameraMode.FreeCamera)
 		return
@@ -288,7 +327,7 @@ function Freecam:UpdateThirdPerson(p_Delta)
 
 	local s_SpectatedSoldier = s_SpectatedPlayer.soldier
 
-	-- Player has no soldier; switch to freecam.
+	-- Player has no soldier; switch to freeCam.
 	if s_SpectatedSoldier == nil then
 		SpectatorManager:SetCameraMode(SpectatorCameraMode.FreeCamera)
 		return
@@ -311,7 +350,7 @@ function Freecam:UpdateThirdPerson(p_Delta)
 	local s_RotateX = -(50.0 * self.m_RotateX * self.m_SimTickCount)
 	local s_RotateY = -(50.0 * self.m_RotateY * self.m_SimTickCount)
 
-	local s_Transform = self.cameraData.transform
+	local s_Transform = self.m_CameraData.transform
 
 	s_RotateX = s_RotateX * p_Delta
 	s_RotateY = -s_RotateY * p_Delta
@@ -352,8 +391,5 @@ function Freecam:UpdateThirdPerson(p_Delta)
 	s_Transform.forward = Vec3(-s_Transform.forward.x, -s_Transform.forward.y, -s_Transform.forward.z)
 end
 
-function Freecam:GetCameraMode()
-	return self.mode
-end
 
-return Freecam()
+return FreeCam()

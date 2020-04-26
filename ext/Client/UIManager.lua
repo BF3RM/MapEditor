@@ -1,10 +1,9 @@
 class 'UIManager'
 
-local m_Freecam = require "Freecam"
-local m_Editor = require "Editor"
+local m_Logger = Logger("InstanceParser", true)
 
 function UIManager:__init()
-	print("Initializing UIManager")
+	m_Logger:Write("Initializing UIManager")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
@@ -30,7 +29,6 @@ function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGrap
 		s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
 		s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
 
-
 		p_Hook:Return(nil)
 	end
 end
@@ -38,65 +36,63 @@ end
 function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
 		
-		if m_Freecam:GetCameraMode() == CameraMode.FreeCam then
-			self:DisableFreecam()
+		if FreeCam:GetCameraMode() ~= CameraMode.FirstPerson then
+			self:DisableFreeCam()
 		else
-			self:EnableFreecam()
+			self:EnableFreeCam()
 		end
 	end
 
 		-- We let go of right mouse button. Activate the UI again.
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
-		self:DisableFreecamMovement()
-		m_Editor:SetPendingRaycast(RaycastType.Camera)
+		self:DisableFreeCamMovement()
+		Editor:SetPendingRaycast(RaycastType.Camera)
 	end
-
 end
 
-function UIManager:OnEnableFreecamMovement()
-	self:EnableFreecamMovement()
+function UIManager:OnEnableFreeCamMovement()
+	self:EnableFreeCamMovement()
 end
 
-function UIManager:EnableFreecamMovement()
+function UIManager:EnableFreeCamMovement()
 	WebUI:DisableKeyboard()
 	WebUI:DisableMouse()
 end
 
-function UIManager:DisableFreecamMovement()
-	if m_Freecam:GetCameraMode() == CameraMode.FreeCam then
+function UIManager:DisableFreeCamMovement()
+	if FreeCam:GetCameraMode() == CameraMode.FreeCam then
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
+		WebUpdater:AddUpdate('MouseEnabled')
+		WebUI:BringToFront()
 	end
 end
 
-
-function UIManager:OnDisableFreecam()
-	self:DisableFreecam()
+function UIManager:OnDisableFreeCam()
+	self:DisableFreeCam()
 end
 
-function UIManager:EnableFreecam()
+function UIManager:EnableFreeCam()
 	NetEvents:SendLocal('EnableInputRestriction')
 
-	m_Freecam:Enable()
+	FreeCam:Enable()
 
 	WebUI:BringToFront()
 	WebUI:EnableMouse()
 	WebUI:Show()
 
-	self:DisableFreecamMovement()
+	self:DisableFreeCamMovement()
 end
 
-function UIManager:DisableFreecam()
+function UIManager:DisableFreeCam()
 	NetEvents:SendLocal('DisableInputRestriction')
-	m_Freecam:Disable()
+	FreeCam:Disable()
 	--WebUI:BringToFront()
 	-- WebUI:Hide()
 	WebUI:DisableMouse()
 
-	self:EnableFreecamMovement()
-
+	self:EnableFreeCamMovement()
 end
-
 
 return UIManager()
 

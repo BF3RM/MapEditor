@@ -1,0 +1,14 @@
+.Row {
+    display: inline-flex;
+}
+
+.Toggler {
+    width: 16px;
+    -webkit-mask: url(../icons/editor/ExpandChevronRight_16x.svg) no-repeat center;
+    /* padding: 12px; */
+    background: #b9b9b9;
+}
+
+.Toggler-open {
+    -webkit-mask: url(../icons/editor/ExpandChevronDown_16x.svg) no-repeat center;
+}

@@ -1,3 +1,6 @@
 *.idea
 ui.vuic
 *.DS_STORE
+WebUI/debugData/*
+WebUI/data/*.json
+node_modules/
