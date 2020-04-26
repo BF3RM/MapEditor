@@ -24,11 +24,17 @@ function EditorCommon:OnPartitionLoaded(p_Partition)
             m_Logger:Write('Instance is null?')
             goto continue
         end
-	    if(l_Instance.instanceGuid == Guid('6BB357C6-4327-4872-B62F-42F195B0799D')) then -- Remove common rose input hook
+	    if(l_Instance.instanceGuid == Guid('117FDD9E-0904-4923-818E-0FFF2CBF5B83')) then -- Remove common rose input hook
 			local s_Instance = InstanceOutputNode(l_Instance)
 		    s_Instance:MakeWritable()
-		    s_Instance.id = MathUtils:FNVHash("Exit")
+		    s_Instance.id = MathUtils:FNVHash("CommoRoseReleased")
 	    end
+	    if(l_Instance.instanceGuid == Guid('3A3B6678-9158-4536-AD55-200DCF392A9D') or l_Instance.instanceGuid == Guid('1BC94AE0-743A-4D1E-B2DB-F203A999F758')) then -- Remove common rose input hook
+		    local s_Instance = UINodePort(l_Instance)
+		    s_Instance:MakeWritable()
+		    s_Instance.query = UIWidgetEventID.UIWidgetEventID_None
+	    end
+
         ::continue::
     end
 end
