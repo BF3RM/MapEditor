@@ -15,6 +15,7 @@ export default class VEXTInterface {
 	public messages: any;
 	public paused: boolean;
 	public executing: boolean;
+	public doneExecuting: boolean = true;
 	public queued: {
 		commands: VextCommand[],
 		messages: object[];
@@ -116,6 +117,7 @@ export default class VEXTInterface {
 	public HandleResponse(CARArray: object[], emulator: boolean) {
 		const scope = this;
 		scope.executing = true;
+		scope.doneExecuting = false;
 		const commandActionResults: CommandActionResult[] = [];
 		CARArray.forEach((obj: object) => {
 			commandActionResults.push(CommandActionResult.FromObject(obj));
@@ -136,6 +138,9 @@ export default class VEXTInterface {
 			index++;
 		});
 		editor.threeManager.setPendingRender();
+		setTimeout(() => {
+			scope.doneExecuting = true;
+		}, 1);
 	}
 
 	public SendEvent(eventName: string, param?: any) {
