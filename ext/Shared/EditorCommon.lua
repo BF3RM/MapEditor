@@ -24,13 +24,17 @@ function EditorCommon:OnPartitionLoaded(p_Partition)
             m_Logger:Write('Instance is null?')
             goto continue
         end
-
+	    if(l_Instance.instanceGuid == Guid('6BB357C6-4327-4872-B62F-42F195B0799D')) then
+			local s_Instance = InstanceOutputNode(l_Instance)
+		    s_Instance:MakeWritable()
+		    s_Instance.id = MathUtils:FNVHash("Exit")
+	    end
         ::continue::
     end
 end
 
 function EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
-    
+
 end
 
 function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectHeader)
