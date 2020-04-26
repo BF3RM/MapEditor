@@ -23,7 +23,7 @@ import { RecycleScroller } from "vue-virtual-scroller";
 		<div id="toolbarCenter">
 		</div>
 		<div id="toolbarRight">
-			<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini">
+			<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
 				<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
 			</el-select>
 		</div>
@@ -36,6 +36,7 @@ import { GIZMO_MODE, WORLD_SPACE } from '@/script/modules/THREEManager';
 import { signals } from '@/script/modules/Signals';
 import IMenuEntry from '@/script/interfaces/IMenuEntry';
 import RecursiveMenubar from '@/script/components/widgets/RecursiveMenubar.vue';
+import { SetViewModeMessage } from '@/script/messages/SetViewModeMessage';
 @Component({ components: { RecursiveMenubar } })
 export default class EditorToolbar extends Vue {
 	private worldView = 0;
@@ -175,6 +176,10 @@ export default class EditorToolbar extends Vue {
 		if (lastPath !== undefined && lastPath.callback !== undefined) {
 			lastPath.callback();
 		}
+	}
+
+	onViewModeChange(newView: number) {
+		window.editor.vext.SendMessage(new SetViewModeMessage(newView));
 	}
 
 	private onMenuRegistered(path: string[], entryCallback?: any) {
