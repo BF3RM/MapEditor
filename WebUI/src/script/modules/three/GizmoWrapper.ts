@@ -10,7 +10,6 @@ export default class GizmoWrapper extends TransformControls {
 
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
 		super(camera, element);
-		this.matrixAutoUpdate = false;
 		this.addEventListener('change', this.onControlChanged.bind(this));
 		this.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
 		this.addEventListener('mouseDown', this.onControlMouseDown.bind(this));

@@ -196,8 +196,15 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
+	get enabled() {
+		return this._enabled;
+	}
+
 	onSelect() {
 		this.selected = true;
+		if (this.parent !== null) {
+			this.parent.visible = true;
+		}
 		this.visible = true;
 		this.children.forEach(go => (go as GameObject).onSelect());
 	}

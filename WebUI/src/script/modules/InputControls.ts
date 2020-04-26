@@ -78,7 +78,7 @@ export class InputControls {
 
 	onMouseMove(event: MouseEvent) {
 		if (event.buttons === 0) {
-			// editor.threeManager.highlight(InputControls.getMousePos(event));
+			editor.threeManager.highlight(InputControls.getMousePos(event));
 		}
 	}
 

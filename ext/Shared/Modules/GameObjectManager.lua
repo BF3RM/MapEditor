@@ -346,7 +346,7 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 
     if (s_GameObject.isDeleted == true) then
         m_Logger:Error("GameObject was already marked as deleted: " .. p_Guid)
-        return false
+        return true
     end
 
     if (s_GameObject.isVanilla) then

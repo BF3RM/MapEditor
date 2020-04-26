@@ -18,7 +18,7 @@ import { Component, Prop, PropSync } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import Command from '@/script/libs/three/Command';
-import {Computed} from "vuex/types/helpers";
+import { Computed } from 'vuex/types/helpers';
 @Component
 export default class HistoryComponent extends EditorComponent {
 	constructor() {

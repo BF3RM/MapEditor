@@ -346,6 +346,7 @@ export default class Editor {
 		}
 
 		this.threeManager.setPendingRender();
+		console.log('Deleted blueprint: ' + gameObject.name);
 	}
 
 	// TODO: Move logic to GameContext

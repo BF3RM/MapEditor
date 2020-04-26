@@ -96,7 +96,7 @@ export class EditorCore {
 		}
 		// TODO: Add an FPS and rendering indicator.
 		if (this.isUpdating) {
-			// window.requestAnimationFrame(this.rl);
+			window.requestAnimationFrame(this.rl);
 		}
 	}
 

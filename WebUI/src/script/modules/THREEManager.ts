@@ -54,8 +54,6 @@ export class THREEManager {
 	public gizmoMode = GIZMO_MODE.select;
 
 	constructor(debugMode: boolean) {
-		this.scene.matrixAutoUpdate = false;
-		this.scene.autoUpdate = false;
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;
@@ -354,14 +352,16 @@ export class THREEManager {
 						if (gameObject.parent != null) {
 							const parent = gameObject.parent as GameObject;
 
-							if (!parent.selected && parent.constructor.name === 'GameObject' &&
+							if (parent.enabled && !parent.selected && parent.constructor.name === 'GameObject' &&
 								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint') &&
 								!editor.selectionGroup.isSelected(parent)) {
 								resolve(parent.guid);
 							}
 						}
 						// Else we select the GameObject.
-						resolve(gameObject.guid);
+						if (gameObject.enabled) {
+							resolve(gameObject.guid);
+						}
 					}
 				}
 			} else {
