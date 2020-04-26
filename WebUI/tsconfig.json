@@ -2,8 +2,8 @@
   "compileOnSave": true,
   "buildOnSave": true,
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
+    "module": "ESNext",
+    "target": "ESNext",
     "lib": ["dom", "esnext"],
     "allowJs": true,
     "outDir": "./dist",

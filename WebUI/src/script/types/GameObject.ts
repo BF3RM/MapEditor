@@ -92,6 +92,18 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		});
 	}
 
+	public getAllChildren():GameObject[] {
+		const out = [] as GameObject[];
+		this.children.forEach((go) => {
+			if (go instanceof GameObject) {
+				console.log(go);
+				out.push(go);
+				out.concat(go.getAllChildren());
+			}
+		});
+		return out;
+	}
+
 	public getChanges() {
 		const scope = this;
 		const changes: any = {};

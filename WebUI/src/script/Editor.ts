@@ -341,6 +341,11 @@ export default class Editor {
 		this.threeManager.deleteObject(gameObject);
 		this.gameObjects.remove(gameObjectGuid);
 
+		gameObject.getAllChildren().forEach((go) => {
+			this.threeManager.deleteObject(go);
+			this.gameObjects.remove(go.guid);
+		});
+
 		if (this.selectionGroup.selectedGameObjects.length === 0) {
 			this.threeManager.hideGizmo();
 		}
