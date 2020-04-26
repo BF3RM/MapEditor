@@ -24,7 +24,7 @@ function EditorCommon:OnPartitionLoaded(p_Partition)
             m_Logger:Write('Instance is null?')
             goto continue
         end
-	    if(l_Instance.instanceGuid == Guid('6BB357C6-4327-4872-B62F-42F195B0799D')) then
+	    if(l_Instance.instanceGuid == Guid('6BB357C6-4327-4872-B62F-42F195B0799D')) then -- Remove common rose input hook
 			local s_Instance = InstanceOutputNode(l_Instance)
 		    s_Instance:MakeWritable()
 		    s_Instance.id = MathUtils:FNVHash("Exit")
