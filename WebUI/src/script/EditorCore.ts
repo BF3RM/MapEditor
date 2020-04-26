@@ -13,6 +13,7 @@ import { Vec3 } from '@/script/types/primitives/Vec3';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
 import { GIZMO_MODE } from '@/script/modules/THREEManager';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -23,17 +24,19 @@ export class EditorCore {
 	private lastUpdateTime: number;
 	private deltaTime: number;
 	private pendingUpdates = new Map<Guid, GameObject>();
-	private rl = this.renderLoop.bind(this);
 	private updateRequested = false;
 	public highlightedObjectGuid: Guid | null = null;
 
+	// @ts-ignore
+	public stats = new Stats();
+
 	constructor() {
+		this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+		signals.editor.Ready.connect(this.renderLoop.bind(this));
 		this.previewBlueprint = null;
 
 		this.lastUpdateTime = 0;
 		this.deltaTime = 1.0 / 30.0;
-
-		this.renderLoop(); // first call to init loop using the requestAnimationFrame
 	}
 
 	public getRaycastTransform() {
@@ -43,7 +46,7 @@ export class EditorCore {
 	public setUpdating(value: boolean) {
 		this.isUpdating = value;
 		if (value) {
-			this.renderLoop();
+			// this.renderLoop();
 		}
 	}
 
@@ -54,50 +57,31 @@ export class EditorCore {
 
 	public renderLoop() {
 		const scope = this;
+		scope.stats.begin();
 		// GameObject update
-
-		// This var is checked twice because we might have stopped the rendering during the last update.
-		if (!scope.isUpdating) {
-			return;
-		}
-		if (scope.lastUpdateTime === 0 ||
-			scope.lastUpdateTime + (scope.deltaTime * 1000.0) <= Date.now()) {
-			scope.lastUpdateTime = Date.now();
-
-			/* for ( var key in this.gameObjects )
-			{
-				var object = this.gameObjects[key];
-
-				if (object.update != undefined)
-					object.update( this.deltaTime );
-
+		this.pendingUpdates.forEach((gameObject, guid) => {
+			const changes = gameObject.getChanges();
+			if (!changes || !editor.vext.doneExecuting) {
+				return;
 			}
-			*/
-
-			this.pendingUpdates.forEach((gameObject, guid) => {
-				const changes = gameObject.getChanges();
-				if (!changes) {
-					return;
+			for (const changeKey in changes) {
+				if (!(changeKey in changes)) {
+					continue;
 				}
-				for (const changeKey in changes) {
-					if (!(changeKey in changes)) {
-						continue;
-					}
-					const change = changes[changeKey];
-					editor.vext.SendMessage(change);
-				}
-			});
-			this.pendingUpdates.clear();
-		}
+				const change = changes[changeKey];
+				editor.vext.SendMessage(change);
+			}
+		});
+		this.pendingUpdates.clear();
 		// An update was requested outside of the usual ThreeJS render loop, this probably means some command has been executed.
 		if (this.updateRequested) {
 			editor.threeManager.setPendingRender();
 			this.updateRequested = false;
 		}
 		// TODO: Add an FPS and rendering indicator.
-		if (this.isUpdating) {
-			window.requestAnimationFrame(this.rl);
-		}
+		requestAnimationFrame(this.renderLoop.bind(this));
+		editor.threeManager.RenderLoop();
+		scope.stats.end();
 	}
 
 	public addPending(guid: Guid, gameObject: GameObject) {

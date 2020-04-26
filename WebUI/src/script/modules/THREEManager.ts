@@ -52,6 +52,9 @@ export class THREEManager {
 	private updatingCamera = false;
 	private debugMode = false;
 	public gizmoMode = GIZMO_MODE.select;
+	public isCameraMoving = false;
+	private clock = new THREE.Clock();
+	private cameraHasMoved: boolean;
 
 	constructor(debugMode: boolean) {
 		signals.editor.Ready.connect(this.initialize.bind(this));
@@ -61,6 +64,8 @@ export class THREEManager {
 
 	public initialize() {
 		const scope = this;
+		scope.scene.autoUpdate = false;
+		scope.scene.matrixAutoUpdate = false;
 		scope.renderer.setPixelRatio(window.devicePixelRatio);
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
 		const page = document.getElementById('ViewportContainer');
@@ -76,28 +81,22 @@ export class THREEManager {
 			const grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);
 			scope.scene.add(grid);
 		}
-
-		const clock = new THREE.Clock();
-
-		(function anim() {
-			const delta = clock.getDelta();
-			const hasControlsUpdated = scope.cameraControls.update(delta);
-
-			requestAnimationFrame(anim);
-
-			// We render only when needed.
-			if (hasControlsUpdated || scope.pendingRender) {
-				scope.render();
-			}
-
-			if (scope.waitingForControlEnd && !scope.updatingCamera && !hasControlsUpdated) {
-				editor.vext.SendEvent('controlEnd');
-				scope.waitingForControlEnd = false;
-			}
-		})();
-
 		this.setFov(90);
 		this.setPendingRender();
+	}
+
+	public RenderLoop() {
+		const scope = this;
+		const delta = scope.clock.getDelta();
+		const hasControlsUpdated = scope.cameraControls.update(delta);
+		if (hasControlsUpdated || scope.pendingRender || scope.cameraHasMoved) {
+			scope.render();
+			scope.cameraHasMoved = false;
+		}
+		if (scope.waitingForControlEnd && !scope.updatingCamera && !hasControlsUpdated) {
+			editor.vext.SendEvent('controlEnd');
+			scope.waitingForControlEnd = false;
+		}
 	}
 
 	public registerEvents() {
@@ -108,9 +107,24 @@ export class THREEManager {
 	public enableFreecamMovement() {
 		this.highlightingEnabled = false;
 		editor.vext.SendEvent('EnableFreeCamMovement');
+		this.OnCameraMoveEnable();
 
 		// Hack to make sure we don't navigate the windows while in freecam.
-		// document.activeElement.blur();
+		(window as any).document.activeElement.blur();
+	}
+
+	private OnCameraMoveEnable() {
+		this.isCameraMoving = true;
+		this.scene.autoUpdate = false;
+		this.scene.matrixAutoUpdate = false;
+	}
+
+	private OnCameraMoveDisable() {
+		this.isCameraMoving = false;
+		this.scene.autoUpdate = true;
+		this.scene.matrixAutoUpdate = true;
+		this.scene.updateMatrix();
+		this.setPendingRender();
 	}
 
 	public attachToScene(gameObject: THREE.Object3D): void {
@@ -293,6 +307,7 @@ export class THREEManager {
 		this.highlightingEnabled = true;
 		// focus on canvas again
 		this.renderer.domElement.focus();
+		this.OnCameraMoveDisable();
 	}
 
 	private getMousePos(event: MouseEvent): Vec2 {
@@ -391,5 +406,6 @@ export class THREEManager {
 
 	public updateCameraTransform(transform: ILinearTransform) {
 		this.cameraControls.updateCameraTransform(transform);
+		this.cameraHasMoved = true;
 	}
 }

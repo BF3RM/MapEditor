@@ -12,7 +12,7 @@
                                 <HierarchyComponent title="Scene Instances"/>
 							</gl-col>
 							<gl-col width="80">
-								<ViewportComponent :showHeader="false" title="ViewPort"/>
+								<ViewportComponent :showHeader="true" title="Viewport"/>
 							</gl-col>
 						</gl-row>
 						<gl-row :height="20">

@@ -35,6 +35,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('Client:LevelLoaded', self, self.OnLevelLoaded)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
+	Events:Subscribe('UI:DrawHud', self, self.OnDrawHud)
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
@@ -108,6 +109,10 @@ end
 
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
 	ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
+end
+
+function MapEditorClient:OnDrawHud()
+	Editor:OnDrawHud()
 end
 
 function MapEditorClient:OnLevelDestroy()

@@ -39,11 +39,13 @@ end
 
 function Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Raycast has to be done in update
+	self:Raycast()
+end
+
+function Editor:OnDrawHud()
 	if( FreeCam:GetCameraMode() == CameraMode.FreeCam and self:CameraHasMoved() == true) then
 		self:UpdateCameraTransform()
 	end
-
-	self:Raycast()
 end
 
 function Editor:Raycast()
