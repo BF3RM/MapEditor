@@ -58,10 +58,10 @@ function MapEditorClient:RegisterEvents()
 
     Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
     Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
-    Hooks:Install('ClientEntityFactory:Create', 999, self, self.OnEntityCreate)
+    Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
-    Hooks:Install('ClientEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+    Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
 ----------- Game functions----------------

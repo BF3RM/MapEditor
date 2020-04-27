@@ -30,8 +30,8 @@ function MapEditorServer:RegisterEvents()
 
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
-	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles) 
-    Hooks:Install('ServerEntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
+    Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
 ----------- Debug ----------------
