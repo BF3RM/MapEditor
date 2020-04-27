@@ -58,8 +58,8 @@ end
 
 function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	--m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
-	local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGUID(
-		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid), 
+	local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGuid(
+		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid),
 		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid)))
 
 	for _,l_Member in ipairs(s_Instance.memberDatas) do
@@ -97,7 +97,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 	if p_Partition == nil then
 		return
 	end
-	
+
 	local s_Instances = p_Partition.instances
 
     local s_PrimaryInstance = _G[p_Partition.primaryInstance.typeInfo.name](p_Partition.primaryInstance)
