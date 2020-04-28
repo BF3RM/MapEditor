@@ -9,7 +9,7 @@ function UIManager:__init()
 end
 
 function UIManager:RegisterVars()
-	
+
 end
 
 function UIManager:RegisterEvents()
@@ -35,7 +35,7 @@ end
 
 function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
-		
+
 		if FreeCam:GetCameraMode() ~= CameraMode.FirstPerson then
 			self:DisableFreeCam()
 		else
@@ -88,7 +88,7 @@ function UIManager:DisableFreeCam()
 	NetEvents:SendLocal('DisableInputRestriction')
 	FreeCam:Disable()
 	--WebUI:BringToFront()
-	-- WebUI:Hide()
+	WebUI:Hide()
 	WebUI:DisableMouse()
 
 	self:EnableFreeCamMovement()
