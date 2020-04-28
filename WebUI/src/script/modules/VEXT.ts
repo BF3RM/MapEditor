@@ -55,9 +55,15 @@ export default class VEXTInterface {
 		};
 		console.log('UI is ready');
 		if (!debug) {
-			console.log('Sending to lua');
-
-			WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
+			// This is a dirty fucking hack to force UI reload when the UI source is updated.
+			// eslint-disable-next-line no-prototype-builtins
+			if (!window.hasOwnProperty('editor')) {
+				console.log('Sending to lua');
+				WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
+			} else {
+				// eslint-disable-next-line no-self-assign
+				window.location = window.location;
+			}
 		}
 	}
 

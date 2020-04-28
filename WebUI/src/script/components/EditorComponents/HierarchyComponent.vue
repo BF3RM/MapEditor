@@ -60,14 +60,16 @@ export default class HierarchyComponent extends EditorComponent {
 
 	constructor() {
 		super();
-	}
-
-	public mounted() {
 		console.log('Mounted');
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
-		this.tree = (this.infiniteTreeComponent as any).tree as InfiniteTree;
+	}
+
+	public mounted() {
+		if (this.infiniteTreeComponent !== undefined) {
+			this.tree = (this.infiniteTreeComponent as any).tree as InfiniteTree;
+		}
 	}
 
 	private createNode(gameObject: GameObject): INode {
