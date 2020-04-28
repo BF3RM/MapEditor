@@ -116,15 +116,17 @@ export class SelectionGroup extends THREE.Object3D {
 				return;
 			}
 		}
-
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
+		this.makeParentsVisible();
 	}
 
 	private deselectAll() {
 		for (const go of this.selectedGameObjects) {
 			(go as GameObject).onDeselect();
 		}
+
+		this.makeParentsInvisible();
 		this.selectedGameObjects = [];
 	}
 
@@ -134,9 +136,23 @@ export class SelectionGroup extends THREE.Object3D {
 		for (let i = 0; i < this.selectedGameObjects.length; i++) {
 			if (this.selectedGameObjects[i].guid === gameObject.guid) {
 				gameObject.onDeselect();
+				this.makeParentsInvisible();
 				this.selectedGameObjects.splice(i, 1);
+				this.makeParentsVisible();
 				return;
 			}
+		}
+	}
+
+	private makeParentsInvisible() {
+		for (const i in this.selectedGameObjects) {
+			(this.selectedGameObjects[i] as GameObject).makeParentsInvisible();
+		}
+	}
+
+	private makeParentsVisible() {
+		for (const i in this.selectedGameObjects) {
+			(this.selectedGameObjects[i] as GameObject).makeParentsVisible();
 		}
 	}
 

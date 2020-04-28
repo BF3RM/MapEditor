@@ -213,9 +213,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	onSelect() {
 		this.selected = true;
-		if (this.parent !== null) {
-			this.parent.visible = true;
-		}
 		this.visible = true;
 		this.children.forEach(go => (go as GameObject).onSelect());
 	}
@@ -228,9 +225,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	onHighlight() {
 		this.highlighted = true;
-		if (this.parent !== null) {
-			this.parent.visible = true;
-		}
 		this.visible = true;
 		this.children.forEach(go => (go as GameObject).onHighlight());
 	}
@@ -238,6 +232,21 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	onUnhighlight() {
 		this.highlighted = false;
 		this.visible = false;
+		this.makeParentsVisible();
 		this.children.forEach(go => (go as GameObject).onUnhighlight());
+	}
+
+	makeParentsInvisible() {
+		if (this.parent !== null && this.parent.constructor.name === 'GameObject' && this.parent.visible) {
+			this.parent.visible = false;
+			(this.parent as GameObject).makeParentsInvisible();
+		}
+	}
+
+	makeParentsVisible() {
+		if (this.parent !== null && this.parent.constructor.name === 'GameObject' && !this.parent.visible) {
+			this.parent.visible = true;
+			(this.parent as GameObject).makeParentsVisible();
+		}
 	}
 }
