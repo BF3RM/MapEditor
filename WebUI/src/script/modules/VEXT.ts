@@ -62,8 +62,6 @@ export default class VEXTInterface {
 				WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
 			} else {
 				// eslint-disable-next-line no-self-assign
-
-				// eslint-disable-next-line no-self-assign
 				window.location = window.location;
 			}
 		}
