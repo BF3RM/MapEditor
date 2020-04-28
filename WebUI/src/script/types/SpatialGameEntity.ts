@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { Vector3 } from 'three';
+import { MeshBasicMaterial, Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
 export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
-	private static SELECTED_COLOR: number = 0xFF0000;
-	private static HIGHLIGHTED_COLOR: number = 0x999999;
+	private static SELECTED_COLOR: THREE.Color = new THREE.Color(0xFF0000);
+	private static HIGHLIGHTED_COLOR: THREE.Color = new THREE.Color(0x999999);
 	private readonly aabb: THREE.LineSegments;
 	private instanceId: number;
 	public transform: LinearTransform;
@@ -43,7 +43,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 			visible: true
 		}));
 
-		const color = SpatialGameEntity.SELECTED_COLOR;
+		// const color = SpatialGameEntity.SELECTED_COLOR;
 
 		const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
 		const positions = new Float32Array(8 * 3);
@@ -154,11 +154,13 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	}
 
 	public onHighlight() {
+		console.log('onHighlight');
 		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
 		this.visible = true;
 	}
 
 	public onUnhighlight() {
+		console.log('onUnhighlight');
 		this.visible = false;
 	}
 
@@ -171,8 +173,12 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		this.visible = true;
 	}
 
-	public SetColor(color: number) {
-		// (this.aabb.material as THREE.LineBasicMaterial).color.setHex(color);
+	public SetColor(color: THREE.Color) {
+		console.log(this.material);
+		const material = this.material;
+		if (!Array.isArray(material)) {
+			(material as MeshBasicMaterial).color = color;
+		}
 		editor.threeManager.setPendingRender();
 	}
 }

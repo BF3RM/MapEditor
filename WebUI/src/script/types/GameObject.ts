@@ -26,10 +26,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public variation: number;
 	public gameEntitiesData: GameEntityData[];
 	public isVanilla: boolean;
-
 	public selected: boolean;
 	public highlighted: boolean;
-	private completeBoundingBox: THREE.Box3;
+	// private completeBoundingBox: THREE.Box3;
 	private _enabled: boolean;
 
 	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject',
@@ -54,7 +53,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this._enabled = true;
 		this.highlighted = false;
 
-		this.completeBoundingBox = new THREE.Box3();
+		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
 	}
@@ -229,11 +228,16 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	onHighlight() {
 		this.highlighted = true;
+		if (this.parent !== null) {
+			this.parent.visible = true;
+		}
+		this.visible = true;
 		this.children.forEach(go => (go as GameObject).onHighlight());
 	}
 
 	onUnhighlight() {
 		this.highlighted = false;
+		this.visible = false;
 		this.children.forEach(go => (go as GameObject).onUnhighlight());
 	}
 }
