@@ -89,8 +89,11 @@ export class THREEManager {
 		const scope = this;
 		const delta = scope.clock.getDelta();
 		const hasControlsUpdated = scope.cameraControls.update(delta);
+		this.gizmoControls.updateMatrixWorld();
+		if (scope.pendingRender) {
+			this.scene.updateMatrixWorld();
+		}
 		if (hasControlsUpdated || scope.pendingRender || scope.cameraHasMoved) {
-			this.scene.updateWorldMatrix(false, false);
 			scope.render();
 			scope.cameraHasMoved = false;
 		}

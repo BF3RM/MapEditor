@@ -46,7 +46,7 @@ export class EditorCore {
 	public setUpdating(value: boolean) {
 		this.isUpdating = value;
 		if (value) {
-			// this.renderLoop();
+			editor.threeManager.setPendingRender();
 		}
 	}
 
