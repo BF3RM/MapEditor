@@ -353,10 +353,11 @@ export class THREEManager {
 			raycaster.setFromCamera(mousePos, this.camera);
 
 			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
-
 			if (intersects.length > 0) {
 				// console.log('hit ' + (intersects.length) + ' objects');
-				for (const element of intersects.reverse()) {
+				for (const element of intersects.sort((a, b) => {
+					return a.distance - b.distance;
+				})) {
 					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 						continue;
 					}
