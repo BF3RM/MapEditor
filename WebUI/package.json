@@ -45,7 +45,7 @@
     "node-sass": "4.14.0",
     "sass": "1.26.5",
     "sass-loader": "8.0.2",
-    "tslint": "6.1.1",
+    "tslint": "6.1.2",
     "tslint-loader": "3.5.4",
     "typescript": "3.8.3",
     "vue-template-compiler": "2.6.11",
