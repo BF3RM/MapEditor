@@ -90,6 +90,7 @@ export class THREEManager {
 		const delta = scope.clock.getDelta();
 		const hasControlsUpdated = scope.cameraControls.update(delta);
 		if (hasControlsUpdated || scope.pendingRender || scope.cameraHasMoved) {
+			this.scene.updateMatrixWorld();
 			scope.render();
 			scope.cameraHasMoved = false;
 		}
