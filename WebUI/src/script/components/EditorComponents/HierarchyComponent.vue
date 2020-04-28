@@ -160,13 +160,6 @@ export default class HierarchyComponent extends EditorComponent {
 		console.log('onSelect');
 	}
 
-	private cleanPath(path: string) {
-		if (!this.selected) {
-			return path;
-		}
-		return path.replace(this.selected.path, '');
-	}
-
 	private shouldSelectNode(node: Node) {
 		// TODO Fool: check if ctrl key is pressed for multi-selection
 		return window.editor.Select(Guid.parse(node.id), false);
