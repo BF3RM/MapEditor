@@ -50,17 +50,17 @@ export class SelectionGroup extends THREE.Object3D {
 			childLocal.multiplyMatrices(go.matrixWorld, oldMatrixInverse); // calculates go's matrix relative to selectiongroup
 			childLocalNew.multiplyMatrices(transformMatrix, childLocal); // calculates go's new matrix with transformation matrix
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
-
 			// If there is no parent, the local matrix is the world matrix
 			if (go.parent == null) {
 				console.warn('Found GameObject without parent, this should never happen. Guid: ' + go.guid.toString());
-				go.matrix = childWorldNew.clone();
+				childWorldNew.decompose(go.position, go.quaternion, go.scale);
 			// If it has a parent, calculate the local matrix relative to it
 			} else {
 				parentWorldInverse.getInverse(go.parent.matrixWorld);
-				go.matrix.multiplyMatrices(childWorldNew, parentWorldInverse);
+				childWorldNew.multiplyMatrices(childWorldNew, parentWorldInverse);
+				childWorldNew.decompose(go.position, go.quaternion, go.scale);
 			}
-			go.matrixAutoUpdate = false;
+			go.updateMatrix();
 			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		// Save new matrix.
