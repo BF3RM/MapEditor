@@ -90,7 +90,7 @@ export class THREEManager {
 		const delta = scope.clock.getDelta();
 		const hasControlsUpdated = scope.cameraControls.update(delta);
 		if (hasControlsUpdated || scope.pendingRender || scope.cameraHasMoved) {
-			this.scene.updateMatrixWorld();
+			this.scene.updateWorldMatrix(false, false);
 			scope.render();
 			scope.cameraHasMoved = false;
 		}
@@ -139,6 +139,7 @@ export class THREEManager {
 	public focus(target?: THREE.Object3D) {
 		editor.vext.SendEvent('controlStart');
 		const scope = this;
+
 		if (target === undefined) {
 			if (editor.selectionGroup.selectedGameObjects.length !== 1) {
 				return;
@@ -185,7 +186,6 @@ export class THREEManager {
 			this.scene.attach(gameObject);
 		}
 		this.scene.remove(gameObject);
-
 		// this.setPendingRender();
 	}
 
@@ -202,7 +202,6 @@ export class THREEManager {
 	public showGizmo() {
 		this.gizmoControls.visible = true;
 		// this.mesh.visible = true;
-
 		// this.setPendingRender();
 	}
 
