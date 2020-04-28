@@ -98,7 +98,7 @@ export class EditorCore {
 		return gameObject;
 	}
 
-	public onSelectGameObject(gameObject: GameObject) {
+	public onSelectGameObject(gameObject: GameObject, isMultiSelection?:boolean) {
 		editor.threeManager.onSelectGameObject(gameObject);
 		/*
 
@@ -135,7 +135,7 @@ export class EditorCore {
 		editor.threeManager.setPendingRender();
 		*/
 		this.RequestUpdate();
-		signals.selectedGameObject.emit(gameObject.guid);
+		signals.selectedGameObject.emit(gameObject.guid, isMultiSelection);
 		return true;
 	}
 
@@ -213,7 +213,7 @@ export class EditorCore {
 
 		editor.selectionGroup.select(gameObject, multiSelection, moveGizmo);
 		editor.threeManager.setGizmoMode(GIZMO_MODE.translate); // should it?
-		return editor.editorCore.onSelectGameObject(gameObject);
+		return editor.editorCore.onSelectGameObject(gameObject, multiSelection);
 	}
 
 	public deselect(guid: Guid) {

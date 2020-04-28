@@ -47,7 +47,7 @@ export default class HierarchyComponent extends EditorComponent {
 
 	private tree: InfiniteTree;
 	private list: Blueprint[] = [];
-	private selected: Node | null;
+	private selected: Node[] = [];
 
 	private search: string = '';
 
@@ -137,18 +137,21 @@ export default class HierarchyComponent extends EditorComponent {
 
 	onSelectedGameObject(guid: Guid, isMultipleSelection?: boolean, scrollTo?: boolean) {
 		const currentNode = this.tree.getNodeById(guid.toString());
-
+		console.log(isMultipleSelection);
 		currentNode.state.selected = true;
 		if (guid.equals(Guid.createEmpty())) {
 			this.list = [];
-			this.selected = null;
+			this.selected = [];
 			return;
 		}
-		if (this.selected) {
-			this.selected.state.selected = false;
+		if (!isMultipleSelection && this.selected.length > 0) {
+			this.selected.forEach((node) => {
+				node.state.selected = false;
+			});
+			this.selected = [];
 		}
-		this.selected = currentNode;
-		this.selected.state.selected = true;
+		this.selected.push(currentNode);
+		currentNode.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
 		this.infiniteTreeComponent.scrollTo(currentNode);
 	}
