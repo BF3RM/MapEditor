@@ -150,6 +150,9 @@ export default class InfiniteTreeComponent extends Vue {
 		if (tree === undefined) {
 			return [];
 		}
+		if (this.$refs.scroller !== undefined) {
+			(this.$refs.scroller as RecycleScroller).scrollToItem(0);
+		}
 		const out = tree.nodes.filter((node) => !(node.state.filtered === false));
 		return out;
 	}

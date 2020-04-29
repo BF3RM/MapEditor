@@ -68,6 +68,9 @@ export default class ListComponent extends EditorComponent {
 		if (this.list === undefined) {
 			return [];
 		}
+		if (this.$refs.scroller !== undefined) {
+			(this.$refs.scroller as DynamicScroller).scrollToItem(0);
+		}
 		return this.list.filter((i) => i.name.toLowerCase().includes(lowerCaseSearch));
 	}
 }
