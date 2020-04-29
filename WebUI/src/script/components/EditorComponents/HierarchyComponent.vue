@@ -64,6 +64,7 @@ export default class HierarchyComponent extends EditorComponent {
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
+		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
 	}
 
 	public mounted() {
@@ -154,6 +155,16 @@ export default class HierarchyComponent extends EditorComponent {
 		currentNode.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
 		this.infiniteTreeComponent.scrollTo(currentNode);
+	}
+
+	private onDeselectedGameObject(guid: Guid) {
+		const node = this.tree.getNodeById(guid.toString());
+		node.state.selected = false;
+		const nodeIndex = (this.selected).findIndex((i) => {
+			// console.log(i.id === node.id);
+			return i.id === node.id;
+		});
+		this.selected.splice(nodeIndex, 1);
 	}
 
 	private onSelectNode(node: Node) {
