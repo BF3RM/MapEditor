@@ -331,6 +331,8 @@ export class THREEManager {
 
 		if (guid !== null) {
 			editor.Select(guid, multiSelection, true);
+		} else {
+			editor.Select(Guid.createEmpty(), false);
 		}
 	}
 
@@ -354,7 +356,7 @@ export class THREEManager {
 		return new Promise((resolve) => {
 			const raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mousePos, this.camera);
-
+			let hitSelf:GameObject | null = null;
 			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
 			if (intersects.length > 0) {
 				// console.log('hit ' + (intersects.length) + ' objects');
@@ -366,11 +368,17 @@ export class THREEManager {
 					}
 					if (element.object.parent.constructor.name === 'GameObject') {
 						const gameObject = element.object.parent as GameObject;
-
+						if (editor.selectionGroup.isSelected(gameObject)) {
+							hitSelf = gameObject;
+							continue;
+						}
 						// Select its parent if possible.
 						if (gameObject.parent != null) {
 							const parent = gameObject.parent as GameObject;
-
+							if (editor.selectionGroup.isSelected(parent)) {
+								hitSelf = parent;
+								continue;
+							}
 							if (parent.enabled && !parent.selected && parent.constructor.name === 'GameObject' &&
 								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint') &&
 								!editor.selectionGroup.isSelected(parent)) {
@@ -381,6 +389,11 @@ export class THREEManager {
 						if (gameObject.enabled) {
 							resolve(gameObject.guid);
 						}
+					}
+					if (hitSelf !== null) {
+						resolve(hitSelf.guid);
+					} else {
+						resolve(Guid.createEmpty());
 					}
 				}
 			} else {

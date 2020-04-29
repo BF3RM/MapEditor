@@ -57,6 +57,10 @@ export class EditorCore {
 
 	public renderLoop() {
 		const scope = this;
+		// eslint-disable-next-line no-prototype-builtins
+		if (!window.hasOwnProperty('editor')) {
+			return;
+		}
 		scope.stats.begin();
 		// GameObject update
 		this.pendingUpdates.forEach((gameObject, guid) => {
@@ -205,7 +209,12 @@ export class EditorCore {
 		if (this.highlightedObjectGuid === guid) {
 			this.unhighlight();
 		}
-
+		if (guid.equals(Guid.createEmpty())) {
+			for (const go of editor.selectionGroup.selectedGameObjects) {
+				this.deselect(go.guid);
+			}
+			return;
+		}
 		if (gameObject === undefined) {
 			LogError('Failed to select gameobject: ' + guid);
 			return false;
