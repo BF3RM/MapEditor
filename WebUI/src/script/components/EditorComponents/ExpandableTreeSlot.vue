@@ -76,7 +76,7 @@ export default class ExpandableTreeSlot extends Vue {
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
-		height: 1.5vmin;
+		height: 1vmin;
 		white-space: nowrap;
 		.text-container {
 			width: 100%;
