@@ -91,7 +91,7 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	onSpawnedBlueprint(commandActionResult: CommandActionResult) {
-		console.log('Spawning:' + commandActionResult.gameObjectTransferData.guid.value);
+		// console.log('Spawning:' + commandActionResult.gameObjectTransferData.guid.value);
 		const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
 		const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
 

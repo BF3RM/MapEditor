@@ -12,7 +12,7 @@ export class GameObjectTransferData {
 	public name: any;
 	public parentData: GameObjectParentData | any;
 	public blueprintCtrRef: CtrRef;
-	public transform: any;
+	public transform: LinearTransform;
 	public variation: number;
 	public gameEntities: GameEntityData[];
 	public isDeleted: boolean;

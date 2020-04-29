@@ -230,7 +230,7 @@ export default class Editor {
 		}
 
 		// Spawn blueprint
-		window.Log(LOGLEVEL.VERBOSE, 'Spawning blueprint: ' + blueprint.instanceGuid);
+		// window.Log(LOGLEVEL.VERBOSE, 'Spawning blueprint: ' + blueprint.instanceGuid);
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: Guid.create(),
 			name: blueprint.name,
@@ -318,6 +318,7 @@ export default class Editor {
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
 			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
+			this.selectionGroup.setMatrix(gameObjectTransferData.transform.toMatrix());
 		}
 
 		this.threeManager.setPendingRender();
