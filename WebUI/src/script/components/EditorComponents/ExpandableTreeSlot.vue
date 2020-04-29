@@ -4,6 +4,9 @@
 			<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 				:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
 		</div>
+		<div class="icon-container">
+			<img :class="'Icon Icon-' + node.type"/>
+		</div>
 		<div class="text-container" @click="SelectNode($event, node, tree)">
 			<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
 			<span class="slot-text" v-else>
@@ -81,8 +84,8 @@ export default class ExpandableTreeSlot extends Vue {
 		.text-container {
 			width: 100%;
 		}
-		.expand-container {
-			width: 1.5vmin;
+		.expand-container, .icon-container {
+			width: 1vmin;
 			height: 100%;
 			color: #6d6d6d;
 
