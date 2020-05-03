@@ -4379,7 +4379,7 @@ jest-worker@^25.4.0:
     merge-stream "^2.0.0"
     supports-color "^7.0.0"
 
-jquery@*, jquery@3.5.0, jquery@>=1.9.1, jquery@^3.4.1:
+jquery@*, jquery@3.5.0, jquery@>=1.9.1, jquery@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.0.tgz#9980b97d9e4194611c36530e7dc46a58d7340fc9"
   integrity sha512-Xb7SVYMvygPxbFMpTFQiHh1J7HClEaThguL15N/Gg37Lri/qKyhRGZYzHRyLH8Stq3Aow0LsHO2O2ci86fCrNQ==
@@ -8118,12 +8118,12 @@ vue-eslint-parser@^7.0.0:
     esquery "^1.0.1"
     lodash "^4.17.15"
 
-vue-golden-layout@2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/vue-golden-layout/-/vue-golden-layout-2.0.5.tgz#4599ae774a61de8dc9e602b0aed57c130f4964a5"
-  integrity sha512-PpJnRGyCTsaWL7doGi4h08ZYOfjAYiUGkLuAoe3YuFMufM47cd8cy42Wo5QRewCUU0aq1UY2idQmtjTOOKihlA==
+vue-golden-layout@2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/vue-golden-layout/-/vue-golden-layout-2.0.6.tgz#8d87c2247e46d882f3f13e3075d84a7553cd9d8c"
+  integrity sha512-YR1L7SnxdujVpLjUb1vNjK2qhLILJF/hoE/iGHJbqkBRCEYD7lArgdWyWfoxlga/+cZHO/5sZmAV6KcIojTThg==
   dependencies:
-    jquery "^3.4.1"
+    jquery "^3.5.0"
     vue-resize-directive "^1.2.0"
 
 vue-hot-reload-api@^2.3.0:
