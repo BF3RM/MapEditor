@@ -12,9 +12,6 @@ InstanceParser = InstanceParser(Realm.Realm_Server)
 CommandActions = CommandActions(Realm.Realm_ClientAndServer)
 EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
 
-local presetJSON = require "preset"
-local preset = json.decode(presetJSON)
-
 function MapEditorServer:__init()
 	m_Logger:Write("Initializing MapEditorServer")
 	self:RegisterEvents()
@@ -75,36 +72,7 @@ end
 
 function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	--ServerTransactionManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
-	if preset == nil then
-		print("FUCK")
-	end
-
-	if preset.header == nil or preset.header.mapName == nil then
-		print("FUCK v2")
-	end
 	ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
-	if string.find(p_Map:lower(), preset.header.mapName:lower()) then
-		print("FOUND DUST2")
-	end
-
-	local commands = {}
-
-	for key, v in pairs(preset.data) do
-		local a = DecodeParams(v)
-		local command = {}
-		command.type = "SpawnBlueprintCommand"
-		command.sender = ""
-		command.gameObjectTransferData = {
-			guid = key,
-			parentData = v.parentData,
-			blueprintCtrRef = v.blueprintCtrRef,
-			transform = v.transform,
-			variation = v.variation
-		}
-		table.insert(commands, command)
-	end
-	print(#commands)
-	ServerTransactionManager:ExecuteCommands(commands, 0)
 end
 
 function MapEditorServer:OnLevelDestroy()
