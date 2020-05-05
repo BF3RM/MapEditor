@@ -140,23 +140,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		signals.objectChanged.emit(this, 'transform', linearTransform);
 	}
 
-	public onMoveEnd(force: boolean = false) {
-		const scope = this;
-		if (!scope.hasMoved() && !force) {
-			return; // No position change
-		}
-		this.updateMatrixWorld(true);
-		const transform = new LinearTransform().setFromMatrix(scope.matrixWorld);
-		const command = new SetTransformCommand(new GameObjectTransferData({
-			guid: this.guid,
-			transform: this.transform
-		}), transform);
-		editor.execute(command);
-		signals.objectChanged.emit(this, 'transform', transform);
-
-		// Send move command to server
-	}
-
 	public setName(name: string) {
 		this.name = name;
 		signals.objectChanged.emit(this, 'name', name);

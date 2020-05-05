@@ -68,7 +68,7 @@ function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson, p_U
 end
 
 function ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
-	if(p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
+	if (p_Pass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0) then
 		return
 	end
 
@@ -81,7 +81,7 @@ function ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 
 	self:ExecuteCommands(s_QueuedCommands, p_Pass)
 
-	if(#self.m_Queue > 0) then
+	if (#self.m_Queue > 0) then
 		self.m_Queue = {}
 	end
 end

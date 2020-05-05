@@ -19,9 +19,45 @@ export class SelectionGroup extends THREE.Object3D {
 		// signals.objectChanged.connect(this.onObjectChanged.bind(this));
 	}
 
-	public onMove() {
+	public onClientOnlyMove() {
+		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
 		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
+	}
+
+	public onClientOnlyMoveEnd() {
+		// // Stop Moving
+		if (this.selectedGameObjects.length === 1) {
+			const gameObject = this.selectedGameObjects[0];
+			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
+			const command = new SetTransformCommand(new GameObjectTransferData({
+				guid: gameObject.guid,
+				transform: gameObject.transform
+			}), transform);
+			editor.execute(command);
+			// signals.objectChanged.emit(gameObject, 'transform', transform);
+			return;
+		}
+
+		const commands = [];
+
+		for (const gameObject of this.selectedGameObjects) {
+			if (!gameObject.hasMoved()) {
+				return; // No position change
+			}
+			// this.updateMatrixWorld(true);
+			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
+			const command = new SetTransformCommand(new GameObjectTransferData({
+				guid: gameObject.guid,
+				transform: gameObject.transform
+			}), transform);
+			// editor.execute(command);
+			// signals.objectChanged.emit(gameObject, 'transform', transform);
+			commands.push(command);
+		}
+
+		const bulkCommand = new BulkCommand(commands);
+		editor.execute(bulkCommand);
 	}
 
 	/*
@@ -95,6 +131,7 @@ export class SelectionGroup extends THREE.Object3D {
 		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
 	}
 
+	// TODO: Add exceptions, like deselecting a children of a gameobject that is currently selected.
 	public select(gameObject: GameObject, multiSelection: boolean, moveGizmo: boolean) {
 		if (gameObject === null || gameObject === undefined) {
 			return;
@@ -145,14 +182,14 @@ export class SelectionGroup extends THREE.Object3D {
 	}
 
 	private makeParentsInvisible() {
-		for (const i in this.selectedGameObjects) {
-			(this.selectedGameObjects[i] as GameObject).makeParentsInvisible();
+		for (const go of this.selectedGameObjects) {
+			go.makeParentsInvisible();
 		}
 	}
 
 	private makeParentsVisible() {
-		for (const i in this.selectedGameObjects) {
-			(this.selectedGameObjects[i] as GameObject).makeParentsVisible();
+		for (const go of this.selectedGameObjects) {
+			go.makeParentsVisible();
 		}
 	}
 

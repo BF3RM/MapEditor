@@ -1,8 +1,7 @@
 import Command from '../libs/three/Command';
-import SpawnBlueprintCommand from '@/script/commands/SpawnBlueprintCommand';
 
 export default class BulkCommand extends Command {
-	constructor(public commands: Command[] | SpawnBlueprintCommand[]) {
+	constructor(public commands: Command[]) {
 		super('BulkCommand');
 		this.name = 'Bulk command ' + commands[0].name;
 	}
