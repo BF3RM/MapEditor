@@ -110,7 +110,7 @@ export class SelectionGroup extends THREE.Object3D {
 	}
 
 	public select(gameObject: GameObject, multiSelection: boolean, moveGizmo: boolean) {
-		if (gameObject === null || gameObject === undefined) {
+		if (!gameObject) {
 			return;
 		}
 
@@ -118,18 +118,18 @@ export class SelectionGroup extends THREE.Object3D {
 			this.deselectAll();
 		}
 
-		// If first object move group to its position
-		if (this.selectedGameObjects.length === 0 || moveGizmo) {
-			this.setMatrix(gameObject.matrixWorld);
-		}
-
 		// TODO: Add exceptions, like deselecting a children of a gameobject that is currently selected.
 		if (multiSelection) {
+			console.log(gameObject.selected);
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
 				this.deselect(gameObject);
 				return;
 			}
+		}
+		// If first object move group to its position
+		if (this.selectedGameObjects.length === 0 || moveGizmo) {
+			this.setMatrix(gameObject.matrixWorld);
 		}
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
@@ -148,8 +148,11 @@ export class SelectionGroup extends THREE.Object3D {
 	// Find game object, deselect it and remove it from array.
 
 	public deselect(gameObject: GameObject) {
+		console.log('aaaaaaaaaa');
+
 		for (let i = 0; i < this.selectedGameObjects.length; i++) {
 			if (this.selectedGameObjects[i].guid === gameObject.guid) {
+				console.log('founddddddd');
 				gameObject.onDeselect();
 				this.makeParentsInvisible();
 				this.selectedGameObjects.splice(i, 1);

@@ -165,14 +165,13 @@ export class EditorCore {
 
 	public select(guid: Guid, multiSelection: boolean, moveGizmo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
-		console.log('select');
-		if (this.highlightedObjectGuid === guid) {
-			this.unhighlight();
-			console.log('unhighlight');
-		}
+		this.unhighlight();
+		// When selecting nothing, deselect all if its not multi selection.
 		if (guid.equals(Guid.createEmpty())) {
-			editor.selectionGroup.deselectAll();
-			editor.threeManager.hideGizmo();
+			if (!multiSelection) {
+				editor.selectionGroup.deselectAll();
+				editor.threeManager.hideGizmo();
+			}
 			return;
 		}
 		if (gameObject === undefined) {
@@ -185,6 +184,7 @@ export class EditorCore {
 		}
 
 		editor.selectionGroup.select(gameObject, multiSelection, moveGizmo);
+		editor.threeManager.setPendingRender();
 		signals.selectedGameObject.emit(gameObject.guid, multiSelection);
 	}
 
@@ -194,9 +194,7 @@ export class EditorCore {
 		if (gameObject === undefined) {
 			return;
 		}
-		// scope.threeManager.removeFromScene(gameObject);
 		editor.selectionGroup.deselect(gameObject);
-		// TODO
 		signals.deselectedGameObject.emit(guid);
 		if (scope.selectionGroup.selectedGameObjects.length === 0) {
 			scope.threeManager.hideGizmo();

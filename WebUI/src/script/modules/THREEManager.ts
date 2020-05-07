@@ -326,7 +326,7 @@ export class THREEManager {
 		if (guid !== null) {
 			editor.Select(guid, multiSelection, true);
 		} else {
-			editor.Select(Guid.createEmpty(), false);
+			editor.Select(Guid.createEmpty(), multiSelection);
 		}
 	}
 
@@ -350,7 +350,7 @@ export class THREEManager {
 		return new Promise((resolve) => {
 			const raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mousePos, this.camera);
-			let hitSelf:GameObject | null = null;
+			let hitSelf: GameObject | null = null;
 			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
 			if (intersects.length > 0) {
 				// console.log('hit ' + (intersects.length) + ' objects');
@@ -384,11 +384,12 @@ export class THREEManager {
 							resolve(gameObject.guid);
 						}
 					}
-					if (hitSelf !== null) {
-						resolve(hitSelf.guid);
-					} else {
-						resolve(Guid.createEmpty());
-					}
+				}
+				// A selected GameObject was hit.
+				if (hitSelf !== null) {
+					resolve(hitSelf.guid);
+				} else { // Didn't hit any GameObjects
+					resolve(null);
 				}
 			} else {
 				// console.log("no hit")
