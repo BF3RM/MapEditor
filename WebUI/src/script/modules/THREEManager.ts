@@ -192,20 +192,14 @@ export class THREEManager {
 		// this.setPendingRender();
 	}
 
-	public onSelectGameObject(gameObject: GameObject) {
-		// this.gizmoControls.Select(gameObject);
-	}
-
 	public hideGizmo() {
 		this.gizmoControls.visible = false;
-		// this.mesh.visible = false;
-		// this.setPendingRender();
+		this.setPendingRender();
 	}
 
 	public showGizmo() {
 		this.gizmoControls.visible = true;
-		// this.mesh.visible = true;
-		// this.setPendingRender();
+		this.setPendingRender();
 	}
 
 	public setPendingRender() {

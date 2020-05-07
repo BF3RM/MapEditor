@@ -102,47 +102,6 @@ export class EditorCore {
 		return gameObject;
 	}
 
-	public onSelectGameObject(gameObject: GameObject, isMultiSelection?:boolean) {
-		editor.threeManager.onSelectGameObject(gameObject);
-		/*
-
-		// If the object is already in this group and it's a multiselection we deselect it
-		if (gameObject.parent === editor.selectionGroup && isMultiSelection) {
-			editor.Deselect(guid);
-			return false;
-		}
-
-		// If we are selecting an object already selected (single selection)
-		if (gameObject.parent === editor.selectionGroup && !isMultiSelection && editor.selectionGroup.children.length === 1 && editor.selectionGroup.children[0] === gameObject) {
-			return false;
-		}
-
-		// Clear selection group when it's a single selection
-		if (!isMultiSelection && editor.selectionGroup.children.length !== 0) {
-			for (let i = editor.selectionGroup.children.length - 1; i >= 0; i--) {
-				editor.Deselect(editor.selectionGroup.children[i].guid);
-			}
-		}
-		editor.threeManager.scene.attach(gameObject);
-		if (editor.selectionGroup.children.length === 0) {
-			editor.selectionGroup.setTransform(new LinearTransform().setFromMatrix(gameObject.matrixWorld));
-		}
-		editor.selectionGroup.AttachObject(gameObject);
-
-		signals.selectedGameObject.emit(guid, isMultiSelection, scrollTo);
-
-		editor.selectionGroup.Select();
-		if (editor.selectionGroup.children.length !== 0) {
-			editor.threeManager.showGizmo();
-		}
-		editor.threeManager.AttachGizmoTo(editor.selectionGroup);
-		editor.threeManager.setPendingRender();
-		*/
-		this.RequestUpdate();
-		signals.selectedGameObject.emit(gameObject.guid, isMultiSelection);
-		return true;
-	}
-
 	public onPreviewDragStart(blueprint: Blueprint) {
 		this.previewBlueprint = blueprint;
 	}
@@ -206,13 +165,14 @@ export class EditorCore {
 
 	public select(guid: Guid, multiSelection: boolean, moveGizmo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+		console.log('select');
 		if (this.highlightedObjectGuid === guid) {
 			this.unhighlight();
+			console.log('unhighlight');
 		}
 		if (guid.equals(Guid.createEmpty())) {
-			for (const go of editor.selectionGroup.selectedGameObjects) {
-				this.deselect(go.guid);
-			}
+			editor.selectionGroup.deselectAll();
+			editor.threeManager.hideGizmo();
 			return;
 		}
 		if (gameObject === undefined) {
@@ -220,9 +180,12 @@ export class EditorCore {
 			return false;
 		}
 
+		if (editor.selectionGroup.selectedGameObjects.length === 0) {
+			editor.threeManager.showGizmo();
+		}
+
 		editor.selectionGroup.select(gameObject, multiSelection, moveGizmo);
-		editor.threeManager.setGizmoMode(GIZMO_MODE.translate); // should it?
-		return editor.editorCore.onSelectGameObject(gameObject, multiSelection);
+		signals.selectedGameObject.emit(gameObject.guid, multiSelection);
 	}
 
 	public deselect(guid: Guid) {

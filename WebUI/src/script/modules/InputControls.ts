@@ -156,7 +156,6 @@ export class InputControls {
 		const scope = this;
 
 		if (event.button === 0) {
-			console.log(event.button);
 			editor.threeManager.enableCameraControls();
 		}
 	}

@@ -5,7 +5,6 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
-import { Guid } from '@/script/types/Guid';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -26,7 +25,7 @@ export class SelectionGroup extends THREE.Object3D {
 	}
 
 	public onClientOnlyMoveEnd() {
-		// // Stop Moving
+		// Only one object selected
 		if (this.selectedGameObjects.length === 1) {
 			const gameObject = this.selectedGameObjects[0];
 			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
@@ -35,7 +34,6 @@ export class SelectionGroup extends THREE.Object3D {
 				transform: gameObject.transform
 			}), transform);
 			editor.execute(command);
-			// signals.objectChanged.emit(gameObject, 'transform', transform);
 			return;
 		}
 
@@ -51,13 +49,14 @@ export class SelectionGroup extends THREE.Object3D {
 				guid: gameObject.guid,
 				transform: gameObject.transform
 			}), transform);
-			// editor.execute(command);
-			// signals.objectChanged.emit(gameObject, 'transform', transform);
 			commands.push(command);
 		}
 
-		const bulkCommand = new BulkCommand(commands);
-		editor.execute(bulkCommand);
+		if (commands.length === 0) {
+			return;
+		}
+
+		editor.execute(new BulkCommand(commands));
 	}
 
 	/*
@@ -103,27 +102,6 @@ export class SelectionGroup extends THREE.Object3D {
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
 	}
 
-	private onObjectChanged(gameObject: GameObject) {
-		if (this.selectedGameObjects.length === 0 || gameObject == null) {
-			return;
-		}
-		if (gameObject.guid === this.selectedGameObjects[0].guid) {
-			// this.setMatrix(gameObject.matrixWorld);
-		}
-	}
-
-	public onMoveEnd() {
-		const commands: SetTransformCommand[] = [];
-		this.selectedGameObjects.forEach((go: GameObject) => {
-			const command = new SetTransformCommand(new GameObjectTransferData({
-				guid: go.guid,
-				transform: go.transform
-			}), go.transform);
-			commands.push(command);
-		});
-		editor.execute(new BulkCommand(commands));
-	}
-
 	public setMatrix(matrix: THREE.Matrix4) {
 		this.transform = new LinearTransform().setFromMatrix(matrix);
 		matrix.decompose(this.position, this.quaternion, this.scale);
@@ -131,7 +109,6 @@ export class SelectionGroup extends THREE.Object3D {
 		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
 	}
 
-	// TODO: Add exceptions, like deselecting a children of a gameobject that is currently selected.
 	public select(gameObject: GameObject, multiSelection: boolean, moveGizmo: boolean) {
 		if (gameObject === null || gameObject === undefined) {
 			return;
@@ -146,6 +123,7 @@ export class SelectionGroup extends THREE.Object3D {
 			this.setMatrix(gameObject.matrixWorld);
 		}
 
+		// TODO: Add exceptions, like deselecting a children of a gameobject that is currently selected.
 		if (multiSelection) {
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
@@ -158,7 +136,7 @@ export class SelectionGroup extends THREE.Object3D {
 		this.makeParentsVisible();
 	}
 
-	private deselectAll() {
+	public deselectAll() {
 		for (const go of this.selectedGameObjects) {
 			(go as GameObject).onDeselect();
 		}

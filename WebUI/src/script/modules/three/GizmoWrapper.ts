@@ -21,18 +21,21 @@ export default class GizmoWrapper extends TransformControls {
 	}
 
 	public onControlChanged() {
+		if (!this.visible) return;
 		// moving
 		editor.selectionGroup.onClientOnlyMove();
 		editor.editorCore.RequestUpdate();
 	}
 
 	public onControlMouseUp() {
+		if (!this.visible) return;
 		this.selected = false;
 		editor.setUpdating(false);
 		editor.selectionGroup.onClientOnlyMoveEnd();
 	}
 
 	public onControlMouseDown(e: any) {
+		if (!this.visible) return;
 		// Stop moving
 		this.selected = true;
 		editor.setUpdating(true);
