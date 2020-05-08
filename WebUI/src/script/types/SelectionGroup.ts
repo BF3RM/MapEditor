@@ -96,7 +96,8 @@ export class SelectionGroup extends THREE.Object3D {
 				childWorldNew.decompose(go.position, go.quaternion, go.scale);
 			}
 			go.updateMatrix();
-			signals.objectChanged.emit(go, 'transform', go.transform);
+			// TODO: create a nextFrame function instead of using setTimeout. Matrix are recalculated on render.
+			setTimeout(() => signals.objectChanged.emit(go, 'transform', go.transform), 20);
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
@@ -146,20 +147,14 @@ export class SelectionGroup extends THREE.Object3D {
 	}
 
 	// Find game object, deselect it and remove it from array.
-
 	public deselect(gameObject: GameObject) {
-		console.log('aaaaaaaaaa');
-
-		for (let i = 0; i < this.selectedGameObjects.length; i++) {
-			if (this.selectedGameObjects[i].guid === gameObject.guid) {
-				console.log('founddddddd');
-				gameObject.onDeselect();
-				this.makeParentsInvisible();
-				this.selectedGameObjects.splice(i, 1);
-				this.makeParentsVisible();
-				return;
-			}
-		}
+		const index = this.selectedGameObjects.findIndex((go) => go.guid === gameObject.guid);
+		console.log(index);
+		if (index === -1) return;
+		gameObject.onDeselect();
+		this.makeParentsInvisible();
+		this.selectedGameObjects.splice(index, 1);
+		this.makeParentsVisible();
 	}
 
 	private makeParentsInvisible() {

@@ -1,6 +1,6 @@
 class 'ClientTransactionManager'
 
-local m_Logger = Logger("ClientTransactionManager", true)
+local m_Logger = Logger("ClientTransactionManager", false)
 
 local CLIENT_READY_DELAY = 5
 

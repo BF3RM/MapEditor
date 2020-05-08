@@ -318,7 +318,7 @@ export default class Editor {
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
 			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
-			this.selectionGroup.setMatrix(gameObjectTransferData.transform.toMatrix());
+			// this.selectionGroup.setMatrix(gameObjectTransferData.transform.toMatrix());
 		}
 
 		this.threeManager.setPendingRender();
