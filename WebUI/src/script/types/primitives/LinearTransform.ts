@@ -158,4 +158,8 @@ export class LinearTransform {
 		this.rotation = (value[1] as Quaternion);
 		this.scale = value[2] as Vec3;
 	}
+
+	get elements() {
+		return [this.position, this.rotation, this.scale];
+	}
 }
