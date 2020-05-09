@@ -72,6 +72,25 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		);
 	}
 
+	public descendantOf(parentGameObject: GameObject): boolean {
+		if (!this.parent || this.parent.type === 'Scene') {
+			return false;
+		}
+		if (this.parent === parentGameObject) {
+			return true;
+		}
+
+		for (const child of this.children) {
+			if (child.constructor.name !== 'GameObject') continue;
+
+			if ((child as GameObject).descendantOf(parentGameObject)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public getCleanName() {
 		return this.name.replace(/^.*[\\/]/, '');
 	}

@@ -119,15 +119,31 @@ export class SelectionGroup extends THREE.Object3D {
 			this.deselectAll();
 		}
 
-		// TODO: Add exceptions, like deselecting a children of a gameobject that is currently selected.
 		if (multiSelection) {
-			console.log(gameObject.selected);
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
+				// Edge case:
+				// Can't deselect a child of a GameObject that is currently selected.
+				if (!this.isSelected(gameObject)) {
+					// TODO: Maybe add a ui console message?
+					return;
+				}
+
 				this.deselect(gameObject);
 				return;
 			}
+			// Edge case:
+			// Selecting a parent of a selected object(s) should deselect that/those object(s) first.
+			if (this.selectedGameObjects.length > 0 && gameObject.children.length > 0) {
+				// Find out if each selected objects are descendants of the new object.
+				for (const selectedGo of this.selectedGameObjects) {
+					if ((selectedGo as GameObject).descendantOf(gameObject)) {
+						this.deselect(selectedGo);
+					}
+				}
+			}
 		}
+
 		// If first object move group to its position
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
 			this.setMatrix(gameObject.matrixWorld);
