@@ -143,12 +143,43 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         partitionGuid = s_BlueprintPartitionGuid,
         instanceGuid = s_BlueprintInstanceGuid
     }
+	self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
     --- This is parent to children / top to bottom
-    self.m_GameObjects[s_GameObject.guid] = s_GameObject
-
     local s_EntityBus = p_Hook:Call()
+	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
+
+		if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
+			local s_GameEntity = GameEntity{
+				entity = l_Entity,
+				instanceId = l_Entity.instanceId,
+				indexInBlueprint = l_Index,
+				typeName = l_Entity.typeInfo.name,
+			}
+
+			if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
+				local s_Entity = SpatialEntity(l_Entity)
+				s_GameEntity.isSpatial = true
+				s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
+				s_GameEntity.aabb = AABB {
+					min = s_Entity.aabb.min,
+					max = s_Entity.aabb.max,
+					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
+				}
+			end
+
+			self.m_Entities[l_Entity.instanceId] = s_TempGuid
+			table.insert(s_GameObject.gameEntities, s_GameEntity)
+		end
+	end
+	if self.m_EntityBusesLookup[s_EntityBus.instanceId] then
+		print('fuckkkkkkkkkkkkkkkkkkkkkk')
+		print(s_EntityBus.instanceId)
+		for k,v in pairs(s_EntityBus.entities) do
+			print(v.typeInfo.name)
+		end
+	end
     self.m_EntityBusesLookup[s_EntityBus.instanceId] = {
-        gameObjectGuid = s_GameObject.guid,
+        gameObjectGuid = tostring(s_GameObject.guid),
         bus = s_EntityBus,
         bp = s_Blueprint.name,
         parentInstanceGuid = s_ParentInstanceGuid,
@@ -176,9 +207,12 @@ function GameObjectManager:Resolve()
         -- TODO Create GameObject
         if(l_EntityBusLookup.bus.parent == nil) then -- Custom or vanilla root
             -- TODO: Add GameObject as child to parent
-            local s_GameObject = self.m_GameObjects[l_EntityBusLookup.gameObjectGuid]
+
+            local s_GameObject = self.m_GameObjects[tostring(l_EntityBusLookup.gameObjectGuid)]
             local s_PendingInfo = self.m_PendingCustomBlueprintGuids[l_EntityBusLookup.gameObjectGuid]
-            if (s_PendingInfo) then -- We spawned this custom entitybus
+	        self.m_GameObjects[tostring(s_GameObject.guid)] = nil
+
+	        if (s_PendingInfo) then -- We spawned this custom entitybus
                 s_GameObject.parentData = s_PendingInfo.parentData
                 s_GameObject.guid = s_PendingInfo.customGuid
                 s_GameObject.vanilla = false
@@ -190,7 +224,8 @@ function GameObjectManager:Resolve()
                 -- TODO: Figure out if we need the parent reference?
                 --table.insert(s_ParentGameObject.children, s_GameObject)
             end
-            table.insert(s_RootGameObjects, s_GameObject)
+	        self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
+	        table.insert(s_RootGameObjects, s_GameObject)
         else -- This is a child of either a custom gameObject or a vanilla gameObject, find the parent!
             if(self.m_EntityBusesLookup[l_EntityBusLookup.bus.parent.instanceId] == nil) then
                 -- TODO: fix maybe
@@ -198,9 +233,8 @@ function GameObjectManager:Resolve()
                 goto continue
             end
             local s_EntityBusParent = self.m_EntityBusesLookup[l_EntityBusLookup.bus.parent.instanceId]
-            local s_ParentGameObject = self.m_GameObjects[s_EntityBusParent.gameObjectGuid]
-            local s_GameObject = self.m_GameObjects[l_EntityBusLookup.gameObjectGuid]
-
+            local s_ParentGameObject = self.m_GameObjects[tostring(s_EntityBusParent.gameObjectGuid)]
+            local s_GameObject = self.m_GameObjects[tostring(l_EntityBusLookup.gameObjectGuid)]
             s_GameObject.parentData = GameObjectParentData{
                 guid = s_ParentGameObject.guid,
                 typeName = s_ParentGameObject.blueprintCtrRef.typeName,
@@ -210,15 +244,16 @@ function GameObjectManager:Resolve()
 
             s_GameObject.vanilla = s_ParentGameObject.vanilla
 
+	        self.m_GameObjects[tostring(s_GameObject.guid)] = nil
             if s_GameObject.vanilla then
                 s_GameObject.guid = self:GetVanillaGuid(s_GameObject.name, s_GameObject.transform.trans)
             else
                 s_GameObject.guid = GenerateCustomGuid()
             end
-
+	        self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
             table.insert(s_ParentGameObject.children, s_GameObject)
         end
-        ::continue::
+	    ::continue::
     end
     for _, l_GameObject in pairs(s_RootGameObjects) do
         if l_GameObject.parentData.guid ~= "previewSpawn" then
