@@ -15,6 +15,9 @@ function GameObjectManager:RegisterVars()
     self.m_UnresolvedGameObjects = {}
     self.m_UnresolvedClientOnlyChildren = {}
     self.m_VanillaGameObjectGuids = {}
+
+    self.m_EntityBusesLookup = {}
+    self.m_UnresolvedEntityBuses = {}
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -103,6 +106,135 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         return
     end
 
+
+    local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
+    local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
+    local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
+
+    local s_ParentInstanceGuid
+    local s_ParentPartitionGuid
+    local s_ParentPrimaryInstance
+
+    if (p_Parent ~= nil) then
+        s_ParentInstanceGuid = tostring(p_Parent.instanceGuid)
+        s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
+        s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
+    end
+    local s_Blueprint = Blueprint(p_Blueprint) -- do we need that? for the name?
+
+    local s_GameObject = GameObject{
+        guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
+        name = s_Blueprint.name,
+        typeName = p_Blueprint.typeInfo.name,
+        parentData = GameObjectParentData{},
+        transform = p_Transform,
+        variation = p_Variation,
+        isVanilla = true,
+        isDeleted = false,
+        isEnabled = true,
+        gameEntities = {},
+        children = {},
+        realm = Realm.Realm_ClientAndServer
+    }
+
+    s_GameObject.blueprintCtrRef = CtrRef {
+        typeName = p_Blueprint.typeInfo.name,
+        name = s_Blueprint.name,
+        partitionGuid = s_BlueprintPartitionGuid,
+        instanceGuid = s_BlueprintInstanceGuid
+    }
+    --- This is parent to children / top to bottom
+    self.m_GameObjects[s_GameObject.guid] = s_GameObject
+
+    local s_EntityBus = p_Hook:Call()
+    self.m_EntityBusesLookup[s_EntityBus.instanceId] = {
+        gameObjectGuid = s_GameObject.guid,
+        bus = s_EntityBus,
+        bp = s_Blueprint.name,
+        parentInstanceGuid = s_ParentInstanceGuid,
+        parentPartitionGuid = s_ParentPartitionGuid
+    }
+
+    --- This is children to parent / bottom to top
+    table.insert(self.m_UnresolvedEntityBuses, s_EntityBus.instanceId)
+
+    -- TODO verify how to get parent
+    if(s_EntityBus.parent == nil) then
+        self:Resolve()
+    end
+end
+
+
+function GameObjectManager:Resolve()
+    --- Backwards, so we resolve parent first
+    local s_RootGameObjects = {}
+
+    for l_Index = #self.m_UnresolvedEntityBuses, 1, -1 do
+        local l_EntityBusInstanceId = self.m_UnresolvedEntityBuses[l_Index]
+        local l_EntityBusLookup = self.m_EntityBusesLookup[l_EntityBusInstanceId]
+
+        -- TODO Create GameObject
+        if(l_EntityBusLookup.bus.parent == nil) then -- Custom or vanilla root
+            -- TODO: Add GameObject as child to parent
+            local s_GameObject = self.m_GameObjects[l_EntityBusLookup.gameObjectGuid]
+            local s_PendingInfo = self.m_PendingCustomBlueprintGuids[l_EntityBusLookup.gameObjectGuid]
+            if (s_PendingInfo) then -- We spawned this custom entitybus
+                s_GameObject.parentData = s_PendingInfo.parentData
+                s_GameObject.guid = s_PendingInfo.customGuid
+                s_GameObject.vanilla = false
+                --table.insert(s_ParentGameObject.children, s_GameObject)
+
+            else -- This is a vanilla root object
+                s_GameObject.guid = self:GetVanillaGuid(s_GameObject.name, s_GameObject.transform.trans)
+                s_GameObject.vanilla = true
+                -- TODO: Figure out if we need the parent reference?
+                --table.insert(s_ParentGameObject.children, s_GameObject)
+            end
+            table.insert(s_RootGameObjects, s_GameObject)
+        else -- This is a child of either a custom gameObject or a vanilla gameObject, find the parent!
+            if(self.m_EntityBusesLookup[l_EntityBusLookup.bus.parent.instanceId] == nil) then
+                -- TODO: fix maybe
+                print("This should never happen")
+                goto continue
+            end
+            local s_EntityBusParent = self.m_EntityBusesLookup[l_EntityBusLookup.bus.parent.instanceId]
+            local s_ParentGameObject = self.m_GameObjects[s_EntityBusParent.gameObjectGuid]
+            local s_GameObject = self.m_GameObjects[l_EntityBusLookup.gameObjectGuid]
+
+            s_GameObject.parentData = GameObjectParentData{
+                guid = s_ParentGameObject.guid,
+                typeName = s_ParentGameObject.blueprintCtrRef.typeName,
+                primaryInstanceGuid = s_ParentGameObject.blueprintCtrRef.instanceGuid,
+                partitionGuid = s_ParentGameObject.blueprintCtrRef.partitionGuid
+            }
+
+            s_GameObject.vanilla = s_ParentGameObject.vanilla
+
+            if s_GameObject.vanilla then
+                s_GameObject.guid = self:GetVanillaGuid(s_GameObject.name, s_GameObject.transform.trans)
+            else
+                s_GameObject.guid = GenerateCustomGuid()
+            end
+
+            table.insert(s_ParentGameObject.children, s_GameObject)
+        end
+        ::continue::
+    end
+    for _, l_GameObject in pairs(s_RootGameObjects) do
+        if l_GameObject.parentData.guid ~= "previewSpawn" then
+            -- at this point, the gameObject and all its children are fully ready to be transferred to JS -> invoke sending of CommandActionResults
+            Events:DispatchLocal("GameObjectManager:GameObjectReady", l_GameObject)
+        end
+    end
+
+    self.m_UnresolvedEntityBuses = {}
+end
+function GameObjectManager:OnEntityCreateFromBlueprint1(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+    -- We dont load vanilla objects if the flag is active
+    if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+        return
+    end
+
     local s_TempGuid = GenerateTempGuid()
 
     local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
@@ -119,9 +251,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
     end
 
-    local s_EntiyBus = p_Hook:Call()
+    local s_EntityBus = p_Hook:Call()
     local s_GameEntities = {}
-    for l_Index, l_Entity in ipairs(s_EntiyBus.entities) do
+    for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 
         if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
             local s_GameEntity = GameEntity{
@@ -146,8 +278,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
             table.insert(s_GameEntities, s_GameEntity)
         end
     end
-
     local s_Blueprint = Blueprint(p_Blueprint) -- do we need that? for the name?
+    local s_VanillaGuid = self:GetVanillaGuid(s_Blueprint.name, p_Transform.trans)
+
     local s_GameObject = GameObject{
         guid = s_TempGuid, -- we set a tempGuid, it will later be set to a vanilla or custom guid
         name = s_Blueprint.name,

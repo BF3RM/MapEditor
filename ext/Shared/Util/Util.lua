@@ -221,18 +221,8 @@ function GenerateCustomGuid()
     return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
-
-function GetPaddedNumberAsString(n, stringLength)
-	local n_string = tostring(n)
-	local prefix = ""
-
-	if string.len(n_string) < stringLength then
-		for _=1,stringLength - string.len(n_string) do
-			prefix = prefix .."0"
-		end
-	end
-
-	return (prefix..n_string)
+function GenerateChildGuidFromCustomGuid(parentGuid)
+	return
 end
 
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
@@ -248,7 +238,28 @@ function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	return PadAndCreateGuid(hashAsString)
 end
 
+function GetPaddedNumberAsString(n, stringLength)
+	local n_string = tostring(n)
+	local prefix = ""
+
+	if string.len(n_string) < stringLength then
+		for _=1,stringLength - string.len(n_string) do
+			prefix = prefix .."0"
+		end
+	else
+		local trimSize = ((string.len(n_string) - stringLength) + 1) * -1
+		n_string = n_string:sub(1, trimSize)
+	end
+
+	return (prefix..n_string)
+end
 -- Generates a guid based on a given number. Used for vanilla objects.
-function PadAndCreateGuid(p_Hash)
-	return Guid(VANILLA_GUID_PREFIX .. "-0000-0000-0000-".. GetPaddedNumberAsString(p_Hash, 12), "D")
+function PadAndCreateGuid(p_Base, p_Index1, p_Index2)
+	local hash = MathUtils:FNVHash(p_Base)
+	hash = GetPaddedNumberAsString(hash, 8)
+	local index1 = GetPaddedNumberAsString(p_Index1,4)
+	local index2 = GetPaddedNumberAsString(p_Index2, 12)
+	local guid = hash .. "-0000-0000-".. index1 .."-".. index2
+	local castedGuid = Guid(guid)
+	return castedGuid
 end
