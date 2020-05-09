@@ -95,12 +95,30 @@ export class THREEManager {
 		}
 		if (hasControlsUpdated || scope.pendingRender || scope.cameraHasMoved) {
 			scope.render();
+			for (const fun of this.nextFramePendingCalls) {
+				fun();
+			}
+			this.nextFramePendingCalls = [];
 			scope.cameraHasMoved = false;
 		}
 		if (scope.waitingForControlEnd && !scope.updatingCamera && !hasControlsUpdated) {
 			editor.vext.SendEvent('controlEnd');
 			scope.waitingForControlEnd = false;
 		}
+	}
+
+	private nextFramePendingCalls: (() => void)[] = [];
+
+	public nextFrame(handler: (this: this) => void) {
+		this.nextFramePendingCalls.push(() => {
+			if (handler) {
+				try {
+					handler.call(this);
+				} catch (e) {
+					console.error(e, 'nextFrame');
+				}
+			}
+		});
 	}
 
 	public registerEvents() {

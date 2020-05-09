@@ -96,8 +96,8 @@ export class SelectionGroup extends THREE.Object3D {
 				childWorldNew.decompose(go.position, go.quaternion, go.scale);
 			}
 			go.updateMatrix();
-			// TODO: create a nextFrame function instead of using setTimeout. Matrix are recalculated on render.
-			setTimeout(() => signals.objectChanged.emit(go, 'transform', go.transform), 20);
+			// Matrix is recalculated on render, we call the signal in the next frame.
+			editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);

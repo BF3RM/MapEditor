@@ -410,9 +410,7 @@ export default class Editor {
 		}
 		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
 			// Make selection happen after all signals have been handled
-			setTimeout(() => {
-				scope.Select(gameObjectGuid, false);
-			}, 2);
+			this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false));
 		}
 	}
 
