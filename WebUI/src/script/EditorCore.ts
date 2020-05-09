@@ -2,17 +2,14 @@ import { LinearTransform } from './types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { PreviewDestroyMessage } from './messages/PreviewDestroyMessage';
 import { Blueprint } from '@/script/types/Blueprint';
-import * as Collections from 'typescript-collections';
 import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
-import { Message } from '@/script/messages/Message';
 import { LogError } from '@/script/modules/Logger';
 import { signals } from '@/script/modules/Signals';
 import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
-import { GIZMO_MODE } from '@/script/modules/THREEManager';
 import Stats from 'three/examples/jsm/libs/stats.module';
 
 export class EditorCore {

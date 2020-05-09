@@ -226,12 +226,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	onHighlight() {
+		if (this.selected) return;
 		this.highlighted = true;
 		this.visible = true;
 		this.children.forEach(go => (go as GameObject).onHighlight());
 	}
 
 	onUnhighlight() {
+		if (this.selected) return;
 		this.highlighted = false;
 		this.visible = false;
 		this.makeParentsVisible();
