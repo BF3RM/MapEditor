@@ -89,7 +89,7 @@ function ToWorld(p_Local, p_ParentWorld)
 		{p_ParentWorld.forward.x,p_ParentWorld.forward.y,p_ParentWorld.forward.z,0},
 		{p_ParentWorld.trans.x,p_ParentWorld.trans.y,p_ParentWorld.trans.z,1}
 	}
-	
+
 	local s_MatrixLocal = matrix{
 		{p_Local.left.x,p_Local.left.y,p_Local.left.z,0},
 		{p_Local.up.x,p_Local.up.y,p_Local.up.z,0},
@@ -97,7 +97,7 @@ function ToWorld(p_Local, p_ParentWorld)
 		{p_Local.trans.x,p_Local.trans.y,p_Local.trans.z,1}
 	}
 
-	local s_MatrixWorld = s_MatrixLocal * s_MatrixParent 
+	local s_MatrixWorld = s_MatrixLocal * s_MatrixParent
 
 	s_LinearTransform.left = Vec3(s_MatrixWorld[1][1],s_MatrixWorld[1][2],s_MatrixWorld[1][3])
 	s_LinearTransform.up = Vec3(s_MatrixWorld[2][1],s_MatrixWorld[2][2],s_MatrixWorld[2][3])
@@ -120,7 +120,7 @@ function ToLocal(world, p_ParentWorld)
 		{p_ParentWorld.forward.x,p_ParentWorld.forward.y,p_ParentWorld.forward.z,0},
 		{p_ParentWorld.trans.x,p_ParentWorld.trans.y,p_ParentWorld.trans.z,1}
 	}
-	
+
 	local s_MatrixWorld = matrix{
 		{world.left.x,world.left.y,world.left.z,0},
 		{world.up.x,world.up.y,world.up.z,0},
@@ -128,8 +128,8 @@ function ToLocal(world, p_ParentWorld)
 		{world.trans.x,world.trans.y,world.trans.z,1}
 	}
 
-	local s_MatrixParent_Inv = matrix.invert(s_MatrixParent) 
-	local s_MatrixLocal = s_MatrixWorld * s_MatrixParent_Inv 
+	local s_MatrixParent_Inv = matrix.invert(s_MatrixParent)
+	local s_MatrixLocal = s_MatrixWorld * s_MatrixParent_Inv
 
 
 	s_LinearTransform.left = Vec3(s_MatrixLocal[1][1],s_MatrixLocal[1][2],s_MatrixLocal[1][3])
@@ -140,7 +140,7 @@ function ToLocal(world, p_ParentWorld)
 	return SanitizeLT(s_LinearTransform)
 end
 
-function SanitizeLT (lt) 
+function SanitizeLT (lt)
 	lt.left = SanitizeVec3(lt.left)
 	lt.up = SanitizeVec3(lt.up)
 	lt.forward = SanitizeVec3(lt.forward)
@@ -221,10 +221,6 @@ function GenerateCustomGuid()
     return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
-function GenerateChildGuidFromCustomGuid(parentGuid)
-	return
-end
-
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	local intHash = MathUtils:FNVHash(p_Name .. tostring(p_Transform))
 
@@ -254,16 +250,9 @@ function GetPaddedNumberAsString(n, stringLength)
 	return (prefix..n_string)
 end
 -- Generates a guid based on a given number. Used for vanilla objects.
-function PadAndCreateGuid(p_Base, p_Index1, p_Index2)
-	local hash = MathUtils:FNVHash(p_Base)
-	hash = GetPaddedNumberAsString(hash, 8)
-	local index1 = GetPaddedNumberAsString(p_Index1,4)
-	local index2 = GetPaddedNumberAsString(p_Index2, 12)
-	local guid = hash .. "-0000-0000-".. index1 .."-".. index2
-	local castedGuid = Guid(guid)
-	return castedGuid
+function PadAndCreateGuid(p_Hash)
+	return Guid(VANILLA_GUID_PREFIX .. "-0000-0000-0000-".. GetPaddedNumberAsString(p_Hash, 12), "D")
 end
-
 function GetLength(T)
 	local count = 0
 	for _ in pairs(T) do count = count + 1 end
