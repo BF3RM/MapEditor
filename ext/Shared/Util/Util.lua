@@ -263,3 +263,9 @@ function PadAndCreateGuid(p_Base, p_Index1, p_Index2)
 	local castedGuid = Guid(guid)
 	return castedGuid
 end
+
+function GetLength(T)
+	local count = 0
+	for _ in pairs(T) do count = count + 1 end
+	return count
+end
