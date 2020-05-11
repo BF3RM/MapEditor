@@ -96,13 +96,13 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onSelectionGroupChanged(group: SelectionGroup) {
-		if (!this.group) {
-			this.group = group;
-		}
-		if (!this.dragging) {
-			// Update inspector transform.
-			this.transform = this.group.transform;
-		}
+		// if (!this.group) {
+		// 	this.group = group;
+		// }
+		// if (!this.dragging) {
+		// 	// Update inspector transform.
+		// 	this.transform = this.group.transform;
+		// }
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
