@@ -144,10 +144,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	public updateTransform() {
 		const matrix = this.transform.toMatrix();
-		const parent = this.parent;
-		if (parent !== null && parent.type !== 'Scene') {
-			editor.threeManager.attachToScene(this as GameObject);
-		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
 	}
@@ -156,7 +152,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.transform = linearTransform;
 		this.updateTransform();
 		editor.threeManager.setPendingRender();
-		signals.objectChanged.emit(this, 'transform', linearTransform);
+		editor.threeManager.nextFrame(() => signals.objectChanged.emit(this, 'transform', linearTransform));
 	}
 
 	public setName(name: string) {

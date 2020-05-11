@@ -19,7 +19,6 @@ import { GIZMO_MODE, THREEManager } from './modules/THREEManager';
 import { EditorCore } from './EditorCore';
 import { SpatialGameEntity } from './types/SpatialGameEntity';
 import { CommandActionResult } from './types/CommandActionResult';
-import { HighlightGroup } from './types/HighlightGroup';
 import { GameObjectTransferData } from './types/GameObjectTransferData';
 import { GameObject } from './types/GameObject';
 import { FrostbiteDataManager } from './modules/FrostbiteDataManager';

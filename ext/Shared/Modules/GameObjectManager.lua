@@ -99,17 +99,15 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
 	return true
 end
-local debug = false
-local counter = 0
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 
 	-- We dont load vanilla objects if the flag is active
 	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 		return
 	end
+
 	if p_Parent ~= nil and p_Parent.instanceGuid == Guid('FE9BF899-0000-0000-FF64-00FF64076739') then
-		print("what")
-		debug = true
+		print("Loading havok WorldPartData")
 	end
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
 	local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
@@ -148,8 +146,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		instanceGuid = s_BlueprintInstanceGuid
 	}
 	self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
-
-	counter = counter + 1
 
 	--- Resolve the parent
 	if p_Parent ~= nil then

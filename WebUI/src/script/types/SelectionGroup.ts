@@ -89,6 +89,9 @@ export class SelectionGroup extends THREE.Object3D {
 			if (go.parent == null) {
 				console.warn('Found GameObject without parent, this should never happen. Guid: ' + go.guid.toString());
 				childWorldNew.decompose(go.position, go.quaternion, go.scale);
+			// If the parent is the scene we dont need to calculate the local matrix as its the same as the world matrix
+			} else if (go.parent.type === 'Scene') {
+				childWorldNew.decompose(go.position, go.quaternion, go.scale);
 			// If it has a parent, calculate the local matrix relative to it
 			} else {
 				parentWorldInverse.getInverse(go.parent.matrixWorld);
