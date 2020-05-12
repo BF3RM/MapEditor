@@ -59,11 +59,11 @@ export class SelectionGroup extends THREE.Object3D {
 		editor.execute(new BulkCommand(commands));
 	}
 
-	/*
-	 Moves all selected objects relative to the selection group. As SelectionGroup doesn't add the selected objects as
-	 children, we have to manually calculate their new matrices. First we calc the SelectionGroup's transformation
-	 matrix with the new and old SelectionGroup's matrices. Then we calc each GameObject transform relative to SelectionGroup
-	 so we can now apply the transformation matrix to get their new matrices.
+	/**
+	 * Moves all selected objects relative to the selection group. As SelectionGroup doesn't add the selected objects as
+	 * children, we have to manually calculate their new matrices. First we calc the SelectionGroup's transformation
+	 * matrix with the new and old SelectionGroup's matrices. Then we calc each GameObject transform relative to SelectionGroup
+	 * so we can now apply the transformation matrix to get their new matrices.
 	 */
 	public updateSelectedGameObjects() {
 		const selectionGroupWorld = this.transform.toMatrix();
@@ -73,32 +73,17 @@ export class SelectionGroup extends THREE.Object3D {
 			this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
 			return;
 		}
-		const oldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld);
-		const transformMatrix = new THREE.Matrix4().multiplyMatrices(selectionGroupWorldNew, oldMatrixInverse);
-
+		const selectionOldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld);
+		const transformMatrix = new THREE.Matrix4().multiplyMatrices(selectionGroupWorldNew, selectionOldMatrixInverse);
 		const childLocal = new THREE.Matrix4();
 		const childLocalNew = new THREE.Matrix4();
 		const childWorldNew = new THREE.Matrix4();
-		const parentWorldInverse = new THREE.Matrix4();
 
 		for (const go of this.selectedGameObjects) {
-			childLocal.multiplyMatrices(go.matrixWorld, oldMatrixInverse); // calculates go's matrix relative to selectiongroup
+			childLocal.multiplyMatrices(go.matrixWorld, selectionOldMatrixInverse); // calculates go's matrix relative to selection group
 			childLocalNew.multiplyMatrices(transformMatrix, childLocal); // calculates go's new matrix with transformation matrix
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
-			// If there is no parent, the local matrix is the world matrix
-			if (go.parent == null) {
-				console.warn('Found GameObject without parent, this should never happen. Guid: ' + go.guid.toString());
-				childWorldNew.decompose(go.position, go.quaternion, go.scale);
-			// If the parent is the scene we dont need to calculate the local matrix as its the same as the world matrix
-			} else if (go.parent.type === 'Scene') {
-				childWorldNew.decompose(go.position, go.quaternion, go.scale);
-			// If it has a parent, calculate the local matrix relative to it
-			} else {
-				parentWorldInverse.getInverse(go.parent.matrixWorld);
-				childWorldNew.multiplyMatrices(childWorldNew, parentWorldInverse);
-				childWorldNew.decompose(go.position, go.quaternion, go.scale);
-			}
-			go.updateMatrix();
+			go.setWorldMatrix(childWorldNew);
 			// Matrix is recalculated on render, we call the signal in the next frame.
 			editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
 		}
@@ -110,7 +95,7 @@ export class SelectionGroup extends THREE.Object3D {
 		this.transform = new LinearTransform().setFromMatrix(matrix);
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
-		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
+		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public select(gameObject: GameObject, multiSelection: boolean, moveGizmo: boolean) {

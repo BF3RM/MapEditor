@@ -143,9 +143,24 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	public updateTransform() {
-		const matrix = this.transform.toMatrix();
+		this.setWorldMatrix(this.transform.toMatrix());
+	}
+
+	/**
+	 * Translates world matrix to local in order to set the matrix.
+	 * */
+	public setWorldMatrix(worldMatrix: THREE.Matrix4) {
+		const matrix = worldMatrix;
+		if (!this.parent) {
+			console.warn('Found GameObject without parent, this should never happen. Guid: ' + this.guid.toString());
+		} else if (this.parent.type !== 'Scene') {
+			// Calculate local transform.
+			const parentWorldInverse = new THREE.Matrix4();
+			parentWorldInverse.getInverse(this.parent.matrixWorld);
+			matrix.multiplyMatrices(parentWorldInverse, matrix);
+		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
-		this.updateMatrix();
+		this.updateMatrix(); // Matrix will update in next render call.
 	}
 
 	public setTransform(linearTransform: LinearTransform) {
