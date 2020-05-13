@@ -171,16 +171,16 @@ export default class Editor {
 	}
 
 	public Duplicate() {
-		// const scope = this;
-		// const commands: Command[] = [];
-		// this.selectionGroup.children.forEach((childGameObject) => {
-		// 	const gameObjectTransferData = childGameObject.getGameObjectTransferData();
-		// 	gameObjectTransferData.guid = Guid.create();
-		//
-		// 	commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
-		// });
+		const scope = this;
+		const commands: Command[] = [];
+		this.selectionGroup.selectedGameObjects.forEach((childGameObject) => {
+			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+			gameObjectTransferData.guid = Guid.create();
+
+			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+		});
 		// console.log(commands);
-		// scope.execute(new BulkCommand(commands));
+		scope.execute(new BulkCommand(commands));
 	}
 
 	public Copy() {

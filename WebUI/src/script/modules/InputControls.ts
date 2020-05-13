@@ -1,6 +1,7 @@
 import { GIZMO_MODE } from '@/script/modules/THREEManager';
 import CameraControls from 'camera-controls';
 import { Vec2 } from '@/script/types/primitives/Vec2';
+import { Guid } from '@/script/types/Guid';
 
 // TODO Fool: add config keymap
 
@@ -230,6 +231,9 @@ export class InputControls {
 		}
 		if (event.which === KEYCODE.F2) {
 			editor.vext.SendEvent('DisableFreecam');
+		}
+		if (event.which === KEYCODE.ESCAPE) {
+			editor.Select(Guid.createEmpty(), false); // Deselects everything.
 		}
 	}
 }

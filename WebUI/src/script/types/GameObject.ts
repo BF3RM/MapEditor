@@ -148,7 +148,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	/**
 	 * Translates world matrix to local in order to set the matrix.
-	 * */
+	 */
 	public setWorldMatrix(worldMatrix: THREE.Matrix4) {
 		const matrix = worldMatrix;
 		if (!this.parent) {

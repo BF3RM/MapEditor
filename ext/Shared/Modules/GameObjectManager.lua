@@ -100,7 +100,6 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	return true
 end
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
-
 	-- We dont load vanilla objects if the flag is active
 	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 		return
@@ -160,7 +159,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)] = nil
 		end
 	else
-		print('Found entity without parent wtf man') -- TODO: fix
+		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+			print('Found vanilla object without parent wtf') -- TODO: do we need to add these objects?
+		else
+			print('Found custom object without parent')
+			-- Custom object, parent is root
+			self:ResolveRootObject(s_GameObject)
+		end
 	end
 
 	--- Save ReferenceObjectDatas that the blueprint might have to resolve parents of descendants.
@@ -184,6 +189,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	---^^^^ This is parent to children / top to bottom ^^^^
 	local s_EntityBus = p_Hook:Call()
 	---vvvv This is children to parent / bottom to top vvvv
+
+	-- TODO: Maybe remove gameobjects that dont have entities.
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
@@ -214,29 +221,43 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if s_GameObject.parentData.guid == nil then
 		local s_UnresolvedRODCount = GetLength(self.m_ReferenceObjectDatas)
 		if (s_UnresolvedRODCount ~= 0) then
-			-- some are client only
-			print(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
+			-- TODO: Resolve client and server only objects
+			if self.m_Realm == Realm.Realm_Server then
+				print(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
+			elseif self.m_Realm == Realm.Realm_Client then
+				print(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
+			end
 			self.m_ReferenceObjectDatas = {}
 		end
+		Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+	end
+
+	--- If its a root custom object we remove it from pending and call ready event.
+	if self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] ~= nil then
+		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
 		Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 	end
 end
 
 function GameObjectManager:ResolveRootObject(p_GameObject)
-	local s_PendingInfo = self.m_PendingCustomBlueprintGuids[tostring(p_GameObject.guid)]
+	local s_PendingInfo = self.m_PendingCustomBlueprintGuids[tostring(p_GameObject.blueprintCtrRef.instanceGuid)]
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil
 
-	-- TODO: Figure out if we need the parent reference?
 	if (s_PendingInfo) then -- We spawned this custom entitybus
-		p_GameObject.parentData = s_PendingInfo.parentData
+		p_GameObject.parentData = GameObjectParentData{
+			guid = s_PendingInfo.parentData.guid,
+			typeName = s_PendingInfo.parentData.typeName,
+			primaryInstanceGuid = s_PendingInfo.parentData.primaryInstanceGuid,
+			partitionGuid = s_PendingInfo.parentData.partitionGuid
+		}
 		p_GameObject.guid = s_PendingInfo.customGuid
 		p_GameObject.vanilla = false
-
 	else -- This is a vanilla root object
+		-- TODO: Figure out if we need the parent reference?
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		p_GameObject.vanilla = true
-
 	end
+
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 end
 
@@ -259,7 +280,6 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 	table.insert(p_ParentGameObject.children, p_GameObject)
 end
-
 
 function GameObjectManager:GetVanillaGameObjectsGuids()
 	return self.m_VanillaGameObjectGuids
