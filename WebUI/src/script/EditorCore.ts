@@ -216,6 +216,7 @@ export class EditorCore {
 		this.unhighlight();
 		gameObject.onHighlight();
 		this.highlightedObjectGuid = guid;
+		editor.threeManager.setPendingRender();
 	}
 
 	public unhighlight() {
@@ -225,5 +226,6 @@ export class EditorCore {
 			gameObject.onUnhighlight();
 		}
 		this.highlightedObjectGuid = null;
+		editor.threeManager.setPendingRender();
 	}
 }

@@ -4,9 +4,9 @@
 			<div class="header">
 				<Search v-model="search"/>
 			</div>
-			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode">
 				<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name + ' (' + node.children.length + ')'"
-									:selected="node.state.selected"/>
+									:selected="node.state.selected" @node:hover="onNodeHover" @node:hover-end="onNodeHoverEnd" @node:click="onNodeClick" />
 			</infinite-tree-component>
 		</gl-component>
 		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
@@ -167,13 +167,24 @@ export default class HierarchyComponent extends EditorComponent {
 		this.selected.splice(nodeIndex, 1);
 	}
 
-	private onSelectNode(node: Node) {
-		console.log('onSelect');
+	private onNodeHover(nodeId: string) {
+		const guid = Guid.parse(nodeId.toString());
+		if (guid.isEmpty()) return;
+		window.editor.editorCore.highlight(guid);
+	}
+
+	private onNodeHoverEnd() {
+		window.editor.editorCore.unhighlight();
+	}
+
+	private onNodeClick(o: any) {
+		const guid = Guid.parse(o.nodeId.toString());
+		if (guid.isEmpty()) return;
+		window.editor.Select(guid, o.event.ctrlKey);
 	}
 
 	private shouldSelectNode(node: Node) {
-		// TODO Fool: check if ctrl key is pressed for multi-selection
-		return window.editor.Select(Guid.parse(node.id), false);
+		// TODO: logic to check if selectable
 	}
 
 	private SpawnBlueprint(blueprint: Blueprint) {

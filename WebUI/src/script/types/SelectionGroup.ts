@@ -144,6 +144,7 @@ export class SelectionGroup extends THREE.Object3D {
 	public deselectAll() {
 		for (const go of this.selectedGameObjects) {
 			(go as GameObject).onDeselect();
+			signals.deselectedGameObject.emit(go.guid);
 		}
 
 		this.makeParentsInvisible();

@@ -1,5 +1,5 @@
 <template>
-	<div class="tree-node" :style="nodeStyle(node)" :class="{ selected: selected }">
+	<div class="tree-node" :style="nodeStyle(node)" :class="{ selected: selected }"  @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
 		<div class="expand-container" @click="ToggleNode($event,node,tree)">
 			<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 				:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
@@ -16,7 +16,7 @@
 	</div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
 
@@ -38,7 +38,7 @@ export default class ExpandableTreeSlot extends Vue {
 	selected: boolean;
 
 	private nodeStyle(node: Node) {
-		if (node.state === undefined) {
+		if (!node.state) {
 			console.error('Missing node state: ' + node);
 		}
 		return {
@@ -46,8 +46,10 @@ export default class ExpandableTreeSlot extends Vue {
 		};
 	}
 
+	@Emit('node:click')
 	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
-		tree.selectNode(node);
+		this.tree.selectNode(node);
+		return { event: e, nodeId: node.id };
 	}
 
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
@@ -57,6 +59,16 @@ export default class ExpandableTreeSlot extends Vue {
 		} else if (toggleState === 'opened') {
 			tree.closeNode(node);
 		}
+	}
+
+	@Emit('node:hover')
+	private NodeHover(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		return node.id;
+	}
+
+	@Emit('node:hover-end')
+	private NodeHoverEnd() {
+		//
 	}
 
 	private toggleState(node: Node) {
