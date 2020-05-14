@@ -221,6 +221,13 @@ function GenerateCustomGuid()
     return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
+function GenerateChildGuid(p_ParentGuid, p_Offset)
+	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
+	local a = s_ParentGuidParts[5]
+	local b = tonumber(a,16)
+	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. string.format("%x", b+1):upper())
+end
+
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	local intHash = MathUtils:FNVHash(p_Name .. tostring(p_Transform))
 
@@ -257,4 +264,11 @@ function GetLength(T)
 	local count = 0
 	for _ in pairs(T) do count = count + 1 end
 	return count
+end
+
+function string:split(sep)
+	local sep, fields = sep or ":", {}
+	local pattern = string.format("([^%s]+)", sep)
+	self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	return fields
 end

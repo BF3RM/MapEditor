@@ -1,6 +1,6 @@
 class 'GameObjectManager'
 
-local m_Logger = Logger("GameObjectManager", false)
+local m_Logger = Logger("GameObjectManager", true)
 
 function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
@@ -85,16 +85,12 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.variationNameHash = p_Variation
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
 
-	local s_ObjectEntities = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
+	local s_EntityBus = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 
-	if #s_ObjectEntities.entities == 0 then
+	if s_EntityBus == nil then
 		m_Logger:Error("Spawning failed")
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = nil
 		return false
-	end
-
-	for _,l_Entity in pairs(s_ObjectEntities.entities) do
-		l_Entity:Init(self.m_Realm, true)
 	end
 
 	return true
@@ -106,11 +102,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	if p_Parent ~= nil and p_Parent.instanceGuid == Guid('FE9BF899-0000-0000-FF64-00FF64076739') then
-		print("Loading havok WorldPartData")
+		m_Logger:Write("Loading havok WorldPartData")
 	end
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
 	local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
-	local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
+	--local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
 
 	local s_ParentInstanceGuid
 	local s_ParentPartitionGuid
@@ -150,26 +146,26 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if p_Parent ~= nil then
 		local s_ParentGameObjectGuid = self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)]
 		local s_ParentGameObject = self.m_GameObjects[tostring(s_ParentGameObjectGuid)]
-		-- ROOT OBJECT
+		-- Root object
 		if s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
 			self:ResolveRootObject(s_GameObject)
-			-- CHILD OBJECT
+			-- Child object
 		else
 			self:ResolveChildObject(s_GameObject, s_ParentGameObject)
 			self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)] = nil
 		end
 	else
 		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
-			print('Found vanilla object without parent wtf') -- TODO: do we need to add these objects?
+			m_Logger:Write('Found vanilla object without parent wtf') -- TODO: do we need to add these objects?
 		else
-			print('Found custom object without parent')
+			m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
 			self:ResolveRootObject(s_GameObject)
 		end
 	end
 
 	--- Save ReferenceObjectDatas that the blueprint might have to resolve parents of descendants.
-	--For prefabs
+	--For prefabs:
 	if (s_Blueprint.objects ~= nil) then
 		for _, l_Member in pairs(s_Blueprint.objects) do
 			if l_Member:Is('ReferenceObjectData') then
@@ -178,10 +174,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	end
 
-	-- For blueprints
+	-- For blueprints:
 	if (s_Blueprint.object ~= nil) then
 		if s_Blueprint.object:Is('ReferenceObjectData') then
-			--print('Found ROD in .objects')
 			self.m_ReferenceObjectDatas[tostring(s_Blueprint.object.instanceGuid)] = s_GameObject.guid
 		end
 	end
@@ -190,7 +185,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	local s_EntityBus = p_Hook:Call()
 	---vvvv This is children to parent / bottom to top vvvv
 
-	-- TODO: Maybe remove gameobjects that dont have entities.
+	-- Custom object have to be manually initialized.
+	if not s_GameObject.isVanilla then
+		for _,l_Entity in pairs(s_EntityBus.entities) do
+			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
+			l_Entity:Init(self.m_Realm, true)
+		end
+	end
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
@@ -223,9 +224,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		if (s_UnresolvedRODCount ~= 0) then
 			-- TODO: Resolve client and server only objects
 			if self.m_Realm == Realm.Realm_Server then
-				print(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
+				m_Logger:Write(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
 			elseif self.m_Realm == Realm.Realm_Client then
-				print(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
+				m_Logger:Write(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
 			end
 			self.m_ReferenceObjectDatas = {}
 		end
@@ -241,7 +242,7 @@ end
 
 function GameObjectManager:ResolveRootObject(p_GameObject)
 	local s_PendingInfo = self.m_PendingCustomBlueprintGuids[tostring(p_GameObject.blueprintCtrRef.instanceGuid)]
-	self.m_GameObjects[tostring(p_GameObject.guid)] = nil
+	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 
 	if (s_PendingInfo) then -- We spawned this custom entitybus
 		p_GameObject.parentData = GameObjectParentData{
@@ -251,11 +252,11 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 			partitionGuid = s_PendingInfo.parentData.partitionGuid
 		}
 		p_GameObject.guid = s_PendingInfo.customGuid
-		p_GameObject.vanilla = false
+		p_GameObject.isVanilla = false
 	else -- This is a vanilla root object
 		-- TODO: Figure out if we need the parent reference?
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
-		p_GameObject.vanilla = true
+		p_GameObject.isVanilla = true
 	end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
@@ -270,12 +271,18 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid
 	}
 
-	p_GameObject.vanilla = p_ParentGameObject.vanilla
-	self.m_GameObjects[tostring(p_GameObject.guid)] = nil
-	if p_GameObject.vanilla then
+	p_GameObject.isVanilla = p_ParentGameObject.isVanilla
+	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
+	if p_GameObject.isVanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 	else
-		p_GameObject.guid = GenerateCustomGuid()
+		local i = 1
+		local s_CustomGuid
+		repeat
+			s_CustomGuid = GenerateChildGuid(p_GameObject.parentData.guid, i)
+			i = i + 1
+		until self.m_GameObjects[tostring(s_CustomGuid)] == nil
+		p_GameObject.guid = s_CustomGuid
 	end
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 	table.insert(p_ParentGameObject.children, p_GameObject)
