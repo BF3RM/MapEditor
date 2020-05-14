@@ -21,7 +21,7 @@ export class SelectionGroup extends THREE.Object3D {
 	public onClientOnlyMove() {
 		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
-		signals.selectionGroupChanged.emit(this, 'transform', this.transform);
+		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public onClientOnlyMoveEnd() {
@@ -136,6 +136,7 @@ export class SelectionGroup extends THREE.Object3D {
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
 			this.setMatrix(gameObject.matrixWorld);
 		}
+		signals.selectedGameObject.emit(gameObject.guid, multiSelection);
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
 		this.makeParentsVisible();
@@ -154,7 +155,7 @@ export class SelectionGroup extends THREE.Object3D {
 	// Find game object, deselect it and remove it from array.
 	public deselect(gameObject: GameObject) {
 		const index = this.selectedGameObjects.findIndex((go) => go.guid === gameObject.guid);
-		console.log(index);
+		signals.deselectedGameObject.emit(gameObject.guid);
 		if (index === -1) return;
 		gameObject.onDeselect();
 		this.makeParentsInvisible();

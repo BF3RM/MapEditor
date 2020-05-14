@@ -36,9 +36,9 @@ export default class HistoryComponent extends EditorComponent {
 
 	onHistoryChanged() {
 		this.$forceUpdate();
-		console.log(this.undos.length);
-		console.log(this.redos.length);
-		console.log('update');
+		// console.log(this.undos.length);
+		// console.log(this.redos.length);
+		// console.log('update');
 	}
 
 	goToState(id: number) {

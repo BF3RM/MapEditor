@@ -182,7 +182,6 @@ export class EditorCore {
 
 		editor.selectionGroup.select(gameObject, multiSelection, moveGizmo);
 		editor.threeManager.setPendingRender();
-		signals.selectedGameObject.emit(gameObject.guid, multiSelection);
 	}
 
 	public deselect(guid: Guid) {
@@ -192,7 +191,6 @@ export class EditorCore {
 			return;
 		}
 		editor.selectionGroup.deselect(gameObject);
-		signals.deselectedGameObject.emit(guid);
 		if (scope.selectionGroup.selectedGameObjects.length === 0) {
 			scope.threeManager.hideGizmo();
 		}

@@ -138,7 +138,7 @@ export default class HierarchyComponent extends EditorComponent {
 
 	onSelectedGameObject(guid: Guid, isMultipleSelection?: boolean, scrollTo?: boolean) {
 		const currentNode = this.tree.getNodeById(guid.toString());
-		console.log(isMultipleSelection);
+		// console.log(isMultipleSelection);
 		currentNode.state.selected = true;
 		if (guid.equals(Guid.createEmpty())) {
 			this.list = [];
