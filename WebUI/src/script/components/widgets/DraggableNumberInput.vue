@@ -65,8 +65,6 @@ export default class DraggableNumberInput extends Vue {
 	@Prop({ required: true, type: Number })
 	private value!: number;
 
-	private formattedValue: number = 0;
-
 	@Emit('input')
 	private adjustValue(val: number | string | MouseEvent): number {
 		let newVal;
@@ -82,9 +80,8 @@ export default class DraggableNumberInput extends Vue {
 		return Number(newVal.toFixed(2));
 	}
 
-	@Watch('value')
-	onChangeValue() {
-		this.formattedValue = Number(this.value.toFixed(2));
+	get formattedValue() {
+		return Number(this.value.toFixed(2));
 	}
 
 	private dragEnd(): void {

@@ -22,7 +22,7 @@ export default class GizmoWrapper extends TransformControls {
 	}
 
 	public onControlChanged() {
-		if (!this.visible) return;
+		if (!this.selected || !this.visible) return;
 		// moving
 		editor.selectionGroup.onClientOnlyMove();
 		editor.editorCore.RequestUpdate();

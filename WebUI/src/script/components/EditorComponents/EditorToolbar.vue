@@ -3,20 +3,27 @@ import { RecycleScroller } from "vue-virtual-scroller";
 	<div id="toolbar">
 		<div id="toolbarLeft">
 			<span id="logo">VeniceEditor</span>
-			<ul id="menubar">
-				<el-menu class="el-menu" mode="horizontal" size="mini" @select="onSelectMenu" :show-timeout="10">
-					<el-menu-item v-for="(item, index) in menuBar.children" :key="index">
-						<RecursiveMenubar v-if="item.children.length > 1" :value="item" :index="index"/>
-						<span v-else :class="item.type">
-							{{item.label}}
-						</span>
+				<el-menu mode="horizontal" menu-trigger="hover" :unique-opened="true" size="mini" v-for="(item, index) in menuBar.children" :key="index" class="el-menu" @select="onSelectMenu">
+<!--					<recursive-menubar v-if="item.children.length > 1" :value="item" :index="index"/>-->
+					<el-submenu v-if="item.children" :index="item.label" :show-timeout="10" :hide-timeout="100">
+						<template slot="title">{{item.label}}</template>
+						<template v-if="item.children.length > 0">
+							<el-menu-item v-for="(subItem, subIndex) in item.children" :key="index + '-' + subIndex" :index="index + '-' + subIndex" :class="subItem.type">
+								<recursive-menubar v-if="subItem.children && subItem.children.length > 0" :value="subItem"/>
+								<span v-else>
+									{{subItem.label}}
+								</span>
+							</el-menu-item>
+						</template>
+					</el-submenu>
+					<el-menu-item v-else :class="item.type" :index="index">
+						{{item.label}}
 					</el-menu-item>
 				</el-menu>
-			</ul>
 			<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
 				<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
 			</el-radio-group>
-			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChanged">
+			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChange">
 				<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
 			</el-radio-group>
 		</div>
@@ -42,7 +49,6 @@ export default class EditorToolbar extends Vue {
 	private worldView = 0;
 	private tool = (window).editor.threeManager.gizmoMode;
 	private worldSpace = (window).editor.threeManager.worldSpace;
-
 	private worldSpaces = ['local', 'world'];
 	private tools = ['select', 'translate', 'rotate', 'scale'];
 
@@ -157,8 +163,8 @@ export default class EditorToolbar extends Vue {
 	];
 
 	private mounted() {
-		signals.gizmoModeChanged.connect(this.onGizmoModeChanged.bind(this));
-		signals.worldSpaceChanged.connect(this.onWorldSpaceChanged.bind(this));
+		signals.gizmoModeChanged.connect(this.onGizmoModeUpdated.bind(this));
+		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
 		signals.menuRegistered.connect(this.onMenuRegistered.bind(this));
 	}
 
@@ -216,16 +222,16 @@ export default class EditorToolbar extends Vue {
 		}
 	}
 
-	private onWorldSpaceChange(mode: WORLD_SPACE) {
+	private onWorldSpaceUpdated(mode: WORLD_SPACE) {
 		console.log('world space changed');
 		this.worldSpace = mode;
 	}
 
-	private onGizmoModeChanged(mode: GIZMO_MODE) {
+	private onGizmoModeUpdated(mode: GIZMO_MODE) {
 		this.tool = mode;
 	}
 
-	private onWorldSpaceChanged(mode: string) {
+	private onWorldSpaceChange(mode: string) {
 		if (this.worldSpaces.indexOf(mode) !== -1) {
 			(window).editor.threeManager.setWorldSpace(mode.toLowerCase() as WORLD_SPACE);
 		} else {

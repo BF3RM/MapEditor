@@ -19,6 +19,14 @@ export class Vec3 extends Vector3 {
 		return new this(Number(object.x), Number(object.y), Number(object.z));
 	}
 
+	public toTable(): IVec3 {
+		return {
+			x: this.x,
+			y: this.y,
+			z: this.z
+		};
+	}
+
 	public static setFromString(matrixString: string) {
 		matrixString = matrixString.replace(/[(]/g, '');
 		matrixString = matrixString.replace(/[)]/g, ', ');

@@ -8,7 +8,9 @@
 				</div>
 				<div class="transform-container">
 					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
-					<linear-transform-control class="lt-control" :hideLabel="false" v-model="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag "/>
+					<linear-transform-control class="lt-control" :hideLabel="false"
+											:position="position" :rotation="rotation" :scale="scale"
+											@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated"/>
 				</div>
 			</div>
 		</div>
@@ -23,14 +25,18 @@ import { signals } from '@/script/modules/Signals';
 import { GameObject } from '@/script/types/GameObject';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
-import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { ILinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { LOGLEVEL } from '@/script/modules/Logger';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
+import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
+import { IQuat, Quat } from '@/script/types/primitives/Quat';
 
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
 	private group: SelectionGroup | null = null;
-	private transform: LinearTransform = new LinearTransform();
+	private position: IVec3 = new Vec3().toTable();
+	private scale: IVec3 = new Vec3(1, 1, 1).toTable();
+	private rotation: IQuat = new Quat().toTable();
 	private dragging = false;
 	private enabled = true;
 
@@ -42,17 +48,21 @@ export default class InspectorComponent extends EditorComponent {
 		signals.selectionGroupChanged.connect(this.onSelectionGroupChanged.bind(this));
 	}
 
-	private onInput(linearTransform: LinearTransform) {
-		console.log('oninput');
+	private onInput() {
 		if (this.group !== null) {
 			// Move selection group to the new position.
-			const matrix = linearTransform.toMatrix();
-			matrix.decompose(this.group.position, this.group.quaternion, this.group.scale);
+			this.group.position.set(this.position.x, this.position.y, this.position.z);
+			this.group.scale.set(this.scale.x, this.scale.y, this.scale.z);
+			this.group.rotation.setFromQuaternion(Quat.setFromTable(this.rotation));
+
 			this.group.updateMatrix();
 			// Update inspector transform.
-			this.transform = linearTransform;
-			// Update children.
-			this.group.updateSelectedGameObjects();
+			window.editor.threeManager.nextFrame(() => {
+				if (this.group) {
+					this.group.onClientOnlyMove();
+				}
+				window.editor.threeManager.setPendingRender();
+			});
 			window.editor.threeManager.setPendingRender();
 		}
 	}
@@ -83,16 +93,20 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	onStartDrag() {
+		// console.log('Drag start');
 		this.dragging = true;
 	}
 
 	onEndDrag() {
-		console.log('Drag end');
-
+		// console.log('Drag end');
 		if (this.group) {
 			this.group.onClientOnlyMoveEnd();
 			this.dragging = false;
 		}
+	}
+
+	private quatUpdated(newQuat: IQuat) {
+		this.rotation = newQuat;
 	}
 
 	private onSelectionGroupChanged(group: SelectionGroup) {
@@ -101,7 +115,9 @@ export default class InspectorComponent extends EditorComponent {
 		}
 		if (!this.dragging) {
 			// Update inspector transform.
-			this.transform = this.group.transform;
+			this.position = this.group.transform.trans.toTable();
+			this.scale = this.group.transform.scale.toTable();
+			this.rotation = this.group.transform.rotation.toTable();
 		}
 	}
 

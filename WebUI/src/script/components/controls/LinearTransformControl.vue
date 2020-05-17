@@ -1,31 +1,51 @@
 <template>
 	<div class="transformControls">
 		<div class="pos-control">
-			<Vec3Control :hideLabel="hideLabel" v-model="value.position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control :hideLabel="hideLabel" :value="position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 		<div class="rot-control">
-			<QuatControl :hideLabel="hideLabel" v-model="value.rotation" label="Rotation" :step=0.14 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+			<QuatControl :hideLabel="hideLabel" :value="rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
 		</div>
 		<div class="scale-control">
-			<Vec3Control :hideLabel="hideLabel" v-model="value.scale" label="Scale" :min=0.01 :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control :hideLabel="hideLabel" :value="scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
-import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import QuatControl from '@/script/components/controls/QuatControl.vue';
+import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
+import { IQuat, Quat } from '@/script/types/primitives/Quat';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
 export default class InspectorComponent extends Vue {
-	@Prop(LinearTransform) value: LinearTransform;
-	@Prop({ default: false }) hideLabel: boolean;
+	@Prop()
+	position: IVec3;
+
+	@Prop()
+	rotation: IQuat;
+
+	@Prop()
+	scale: IVec3;
+
+	@Prop({ default: false })
+	hideLabel: boolean;
+
+	@Emit('update:rotation')
+	quadUpdate(newVal: IQuat) {
+		return newVal;
+	}
 
 	onChangeValue() {
-		this.$emit('input', this.value);
+		this.$emit('input');
+	}
+
+	@Emit('quatUpdated')
+	quatUpdated(newQuat: IQuat) {
+		return newQuat;
 	}
 
 	@Emit('startDrag')

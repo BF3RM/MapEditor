@@ -1,12 +1,12 @@
 <template>
-		<el-submenu v-if="value.children" :index="value.label">
+		<el-submenu v-if="value.children" :index="value.label" :show-timeout="10" :hide-timeout="100">
 			<template slot="title">{{value.label}}</template>
 			<template v-if="value.children.length > 0">
 				<el-menu-item v-for="(subItem, subIndex) in value.children" :key="index + '-' + subIndex" :index="index + '-' + subIndex" :class="subItem.type">
-					<RecursiveMenubar v-if="subItem.children && subItem.children.length > 0" :value="subItem"/>
-					<template v-else>
+					<recursive-menubar v-if="subItem.children && subItem.children.length > 0" :value="subItem"/>
+					<span v-else>
 						{{subItem.label}}
-					</template>
+					</span>
 				</el-menu-item>
 			</template>
 		</el-submenu>

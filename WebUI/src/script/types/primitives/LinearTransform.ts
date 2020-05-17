@@ -1,11 +1,12 @@
 import { Euler, Matrix4, Quaternion } from 'three';
-import { Vec3 } from '@/script/types/primitives/Vec3';
+import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
+import { Quat } from '@/script/types/primitives/Quat';
 
 export interface ILinearTransform {
-	forward: { x: number, y: number, z: number };
-	left: { x: number, y: number, z: number };
-	trans: { x: number, y: number, z: number };
-	up: { x: number, y: number, z: number };
+	forward: IVec3;
+	left: IVec3;
+	trans: IVec3;
+	up: IVec3;
 }
 
 export class LinearTransform {
@@ -13,7 +14,7 @@ export class LinearTransform {
 	public left: Vec3;
 	public trans: Vec3;
 	public up: Vec3;
-	public _rotation: Quaternion = new Quaternion();
+	public _rotation: Quat = new Quat();
 	public _scale: Vec3 = new Vec3(1, 1, 1);
 
 	constructor(left: Vec3 = new Vec3().left, up: Vec3 = new Vec3().up, forward: Vec3 = new Vec3().forward, trans: Vec3 = new Vec3()) {
@@ -39,7 +40,7 @@ export class LinearTransform {
 	}
 
 	public toTable() {
-		return { left: this.left, up: this.up, forward: this.forward, trans: this.trans };
+		return { left: this.left.toTable(), up: this.up.toTable(), forward: this.forward.toTable(), trans: this.trans.toTable() };
 	}
 
 	public setFromString(matrixString: string) {
@@ -101,10 +102,10 @@ export class LinearTransform {
 	}
 
 	public static setFromTable(table: ILinearTransform) {
-		const left = new Vec3(table.left.x, table.left.y, table.left.z);
-		const up = new Vec3(table.up.x, table.up.y, table.up.z);
-		const forward = new Vec3(table.forward.x, table.forward.y, table.forward.z);
-		const trans = new Vec3(table.trans.x, table.trans.y, table.trans.z);
+		const left = Vec3.setFromTable(table.left);
+		const up = Vec3.setFromTable(table.up);
+		const forward = Vec3.setFromTable(table.forward);
+		const trans = Vec3.setFromTable(table.trans);
 		return new this(left, up, forward, trans);
 	}
 
@@ -134,11 +135,11 @@ export class LinearTransform {
 		this.setFromMatrix(matrix.compose(this.trans, this.rotation, this._scale));
 	}
 
-	get rotation(): Quaternion {
+	get rotation(): Quat {
 		return this._rotation;
 	}
 
-	set rotation(value: Quaternion) {
+	set rotation(value: Quat) {
 		const matrix = new Matrix4();
 		const pos = this.trans;
 		const scale = this.scale;
@@ -155,7 +156,7 @@ export class LinearTransform {
 
 	set elements(value: object[]) {
 		this.position = value[0] as Vec3;
-		this.rotation = (value[1] as Quaternion);
+		this.rotation = (value[1] as Quat);
 		this.scale = value[2] as Vec3;
 	}
 

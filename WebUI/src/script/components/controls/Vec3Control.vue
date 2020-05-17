@@ -8,20 +8,21 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import { Vector3 } from 'three';
+import { IVec3 } from '@/script/types/primitives/Vec3';
 
 @Component({ components: { DraggableNumberInput } })
 export default class Vec3Control extends Vue {
 	@Prop(String) label: string;
 	@Prop({ default: 0.014 }) step: number;
-	@Prop(Object) value: Vector3;
+	@Prop() value: IVec3;
 	@Prop(Number) min: number;
 	@Prop({ default: false }) hideLabel: boolean;
 
 	onChangeValue() {
-		this.$emit('input', this.value);
+		this.$emit('input');
 	}
 
 	@Emit('startDrag')

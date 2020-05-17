@@ -211,11 +211,13 @@ export class THREEManager {
 	}
 
 	public hideGizmo() {
+		this.gizmoControls.enabled = false;
 		this.gizmoControls.visible = false;
 		this.setPendingRender();
 	}
 
 	public showGizmo() {
+		this.gizmoControls.enabled = true;
 		this.gizmoControls.visible = true;
 		this.setPendingRender();
 	}
