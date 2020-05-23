@@ -81,7 +81,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 
 		for (const child of this.children) {
-			if (child.constructor.name !== 'GameObject') continue;
+			if (child.constructor !== GameObject) continue;
 
 			if ((child as GameObject).descendantOf(parentGameObject)) {
 				return true;
@@ -187,7 +187,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	// TODO: Reimplement
 	public Enable() {
 		for (const child of this.children) {
-			if (child.constructor.name === 'GameObject') {
+			if (child.constructor === GameObject) {
 				(child as GameObject).Enable();
 			} else {
 				(child as GameObject).visible = true;
@@ -201,7 +201,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	// TODO: Reimplement
 	public Disable() {
 		for (const child of this.children) {
-			if (child.constructor.name === 'GameObject') {
+			if (child.constructor === GameObject) {
 				(child as GameObject).Disable();
 			} else {
 				(child as GameObject).visible = false;
@@ -252,14 +252,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	makeParentsInvisible() {
-		if (this.parent !== null && this.parent.constructor.name === 'GameObject' && this.parent.visible) {
+		if (this.parent !== null && this.parent.constructor === GameObject && this.parent.visible) {
 			this.parent.visible = false;
 			(this.parent as GameObject).makeParentsInvisible();
 		}
 	}
 
 	makeParentsVisible() {
-		if (this.parent !== null && this.parent.constructor.name === 'GameObject' && !this.parent.visible) {
+		if (this.parent !== null && this.parent.constructor === GameObject && !this.parent.visible) {
 			this.parent.visible = true;
 			(this.parent as GameObject).makeParentsVisible();
 		}

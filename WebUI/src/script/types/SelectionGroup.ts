@@ -181,7 +181,7 @@ export class SelectionGroup extends THREE.Object3D {
 		}
 
 		const go = this.selectedGameObjects[0] as GameObject;
-		if (go.parent != null && go.parent.constructor.name === 'GameObject') {
+		if (go.parent != null && go.parent.constructor === GameObject) {
 			this.select(go.parent as GameObject, false, true);
 		}
 	}

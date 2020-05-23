@@ -380,7 +380,7 @@ export class THREEManager {
 					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 						continue;
 					}
-					if (element.object.parent.constructor.name === 'GameObject') {
+					if (element.object.parent.constructor === GameObject) {
 						const gameObject = element.object.parent as GameObject;
 						if (editor.selectionGroup.isSelected(gameObject)) {
 							hitSelf = gameObject;
@@ -390,32 +390,39 @@ export class THREEManager {
 						if (gameObject.parent != null) {
 							const parent = gameObject.parent as GameObject;
 							if (editor.selectionGroup.isSelected(parent)) {
+								console.log('Hit self ' + parent.guid);
 								hitSelf = parent;
 								continue;
 							}
-							if (parent.enabled && !parent.selected && parent.constructor.name === 'GameObject' &&
+							if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
 								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint') &&
 								!editor.selectionGroup.isSelected(parent)) {
 								resolve(parent.guid);
+								return parent.guid;
 							}
 						}
 						// Else we select the GameObject.
 						if (gameObject.enabled) {
 							resolve(gameObject.guid);
+							return gameObject.guid;
 						}
 					}
 				}
 				// A selected GameObject was hit.
 				if (hitSelf !== null) {
 					resolve(hitSelf.guid);
+					return hitSelf.guid;
 				} else { // Didn't hit any GameObjects
 					resolve(null);
+					return null;
 				}
 			} else {
 				// console.log("no hit")
 				resolve(null);
+				return null;
 			}
 			resolve(null);
+			return null;
 		});
 	}
 
