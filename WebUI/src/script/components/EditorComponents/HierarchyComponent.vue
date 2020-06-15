@@ -159,12 +159,14 @@ export default class HierarchyComponent extends EditorComponent {
 
 	private onDeselectedGameObject(guid: Guid) {
 		const node = this.tree.getNodeById(guid.toString());
-		node.state.selected = false;
-		const nodeIndex = (this.selected).findIndex((i) => {
-			// console.log(i.id === node.id);
-			return i.id === node.id;
-		});
-		this.selected.splice(nodeIndex, 1);
+		if (node) {
+			node.state.selected = false;
+			const nodeIndex = (this.selected).findIndex((i) => {
+				// console.log(i.id === node.id);
+				return i.id === node.id;
+			});
+			this.selected.splice(nodeIndex, 1);
+		}
 	}
 
 	private onNodeHover(nodeId: string) {
