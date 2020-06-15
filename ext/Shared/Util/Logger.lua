@@ -55,7 +55,7 @@ function Logger:Error(p_Message)
 		return
 	end
 
-	error("["..self.className.."] " .. tostring(p_Message))
+	print("["..self.className.."] " .. tostring(p_Message))
 end
 
 return Logger
