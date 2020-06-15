@@ -9,21 +9,21 @@
 					<gl-col :width="80">
 						<gl-row :height="80">
 							<gl-col :width="20">
-                                <HierarchyComponent title="Scene Instances"/>
+                                <HierarchyComponent/>
 							</gl-col>
 							<gl-col width="80">
-								<ViewportComponent :showHeader="true" title="Viewport"/>
+								<ViewportComponent :showHeader="true"/>
 							</gl-col>
 						</gl-row>
 						<gl-row :height="20">
-							<ExplorerComponent :width="70" title="Project"/>
-							<ConsoleComponent title="Console"/>
+							<ExplorerComponent :width="70"/>
+							<ConsoleComponent/>
 						</gl-row>
 					</gl-col>
 					<gl-col :width="20">
                         <gl-stack>
-                            <InspectorComponent title="Inspector"/>
-                            <HistoryComponent title="History"/>
+                            <InspectorComponent/>
+                            <HistoryComponent/>
                         </gl-stack>
 					</gl-col>
 				</gl-row>
