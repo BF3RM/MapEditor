@@ -42,7 +42,7 @@ function GameEntity:Destroy()
     GameObjectManager.m_Entities[self.instanceId] = nil
 end
 
-function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
+function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled)
     -- TODO: update self.transform
 
     local s_Entity = self.entity
@@ -66,7 +66,7 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
         else
             s_Entity.transform = ToWorld(self.transform, LinearTransform(p_LinearTransform))
 
-            if(p_UpdateCollision) then
+            if(p_UpdateCollision and p_Enabled) then
                 s_Entity:FireEvent("Disable")
                 s_Entity:FireEvent("Enable")
                 --self:UpdateOffsets(p_Guid, s_Entity.instanceId, LinearTransform(p_LinearTransform))

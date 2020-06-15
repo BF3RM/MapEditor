@@ -187,8 +187,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
                 m_Logger:Error("GameEntity is nil?")
                 return false
             end
-
-            local response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision)
+            local response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, self.enabled)
 
             if not response then
                 return false

@@ -30,6 +30,9 @@ import { LOGLEVEL } from '@/script/modules/Logger';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
+import Command from '@/script/libs/three/Command';
+import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
+import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
 @Component({ components: { LinearTransformControl } })
 export default class InspectorComponent extends EditorComponent {
@@ -119,10 +122,21 @@ export default class InspectorComponent extends EditorComponent {
 			this.scale = this.group.transform.scale.toTable();
 			this.rotation = this.group.transform.rotation.toTable();
 		}
+		this.enabled = this.group.selectedGameObjects[0].enabled;
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
-		// this.enableInput.checked = this.group.enabled;
+		let command: Command;
+		if (!this.group || this.isEmpty) {
+			return;
+		}
+		if (!this.enabled) {
+			command = new DisableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
+		} else {
+			command = new EnableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
+		}
+		console.log(this.enabled);
+		window.editor.execute(command);
 	}
 
 	private onNameChange(e: InputEvent) {

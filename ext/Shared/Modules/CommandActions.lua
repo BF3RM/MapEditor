@@ -133,7 +133,7 @@ function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
 		return
 	end
 
-	local s_Result = GameObjectManager:EnableEntity(p_Command.gameObjectTransferData.guid)
+	local s_Result = GameObjectManager:EnableGameObject(p_Command.gameObjectTransferData.guid)
 
 	if(s_Result == false) then
 		m_Logger:Write("Failed to enable blueprint: " .. p_Command.gameObjectTransferData.guid)
