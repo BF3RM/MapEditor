@@ -121,6 +121,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if(s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
 		return
 	end
+	local original = CtrRef{}
+	if(p_Parent ~= nil) then
+		original = CtrRef {
+			typeName = p_Parent.typeInfo.name,
+			instanceGuid = s_ParentInstanceGuid,
+			partitionGuid = tostring(p_Parent.partitionGuid)
+		}
+	end
 	local s_GameObject = GameObject{
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
@@ -133,7 +141,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		isEnabled = true,
 		gameEntities = {},
 		children = {},
-		realm = Realm.Realm_ClientAndServer
+		realm = Realm.Realm_ClientAndServer,
+		original = original
 	}
 
 	s_GameObject.blueprintCtrRef = CtrRef {

@@ -14,6 +14,7 @@ function GameObject:__init(arg)
     self.realm = arg.realm
     self.isUserModified = true
     self.userModifiedFields = {}
+	self.original = arg.original
     --self.name = arg.name
     --self.parentData = arg.parentData
     --self.transform = arg.transform  -- world transform

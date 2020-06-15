@@ -10,7 +10,8 @@ function GameObjectSaveData:__init(p_GameObject)
     self.parentData = p_GameObject.parentData
     self.transform = p_GameObject.transform
     self.variation = p_GameObject.variation
-
+	self.isVanilla = p_GameObject.isVanilla
+	self.original = p_GameObject.original
     -- Only save if they aren't the default value
     if p_GameObject.isDeleted then
         self.isDeleted = true
@@ -31,7 +32,9 @@ function GameObjectSaveData:GetAsTable()
         variation = self.variation,
         isDeleted = self.isDeleted,
         isEnabled = self.isEnabled,
-    }
+        isVanilla = self.isVanilla,
+        original = self.original:GetTable(),
+	}
 end
 
 return GameObjectSaveData
