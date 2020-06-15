@@ -1,14 +1,14 @@
 <template>
-	<gl-component id="viewport-component">
+	<EditorComponent id="viewport-component" title="Viewport">
 		<div id="stats" ref="stats"/>
-	</gl-component>
+	</EditorComponent>
 </template>
 
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
-@Component
+@Component({ components: { EditorComponent } })
 export default class ViewportComponent extends EditorComponent {
 	constructor() {
 		super();

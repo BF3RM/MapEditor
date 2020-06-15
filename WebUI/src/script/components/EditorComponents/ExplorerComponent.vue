@@ -1,17 +1,17 @@
 <template>
 	<gl-row>
 		<gl-col>
-			<editor-component id="explorer-component" title="Explorer">
+			<EditorComponent id="explorer-component" title="Project">
 				<div class="header">
 					<Search v-model="search"/>
 				</div>
 				<infinite-tree-component class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
-			</editor-component>
+			</EditorComponent>
 		</gl-col>
 		<gl-col>
-			<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
+			<ListComponent class="datafont" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 				<template slot-scope="{ item, data }" >
 					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
 				</template>

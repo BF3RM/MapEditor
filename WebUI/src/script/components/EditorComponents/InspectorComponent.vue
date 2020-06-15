@@ -1,5 +1,5 @@
 <template>
-	<gl-component class="inspector-component">
+	<EditorComponent class="inspector-component" title="Inspector">
 		<div v-if="!isEmpty">
 			<div class="header">
 				<div class="enable-container">
@@ -14,7 +14,7 @@
 				</div>
 			</div>
 		</div>
-	</gl-component>
+	</EditorComponent>
 </template>
 
 <script lang="ts">
@@ -34,7 +34,7 @@ import Command from '@/script/libs/three/Command';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
-@Component({ components: { LinearTransformControl } })
+@Component({ components: { LinearTransformControl, EditorComponent } })
 export default class InspectorComponent extends EditorComponent {
 	private group: SelectionGroup | null = null;
 	private position: IVec3 = new Vec3().toTable();

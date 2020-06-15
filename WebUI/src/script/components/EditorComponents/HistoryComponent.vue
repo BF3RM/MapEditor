@@ -1,5 +1,5 @@
 <template>
-    <gl-component id="history-component">
+    <EditorComponent id="history-component" title="History">
         <ul class="undos">
             <li v-for="(undoEntry, index) in undos" :key="index" @click="goToState(undoEntry.id)">
                 {{undoEntry.name}}
@@ -10,7 +10,7 @@
 				{{redoEntry.name}}
 			</li>
 		</ul>
-    </gl-component>
+    </EditorComponent>
 </template>
 
 <script lang="ts">
@@ -19,7 +19,8 @@ import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import Command from '@/script/libs/three/Command';
 import { Computed } from 'vuex/types/helpers';
-@Component
+@Component({ components: { EditorComponent } })
+
 export default class HistoryComponent extends EditorComponent {
 	constructor() {
 		super();

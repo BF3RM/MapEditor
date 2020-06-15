@@ -1,5 +1,5 @@
 <template>
-	<gl-component>
+	<EditorComponent title="Console">
 		<div class="header">
 			<input type="range" min="0" max="6" step="1" :value="data.filterLevel" @input="onUpdateFilter">
 			<div class="logLevel">{{data.filterLevel}} - {{logLevelDict[data.filterLevel]}}</div>
@@ -32,7 +32,7 @@
 				</div>
 			</DynamicScrollerItem>
 		</DynamicScroller>
-	</gl-component>
+	</EditorComponent>
 </template>
 
 <script lang="ts">
@@ -46,7 +46,7 @@ import { inspect } from 'util';
 import { ConsoleEntry, IConsoleEntry } from '@/script/types/ConsoleEntry';
 import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { DynamicScroller, DynamicScrollerItem, Search } })
+@Component({ components: { DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ConsoleComponent extends EditorComponent {
 	// WTF? What's a better way to do this?
 	private logLevelDict = [

@@ -1,5 +1,5 @@
 <template>
-	<gl-component class="list-component">
+	<EditorComponent class="list-component" :title="title">
 		<div class="header">
 			<Search v-model="data.search" @search="onSearch"/>
 		</div>
@@ -26,7 +26,7 @@
 				</slot>
 				</DynamicScrollerItem>
 		</DynamicScroller>
-	</gl-component>
+	</EditorComponent>
 </template>
 
 <script lang="ts">
@@ -36,7 +36,7 @@ import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtu
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import Search from '@/script/components/widgets/Search.vue';
 
-@Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem, Search } })
+@Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ListComponent extends EditorComponent {
 	@Prop(Array) public list: {name: string}[];
 	@Prop(String) public keyField: string;

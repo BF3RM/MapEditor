@@ -1,5 +1,5 @@
 <template>
-	<gl-component>
+	<gl-component :title="title">
 		<slot>
 		</slot>
 	</gl-component>
@@ -12,6 +12,7 @@ import { glCustomContainer } from 'vue-golden-layout';
 export default class EditorComponent extends glCustomContainer {
 	@Prop({ default: true }) showHeader: boolean;
 	@Prop({ default: false }) isDestructible: boolean;
+	@Prop({ default: 'EditorComponent' }) title: string;
 	public beforeDestroy() {
 		console.log('Destroy');
 		if (!this.isDestructible) {

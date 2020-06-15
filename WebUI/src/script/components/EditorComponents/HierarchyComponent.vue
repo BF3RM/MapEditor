@@ -1,6 +1,6 @@
 <template>
 	<gl-col>
-		<gl-component id="explorer-component" :title="title">
+		<EditorComponent id="explorer-component" title="Scene Instances">
 			<div class="header">
 				<Search v-model="search"/>
 			</div>
@@ -8,7 +8,7 @@
 				<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name + ' (' + node.children.length + ')'"
 									:selected="node.state.selected" @node:hover="onNodeHover" @node:hover-end="onNodeHoverEnd" @node:click="onNodeClick" />
 			</infinite-tree-component>
-		</gl-component>
+		</EditorComponent>
 		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 			<template slot-scope="{ item, data }">
 				<div class="slot-scope">
@@ -35,7 +35,7 @@ import { Guid } from '@/script/types/Guid';
 import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
 
-@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot } })
+@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent } })
 
 export default class HierarchyComponent extends EditorComponent {
 	private data: INode = {
