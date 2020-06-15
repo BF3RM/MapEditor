@@ -30,6 +30,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public highlighted: boolean;
 	// private completeBoundingBox: THREE.Box3;
 	private _enabled: boolean;
+	public parent: GameObject;
 
 	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
