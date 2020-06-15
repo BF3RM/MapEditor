@@ -25,7 +25,7 @@ function GameObjectSaveData:GetAsTable()
         guid = self.guid,
         name = self.name,
         typeName = self.typeName,
-        blueprintCtrRef = self.blueprintCtrRef,
+        blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),
         transform = self.transform,
         variation = self.variation,

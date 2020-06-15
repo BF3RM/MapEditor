@@ -54,7 +54,12 @@ function MapEditorServer:OnChat(p_Player, p_RecipientMask, p_Message)
 	local firstPart = s_Parts[1]
 
 	if firstPart == 'save' then
-		ServerTransactionManager:OnRequestProjectSave(p_Player, "DebugProject", "XP3_Shield", "ConquestLarge0", { "levels/mp_001/mp_001", "levels/mp_001/conquest" })
+		ProjectManager:OnRequestProjectSave(p_Player, {
+			projectName = "DebugProject",
+			mapName = "XP2_Skybar",
+			gameModeName = "TeamDeathMatchC0",
+			requiredBundles = { "levels/XP2_Skybar/XP2_Skybar", "levels/XP2_Skybar/XP2_Skybar" }
+		})
 	end
 end
 
