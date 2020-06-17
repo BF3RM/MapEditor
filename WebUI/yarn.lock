@@ -7840,10 +7840,10 @@ type-is@~1.6.17, type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-typed-signals@1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/typed-signals/-/typed-signals-1.0.5.tgz#cb909bca73433f215d9e053bc37b7d9cde77f272"
-  integrity sha512-kKrgAGzAGXco9xu6UsoM3NaKBPO6g6KNxfOoJk8wMJbOFDJlw9hkbgoB60bC23At8gsehF1c02bTtLRMrhzTsA==
+typed-signals@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/typed-signals/-/typed-signals-2.0.0.tgz#a055654f0b26554edc9a48b55e8c912d49dcaa47"
+  integrity sha512-xuak+zn9utjfJ/Bcv7YfXrss2SiDUXqKEx2zgjLGGSEsez3/NrJCR5dh86us2cyHDzOAJuz5t1/8TDLLOoMpFA==
 
 typedarray@^0.0.6:
   version "0.0.6"
