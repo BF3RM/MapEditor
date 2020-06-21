@@ -29,6 +29,7 @@
 				</gl-row>
 			</golden-layout>
 		</div>
+		<ProjectSettingsComponent>sup</ProjectSettingsComponent>
 	</div>
 </template>
 <script lang="ts">
@@ -53,8 +54,9 @@ import InspectorComponent from '@/script/components/EditorComponents/InspectorCo
 import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
 import Editor from '@/script/Editor';
 import { Log, LogError } from '@/script/modules/Logger';
+import ProjectSettingsComponent from '@/script/components/WindowComponents/ProjectSettingsComponent.vue';
 
-@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar, InspectorComponent, HistoryComponent } })
+@Component({ components: { PlaceholderComponent, ExplorerComponent, ConsoleComponent, ViewportComponent, HierarchyComponent, EditorToolbar, InspectorComponent, HistoryComponent, ProjectSettingsComponent } })
 export default class App extends Vue {
 	constructor() {
 		super();
