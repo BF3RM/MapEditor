@@ -85,7 +85,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
             -- Load User Data from Database
             local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
             --self:UpdateLevelFromOldSaveFile(s_SaveFile)
-            self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
+            self:CreateAndExecuteImitationCommands(DecodeParams(json.decode(s_ProjectSaveData[1].save_file_json)))
         end
     end
 end
@@ -112,10 +112,15 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
     -- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
     -- Invoke Restart
+	if(self.m_MapName == s_MapName) then
+		RCON:SendCommand('mapList.restartRound')
+	else
+		RCON:SendCommand('mapList.clear')
+		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
+		print(out)
+		RCON:SendCommand('mapList.runNextRound')
+	end
 
-    RCON:SendCommand('mapList.clear')
-    RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
-    RCON:SendCommand('mapList.runNextRound')
 end
 
 function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
@@ -149,7 +154,8 @@ end
 function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
     local s_SaveFileCommands = {}
 
-    for l_Guid, l_GameObjectSaveData in pairs(p_ProjectSaveData) do
+    for _, l_GameObjectSaveData in pairs(p_ProjectSaveData) do
+	    local l_Guid = l_GameObjectSaveData.guid
         if (GameObjectManager.m_GameObjects[l_Guid] == nil) then
             m_Logger:Error("GameObject with Guid " .. tostring(l_Guid) .. " not found in GameObjectManager.")
         end
