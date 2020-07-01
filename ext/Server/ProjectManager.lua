@@ -15,11 +15,20 @@ function ProjectManager:__init()
 end
 
 function ProjectManager:RegisterEvents()
+	NetEvents:Subscribe('ProjectManager:RequestProjectHeaders', self, self.OnRequestProjectHeaders)
     NetEvents:Subscribe('ProjectManager:RequestProjectHeaderUpdate', self, self.OnRequestProjectHeaderUpdate)
     NetEvents:Subscribe('ProjectManager:RequestProjectData', self, self.OnRequestProjectData)
     NetEvents:Subscribe('ProjectManager:RequestProjectSave', self, self.OnRequestProjectSave)
     NetEvents:Subscribe('ProjectManager:RequestProjectLoad', self, self.OnRequestProjectLoad)
     NetEvents:Subscribe('ProjectManager:RequestProjectDelete', self, self.OnRequestProjectDelete)
+end
+
+function ProjectManager:OnRequestProjectHeaders(p_Player)
+	if p_Player == nil then -- update all players
+		NetEvents:SendLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+	else
+		NetEvents:SendToLocal("MapEditorClient:ReceiveProjectHeaders", p_Player, DataBaseManager:GetProjectHeaders())
+	end
 end
 
 function ProjectManager:OnRequestProjectHeaderUpdate(p_Player)
@@ -29,27 +38,27 @@ end
 function ProjectManager:UpdateClientProjectHeader(p_Player)
     if self.m_CurrentProjectHeader ~= nil then
         if p_Player == nil then -- update all players
-            NetEvents:SendLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+            NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
         else
             NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, self.m_CurrentProjectHeader)
         end
     end
 end
 
-function ServerTransactionManager:OnRequestProjectData(p_Player, p_ProjectName)
+function ServerTransactionManager:OnRequestProjectData(p_Player, p_ProjectId)
     m_Logger:Write("Data requested: " .. p_ProjectName)
 
-    local s_ProjectDataJson = DataBaseManager:GetProjectDataByProjectName(p_ProjectName)
+    local s_ProjectDataJson = DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 
     NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectDataJson)
 end
 
-function ServerTransactionManager:OnRequestProjectDelete(p_ProjectName)
-    m_Logger:Write("Delete requested: " .. p_ProjectName)
+function ServerTransactionManager:OnRequestProjectDelete(p_ProjectId)
+    m_Logger:Write("Delete requested: " .. p_ProjectId)
 
     --TODO: if the project that gets deleted is the currently loaded project, we need to clear all data and reload an empty map.
 
-    DataBaseManager:DeleteProject(p_ProjectName)
+    DataBaseManager:DeleteProject(p_ProjectId)
 end
 
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
@@ -74,22 +83,23 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
             end
 
             -- Load User Data from Database
-            local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectName(self.m_CurrentProjectHeader.projectName)
+            local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
             --self:UpdateLevelFromOldSaveFile(s_SaveFile)
             self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
         end
     end
 end
 
-function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectName)
-    m_Logger:Write("Load requested: " .. p_ProjectName)
+function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
+    m_Logger:Write("Load requested: " .. p_ProjectId)
     -- TODO: check player's permission once that is implemented
 
-    self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectName)
+    self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectId)
 
     local s_MapName = self.m_CurrentProjectHeader.mapName
     local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
-
+	print(self.m_CurrentProjectHeader)
+	print(tostring(self.m_CurrentProjectHeader))
     if s_MapName == nil or
             Maps[s_MapName] == nil or
             s_GameModeName == nil or

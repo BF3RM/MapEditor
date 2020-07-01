@@ -39,6 +39,7 @@ function MapEditorClient:RegisterEvents()
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
+	NetEvents:Subscribe('MapEditorClient:ReceiveProjectHeaders', self, self.OnReceiveProjectHeaders)
 	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
 
 	-- WebUI events
@@ -148,6 +149,7 @@ end
 
 function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
 	-- TODO: set project header
+	print(p_ProjectHeader)
 end
 
 ----------- WebUI functions----------------
@@ -156,24 +158,29 @@ function MapEditorClient:OnUIReloaded()
 	Editor:InitializeUIData(ClientTransactionManager:GetExecutedCommandActions())
 end
 
+function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
+	local s_ProjectHeaders = DecodeParams(p_ProjectHeaders)
+	WebUpdater:AddUpdate('SetProjectHeaders', s_ProjectHeaders)
+end
+
 function MapEditorClient:OnRequestProjectSave(p_ProjectSaveDataJson)
 	local s_ProjectSaveData = DecodeParams(json.decode(p_ProjectSaveDataJson))
 	NetEvents:SendLocal("ProjectManager:RequestProjectSave", s_ProjectSaveData)
 end
 
-function MapEditorClient:OnRequestProjectLoad(p_ProjectName)
-	m_Logger:Write("Load requested: " .. p_ProjectName)
-	NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_ProjectName)
+function MapEditorClient:OnRequestProjectLoad(p_ProjectId)
+	m_Logger:Write("Load requested: " .. p_ProjectId)
+	NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_ProjectId)
 end
 
-function MapEditorClient:OnRequestProjectDelete(p_ProjectName)
-	m_Logger:Write("Delete requested: " .. p_ProjectName)
-	NetEvents:SendLocal("ProjectManager:RequestProjectDelete", p_ProjectName)
+function MapEditorClient:OnRequestProjectDelete(p_ProjectId)
+	m_Logger:Write("Delete requested: " .. p_ProjectId)
+	NetEvents:SendLocal("ProjectManager:RequestProjectDelete", p_ProjectId)
 end
 
-function MapEditorClient:OnRequestProjectData(p_ProjectName)
-	m_Logger:Write("Project Data requested: " .. p_ProjectName)
-	NetEvents:SendLocal("ProjectManager:RequestProjectData", p_ProjectName)
+function MapEditorClient:OnRequestProjectData(p_ProjectId)
+	m_Logger:Write("Project Data requested: " .. p_ProjectId)
+	NetEvents:SendLocal("ProjectManager:RequestProjectData", p_ProjectId)
 end
 
 function MapEditorClient:OnEnableFreeCamMovement()

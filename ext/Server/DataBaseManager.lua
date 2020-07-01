@@ -16,6 +16,7 @@ local m_SaveFile_Text_Column_Name = "save_file_json"
 
 function DataBaseManager:__init()
 	m_Logger:Write("Initializing DataBaseManager")
+	self:CreateOrUpdateDatabase()
 end
 
 function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas)
@@ -24,7 +25,6 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 	local s_GameObjectSaveDatasJson = json.encode(p_GameObjectSaveDatas)
 	local s_RequiredBundlesJson = json.encode(p_RequiredBundles)
 
-	self:CreateOrUpdateDatabase()
 	local s_HeaderId = self:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, s_RequiredBundlesJson, s_TimeStamp)
 	self:SaveProjectData(s_HeaderId, s_GameObjectSaveDatasJson)
 end
@@ -153,7 +153,8 @@ function DataBaseManager:GetProjectHeaders()
 			mapName = row[m_MapName_Text_Column_Name],
 			gameModeName = row[m_GameModeName_Text_Column_Name],
 			requiredBundles = row[m_RequiredBundles_Text_Column_Name],
-			timeStamp = row[m_TimeStamp_Text_Column_Name]
+			timeStamp = row[m_TimeStamp_Text_Column_Name],
+			id = row['id']
 		}
 
 		table.insert(s_ProjectHeaders, s_Header)
@@ -162,33 +163,34 @@ function DataBaseManager:GetProjectHeaders()
 	return s_ProjectHeaders
 end
 
-function DataBaseManager:GetProjectHeader(p_ProjectName)
-	m_Logger:Write("GetProjectHeader()" .. p_ProjectName)
+function DataBaseManager:GetProjectHeader(p_ProjectId)
+	p_ProjectId = tostring(math.floor(p_ProjectId))
+	m_Logger:Write("GetProjectHeader()" .. p_ProjectId)
 
-	local s_ProjectHeaderRow = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE '.. m_ProjectName_Text_Column_Name .. ' = "' .. p_ProjectName .. '" LIMIT 1')
-
-	m_Logger:Write(s_ProjectHeaderRow)
+	local s_ProjectHeaderRow = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE '.. 'id' .. ' = ' .. p_ProjectId .. ' LIMIT 1')
+	-- m_Logger:Write(s_ProjectHeaderRow)
 
 	if not s_ProjectHeaderRow then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
 		return
 	end
-
 	local s_Header = {
-		projectName = s_ProjectHeaderRow[m_ProjectName_Text_Column_Name],
-		mapName = s_ProjectHeaderRow[m_MapName_Text_Column_Name],
-		gameModeName = s_ProjectHeaderRow[m_GameModeName_Text_Column_Name],
-		requiredBundles = s_ProjectHeaderRow[m_RequiredBundles_Text_Column_Name],
-		timeStamp = s_ProjectHeaderRow[m_TimeStamp_Text_Column_Name]
+		projectName = s_ProjectHeaderRow[1][m_ProjectName_Text_Column_Name],
+		mapName = s_ProjectHeaderRow[1][m_MapName_Text_Column_Name],
+		gameModeName = s_ProjectHeaderRow[1][m_GameModeName_Text_Column_Name],
+		requiredBundles = s_ProjectHeaderRow[1][m_RequiredBundles_Text_Column_Name],
+		timeStamp = s_ProjectHeaderRow[1][m_TimeStamp_Text_Column_Name],
+		id = s_ProjectHeaderRow[1]['id']
 	}
 
 	return s_Header
 end
 
-function DataBaseManager:GetProjectDataByProjectName(p_ProjectName)
-	m_Logger:Write("GetProjectDataByProjectName()" .. p_ProjectName)
+function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
+	p_ProjectId = tostring(math.floor(p_ProjectId))
+	m_Logger:Write("GetProjectDataByProjectId()" .. p_ProjectId)
 
-	local projectDataJson = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectName_Text_Column_Name .. ' = "' .. p_ProjectName .. '" LIMIT 1')
+	local projectDataJson = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. p_ProjectId .. ' LIMIT 1')
 
 	-- m_Logger:Write(projectDataJson)
 
@@ -200,17 +202,17 @@ function DataBaseManager:GetProjectDataByProjectName(p_ProjectName)
 	return projectDataJson
 end
 
-function DataBaseManager:DeleteProject(p_ProjectName)
-	m_Logger:Write("DeleteProject()" .. p_ProjectName)
+function DataBaseManager:DeleteProject(p_ProjectId)
+	m_Logger:Write("DeleteProject()" .. p_ProjectId)
 
-	local s_ProjectHeader = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE ' .. m_ProjectName_Text_Column_Name .. ' = "' .. p_ProjectName)
+	local s_ProjectHeader = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE ' .. 'id' .. ' = ' .. p_ProjectId)
 
 	if not s_ProjectHeader then
 		m_Logger:Error("Invalid project name")
 	end
 
 	SQL:Query('DELETE FROM ' .. m_DB_Header_Table_Name .. ' WHERE id = "' .. s_ProjectHeader["id"]) -- this should cascade delete the according data table
-	-- SQL:Query('DELETE FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = "' .. s_ProjectHeader["id"]) 
+	-- SQL:Query('DELETE FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = "' .. s_ProjectHeader["id"])
 end
 
 return DataBaseManager()

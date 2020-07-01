@@ -28,4 +28,13 @@ export default class WindowComponent extends Vue {
 		transform: translate(-50%, -50%);
 		background-color: rgba(34, 34, 34, 0.8) !important;
 	}
+	.header {
+		color: #fff;
+		background-color: rgba(34, 34, 34, 0.8) !important;
+		padding: 5px;
+	}
+	.content {
+		color: #999;
+		padding: 5px;
+	}
 </style>

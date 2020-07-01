@@ -146,3 +146,14 @@ export default class App extends Vue {
 		pointer-events: none;
 	}
 </style>
+<style>
+	.lm_splitter {
+		position: relative;
+		z-index: 0;
+	}
+	.lm_header {
+		overflow: visible;
+		position: relative;
+		z-index: 0;
+	}
+</style>

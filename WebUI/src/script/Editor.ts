@@ -27,6 +27,7 @@ import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
 import { LogError, LOGLEVEL } from '@/script/modules/Logger';
 import { GenerateBlueprints } from '@/script/modules/DebugData';
+import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
 
 export default class Editor {
 	public config = new Config();
@@ -104,7 +105,7 @@ export default class Editor {
 		signals.menuRegistered.emit(['File', 'Open'], this.NotImplemented.bind(this));
 		signals.menuRegistered.emit(['File', 'Import', 'From file'], this.NotImplemented.bind(this));
 		signals.menuRegistered.emit(['File', 'Import', 'From level'], this.NotImplemented.bind(this));
-
+		signals.menuRegistered.emit(['File', 'Load'], this.vext.SendMessage(new GetProjectsMessage()));
 		signals.menuRegistered.emit(['Edit', 'Undo'], this.undo.bind(this));
 		signals.menuRegistered.emit(['Edit', 'Redo'], this.redo.bind(this));
 		signals.menuRegistered.emit(['Edit', '']); // Separator

@@ -41,7 +41,9 @@ export default class VEXTInterface {
 			SetRaycastTransformMessage: signals.setRaycastPosition.emit,
 			SetPlayerNameMessage: signals.setPlayerName.emit,
 			SetScreenToWorldPositionMessage: signals.setScreenToWorldPosition.emit,
-			SetUpdateRateMessage: signals.setUpdateRateMessage.emit
+			SetUpdateRateMessage: signals.setUpdateRateMessage.emit,
+			GetProjectsMessage: signals.getProjects.emit,
+			SetProjectHeaders: signals.setProjectHeaders.emit
 			// 'SelectedGameObject':	   signals.selectedGameObject.emit,
 			// 'DeselectedGameObject':	signals.deselectedGameObject.emit,
 		};
@@ -186,7 +188,7 @@ export default class VEXTInterface {
 			// window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
 			// window.Log(LOGLEVEL.VERBOSE, messages);
 			// We don't handle messages in VEXTEmulator yet
-			// scope.emulator.Receive(commands);
+			scope.emulator.ReceiveMessage(messages);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
 		}
@@ -196,7 +198,7 @@ export default class VEXTInterface {
 
 	public WebUpdateBatch(updates: any[]) {
 		// console.log('[VEXT] WebUpdateBatch');
-		// console.log(updates);
+		console.log(updates);
 		updates.forEach((obj: any) => {
 			(this as any)[obj.path](obj.payload);
 		});
@@ -209,12 +211,14 @@ export default class VEXTInterface {
 			message = messageRaw;
 			emulator = true;
 		} else {
+			window.Log(LOGLEVEL.VERBOSE, 'Parsing message');
 			window.Log(LOGLEVEL.VERBOSE, messageRaw);
 			message = JSON.parse(messageRaw);
+			console.log(message.type);
 		}
 
 		if (this.messages[message.type] === undefined) {
-			window.LogError('Failed to call a null signal: ' + message.type);
+			window.LogError('Failed to call a null message signal: ' + message.type);
 			return;
 		}
 		if (emulator) {
@@ -257,5 +261,9 @@ export default class VEXTInterface {
 
 	public MouseEnabled() {
 		editor.threeManager.mouseEnabled();
+	}
+
+	public SetProjectHeaders(headers: any) {
+		signals.setProjectHeaders.emit(headers);
 	}
 }

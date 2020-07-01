@@ -3,6 +3,8 @@ import { LogError } from '@/script/modules/Logger';
 
 export class VEXTemulator {
 	private commands: any;
+	private messages: any;
+
 	constructor() {
 		this.commands = {};
 		this.commands.SpawnBlueprintCommand = this.SpawnBlueprint;
@@ -14,6 +16,9 @@ export class VEXTemulator {
 		this.commands.SetVariationCommand = this.SetVariation;
 		this.commands.EnableBlueprintCommand = this.EnableBlueprint;
 		this.commands.DisableBlueprintCommand = this.DisableBlueprint;
+
+		this.messages = {};
+		this.messages.GetProjectsMessage = this.GetProjectsMessage;
 	}
 
 	public Receive(commands: any[]) {
@@ -30,6 +35,34 @@ export class VEXTemulator {
 		setTimeout(() => {
 			editor.vext.HandleResponse(responses, true);
 		}, 1);
+	}
+
+	public ReceiveMessage(messages: any[]) {
+		const scope = this;
+		const responses: any[] = [];
+		messages.forEach((message) => {
+			if (scope.messages[message.type] === undefined) {
+				console.error('NotImplemented: ' + message.type);
+			} else {
+				responses.push(scope.messages[message.type](message));
+			}
+		});
+		// Delay to simulate tick pass
+		for (const response of responses) {
+			setTimeout(() => {
+				editor.vext.HandleMessage(response);
+			}, 1);
+		}
+	}
+
+	private GetProjectsMessage() {
+		const save = [{ id: 1, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245943322 },
+			{ id: 2, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245944322 },
+			{ id: 3, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245945322 },
+			{ id: 4, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245946322 },
+			{ id: 5, project_name: 'NewdebugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245947322 },
+			{ id: 6, project_name: 'NewdebugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245948322 }];
+		return { type: 'GetProjectsMessage', value: save };
 	}
 
 	private CreateGroup(commandActionResult: CommandActionResult) {

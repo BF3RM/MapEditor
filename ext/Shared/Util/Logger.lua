@@ -32,8 +32,12 @@ function Logger:Write(p_Message)
 	end
 
 	::continue::
-
-	print("["..self.className.."] " .. tostring(p_Message))
+	if(type(p_Message) == 'table') then
+		print("["..self.className.."]")
+		print(p_Message)
+	else
+		print("["..self.className.."] " .. tostring(p_Message))
+	end
 end
 
 function Logger:WriteTable(p_Table)

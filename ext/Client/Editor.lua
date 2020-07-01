@@ -32,6 +32,7 @@ function Editor:OnEngineMessage(p_Message)
 		end
 
 		--- Client requests all updates that the server has.
+		NetEvents:SendLocal("ProjectManager:RequestProjectHeaders") -- Todo: move this to other class
 		NetEvents:SendLocal("ProjectManager:RequestProjectHeaderUpdate") -- Todo: move this to other class
 		WebUpdater:AddUpdate('SetPlayerName', s_LocalPlayer.name)
 	end

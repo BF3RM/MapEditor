@@ -16,8 +16,11 @@ function MessageActions:RegisterVars()
     self.PreviewSpawnMessage = self.PreviewSpawn
     self.PreviewDestroyMessage = self.PreviewDestroy
     self.PreviewMoveMessage = self.PreviewMove
+	self.GetProjectsMessage = self.GetProjects
 end
-
+function MessageActions:GetProjects(p_Message)
+	NetEvents:SendLocal('GetProjectHeaders')
+end
 function MessageActions:MoveObject(p_Message)
     local gameObjectTransferData = p_Message.gameObjectTransferData
 
