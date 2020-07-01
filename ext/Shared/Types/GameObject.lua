@@ -15,6 +15,7 @@ function GameObject:__init(arg)
     self.isUserModified = true
     self.userModifiedFields = {}
 	self.original = arg.original
+	self.localTransform = arg.localTransform
     --self.name = arg.name
     --self.parentData = arg.parentData
     --self.transform = arg.transform  -- world transform
@@ -161,8 +162,6 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
 end
 
 function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
-    -- TODO: update self.transform
-
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             if(l_ChildGameObject == nil) then
@@ -172,6 +171,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 
             -- We calculate the offset to get where the child gameobject should be
             local s_Offset = ToLocal(l_ChildGameObject.transform, self.transform)
+	        l_ChildGameObject.localTransform = s_Offset
             local s_LinearTransform = ToWorld(s_Offset, p_LinearTransform)
 
             local s_Response = l_ChildGameObject:SetTransform(s_LinearTransform, p_UpdateCollision)

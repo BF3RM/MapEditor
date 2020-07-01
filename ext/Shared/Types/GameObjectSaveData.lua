@@ -12,7 +12,9 @@ function GameObjectSaveData:__init(p_GameObject)
     self.variation = p_GameObject.variation
 	self.isVanilla = p_GameObject.isVanilla
 	self.original = p_GameObject.original
-    -- Only save if they aren't the default value
+	self.localTransform = p_GameObject.localTransform
+
+	-- Only save if they aren't the default value
     if p_GameObject.isDeleted then
         self.isDeleted = true
     end
@@ -29,6 +31,7 @@ function GameObjectSaveData:GetAsTable()
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),
         transform = self.transform,
+        localTransform = self.localTransform,
         variation = self.variation,
         isDeleted = self.isDeleted,
         isEnabled = self.isEnabled,

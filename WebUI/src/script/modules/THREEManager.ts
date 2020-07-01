@@ -57,6 +57,7 @@ export class THREEManager {
 	private cameraHasMoved: boolean;
 
 	constructor(debugMode: boolean) {
+		this.scene.name = 'scene';
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;
