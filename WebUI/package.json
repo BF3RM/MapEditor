@@ -47,7 +47,7 @@
     "sass-loader": "8.0.2",
     "tslint": "6.1.2",
     "tslint-loader": "3.5.4",
-    "typescript": "3.9.5",
+    "typescript": "3.9.6",
     "vue-template-compiler": "2.6.11",
     "webpack": "4.43.0"
   },
