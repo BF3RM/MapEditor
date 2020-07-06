@@ -12,11 +12,9 @@ function GameObjectManager:RegisterVars()
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_Entities = {}
-	self.m_UnresolvedGameObjects = {}
-	self.m_UnresolvedClientOnlyChildren = {}
 	self.m_VanillaGameObjectGuids = {}
 
-
+	--- key: child (ReferenceObjectData) guid, value: parent GameObject guid
 	self.m_ReferenceObjectDatas = {}
 end
 
@@ -118,7 +116,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
 	end
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
-	if(s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
+	if (s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
 		return
 	end
 	local original = CtrRef{}
@@ -175,7 +173,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	end
 
-	--- Save ReferenceObjectDatas that the blueprint might have to resolve parents of descendants.
+	--- Save ReferenceObjectDatas that the blueprint might have, to resolve parents of descendants.
 	--For prefabs:
 	if (s_Blueprint.objects ~= nil) then
 		for _, l_Member in pairs(s_Blueprint.objects) do
@@ -239,6 +237,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			elseif self.m_Realm == Realm.Realm_Client then
 				m_Logger:Write(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
 			end
+
 			self.m_ReferenceObjectDatas = {}
 		end
 		Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
@@ -268,6 +267,8 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 		-- TODO: Figure out if we need the parent reference?
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		p_GameObject.isVanilla = true
+
+		table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 	end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
@@ -286,6 +287,7 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 	if p_GameObject.isVanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
+		table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 	else
 		local i = 1
 		local s_CustomGuid

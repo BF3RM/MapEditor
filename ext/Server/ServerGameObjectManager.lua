@@ -10,6 +10,7 @@ end
 
 function ServerGameObjectManager:RegisterVars()
 	self.m_FirstPlayerLoaded = false
+	self.m_UnresolvedClientOnlyChildren = {}
 end
 
 function ServerGameObjectManager:RegisterEvents()
@@ -64,23 +65,23 @@ function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
 
             table.insert(parent.children, s_GameObject)
         else
-            if (GameObjectManager.m_UnresolvedClientOnlyChildren[parentGuidString] == nil) then
-				GameObjectManager.m_UnresolvedClientOnlyChildren[parentGuidString] = { }
+            if (self.m_UnresolvedClientOnlyChildren[parentGuidString] == nil) then
+				self.m_UnresolvedClientOnlyChildren[parentGuidString] = { }
             end
 
-            table.insert(GameObjectManager.m_UnresolvedClientOnlyChildren[parentGuidString], tostring(s_GameObject.guid))
+            table.insert(self.m_UnresolvedClientOnlyChildren[parentGuidString], tostring(s_GameObject.guid))
         end
     end
 
-    if (GameObjectManager.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
-            #GameObjectManager.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
+    if (self.m_UnresolvedClientOnlyChildren[s_GuidString] ~= nil and
+            #self.m_UnresolvedClientOnlyChildren[s_GuidString] > 0) then -- current gameobject is some previous clientonly gameobject's parent
 
-        for _, childGameObjectGuidString in pairs(GameObjectManager.m_UnresolvedClientOnlyChildren[s_GuidString]) do
+        for _, childGameObjectGuidString in pairs(self.m_UnresolvedClientOnlyChildren[s_GuidString]) do
             table.insert(s_GameObject.children, GameObjectManager.m_GameObjects[childGameObjectGuidString])
             --m_Logger:Write("Resolved child " .. childGameObjectGuidString .. " with parent " .. s_GuidString)
         end
 
-		GameObjectManager.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
+		self.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
     end
 
 	GameObjectManager:AddGameObjectToTable(s_GameObject)

@@ -26,9 +26,9 @@ function ClientGameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsG
 	local s_ClientOnlyGameObjectTransferDatas = {}
 
 	for _, l_Guid in pairs(s_ClientOnlyGuids) do
-		local s_GameObject = GameObjectManager.m_GameObjects[l_Guid]
+		local s_GameObject = GameObjectManager.m_GameObjects[tostring(l_Guid)]
 		if s_GameObject == nil then
-			m_Logger:Error("Couldn't find client-only gameobject with guid: ".. l_Guid)
+			m_Logger:Error("Couldn't find client-only gameobject with guid: ".. tostring(l_Guid))
 		else
 			s_GameObject.realm = Realm.Realm_Client
 			table.insert(s_ClientOnlyGameObjectTransferDatas, s_GameObject:GetGameObjectTransferData())
