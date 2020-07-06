@@ -24,7 +24,9 @@ function ClientTransactionManager:RegisterVars()
     self.m_ClientReadyDelta = 0
     self.m_ClientReady = false
 end
-
+function ClientTransactionManager:OnLevelDestroy()
+	self:RegisterVars()
+end
 function ClientTransactionManager:RegisterEvents()
     Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
