@@ -416,10 +416,10 @@ function GameObjectManager:DisableGameObject(p_Guid)
 end
 
 function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
-	local s_GameObject = self.m_GameObjects[p_Guid]
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if s_GameObject == nil then
-		m_Logger:Error('Object with id ' .. p_Guid .. ' does not exist')
+		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
 		return false
 	end
 

@@ -317,6 +317,10 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
+			if (gameObject.parent) {
+				gameObject.parent.updateMatrixWorld();
+				console.log('Updated matrix world yo');
+			}
 			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
 			// this.selectionGroup.setMatrix(gameObjectTransferData.transform.toMatrix());
 		}
