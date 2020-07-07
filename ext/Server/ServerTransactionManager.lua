@@ -127,7 +127,7 @@ function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 	end
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
 	if (#s_CommandActionResults > 0) then
-		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(p_Commands))
+		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(p_Commands), #self.m_Transactions)
 	end
 end
 

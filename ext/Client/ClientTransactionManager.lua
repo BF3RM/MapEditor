@@ -53,7 +53,7 @@ function ClientTransactionManager:OnSyncClientContext(p_Update)
     if p_Update == nil or p_Update.lastTransactionId == nil or p_Update.transferDatas == nil then
         m_Logger:Error('OnSyncClientContext got nil data')
     end
-    self:UpdateTransactionId(p_Update.lastTransactionId)
+    self:UpdateTransactionId(p_Update.lastTransactionId, true)
     self:SyncClientTransferDatas(p_Update.transferDatas)
 end
 
@@ -211,7 +211,8 @@ function ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
     end
 end
 
-function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson)
+function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_TransactionId)
+    self:UpdateTransactionId(p_TransactionId, false)
     local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
     self:ExecuteCommands(s_Commands, nil)
@@ -298,14 +299,14 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
     end
 end
 
-function ClientTransactionManager:UpdateTransactionId(p_TransactionId)
+function ClientTransactionManager:UpdateTransactionId(p_TransactionId, p_IsFirstUpdate)
     if p_TransactionId < self.m_TransactionId then
         m_Logger:Error("Client's transaction id is greater than the server's. This should never happen.")
         return
     end
 
     --- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
-    if p_TransactionId ~= self.m_TransactionId and self.m_TransactionId ~= 0 then
+    if p_IsFirstUpdate and p_TransactionId ~= self.m_TransactionId and self.m_TransactionId ~= 0 then
         m_Logger:Warning("Client is desynced, syncing it. This should rarely happen, did the client hung up? network problem? Please report it on the repo.")
     end
 
