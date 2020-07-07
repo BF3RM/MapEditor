@@ -14,7 +14,7 @@ function ServerTransactionManager:RegisterEvents()
 end
 
 function ServerTransactionManager:RegisterVars()
-	self.m_Queue = {};
+	self.m_Queue = {}
 	self.m_Transactions = {}
 end
 
@@ -56,9 +56,11 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
         end
     end
 
-    -- TODO: These should be on the same netevent, merge them when this vext issue is fixed: https://github.com/EmulatorNexus/VeniceUnleashed/issues/451
-    NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, s_UpdatedGameObjectTransferDatas)
-    NetEvents:SendToLocal("ServerTransactionManager:UpdateTransactionId", p_Player, #self.m_Transactions)
+    -- TODO: Change to 2 arguments when this is fixed https://github.com/EmulatorNexus/VeniceUnleashed/issues/451
+    NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, {
+		transferDatas = s_UpdatedGameObjectTransferDatas,
+		lastTransactionId = #self.m_Transactions
+	})
 end
 
 function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson, p_UpdatePass)
@@ -74,7 +76,7 @@ function ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 
 	local s_QueuedCommands = {}
 
-	for _,l_Command in ipairs(self.m_Queue) do
+	for _,l_Command in pairs(self.m_Queue) do
 		m_Logger:Write("Executing command delayed: " .. l_Command.type)
 		table.insert(s_QueuedCommands, l_Command)
 	end
@@ -88,7 +90,7 @@ end
 
 function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
-	for _, l_Command in ipairs(p_Commands) do
+	for _, l_Command in pairs(p_Commands) do
 
 		local s_CommandAction = CommandActions[l_Command.type]
 

@@ -74,6 +74,7 @@ end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
+	ClientTransactionManager:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnLoaded()
@@ -91,7 +92,6 @@ function MapEditorClient:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message)
-	ClientTransactionManager:OnEngineMessage(p_Message)
 	Editor:OnEngineMessage(p_Message)
 end
 
@@ -119,6 +119,7 @@ end
 function MapEditorClient:OnLevelDestroy()
 	print("Destroy!")
 	GameObjectManager:OnLevelDestroy()
+	ClientTransactionManager:OnLevelDestroy()
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)

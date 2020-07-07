@@ -2,6 +2,7 @@ class 'ClientTransactionManager'
 
 local m_Logger = Logger("ClientTransactionManager", false)
 
+-- Delay after loading, so we make sure everything is loaded on client
 local CLIENT_READY_DELAY = 5
 
 function ClientTransactionManager:__init()
@@ -28,28 +29,37 @@ end
 function ClientTransactionManager:RegisterEvents()
     Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
 
-    NetEvents:Subscribe('ServerTransactionManager:UpdateTransactionId', self, self.OnUpdateTransactionId)
     NetEvents:Subscribe('ServerTransactionManager:CommandsInvoked', self, self.OnServerCommandsInvoked)
     NetEvents:Subscribe('ServerTransactionManager:SyncClientContext', self, self.OnSyncClientContext)
 end
 
-function ClientTransactionManager:OnEngineMessage(p_Message)
-    if p_Message.type == MessageType.ClientCharacterLocalPlayerSetMessage then
-        local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+function ClientTransactionManager:OnLevelLoaded(p_MapName, p_GameModeName)
+    local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
-        if s_LocalPlayer == nil then
-            m_Logger:Error("Local player is nil")
-            return
-        end
-
-        self.m_ClientReady = true
-
+    if s_LocalPlayer == nil then
+        m_Logger:Error("Local player is nil")
+        return
     end
+
+    self.m_ClientReady = true
+end
+
+function ClientTransactionManager:OnLevelDestroy()
+    self.m_ClientReady = false
+    self.m_TransactionId = 0
+end
+
+function ClientTransactionManager:OnSyncClientContext(p_Update)
+    if p_Update == nil or p_Update.lastTransactionId == nil or p_Update.transferDatas == nil then
+        m_Logger:Error('OnSyncClientContext got nil data')
+    end
+    self:UpdateTransactionId(p_Update.lastTransactionId)
+    self:SyncClientTransferDatas(p_Update.transferDatas)
 end
 
 --- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
 --- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
-function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransferDatas)
+function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTransferDatas)
     local s_Commands = {}
 
     for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
@@ -88,7 +98,7 @@ function ClientTransactionManager:OnSyncClientContext(p_UpdatedGameObjectTransfe
                 local s_ComparisonGameObjectTransferData = s_GameObject:GetGameObjectTransferData()
                 local s_Changes = GetChanges(s_ComparisonGameObjectTransferData, s_GameObjectTransferData)
 
-                for _, change in ipairs(s_Changes) do
+                for _, change in pairs(s_Changes) do
 
                     if change == "transform" then
                         s_Command = {
@@ -176,7 +186,7 @@ function ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 
     local s_Commands = {}
 
-    for _,l_Command in ipairs(self.m_Queue.commands) do
+    for _,l_Command in pairs(self.m_Queue.commands) do
         m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
         table.insert(s_Commands, l_Command)
     end
@@ -185,7 +195,7 @@ function ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 
     local s_Messages = {}
 
-    for _,l_Message in ipairs(self.m_Queue.messages) do
+    for _,l_Message in pairs(self.m_Queue.messages) do
         m_Logger:Write("Executing message in the correct UpdatePass: " .. l_Message.type)
         table.insert(s_Messages, l_Message)
     end
@@ -209,7 +219,7 @@ end
 
 function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
     local s_CommandActionResults = {}
-    for _, l_Command in ipairs(p_Commands) do
+    for _, l_Command in pairs(p_Commands) do
         local s_CommandAction = CommandActions[l_Command.type]
         if(s_CommandAction == nil) then
             m_Logger:Error("Attempted to call a nil command action: " .. l_Command.type)
@@ -263,7 +273,7 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
         s_Messages = DecodeParams(json.decode(p_Messages))
     end
 
-    for _, l_Message in ipairs(s_Messages) do
+    for _, l_Message in pairs(s_Messages) do
 
         local s_MessageAction = MessageActions[l_Message.type]
         if(s_MessageAction == nil) then
@@ -288,7 +298,7 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
     end
 end
 
-function ClientTransactionManager:OnUpdateTransactionId(p_TransactionId)
+function ClientTransactionManager:UpdateTransactionId(p_TransactionId)
     if p_TransactionId < self.m_TransactionId then
         m_Logger:Error("Client's transaction id is greater than the server's. This should never happen.")
         return
