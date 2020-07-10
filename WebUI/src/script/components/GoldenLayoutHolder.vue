@@ -1,38 +1,40 @@
 <template>
-	<golden-layout
-		:hasHeaders = "true"
-		:reorderEnabled = "true"
-		:selectionEnabled = "true"
-		:popoutWholeStack = "true"
-		:closePopoutsOnUnload = "false"
-		:showPopoutIcon = "false"
-		:showMaximiseIcon = "true"
-		:showCloseIcon = "false"
-		ref="gl"
-		class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
-		<gl-row>
-			<gl-col :width="80">
-				<gl-row :height="80">
-					<gl-col :width="20">
-						<HierarchyComponent/>
-					</gl-col>
-					<gl-col id="viewport-container" width="80">
-						<ViewportComponent :showHeader="true"/>
-					</gl-col>
-				</gl-row>
-				<gl-row :height="20">
-					<ExplorerComponent :width="70"/>
-					<ConsoleComponent/>
-				</gl-row>
-			</gl-col>
-			<gl-col :width="20">
-				<gl-stack>
-					<InspectorComponent/>
-					<HistoryComponent/>
-				</gl-stack>
-			</gl-col>
-		</gl-row>
-	</golden-layout>
+	<div id="glHolder">
+		<golden-layout
+			:hasHeaders = "true"
+			:reorderEnabled = "true"
+			:selectionEnabled = "true"
+			:popoutWholeStack = "true"
+			:closePopoutsOnUnload = "false"
+			:showPopoutIcon = "false"
+			:showMaximiseIcon = "true"
+			:showCloseIcon = "false"
+			ref="gl"
+			class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
+			<gl-row>
+				<gl-col :width="80">
+					<gl-row :height="80">
+						<gl-col :width="20">
+							<HierarchyComponent/>
+						</gl-col>
+						<gl-col id="viewport-container" width="80">
+							<ViewportComponent :showHeader="true"/>
+						</gl-col>
+					</gl-row>
+					<gl-row :height="20">
+						<ExplorerComponent :width="70"/>
+						<ConsoleComponent/>
+					</gl-row>
+				</gl-col>
+				<gl-col :width="20">
+					<gl-stack>
+						<InspectorComponent/>
+						<HistoryComponent/>
+					</gl-stack>
+				</gl-col>
+			</gl-row>
+		</golden-layout>
+	</div>
 </template>
 
 <script lang="ts">
