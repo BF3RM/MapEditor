@@ -3,7 +3,7 @@ import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { Guid } from '@/script/types/Guid';
 
 import { GameObject } from '@/script/types/GameObject';
-import { GIZMO_MODE, VIEW, WORLD_SPACE } from '@/script/types/Enums';
+import { EDITOR_MODE, GIZMO_MODE, VIEW, WORLD_SPACE } from '@/script/types/Enums';
 
 export const signals = {
 	editor: {

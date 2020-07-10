@@ -6,7 +6,7 @@ import { VextCommand } from '@/script/types/VextCommand';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
 import { IBlueprint } from '@/script/interfaces/IBlueprint';
-import { LOGLEVEL, VIEW } from '@/script/types/Enums';
+import { EDITOR_MODE, LOGLEVEL, VIEW } from '@/script/types/Enums';
 
 export default class VEXTInterface {
 	public emulator: VEXTemulator;
@@ -267,7 +267,23 @@ export default class VEXTInterface {
 		signals.setProjectHeaders.emit(headers);
 	}
 
-	public LoadingComplete() {
-		signals.setActiveView.emit(VIEW.EDITOR);
+	public EditorModeChanged(mode: EDITOR_MODE) {
+		let view = VIEW.LOADING;
+		switch (mode) {
+		case EDITOR_MODE.LOADING:
+			view = VIEW.LOADING;
+			break;
+		case EDITOR_MODE.EDITOR:
+			view = VIEW.EDITOR;
+			break;
+		case EDITOR_MODE.PLAYING:
+			view = VIEW.PLAYING;
+			break;
+		case EDITOR_MODE.FREECAM:
+			view = VIEW.FREECAM;
+			break;
+		}
+
+		signals.setActiveView.emit(view);
 	}
 }

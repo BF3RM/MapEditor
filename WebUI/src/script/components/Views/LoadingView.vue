@@ -2,7 +2,6 @@
 	<div id="loading-view">
 		<div id="progress-container">
 			<span id="logo">VeniceEditor</span>
-
 			<div class="loader">
 				<!--<spinner />-->
 				<p>Loading <span/><span/><span/></p>
@@ -47,7 +46,6 @@ export default class LoadingView extends Vue {
 				font-size: 20px;
 				padding: 5px;
 			}
-
 
 			.loader {
 				display: flex;

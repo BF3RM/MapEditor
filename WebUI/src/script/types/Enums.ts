@@ -129,9 +129,16 @@ export enum GIZMO_MODE {
 	scale = 'scale',
 }
 
+export enum EDITOR_MODE {
+	LOADING = 1,
+	EDITOR = 2,
+	PLAYING = 3,
+	FREECAM = 4
+}
+
 export enum VIEW {
-	LOADING= 'Loading',
+	LOADING = 'Loading',
 	EDITOR = 'Editor',
-	SPECTATING = 'Spectating',
-	PLAYING = 'Playing'
+	PLAYING = 'Playing',
+	FREECAM = 'FreeCam'
 }

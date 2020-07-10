@@ -117,9 +117,9 @@ function MapEditorClient:OnDrawHud()
 end
 
 function MapEditorClient:OnLevelDestroy()
-	print("Destroy!")
 	GameObjectManager:OnLevelDestroy()
 	ClientTransactionManager:OnLevelDestroy()
+	UIManager:OnLevelDestroy()
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)

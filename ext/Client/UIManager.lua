@@ -17,7 +17,13 @@ function UIManager:RegisterEvents()
 end
 
 function UIManager:OnLoadingComplete()
-	WebUpdater:AddUpdate('LoadingComplete')
+	self.m_ActiveMode = EditorMode.Editor
+	WebUpdater:AddUpdate('EditorModeChanged', self.m_ActiveMode)
+end
+
+function UIManager:OnLevelDestroy()
+	self.m_ActiveMode = EditorMode.Loading
+	WebUpdater:AddUpdate('EditorModeChanged', self.m_ActiveMode)
 end
 
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
