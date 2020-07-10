@@ -10,18 +10,7 @@ import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
-
-export enum WORLD_SPACE {
-	local = 'local',
-	world = 'world',
-}
-
-export enum GIZMO_MODE {
-	select = 'select',
-	translate = 'translate',
-	rotate = 'rotate',
-	scale = 'scale',
-}
+import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
 
 export class THREEManager {
 	private scene = new THREE.Scene();

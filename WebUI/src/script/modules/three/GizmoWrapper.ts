@@ -1,8 +1,7 @@
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as THREE from 'three';
-import { GameObject } from '@/script/types/GameObject';
-import { WORLD_SPACE } from '@/script/modules/THREEManager';
 import { signals } from '@/script/modules/Signals';
+import { WORLD_SPACE } from '@/script/types/Enums';
 
 export default class GizmoWrapper extends TransformControls {
 	public visible = false;

@@ -3,10 +3,10 @@ import { VEXTemulator } from '@/script/modules/VEXTemulator';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { signals } from '@/script/modules/Signals';
 import { VextCommand } from '@/script/types/VextCommand';
-import { LOGLEVEL } from '@/script/modules/Logger';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
 import { IBlueprint } from '@/script/interfaces/IBlueprint';
+import { LOGLEVEL, VIEW } from '@/script/types/Enums';
 
 export default class VEXTInterface {
 	public emulator: VEXTemulator;
@@ -265,5 +265,9 @@ export default class VEXTInterface {
 
 	public SetProjectHeaders(headers: any) {
 		signals.setProjectHeaders.emit(headers);
+	}
+
+	public LoadingComplete() {
+		signals.setActiveView.emit(VIEW.EDITOR);
 	}
 }

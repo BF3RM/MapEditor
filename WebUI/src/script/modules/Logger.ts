@@ -1,13 +1,5 @@
 import { signals } from '@/script/modules/Signals';
-export enum LOGLEVEL {
-	NONE = 0,
-	ERROR = 1,
-	PROD = 2,
-	WARNING = 3,
-	INFO = 4,
-	DEBUG = 5,
-	VERBOSE = 6,
-}
+import { LOGLEVEL } from '@/script/types/Enums';
 
 export function LogError(message: string, info?: any): void {
 	signals.onLog.emit(LOGLEVEL.ERROR, message, info);

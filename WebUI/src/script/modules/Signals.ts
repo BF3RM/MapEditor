@@ -2,8 +2,8 @@ import { Signal } from 'typed-signals';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { Guid } from '@/script/types/Guid';
 
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/modules/THREEManager';
 import { GameObject } from '@/script/types/GameObject';
+import { GIZMO_MODE, VIEW, WORLD_SPACE } from '@/script/types/Enums';
 
 export const signals = {
 	editor: {
@@ -79,6 +79,6 @@ export const signals = {
 
 	windowRegistered: new Signal(),
 
-	historyChanged: new Signal()
-
+	historyChanged: new Signal(),
+	setActiveView: new Signal<(mode: VIEW) => void>()
 };

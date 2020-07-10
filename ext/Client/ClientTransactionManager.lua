@@ -34,19 +34,13 @@ function ClientTransactionManager:RegisterEvents()
 end
 
 function ClientTransactionManager:OnLevelLoaded(p_MapName, p_GameModeName)
-    local s_LocalPlayer = PlayerManager:GetLocalPlayer()
-
-    if s_LocalPlayer == nil then
-        m_Logger:Error("Local player is nil")
-        return
-    end
-
     self.m_ClientReady = true
 end
 
 function ClientTransactionManager:OnLevelDestroy()
     self.m_ClientReady = false
     self.m_TransactionId = 0
+    self.m_ClientReadyDelta = 0
 end
 
 function ClientTransactionManager:OnSyncClientContext(p_Update)
@@ -55,6 +49,8 @@ function ClientTransactionManager:OnSyncClientContext(p_Update)
     end
     self:UpdateTransactionId(p_Update.lastTransactionId, true)
     self:SyncClientTransferDatas(p_Update.transferDatas)
+
+    WebUpdater:AddUpdate('LoadingComplete')
 end
 
 --- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
@@ -164,7 +160,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 end
 
 function ClientTransactionManager:UpdatePlayerReadyTimer(p_Delta)
-    if not self.m_ClientReady then
+    if not self.m_ClientReady or self.m_ClientReadyDelta == -1 then
         return
     end
 
@@ -172,8 +168,9 @@ function ClientTransactionManager:UpdatePlayerReadyTimer(p_Delta)
 
     if self.m_ClientReadyDelta > CLIENT_READY_DELAY then
         --- Client requests all updates that the server has.
+        m_Logger:Write("Client READY")
         NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
-        self.m_ClientReady = false -- We disable it as we dont care about this flag anymore. This way the timer stops increasing.
+        self.m_ClientReadyDelta = -1
     end
 end
 

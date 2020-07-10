@@ -41,10 +41,10 @@ import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
-import { LOGLEVEL } from '@/script/modules/Logger';
 import { inspect } from 'util';
 import { ConsoleEntry, IConsoleEntry } from '@/script/types/ConsoleEntry';
 import Search from '@/script/components/widgets/Search.vue';
+import { LOGLEVEL } from '@/script/types/Enums';
 
 @Component({ components: { DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ConsoleComponent extends EditorComponent {

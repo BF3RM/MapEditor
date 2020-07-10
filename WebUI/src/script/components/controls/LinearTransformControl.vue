@@ -21,7 +21,7 @@ import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
-export default class InspectorComponent extends Vue {
+export default class LinearTransformControl extends Vue {
 	@Prop()
 	position: IVec3;
 
