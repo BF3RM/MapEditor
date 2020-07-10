@@ -1,6 +1,6 @@
 class 'ClientTransactionManager'
 
-local m_Logger = Logger("ClientTransactionManager", false)
+local m_Logger = Logger("ClientTransactionManager", true)
 
 -- Delay after loading, so we make sure everything is loaded on client
 local CLIENT_READY_DELAY = 5
@@ -44,13 +44,16 @@ function ClientTransactionManager:OnLevelDestroy()
 end
 
 function ClientTransactionManager:OnSyncClientContext(p_Update)
-    if p_Update == nil or p_Update.lastTransactionId == nil or p_Update.transferDatas == nil then
+    if p_Update == nil then
+        goto continue
+    elseif p_Update.lastTransactionId == nil or p_Update.transferDatas == nil then
         m_Logger:Error('OnSyncClientContext got nil data')
     end
     self:UpdateTransactionId(p_Update.lastTransactionId, true)
     self:SyncClientTransferDatas(p_Update.transferDatas)
 
-    WebUpdater:AddUpdate('LoadingComplete')
+    ::continue::
+    Events:DispatchLocal('UIManager:LoadingComplete')
 end
 
 --- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly

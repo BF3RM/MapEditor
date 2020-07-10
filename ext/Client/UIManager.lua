@@ -9,14 +9,17 @@ function UIManager:__init()
 end
 
 function UIManager:RegisterVars()
-
+	self.m_ActiveMode = EditorMode.Loading
 end
 
 function UIManager:RegisterEvents()
-
+	Events:Subscribe('UIManager:LoadingComplete', self, self.OnLoadingComplete)
 end
 
------------ Game functions----------------
+function UIManager:OnLoadingComplete()
+	WebUpdater:AddUpdate('LoadingComplete')
+end
+
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 	self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 end
@@ -95,4 +98,3 @@ function UIManager:DisableFreeCam()
 end
 
 return UIManager()
-

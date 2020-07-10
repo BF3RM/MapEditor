@@ -39,11 +39,11 @@ import { RecycleScroller } from "vue-virtual-scroller";
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/modules/THREEManager';
 import { signals } from '@/script/modules/Signals';
 import IMenuEntry from '@/script/interfaces/IMenuEntry';
 import RecursiveMenubar from '@/script/components/widgets/RecursiveMenubar.vue';
 import { SetViewModeMessage } from '@/script/messages/SetViewModeMessage';
+import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
 @Component({ components: { RecursiveMenubar } })
 export default class EditorToolbar extends Vue {
 	private worldView = 0;

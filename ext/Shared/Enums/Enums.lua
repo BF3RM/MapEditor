@@ -17,8 +17,10 @@ GameObjectType = {
 }
 
 EditorMode = {
-	Editor = 1,
-	Play = 2
+	Loading = 1,
+	Editor = 2,
+	Playing = 3,
+	FreeCam = 4
 }
 
 ActionResultType = {

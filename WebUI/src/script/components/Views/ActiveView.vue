@@ -13,7 +13,7 @@ import { signals } from '@/script/modules/Signals';
 
 @Component
 export default class ActiveView extends Vue {
-	activeViewName: VIEW = VIEW.EDITOR;
+	activeViewName: VIEW = VIEW.LOADING;
 
 	mounted() {
 		signals.setActiveView.connect(this.onSetActiveView.bind(this));
