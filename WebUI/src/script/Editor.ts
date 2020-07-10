@@ -15,7 +15,7 @@ import { EditorUI } from './modules/EditorUI';
 import { SelectionGroup } from './types/SelectionGroup';
 import { Config } from './modules/Config';
 import { Blueprint } from './types/Blueprint';
-import { GIZMO_MODE, THREEManager } from './modules/THREEManager';
+import { THREEManager } from './modules/THREEManager';
 import { EditorCore } from './EditorCore';
 import { SpatialGameEntity } from './types/SpatialGameEntity';
 import { CommandActionResult } from './types/CommandActionResult';
@@ -25,7 +25,6 @@ import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
-import { LogError, LOGLEVEL } from '@/script/modules/Logger';
 import { GenerateBlueprints } from '@/script/modules/DebugData';
 import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
 

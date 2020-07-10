@@ -1,12 +1,22 @@
 <template>
-	<golden-layout :showPopoutIcon=false :showCloseIcon=false class="gl" @initialised="onInitialised" ref="gl" @stackCreated="onStackCreated">
+	<golden-layout
+		:hasHeaders = "true"
+		:reorderEnabled = "true"
+		:selectionEnabled = "true"
+		:popoutWholeStack = "true"
+		:closePopoutsOnUnload = "false"
+		:showPopoutIcon = "false"
+		:showMaximiseIcon = "true"
+		:showCloseIcon = "false"
+		ref="gl"
+		class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
 		<gl-row>
 			<gl-col :width="80">
 				<gl-row :height="80">
 					<gl-col :width="20">
 						<HierarchyComponent/>
 					</gl-col>
-					<gl-col width="80">
+					<gl-col id="viewport-container" width="80">
 						<ViewportComponent :showHeader="true"/>
 					</gl-col>
 				</gl-row>
@@ -47,36 +57,6 @@ import PerfectScrollbar from 'perfect-scrollbar';
 	}
 })
 export default class GoldenLayoutHolder extends Vue {
-	public mounted() {
-		(this.$refs.gl as any).layout.config.settings = {
-			hasHeaders: true,
-			reorderEnabled: true,
-			selectionEnabled: true,
-			popoutWholeStack: true,
-			closePopoutsOnUnload: false,
-			showPopoutIcon: false,
-			showMaximiseIcon: true,
-			showCloseIcon: false
-		};
-
-		const viewport = document.getElementById('viewport-component');
-		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
-			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
-		}
-		window.onload = () => {
-			// Component height is set the tick before it's actually rendered, so it gets set to 0.
-			// So we wait a tick and trigger a resize event on the now rendered layout.
-			setTimeout(() => {
-				(this.$refs.gl as any).layout.onResize();
-				const scrollables = document.getElementsByClassName('scrollable');
-				for (const scrollable of scrollables as any) {
-					const ps = new PerfectScrollbar(scrollable as HTMLElement, {
-					});
-				}
-			}, 1);
-		};
-	}
-
 	private onInitialised() {
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
@@ -87,12 +67,23 @@ export default class GoldenLayoutHolder extends Vue {
 
 	private onStackCreated(stack: any) {
 		if (stack.contentItems.length > 0) {
-			setTimeout(() => {
+			this.$nextTick(() => {
 				if (!stack.contentItems[0].vueObject.$vnode.context.showHeader) {
-					stack.header.position(false);
+					stack.header.position();
 				}
-			}, 1);
+			});
 		}
+	}
+
+	private onMount() {
+		this.$nextTick(() => {
+			(this.$refs.gl as any).layout.onResize();
+			const scrollables = document.getElementsByClassName('scrollable');
+			for (const scrollable of scrollables as any) {
+				const ps = new PerfectScrollbar(scrollable as HTMLElement, {
+				});
+			}
+		});
 	}
 }
 </script>

@@ -1,8 +1,7 @@
-import { GIZMO_MODE } from '@/script/modules/THREEManager';
 import CameraControls from 'camera-controls';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { Guid } from '@/script/types/Guid';
-import { KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
+import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
 
 // TODO Fool: add config keymap
 

@@ -24,3 +24,5 @@ export default class ViewportComponent extends EditorComponent {
 	}
 }
 </script>
+<style>
+</style>

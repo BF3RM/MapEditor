@@ -1,5 +1,5 @@
-import { LOGLEVEL } from '@/script/modules/Logger';
 import * as Util from 'util';
+import { LOGLEVEL } from '@/script/types/Enums';
 
 export interface IConsoleEntry {
 	level: LOGLEVEL;

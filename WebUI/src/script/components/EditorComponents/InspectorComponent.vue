@@ -26,7 +26,6 @@ import { GameObject } from '@/script/types/GameObject';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
 import { ILinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
-import { LOGLEVEL } from '@/script/modules/Logger';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
