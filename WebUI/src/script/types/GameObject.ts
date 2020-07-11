@@ -185,13 +185,10 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		new LinearTransform().setFromMatrix(this.matrixWorld);
 	}
 
-	// TODO: Reimplement
 	public Enable() {
 		for (const child of this.children) {
-			if (child.constructor === GameObject) {
+			if (child instanceof GameObject) {
 				(child as GameObject).Enable();
-			} else {
-				(child as GameObject).visible = true;
 			}
 		}
 		this.visible = true;
@@ -202,13 +199,11 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	// TODO: Reimplement
 	public Disable() {
 		for (const child of this.children) {
-			if (child.constructor === GameObject) {
+			if (child instanceof GameObject) {
 				(child as GameObject).Disable();
-			} else {
-				(child as GameObject).visible = false;
 			}
 		}
-		this.visible = false;
+		// this.visible = false;
 		this._enabled = false;
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}

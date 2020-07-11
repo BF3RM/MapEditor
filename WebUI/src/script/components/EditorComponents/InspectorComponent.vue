@@ -18,14 +18,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync, Ref } from 'vue-property-decorator';
+import { Component, Ref } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
-import { GameObject } from '@/script/types/GameObject';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
-import { ILinearTransform, LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
@@ -125,17 +123,28 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
-		let command: Command;
-		if (!this.group || this.isEmpty) {
-			return;
-		}
-		if (!this.enabled) {
-			command = new DisableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
-		} else {
-			command = new EnableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
-		}
-		console.log(this.enabled);
-		window.editor.execute(command);
+		this.$nextTick(() => {
+			if (!this.group) {
+				return;
+			}
+
+			if (this.enabled) {
+				this.group.enable();
+			} else {
+				this.group.disable();
+			}
+		});
+		// let command: Command;
+		// if (!this.group || this.isEmpty) {
+		// 	return;
+		// }
+		// if (!this.enabled) {
+		// 	command = new DisableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
+		// } else {
+		// 	command = new EnableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
+		// }
+		// console.log(this.enabled);
+		// window.editor.execute(command);
 	}
 
 	private onNameChange(e: InputEvent) {

@@ -5,6 +5,8 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
+import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
+import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -25,18 +27,6 @@ export class SelectionGroup extends THREE.Object3D {
 	}
 
 	public onClientOnlyMoveEnd() {
-		// Only one object selected
-		if (this.selectedGameObjects.length === 1) {
-			const gameObject = this.selectedGameObjects[0];
-			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
-			const command = new SetTransformCommand(new GameObjectTransferData({
-				guid: gameObject.guid,
-				transform: gameObject.transform
-			}), transform);
-			editor.execute(command);
-			return;
-		}
-
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
@@ -56,7 +46,11 @@ export class SelectionGroup extends THREE.Object3D {
 			return;
 		}
 
-		editor.execute(new BulkCommand(commands));
+		if (commands.length === 1) {
+			editor.execute(commands[0]);
+		} else {
+			editor.execute(new BulkCommand(commands));
+		}
 	}
 
 	/**
@@ -188,5 +182,47 @@ export class SelectionGroup extends THREE.Object3D {
 
 	public isSelected(go: GameObject) {
 		return this.selectedGameObjects.includes(go);
+	}
+
+	public enable() {
+		const commands = [];
+
+		for (const gameObject of this.selectedGameObjects) {
+			const command = new EnableBlueprintCommand(new GameObjectTransferData({
+				guid: gameObject.guid
+			}));
+			commands.push(command);
+		}
+
+		if (commands.length === 0) {
+			return;
+		}
+
+		if (commands.length === 1) {
+			editor.execute(commands[0]);
+		} else {
+			editor.execute(new BulkCommand(commands));
+		}
+	}
+
+	public disable() {
+		const commands = [];
+
+		for (const gameObject of this.selectedGameObjects) {
+			const command = new DisableBlueprintCommand(new GameObjectTransferData({
+				guid: gameObject.guid
+			}));
+			commands.push(command);
+		}
+
+		if (commands.length === 0) {
+			return;
+		}
+
+		if (commands.length === 1) {
+			editor.execute(commands[0]);
+		} else {
+			editor.execute(new BulkCommand(commands));
+		}
 	}
 }

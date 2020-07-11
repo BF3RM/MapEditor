@@ -231,7 +231,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if s_GameObject.parentData.guid == nil then
 		local s_UnresolvedRODCount = GetLength(self.m_ReferenceObjectDatas)
 		if (s_UnresolvedRODCount ~= 0) then
-			-- TODO: Resolve client and server only objects
 			if self.m_Realm == Realm.Realm_Server then
 				m_Logger:Write(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
 			elseif self.m_Realm == Realm.Realm_Client then
@@ -264,7 +263,6 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 		p_GameObject.guid = s_PendingInfo.customGuid
 		p_GameObject.isVanilla = false
 	else -- This is a vanilla root object
-		-- TODO: Figure out if we need the parent reference?
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		p_GameObject.isVanilla = true
 

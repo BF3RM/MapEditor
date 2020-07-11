@@ -27,6 +27,7 @@ import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
 import { GenerateBlueprints } from '@/script/modules/DebugData';
 import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
+import { EDITOR_MODE } from '@/script/types/Enums';
 
 export default class Editor {
 	public config = new Config();
@@ -96,6 +97,9 @@ export default class Editor {
 		// Adds the chrome background and debug window
 		if (this.debug) {
 			this.setPlayerName('LocalPlayer');
+			setTimeout(() => {
+				this.vext.EditorModeChanged(EDITOR_MODE.EDITOR);
+			}, 200);
 		}
 	}
 
