@@ -17,13 +17,17 @@ function UIManager:RegisterEvents()
 end
 
 function UIManager:OnLoadingComplete()
-	self.m_ActiveMode = EditorMode.Editor
-	WebUpdater:AddUpdate('EditorModeChanged', self.m_ActiveMode)
+	self:SetEditorMode(EditorMode.Playing)
 end
 
 function UIManager:OnLevelDestroy()
-	self.m_ActiveMode = EditorMode.Loading
-	WebUpdater:AddUpdate('EditorModeChanged', self.m_ActiveMode)
+	self:SetEditorMode(EditorMode.Loading)
+end
+
+function UIManager:SetEditorMode(p_Mode)
+	m_Logger:Write('Setting editor mode to '.. p_Mode)
+	self.m_ActiveMode = p_Mode
+	WebUpdater:AddUpdate('EditorModeChanged', p_Mode)
 end
 
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
@@ -88,7 +92,7 @@ function UIManager:EnableFreeCam()
 
 	WebUI:BringToFront()
 	WebUI:EnableMouse()
-	WebUI:Show()
+	self:SetEditorMode(EditorMode.Editor)
 
 	self:DisableFreeCamMovement()
 end
@@ -96,11 +100,14 @@ end
 function UIManager:DisableFreeCam()
 	NetEvents:SendLocal('DisableInputRestriction')
 	FreeCam:Disable()
-	--WebUI:BringToFront()
-	WebUI:Hide()
+	self:SetEditorMode(EditorMode.Playing)
 	WebUI:DisableMouse()
 
 	self:EnableFreeCamMovement()
+end
+
+function UIManager:OnUIReloaded()
+	self:SetEditorMode(self.m_ActiveMode)
 end
 
 return UIManager()

@@ -157,6 +157,7 @@ end
 
 function MapEditorClient:OnUIReloaded()
 	Editor:InitializeUIData(ClientTransactionManager:GetExecutedCommandActions())
+	UIManager:OnUIReloaded()
 end
 
 function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)

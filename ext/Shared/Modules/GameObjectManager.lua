@@ -165,7 +165,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	else
 		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
-			m_Logger:Write('Found vanilla object without parent. Name: '..p_Blueprint.name..', Guid: '..tostring(p_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
+			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 		else
 			m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root

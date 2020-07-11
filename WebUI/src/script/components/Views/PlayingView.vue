@@ -1,6 +1,5 @@
 <template>
-	<div>
-		Free camera
+	<div>Playing
 	</div>
 </template>
 
@@ -8,7 +7,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component
-export default class FreeCamView extends Vue {
+export default class PlayingView extends Vue {
 
 }
 </script>
