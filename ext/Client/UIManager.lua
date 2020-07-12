@@ -1,6 +1,6 @@
 class 'UIManager'
 
-local m_Logger = Logger("InstanceParser", true)
+local m_Logger = Logger("UIManager", true)
 
 function UIManager:__init()
 	m_Logger:Write("Initializing UIManager")
@@ -48,15 +48,14 @@ end
 
 function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
-
-		if FreeCam:GetCameraMode() ~= CameraMode.FirstPerson then
+		if self.m_ActiveMode == EditorMode.Editor then
 			self:DisableFreeCam()
-		else
+		elseif self.m_ActiveMode == EditorMode.Playing then
 			self:EnableFreeCam()
 		end
 	end
 
-		-- We let go of right mouse button. Activate the UI again.
+	-- We let go of right mouse button. Activate the UI again.
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
 		self:DisableFreeCamMovement()
 		Editor:SetPendingRaycast(RaycastType.Camera)
@@ -81,11 +80,14 @@ function UIManager:DisableFreeCamMovement()
 	end
 end
 
-function UIManager:OnDisableFreeCam()
+function UIManager:OnDisableEditorMode()
 	self:DisableFreeCam()
 end
 
 function UIManager:EnableFreeCam()
+	if self.m_ActiveMode ~= EditorMode.Playing then
+		return
+	end
 	NetEvents:SendLocal('EnableInputRestriction')
 
 	FreeCam:Enable()
@@ -98,6 +100,9 @@ function UIManager:EnableFreeCam()
 end
 
 function UIManager:DisableFreeCam()
+	if self.m_ActiveMode ~= EditorMode.Editor then
+		return
+	end
 	NetEvents:SendLocal('DisableInputRestriction')
 	FreeCam:Disable()
 	self:SetEditorMode(EditorMode.Playing)

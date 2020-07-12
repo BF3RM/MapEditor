@@ -31,9 +31,9 @@ export default class LoadingView extends Vue {
 			position: absolute;
 			background-color: #202020;
 			color: white;
-			bottom: 0;
+			top: 0;
 			width: 100%;
-			height: 15%;
+			height: 5%;
 			display: flex;
 			align-items: center;
 			justify-content: center;

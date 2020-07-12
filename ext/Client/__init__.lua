@@ -52,7 +52,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
 
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
-	Events:Subscribe('MapEditor:DisableFreeCam', self, self.OnDisableFreeCam)
+	Events:Subscribe('MapEditor:DisableEditorMode', self, self.OnDisableEditorMode)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
 	Events:Subscribe('MapEditor:controlEnd', self, self.OnCameraControlEnd)
 	Events:Subscribe('MapEditor:controlUpdate', self, self.OnCameraControlUpdate)
@@ -190,8 +190,8 @@ function MapEditorClient:OnEnableFreeCamMovement()
 	FreeCam:OnEnableFreeCamMovement()
 end
 
-function MapEditorClient:OnDisableFreeCam()
-	UIManager:OnDisableFreeCam()
+function MapEditorClient:OnDisableEditorMode()
+	UIManager:OnDisableEditorMode()
 end
 
 function MapEditorClient:OnCameraControlStart()

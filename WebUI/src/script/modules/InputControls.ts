@@ -119,8 +119,8 @@ export class InputControls {
 		if (event.which === KEYCODE.DELETE) {
 			editor.DeleteSelected();
 		}
-		if (event.which === KEYCODE.F2) {
-			editor.vext.SendEvent('DisableFreecam');
+		if (event.which === KEYCODE.F1) {
+			editor.vext.SendEvent('DisableEditorMode');
 		}
 		if (event.which === KEYCODE.ESCAPE) {
 			editor.Select(Guid.createEmpty(), false); // Deselects everything.
