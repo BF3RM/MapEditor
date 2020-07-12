@@ -4,12 +4,29 @@
 			<div class="header">
 				<Search v-model="search"/>
 			</div>
-			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent" :search="search" :autoOpen="true" :data="data" :selectable="true" :should-select-node="shouldSelectNode">
-				<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name + ' (' + node.children.length + ')'"
-									:selected="node.state.selected" @node:hover="onNodeHover" @node:hover-end="onNodeHoverEnd" @node:click="onNodeClick" />
+			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent"
+									:search="search"
+									:autoOpen="true"
+									:data="data"
+									:selectable="true"
+									:should-select-node="shouldSelectNode">
+				<expandable-tree-slot slot-scope="{ node, index, tree, active, data }"
+									:node="node"
+									:tree="tree"
+									:search="search"
+									:nodeText="node.name + ' (' + node.children.length + ')'"
+									:selected="node.state.selected"
+									:class="{ disabled: !data.enabled }"
+									@node:hover="onNodeHover"
+									@node:hover-end="onNodeHoverEnd"
+									@node:click="onNodeClick" />
 			</infinite-tree-component>
 		</EditorComponent>
-		<ListComponent class="datafont" title="Explorer data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
+		<ListComponent class="datafont" title="Explorer data"
+					:list="list"
+					:keyField="'instanceGuid'"
+					:headers="['Name', 'Type']"
+					:click="SpawnBlueprint">
 			<template slot-scope="{ item, data }">
 				<div class="slot-scope">
 					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
@@ -65,6 +82,7 @@ export default class HierarchyComponent extends EditorComponent {
 		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
+		signals.objectChanged.connect(this.onObjectChanged.bind(this));
 	}
 
 	public mounted() {
@@ -80,7 +98,8 @@ export default class HierarchyComponent extends EditorComponent {
 			type: gameObject.typeName,
 			children: [],
 			data: {
-				parentGuid: gameObject.parentData.guid
+				parentGuid: gameObject.parentData.guid,
+				enabled: gameObject.enabled
 			}
 		};
 	}
@@ -195,10 +214,27 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 		window.editor.SpawnBlueprint(blueprint);
 	}
+
+	private onObjectChanged(gameObject: GameObject, field: string, value: any) {
+		if (!gameObject) {
+			return;
+		}
+		if (field === 'enabled') {
+			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
+			if (node) {
+				node.data.enabled = value;
+				// This doesnt work, data is not updated reactively
+			}
+		}
+	}
 }
 </script>
 <style lang="scss" scoped>
 	.expand {
 		display: inline;
+	}
+
+	.disabled {
+		/*opacity: 0.5;*/
 	}
 </style>

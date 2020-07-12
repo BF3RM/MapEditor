@@ -38,7 +38,7 @@ export const signals = {
 	deletedGroup: new Signal(),
 
 	selectedGameObject: new Signal<(guid: Guid, isMultiSelection?:boolean) => void>(),
-	deselectedGameObject: new Signal(),
+	deselectedGameObject: new Signal<(guid: Guid) => void>(),
 
 	selectionGroupChanged: new Signal(),
 

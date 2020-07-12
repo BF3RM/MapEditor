@@ -191,29 +191,18 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 				(child as GameObject).Enable();
 			}
 		}
-		this.visible = true;
 		this._enabled = true;
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
 	}
 
-	// TODO: Reimplement
 	public Disable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
 				(child as GameObject).Disable();
 			}
 		}
-		// this.visible = false;
 		this._enabled = false;
 		signals.objectChanged.emit(this, 'enabled', this.enabled);
-	}
-
-	set enabled(value: boolean) {
-		if (value) {
-			window.editor.execute(new EnableBlueprintCommand(this.getGameObjectTransferData()));
-		} else {
-			window.editor.execute(new DisableBlueprintCommand(this.getGameObjectTransferData()));
-		}
 	}
 
 	get enabled() {

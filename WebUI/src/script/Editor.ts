@@ -248,23 +248,6 @@ export default class Editor {
 		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
 	}
 
-	/*	DisableSelected() {
-		let scope = this;
-		let commands = [];
-		editor.selectionGroup.children.forEach(function(childGameObject) {
-			let gameObjectTransferData = new GameObjectTransferData({
-				guid: childGameObject.guid
-			});
-
-			commands.push(new DisableBlueprintCommand(gameObjectTransferData));
-		});
-		if(commands.length > 0) {
-			scope.execute(new BulkCommand(commands));
-		}
-	} */
-
-	// TODO: EnableBlueprintCommand and DisableBlueprintCommand are not invoked anywhere, but the whole lua side works.
-
 	public DeleteSelected() {
 		const scope = this;
 		const commands: Command[] = [];
@@ -367,8 +350,13 @@ export default class Editor {
 		const scope = this;
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
-		const parentGuid = gameObjectTransferData.parentData.guid;
 
+		if (this.gameObjects.getValue(gameObjectGuid)) {
+			console.error('Tried to create a GameObject that already exists');
+			return;
+		}
+
+		const parentGuid = gameObjectTransferData.parentData.guid;
 		const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
 		editor.threeManager.attachToScene(gameObject);
 		gameObject.updateTransform();

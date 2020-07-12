@@ -12,7 +12,8 @@
 				v-bind="{
 					node: item,
 					tree: tree,
-					index: index
+					index: index,
+					data: data
 				}"
 			/>
 		</div>

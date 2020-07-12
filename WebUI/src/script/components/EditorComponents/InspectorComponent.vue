@@ -27,9 +27,6 @@ import LinearTransformControl from '@/script/components/controls/LinearTransform
 import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
-import Command from '@/script/libs/three/Command';
-import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
-import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
 @Component({ components: { LinearTransformControl, EditorComponent } })
 export default class InspectorComponent extends EditorComponent {
@@ -134,17 +131,6 @@ export default class InspectorComponent extends EditorComponent {
 				this.group.disable();
 			}
 		});
-		// let command: Command;
-		// if (!this.group || this.isEmpty) {
-		// 	return;
-		// }
-		// if (!this.enabled) {
-		// 	command = new DisableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
-		// } else {
-		// 	command = new EnableBlueprintCommand(this.group.selectedGameObjects[0].getGameObjectTransferData());
-		// }
-		// console.log(this.enabled);
-		// window.editor.execute(command);
 	}
 
 	private onNameChange(e: InputEvent) {
