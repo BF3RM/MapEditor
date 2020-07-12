@@ -1,20 +1,21 @@
 <template>
 	<div id="loading-view">
-		<div id="progress-container">
-			<span id="logo">VeniceEditor</span>
+		<info-top-bar>
 			<div class="loader">
 				<!--<spinner />-->
 				<p>Loading <span/><span/><span/></p>
 			</div>
-		</div>
+		</info-top-bar>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import InfoTopBar from '@/script/components/InfoTopBar.vue';
 
 @Component({
 	components: {
+		InfoTopBar
 
 	}
 })
@@ -27,54 +28,33 @@ export default class LoadingView extends Vue {
 		width: 100%;
 		height: 100%;
 
-		#progress-container {
-			position: absolute;
-			background-color: #202020;
-			color: white;
-			top: 0;
-			width: 100%;
-			height: 5%;
+		.loader {
 			display: flex;
-			align-items: center;
-			justify-content: center;
 
-			#logo {
-				position: absolute;
-				left: 5vmin	;
-				color: #fff;
-				font-weight: bolder;
-				font-size: 20px;
-				padding: 5px;
-			}
+			p {
+				font-size: 1.8vmin;
+				font-weight: 400;
+				margin: 0;
 
-			.loader {
-				display: flex;
+				span {
+					&::after {
+						content: ".";
+					}
 
-				p {
-					font-size: 1.8vmin;
-					font-weight: 400;
-					margin: 0;
+					animation: 1s blink infinite;
 
-					span {
-						&::after {
-							content: ".";
-						}
+					&:nth-child(2) {
+						animation-delay: 250ms
+					}
 
-						animation: 1s blink infinite;
-
-						&:nth-child(2) {
-							animation-delay: 250ms
-						}
-
-						&:nth-child(3) {
-							animation-delay: 500ms
-						}
+					&:nth-child(3) {
+						animation-delay: 500ms
 					}
 				}
+			}
 
-				@keyframes blink {
-					50% { color: transparent }
-				}
+			@keyframes blink {
+				50% { color: transparent }
 			}
 		}
 	}
