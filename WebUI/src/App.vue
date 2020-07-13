@@ -15,6 +15,7 @@ import './style/icons.scss';
 import Editor from '@/script/Editor';
 import { Log, LogError } from '@/script/modules/Logger';
 import ActiveView from '@/script/components/Views/ActiveView.vue';
+import { EDITOR_MODE } from '@/script/types/Enums';
 
 @Component({
 	components: {
@@ -42,6 +43,13 @@ export default class App extends Vue {
 
 	get editor() {
 		return window.editor;
+	}
+
+	public beforeDestroy() {
+		console.log('Reloading UI');
+		// Hack to force a complete UI reload when a component is destroyed because we did a hot-reload
+		// eslint-disable-next-line no-self-assign
+		window.location = window.location;
 	}
 }
 </script>
