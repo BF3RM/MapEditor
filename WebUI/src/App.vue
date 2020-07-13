@@ -48,8 +48,10 @@ export default class App extends Vue {
 	public beforeDestroy() {
 		console.log('Reloading UI');
 		// Hack to force a complete UI reload when a component is destroyed because we did a hot-reload
+
 		// eslint-disable-next-line no-self-assign
 		window.location = window.location;
+		window.editor.vext.SendEvent('UIReloaded');
 	}
 }
 </script>
