@@ -121,6 +121,9 @@ export default class Editor {
 		signals.menuRegistered.emit(['Edit', '']); // Separator
 		if (this.debug) {
 			this.blueprintManager.registerBlueprints(GenerateBlueprints(100));
+		} else {
+			this.vext.SendEvent('UIReloaded');
+			console.log('Sent event');
 		}
 	}
 
