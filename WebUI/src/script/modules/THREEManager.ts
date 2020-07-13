@@ -246,6 +246,7 @@ export class THREEManager {
 		this.gizmoMode = mode;
 
 		signals.gizmoModeChanged.emit(mode);
+		this.setPendingRender();
 	}
 
 	public setWorldSpace(space: WORLD_SPACE) {
