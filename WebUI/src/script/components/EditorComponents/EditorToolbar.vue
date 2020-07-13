@@ -1,8 +1,7 @@
-import { RecycleScroller } from "vue-virtual-scroller";
 <template>
 	<div id="toolbar">
-		<div id="toolbarLeft">
-			<span id="logo">VeniceEditor</span>
+		<info-top-bar>
+			<div id="toolbarLeft">
 				<el-menu mode="horizontal" menu-trigger="hover" :unique-opened="true" size="mini" v-for="(item, index) in menuBar.children" :key="index" class="el-menu" @select="onSelectMenu">
 <!--					<recursive-menubar v-if="item.children.length > 1" :value="item" :index="index"/>-->
 					<el-submenu v-if="item.children" :index="item.label" :show-timeout="10" :hide-timeout="100">
@@ -20,20 +19,24 @@ import { RecycleScroller } from "vue-virtual-scroller";
 						{{item.label}}
 					</el-menu-item>
 				</el-menu>
-			<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
-				<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
-			</el-radio-group>
-			<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChange">
-				<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
-			</el-radio-group>
-		</div>
-		<div id="toolbarCenter">
-		</div>
-		<div id="toolbarRight">
-			<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
-				<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
-			</el-select>
-		</div>
+				<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
+					<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
+				</el-radio-group>
+				<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChange">
+					<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
+				</el-radio-group>
+			</div>
+			<div id="toolbarCenter">
+				<key-tip
+					:keys="'F1'"
+					:description="'Enable play mode'"/>
+			</div>
+			<div id="toolbarRight">
+				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
+					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
+				</el-select>
+			</div>
+		</info-top-bar>
 	</div>
 </template>
 
@@ -44,7 +47,10 @@ import IMenuEntry from '@/script/interfaces/IMenuEntry';
 import RecursiveMenubar from '@/script/components/widgets/RecursiveMenubar.vue';
 import { SetViewModeMessage } from '@/script/messages/SetViewModeMessage';
 import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
-@Component({ components: { RecursiveMenubar } })
+import InfoTopBar from '@/script/components/InfoTopBar.vue';
+import KeyTip from '@/script/components/KeyTip.vue';
+
+@Component({ components: { InfoTopBar, RecursiveMenubar, KeyTip } })
 export default class EditorToolbar extends Vue {
 	private worldView = 0;
 	private tool = (window).editor.threeManager.gizmoMode;
@@ -384,8 +390,7 @@ input#worldView {
 	z-index: 2147483647;
 	left: 0;
 	top: 0;
-	width: 100%;
-	height: 30px;
+	width: 100vw;
 	background-color: #1d1d1d;
 	display: flex;
 	justify-content: space-between;
@@ -441,15 +446,13 @@ label i {
 	background-color: #111;
 }
 
-#logo {
-	color: #fff;
-	font-weight: bolder;
-	font-size: 20px;
-	padding: 5px;
-}
-
 label.is-active {
 	background: #444;
 	border-radius: 5px;
+}
+
+#toolbarRight {
+	margin-left: auto;
+	margin-right: 5vmin;
 }
 </style>

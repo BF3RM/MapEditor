@@ -7,9 +7,10 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import '@/style/reset.scss';
+import '@/style/style.scss';
+
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import 'golden-layout/src/css/goldenlayout-dark-theme.css';
-import './style/style.scss';
 import './style/icons.scss';
 import Editor from '@/script/Editor';
 import { Log, LogError } from '@/script/modules/Logger';

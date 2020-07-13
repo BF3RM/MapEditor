@@ -1,8 +1,9 @@
 <template>
-	<div>
-		<EditorToolbar/>
+	<div id="editor-view">
+<!--		<info-top-bar></info-top-bar>-->
+		<EditorToolbar id="toolbar"/>
 		<div id="ViewportContainer"></div>
-		<GoldenLayoutHolder/>
+		<GoldenLayoutHolder id="golden-layout-holder"/>
 		<ProjectSettingsComponent>sup</ProjectSettingsComponent>
 	</div>
 </template>
@@ -12,10 +13,11 @@ import { Component, Vue } from 'vue-property-decorator';
 import EditorToolbar from '../EditorComponents/EditorToolbar.vue';
 import ProjectSettingsComponent from '../WindowComponents/ProjectSettingsComponent.vue';
 import GoldenLayoutHolder from '@/script/components/GoldenLayoutHolder.vue';
-import ViewportComponent from '@/script/components/EditorComponents/ViewportComponent.vue';
+import InfoTopBar from '@/script/components/InfoTopBar.vue';
 
 @Component({
 	components: {
+		InfoTopBar,
 		GoldenLayoutHolder,
 		EditorToolbar,
 		ProjectSettingsComponent
@@ -31,6 +33,13 @@ export default class EditorView extends Vue {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+	#editor-view {
+		position: relative;
+		#golden-layout-holder {
+			position: relative;
+			width: 100vw;
+			height: 95vh;
+		}
+	}
 </style>

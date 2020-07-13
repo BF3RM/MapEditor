@@ -1,11 +1,8 @@
 <template>
 	<info-top-bar>
 		<key-tip
-		:key-name="'F1'"
-		:description="'Enable editor mode'"/>
-		<key-tip
-			:key-name="'F2'"
-			:description="'Something else'"/>
+			:keys="'F1'"
+			:description="'Enable editor mode'"/>
 	</info-top-bar>
 </template>
 

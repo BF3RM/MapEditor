@@ -20,7 +20,7 @@ export default class InfoTopBar extends Vue {
 
 <style lang="scss" scoped>
 	#container {
-		position: absolute;
+		position: relative;
 		background-color: #202020;
 		color: white;
 		top: 0;

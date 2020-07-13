@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
-import Editor from './script/Editor';
-import { Log, LogError } from '@/script/modules/Logger';
 import vgl from 'vue-golden-layout';
 import '@/script/hacks/HTMLDivElement';
 import ElementUI from 'element-ui';

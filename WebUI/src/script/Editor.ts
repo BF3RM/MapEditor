@@ -98,7 +98,7 @@ export default class Editor {
 		if (this.debug) {
 			this.setPlayerName('LocalPlayer');
 			setTimeout(() => {
-				this.vext.EditorModeChanged(EDITOR_MODE.PLAYING);
+				this.vext.EditorModeChanged(EDITOR_MODE.EDITOR);
 			}, 200);
 		}
 	}
