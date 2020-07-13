@@ -2,6 +2,7 @@
 	<EditorComponent class="inspector-component" title="Inspector">
 		<div v-if="!isEmpty">
 			<div class="header">
+				<div class="title">Entity</div>
 				<div class="enable-container">
 					<label class="enable-label" for="enabled">Enabled:</label>
 					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
@@ -11,6 +12,20 @@
 					<linear-transform-control class="lt-control" :hideLabel="false"
 											:position="position" :rotation="rotation" :scale="scale"
 											@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated"/>
+				</div>
+				<div class="transform-container" v-if="!multiSelection && !isEmpty">
+					<div class="title">Blueprint</div>
+					<label class="name-label" for="bp-name">Name:</label>
+					<input class="name-input" id="bp-name" disabled="true" :value="blueprintName">
+
+					<label class="name-label" for="bp-type">Type:</label>
+					<input class="name-input" id="bp-type" disabled="true" :value="blueprintType">
+
+					<label class="name-label" for="bp-instance-guid">Instance GUID:</label>
+					<input class="name-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
+
+					<label class="name-label" for="bp-partition-guid">Partition GUID:</label>
+					<input class="name-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
 				</div>
 			</div>
 		</div>
@@ -36,6 +51,10 @@ export default class InspectorComponent extends EditorComponent {
 	private rotation: IQuat = new Quat().toTable();
 	private dragging = false;
 	private enabled = true;
+	private blueprintName: string = '';
+	private blueprintType: string = '';
+	private blueprintGuid: string = '';
+	private blueprintPartitionGuid: string = '';
 
 	@Ref('enableInput')
 	enableInput!: HTMLInputElement;
@@ -43,6 +62,8 @@ export default class InspectorComponent extends EditorComponent {
 	constructor() {
 		super();
 		signals.selectionGroupChanged.connect(this.onSelectionGroupChanged.bind(this));
+		signals.selectedGameObject.connect(this.onSelection.bind(this));
+		signals.deselectedGameObject.connect(this.onSelection.bind(this));
 	}
 
 	private onInput() {
@@ -62,6 +83,21 @@ export default class InspectorComponent extends EditorComponent {
 			});
 			window.editor.threeManager.setPendingRender();
 		}
+	}
+
+	private onSelection() {
+		this.$nextTick(() => {
+			if (this.multiSelection || this.isEmpty || !this.group) {
+				return;
+			}
+
+			const selectedGameObject = this.group.selectedGameObjects[0];
+			if (!selectedGameObject) return;
+			this.blueprintGuid = selectedGameObject.blueprintCtrRef.instanceGuid.toString();
+			this.blueprintName = selectedGameObject.blueprintCtrRef.name.toString();
+			this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
+			this.blueprintPartitionGuid = selectedGameObject.blueprintCtrRef.partitionGuid.toString();
+		});
 	}
 
 	get isEmpty() {
@@ -107,16 +143,18 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onSelectionGroupChanged(group: SelectionGroup) {
-		if (!this.group) {
-			this.group = group;
-		}
-		if (!this.dragging) {
-			// Update inspector transform.
-			this.position = this.group.transform.trans.toTable();
-			this.scale = this.group.transform.scale.toTable();
-			this.rotation = this.group.transform.rotation.toTable();
-		}
-		this.enabled = this.group.selectedGameObjects[0].enabled;
+		this.$nextTick(() => {
+			if (!this.group) {
+				this.group = group;
+			}
+			if (!this.dragging) {
+				// Update inspector transform.
+				this.position = this.group.transform.trans.toTable();
+				this.scale = this.group.transform.scale.toTable();
+				this.rotation = this.group.transform.rotation.toTable();
+			}
+			this.enabled = this.group.selectedGameObjects[0].enabled;
+		});
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
@@ -148,6 +186,11 @@ export default class InspectorComponent extends EditorComponent {
 		width: 100%;
 	}
 	.inspector-component {
+		.title {
+			margin: 1vmin 0;
+			font-size: 1.5em;
+			font-weight: bold;
+		}
 		.enable-container {
 			display: flex;
 			flex-direction: row;

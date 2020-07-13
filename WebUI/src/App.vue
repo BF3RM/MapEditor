@@ -36,6 +36,9 @@ export default class App extends Vue {
 		(window).editor = new Editor(debugMode);
 		(window).Log = Log;
 		(window).LogError = LogError;
+		this.$nextTick(() => {
+			window.editor.vext.SendEvent('UIReloaded');
+		});
 	}
 
 	@Prop()
@@ -51,7 +54,6 @@ export default class App extends Vue {
 
 		// eslint-disable-next-line no-self-assign
 		window.location = window.location;
-		window.editor.vext.SendEvent('UIReloaded');
 	}
 }
 </script>
