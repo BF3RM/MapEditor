@@ -95,6 +95,8 @@ export default class GoldenLayoutHolder extends Vue {
 		height: 100%;
 	}
 	#glHolder {
+		height: 95vh;
+		width: 100vw;
 		pointer-events: none;
 	}
 </style>
