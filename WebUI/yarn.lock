@@ -8063,10 +8063,10 @@ vue-eslint-parser@^7.0.0:
     esquery "^1.0.1"
     lodash "^4.17.15"
 
-vue-golden-layout@2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/vue-golden-layout/-/vue-golden-layout-2.0.8.tgz#3e2ca299cbc119f6e3af94d6499fa62148b6fb3f"
-  integrity sha512-kxQrX8VHtFG9rO+v4rPlpSebMzjhJX8WvuPDG0fHjjnK2wCDdDAjs7ifoSPZl0rdY0g/I7vbjnvKLSyS8RDf/w==
+vue-golden-layout@2.0.9:
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/vue-golden-layout/-/vue-golden-layout-2.0.9.tgz#897e9215d1bf3e88c1a2885c281fd95172299e8e"
+  integrity sha512-/9BT54pT/PgyWOoluP/MfaDqRGaJWBRBoK028R8tTpPjf4bVKfDHxazLSjGSkd8KWWgxw5WlY7sl3mKVarV/Zw==
   dependencies:
     jquery "^3.5.0"
     vue-resize-directive "^1.2.0"
