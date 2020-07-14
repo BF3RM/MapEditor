@@ -80,5 +80,6 @@ export const signals = {
 	windowRegistered: new Signal(),
 
 	historyChanged: new Signal(),
-	setActiveView: new Signal<(mode: VIEW) => void>()
+	setActiveView: new Signal<(mode: VIEW) => void>(),
+	setLoadingInfo: new Signal<(info: string) => void>()
 };

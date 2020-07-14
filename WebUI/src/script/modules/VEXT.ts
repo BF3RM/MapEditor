@@ -286,4 +286,8 @@ export default class VEXTInterface {
 
 		signals.setActiveView.emit(view);
 	}
+
+	public SetLoadingInfo(info: string) {
+		signals.setLoadingInfo.emit(info);
+	}
 }

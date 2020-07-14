@@ -36,6 +36,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('UI:DrawHud', self, self.OnDrawHud)
+	Events:Subscribe('Level:LoadingInfo', self, self.OnLoadingInfo)
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
@@ -127,11 +128,23 @@ function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
 end
 
 function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	local loadingInfo = ''
+	for k,v in pairs(p_Bundles) do
+		loadingInfo = loadingInfo .. v
+		if(k ~= #p_Bundles) then
+			loadingInfo = loadingInfo .. ", "
+		end
+	end
+	WebUI:ExecuteJS(string.format("editor.vext.SetLoadingInfo('Mounting bundles: %s')", tostring(loadingInfo)))
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
 end
 
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+end
+
+function MapEditorClient:OnLoadingInfo( p_Info )
+	WebUI:ExecuteJS(string.format("editor.vext.SetLoadingInfo('%s')", p_Info))
 end
 
 ----------- Editor functions----------------

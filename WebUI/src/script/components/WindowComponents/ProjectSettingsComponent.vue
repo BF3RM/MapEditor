@@ -13,7 +13,7 @@
 			<input placeholder="Project Name" v-model="newSaveName"/>
 		</div>
 		<div class="footer" v-if="!showNewSave">
-			<button :disabled="projects.length === 0 || selectedProject !== null" @click="loadSave()">Load</button>
+			<button :disabled="projects.length === 0 || selectedProject === null" @click="loadSave()">Load</button>
 			<button @click="NewSave()">New Save</button>
 		</div>
 		<div class="footer" v-if="showNewSave">
@@ -42,7 +42,6 @@ export default class ProjectSettingsComponent extends Vue {
 		visible: false
 	};
 
-	// window.editor.vext.SendMessage(new GetProjectsMessage())
 	NotImplemented() {
 		console.error('Not implemented');
 	}
@@ -55,6 +54,7 @@ export default class ProjectSettingsComponent extends Vue {
 			this.state.visible = true;
 		});
 		signals.menuRegistered.emit(['File', 'Load Project'], () => {
+			window.editor.vext.SendMessage(new GetProjectsMessage());
 			this.showNewSave = false;
 			this.title = 'Load Project';
 			this.state.visible = true;
@@ -81,6 +81,9 @@ export default class ProjectSettingsComponent extends Vue {
 			projectName = this.newSaveName;
 		}
 		console.log('Saving project as ' + projectName);
+		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectSave', {
+			projectName: projectName
+		});
 	}
 
 	onSelectProject(project:any) {

@@ -3,7 +3,7 @@
 		<info-top-bar>
 			<div class="loader">
 				<!--<spinner />-->
-				<p>Loading <span/><span/><span/></p>
+				<p>{{loadingInfo}} <span/><span/><span/></p>
 			</div>
 		</info-top-bar>
 	</div>
@@ -12,6 +12,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import InfoTopBar from '@/script/components/InfoTopBar.vue';
+import { signals } from '@/script/modules/Signals';
 
 @Component({
 	components: {
@@ -20,6 +21,14 @@ import InfoTopBar from '@/script/components/InfoTopBar.vue';
 	}
 })
 export default class LoadingView extends Vue {
+	private loadingInfo = 'Loading resources';
+	mounted() {
+		signals.setLoadingInfo.connect((info) => {
+			console.log('Got loading info');
+			this.loadingInfo = info;
+			this.$forceUpdate();
+		});
+	}
 }
 </script>
 
