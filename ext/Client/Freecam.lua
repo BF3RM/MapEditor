@@ -37,7 +37,7 @@ function FreeCam:RegisterVars()
 	self.m_LastSpectatedPlayer = 0
 end
 
-function Freecam:Create()
+function FreeCam:Create()
     print("function Freecam:Create()")
     local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
     if s_Entity == nil then
@@ -48,6 +48,7 @@ function Freecam:Create()
     self.cameraData.fov = 90
     self.camera = s_Entity
 end
+
 function FreeCam:SetCameraMode(p_Mode)
     if self.m_Mode == CameraMode.Editor then
         self:UpdateFreeCamVars()

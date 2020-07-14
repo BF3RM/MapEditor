@@ -65,6 +65,7 @@ export default class GoldenLayoutHolder extends Vue {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
 			signals.editor.Ready.emit(true);
 		}
+		this.onMount();
 	}
 
 	private onStackCreated(stack: any) {

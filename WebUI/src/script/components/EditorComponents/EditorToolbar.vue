@@ -58,6 +58,7 @@ export default class EditorToolbar extends Vue {
 	private worldSpaces = ['local', 'world'];
 	private tools = ['select', 'translate', 'rotate', 'scale'];
 
+	private windows = [];
 	private menuBar: IMenuEntry = {
 		type: 'menu',
 		entries: new Map<string, IMenuEntry>(),

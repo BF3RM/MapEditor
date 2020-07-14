@@ -1,8 +1,9 @@
 <template>
-	<WindowComponent title="Project Settings">
+	<WindowComponent :state="state" :title="title" :isDestructible="true">
 		<div class="Container" v-if="!showNewSave">
 			<ul class="projectList">
-				<li v-for="(project, projectName) in projects" v-bind:key="projectName" @click="onSelectProject(project)" :class="selectedProjectName === projectName ? 'selected' : null">{{projectName}}</li>
+				<li v-if="projects.length === 0">No saved projects</li>
+				<li v-else v-for="(project, projectName) in projects" v-bind:key="projectName" @click="onSelectProject(project)" :class="selectedProjectName === projectName ? 'selected' : null">{{projectName}}</li>
 			</ul>
 			<ul v-if="selectedProject" class="saveList">
 				<li v-for="(project) in selectedProject" v-bind:key="project.timeStamp" @click="selectSave(project)" :class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : null">{{FormatTime(project.timeStamp)}} ago</li>
@@ -12,7 +13,7 @@
 			<input placeholder="Project Name" v-model="newSaveName"/>
 		</div>
 		<div class="footer" v-if="!showNewSave">
-			<button @click="loadSave()">Load</button>
+			<button :disabled="projects.length === 0 || selectedProject !== null" @click="loadSave()">Load</button>
 			<button @click="NewSave()">New Save</button>
 		</div>
 		<div class="footer" v-if="showNewSave">
@@ -22,26 +23,42 @@
 	</WindowComponent>
 </template>
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { glCustomContainer } from 'vue-golden-layout';
 import WindowComponent from './WindowComponent.vue';
 import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
 import { signals } from '@/script/modules/Signals';
 
 @Component({ components: { WindowComponent } })
-export default class ProjectSettingsComponent extends WindowComponent {
+export default class ProjectSettingsComponent extends Vue {
+	private title = 'Project Settings';
 	private projects = [];
 	private selectedProject: any = null;
 	private selectedSave: any = null;
 	private selectedProjectName = '';
 	private showNewSave = false;
 	private newSaveName = '';
-	constructor() {
-		super();
+	private state = {
+		visible: false
+	};
+
+	// window.editor.vext.SendMessage(new GetProjectsMessage())
+	NotImplemented() {
+		console.error('Not implemented');
 	}
 
 	mounted() {
 		signals.setProjectHeaders.connect(this.onGetProjects.bind(this));
+		signals.menuRegistered.emit(['File', 'New Project'], () => {
+			this.showNewSave = true;
+			this.title = 'New Project';
+			this.state.visible = true;
+		});
+		signals.menuRegistered.emit(['File', 'Load Project'], () => {
+			this.showNewSave = false;
+			this.title = 'Load Project';
+			this.state.visible = true;
+		});
 	}
 
 	selectSave(project: any) {
@@ -76,13 +93,15 @@ export default class ProjectSettingsComponent extends WindowComponent {
 	onGetProjects(availableProjects: any) {
 		console.log(availableProjects);
 		const projects:any = {};
-		for (const project of availableProjects) {
-			if (projects[project.projectName] === undefined) {
-				projects[project.projectName] = [];
+		if (Object.keys(availableProjects).length !== 0) {
+			for (const project of availableProjects) {
+				if (projects[project.projectName] === undefined) {
+					projects[project.projectName] = [];
+				}
+				projects[project.projectName].push(project);
 			}
-			projects[project.projectName].push(project);
+			this.projects = projects;
 		}
-		this.projects = projects;
 
 		console.log(this.projects);
 	}

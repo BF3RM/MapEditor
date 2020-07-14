@@ -9,7 +9,6 @@ const locale = require('element-ui/lib/locale/lang/en');
 
 Vue.use(vgl);
 Vue.use(ElementUI, { locale });
-
 new Vue({
 	render: (h) => h(App),
 	store

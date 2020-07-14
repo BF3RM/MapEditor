@@ -104,11 +104,6 @@ export default class Editor {
 	}
 
 	public onEditorReady() {
-		signals.menuRegistered.emit(['File', 'New'], this.NotImplemented.bind(this));
-		signals.menuRegistered.emit(['File', 'Open'], this.NotImplemented.bind(this));
-		signals.menuRegistered.emit(['File', 'Import', 'From file'], this.NotImplemented.bind(this));
-		signals.menuRegistered.emit(['File', 'Import', 'From level'], this.NotImplemented.bind(this));
-		signals.menuRegistered.emit(['File', 'Load'], this.vext.SendMessage(new GetProjectsMessage()));
 		signals.menuRegistered.emit(['Edit', 'Undo'], this.undo.bind(this));
 		signals.menuRegistered.emit(['Edit', 'Redo'], this.redo.bind(this));
 		signals.menuRegistered.emit(['Edit', '']); // Separator
