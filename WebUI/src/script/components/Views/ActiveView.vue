@@ -1,8 +1,8 @@
 <template>
 	<div class="screen-container">
-		<transition name="fade">
-			<component :is="activeViewComponent" class="screen"/>
-		</transition>
+		<EditorView  class="screen" v-show="activeViewName === viewEnum.EDITOR"/>
+		<PlayingView class="screen" v-show="activeViewName === viewEnum.PLAYING"/>
+		<LoadingView class="screen" v-show="activeViewName === viewEnum.LOADING"/>
 	</div>
 </template>
 
@@ -10,21 +10,18 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { VIEW } from '../../types/Enums';
 import { signals } from '@/script/modules/Signals';
-
-@Component
+import EditorView from '@/script/components/Views/EditorView.vue';
+import PlayingView from '@/script/components/Views/PlayingView.vue';
+import LoadingView from '@/script/components/Views/LoadingView.vue';
+@Component({
+	components: { LoadingView, PlayingView, EditorView }
+})
 export default class ActiveView extends Vue {
-	activeViewName: VIEW = VIEW.LOADING;
+	private activeViewName: VIEW = VIEW.LOADING;
+	private viewEnum = VIEW;
 
 	mounted() {
 		signals.setActiveView.connect(this.onSetActiveView.bind(this));
-	}
-
-	get activeViewComponent() {
-		if (!this.activeViewName) {
-			return null;
-		}
-
-		return () => import(`./${this.activeViewName}View.vue`);
 	}
 
 	onSetActiveView(newActiveView: VIEW) {
