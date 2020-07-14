@@ -153,10 +153,16 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 	--- Resolve the parent
 	if p_Parent ~= nil then
-		local s_ParentGameObjectGuid = self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)]
-		local s_ParentGameObject = self.m_GameObjects[tostring(s_ParentGameObjectGuid)]
+		local s_ReferenceObjectData = self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)]
+		local s_ParentGameObjectGuid
+		local s_ParentGameObject
+
+		if s_ReferenceObjectData ~= nil then
+			s_ParentGameObjectGuid = s_ReferenceObjectData.parentGuid
+			s_ParentGameObject = self.m_GameObjects[tostring(s_ParentGameObjectGuid)]
+		end
 		-- Root object
-		if s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
+		if s_ReferenceObjectData == nil or s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
 			self:ResolveRootObject(s_GameObject)
 			-- Child object
 		else
@@ -166,6 +172,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	else
 		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
+			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
+			self.m_GameObjects[tostring(s_GameObject.guid)] = nil
+			return
 		else
 			m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
@@ -178,7 +187,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if (s_Blueprint.objects ~= nil) then
 		for _, l_Member in pairs(s_Blueprint.objects) do
 			if l_Member:Is('ReferenceObjectData') then
-				self.m_ReferenceObjectDatas[tostring(l_Member.instanceGuid)] = s_GameObject.guid
+				self.m_ReferenceObjectDatas[tostring(l_Member.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = l_Member.typeInfo.name }
 			end
 		end
 	end
@@ -186,7 +195,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	-- For blueprints:
 	if (s_Blueprint.object ~= nil) then
 		if s_Blueprint.object:Is('ReferenceObjectData') then
-			self.m_ReferenceObjectDatas[tostring(s_Blueprint.object.instanceGuid)] = s_GameObject.guid
+			self.m_ReferenceObjectDatas[tostring(s_Blueprint.object.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = s_Blueprint.object.typeInfo.name }
 		end
 	end
 
@@ -231,10 +240,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if s_GameObject.parentData.guid == nil then
 		local s_UnresolvedRODCount = GetLength(self.m_ReferenceObjectDatas)
 		if (s_UnresolvedRODCount ~= 0) then
+			-- TODO: update blueprint data with the correct realm if its client or server only
 			if self.m_Realm == Realm.Realm_Server then
 				m_Logger:Write(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
+				for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
+					m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
+				end
 			elseif self.m_Realm == Realm.Realm_Client then
 				m_Logger:Write(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
+				for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
+					m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
+				end
 			end
 
 			self.m_ReferenceObjectDatas = {}
