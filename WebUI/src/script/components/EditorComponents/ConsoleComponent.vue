@@ -218,7 +218,6 @@ export default class ConsoleComponent extends EditorComponent {
 		if (err.stack === undefined) {
 			return '';
 		}
-		// Is this really correct TSLinter?
 		const lines = err.stack.split('\n');
 		lines.splice(0, 3);
 		return lines.join('\n');
