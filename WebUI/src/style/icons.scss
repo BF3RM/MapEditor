@@ -1,0 +1,91 @@
+html {
+    font-size: 12px;
+}
+.Icon {
+    height: 12px;
+    width: 12px;
+    -webkit-mask-size: contain!important;
+    background-color: #9c9898;
+}
+.selectIcon{
+    -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
+}
+.translateIcon {
+    -webkit-mask: url(../icons/editor/cursor-move.svg) no-repeat center;
+}
+.rotateIcon {
+    -webkit-mask: url(../icons/editor/rotate-3d.svg) no-repeat center;
+}
+.scaleIcon {
+    -webkit-mask: url(../icons/editor/arrow-expand.svg) no-repeat center;
+}
+.globeIcon {
+    -webkit-mask: url(../icons/editor/earth.svg) no-repeat center;
+}
+.cubeIcon {
+    -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
+}
+.afavoritable:hover {
+    -webkit-mask: url(../icons/editor/star.svg) no-repeat center;
+}
+
+.faavoritable.favorited:hover {
+     -webkit-mask: url(../icons/editor/star-off.svg) no-repeat center;
+ }
+
+
+
+.Icon-EffectBlueprint {
+    -webkit-mask: url(../icons/types/EffectBlueprint.svg) no-repeat center;
+}
+.Icon-LogicPrefabBlueprint {
+    -webkit-mask: url(../icons/types/LogicPrefabBlueprint.svg) no-repeat center;
+}
+.Icon-ObjectBlueprint {
+    -webkit-mask: url(../icons/types/ObjectBlueprint.svg) no-repeat center;
+}
+.Icon-PrefabBlueprint {
+    -webkit-mask: url(../icons/types/PrefabBlueprint.svg) no-repeat center;
+}
+.Icon-SpatialPrefabBlueprint {
+    -webkit-mask: url(../icons/types/SpatialPrefabBlueprint.svg) no-repeat center;
+}
+.Icon-VisualEnvironmentBlueprint {
+    -webkit-mask: url(../icons/types/VisualEnvironmentBlueprint.svg) no-repeat center;
+}
+.Icon-VisualEnvironmentBlueprint2 {
+    -webkit-mask: url(../icons/types/VisualEnvironmentBlueprint2.svg) no-repeat center;
+}
+.Icon-Texture {
+    -webkit-mask: url(../icons/types/Texture.svg) no-repeat center;
+}
+.Icon-Texture2 {
+    -webkit-mask: url(../icons/types/Texture2.svg) no-repeat center;
+}
+.Icon-Light {
+    -webkit-mask: url(../icons/types/Light.svg) no-repeat center;
+}
+
+.Icon-GameObject {
+    -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
+    background-color: #9c9898;
+}
+
+.ExpandDown {
+    -webkit-mask: url(../icons/editor/ExpandChevronDown_16x.svg) no-repeat center;
+}
+.ExpandRight {
+    -webkit-mask: url(../icons/editor/ExpandChevronRight_16x.svg) no-repeat center;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+
+  /* Remove default */
+  -webkit-appearance: none;
+
+  width: 20px;
+  height: 20px;
+  -webkit-mask: url(../icons/editor/close-circle.svg) no-repeat center;
+  -webkit-mask-size: 15px;
+  background-color: #9c9898;
+}

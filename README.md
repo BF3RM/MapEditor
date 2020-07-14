@@ -1,16 +1,7 @@
 # Vext-MapEditor
 A realtime map editor for Venice Unleashed
 
-**Note: you need to load BlueprintManager too in order to use this mod. https://github.com/Powback/BlueprintManager**
-
-# Branches:
-- history_implementation
-    - Major refactoring
-- vanilla
-    - Testing different vanilla modification implementations
-    
-    
-Controls:
+## Controls:
 
 F1 to enable freecam.
 
@@ -40,3 +31,6 @@ In freecam, without holding right click:
 - CTRL+SHIFT+D to clone selected entity to the root directory
 - CTRL+C to copy selected entity
 - CTRL+V to paste saved entity to the selected group 
+
+# Disclamer
+This project is using [Three.js](https://threejs.org/) as the rendering foundation.

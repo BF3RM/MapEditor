@@ -1,0 +1,3 @@
+ME_CONFIG = {
+	LOAD_VANILLA = true
+}
