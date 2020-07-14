@@ -163,7 +163,7 @@ end
 
 function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
 	-- TODO: set project header
-	print(p_ProjectHeader)
+	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_ProjectHeader)
 end
 
 ----------- WebUI functions----------------
@@ -178,9 +178,10 @@ function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
 	WebUpdater:AddUpdate('SetProjectHeaders', s_ProjectHeaders)
 end
 
-function MapEditorClient:OnRequestProjectSave(p_ProjectSaveDataJson)
-	local s_ProjectSaveData = DecodeParams(json.decode(p_ProjectSaveDataJson))
-	NetEvents:SendLocal("ProjectManager:RequestProjectSave", s_ProjectSaveData)
+function MapEditorClient:OnRequestProjectSave(p_ProjectHeaderDataJson)
+	local s_ProjectHeaderData = DecodeParams(json.decode(p_ProjectHeaderDataJson))
+	print(s_ProjectHeaderData)
+	NetEvents:SendLocal("ProjectManager:RequestProjectSave", s_ProjectHeaderData)
 end
 
 function MapEditorClient:OnRequestProjectLoad(p_ProjectId)

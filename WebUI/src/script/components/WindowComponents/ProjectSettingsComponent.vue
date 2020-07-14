@@ -13,7 +13,7 @@
 			<input placeholder="Project Name" v-model="newSaveName"/>
 		</div>
 		<div class="footer" v-if="!showNewSave">
-			<button :disabled="projects.length === 0 || selectedProject === null" @click="loadSave()">Load</button>
+			<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
 			<button @click="NewSave()">New Save</button>
 		</div>
 		<div class="footer" v-if="showNewSave">
@@ -37,9 +37,20 @@ export default class ProjectSettingsComponent extends Vue {
 	private selectedSave: any = null;
 	private selectedProjectName = '';
 	private showNewSave = false;
-	private newSaveName = '';
 	private state = {
 		visible: false
+	};
+
+	get newSaveName() {
+		return (this.currentProjectHeader as any).projectName;
+	}
+
+	set newSaveName(value: string) {
+		(this.currentProjectHeader as any).projectName = value;
+	}
+
+	private currentProjectHeader = {
+		projectName: 'Untitled Project'
 	};
 
 	NotImplemented() {
@@ -59,6 +70,9 @@ export default class ProjectSettingsComponent extends Vue {
 			this.title = 'Load Project';
 			this.state.visible = true;
 		});
+		signals.setCurrentProjectHeader.connect((projectHeader) => {
+			this.currentProjectHeader = projectHeader;
+		});
 	}
 
 	selectSave(project: any) {
@@ -76,14 +90,13 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	Save(newSave: boolean = false) {
-		let projectName = this.selectedProjectName;
+		const projectHeader = Object.assign({}, this.currentProjectHeader);
+		(projectHeader as any).projectName = this.selectedProjectName;
 		if (newSave) {
-			projectName = this.newSaveName;
+			(projectHeader as any).projectName = this.newSaveName;
 		}
-		console.log('Saving project as ' + projectName);
-		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectSave', {
-			projectName: projectName
-		});
+		console.log('Saving project as ' + (projectHeader as any).projectName);
+		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectSave', JSON.stringify(projectHeader));
 	}
 
 	onSelectProject(project:any) {

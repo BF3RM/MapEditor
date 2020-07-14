@@ -267,6 +267,10 @@ export default class VEXTInterface {
 		signals.setProjectHeaders.emit(headers);
 	}
 
+	SetCurrentProjectHeader(header: any) {
+		signals.setCurrentProjectHeader.emit(header);
+	}
+
 	public EditorModeChanged(mode: EDITOR_MODE) {
 		let view = VIEW.LOADING;
 		switch (mode) {

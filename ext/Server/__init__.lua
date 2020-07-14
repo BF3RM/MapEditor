@@ -90,6 +90,7 @@ end
 
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
+	ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
 end
 
 function MapEditorServer:OnPlayerAuthenticated(p_Player)

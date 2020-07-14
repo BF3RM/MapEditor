@@ -9,9 +9,14 @@ function ProjectManager:__init()
     m_Logger:Write("Initializing ProjectManager")
 
     self.m_CurrentProjectHeader = nil -- dont reset this, is required info for map restart
-    self.m_MapName = nil
-
+	self:RegisterVars()
     self:RegisterEvents()
+end
+
+function ProjectManager:RegisterVars()
+	self.m_MapName = nil
+	self.m_GameMode = nil
+	self.m_LoadedBundles = {}
 end
 
 function ProjectManager:RegisterEvents()
@@ -21,6 +26,12 @@ function ProjectManager:RegisterEvents()
     NetEvents:Subscribe('ProjectManager:RequestProjectSave', self, self.OnRequestProjectSave)
     NetEvents:Subscribe('ProjectManager:RequestProjectLoad', self, self.OnRequestProjectLoad)
     NetEvents:Subscribe('ProjectManager:RequestProjectDelete', self, self.OnRequestProjectDelete)
+end
+
+function ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
+	for _,v in pairs(p_Bundles) do
+		self.m_LoadedBundles[v] = true
+	end
 end
 
 function ProjectManager:OnRequestProjectHeaders(p_Player)
@@ -36,12 +47,18 @@ function ProjectManager:OnRequestProjectHeaderUpdate(p_Player)
 end
 
 function ProjectManager:UpdateClientProjectHeader(p_Player)
-    if self.m_CurrentProjectHeader ~= nil then
-        if p_Player == nil then -- update all players
-            NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
-        else
-            NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, self.m_CurrentProjectHeader)
-        end
+    if self.m_CurrentProjectHeader == nil then
+	    self.m_CurrentProjectHeader = {
+		    projectName = 'Untitled Project',
+		    mapName = self.m_MapName,
+		    gameModeName = self.m_GameMode,
+		    requiredBundles = self.m_RequiredBundles
+	    }
+    end
+    if p_Player == nil then -- update all players
+        NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+    else
+        NetEvents:SendToLocal("MapEditorClient:ReceiveCurrentProjectHeader", p_Player, self.m_CurrentProjectHeader)
     end
 end
 
@@ -65,11 +82,12 @@ function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
     m_IsLevelLoaded = true
 
     self.m_MapName = p_Map
+	self.m_GameMode = p_GameMode
 end
 
 function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
     -- TODO: ugly, find a better entry point to invoke project data loading
-    if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil then
+    if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil then
         m_LoadDelay = m_LoadDelay + p_Delta
 
         if m_LoadDelay > 10 and
