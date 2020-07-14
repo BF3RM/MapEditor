@@ -55,57 +55,62 @@ export default class ExplorerComponent extends EditorComponent {
 	}
 
 	private onBlueprintRegistered(blueprints: Blueprint[]) {
-		const data: INode = {
-			'id': 'root',
-			'type': 'folder',
-			'name': 'Venice',
-			'children': []
-		};
-		// TODO: Make sure this works after the new blueprint shit.
-		for (const instance of blueprints) {
-			const path = instance.name;
-			const paths = getPaths(path);
-			let parentPath: INode = data;
-			const fileName = getFilename(path);
-			let currentPath = '';
-			paths.forEach((subPath) => {
-				currentPath += subPath + '/';
-				if (parentPath === undefined) {
-					console.error('Missing parent path?');
-				}
-				if (parentPath.children === undefined) {
-					console.error('Missing child field?');
-					return;
-				}
-				const parentIndex = parentPath.children.find((x) => x.name.toLowerCase() === subPath.toLowerCase());
-				if (parentIndex === undefined) {
-					const a = parentPath.children.push({
-						'id': Guid.create().toString(),
-						'name': subPath,
-						'type': 'folder',
-						'children': [],
-						'path': currentPath
-					});
-					if (parentPath.children[a - 1] !== undefined) {
-						parentPath = parentPath.children[a - 1];
+		const scope = this;
+		return new Promise((resolve, reject) => {
+			const data: INode = {
+				'id': 'root',
+				'type': 'folder',
+				'name': 'Venice',
+				'children': []
+			};
+			// TODO: Make sure this works after the new blueprint shit.
+			for (const instance of blueprints) {
+				const path = instance.name;
+				const paths = getPaths(path);
+				let parentPath: INode = data;
+				const fileName = getFilename(path);
+				let currentPath = '';
+				paths.forEach((subPath) => {
+					currentPath += subPath + '/';
+					if (parentPath === undefined) {
+						console.error('Missing parent path?');
+					}
+					if (parentPath.children === undefined) {
+						console.error('Missing child field?');
+						return;
+					}
+					const parentIndex = parentPath.children.find((x) => x.name.toLowerCase() === subPath.toLowerCase());
+					if (parentIndex === undefined) {
+						const a = parentPath.children.push({
+							'id': Guid.create().toString(),
+							'name': subPath,
+							'type': 'folder',
+							'children': [],
+							'path': currentPath
+						});
+						if (parentPath.children[a - 1] !== undefined) {
+							parentPath = parentPath.children[a - 1];
+						} else {
+							console.error('Missing parent path');
+						}
 					} else {
-						console.error('Missing parent path');
+						parentPath = parentIndex;
+						// Sometimes the object is referenced lowercase. If we have a string that has uppercase letters, we can assume it's correct.
+						// Replace lowercase paths with the actual case.
+						if (hasUpperCase(subPath) && hasLowerCase(parentPath.name)) {
+							parentPath.name = subPath;
+						}
 					}
-				} else {
-					parentPath = parentIndex;
-					// Sometimes the object is referenced lowercase. If we have a string that has uppercase letters, we can assume it's correct.
-					// Replace lowercase paths with the actual case.
-					if (hasUpperCase(subPath) && hasLowerCase(parentPath.name)) {
-						parentPath.name = subPath;
-					}
+				});
+				if (parentPath.content === undefined) {
+					parentPath.content = [];
 				}
-			});
-			if (parentPath.content === undefined) {
-				parentPath.content = [];
+				parentPath.content.push(instance);
 			}
-			parentPath.content.push(instance);
-		}
-		this.treeData = data;
+			resolve(data);
+		}).then((data) => {
+			scope.treeData = data as INode;
+		});
 	}
 
 	private onSelectNode(node: Node) {

@@ -347,66 +347,68 @@ export default class Editor {
 
 	// TODO: Move logic to GameContext
 	public onSpawnedBlueprint(commandActionResult: CommandActionResult) {
-		const scope = this;
-		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObjectGuid = gameObjectTransferData.guid;
+		return new Promise((resolve, reject) => {
+			const scope = this;
+			const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
+			const gameObjectGuid = gameObjectTransferData.guid;
 
-		if (this.gameObjects.getValue(gameObjectGuid)) {
-			console.error('Tried to create a GameObject that already exists');
-			return;
-		}
-
-		const parentGuid = gameObjectTransferData.parentData.guid;
-		const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
-		editor.threeManager.attachToScene(gameObject);
-		gameObject.updateTransform();
-		for (const gameEntityData of gameObjectTransferData.gameEntities) {
-			const entityData = gameEntityData;
-			// UniqueID is fucking broken. this won't work online, boi.
-			if (entityData.isSpatial) {
-				const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
-				gameObject.add(gameEntity);
+			if (this.gameObjects.getValue(gameObjectGuid)) {
+				console.error('Tried to create a GameObject that already exists');
+				return;
 			}
-		}
 
-		this.gameObjects.setValue(gameObjectGuid, gameObject);
-		// If the parent is the leveldata, ignore all this
-		// todo: make an entry for the leveldata itself maybe?
-
-		// Allows children to be spawned before parents, and then added to the appropriate parent.
-		if (!scope.gameContext.levelData.containsKey(parentGuid)) {
-			// Parent doesnt exists yet
-			if (!this.gameObjects.containsKey(parentGuid)) {
-				let parent = this.missingParent.getValue(parentGuid);
-				if (parent === undefined) {
-					this.missingParent.setValue(parentGuid, []);
-					parent = this.missingParent.getValue(parentGuid);
-				}
-				if (parent !== undefined) { // hack to suppress compiler warnings.
-					parent.push(gameObject);
-				}
-			} else {
-				// Parent already exists
-				const parent = this.gameObjects.getValue(parentGuid);
-				if (parent !== undefined) {
-					parent.attach(gameObject);
+			const parentGuid = gameObjectTransferData.parentData.guid;
+			const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
+			editor.threeManager.attachToScene(gameObject);
+			gameObject.updateTransform();
+			for (const gameEntityData of gameObjectTransferData.gameEntities) {
+				const entityData = gameEntityData;
+				// UniqueID is fucking broken. this won't work online, boi.
+				if (entityData.isSpatial) {
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
+					gameObject.add(gameEntity);
 				}
 			}
 
-			if (this.missingParent.containsKey(gameObjectGuid)) {
-				const missingParent = this.missingParent.getValue(gameObjectGuid);
-				if (missingParent !== undefined) {
-					missingParent.forEach((child) => {
-						gameObject.attach(child);
-					});
+			this.gameObjects.setValue(gameObjectGuid, gameObject);
+			// If the parent is the leveldata, ignore all this
+			// todo: make an entry for the leveldata itself maybe?
+
+			// Allows children to be spawned before parents, and then added to the appropriate parent.
+			if (!scope.gameContext.levelData.containsKey(parentGuid)) {
+				// Parent doesnt exists yet
+				if (!this.gameObjects.containsKey(parentGuid)) {
+					let parent = this.missingParent.getValue(parentGuid);
+					if (parent === undefined) {
+						this.missingParent.setValue(parentGuid, []);
+						parent = this.missingParent.getValue(parentGuid);
+					}
+					if (parent !== undefined) { // hack to suppress compiler warnings.
+						parent.push(gameObject);
+					}
+				} else {
+					// Parent already exists
+					const parent = this.gameObjects.getValue(parentGuid);
+					if (parent !== undefined) {
+						parent.attach(gameObject);
+					}
 				}
-				this.missingParent.remove(gameObjectGuid);
+
+				if (this.missingParent.containsKey(gameObjectGuid)) {
+					const missingParent = this.missingParent.getValue(gameObjectGuid);
+					if (missingParent !== undefined) {
+						missingParent.forEach((child) => {
+							gameObject.attach(child);
+						});
+					}
+					this.missingParent.remove(gameObjectGuid);
+				}
 			}
-		}
-		if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
-			// Make selection happen after all signals have been handled
-			this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false));
-		}
+			if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
+				// Make selection happen after all signals have been handled
+				this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false));
+			}
+		});
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {
