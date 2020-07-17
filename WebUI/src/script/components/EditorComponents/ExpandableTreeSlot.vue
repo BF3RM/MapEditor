@@ -1,17 +1,27 @@
 <template>
-	<div class="tree-node" :style="nodeStyle(node)" :class="{ selected: selected }"  @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
-		<div class="expand-container" @click="ToggleNode($event,node,tree)">
-			<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
-				:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
+	<div class="tree-node" :class="{ selected: selected }"  @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
+		<div v-if="hasVisibilityOptions" class="tree-node">
+			<div class="enable-container icon-container">
+				<img :src="enabledIcnSrc"/>
+			</div>
+			<div class="selectable-container icon-container">
+				<img :src="require(`@/icons/editor/pointer.svg`)"/>
+			</div>
 		</div>
-		<div class="icon-container">
-			<img :class="'Icon Icon-' + node.type"/>
-		</div>
-		<div class="text-container" @click="SelectNode($event, node, tree)">
-			<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
-			<span class="slot-text" v-else>
-				{{ nodeText }}
-			</span>
+		<div class="tree-node" :style="nodeStyle(node)">
+			<div class="expand-container" @click="ToggleNode($event,node,tree)">
+				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
+					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
+			</div>
+			<div class="icon-container">
+				<img :class="'Icon Icon-' + node.type"/>
+			</div>
+			<div class="text-container" @click="SelectNode($event, node, tree)">
+				<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
+				<span class="slot-text" v-else>
+					{{ nodeText }}
+				</span>
+			</div>
 		</div>
 	</div>
 </template>
@@ -22,8 +32,14 @@ import InfiniteTree, { Node, INode } from 'infinite-tree';
 
 @Component({ components: { Highlighter } })
 export default class ExpandableTreeSlot extends Vue {
+	@Prop({ default: false })
+	hasVisibilityOptions?: boolean;
+
 	@Prop()
 	node: Node;
+
+	@Prop({ default: true })
+	enabled: boolean;
 
 	@Prop()
 	tree: any;
@@ -36,6 +52,10 @@ export default class ExpandableTreeSlot extends Vue {
 
 	@Prop()
 	selected: boolean;
+
+	get enabledIcnSrc() {
+		return this.enabled ? require('@/icons/editor/eye-visible.svg') : require('@/icons/editor/eye-not-visible.svg');
+	}
 
 	private nodeStyle(node: Node) {
 		if (!node.state) {
@@ -91,18 +111,18 @@ export default class ExpandableTreeSlot extends Vue {
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
-		height: 1.5vmin;
+		height: 1.7vmin;
 		white-space: nowrap;
 		.text-container {
 			width: 100%;
 		}
 		.expand-container {
 			width: 1.7vmin;
-			height: 1.7vmin;
+			height: 100%;
 			color: #6d6d6d;
 
 			img {
-				/*max-width: 2vmin;*/
+				max-width: 100%;
 				max-height: 100%;
 				transition: transform 0.1s;
 
@@ -112,9 +132,14 @@ export default class ExpandableTreeSlot extends Vue {
 			}
 		}
 		.icon-container {
-			width: 1vmin;
+			width: 1.7vmin;
 			height: 100%;
 			color: #6d6d6d;
+
+			img {
+				max-width: 100%;
+				max-height: 100%;
+			}
 		}
 		&:hover {
 			background-color: #343434;

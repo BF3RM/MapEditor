@@ -5,7 +5,7 @@
                 {{undoEntry.name}}
             </li>
 		</ul>
-		<ul class="redos" v-if="redos.length > 0">
+		<ul class="redos">
 			<li v-for="(redoEntry, index) in redos" :key="index" @click="goToState(redoEntry.id)">
 				{{redoEntry.name}}
 			</li>
@@ -19,30 +19,27 @@ import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import Command from '@/script/libs/three/Command';
 import { Computed } from 'vuex/types/helpers';
-@Component({ components: { EditorComponent } })
-
+@Component({
+	components: {
+		EditorComponent
+	}
+})
 export default class HistoryComponent extends EditorComponent {
 	constructor() {
 		super();
 		signals.historyChanged.connect(this.onHistoryChanged.bind(this));
 	}
 
-	get undos():Command[] {
-		return window.editor.history.undos;
-	}
-
-	get redos():Command[] {
-		return window.editor.history.redos;
-	}
+	undos: Command[] = [];
+	redos: Command[] = [];
 
 	onHistoryChanged() {
-		this.$forceUpdate();
-		// console.log(this.undos.length);
-		// console.log(this.redos.length);
-		// console.log('update');
+		this.undos = window.editor.history.undos;
+		this.redos = window.editor.history.redos.slice().reverse();
 	}
 
 	goToState(id: number) {
+		console.log(id);
 		window.editor.history.goToState(id);
 	}
 	/*
@@ -77,5 +74,13 @@ export default class HistoryComponent extends EditorComponent {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+	.undos {
+		:last-child {
+			background-color: #0a6aa1;
+		}
+	}
+	.redos {
+		opacity: 0.6;
+	}
 </style>

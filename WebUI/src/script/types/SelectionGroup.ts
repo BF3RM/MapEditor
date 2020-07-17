@@ -149,8 +149,8 @@ export class SelectionGroup extends THREE.Object3D {
 	// Find game object, deselect it and remove it from array.
 	public deselect(gameObject: GameObject) {
 		const index = this.selectedGameObjects.findIndex((go) => go.guid === gameObject.guid);
-		signals.deselectedGameObject.emit(gameObject.guid);
 		if (index === -1) return;
+		signals.deselectedGameObject.emit(gameObject.guid);
 		gameObject.onDeselect();
 		this.makeParentsInvisible();
 		this.selectedGameObjects.splice(index, 1);

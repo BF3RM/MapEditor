@@ -4,19 +4,21 @@
 			<div class="header">
 				<Search v-model="search"/>
 			</div>
-			<infinite-tree-component class="scrollable datafont" ref="infiniteTreeComponent"
+			<infinite-tree-component class="scrollable datafont"
+									ref="infiniteTreeComponent"
 									:search="search"
 									:autoOpen="true"
 									:data="data"
 									:selectable="true"
 									:should-select-node="shouldSelectNode">
 				<expandable-tree-slot slot-scope="{ node, index, tree, active, data }"
+									:has-visibility-options="true"
 									:node="node"
 									:tree="tree"
 									:search="search"
 									:nodeText="node.name + ' (' + node.children.length + ')'"
 									:selected="node.state.selected"
-									:class="{ disabled: !data.enabled }"
+									:enabled="true"
 									@node:hover="onNodeHover"
 									@node:hover-end="onNodeHoverEnd"
 									@node:click="onNodeClick" />
@@ -80,6 +82,8 @@ export default class HierarchyComponent extends EditorComponent {
 		console.log('Mounted');
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
+		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
+		// signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
@@ -102,6 +106,11 @@ export default class HierarchyComponent extends EditorComponent {
 				enabled: gameObject.enabled
 			}
 		};
+	}
+
+	public onEnabledBlueprint(commandActionResult: CommandActionResult) {
+		// const node: Node = this.tree.getNodeById(commandActionResult.gameObjectTransferData.guid.toString());
+		// this.tree.updateNode(node, { node.data })
 	}
 
 	onDeletedBlueprint(commandActionResult: CommandActionResult) {
@@ -234,9 +243,5 @@ export default class HierarchyComponent extends EditorComponent {
 <style lang="scss" scoped>
 	.expand {
 		display: inline;
-	}
-
-	.disabled {
-		/*opacity: 0.5;*/
 	}
 </style>
