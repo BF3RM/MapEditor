@@ -5,7 +5,6 @@ local m_Logger = Logger("GameObjectTransferData", true)
 function GameObjectTransferData:__init(arg)
     self.guid = arg.guid
     self.name = arg.name
-    self.typeName = arg.typeName
     self.blueprintCtrRef = arg.blueprintCtrRef
     self.parentData = arg.parentData
     self.transform = arg.transform
@@ -23,7 +22,6 @@ function GameObjectTransferData:GetGameObject()
     local s_GameObject = GameObject{
         guid = self.guid,
         name = self.name,
-        typeName = self.typeName,
         blueprintCtrRef = CtrRef(self.blueprintCtrRef),
         parentData = GameObjectParentData(self.parentData),
         transform = self.transform,

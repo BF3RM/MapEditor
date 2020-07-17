@@ -19,7 +19,6 @@ import { IGameEntity } from '@/script/interfaces/IGameEntity';
 */
 export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
-	public typeName: string;
 	public transform: LinearTransform;
 	public parentData: GameObjectParentData;
 	public blueprintCtrRef: CtrRef;
@@ -32,13 +31,12 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	private _enabled: boolean;
 	public parent: GameObject;
 
-	constructor(guid: Guid = Guid.create(), typeName: string = 'GameObject', name: string = 'Unnamed GameObject',
+	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
 		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false) {
 		super();
 
 		this.guid = guid;
-		this.typeName = typeName;
 		this.name = name;
 		this.transform = transform;
 		this.parentData = parentData;
@@ -62,7 +60,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public static CreateWithTransferData(gameObjectTransferData: GameObjectTransferData) {
 		return new this(
 			gameObjectTransferData.guid,
-			gameObjectTransferData.typeName,
 			gameObjectTransferData.name,
 			gameObjectTransferData.transform,
 			gameObjectTransferData.parentData,

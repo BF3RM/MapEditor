@@ -99,7 +99,7 @@ export default class HierarchyComponent extends EditorComponent {
 		return {
 			id: gameObject.guid.toString(),
 			name: gameObject.getCleanName(),
-			type: gameObject.typeName,
+			type: gameObject.blueprintCtrRef.typeName,
 			children: [],
 			data: {
 				parentGuid: gameObject.parentData.guid,

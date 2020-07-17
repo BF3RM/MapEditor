@@ -164,7 +164,6 @@ export class VEXTemulator {
 					}
 				],
 				guid: commandActionResult.gameObjectTransferData.guid,
-				typeName: 'ObjectBlueprint',
 				parentData: commandActionResult.gameObjectTransferData.parentData,
 				name: commandActionResult.gameObjectTransferData.name,
 				variation: commandActionResult.gameObjectTransferData.variation

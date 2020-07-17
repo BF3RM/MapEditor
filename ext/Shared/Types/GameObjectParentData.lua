@@ -4,7 +4,7 @@ local m_Logger = Logger("GameObjectParentData", true)
 
 function GameObjectParentData:__init(arg)
     self.guid = arg.guid
-    self.typeName = arg.typeName
+    self.typeName = arg.typeName -- TODO: do we need this?
     self.primaryInstanceGuid = arg.primaryInstanceGuid
     self.partitionGuid = arg.partitionGuid
 end

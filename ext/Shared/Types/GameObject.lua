@@ -6,7 +6,6 @@ local m_TraceableField_Suffix = "_original_value"
 function GameObject:__init(arg)
     self.guid = arg.guid
     self.creatorName = arg.creatorName -- never gets sent to js
-    self.typeName = arg.typeName
     self.blueprintCtrRef = arg.blueprintCtrRef
     self.isVanilla = arg.isVanilla -- never gets sent to js
     self.gameEntities = arg.gameEntities or { }
@@ -205,7 +204,6 @@ function GameObject:GetGameObjectTransferData()
     local s_GameObjectTransferData = {
         guid = self.guid,
         name = self.name,
-        typeName = self.typeName,
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),
         transform = self.transform,

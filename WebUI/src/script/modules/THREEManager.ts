@@ -386,7 +386,7 @@ export class THREEManager {
 								continue;
 							}
 							if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
-								(parent.typeName === 'PrefabBlueprint' || parent.typeName === 'SpatialPrefabBlueprint') &&
+								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
 								!editor.selectionGroup.isSelected(parent)) {
 								resolve(parent.guid);
 								return parent.guid;

@@ -210,7 +210,6 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
                 gameObjectTransferData = { -- We're not using the actual type, i think its because of json serialization fuckups
                     guid = l_Guid,
                     name = l_GameObjectSaveData.name,
-                    typeName = l_GameObjectSaveData.typeName,
                     blueprintCtrRef = l_GameObjectSaveData.blueprintCtrRef,
                     parentData = l_GameObjectSaveData.parentData,
                     transform = l_GameObjectSaveData.transform,

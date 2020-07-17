@@ -8,7 +8,6 @@ import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 
 export class GameObjectTransferData {
 	public guid: any;
-	public typeName: string;
 	public name: any;
 	public parentData: GameObjectParentData | any;
 	public blueprintCtrRef: CtrRef;
@@ -26,7 +25,6 @@ export class GameObjectTransferData {
 
 		this.guid = args.guid;
 		this.name = args.name; // for debugging only
-		this.typeName = args.typeName;
 		this.parentData = args.parentData;
 		this.blueprintCtrRef = args.blueprintCtrRef;
 		this.transform = args.transform;
