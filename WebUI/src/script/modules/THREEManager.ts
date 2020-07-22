@@ -11,6 +11,7 @@ import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
+import { Blueprint } from '@/script/types/Blueprint';
 
 export class THREEManager {
 	private scene = new THREE.Scene();
@@ -28,6 +29,7 @@ export class THREEManager {
 
 	private gridSnap = false;
 	private highlightingEnabled = true;
+	private dragging = false;
 	private raycastPlacing = false;
 	private lastRaycastTime = new Date();
 	private pendingRaycast = false;
@@ -112,8 +114,46 @@ export class THREEManager {
 	}
 
 	public registerEvents() {
+		// TODO: Drag events dont work in WebUI currently
+		this.renderer.domElement.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+		this.renderer.domElement.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+		this.renderer.domElement.addEventListener('mousemove', this.onMouseOver.bind(this));
+		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 		signals.objectChanged.connect(this.setPendingRender.bind(this)); // Object changed? setPendingRender!
+	}
+
+	public onMouseLeave(event: any) {
+		if (this.dragging) {
+			editor.editorCore.onPreviewStop();
+			editor.editorCore.onPreviewDragStop();
+			this.dragging = false;
+		}
+	}
+
+	public onMouseEnter(event: any) {
+		if (this.dragging) {
+			editor.editorCore.onPreviewStart();
+		}
+	}
+
+	public onDragStart(event: any, item: Blueprint) {
+		this.dragging = true;
+		editor.editorCore.onPreviewDragStart(item);
+	}
+
+	public onMouseOver(event: any) {
+		if (this.dragging) {
+			editor.editorCore.onPreviewDrag(event);
+		}
+	}
+
+	public onMouseUp(event: any) {
+		if (this.dragging) {
+			this.dragging = false;
+			editor.editorCore.onPreviewDrop();
+			editor.editorCore.onPreviewDragStop();
+		}
 	}
 
 	public enableFreecamMovement() {

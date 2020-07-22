@@ -69,13 +69,13 @@ export default class GoldenLayoutHolder extends Vue {
 	}
 
 	private onStackCreated(stack: any) {
-		if (stack.contentItems.length > 0) {
-			this.$nextTick(() => {
+		this.$nextTick(() => {
+			if (stack.contentItems.length > 0) {
 				if (!stack.contentItems[0].vueObject.$vnode.context.showHeader) {
 					stack.header.position();
 				}
-			});
-		}
+			}
+		});
 	}
 
 	private onMount() {

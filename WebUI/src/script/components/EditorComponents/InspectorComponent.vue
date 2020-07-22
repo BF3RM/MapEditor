@@ -13,7 +13,7 @@
 											:position="position" :rotation="rotation" :scale="scale"
 											@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated"/>
 				</div>
-				<div class="transform-container" v-if="!multiSelection && !isEmpty">
+				<div class="blueprint-container" v-if="!multiSelection && !isEmpty">
 					<div class="title">Blueprint</div>
 					<label class="name-label" for="bp-name">Name:</label>
 					<input class="name-input" id="bp-name" disabled="true" :value="blueprintName">

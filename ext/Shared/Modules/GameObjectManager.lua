@@ -130,7 +130,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	local s_GameObject = GameObject{
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
-		--typeName = p_Blueprint.typeInfo.name,
 		parentData = GameObjectParentData{},
 		transform = p_Transform,
 		variation = p_Variation,
@@ -343,7 +342,7 @@ function GameObjectManager:GetVanillaGuid(p_Name, p_Transform)
 end
 
 function GameObjectManager:DeleteGameObject(p_Guid)
-	local s_GameObject = self.m_GameObjects[p_Guid]
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if (s_GameObject == nil) then
 		m_Logger:Error("GameObject not found: " .. p_Guid)
@@ -360,14 +359,14 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 	else
 		s_GameObject:Destroy()
 
-		self.m_GameObjects[p_Guid] = nil
+		self.m_GameObjects[tostring(p_Guid)] = nil
 	end
 
 	return true
 end
 
 function GameObjectManager:UndeleteBlueprint(p_Guid)
-	local s_GameObject = self.m_GameObjects[p_Guid]
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if (s_GameObject == nil) then
 		m_Logger:Error("GameObject not found: " .. p_Guid)
@@ -405,7 +404,7 @@ end
 --end
 
 function GameObjectManager:EnableGameObject(p_Guid)
-	local s_GameObject = self.m_GameObjects[p_Guid]
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if (s_GameObject == nil) then
 		m_Logger:Error("Failed to find and enable blueprint: " .. p_Guid)
@@ -418,7 +417,7 @@ function GameObjectManager:EnableGameObject(p_Guid)
 end
 
 function GameObjectManager:DisableGameObject(p_Guid)
-	local s_GameObject = self.m_GameObjects[p_Guid]
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if (s_GameObject == nil) then
 		m_Logger:Error("Failed to find and disable blueprint: " .. p_Guid)

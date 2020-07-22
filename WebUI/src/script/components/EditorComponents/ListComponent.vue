@@ -21,6 +21,7 @@
 						:size-dependencies="[item.expanded]"
 						:min-item-size="30"
 						@click.native="onClick(item)"
+						@mousedown.native="onMouseDown($event, item)"
 				>
 				<slot :item="item" :data="data">
 				</slot>
@@ -35,6 +36,7 @@ import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import Search from '@/script/components/widgets/Search.vue';
+import { Blueprint } from '@/script/types/Blueprint';
 
 @Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ListComponent extends EditorComponent {
@@ -50,6 +52,11 @@ export default class ListComponent extends EditorComponent {
 
 	constructor() {
 		super();
+	}
+
+	private onMouseDown(e: any, item: Blueprint) {
+		console.log('dragging started');
+		window.editor.threeManager.onDragStart(e, item);
 	}
 
 	private onClick(item: any) {
@@ -88,6 +95,10 @@ export default class ListComponent extends EditorComponent {
 		.scrollable {
 			height: 100%;
 			width: 100%;
+		}
+
+		.tr {
+			cursor: move;
 		}
 	}
 </style>
