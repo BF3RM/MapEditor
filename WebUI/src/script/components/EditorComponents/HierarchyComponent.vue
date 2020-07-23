@@ -184,7 +184,9 @@ export default class HierarchyComponent extends EditorComponent {
 		this.selected.push(currentNode);
 		currentNode.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
-		this.infiniteTreeComponent.scrollTo(currentNode);
+		if (scrollTo) {
+			this.infiniteTreeComponent.scrollTo(currentNode);
+		}
 	}
 
 	private onDeselectedGameObject(guid: Guid) {
@@ -212,7 +214,7 @@ export default class HierarchyComponent extends EditorComponent {
 	private onNodeClick(o: any) {
 		const guid = Guid.parse(o.nodeId.toString());
 		if (guid.isEmpty()) return;
-		window.editor.Select(guid, o.event.ctrlKey);
+		window.editor.Select(guid, o.event.ctrlKey, false, true);
 	}
 
 	private shouldSelectNode(node: Node) {

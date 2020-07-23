@@ -278,8 +278,8 @@ export default class Editor {
 		Commands
 
 	*/
-	public Select(guid: Guid, multiSelection: boolean, moveGizmo: boolean = false) {
-		this.editorCore.select(guid, multiSelection, moveGizmo);
+	public Select(guid: Guid, multiSelection: boolean, scrollTo: boolean = false, moveGizmo: boolean = false) {
+		this.editorCore.select(guid, multiSelection, scrollTo, moveGizmo);
 	}
 
 	public Deselect(guid: Guid) {
@@ -301,6 +301,9 @@ export default class Editor {
 			if (gameObject.parent) {
 				gameObject.parent.updateMatrixWorld();
 				console.log('Updated matrix world yo');
+				if (this.selectionGroup.isSelected(gameObject)) {
+					this.selectionGroup.RefreshTransform();
+				}
 			}
 			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
 			// this.selectionGroup.setMatrix(gameObjectTransferData.transform.toMatrix());
@@ -401,7 +404,7 @@ export default class Editor {
 			}
 			if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
 				// Make selection happen after all signals have been handled
-				this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false));
+				this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
 			}
 		});
 	}

@@ -86,18 +86,15 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onSelection() {
-		this.$nextTick(() => {
-			if (this.multiSelection || this.isEmpty || !this.group) {
-				return;
-			}
-
-			const selectedGameObject = this.group.selectedGameObjects[0];
-			if (!selectedGameObject) return;
-			this.blueprintGuid = selectedGameObject.blueprintCtrRef.instanceGuid.toString();
-			this.blueprintName = selectedGameObject.blueprintCtrRef.name.toString();
-			this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
-			this.blueprintPartitionGuid = selectedGameObject.blueprintCtrRef.partitionGuid.toString();
-		});
+		if (this.multiSelection || this.isEmpty || !this.group) {
+			return;
+		}
+		const selectedGameObject = this.group.selectedGameObjects[0];
+		if (!selectedGameObject) return;
+		this.blueprintGuid = selectedGameObject.blueprintCtrRef.instanceGuid.toString();
+		this.blueprintName = selectedGameObject.blueprintCtrRef.name.toString();
+		this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
+		this.blueprintPartitionGuid = selectedGameObject.blueprintCtrRef.partitionGuid.toString();
 	}
 
 	get isEmpty() {

@@ -160,7 +160,7 @@ export class EditorCore {
 		this.previewBlueprint = null;
 	}
 
-	public select(guid: Guid, multiSelection: boolean, moveGizmo: boolean) {
+	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 		this.unhighlight();
 		// When selecting nothing, deselect all if its not multi selection.
@@ -180,7 +180,7 @@ export class EditorCore {
 			editor.threeManager.showGizmo();
 		}
 
-		editor.selectionGroup.select(gameObject, multiSelection, moveGizmo);
+		editor.selectionGroup.select(gameObject, multiSelection, scrollTo, moveGizmo);
 		editor.threeManager.setPendingRender();
 	}
 

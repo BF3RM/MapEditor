@@ -1,5 +1,5 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }"  @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
+	<div class="tree-node" :class="{ selected: selected }"  @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="tree-node">
 			<div class="enable-container icon-container">
 				<img :src="enabledIcnSrc"/>
@@ -16,7 +16,7 @@
 			<div class="icon-container">
 				<img :class="'Icon Icon-' + node.type"/>
 			</div>
-			<div class="text-container" @click="SelectNode($event, node, tree)">
+			<div class="text-container">
 				<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
 				<span class="slot-text" v-else>
 					{{ nodeText }}
@@ -69,6 +69,8 @@ export default class ExpandableTreeSlot extends Vue {
 	@Emit('node:click')
 	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		this.tree.selectNode(node);
+		this.selected = true;
+		this.$forceUpdate();
 		return { event: e, nodeId: node.id };
 	}
 
@@ -111,7 +113,7 @@ export default class ExpandableTreeSlot extends Vue {
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
-		height: 1.7vmin;
+		height: 1vmin;
 		white-space: nowrap;
 		.text-container {
 			width: 100%;

@@ -411,7 +411,7 @@ export class THREEManager {
 					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 						continue;
 					}
-					if (element.object.parent.constructor === GameObject) {
+					if (element.object.parent.constructor === GameObject && element.object.parent.name !== 'Gameplay/Logic/ShowRoom') {
 						const gameObject = element.object.parent as GameObject;
 						if (editor.selectionGroup.isSelected(gameObject)) {
 							hitSelf = gameObject;
@@ -427,13 +427,13 @@ export class THREEManager {
 							}
 							if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
 								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
-								!editor.selectionGroup.isSelected(parent)) {
+								!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom') {
 								resolve(parent.guid);
 								return parent.guid;
 							}
 						}
 						// Else we select the GameObject.
-						if (gameObject.enabled) {
+						if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
 							resolve(gameObject.guid);
 							return gameObject.guid;
 						}

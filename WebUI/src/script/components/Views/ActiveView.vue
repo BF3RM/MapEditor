@@ -1,6 +1,6 @@
 <template>
 	<div class="screen-container">
-		<EditorView  class="screen" v-show="activeViewName === viewEnum.EDITOR"/>
+		<EditorView  class="screen" v-if="activeViewName === viewEnum.EDITOR"/>
 		<PlayingView class="screen" v-show="activeViewName === viewEnum.PLAYING"/>
 		<LoadingView class="screen" v-show="activeViewName === viewEnum.LOADING"/>
 	</div>

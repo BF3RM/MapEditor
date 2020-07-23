@@ -122,6 +122,9 @@ export class InputControls {
 		if (event.which === KEYCODE.F1) {
 			editor.vext.SendEvent('DisableEditorMode');
 		}
+		if (event.which === KEYCODE.F5) {
+			window.location = (window as any).location;
+		}
 		if (event.which === KEYCODE.ESCAPE) {
 			editor.Select(Guid.createEmpty(), false); // Deselects everything.
 		}

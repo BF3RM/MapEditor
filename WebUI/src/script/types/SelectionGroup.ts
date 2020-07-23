@@ -92,7 +92,13 @@ export class SelectionGroup extends THREE.Object3D {
 		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
-	public select(gameObject: GameObject, multiSelection: boolean, moveGizmo: boolean) {
+	public RefreshTransform(): void {
+		if (this.selectedGameObjects.length !== 0) {
+			this.setMatrix(this.selectedGameObjects[0].matrixWorld);
+		}
+	}
+
+	public select(gameObject: GameObject, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
 		if (!gameObject) {
 			return;
 		}
@@ -130,7 +136,7 @@ export class SelectionGroup extends THREE.Object3D {
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
 			this.setMatrix(gameObject.matrixWorld);
 		}
-		signals.selectedGameObject.emit(gameObject.guid, multiSelection);
+		signals.selectedGameObject.emit(gameObject.guid, multiSelection, scrollTo);
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
 		this.makeParentsVisible();
@@ -176,7 +182,7 @@ export class SelectionGroup extends THREE.Object3D {
 
 		const go = this.selectedGameObjects[0] as GameObject;
 		if (go.parent != null && go.parent.constructor === GameObject) {
-			this.select(go.parent as GameObject, false, true);
+			this.select(go.parent as GameObject, false, true, true);
 		}
 	}
 
