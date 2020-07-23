@@ -166,6 +166,7 @@ function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
     m_Logger:Write("^^^^^^^^^^^^^^^^^")
 
     DataBaseManager:SaveProject(p_ProjectSaveData.projectName, p_ProjectSaveData.mapName, p_ProjectSaveData.gameModeName, p_ProjectSaveData.requiredBundles, s_GameObjectSaveDatas)
+	NetEvents:SendToLocal("MapEditorClient:ReceiveProjectHeaders", p_Player, DataBaseManager:GetProjectHeaders())
 end
 
 -- we're creating commands from the savefile, basically imitating every step that has been undertaken
