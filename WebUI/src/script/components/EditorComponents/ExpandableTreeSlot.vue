@@ -69,7 +69,6 @@ export default class ExpandableTreeSlot extends Vue {
 	@Emit('node:click')
 	public SelectNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		this.tree.selectNode(node);
-		this.selected = true;
 		this.$forceUpdate();
 		return { event: e, nodeId: node.id };
 	}

@@ -123,7 +123,12 @@ export class THREEManager {
 		signals.objectChanged.connect(this.setPendingRender.bind(this)); // Object changed? setPendingRender!
 	}
 
-	public onMouseLeave(event: any) {
+	public onDragStart(event: any, item: Blueprint) {
+		this.dragging = true;
+		editor.editorCore.onPreviewDragStart(item);
+	}
+
+	public onDragStop(event: any) {
 		if (this.dragging) {
 			editor.editorCore.onPreviewStop();
 			editor.editorCore.onPreviewDragStop();
@@ -131,15 +136,14 @@ export class THREEManager {
 		}
 	}
 
+	public onMouseLeave(event: any) {
+		this.onDragStop(event);
+	}
+
 	public onMouseEnter(event: any) {
 		if (this.dragging) {
 			editor.editorCore.onPreviewStart();
 		}
-	}
-
-	public onDragStart(event: any, item: Blueprint) {
-		this.dragging = true;
-		editor.editorCore.onPreviewDragStart(item);
 	}
 
 	public onMouseOver(event: any) {

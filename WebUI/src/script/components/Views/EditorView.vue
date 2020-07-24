@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div @mouseup="onMouseUp">
 		<EditorToolbar/>
 		<div id="ViewportContainer"></div>
 		<GoldenLayoutHolder/>
@@ -28,6 +28,10 @@ export default class EditorView extends Vue {
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
 		}
+	}
+
+	onMouseUp(e: any) {
+		window.editor.threeManager.onDragStop(e);
 	}
 }
 </script>
