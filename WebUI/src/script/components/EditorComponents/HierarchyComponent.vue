@@ -57,12 +57,17 @@ import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableT
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent } })
 
 export default class HierarchyComponent extends EditorComponent {
-	private data: INode = {
+	private data: INode[] = [{
 		'type': 'folder',
-		'name': 'root',
-		'id': 'root',
+		'name': 'Vanilla',
+		'id': 'vanilla_root',
 		'children': []
-	};
+	}, {
+		'type': 'folder',
+		'name': 'Custom',
+		'id': 'custom_root',
+		'children': []
+	}];
 
 	private tree: InfiniteTree;
 	private list: Blueprint[] = [];
@@ -145,11 +150,12 @@ export default class HierarchyComponent extends EditorComponent {
 						this.existingParents.get(parentId)!.push(entry);
 					} else {
 						// Entry does not have a parent.
-						if (!this.existingParents.has('root')) {
-							this.existingParents.set('root', []);
+						const rootId = gameObject.isVanilla ? 'vanilla_root' : 'custom_root';
+						if (!this.existingParents.has(rootId)) {
+							this.existingParents.set(rootId, []);
 						}
 						console.log('Root');
-						this.existingParents.get('root')!.push(entry);
+						this.existingParents.get(rootId)!.push(entry);
 					}
 				}
 				for (const parentNodeId of this.existingParents.keys()) {

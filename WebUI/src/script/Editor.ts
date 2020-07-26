@@ -224,7 +224,7 @@ export default class Editor {
 			variation = blueprint.getDefaultVariation();
 		}
 		if (parentData === undefined) {
-			parentData = new GameObjectParentData(Guid.createEmpty(), 'root', Guid.createEmpty(), Guid.createEmpty());
+			parentData = new GameObjectParentData(Guid.createEmpty(), 'custom_root', Guid.createEmpty(), Guid.createEmpty());
 		}
 
 		// Spawn blueprint
