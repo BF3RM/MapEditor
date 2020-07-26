@@ -88,6 +88,13 @@ function UIManager:EnableFreeCam()
 	if self.m_ActiveMode ~= EditorMode.Playing then
 		return
 	end
+
+	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+	-- Don't change to freecam if the player isnt alive, maybe add message saying so?
+	if s_LocalPlayer == nil or s_LocalPlayer.soldier == nil then
+		return
+	end
+
 	NetEvents:SendLocal('EnableInputRestriction')
 
 	FreeCam:Enable()

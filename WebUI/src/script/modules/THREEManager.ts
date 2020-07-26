@@ -114,7 +114,7 @@ export class THREEManager {
 	}
 
 	public registerEvents() {
-		// TODO: Drag events dont work in WebUI currently
+		// TODO: Drag events don't work in WebUI currently, use them instead when they're fixed.
 		this.renderer.domElement.addEventListener('mouseenter', this.onMouseEnter.bind(this));
 		this.renderer.domElement.addEventListener('mouseleave', this.onMouseLeave.bind(this));
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseOver.bind(this));
