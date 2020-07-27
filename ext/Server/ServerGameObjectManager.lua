@@ -24,7 +24,7 @@ function ServerGameObjectManager:ClientReady(p_Player)
 	end
 	m_Logger:Write("Fist player ready, sending vanilla gameobjects guids")
 
-	NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
+	--NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
 end
 
 function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
