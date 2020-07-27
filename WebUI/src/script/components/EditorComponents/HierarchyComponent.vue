@@ -129,6 +129,9 @@ export default class HierarchyComponent extends EditorComponent {
 			const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
 			const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
 
+			// Don't add preview object to hierarchy.
+			if (gameObject.parentData.typeName === 'previewSpawn') return;
+
 			const currentEntry = this.createNode(gameObject);
 			this.entries.set(gameObjectGuid, currentEntry);
 			this.queue.set(currentEntry.id, currentEntry);

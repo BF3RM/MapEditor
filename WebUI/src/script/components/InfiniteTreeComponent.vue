@@ -50,7 +50,7 @@ export default class InfiniteTreeComponent extends Vue {
 	@Prop({ default: 0 })
 	tabIndex: number;
 
-	@Prop({ type: Object, default: [] })
+	@Prop({ default: [] })
 	data: object[];
 
 	@Prop({ default: 32 })
