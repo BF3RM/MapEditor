@@ -25,7 +25,7 @@ export default class InfoTopBar extends Vue {
 		color: white;
 		top: 0;
 		width: 100vw;
-		height: 5vh;
+		height: 30px;
 		display: flex;
 		align-items: center;
 

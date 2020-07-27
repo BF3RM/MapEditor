@@ -388,7 +388,7 @@ input#worldView {
 <style lang="scss" scoped>
 #toolbar {
 	user-select: none;
-	z-index: 2147483647;
+	z-index: 1;
 	left: 0;
 	top: 0;
 	width: 100vw;

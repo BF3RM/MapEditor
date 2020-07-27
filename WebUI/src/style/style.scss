@@ -76,9 +76,15 @@ input {
   flex: 1;
 }
 .lm_header .lm_tab.lm_active, .lm_header .lm_tab {
-  box-shadow: none;
+  box-shadow: none!important;
 }
-
+.lm_header .lm_tab.lm_active {
+  border-bottom: 3px solid #409EFF!important;
+  padding-bottom: 3px!important;
+}
+.lm_drag_handle:hover {
+  background-color: #409EFF;
+}
 input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
 }
