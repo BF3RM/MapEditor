@@ -174,8 +174,7 @@ function MapEditorClient:OnUIReloaded()
 end
 
 function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
-	local s_ProjectHeaders = DecodeParams(p_ProjectHeaders)
-	WebUpdater:AddUpdate('SetProjectHeaders', s_ProjectHeaders)
+	WebUpdater:AddUpdate('SetProjectHeaders', p_ProjectHeaders)
 end
 
 function MapEditorClient:OnRequestProjectSave(p_ProjectHeaderDataJson)

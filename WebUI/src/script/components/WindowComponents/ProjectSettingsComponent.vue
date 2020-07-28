@@ -108,7 +108,7 @@ export default class ProjectSettingsComponent extends Vue {
 
 	onGetProjects(availableProjects: any) {
 		console.log(availableProjects);
-		const projects:any = {};
+		const projects: any = {};
 		if (Object.keys(availableProjects).length !== 0) {
 			for (const project of availableProjects) {
 				if (projects[project.projectName] === undefined) {

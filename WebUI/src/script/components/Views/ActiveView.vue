@@ -1,6 +1,6 @@
 <template>
 	<div class="screen-container">
-		<EditorView  class="screen" v-if="activeViewName === viewEnum.EDITOR"/>
+		<EditorView  class="screen" v-show="activeViewName === viewEnum.EDITOR"/>
 		<PlayingView class="screen" v-show="activeViewName === viewEnum.PLAYING"/>
 		<LoadingView class="screen" v-show="activeViewName === viewEnum.LOADING"/>
 	</div>
@@ -17,7 +17,7 @@ import LoadingView from '@/script/components/Views/LoadingView.vue';
 	components: { LoadingView, PlayingView, EditorView }
 })
 export default class ActiveView extends Vue {
-	private activeViewName: VIEW = VIEW.LOADING;
+	private activeViewName: VIEW = VIEW.EDITOR;
 	private viewEnum = VIEW;
 
 	mounted() {

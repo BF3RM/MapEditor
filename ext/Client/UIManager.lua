@@ -21,7 +21,7 @@ function UIManager:OnLoadingComplete()
 end
 
 function UIManager:OnLevelDestroy()
-	self:SetEditorMode(EditorMode.Loading)
+	self.m_ActiveMode = EditorMode.Loading
 end
 
 function UIManager:SetEditorMode(p_Mode)

@@ -157,7 +157,7 @@ export default class HierarchyComponent extends EditorComponent {
 						if (!this.existingParents.has(rootId)) {
 							this.existingParents.set(rootId, []);
 						}
-						console.log('Root');
+						// console.log('Root');
 						this.existingParents.get(rootId)!.push(entry);
 					}
 				}
