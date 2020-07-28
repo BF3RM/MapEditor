@@ -1,15 +1,15 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }"  @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
-		<div v-if="hasVisibilityOptions" class="tree-node">
+	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
+		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container">
-				<img :src="enabledIcnSrc"/>
+				<img :src="require(`@/icons/editor/eye.svg`)"/>
 			</div>
 			<div class="selectable-container icon-container">
-				<img :src="require(`@/icons/editor/pointer.svg`)"/>
+				<img :src="require(`@/icons/editor/select.svg`)"/>
 			</div>
 		</div>
 		<div class="tree-node" :style="nodeStyle(node)">
-			<div class="expand-container" @click="ToggleNode($event,node,tree)">
+			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
 			</div>
@@ -54,7 +54,7 @@ export default class ExpandableTreeSlot extends Vue {
 	selected: boolean;
 
 	get enabledIcnSrc() {
-		return this.enabled ? require('@/icons/editor/eye-visible.svg') : require('@/icons/editor/eye-not-visible.svg');
+		return this.enabled ? require('@/icons/editor/eye.svg') : require('@/icons/editor/eye.svg');
 	}
 
 	private nodeStyle(node: Node) {
@@ -106,34 +106,37 @@ export default class ExpandableTreeSlot extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+	.visibility-node {
+		display: flex;
+		align-content: center;
+		height: 13px;
+
+		* {
+			margin: 0 2px;
+		}
+	}
+
 	.tree-node {
 		display: flex;
 		font-family: sans-serif;
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
-		height: 1vmin;
-		white-space: nowrap;
+		height: 13px;
+		/*white-space: nowrap;*/
+
 		.text-container {
-			width: 100%;
+			width: available;
 		}
-		.expand-container {
-			width: 1.7vmin;
-			height: 100%;
-			color: #6d6d6d;
+		.expand-container img {
+			transition: transform 0.1s;
 
-			img {
-				max-width: 100%;
-				max-height: 100%;
-				transition: transform 0.1s;
-
-				&.expanded {
-					transform: rotate(90deg);
-				}
+			&.expanded {
+				transform: rotate(90deg);
 			}
 		}
 		.icon-container {
-			width: 1.7vmin;
+			width: 13px;;
 			height: 100%;
 			color: #6d6d6d;
 
@@ -151,7 +154,7 @@ export default class ExpandableTreeSlot extends Vue {
 		}
 
 		.slot-text {
-			margin: 0.4vmin;
+			margin-left: 5px;
 		}
 	}
 </style>

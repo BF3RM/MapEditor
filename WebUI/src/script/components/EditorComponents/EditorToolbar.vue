@@ -456,4 +456,7 @@ label.is-active {
 	margin-left: auto;
 	margin-right: 5vmin;
 }
+span {
+	user-select: none;
+}
 </style>
