@@ -30,6 +30,10 @@ function UIManager:SetEditorMode(p_Mode)
 	WebUpdater:AddUpdate('EditorModeChanged', p_Mode)
 end
 
+function UIManager:OnLevelDestroy()
+	WebUI:ExecuteJS("window.location = window.location")
+end
+----------- Game functions----------------
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 	self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 end

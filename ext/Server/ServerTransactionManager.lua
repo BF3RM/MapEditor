@@ -17,7 +17,9 @@ function ServerTransactionManager:RegisterVars()
 	self.m_Queue = {}
 	self.m_Transactions = {}
 end
-
+function ServerTransactionManager:OnLevelDestroy()
+	self:RegisterVars()
+end
 function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
     if p_Player == nil then
         return

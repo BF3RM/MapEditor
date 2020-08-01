@@ -131,6 +131,8 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     -- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
     -- Invoke Restart
 	if(self.m_MapName == s_MapName) then
+		local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
+		Events:Dispatch('MapLoader:LoadLevel', {header = self.m_CurrentProjectHeader, data = DecodeParams(json.decode(s_ProjectSaveData[1].save_file_json)), vanillaOnly = true})
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
@@ -153,7 +155,7 @@ function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
     for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
         if l_GameObject:IsUserModified() == true then
             count = count + 1
-            table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
+            s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
         end
     end
 
@@ -183,7 +185,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
         --If it's a vanilla object we move it or we delete it. If not we spawn a new object.
         if IsVanilla(l_Guid) then
-            if l_GameObjectSaveData.isDeleted then
+            --[[if l_GameObjectSaveData.isDeleted then
                 s_Command = {
                     sender = "LoadingSaveFile",
                     type = "DeleteBlueprintCommand",
@@ -203,6 +205,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
             end
 
             table.insert(s_SaveFileCommands, s_Command)
+            --]]
         else
             s_Command = {
                 guid = l_Guid,

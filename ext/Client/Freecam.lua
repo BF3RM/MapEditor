@@ -5,7 +5,6 @@ local m_RotationHelper = require "__shared/Util/RotationHelper"
 
 function FreeCam:__init()
 	m_Logger:Write("Initializing FreeCam module")
-
 	self:RegisterVars()
 end
 
@@ -35,6 +34,9 @@ function FreeCam:RegisterVars()
 	self.m_ThirdPersonRotY = 0.0
 
 	self.m_LastSpectatedPlayer = 0
+end
+function FreeCam:OnLevelDestroy()
+	self:RegisterVars()
 end
 
 function FreeCam:Create()

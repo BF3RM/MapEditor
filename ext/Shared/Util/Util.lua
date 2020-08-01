@@ -68,7 +68,7 @@ function DecodeParams(p_Table)
 			p_Table[s_Key] = s_LinearTransform
 
 		elseif type(s_Value) == "table" then
-			DecodeParams(s_Value)
+			s_Value = DecodeParams(s_Value)
 		end
 
 	end
