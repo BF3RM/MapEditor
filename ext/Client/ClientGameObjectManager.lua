@@ -15,28 +15,32 @@ end
 --- Called when this client is done loading. We compare server and client guids to check which objects are client or server
 --- only.
 function ClientGameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsGuids)
-	local s_ClientGuids = GameObjectManager.m_VanillaGameObjectGuids
-	local s_ServerGuids = p_GameObjectsGuids
-	local s_ClientOnlyGuids = self:FindMissingValues(s_ClientGuids, s_ServerGuids)
-	local s_ServerOnlyGuids = self:FindMissingValues(s_ServerGuids, s_ClientGuids) -- Might not be needed, havent found server-only objects yet
+	Async:Start(function ()
+		print("Resolving something idk")
+		local s_ClientGuids = GameObjectManager.m_VanillaGameObjectGuids
+		local s_ServerGuids = p_GameObjectsGuids
+		local s_ClientOnlyGuids = self:FindMissingValues(s_ClientGuids, s_ServerGuids)
+		local s_ServerOnlyGuids = self:FindMissingValues(s_ServerGuids, s_ClientGuids) -- Might not be needed, havent found server-only objects yet
 
-	m_Logger:Write("Found ".. #s_ClientOnlyGuids .." client-only gameobjects")
-	m_Logger:Write("Found ".. #s_ServerOnlyGuids .." server-only gameobjects")
+		m_Logger:Write("Found ".. #s_ClientOnlyGuids .." client-only gameobjects")
+		m_Logger:Write("Found ".. #s_ServerOnlyGuids .." server-only gameobjects")
 
-	local s_ClientOnlyGameObjectTransferDatas = {}
+		local s_ClientOnlyGameObjectTransferDatas = {}
 
-	for _, l_Guid in pairs(s_ClientOnlyGuids) do
-		local s_GameObject = GameObjectManager.m_GameObjects[tostring(l_Guid)]
-		if s_GameObject == nil then
-			m_Logger:Error("Couldn't find client-only gameobject with guid: ".. tostring(l_Guid))
-		else
-			s_GameObject.realm = Realm.Realm_Client
-			table.insert(s_ClientOnlyGameObjectTransferDatas, s_GameObject:GetGameObjectTransferData())
+		for _, l_Guid in pairs(s_ClientOnlyGuids) do
+			local s_GameObject = GameObjectManager.m_GameObjects[tostring(l_Guid)]
+			if s_GameObject == nil then
+				m_Logger:Error("Couldn't find client-only gameobject with guid: ".. tostring(l_Guid))
+			else
+				s_GameObject.realm = Realm.Realm_Client
+				table.insert(s_ClientOnlyGameObjectTransferDatas, s_GameObject:GetGameObjectTransferData())
+			end
+			Async:yield()
 		end
-	end
-
-	NetEvents:SendLocal("ServerGameObjectManager:ClientOnlyGameObjectsTransferData", s_ClientOnlyGameObjectTransferDatas)
-	NetEvents:SendLocal("ServerGameObjectManager:ServerOnlyGameObjectsGuids", s_ServerOnlyGuids)
+		NetEvents:SendLocal("ServerGameObjectManager:ClientOnlyGameObjectsTransferData", s_ClientOnlyGameObjectTransferDatas)
+		NetEvents:SendLocal("ServerGameObjectManager:ServerOnlyGameObjectsGuids", s_ServerOnlyGuids)
+		print("Done resolving")
+	end)
 end
 
 -- TODO: Find better algorithm
@@ -56,6 +60,7 @@ function ClientGameObjectManager:FindMissingValues(p_OriginalTable, p_NewTable)
 		if not s_Found then
 			table.insert(s_MissingValues, l_OriginalValue)
 		end
+		Async:yield()
 	end
 	return s_MissingValues
 end

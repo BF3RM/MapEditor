@@ -1,4 +1,5 @@
 class 'MapEditorShared'
+Async = require "__shared/Util/Async"
 
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
@@ -25,7 +26,6 @@ require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
 
 require "__shared/Config"
-
 local m_Logger = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()

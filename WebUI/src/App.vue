@@ -61,7 +61,6 @@ export default class App extends Vue {
 <style scoped>
 	#viewport-container * {
 		background: none !important;
-		pointer-events: none;
 	}
 </style>
 <style>
