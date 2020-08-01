@@ -8,6 +8,7 @@
 					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 				</div>
 				<div class="transform-container">
+					<label class="name-label" for="name">GUID:</label><input class="guid-input" :value="gameObjectGuid" :disabled="true">
 					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 					<linear-transform-control class="lt-control" :hideLabel="false"
 											:position="position" :rotation="rotation" :scale="scale"
@@ -121,6 +122,17 @@ export default class InspectorComponent extends EditorComponent {
 			return 'Multiselection';
 		} else {
 			return this.group.selectedGameObjects[0].name;
+		}
+	}
+
+	get gameObjectGuid() {
+		if (!this.group || this.isEmpty) {
+			return '';
+		}
+		if (this.multiSelection) {
+			return 'Multiselection';
+		} else {
+			return this.group.selectedGameObjects[0].guid.toString();
 		}
 	}
 
