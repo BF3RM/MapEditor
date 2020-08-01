@@ -135,6 +135,7 @@ export default class VEXTInterface {
 		commandActionResults.forEach((commandActionResult: CommandActionResult) => {
 			if (scope.commands[commandActionResult.type] === undefined) {
 				window.LogError('Failed to call a null signal: ' + commandActionResult.type);
+				scope.executing = false;
 				return;
 			}
 			if (index === commandActionResults.length - 1) {

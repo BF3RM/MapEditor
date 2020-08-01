@@ -54,7 +54,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = 'BlueprintSpawnInvoked',
+		type = 'SpawnedBlueprint',
 		gameObjectTransferData = s_ResultGameObjectTransferData,
 	}
 
@@ -101,7 +101,7 @@ function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
 	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
 		return nil, ActionResultType.Queue
 	end
-
+	print("UndeleteBlueprint with guid " .. p_Command.gameObjectTransferData.guid)
 	if not IsVanilla(p_Command.gameObjectTransferData.guid) then
 		return CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end
@@ -113,14 +113,11 @@ function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
-		guid = p_Command.gameObjectTransferData.guid,
-		isDeleted = false
-	}
+	local s_GameObjectTransferData = GameObjectManager.m_GameObjects[p_Command.gameObjectTransferData.guid]:GetGameObjectTransferData()
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "UndeletedBlueprint", -- does not exist on js
+		type = "SpawnedBlueprint",
 		gameObjectTransferData =  s_GameObjectTransferData,
 	}
 
