@@ -34,3 +34,8 @@ In freecam, without holding right click:
 
 # Disclamer
 This project is using [Three.js](https://threejs.org/) as the rendering foundation.
+
+# Building
+- Install npm (if not already installed)
+- cd `./webui`
+- `npm run build`
