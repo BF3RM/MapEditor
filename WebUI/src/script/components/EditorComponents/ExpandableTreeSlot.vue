@@ -110,6 +110,7 @@ export default class ExpandableTreeSlot extends Vue {
 		display: flex;
 		align-content: center;
 		height: 13px;
+		background-color: #404040;
 
 		* {
 			margin: 0 2px;

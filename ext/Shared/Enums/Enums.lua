@@ -28,3 +28,10 @@ ActionResultType = {
 	Failure = 2,
 	Queue = 3
 }
+
+AsyncState = {
+	Scheduled = "scheduled",
+	Suspended = "suspended",
+	Running = "running",
+	Dead = "dead"
+}

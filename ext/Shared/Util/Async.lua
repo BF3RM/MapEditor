@@ -1,17 +1,10 @@
 class 'Async'
-asyncStates = {
-	"scheduled",
-	"suspended",
-	"running",
-	"dead"
-}
 
 function Async:__init()
 	print("Initializing Async")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
-
 
 function Async:RegisterVars()
 	self.m_Tasks = {}
@@ -21,42 +14,42 @@ function Async:RegisterEvents()
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
 end
 
-function Async:yield()
+function Async:Yield()
 	coroutine.yield()
 end
 
-function Async:Start(task)
-	local task = {
+function Async:Start(p_Task)
+	local s_Task = {
 		id = #self.m_Tasks + 1,
-		task = task,
+		task = p_Task,
 		time = 0,
-		state = asyncStates[2],
+		state = AsyncState.Suspended,
 		coroutine = nil
 	}
-	task.coroutine = coroutine.create(function()
-		task.state = asyncStates[3] -- Set to running
-		task.task()
-		task.state = asyncStates[4] -- Set to dead after executing
+	s_Task.coroutine = coroutine.create(function()
+		s_Task.state = AsyncState.Running
+		s_Task.task()
+		s_Task.state = AsyncState.Dead
 	end)
-	table.insert(self.m_Tasks, task)
+	table.insert(self.m_Tasks, s_Task)
 end
 
 function Async:OnEngineUpdate(p_Delta)
-	local tasksToHandle = #self.m_Tasks
+	local s_TasksToHandle = #self.m_Tasks
 	for _, task in pairs(self.m_Tasks) do
-		if(task.state == asyncStates[2]) then -- If suspended, resume task
+		if (task.state == AsyncState.Suspended) then -- If suspended, resume task
 			print("Running task")
 			coroutine.resume(task.coroutine)
 		end
-		if(task.state == asyncStates[3]) then -- Task is already running I guess
+		if (task.state == AsyncState.Running) then -- Task is already running I guess
 			coroutine.resume(task.coroutine)
 			task.time = task.time + p_Delta
 		end
-		if(task.state == asyncStates[4]) then -- Task is dead
-			tasksToHandle = tasksToHandle - 1
+		if (task.state == AsyncState.Dead) then -- Task is dead
+			s_TasksToHandle = s_TasksToHandle - 1
 		end
 	end
-	if(#self.m_Tasks > 0 and tasksToHandle == 0) then
+	if (#self.m_Tasks > 0 and s_TasksToHandle == 0) then
 		print("All tasks are completed. Clearing buffer")
 		self.m_Tasks = {}
 	end

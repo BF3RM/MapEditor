@@ -415,7 +415,7 @@ export class THREEManager {
 					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
 						continue;
 					}
-					if (element.object.parent.constructor === GameObject && element.object.parent.name !== 'Gameplay/Logic/ShowRoom') {
+					if (element.object.parent.constructor === GameObject && (element.object.parent as any).name !== 'Gameplay/Logic/ShowRoom') {
 						const gameObject = element.object.parent as GameObject;
 						if (editor.selectionGroup.isSelected(gameObject)) {
 							hitSelf = gameObject;

@@ -35,7 +35,7 @@ function ClientGameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsG
 				s_GameObject.realm = Realm.Realm_Client
 				table.insert(s_ClientOnlyGameObjectTransferDatas, s_GameObject:GetGameObjectTransferData())
 			end
-			Async:yield()
+			Async:Yield()
 		end
 		NetEvents:SendLocal("ServerGameObjectManager:ClientOnlyGameObjectsTransferData", s_ClientOnlyGameObjectTransferDatas)
 		NetEvents:SendLocal("ServerGameObjectManager:ServerOnlyGameObjectsGuids", s_ServerOnlyGuids)
@@ -60,7 +60,7 @@ function ClientGameObjectManager:FindMissingValues(p_OriginalTable, p_NewTable)
 		if not s_Found then
 			table.insert(s_MissingValues, l_OriginalValue)
 		end
-		Async:yield()
+		Async:Yield()
 	end
 	return s_MissingValues
 end
