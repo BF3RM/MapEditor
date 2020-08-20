@@ -1,14 +1,14 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
+	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
-			<div class="enable-container icon-container">
-				<img :src="require(`@/icons/editor/eye.svg`)"/>
+			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
+				<img :src="enabledIcnSrc"/>
 			</div>
 			<div class="selectable-container icon-container">
 				<img :src="require(`@/icons/editor/select.svg`)"/>
 			</div>
 		</div>
-		<div class="tree-node" :style="nodeStyle(node)">
+		<div class="tree-node" :style="nodeStyle(node)" @click="SelectNode($event, node, tree)">
 			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
@@ -38,9 +38,6 @@ export default class ExpandableTreeSlot extends Vue {
 	@Prop()
 	node: Node;
 
-	@Prop({ default: true })
-	enabled: boolean;
-
 	@Prop()
 	tree: any;
 
@@ -53,8 +50,19 @@ export default class ExpandableTreeSlot extends Vue {
 	@Prop()
 	selected: boolean;
 
+	@Prop()
+	content: any[] | null;
+
+	get enabled() {
+		if (this.content && this.content[0]) {
+			return this.content[0].enabled;
+		} else {
+			return true;
+		}
+	}
+
 	get enabledIcnSrc() {
-		return this.enabled ? require('@/icons/editor/eye.svg') : require('@/icons/editor/eye.svg');
+		return this.enabled ? require('@/icons/editor/eye.svg') : require('@/icons/editor/eye-crossed.svg');
 	}
 
 	private nodeStyle(node: Node) {
@@ -71,6 +79,11 @@ export default class ExpandableTreeSlot extends Vue {
 		this.tree.selectNode(node);
 		this.$forceUpdate();
 		return { event: e, nodeId: node.id };
+	}
+
+	@Emit('node:toggle-enable')
+	public ToggleEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		return node;
 	}
 
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {

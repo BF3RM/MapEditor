@@ -28,6 +28,8 @@ import { signals } from '@/script/modules/Signals';
 import { GenerateBlueprints } from '@/script/modules/DebugData';
 import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
 import { EDITOR_MODE } from '@/script/types/Enums';
+import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
+import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
 export default class Editor {
 	public config = new Config();
@@ -255,6 +257,20 @@ export default class Editor {
 		if (commands.length > 0) {
 			scope.execute(new BulkCommand(commands));
 		}
+	}
+
+	public Enable(guid: Guid) {
+		const command = new EnableBlueprintCommand(new GameObjectTransferData({
+			guid: guid
+		}));
+		this.execute(command);
+	}
+
+	public Disable(guid: Guid) {
+		const command = new DisableBlueprintCommand(new GameObjectTransferData({
+			guid: guid
+		}));
+		this.execute(command);
 	}
 
 	public getGameObjectByGuid(guid: Guid) {

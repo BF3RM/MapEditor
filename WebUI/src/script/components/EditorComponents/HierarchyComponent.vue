@@ -11,14 +11,15 @@
 									:data="data"
 									:selectable="true"
 									:should-select-node="shouldSelectNode">
-				<expandable-tree-slot slot-scope="{ node, index, tree, active, data }"
+				<expandable-tree-slot slot-scope="{ node, index, tree, active }"
 									:has-visibility-options="true"
 									:node="node"
 									:tree="tree"
 									:search="search"
+									:content="node.content"
 									:nodeText="node.name + ' (' + node.children.length + ')'"
 									:selected="node.state.selected"
-									:enabled="true"
+									@node:toggle-enable="onNodeToggleEnable"
 									@node:hover="onNodeHover"
 									@node:hover-end="onNodeHoverEnd"
 									@node:click="onNodeClick" />
@@ -39,12 +40,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref } from 'vue-property-decorator';
+import { Component, Ref } from 'vue-property-decorator';
 import EditorComponent from '@/script/components/EditorComponents/EditorComponent.vue';
 import InfiniteTreeComponent from '@/script/components/InfiniteTreeComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
-import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import Highlighter from '../widgets/Highlighter.vue';
 import ListComponent from '@/script/components/EditorComponents/ListComponent.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
@@ -61,12 +61,18 @@ export default class HierarchyComponent extends EditorComponent {
 		'type': 'folder',
 		'name': 'Vanilla',
 		'id': 'vanilla_root',
-		'children': []
+		'children': [],
+		'content': [{
+			'enabled': true
+		}]
 	}, {
 		'type': 'folder',
 		'name': 'Custom',
 		'id': 'custom_root',
-		'children': []
+		'children': [],
+		'content': [{
+			'enabled': true
+		}]
 	}];
 
 	private tree: InfiniteTree;
@@ -87,7 +93,7 @@ export default class HierarchyComponent extends EditorComponent {
 		console.log('Mounted');
 		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
-		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
+		// signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
 		// signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
@@ -106,16 +112,11 @@ export default class HierarchyComponent extends EditorComponent {
 			name: gameObject.getCleanName(),
 			type: gameObject.blueprintCtrRef.typeName,
 			children: [],
-			data: {
+			content: [{
 				parentGuid: gameObject.parentData.guid,
 				enabled: gameObject.enabled
-			}
+			}]
 		};
-	}
-
-	public onEnabledBlueprint(commandActionResult: CommandActionResult) {
-		// const node: Node = this.tree.getNodeById(commandActionResult.gameObjectTransferData.guid.toString());
-		// this.tree.updateNode(node, { node.data })
 	}
 
 	onDeletedBlueprint(commandActionResult: CommandActionResult) {
@@ -141,7 +142,11 @@ export default class HierarchyComponent extends EditorComponent {
 
 				for (const entry of this.queue.values()) {
 					// Check if the parent is in the queue
-					const parentId = entry.data.parentGuid.toString();
+					if (!entry.content || !entry.content[0]) {
+						console.error('Found node without content field');
+						continue;
+					}
+					const parentId = entry.content[0].parentGuid.toString();
 					if (this.queue.has(parentId)) {
 						this.queue.get(parentId)!.children!.push(entry);
 						// Check if the parent node is already spawned
@@ -210,6 +215,20 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 	}
 
+	private onNodeToggleEnable(node: Node) {
+		if (!node.content || !node.content[0]) {
+			return;
+		}
+		const guid = Guid.parse(node.id.toString());
+		if (guid.isEmpty()) return;
+
+		if (node.content[0].enabled) {
+			window.editor.Disable(guid);
+		} else {
+			window.editor.Enable(guid);
+		}
+	}
+
 	private onNodeHover(nodeId: string) {
 		const guid = Guid.parse(nodeId.toString());
 		if (guid.isEmpty()) return;
@@ -244,7 +263,9 @@ export default class HierarchyComponent extends EditorComponent {
 		if (field === 'enabled') {
 			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
 			if (node) {
-				node.data.enabled = value;
+				if (node.content && node.content[0]) {
+					node.content[0].enabled = value;
+				}
 				// This doesnt work, data is not updated reactively
 			}
 		}
