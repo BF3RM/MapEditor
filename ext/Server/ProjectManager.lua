@@ -144,31 +144,37 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 end
 
 function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
-    m_Logger:Write("Save requested: " .. p_ProjectSaveData.projectName)
+	-- TODO: check player's permission once that is implemented
 
-    -- TODO: check player's permission once that is implemented
+	Async:Start(function() self:SaveProjectCoroutine(p_ProjectSaveData)
+	end)
+end
 
-    local s_GameObjectSaveDatas = {}
-    local count = 0
+function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
+	m_Logger:Write("Save requested: " .. p_ProjectSaveData.projectName)
 
-    -- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
-    for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
-        if l_GameObject:IsUserModified() == true then
-            count = count + 1
-            s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
-        end
-    end
+	local s_GameObjectSaveDatas = {}
+	local count = 0
 
-    m_Logger:Write("vvvvvvvvvvvvvvvvv")
-    m_Logger:Write("GameObjectSaveDatas: " .. count)
-    for _, gameObjectSaveData in pairs(s_GameObjectSaveDatas) do
-        m_Logger:Write(tostring(gameObjectSaveData.guid) .. " | " .. gameObjectSaveData.name)
-    end
-    m_Logger:Write(json.encode(s_GameObjectSaveDatas))
-    m_Logger:Write("^^^^^^^^^^^^^^^^^")
+	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
+	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
+		if l_GameObject:IsUserModified() == true then
+			count = count + 1
+			s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
+		end
+		Async:Yield()
+	end
+
+	m_Logger:Write("vvvvvvvvvvvvvvvvv")
+	m_Logger:Write("GameObjectSaveDatas: " .. count)
+	for _, gameObjectSaveData in pairs(s_GameObjectSaveDatas) do
+		m_Logger:Write(tostring(gameObjectSaveData.guid) .. " | " .. gameObjectSaveData.name)
+	end
+	m_Logger:Write(json.encode(s_GameObjectSaveDatas))
+	m_Logger:Write("^^^^^^^^^^^^^^^^^")
 
 	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_CurrentProjectHeader.requiredBundles, s_GameObjectSaveDatas)
-	NetEvents:SendToLocal("MapEditorClient:ReceiveProjectHeaders", p_Player, DataBaseManager:GetProjectHeaders())
+	NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
 end
 
 -- we're creating commands from the savefile, basically imitating every step that has been undertaken
