@@ -1,3 +1,4 @@
+import {INode} from "infinite-tree";
 <template>
 	<EditorComponent class="inspector-component" title="Inspector">
 		<div v-if="!isEmpty">
@@ -43,6 +44,7 @@ import LinearTransformControl from '@/script/components/controls/LinearTransform
 import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
+import { GameObject } from '@/script/types/GameObject';
 
 @Component({ components: { LinearTransformControl, EditorComponent } })
 export default class InspectorComponent extends EditorComponent {
@@ -65,6 +67,16 @@ export default class InspectorComponent extends EditorComponent {
 		signals.selectionGroupChanged.connect(this.onSelectionGroupChanged.bind(this));
 		signals.selectedGameObject.connect(this.onSelection.bind(this));
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));
+		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+	}
+
+	private onObjectChanged(gameObject: GameObject, field: string, value: any) {
+		if (!gameObject || !this.group) {
+			return;
+		}
+		if (field === 'enabled' && this.group.isSelected(gameObject) && this.group.selectedGameObjects.length === 1) {
+			this.enabled = value;
+		}
 	}
 
 	private onInput() {
