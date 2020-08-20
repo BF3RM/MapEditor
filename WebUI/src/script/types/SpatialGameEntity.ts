@@ -4,6 +4,7 @@ import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { MeshBasicMaterial, Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
+import { RAYCAST_LAYER } from '@/script/types/Enums';
 
 export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	private static SELECTED_COLOR: THREE.Color = new THREE.Color(0xFF0000);
@@ -58,6 +59,9 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 			aabb.min,
 			aabb.max);
 		this.updateMatrix();
+
+		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
+		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public onHighlight() {

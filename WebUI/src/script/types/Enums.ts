@@ -142,3 +142,8 @@ export enum VIEW {
 	PLAYING = 'Playing',
 	FREECAM = 'FreeCam'
 }
+
+export enum RAYCAST_LAYER {
+	GAMEOBJECT = 0,
+	GAMEENTITY= 1
+}

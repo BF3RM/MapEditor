@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
+import { RAYCAST_LAYER } from '@/script/types/Enums';
 
 /*
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -55,6 +56,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
+
+		this.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
+		this.layers.disable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public static CreateWithTransferData(gameObjectTransferData: GameObjectTransferData) {

@@ -10,7 +10,7 @@ import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 
 export class THREEManager {
@@ -52,6 +52,8 @@ export class THREEManager {
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;
+		this.camera.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
+		this.camera.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public initialize() {
@@ -406,6 +408,11 @@ export class THREEManager {
 			const raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mousePos, this.camera);
 			let hitSelf: GameObject | null = null;
+
+			// Only check raycast collisions with GameEntities
+			raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
+			raycaster.layers.enable(RAYCAST_LAYER.GAMEENTITY);
+
 			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
 			if (intersects.length > 0) {
 				// console.log('hit ' + (intersects.length) + ' objects');

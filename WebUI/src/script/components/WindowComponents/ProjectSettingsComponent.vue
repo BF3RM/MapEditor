@@ -6,7 +6,7 @@
 				<li v-else v-for="(project, projectName) in projects" v-bind:key="projectName" @click="onSelectProject(project)" :class="selectedProjectName === projectName ? 'selected' : null">{{projectName}}</li>
 			</ul>
 			<ul v-if="selectedProject" class="saveList">
-				<li v-for="(project) in selectedProject" v-bind:key="project.timeStamp" @click="selectSave(project)" :class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : null">{{FormatTime(project.timeStamp)}} ago</li>
+				<li v-for="(project) in selectedProject" v-bind:key="project.timeStamp" @click="selectSave(project)" :class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : null">{{FormatTime(project.timeStamp)}}</li>
 			</ul>
 		</div>
 		<div class="Container" v-if="showNewSave">
