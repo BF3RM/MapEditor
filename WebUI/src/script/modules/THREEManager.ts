@@ -403,6 +403,7 @@ export class THREEManager {
 		}
 	}
 
+	// TODO: Clean up
 	public raycastSelection(mousePos: Vec2) {
 		return new Promise((resolve) => {
 			const raycaster = new THREE.Raycaster();
@@ -419,7 +420,7 @@ export class THREEManager {
 				for (const element of intersects.sort((a, b) => {
 					return a.distance - b.distance;
 				})) {
-					if (element.object == null || element.object.parent == null || element.object.type === 'LineSegments') {
+					if (element.object == null || element.object.parent == null) {
 						continue;
 					}
 					if (element.object.parent.constructor === GameObject && (element.object.parent as any).name !== 'Gameplay/Logic/ShowRoom') {
@@ -428,17 +429,26 @@ export class THREEManager {
 							hitSelf = gameObject;
 							continue;
 						}
+
+						if (!gameObject.raycastEnabled) {
+							continue;
+						}
+
 						// Select its parent if possible.
 						if (gameObject.parent != null) {
 							const parent = gameObject.parent as GameObject;
+							// if (!parent.raycastEnabled) {
+							// 	continue;
+							// }
 							if (editor.selectionGroup.isSelected(parent)) {
 								console.log('Hit self ' + parent.guid);
 								hitSelf = parent;
 								continue;
 							}
 							if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
-								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
-								!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom') {
+									(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
+									!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
+									!parent.raycastEnabled) {
 								resolve(parent.guid);
 								return parent.guid;
 							}

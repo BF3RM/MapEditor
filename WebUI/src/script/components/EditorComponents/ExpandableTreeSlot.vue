@@ -4,8 +4,8 @@
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
 				<img :src="enabledIcnSrc"/>
 			</div>
-			<div class="selectable-container icon-container">
-				<img :src="require(`@/icons/editor/select.svg`)"/>
+			<div class="selectable-container icon-container" @click="ToggleRaycastEnabled($event, node, tree)">
+				<img :src="raycastEnabledIcnSrc"/>
 			</div>
 		</div>
 		<div class="tree-node" :style="nodeStyle(node)" @click="SelectNode($event, node, tree)">
@@ -61,8 +61,20 @@ export default class ExpandableTreeSlot extends Vue {
 		}
 	}
 
+	get raycastEnabled() {
+		if (this.content && this.content[0]) {
+			return this.content[0].raycastEnabled;
+		} else {
+			return true;
+		}
+	}
+
 	get enabledIcnSrc() {
 		return this.enabled ? require('@/icons/editor/eye.svg') : require('@/icons/editor/eye-crossed.svg');
+	}
+
+	get raycastEnabledIcnSrc() {
+		return this.raycastEnabled ? require('@/icons/editor/select.svg') : require('@/icons/editor/select-crossed.svg');
 	}
 
 	private nodeStyle(node: Node) {
@@ -83,6 +95,11 @@ export default class ExpandableTreeSlot extends Vue {
 
 	@Emit('node:toggle-enable')
 	public ToggleEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		return node;
+	}
+
+	@Emit('node:toggle-raycast-enable')
+	public ToggleRaycastEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		return node;
 	}
 

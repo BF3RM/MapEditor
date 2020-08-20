@@ -20,6 +20,7 @@
 									:nodeText="node.name + ' (' + node.children.length + ')'"
 									:selected="node.state.selected"
 									@node:toggle-enable="onNodeToggleEnable"
+									@node:toggle-raycast-enable="onNodeToggleRaycastEnable"
 									@node:hover="onNodeHover"
 									@node:hover-end="onNodeHoverEnd"
 									@node:click="onNodeClick" />
@@ -63,7 +64,8 @@ export default class HierarchyComponent extends EditorComponent {
 		'id': 'vanilla_root',
 		'children': [],
 		'content': [{
-			'enabled': true
+			'enabled': true,
+			'raycastEnabled': true
 		}]
 	}, {
 		'type': 'folder',
@@ -71,7 +73,8 @@ export default class HierarchyComponent extends EditorComponent {
 		'id': 'custom_root',
 		'children': [],
 		'content': [{
-			'enabled': true
+			'enabled': true,
+			'raycastEnabled': true
 		}]
 	}];
 
@@ -114,7 +117,8 @@ export default class HierarchyComponent extends EditorComponent {
 			children: [],
 			content: [{
 				parentGuid: gameObject.parentData.guid,
-				enabled: gameObject.enabled
+				enabled: gameObject.enabled,
+				raycastEnabled: gameObject.raycastEnabled
 			}]
 		};
 	}
@@ -229,6 +233,16 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 	}
 
+	private onNodeToggleRaycastEnable(node: Node) {
+		if (!node.content || !node.content[0]) {
+			return;
+		}
+		const guid = Guid.parse(node.id.toString());
+		if (guid.isEmpty()) return;
+
+		window.editor.ToggleRaycastEnabled(guid, !node.content[0].raycastEnabled);
+	}
+
 	private onNodeHover(nodeId: string) {
 		const guid = Guid.parse(nodeId.toString());
 		if (guid.isEmpty()) return;
@@ -265,6 +279,16 @@ export default class HierarchyComponent extends EditorComponent {
 			if (node) {
 				if (node.content && node.content[0]) {
 					node.content[0].enabled = value;
+				}
+				// This doesnt work, data is not updated reactively
+			}
+		}
+
+		if (field === 'raycastEnabled') {
+			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
+			if (node) {
+				if (node.content && node.content[0]) {
+					node.content[0].raycastEnabled = value;
 				}
 				// This doesnt work, data is not updated reactively
 			}

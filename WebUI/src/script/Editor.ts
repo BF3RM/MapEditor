@@ -273,6 +273,13 @@ export default class Editor {
 		this.execute(command);
 	}
 
+	public ToggleRaycastEnabled(guid: Guid, enabled: boolean) {
+		const go = this.getGameObjectByGuid(guid);
+		if (go) {
+			go.raycastEnabled = enabled;
+		}
+	}
+
 	public getGameObjectByGuid(guid: Guid) {
 		return this.gameObjects.getValue(guid);
 	}

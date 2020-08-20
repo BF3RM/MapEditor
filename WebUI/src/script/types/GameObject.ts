@@ -26,10 +26,11 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public variation: number;
 	public gameEntitiesData: GameEntityData[];
 	public isVanilla: boolean;
-	public selected: boolean;
-	public highlighted: boolean;
+	public selected: boolean = false;
+	public highlighted: boolean = false;
 	// private completeBoundingBox: THREE.Box3;
-	private _enabled: boolean;
+	private _enabled: boolean = true;
+	private _raycastEnabled: boolean = true;
 	public parent: GameObject;
 
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
@@ -47,11 +48,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.gameEntitiesData = gameEntities;
 		this.isVanilla = isVanilla;
 
-		this.selected = false;
 		this.matrixAutoUpdate = false;
 		this.visible = false;
-		this._enabled = true;
-		this.highlighted = false;
 
 		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
@@ -184,6 +182,20 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	public getLinearTransform() {
 		new LinearTransform().setFromMatrix(this.matrixWorld);
+	}
+
+	set raycastEnabled(value: boolean) {
+		for (const child of this.children) {
+			if (child instanceof GameObject) {
+				(child as GameObject).raycastEnabled = value;
+			}
+		}
+		this._raycastEnabled = value;
+		signals.objectChanged.emit(this, 'raycastEnabled', this.raycastEnabled);
+	}
+
+	get raycastEnabled() {
+		return this._raycastEnabled;
 	}
 
 	public Enable() {
