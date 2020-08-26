@@ -26,19 +26,6 @@ import VEXTInterface from '@/script/modules/VEXT';
 export default class App extends Vue {
 	constructor() {
 		super();
-		let debugMode: boolean = false;
-		if (!navigator.userAgent.includes('VeniceUnleashed')) {
-			if (window.location.ancestorOrigins === undefined || window.location.ancestorOrigins[0] !== 'webui://main') {
-				debugMode = true;
-			}
-		}
-
-		window.debug = debugMode;
-		(window).editor = new Editor(debugMode);
-		window.vext = new VEXTInterface(debugMode);
-
-		(window).Log = Log;
-		(window).LogError = LogError;
 		console.log('UI RELOADED');
 		this.$nextTick(() => {
 			window.vext.SendEvent('UIReloaded');
