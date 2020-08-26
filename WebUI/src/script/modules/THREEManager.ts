@@ -47,8 +47,6 @@ export class THREEManager {
 	private clock = new THREE.Clock();
 	private cameraHasMoved: boolean;
 
-	private currentRaycast: any = null;
-
 	constructor(debugMode: boolean) {
 		this.scene.name = 'scene';
 		signals.editor.Ready.connect(this.initialize.bind(this));
@@ -393,20 +391,15 @@ export class THREEManager {
 		const now = new Date();
 		if ((now.getTime() - this.lastRaycastTime.getTime() >= 100) && !this.pendingRaycast) {
 			this.pendingRaycast = true;
-			if (this.currentRaycast) {
-				clearTimeout(this.currentRaycast);
+			const guid = await this.raycastSelection(mousePos) as Guid;
+			if (guid !== null) {
+				editor.editorCore.highlight(guid);
+			} else {
+				editor.editorCore.unhighlight();
 			}
-			this.currentRaycast = setTimeout(async () => {
-				const guid = await this.raycastSelection(mousePos) as Guid;
-				if (guid !== null) {
-					editor.editorCore.highlight(guid);
-				} else {
-					editor.editorCore.unhighlight();
-				}
-				this.lastRaycastTime = now;
-				this.pendingRaycast = false;
-				this.setPendingRender();
-			}, 1);
+			this.lastRaycastTime = now;
+			this.pendingRaycast = false;
+			this.setPendingRender();
 		}
 	}
 
