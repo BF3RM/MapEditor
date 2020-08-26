@@ -192,7 +192,7 @@ export default class EditorToolbar extends Vue {
 	}
 
 	onViewModeChange(newView: number) {
-		window.editor.vext.SendMessage(new SetViewModeMessage(newView));
+		window.vext.SendMessage(new SetViewModeMessage(newView));
 	}
 
 	private onMenuRegistered(path: string[], entryCallback?: any) {

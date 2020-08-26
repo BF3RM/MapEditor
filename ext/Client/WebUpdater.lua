@@ -52,7 +52,7 @@ function WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 	if self.m_ElapsedTime > UI_UPDATE_TIME then
 		self.m_ElapsedTime = 0
 		if self.m_WebUpdateStack ~= nil and #self.m_WebUpdateStack > 0 then
-			WebUI:ExecuteJS(string.format("editor.vext.WebUpdateBatch(%s)", json.encode(self.m_WebUpdateStack)))
+			WebUI:ExecuteJS(string.format("window.vext.WebUpdateBatch(%s)", json.encode(self.m_WebUpdateStack)))
 			self.m_WebUpdateStack = {}
 		end
 	end

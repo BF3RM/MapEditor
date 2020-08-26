@@ -13,10 +13,10 @@ export default class DeleteBlueprintCommand extends Command {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid
 		});
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData)); // the lua side doesnt need the gameObjectTransferData just to delete the object, so we save memory
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData)); // the lua side doesnt need the gameObjectTransferData just to delete the object, so we save memory
 	}
 
 	public undo() {
-		editor.vext.SendCommand(new VextCommand('UndeleteBlueprintCommand', this.gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand('UndeleteBlueprintCommand', this.gameObjectTransferData));
 	}
 }

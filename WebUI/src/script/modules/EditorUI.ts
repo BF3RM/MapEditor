@@ -300,7 +300,7 @@ export class EditorUI {
 
 	public worldViewChanged(e: any, ui: any) {
 		const message = new SetViewModeMessage(ui.item.value);
-		editor.vext.SendMessage(message);
+		window.vext.SendMessage(message);
 	}
 
 	public onResize() {

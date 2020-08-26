@@ -39,6 +39,7 @@ export default class GizmoWrapper extends TransformControls {
 		// Stop moving
 		this.selected = true;
 		editor.setUpdating(true);
+		console.log(this.getMode());
 	}
 
 	private onEditorReady() {

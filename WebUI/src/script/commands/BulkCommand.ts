@@ -7,18 +7,18 @@ export default class BulkCommand extends Command {
 	}
 
 	public execute() {
-		editor.vext.Pause();
+		window.vext.Pause();
 		this.commands.forEach((command) => {
 			command.execute();
 		});
-		editor.vext.Resume();
+		window.vext.Resume();
 	}
 
 	public undo() {
-		editor.vext.Pause();
+		window.vext.Pause();
 		this.commands.forEach((command) => {
 			command.undo();
 		});
-		editor.vext.Resume();
+		window.vext.Resume();
 	}
 }

@@ -96,7 +96,7 @@ export class THREEManager {
 			scope.cameraHasMoved = false;
 		}
 		if (scope.waitingForControlEnd && !scope.updatingCamera && !hasControlsUpdated) {
-			editor.vext.SendEvent('controlEnd');
+			window.vext.SendEvent('controlEnd');
 			scope.waitingForControlEnd = false;
 		}
 	}
@@ -164,7 +164,7 @@ export class THREEManager {
 
 	public enableFreecamMovement() {
 		this.highlightingEnabled = false;
-		editor.vext.SendEvent('EnableFreeCamMovement');
+		window.vext.SendEvent('EnableFreeCamMovement');
 		this.OnCameraMoveEnable();
 
 		// Hack to make sure we don't navigate the windows while in freecam.
@@ -194,7 +194,7 @@ export class THREEManager {
 	}
 
 	public focus(target?: THREE.Object3D) {
-		editor.vext.SendEvent('controlStart');
+		window.vext.SendEvent('controlStart');
 		const scope = this;
 
 		if (target === undefined) {
@@ -263,7 +263,7 @@ export class THREEManager {
 	}
 
 	private render() {
-		if (editor.vext.executing) return;
+		if (window.vext.executing) return;
 		this.renderer.render(this.scene, this.camera);
 		this.pendingRender = false;
 	}

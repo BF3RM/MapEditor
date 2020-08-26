@@ -141,7 +141,7 @@ export default class HierarchyComponent extends EditorComponent {
 			this.entries.set(gameObjectGuid, currentEntry);
 			this.queue.set(currentEntry.id, currentEntry);
 
-			if (!(window as any).editor.vext.executing) {
+			if (!window.vext.executing) {
 				const updatedNodes = {};
 
 				for (const entry of this.queue.values()) {

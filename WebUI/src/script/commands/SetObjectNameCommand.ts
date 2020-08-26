@@ -13,7 +13,7 @@ export default class SetObjectNameCommand extends Command {
 			guid: this.gameObjectTransferData.guid,
 			name: this.newGameObjectName
 		});
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 
 	public undo() {
@@ -21,6 +21,6 @@ export default class SetObjectNameCommand extends Command {
 			guid: this.gameObjectTransferData.guid,
 			name: this.gameObjectTransferData.name
 		});
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 }

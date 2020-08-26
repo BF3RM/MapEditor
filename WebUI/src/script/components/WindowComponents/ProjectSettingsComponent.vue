@@ -65,7 +65,7 @@ export default class ProjectSettingsComponent extends Vue {
 			this.state.visible = true;
 		});
 		signals.menuRegistered.emit(['File', 'Load Project'], () => {
-			window.editor.vext.SendMessage(new GetProjectsMessage());
+			window.vext.SendMessage(new GetProjectsMessage());
 			this.showNewSave = false;
 			this.title = 'Load Project';
 			this.state.visible = true;

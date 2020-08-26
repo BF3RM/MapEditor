@@ -37,7 +37,6 @@ export default class Editor {
 	public debug: boolean;
 	public threeManager: THREEManager;
 	public ui: EditorUI;
-	public vext: VEXTInterface;
 	public history = new History(this);
 	public blueprintManager = new BlueprintManager();
 	public gameContext = new GameContext();
@@ -55,12 +54,10 @@ export default class Editor {
 	constructor(debug: boolean = false) {
 		this.debug = debug;
 		this.ui = new EditorUI(debug);
-		this.vext = new VEXTInterface(debug);
 		this.threeManager = new THREEManager(debug);
 
 		// Commands
 		signals.editor.Ready.connect(this.onEditorReady.bind(this));
-		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
 		signals.blueprintSpawnInvoked.connect(this.onBlueprintSpawnInvoked.bind(this));
 		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
 		signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
@@ -100,7 +97,7 @@ export default class Editor {
 		if (this.debug) {
 			this.setPlayerName('LocalPlayer');
 			setTimeout(() => {
-				this.vext.EditorModeChanged(EDITOR_MODE.EDITOR);
+				window.vext.EditorModeChanged(EDITOR_MODE.EDITOR);
 			}, 200);
 		}
 	}
@@ -119,7 +116,6 @@ export default class Editor {
 		if (this.debug) {
 			this.blueprintManager.registerBlueprints(GenerateBlueprints(100));
 		} else {
-			this.vext.SendEvent('UIReloaded');
 			console.log('Sent event');
 		}
 	}
@@ -323,7 +319,6 @@ export default class Editor {
 		if (gameObject !== undefined) {
 			if (gameObject.parent) {
 				gameObject.parent.updateMatrixWorld();
-				console.log('Updated matrix world yo');
 				if (this.selectionGroup.isSelected(gameObject)) {
 					this.selectionGroup.RefreshTransform();
 				}
@@ -425,10 +420,11 @@ export default class Editor {
 					this.missingParent.remove(gameObjectGuid);
 				}
 			}
-			if (!scope.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
+			if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
 				// Make selection happen after all signals have been handled
 				this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
 			}
+			signals.spawnedBlueprint.emit(commandActionResult);
 		});
 	}
 

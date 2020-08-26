@@ -17,7 +17,7 @@ export default class CameraControlWrapper extends CameraControls {
 		this.mouseButtons.middle = CameraControls.ACTION.TRUCK;
 
 		this.addEventListener('controlstart', (event: any) => {
-			editor.vext.SendEvent('controlStart');
+			window.vext.SendEvent('controlStart');
 		});
 		this.addEventListener('controlend', (event: any) => {
 			this.waitingForControlEnd = true;
@@ -26,7 +26,7 @@ export default class CameraControlWrapper extends CameraControls {
 			if (!this.updatingCamera) {
 				// lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
 				const transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld);
-				editor.vext.SendEvent('controlUpdate', {
+				window.vext.SendEvent('controlUpdate', {
 					transform
 				});
 			}

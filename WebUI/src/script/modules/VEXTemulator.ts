@@ -33,7 +33,7 @@ export class VEXTemulator {
 		});
 		// Delay to simulate tick pass
 		setTimeout(() => {
-			editor.vext.HandleResponse(responses, true);
+			window.vext.HandleResponse(responses, true);
 		}, 1);
 	}
 
@@ -50,7 +50,7 @@ export class VEXTemulator {
 		// Delay to simulate tick pass
 		for (const response of responses) {
 			setTimeout(() => {
-				editor.vext.HandleMessage(response);
+				window.vext.HandleMessage(response);
 			}, 1);
 		}
 	}

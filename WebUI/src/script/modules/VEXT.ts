@@ -25,7 +25,7 @@ export default class VEXTInterface {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
 		this.commands = {
-			SpawnedBlueprint: signals.spawnedBlueprint.emit,
+			SpawnedBlueprint: editor.onSpawnedBlueprint.bind(editor),
 			BlueprintSpawnInvoked: signals.blueprintSpawnInvoked.emit,
 			DeletedBlueprint: signals.deletedBlueprint.emit,
 			CreatedGroup: signals.createdGroup.emit,
@@ -47,7 +47,6 @@ export default class VEXTInterface {
 			// 'SelectedGameObject':	   signals.selectedGameObject.emit,
 			// 'DeselectedGameObject':	signals.deselectedGameObject.emit,
 		};
-
 		this.paused = false;
 		this.executing = false;
 
@@ -56,15 +55,20 @@ export default class VEXTInterface {
 			messages: []
 		};
 		console.log('UI is ready');
+
 		if (!debug) {
 			// This is a dirty fucking hack to force UI reload when the UI source is updated.
 			// eslint-disable-next-line no-prototype-builtins
-			if (!window.hasOwnProperty('editor')) {
-				console.log('Sending to lua');
-				WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
+			if (window.hasOwnProperty('editor')) {
+				setTimeout(() => {
+					console.log('Sending to lua');
+					console.log(window.vext);
+					signals.editor.Ready.emit(true);
+					WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
+				}, 1);
 			} else {
 				// eslint-disable-next-line no-self-assign
-				window.location = window.location;
+				// window.location = window.location;
 			}
 		}
 	}

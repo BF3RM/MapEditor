@@ -12,13 +12,13 @@ export default class DisableBlueprintCommand extends Command {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid
 		});
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 
 	public undo() {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid
 		});
-		editor.vext.SendCommand(new VextCommand('EnableBlueprintCommand', gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand('EnableBlueprintCommand', gameObjectTransferData));
 	}
 }

@@ -62,7 +62,7 @@ export class EditorCore {
 		// GameObject update
 		this.pendingUpdates.forEach((gameObject, guid) => {
 			const changes = gameObject.getChanges();
-			if (!changes || !editor.vext.doneExecuting) {
+			if (!changes || !window.vext.doneExecuting) {
 				return;
 			}
 			for (const changeKey in changes) {
@@ -70,7 +70,7 @@ export class EditorCore {
 					continue;
 				}
 				const change = changes[changeKey];
-				editor.vext.SendMessage(change);
+				window.vext.SendMessage(change);
 			}
 		});
 		this.pendingUpdates.clear();
@@ -106,7 +106,7 @@ export class EditorCore {
 	public onPreviewDrag(e: MouseEvent) {
 		const direction = editor.threeManager.getMouse3D(e);
 		const s2wMessage = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
-		editor.vext.SendMessage(s2wMessage);
+		window.vext.SendMessage(s2wMessage);
 
 		if (this.previewBlueprint == null || !this.isPreviewBlueprintSpawned) {
 			return;
@@ -117,7 +117,7 @@ export class EditorCore {
 			transform: this.screenToWorldTransform.clone()
 		});
 
-		editor.vext.SendMessage(new MoveObjectMessage(gameObjectTransferData));
+		window.vext.SendMessage(new MoveObjectMessage(gameObjectTransferData));
 	}
 
 	public onPreviewDragStop() {
@@ -138,13 +138,13 @@ export class EditorCore {
 			variation: this.previewBlueprint.getDefaultVariation()
 		});
 
-		editor.vext.SendMessage(new PreviewSpawnMessage(gameObjectTransferData));
+		window.vext.SendMessage(new PreviewSpawnMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = true;
 	}
 
 	public onPreviewStop() {
 		const gameObjectTransferData = new GameObjectTransferData({ guid: editor.config.PreviewGameObjectGuid });
-		editor.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
+		window.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = false;
 	}
 
@@ -155,7 +155,7 @@ export class EditorCore {
 		editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
 
 		const gameObjectTransferData = new GameObjectTransferData({ guid: editor.config.PreviewGameObjectGuid });
-		editor.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
+		window.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = false;
 		this.previewBlueprint = null;
 	}

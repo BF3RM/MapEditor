@@ -9,13 +9,13 @@ export default class SpawnBlueprintCommand extends Command {
 	}
 
 	public execute() {
-		editor.vext.SendCommand(new VextCommand(this.type, this.gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, this.gameObjectTransferData));
 	}
 
 	public undo() {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid
 		});
-		editor.vext.SendCommand(new VextCommand('DeleteBlueprintCommand', gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand('DeleteBlueprintCommand', gameObjectTransferData));
 	}
 }

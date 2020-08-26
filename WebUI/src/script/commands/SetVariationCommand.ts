@@ -15,7 +15,7 @@ export default class SetVariationCommand extends Command {
 			variation: this.newVariationKey
 		});
 
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 
 	public undo() {
@@ -24,6 +24,6 @@ export default class SetVariationCommand extends Command {
 			variation: this.gameObjectTransferData.variation
 		});
 
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 }

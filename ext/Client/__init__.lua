@@ -136,7 +136,7 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 			loadingInfo = loadingInfo .. ", "
 		end
 	end
-	WebUI:ExecuteJS(string.format("editor.vext.SetLoadingInfo('Mounting bundles: %s')", tostring(loadingInfo)))
+	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(loadingInfo)))
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
 end
 
@@ -145,7 +145,7 @@ function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 end
 
 function MapEditorClient:OnLoadingInfo( p_Info )
-	WebUI:ExecuteJS(string.format("editor.vext.SetLoadingInfo('%s')", p_Info))
+	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('%s')", p_Info))
 end
 
 ----------- Editor functions----------------

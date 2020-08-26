@@ -14,7 +14,7 @@ export class SetTransformCommand extends Command {
 			guid: this.gameObjectTransferData.guid,
 			transform: this.newTransform
 		});
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 
 	public undo() {
@@ -22,6 +22,6 @@ export class SetTransformCommand extends Command {
 			guid: this.gameObjectTransferData.guid,
 			transform: this.gameObjectTransferData.transform
 		});
-		editor.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 }

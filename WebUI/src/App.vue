@@ -16,6 +16,7 @@ import Editor from '@/script/Editor';
 import { Log, LogError } from '@/script/modules/Logger';
 import ActiveView from '@/script/components/Views/ActiveView.vue';
 import { EDITOR_MODE } from '@/script/types/Enums';
+import VEXTInterface from '@/script/modules/VEXT';
 
 @Component({
 	components: {
@@ -34,10 +35,13 @@ export default class App extends Vue {
 
 		window.debug = debugMode;
 		(window).editor = new Editor(debugMode);
+		window.vext = new VEXTInterface(debugMode);
+
 		(window).Log = Log;
 		(window).LogError = LogError;
+		console.log('UI RELOADED');
 		this.$nextTick(() => {
-			window.editor.vext.SendEvent('UIReloaded');
+			window.vext.SendEvent('UIReloaded');
 		});
 	}
 
