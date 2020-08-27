@@ -103,10 +103,14 @@ export class EditorCore {
 		this.previewBlueprint = blueprint;
 	}
 
-	public onPreviewDrag(e: MouseEvent) {
+	public GetMouseToScreenPosition(e: MouseEvent) {
 		const direction = editor.threeManager.getMouse3D(e);
 		const s2wMessage = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
 		window.vext.SendMessage(s2wMessage);
+	}
+
+	public onPreviewDrag(e: MouseEvent) {
+		this.GetMouseToScreenPosition(e);
 
 		if (this.previewBlueprint == null || !this.isPreviewBlueprintSpawned) {
 			return;

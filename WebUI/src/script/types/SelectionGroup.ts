@@ -7,6 +7,8 @@ import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
+import { Vector3 } from 'three';
+import { Vec3 } from '@/script/types/primitives/Vec3';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -88,6 +90,15 @@ export class SelectionGroup extends THREE.Object3D {
 	public setMatrix(matrix: THREE.Matrix4) {
 		this.transform = new LinearTransform().setFromMatrix(matrix);
 		matrix.decompose(this.position, this.quaternion, this.scale);
+		this.updateMatrix();
+		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+	}
+
+	public setPosition(x:number, y:number, z:number) {
+		const pos = new Vec3(x, y, z);
+		this.matrix.setPosition(pos);
+		this.transform.setFromMatrix(this.matrix);
+		this.matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
 		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}

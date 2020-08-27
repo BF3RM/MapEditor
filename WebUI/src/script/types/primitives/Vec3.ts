@@ -27,6 +27,10 @@ export class Vec3 extends Vector3 {
 		};
 	}
 
+	public toString(): string {
+		return '(' + this.x + ',' + this.y + ',' + this.z + ')';
+	}
+
 	public static setFromString(matrixString: string) {
 		matrixString = matrixString.replace(/[(]/g, '');
 		matrixString = matrixString.replace(/[)]/g, ', ');

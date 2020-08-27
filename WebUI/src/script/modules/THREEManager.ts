@@ -152,6 +152,10 @@ export class THREEManager {
 		if (this.dragging) {
 			editor.editorCore.onPreviewDrag(event);
 		}
+		if (this.gizmoControls.raycastPlacing) {
+			editor.editorCore.GetMouseToScreenPosition(event);
+			this.gizmoControls.OnMouseMove(event);
+		}
 	}
 
 	public onMouseUp(event: any) {
@@ -160,6 +164,7 @@ export class THREEManager {
 			editor.editorCore.onPreviewDrop();
 			editor.editorCore.onPreviewDragStop();
 		}
+		this.gizmoControls.OnMouseUp(event);
 	}
 
 	public enableFreecamMovement() {
