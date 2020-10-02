@@ -9,7 +9,6 @@ import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
-import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 
@@ -23,7 +22,7 @@ export class THREEManager {
 	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
-	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement);
+	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
 	private inputControls = new InputControls(this.renderer.domElement);
 	public worldSpace = WORLD_SPACE.local;
 
@@ -76,6 +75,7 @@ export class THREEManager {
 			const grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);
 			scope.scene.add(grid);
 		}
+		this.setGizmoMode(GIZMO_MODE.select);
 		this.setFov(90);
 		this.setPendingRender();
 	}

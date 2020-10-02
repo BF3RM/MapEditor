@@ -1,14 +1,14 @@
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as THREE from 'three';
 import { signals } from '@/script/modules/Signals';
-import { WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
 
 export default class GizmoWrapper extends TransformControls {
 	public visible = false;
 	public selected = false;
 	public raycastPlacing = false;
 
-	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
+	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement, gizmoMode = GIZMO_MODE.select) {
 		super(camera, element);
 		this.setSize(0.8);
 		this.matrixAutoUpdate = true;
@@ -20,6 +20,9 @@ export default class GizmoWrapper extends TransformControls {
 			editor.threeManager.cameraControls.enabled = !event.value;
 		});
 		signals.editor.Ready.connect(this.onEditorReady.bind(this));
+		signals.editor.Ready.connect(() => {
+			editor.threeManager.setGizmoMode(gizmoMode);
+		});
 	}
 
 	public onControlChanged() {
