@@ -68,8 +68,9 @@ export class THREEManager {
 			page.appendChild(scope.renderer.domElement);
 			scope.renderer.domElement.setAttribute('tabindex', '0');
 			scope.renderer.domElement.focus();
+		} else {
+			console.error('Unable to find ViewPort');
 		}
-
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
 			const grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);

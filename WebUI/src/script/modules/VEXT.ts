@@ -56,21 +56,15 @@ export default class VEXTInterface {
 		};
 		console.log('UI is ready');
 
-		if (!debug) {
-			// This is a dirty fucking hack to force UI reload when the UI source is updated.
-			// eslint-disable-next-line no-prototype-builtins
-			if (window.hasOwnProperty('editor')) {
-				setTimeout(() => {
-					console.log('Sending to lua');
-					console.log(window.vext);
-					signals.editor.Ready.emit(true);
-					WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
-				}, 1);
-			} else {
-				// eslint-disable-next-line no-self-assign
-				// window.location = window.location;
+		// This is a dirty hack to force UI reload when the UI source is updated.
+		// eslint-disable-next-line no-prototype-builtins
+		setTimeout(() => {
+			console.log(window.vext);
+			signals.editor.Ready.emit(true);
+			if (!debug) {
+				WebUI.Call('DispatchEventLocal', 'MapEditor:UIReady');
 			}
-		}
+		}, 1);
 	}
 
 	// Internal
@@ -158,7 +152,7 @@ export default class VEXTInterface {
 
 	public SendEvent(eventName: string, param?: any) {
 		if (editor.debug) {
-			console.log(eventName);
+			console.log('Sending event: ' + eventName);
 			if (param != null) {
 				console.log(param);
 			}

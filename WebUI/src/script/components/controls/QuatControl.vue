@@ -55,7 +55,7 @@ export default class QuatControl extends Vue {
 		if (this.mode !== 'Vec4') {
 			const newQuat = new Quat().setFromEuler(new Euler(this.euler.x * DEG2RAD, this.euler.y * DEG2RAD, this.euler.z * DEG2RAD));
 			const a = (newQuat as Quat).toTable();
-			this.$emit('quatUpdated', a);
+			this.$emit('quat-updated', a);
 		}
 	}
 }
