@@ -30,7 +30,7 @@ export default class DraggableNumberInput extends Vue {
 		return this.adjustValue.bind(this);
 	}
 
-	get boundEnd(): EventListener {
+	get boundEnd() {
 		return this.dragEnd.bind(this);
 	}
 
@@ -92,7 +92,7 @@ export default class DraggableNumberInput extends Vue {
 
 		document.removeEventListener('mousemove', this.boundAdjust);
 		document.removeEventListener('mouseup', this.boundEnd);
-		this.$emit('endDrag');
+		this.$emit('end-drag');
 	}
 
 	private dragStart(): void {
@@ -103,7 +103,7 @@ export default class DraggableNumberInput extends Vue {
 
 		document.addEventListener('mousemove', this.boundAdjust);
 		document.addEventListener('mouseup', this.boundEnd);
-		this.$emit('startDrag');
+		this.$emit('start-drag');
 	}
 }
 </script>
