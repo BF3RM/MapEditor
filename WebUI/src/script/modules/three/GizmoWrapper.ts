@@ -1,7 +1,7 @@
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as THREE from 'three';
 import { signals } from '@/script/modules/Signals';
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, KEYCODE, WORLD_SPACE } from '@/script/types/Enums';
 
 export default class GizmoWrapper extends TransformControls {
 	public visible = false;
@@ -11,7 +11,6 @@ export default class GizmoWrapper extends TransformControls {
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement, gizmoMode = GIZMO_MODE.select) {
 		super(camera, element);
 		this.setSize(0.8);
-		this.matrixAutoUpdate = true;
 
 		this.addEventListener('change', this.onControlChanged.bind(this));
 		this.addEventListener('mouseUp', this.onControlMouseUp.bind(this));
@@ -23,6 +22,7 @@ export default class GizmoWrapper extends TransformControls {
 		signals.editor.Ready.connect(() => {
 			editor.threeManager.setGizmoMode(gizmoMode);
 		});
+		this.enabled = false;
 	}
 
 	public onControlChanged() {
@@ -33,14 +33,18 @@ export default class GizmoWrapper extends TransformControls {
 	}
 
 	public onControlMouseUp() {
-		if (!this.visible) return;
 		this.selected = false;
+		if (!this.visible) return;
+		console.log('Control deselected');
+		console.log(this.matrixWorld);
+		this.updateMatrixWorld();
 		editor.setUpdating(false);
-		editor.selectionGroup.onClientOnlyMoveEnd();
 		if (this.raycastPlacing) {
 			this.raycastPlacing = false;
 			this.enabled = true;
 		}
+		editor.selectionGroup.onClientOnlyMoveEnd();
+		console.log(this.matrixWorld);
 	}
 
 	public onControlMouseDown(e: any) {
@@ -48,9 +52,10 @@ export default class GizmoWrapper extends TransformControls {
 		// Stop moving
 		this.selected = true;
 		editor.setUpdating(true);
-		if (this.axis === 'XYZ') {
+		if (this.axis === 'XYZ' && editor.threeManager.inputControls.IsKeyDown(KEYCODE.SHIFT)) {
 			this.raycastPlacing = true;
 			this.enabled = false;
+			this.dragging = false;
 		} else {
 			this.raycastPlacing = false;
 			this.enabled = true;
@@ -59,18 +64,18 @@ export default class GizmoWrapper extends TransformControls {
 
 	public OnMouseMove(event: MouseEvent) {
 		if (this.raycastPlacing) {
-			console.log('Moving group to ' + editor.editorCore.screenToWorldTransform.trans.toString());
 			const pos = editor.editorCore.screenToWorldTransform.trans;
-			editor.selectionGroup.setPosition(pos.x, pos.y, pos.z);
-			editor.selectionGroup.onClientOnlyMove();
+			this.SetPosition(pos.x, pos.y, pos.z);
 			editor.editorCore.RequestUpdate();
 		}
 	}
 
 	public OnMouseUp(event: MouseEvent) {
+		this.selected = false;
 		if (this.raycastPlacing) {
 			this.raycastPlacing = false;
 			this.enabled = true;
+			editor.selectionGroup.onClientOnlyMoveEnd();
 		}
 	}
 
@@ -79,5 +84,9 @@ export default class GizmoWrapper extends TransformControls {
 		editor.threeManager.attachToScene(this);
 		this.attach(editor.selectionGroup);
 		this.visible = true;
+	}
+
+	public SetPosition(x:number, y:number, z:number) {
+		editor.selectionGroup.setPosition(x, y, z);
 	}
 }

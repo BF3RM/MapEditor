@@ -1,5 +1,10 @@
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { LogError } from '@/script/modules/Logger';
+import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
+import * as THREE from 'three';
+import { RAYCAST_LAYER } from '@/script/types/Enums';
+import { GameObject } from '@/script/types/GameObject';
+import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 
 export class VEXTemulator {
 	private commands: any;
@@ -19,6 +24,8 @@ export class VEXTemulator {
 
 		this.messages = {};
 		this.messages.GetProjectsMessage = this.GetProjectsMessage;
+		this.messages.SetScreenToWorldPositionMessage = this.SetScreenToWorldPositionMessage;
+		this.messages.MoveObjectMessage = this.MoveObjectMessage;
 	}
 
 	public Receive(commands: any[]) {
@@ -234,5 +241,26 @@ export class VEXTemulator {
 			}
 		};
 		return response;
+	}
+
+	private SetScreenToWorldPositionMessage(args: SetScreenToWorldTransformMessage) {
+		const raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera(args.coordinates, editor.threeManager.camera);
+		const intersects = raycaster.intersectObjects(editor.threeManager.scene.children, true);
+		if (intersects.length > 0) {
+			for (const intersect of intersects) {
+				if (intersect.object.name === 'groundPlane') {
+					return {
+						type: 'SetScreenToWorldPositionMessage',
+						position: intersect.point
+					};
+				}
+			}
+		}
+		return null;
+	}
+
+	private MoveObjectMessage(args: MoveObjectMessage) {
+		return null;
 	}
 }

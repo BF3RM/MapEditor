@@ -13,17 +13,17 @@ import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 
 export class THREEManager {
-	private scene = new THREE.Scene();
+	public scene = new THREE.Scene();
 	private renderer = new THREE.WebGLRenderer({
 		alpha: true,
 		antialias: true
 	});
 
-	private camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
+	public camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
 
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
-	private inputControls = new InputControls(this.renderer.domElement);
+	public inputControls = new InputControls(this.renderer.domElement);
 	public worldSpace = WORLD_SPACE.local;
 
 	private gridSnap = false;
@@ -72,7 +72,14 @@ export class THREEManager {
 		}
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
-			const grid = new THREE.GridHelper(100, 100, 0x444444, 0x888888);
+			const planeSize = 100;
+			const grid = new THREE.GridHelper(planeSize, planeSize, 0x444444, 0x888888);
+			const plGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
+			const plMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x444444), side: THREE.DoubleSide, opacity: 0.5, transparent: true, depthWrite: false });
+			const planeMesh = new THREE.Mesh(plGeometry, plMaterial);
+			planeMesh.name = 'groundPlane';
+			planeMesh.rotateX(1.5708);
+			scope.scene.add(planeMesh);
 			scope.scene.add(grid);
 		}
 		this.setGizmoMode(GIZMO_MODE.select);
@@ -150,11 +157,11 @@ export class THREEManager {
 	}
 
 	public onMouseOver(event: any) {
+		// editor.editorCore.GetMouseToScreenPosition(event);
 		if (this.dragging) {
 			editor.editorCore.onPreviewDrag(event);
 		}
 		if (this.gizmoControls.raycastPlacing) {
-			editor.editorCore.GetMouseToScreenPosition(event);
 			this.gizmoControls.OnMouseMove(event);
 		}
 	}
@@ -327,8 +334,8 @@ export class THREEManager {
 
 	public disableGridSnap() {
 		this.gridSnap = false;
-		this.gizmoControls.translationSnap = null;
-		this.gizmoControls.rotationSnap = null;
+		this.gizmoControls.setTranslationSnap(null);
+		this.gizmoControls.setRotationSnap(null);
 	}
 
 	public ToggleGridSnap() {
@@ -419,7 +426,6 @@ export class THREEManager {
 			// Only check raycast collisions with GameEntities
 			raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
 			raycaster.layers.enable(RAYCAST_LAYER.GAMEENTITY);
-
 			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
 			if (intersects.length > 0) {
 				// console.log('hit ' + (intersects.length) + ' objects');

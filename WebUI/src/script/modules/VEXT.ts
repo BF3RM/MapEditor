@@ -7,6 +7,7 @@ import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
 import { IBlueprint } from '@/script/interfaces/IBlueprint';
 import { EDITOR_MODE, LOGLEVEL, VIEW } from '@/script/types/Enums';
+import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
 
 export default class VEXTInterface {
 	public emulator: VEXTemulator;
@@ -40,7 +41,7 @@ export default class VEXTInterface {
 			SetCameraTransformMessage: signals.setCameraTransform.emit,
 			SetRaycastTransformMessage: signals.setRaycastPosition.emit,
 			SetPlayerNameMessage: signals.setPlayerName.emit,
-			SetScreenToWorldPositionMessage: signals.setScreenToWorldPosition.emit,
+			SetScreenToWorldPositionMessage: this.SetScreenToWorldPosition,
 			SetUpdateRateMessage: signals.setUpdateRateMessage.emit,
 			GetProjectsMessage: signals.getProjects.emit,
 			SetProjectHeaders: signals.setProjectHeaders.emit
@@ -110,8 +111,10 @@ export default class VEXTInterface {
 		if (commands.length === 0) {
 			return;
 		}
-
 		const scope = this;
+		for (const command of commands) {
+			console.log(command.type);
+		}
 		if (editor.debug) {
 			scope.emulator.Receive(commands);
 		} else {
@@ -206,6 +209,9 @@ export default class VEXTInterface {
 	public HandleMessage(messageRaw: any) {
 		let message: any;
 		let emulator = false;
+		if (messageRaw === null) {
+			return;
+		}
 		if (typeof (messageRaw) === 'object') {
 			message = messageRaw;
 			emulator = true;
@@ -240,8 +246,8 @@ export default class VEXTInterface {
 		editor.setRaycastPosition(Vec3.setFromTable(pos));
 	}
 
-	public SetScreenToWorldPosition(pos: IVec3) {
-		editor.setScreenToWorldPosition(Vec3.setFromTable(pos));
+	public SetScreenToWorldPosition(message: SetScreenToWorldTransformMessage) {
+		editor.setScreenToWorldPosition(Vec3.setFromTable(message.position));
 	}
 
 	public UpdateCameraTransform(transform: ILinearTransform) {

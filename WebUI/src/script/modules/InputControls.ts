@@ -6,6 +6,7 @@ import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
 // TODO Fool: add config keymap
 
 export class InputControls {
+	public keys: boolean[] = [];
 	constructor(element: HTMLCanvasElement) {
 		element.addEventListener('keydown', this.onKeyDown.bind(this));
 		element.addEventListener('keyup', this.onKeyUp.bind(this));
@@ -14,7 +15,7 @@ export class InputControls {
 		element.addEventListener('mousedown', this.onMouseDown.bind(this));
 	}
 
-	private static getMousePos(event: MouseEvent): Vec2 {
+	public static getMousePos(event: MouseEvent): Vec2 {
 		const mousePos = new Vec2();
 		mousePos.x = (event.clientX / window.innerWidth) * 2 - 1;
 		mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -58,6 +59,7 @@ export class InputControls {
 	}
 
 	onKeyUp(event: KeyboardEvent) {
+		this.keys[event.which] = false;
 		// Disable camera rotation
 		if (event.which === KEYCODE.ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
@@ -68,6 +70,8 @@ export class InputControls {
 	}
 
 	onKeyDown(event: KeyboardEvent) {
+		this.keys[event.which] = true;
+
 		// Enable camera rotation
 		if (event.which === KEYCODE.ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
@@ -128,5 +132,9 @@ export class InputControls {
 		if (event.which === KEYCODE.ESCAPE) {
 			editor.Select(Guid.createEmpty(), false); // Deselects everything.
 		}
+	}
+
+	public IsKeyDown(keycode: KEYCODE): boolean {
+		return this.keys[keycode] === true; // Can also be undefined
 	}
 }

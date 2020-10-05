@@ -11,6 +11,8 @@ import { Vec3 } from '@/script/types/primitives/Vec3';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { Vec2 } from '@/script/types/primitives/Vec2';
+import { InputControls } from '@/script/modules/InputControls';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -105,13 +107,13 @@ export class EditorCore {
 
 	public GetMouseToScreenPosition(e: MouseEvent) {
 		const direction = editor.threeManager.getMouse3D(e);
-		const s2wMessage = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z));
+		const coordinates = InputControls.getMousePos(e);
+		const s2wMessage = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z), coordinates);
 		window.vext.SendMessage(s2wMessage);
 	}
 
 	public onPreviewDrag(e: MouseEvent) {
-		this.GetMouseToScreenPosition(e);
-
+		// this.GetMouseToScreenPosition(e);
 		if (this.previewBlueprint == null || !this.isPreviewBlueprintSpawned) {
 			return;
 		}

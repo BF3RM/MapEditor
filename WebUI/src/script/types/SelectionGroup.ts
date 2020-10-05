@@ -25,17 +25,16 @@ export class SelectionGroup extends THREE.Object3D {
 	public onClientOnlyMove() {
 		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
-		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+		// editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public onClientOnlyMoveEnd() {
+		this.updateMatrixWorld(true);
 		const commands = [];
-
 		for (const gameObject of this.selectedGameObjects) {
 			if (!gameObject.hasMoved()) {
 				return; // No position change
 			}
-			// this.updateMatrixWorld(true);
 			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
 			const command = new SetTransformCommand(new GameObjectTransferData({
 				guid: gameObject.guid,
@@ -47,7 +46,6 @@ export class SelectionGroup extends THREE.Object3D {
 		if (commands.length === 0) {
 			return;
 		}
-
 		if (commands.length === 1) {
 			editor.execute(commands[0]);
 		} else {
@@ -61,14 +59,11 @@ export class SelectionGroup extends THREE.Object3D {
 	 * matrix with the new and old SelectionGroup's matrices. Then we calc each GameObject transform relative to SelectionGroup
 	 * so we can now apply the transformation matrix to get their new matrices.
 	 */
-	public updateSelectedGameObjects() {
-		const selectionGroupWorld = this.transform.toMatrix();
-		const selectionGroupWorldNew = this.matrixWorld;
-		// Ignore if it hasn't moved.
-		if (selectionGroupWorld.equals(selectionGroupWorldNew)) {
-			this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
-			return;
-		}
+	public updateSelectedGameObjects(oldMatrix = this.transform.toMatrix(), newMatrix = this.matrixWorld) {
+		this.updateMatrixWorld();
+		const selectionGroupWorld = oldMatrix;
+		const selectionGroupWorldNew = newMatrix;
+
 		const selectionOldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld);
 		const transformMatrix = new THREE.Matrix4().multiplyMatrices(selectionGroupWorldNew, selectionOldMatrixInverse);
 		const childLocal = new THREE.Matrix4();
@@ -81,7 +76,7 @@ export class SelectionGroup extends THREE.Object3D {
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
 			go.setWorldMatrix(childWorldNew);
 			// Matrix is recalculated on render, we call the signal in the next frame.
-			editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
+			// editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
@@ -91,16 +86,14 @@ export class SelectionGroup extends THREE.Object3D {
 		this.transform = new LinearTransform().setFromMatrix(matrix);
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
-		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+		// editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public setPosition(x:number, y:number, z:number) {
-		const pos = new Vec3(x, y, z);
-		this.matrix.setPosition(pos);
-		this.transform.setFromMatrix(this.matrix);
-		this.matrix.decompose(this.position, this.quaternion, this.scale);
-		this.updateMatrix();
-		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+		this.position.set(x, y, z);
+		this.updateSelectedGameObjects();
+		editor.threeManager.setPendingRender();
+		// editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public RefreshTransform(): void {
