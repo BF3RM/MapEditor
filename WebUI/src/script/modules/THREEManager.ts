@@ -157,7 +157,7 @@ export class THREEManager {
 	}
 
 	public onMouseOver(event: any) {
-		// editor.editorCore.GetMouseToScreenPosition(event);
+		editor.editorCore.GetMouseToScreenPosition(event);
 		if (this.dragging) {
 			editor.editorCore.onPreviewDrag(event);
 		}
