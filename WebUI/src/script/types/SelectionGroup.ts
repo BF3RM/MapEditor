@@ -25,7 +25,7 @@ export class SelectionGroup extends THREE.Object3D {
 	public onClientOnlyMove() {
 		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
-		// editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public onClientOnlyMoveEnd() {
@@ -86,7 +86,7 @@ export class SelectionGroup extends THREE.Object3D {
 		this.transform = new LinearTransform().setFromMatrix(matrix);
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix();
-		// editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
 	public setPosition(x:number, y:number, z:number) {
