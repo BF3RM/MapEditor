@@ -76,7 +76,7 @@ export class SelectionGroup extends THREE.Object3D {
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
 			go.setWorldMatrix(childWorldNew);
 			// Matrix is recalculated on render, we call the signal in the next frame.
-			// editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
+			editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);
