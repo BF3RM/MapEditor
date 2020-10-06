@@ -8,7 +8,8 @@ import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
 export class InputControls {
 	public keys: boolean[] = [];
 	constructor(element: HTMLCanvasElement) {
-		element.addEventListener('keydown', this.onKeyDown.bind(this));
+		element.addEventListener('keydown', this.onCanvasKeyDown.bind(this));
+		window.addEventListener('keydown', this.onKeyDown.bind(this));
 		element.addEventListener('keyup', this.onKeyUp.bind(this));
 		element.addEventListener('mousemove', this.onMouseMove.bind(this));
 		element.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -69,13 +70,8 @@ export class InputControls {
 		}
 	}
 
-	onKeyDown(event: KeyboardEvent) {
-		this.keys[event.which] = true;
-
-		// Enable camera rotation
-		if (event.which === KEYCODE.ALT) {
-			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
-		}
+	// Keys that should only work when the canvas is focused
+	onCanvasKeyDown(event: KeyboardEvent) {
 		if (event.which === KEYCODE.KEY_Q) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.select);
 		}
@@ -88,11 +84,27 @@ export class InputControls {
 		if (event.which === KEYCODE.KEY_R) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.scale);
 		}
+		if (event.which === KEYCODE.KEY_X) {
+			editor.threeManager.toggleWorldSpace();
+		}
+		if (event.which === KEYCODE.CTRL) {
+			editor.threeManager.enableGridSnap();
+		}
+
+	}
+
+	onKeyDown(event: KeyboardEvent) {
+		this.keys[event.which] = true;
+
 		if (event.which === KEYCODE.KEY_F) {
 			editor.threeManager.focus();
 		}
 		if (event.which === KEYCODE.KEY_P) {
 			editor.selectionGroup.selectParent();
+		}
+		// Enable camera rotation
+		if (event.which === KEYCODE.ALT) {
+			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
 		}
 		if (event.which === KEYCODE.KEY_Z && event.ctrlKey && event.shiftKey) { // CTRL + Shift + Z
 			editor.redo();
@@ -101,7 +113,6 @@ export class InputControls {
 			editor.undo();
 			return false;
 		}
-
 		if (event.which === KEYCODE.KEY_D && event.ctrlKey) { // CTRL + D
 			editor.Duplicate();
 		}
@@ -113,12 +124,6 @@ export class InputControls {
 		}
 		if (event.which === KEYCODE.KEY_X && event.ctrlKey) { // CTRL + X
 			editor.Cut();
-		}
-		if (event.which === KEYCODE.CTRL) {
-			editor.threeManager.enableGridSnap();
-		}
-		if (event.which === KEYCODE.KEY_X) {
-			editor.threeManager.toggleWorldSpace();
 		}
 		if (event.which === KEYCODE.DELETE) {
 			editor.DeleteSelected();
