@@ -11,6 +11,8 @@ export class Vec3 extends Vector3 {
 		super(x, y, z);
 	}
 
+	public static Zero = new Vec3(0, 0, 0);
+
 	public clone(): any {
 		return new Vec3(this.x, this.y, this.z);
 	}

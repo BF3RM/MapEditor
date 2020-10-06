@@ -86,7 +86,10 @@ function Editor:Raycast()
 		WebUpdater:AddUpdate('SetRaycastPosition', s_Transform.trans)
 	end
 	if(self.m_PendingRaycast.type == RaycastType.Mouse) then
-		WebUpdater:AddUpdate('SetScreenToWorldPosition', s_Transform.trans)
+		WebUpdater:AddUpdate('SetScreenToWorldPosition', {
+			type = "SetScreenToWorldPosition",
+			position = s_Transform.trans
+		})
 	end
 
 	self.m_PendingRaycast = false

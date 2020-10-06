@@ -245,7 +245,7 @@ export class VEXTemulator {
 
 	private SetScreenToWorldPositionMessage(args: SetScreenToWorldTransformMessage) {
 		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera(args.coordinates, editor.threeManager.camera);
+		raycaster.setFromCamera(args.position, editor.threeManager.camera);
 		const intersects = raycaster.intersectObjects(editor.threeManager.scene.children, true);
 		if (intersects.length > 0) {
 			for (const intersect of intersects) {
