@@ -90,7 +90,6 @@ export class InputControls {
 		if (event.which === KEYCODE.CTRL) {
 			editor.threeManager.enableGridSnap();
 		}
-
 	}
 
 	onKeyDown(event: KeyboardEvent) {
