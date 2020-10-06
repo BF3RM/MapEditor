@@ -157,7 +157,8 @@ export default class ExpandableTreeSlot extends Vue {
 		/*white-space: nowrap;*/
 
 		.text-container {
-			width: available;
+      width: available;
+      overflow: hidden;
 		}
 		.expand-container img {
 			transition: transform 0.1s;
