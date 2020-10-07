@@ -2,6 +2,8 @@ import CameraControls from 'camera-controls';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
+import { Vec3 } from '@/script/types/primitives/Vec3';
+import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
 
 // TODO Fool: add config keymap
 
@@ -10,8 +12,9 @@ export class InputControls {
 	constructor(element: HTMLCanvasElement) {
 		element.addEventListener('keydown', this.onCanvasKeyDown.bind(this));
 		window.addEventListener('keydown', this.onKeyDown.bind(this));
+		window.addEventListener('mousemove', this.onMouseMove.bind(this));
 		element.addEventListener('keyup', this.onKeyUp.bind(this));
-		element.addEventListener('mousemove', this.onMouseMove.bind(this));
+		element.addEventListener('mousemove', this.onCanvasMouseMove.bind(this));
 		element.addEventListener('mouseup', this.onMouseUp.bind(this));
 		element.addEventListener('mousedown', this.onMouseDown.bind(this));
 	}
@@ -53,7 +56,42 @@ export class InputControls {
 		}
 	}
 
-	onMouseMove(event: MouseEvent) {
+	prevX = 0;
+	prevY = 0;
+
+	public movementX = 0;
+	public movementY = 0;
+	// Mouse is teleporting to the other side
+	isTeleporting = false;
+
+	onMouseMove(e: MouseEvent) {
+		if (!this.isTeleporting) {
+			this.movementX = (this.prevX ? e.screenX - this.prevX : 0);
+			this.movementY = (this.prevY ? e.screenY - this.prevY : 0);
+
+			this.prevX = e.screenX;
+			this.prevY = e.screenY;
+		}
+	}
+
+	public TeleportMouse(e: MouseEvent, direction: string) {
+		const message = new TeleportMouseMessage(new Vec2(e.clientX, e.clientY), direction);
+		if (direction === 'right') {
+			this.prevX = e.screenX - 5;
+			this.movementX = 0;
+		}
+		if (direction === 'left') {
+			this.prevX = 5;
+			this.movementX = 0;
+		}
+		this.isTeleporting = true;
+		setTimeout(() => {
+			this.isTeleporting = false;
+		}, 1);
+		window.vext.SendMessage(message);
+	}
+
+	onCanvasMouseMove(event: MouseEvent) {
 		if (event.buttons === 0) {
 			editor.threeManager.highlight(InputControls.getMousePos(event));
 		}
