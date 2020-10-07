@@ -317,14 +317,13 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
+			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
 			if (gameObject.parent) {
 				gameObject.parent.updateMatrixWorld();
 				if (this.selectionGroup.isSelected(gameObject)) {
 					this.selectionGroup.RefreshTransform();
 				}
 			}
-			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
-			// this.selectionGroup.setMatrix(gameObjectTransferData.transform.toMatrix());
 		}
 
 		this.threeManager.setPendingRender();
