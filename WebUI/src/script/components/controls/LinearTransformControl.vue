@@ -1,13 +1,13 @@
 <template>
 	<div class="transformControls">
 		<div class="pos-control">
-			<Vec3Control :hideLabel="hideLabel" :value="position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 		<div class="rot-control">
-			<QuatControl :hideLabel="hideLabel" :value="rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
 		</div>
 		<div class="scale-control">
-			<Vec3Control :hideLabel="hideLabel" :value="scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 	</div>
 </template>

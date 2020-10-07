@@ -17,7 +17,8 @@
 				:name="inputName"
 				:step="step"
 				:value="formattedValue"
-				@input="adjustValue($event.target.value)">
+				@input="adjustValue($event.target.value)"
+				@blur="$emit('blur')">
 	</div>
 </template>
 

@@ -1,9 +1,9 @@
 <template>
 	<div class="Vec3Control">
 		<b v-if="label">{{label}}</b>
-		<DraggableNumberInput :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<DraggableNumberInput :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<DraggableNumberInput :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 	</div>
 </template>
 

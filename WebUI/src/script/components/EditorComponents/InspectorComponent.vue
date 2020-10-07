@@ -13,7 +13,7 @@ import {INode} from "infinite-tree";
 					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 					<linear-transform-control class="lt-control" :hideLabel="false"
 											:position="position" :rotation="rotation" :scale="scale"
-											@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated"/>
+											@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
 				</div>
 				<div class="blueprint-container" v-if="!multiSelection && !isEmpty">
 					<div class="title">Blueprint</div>
@@ -79,21 +79,15 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
+	// Why is this called twice?
 	private onInput() {
 		if (this.group !== null) {
 			// Move selection group to the new position.
 			this.group.position.set(this.position.x, this.position.y, this.position.z);
 			this.group.scale.set(this.scale.x, this.scale.y, this.scale.z);
 			this.group.rotation.setFromQuaternion(Quat.setFromTable(this.rotation));
-
 			this.group.updateMatrix();
-			// Update inspector transform.
-			window.editor.threeManager.nextFrame(() => {
-				if (this.group) {
-					this.group.onClientOnlyMove();
-				}
-				window.editor.threeManager.setPendingRender();
-			});
+			this.group.onClientOnlyMove();
 			window.editor.threeManager.setPendingRender();
 		}
 	}
