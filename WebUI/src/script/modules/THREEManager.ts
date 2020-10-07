@@ -313,6 +313,7 @@ export class THREEManager {
 			this.gizmoControls.setSpace(space);
 			console.log('Changed worldspace to ' + space);
 			this.worldSpace = space;
+			signals.worldSpaceChanged.emit(space);
 		} else {
 			console.error('Tried to set an invalid world space');
 		}
