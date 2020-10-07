@@ -203,6 +203,7 @@ export default class HierarchyComponent extends EditorComponent {
 		currentNode.state.selected = true;
 		this.$set(currentNode.state, 'enabled', true);
 		if (scrollTo) {
+			this.infiniteTreeComponent.openParentNodes(currentNode);
 			this.infiniteTreeComponent.scrollTo(currentNode);
 		}
 	}
