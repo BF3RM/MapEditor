@@ -84,9 +84,6 @@ export class InputControls {
 		if (event.which === KEYCODE.KEY_R) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.scale);
 		}
-		if (event.which === KEYCODE.KEY_X) {
-			editor.threeManager.toggleWorldSpace();
-		}
 		if (event.which === KEYCODE.CTRL) {
 			editor.threeManager.enableGridSnap();
 		}
@@ -95,6 +92,9 @@ export class InputControls {
 	onKeyDown(event: KeyboardEvent) {
 		this.keys[event.which] = true;
 
+		if (event.which === KEYCODE.KEY_X) {
+			editor.threeManager.toggleWorldSpace();
+		}
 		if (event.which === KEYCODE.KEY_F) {
 			editor.threeManager.focus();
 		}

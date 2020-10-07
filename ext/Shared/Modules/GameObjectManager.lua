@@ -98,7 +98,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 		return
 	end
-
 	if p_Parent ~= nil and p_Parent.instanceGuid == Guid('FE9BF899-0000-0000-FF64-00FF64076739') then
 		m_Logger:Write("Loading havok WorldPartData")
 	end
@@ -141,6 +140,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		realm = Realm.Realm_ClientAndServer,
 		original = original
 	}
+	if(self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil) then
+		s_GameObject.creatorName = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].creatorName
+	end
+
 
 	s_GameObject.blueprintCtrRef = CtrRef {
 		typeName = p_Blueprint.typeInfo.name,

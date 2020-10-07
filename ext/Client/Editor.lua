@@ -35,6 +35,7 @@ function Editor:OnEngineMessage(p_Message)
 		NetEvents:SendLocal("ProjectManager:RequestProjectHeaders") -- Todo: move this to other class
 		NetEvents:SendLocal("ProjectManager:RequestProjectHeaderUpdate") -- Todo: move this to other class
 		WebUpdater:AddUpdate('SetPlayerName', s_LocalPlayer.name)
+		print("Set player name to: " .. s_LocalPlayer.name)
 	end
 end
 
@@ -121,13 +122,18 @@ function Editor:InitializeUIData(p_CommandActionResults)
 		p_CommandActionResults = {}
 	end
 	local s_LevelDatas = InstanceParser:GetLevelDatas()
+	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+
+	if s_LocalPlayer ~= nil then
+		m_Logger:Error("Local player is nil")
+		WebUpdater:AddUpdate('SetPlayerName', s_LocalPlayer.name)
+	end
 
 	for _, l_LevelData in pairs(s_LevelDatas) do
 		WebUpdater:AddUpdate('LoadLevel', json.encode(l_LevelData))
 	end
 
 	WebUpdater:AddUpdate('RegisterBlueprints', json.encode(InstanceParser.m_Blueprints))
-
 	for _, l_CommandActionResult in pairs(p_CommandActionResults) do
 		WebUpdater:AddUpdate('HandleResponse', json.decode(l_CommandActionResult))
 	end
