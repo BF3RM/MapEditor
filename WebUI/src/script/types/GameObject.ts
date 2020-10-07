@@ -257,6 +257,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			this.parent.visible = false;
 			(this.parent as GameObject).makeParentsInvisible();
 		}
+		editor.selectionGroup.makeParentsVisible();
 	}
 
 	makeParentsVisible() {

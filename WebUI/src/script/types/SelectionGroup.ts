@@ -167,13 +167,13 @@ export class SelectionGroup extends THREE.Object3D {
 		this.makeParentsVisible();
 	}
 
-	private makeParentsInvisible() {
+	public makeParentsInvisible() {
 		for (const go of this.selectedGameObjects) {
 			go.makeParentsInvisible();
 		}
 	}
 
-	private makeParentsVisible() {
+	public makeParentsVisible() {
 		for (const go of this.selectedGameObjects) {
 			go.makeParentsVisible();
 		}
