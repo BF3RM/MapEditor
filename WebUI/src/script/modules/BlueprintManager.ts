@@ -29,7 +29,7 @@ export class BlueprintManager {
 				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp as IBlueprint);
 			}
 		}
-		signals.blueprintsRegistered.emit(this.blueprints.values());
+		signals.blueprintsRegistered.emit(this.GetBLueprintsSorted());
 	}
 
 	public registerBlueprints(blueprints: IBlueprint[]) {
@@ -44,7 +44,19 @@ export class BlueprintManager {
 				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp);
 			}
 		}
-		signals.blueprintsRegistered.emit(this.blueprints.values());
+		signals.blueprintsRegistered.emit(this.GetBLueprintsSorted());
+	}
+
+	private GetBLueprintsSorted():Blueprint[] {
+		return this.blueprints.values().sort((a, b) => {
+			if (a.name < b.name) {
+				return -1;
+			}
+			if (a.name > b.name) {
+				return 1;
+			}
+			return 0;
+		});
 	}
 
 	public getBlueprintByGuid(instanceGuid: Guid) {
