@@ -114,6 +114,11 @@ export default class InfiniteTreeComponent extends Vue {
 			(this.tree).unfilter();
 		}
 		(this.tree).filter(newValue);
+
+		// When the search changes, it makes sense to view the results from the top
+		if (this.$refs.scroller !== undefined) {
+			(this.$refs.scroller as RecycleScroller).scrollToItem(0);
+		}
 	}
 
 	@Prop({
@@ -150,9 +155,6 @@ export default class InfiniteTreeComponent extends Vue {
 		const tree = this.tree;
 		if (tree === undefined) {
 			return [];
-		}
-		if (this.$refs.scroller !== undefined) {
-			(this.$refs.scroller as RecycleScroller).scrollToItem(0);
 		}
 		const out = tree.nodes.filter((node) => !(node.state.filtered === false));
 		return out;
