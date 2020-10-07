@@ -12,6 +12,7 @@ import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
+import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 
 /*
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -70,6 +71,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.gameEntities,
 			gameObjectTransferData.isVanilla
 		);
+	}
+
+	public OnMoving() {
+		for (const child of this.children) {
+			if (child.type === 'SpatialGameEntity') {
+				(child as SpatialGameEntity).updateTransform();
+			}
+		}
 	}
 
 	public descendantOf(parentGameObject: GameObject): boolean {
@@ -144,6 +153,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	public updateTransform() {
 		this.setWorldMatrix(this.transform.toMatrix());
+		for (const child of this.children) {
+			(child as SpatialGameEntity).updateTransform();
+		}
 	}
 
 	/**

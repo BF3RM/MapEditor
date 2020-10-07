@@ -9,6 +9,7 @@ import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
+import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -25,6 +26,11 @@ export class SelectionGroup extends THREE.Object3D {
 	public onClientOnlyMove() {
 		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
+		for (const go of this.selectedGameObjects) {
+			for (const child of go.children) {
+				child.updateTransform();
+			}
+		}
 		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 

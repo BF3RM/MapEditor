@@ -6,14 +6,16 @@ import { MeshBasicMaterial, Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
 
-export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
+export class SpatialGameEntity extends THREE.Object3D implements IGameEntity {
 	private static SELECTED_COLOR: THREE.Color = new THREE.Color(0xFF0000);
 	private static HIGHLIGHTED_COLOR: THREE.Color = new THREE.Color(0x999999);
-	private instanceId: number;
+	public instanceId: number;
 	public transform: LinearTransform;
+	public entityType = 'SpatialGameEntity';
 	private box: THREE.Box3;
 
 	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox) {
+		super();
 		const pointsGeom = new THREE.Geometry();
 		pointsGeom.vertices.push(
 			aabb.min,
@@ -37,11 +39,11 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 		);
 		boxGeom.translate(center.x, center.y, center.z);
 
-		super(boxGeom, new THREE.MeshBasicMaterial({
+		/* super(boxGeom, new THREE.MeshBasicMaterial({
 			color: SpatialGameEntity.SELECTED_COLOR,
 			wireframe: true,
 			visible: true
-		}));
+		})); */
 
 		const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
 		const positions = new Float32Array(8 * 3);
@@ -62,6 +64,8 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
 		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
+		this.updateMatrixWorld();
+		editor.threeManager.instanceManager.AddFromSpatialEntity(this);
 	}
 
 	public onHighlight() {
@@ -83,10 +87,15 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	}
 
 	public SetColor(color: THREE.Color) {
-		const material = this.material;
+		/* const material = this.material;
 		if (!Array.isArray(material)) {
 			(material as MeshBasicMaterial).color = color;
 		}
+		 */
 		editor.threeManager.setPendingRender();
+	}
+
+	public updateTransform() {
+		editor.threeManager.instanceManager.SetMatrixFromSpatialEntity(this);
 	}
 }
