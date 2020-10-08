@@ -244,19 +244,19 @@ export class VEXTemulator {
 	}
 
 	private SetScreenToWorldPositionMessage(args: SetScreenToWorldTransformMessage) {
-		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera(args.coordinates, editor.threeManager.camera);
-		const intersects = raycaster.intersectObjects(editor.threeManager.scene.children, true);
-		if (intersects.length > 0) {
-			for (const intersect of intersects) {
-				if (intersect.object.name === 'groundPlane') {
-					return {
-						type: 'SetScreenToWorldPositionMessage',
-						position: intersect.point
-					};
-				}
-			}
-		}
+		// const raycaster = new THREE.Raycaster();
+		// raycaster.setFromCamera(args.coordinates, editor.threeManager.camera);
+		// const intersects = raycaster.intersectObjects(editor.threeManager.scene.children, true);
+		// if (intersects.length > 0) {
+		// 	for (const intersect of intersects) {
+		// 		if (intersect.object.name === 'groundPlane') {
+		// 			return {
+		// 				type: 'SetScreenToWorldPositionMessage',
+		// 				position: intersect.point
+		// 			};
+		// 		}
+		// 	}
+		// }
 		return null;
 	}
 
