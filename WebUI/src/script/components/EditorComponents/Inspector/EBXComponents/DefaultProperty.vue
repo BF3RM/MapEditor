@@ -12,6 +12,7 @@
             </template>
             <template v-else>
                 {{ field.value }}
+				{{field}}
             </template>
         </div>
     </div>

@@ -2,15 +2,16 @@
 	<EditorComponent class="grid-component" :title="title">
 		<div class="header">
 			<Search v-model="data.search" @search="onSearch"/>
-			<input type="range" min="1" max="50" v-model="scale" class="slider" id="myRange">
 		</div>
-		<div class="grid-container" :style="containerStyle">
+		<div class="grid-container">
 			<div class="grid-item" v-for="(item, index) in filteredItems()" :key="index"
 							@click="onClick(item)"
 							@mousedown="onMouseDown($event, item)">
-				<img :class="'Icon Icon-' + item.typeName"/>
-				<div><Highlighter class="name" :text="item.getName()"/></div>
+				<slot :item="item" :data="data">
+				</slot>
 			</div>
+		</div>
+		<div v-html="style">
 		</div>
 	</EditorComponent>
 </template>
@@ -44,8 +45,27 @@ export default class GridComponent extends EditorComponent {
 		super();
 	}
 
-	get containerStyle() {
-		return 'grid-template-columns: repeat(auto-fit, minmax(' + this.scale + 'em, 1fr))';
+	get style() {
+		return `
+<style>
+.grid-container {
+	grid-template-columns: repeat(auto-fit, minmax(` + this.data.scale + `em, 1fr))
+}
+.grid-item {
+	width: ` + this.data.scale + `em;
+}
+.grid-item .Icon{
+	width: ` + this.data.scale + `em;
+	height: ` + this.data.scale / 3 + `em;
+}
+</style>
+`;
+	}
+
+	get iconStyle() {
+		return {
+
+		};
 	}
 
 	private onMouseDown(e: any, item: Blueprint) {
@@ -105,17 +125,13 @@ export default class GridComponent extends EditorComponent {
 .grid-container {
 	/* overflow: hidden; */
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(14em, 1fr));
 }
 .grid-item {
-	width: 14em;
 	overflow: hidden;
 	/* height: 10em; */
 	text-align: center;
 }
 .grid-item .Icon{
-	width: 14em;
-	height: 5em;
 	padding-top: 1em;
 }
 </style>

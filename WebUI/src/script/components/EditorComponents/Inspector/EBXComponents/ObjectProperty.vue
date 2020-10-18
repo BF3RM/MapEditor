@@ -1,7 +1,7 @@
 <template>
     <div class="table">
         <div v-if="field.value">
-			<Property v-for="(value, key) in field.value" :partition="partition" :field="value" :key="key"></Property>
+			<property v-for="(value, key) in field.value" :partition="partition" :field="value" :key="key"></property>
         </div>
 		<div v-else>
 			nil
@@ -14,11 +14,12 @@ import Vue, { PropType } from 'vue';
 
 import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
+import Property from '@/script/components/EditorComponents/Inspector/EBXComponents/Property.vue';
 
 export default Vue.extend({
 	name: 'ObjectProperty',
 	components: {
-		Property: () => require('./Property.vue')
+		property: Property
 	},
 	props: {
 		partition: {

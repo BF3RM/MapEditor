@@ -14,14 +14,16 @@ export default class SelectionWrapper {
 		let gizmoWasSelected = false;
 
 		canvas.addEventListener('mousedown', function (event) {
-			if (event.which !== 1 || editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+			if (event.which !== 1 || !event.shiftKey || editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = true;
+				helper.element.style.display = 'none';
 				return;
 			}
 			for (const item of selectionBox.collection) {
 				// item.material.emissive.set(0x000000);
 			}
+			helper.element.style.display = 'inherit';
 
 			selectionBox.startPoint.set(
 				(event.clientX / window.innerWidth) * 2 - 1,

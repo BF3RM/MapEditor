@@ -33,6 +33,8 @@ export class VEXTemulator {
 
 		this.events = {};
 		this.events.UIReloaded = this.UIReloaded;
+		this.events.controlUpdate = () => {};
+		this.events.controlStart = () => {};
 	}
 
 	public Receive(commands: any[]) {

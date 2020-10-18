@@ -1,5 +1,5 @@
 <template>
-	<EditorComponent id="viewport-component" title="Viewport">
+	<EditorComponent id="viewport-component" title="Viewport" >
 		<div id="stats" ref="stats"/>
 	</EditorComponent>
 </template>

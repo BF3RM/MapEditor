@@ -40,7 +40,7 @@ export default Vue.extend({
 		},
 		currentPath: {
 			type: String,
-			required: true
+			required: false
 		},
 		autoOpen: {
 			type: Boolean,
