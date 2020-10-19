@@ -9,8 +9,12 @@ export default class SelectionWrapper {
 		const selectionBox = new SelectionBox(camera, scene);
 		const helper = new SelectionHelper(selectionBox, renderer, 'selectBox');
 
+		let gizmoWasSelected = false;
+
 		canvas.addEventListener('mousedown', function (event) {
 			if (editor.threeManager.gizmoControls.selected) {
+				helper.isDown = false;
+				gizmoWasSelected = true;
 				return;
 			}
 			for (const item of selectionBox.collection) {
@@ -24,12 +28,11 @@ export default class SelectionWrapper {
 		});
 
 		canvas.addEventListener('mousemove', function (event) {
+			console.log(editor.threeManager.gizmoControls.selected);
+
 			if (editor.threeManager.gizmoControls.selected) {
 				helper.isDown = false;
-				selectionBox.endPoint.set(
-					(event.clientX / window.innerWidth) * 2 - 1,
-					-(event.clientY / window.innerHeight) * 2 + 1,
-					0.5);
+				gizmoWasSelected = true;
 				return;
 			}
 			if (helper.isDown) {
@@ -62,6 +65,11 @@ export default class SelectionWrapper {
 		});
 
 		canvas.addEventListener('mouseup', function (event) {
+			if (editor.threeManager.gizmoControls.selected || gizmoWasSelected) {
+				helper.isDown = false;
+				gizmoWasSelected = false;
+				return;
+			}
 			selectionBox.endPoint.set(
 				(event.clientX / window.innerWidth) * 2 - 1,
 				-(event.clientY / window.innerHeight) * 2 + 1,

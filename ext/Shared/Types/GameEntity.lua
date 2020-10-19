@@ -10,8 +10,13 @@ function GameEntity:__init(arg)
     self.isSpatial = arg.isSpatial or false
     self.transform = arg.transform -- local transform
     self.aabb = arg.aabb
-end
 
+	self.entity:RegisterDestroyCallback(self, self.OnDestroyed)
+end
+function GameEntity:OnDestroyed()
+	print("Entity destroyed")
+	self.entity = nil
+end
 function GameEntity:GetGameEntityTransferData()
     local s_GameEntityTransferData = {
         indexInBlueprint = self.indexInBlueprint,
