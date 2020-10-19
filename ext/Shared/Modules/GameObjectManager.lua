@@ -442,5 +442,19 @@ function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateColli
 
 	return s_GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 end
+function GameObjectManager:SetVariation(p_Guid, p_Variation)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
+	if s_GameObject == nil then
+		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
+		return false
+	end
+	local s_TransferData = s_GameObject:GetGameObjectTransferData()
+	s_TransferData.variation = p_Variation
+
+	self:DeleteGameObject(p_Guid)
+	--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
+	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false)
+	return true
+end
 return GameObjectManager

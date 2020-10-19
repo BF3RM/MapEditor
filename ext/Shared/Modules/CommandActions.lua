@@ -18,6 +18,7 @@ function CommandActions:RegisterVars()
 	self.SelectGameObjectCommand = self.SelectGameObject
 	self.EnableBlueprintCommand = self.EnableBlueprint
 	self.DisableBlueprintCommand = self.DisableBlueprint
+	self.SetVariationCommand = self.SetVariation
 end
 
 function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
@@ -222,6 +223,33 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "SetTransform",
+		gameObjectTransferData = s_GameObjectTransferData
+	}
+
+	return s_CommandActionResult, ActionResultType.Success
+end
+
+
+function CommandActions:SetVariation(p_Command, p_UpdatePass)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The SetTransform needs to have a valid gameObjectTransferData set.")
+		return
+	end
+
+	local s_Result = GameObjectManager:SetVariation(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.variation)
+	if (s_Result == false) then
+		m_Logger:Write("Failed to set variation for object " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
+	end
+
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		variation = p_Command.gameObjectTransferData.variation
+	}
+
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = "SetVariation",
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 

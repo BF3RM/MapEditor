@@ -16,8 +16,8 @@ export class CtrRef {
 	public setFromTable(table: any) {
 		this.typeName = table.typeName;
 		this.name = table.name;
-		this.partitionGuid = table.partitionGuid;
-		this.instanceGuid = table.instanceGuid;
+		this.partitionGuid = new Guid(table.partitionGuid);
+		this.instanceGuid = new Guid(table.instanceGuid);
 
 		return this;
 	}

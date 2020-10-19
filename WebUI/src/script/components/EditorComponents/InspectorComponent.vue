@@ -28,6 +28,10 @@ import {INode} from "infinite-tree";
 
 					<label class="name-label" for="bp-partition-guid">Partition GUID:</label>
 					<input class="name-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
+
+					<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
+						<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
+					</el-select>
 				</div>
 			</div>
 		</div>
@@ -45,6 +49,7 @@ import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
 import { GameObject } from '@/script/types/GameObject';
+import SetVariationCommand from '@/script/commands/SetVariationCommand';
 
 @Component({ components: { LinearTransformControl, EditorComponent } })
 export default class InspectorComponent extends EditorComponent {
@@ -58,6 +63,8 @@ export default class InspectorComponent extends EditorComponent {
 	private blueprintType: string = '';
 	private blueprintGuid: string = '';
 	private blueprintPartitionGuid: string = '';
+	private blueprintVariations: {hash: number, name: string}[] = [];
+	private selectedVariation = 0;
 
 	@Ref('enableInput')
 	enableInput!: HTMLInputElement;
@@ -68,6 +75,9 @@ export default class InspectorComponent extends EditorComponent {
 		signals.selectedGameObject.connect(this.onSelection.bind(this));
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+		if (!this.group) {
+			this.group = window.editor.selectionGroup;
+		}
 	}
 
 	private onObjectChanged(gameObject: GameObject, field: string, value: any) {
@@ -77,6 +87,15 @@ export default class InspectorComponent extends EditorComponent {
 		if (field === 'enabled' && this.group.isSelected(gameObject) && this.group.selectedGameObjects.length === 1) {
 			this.enabled = value;
 		}
+	}
+
+	private onChangeVariation(newVariation: number) {
+		console.log(newVariation);
+		if (window.editor.selectionGroup.selectedGameObjects.length !== 1) {
+			return;
+		}
+		const command = new SetVariationCommand(window.editor.selectionGroup.selectedGameObjects[0].getGameObjectTransferData(), newVariation);
+		window.editor.execute(command);
 	}
 
 	// Why is this called twice?
@@ -93,17 +112,22 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	private onSelection() {
-		this.$nextTick(() => {
-			if (this.multiSelection || this.isEmpty || !this.group) {
-				return;
-			}
-			const selectedGameObject = this.group.selectedGameObjects[0];
-			if (!selectedGameObject) return;
-			this.blueprintGuid = selectedGameObject.blueprintCtrRef.instanceGuid.toString();
-			this.blueprintName = selectedGameObject.blueprintCtrRef.name.toString();
-			this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
-			this.blueprintPartitionGuid = selectedGameObject.blueprintCtrRef.partitionGuid.toString();
-		});
+		if (this.multiSelection || this.isEmpty || !this.group) {
+			return;
+		}
+		const selectedGameObject = this.group.selectedGameObjects[0];
+		if (!selectedGameObject) return;
+		this.blueprintGuid = selectedGameObject.blueprintCtrRef.instanceGuid.toString();
+		this.blueprintPartitionGuid = selectedGameObject.blueprintCtrRef.partitionGuid.toString();
+		this.blueprintName = selectedGameObject.blueprintCtrRef.name.toString();
+		this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
+		const bp = window.editor.blueprintManager.getBlueprintByGuid(selectedGameObject.blueprintCtrRef.instanceGuid);
+		if (bp) {
+			this.blueprintVariations = bp.variations;
+		} else {
+			this.blueprintVariations = [{ hash: 0, name: 'default' }];
+		}
+		this.selectedVariation = selectedGameObject.variation;
 	}
 
 	get isEmpty() {

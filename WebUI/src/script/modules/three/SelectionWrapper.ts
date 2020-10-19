@@ -28,8 +28,6 @@ export default class SelectionWrapper {
 		});
 
 		canvas.addEventListener('mousemove', function (event) {
-			console.log(editor.threeManager.gizmoControls.selected);
-
 			if (editor.threeManager.gizmoControls.selected) {
 				helper.isDown = false;
 				gizmoWasSelected = true;
