@@ -13,11 +13,13 @@ export default class Command {
 	public id: number;
 	public inMemory: boolean;
 	public updatable: boolean;
+	public timeStamp: number;
 
 	constructor(public type: string = '', public name: string = '') {
 		this.id = -1;
 		this.inMemory = false;
 		this.updatable = false;
+		this.timeStamp = Date.now();
 	}
 
 	public execute() {
