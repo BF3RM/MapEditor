@@ -18,6 +18,7 @@ function InstanceParser:RegisterVars()
 	self.m_MeshVariationDatabases = {}
 	self.m_StaticModelGroupDatabase = {}
 	self.m_StaticModelGroupEntityDataGuids = {}
+	self.m_ObjectVariations = {}
 
 	self.m_IllegalTypes = Set {
 		"DebrisClusterData",
@@ -84,7 +85,7 @@ function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 				for _, l_Variation in pairs(s_Variations) do
 					local s_Variation = {
 						hash =l_Variation,
-						name ="fuck"
+						name = self.m_ObjectVariations[l_Variation]
 					}
 					table.insert(self.m_Variations[s_Mesh], s_Variation)
 				end
@@ -162,6 +163,11 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
 		end
 
+		if(l_Instance.typeInfo.name == "ObjectVariation") then
+			local s_Instance = ObjectVariation(l_Instance)
+			self.m_ObjectVariations[s_Instance.nameHash] = s_Instance.name
+		end
+
 		if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
 			self.m_StaticModelGroupEntityDataGuids.instanceGuid = l_Instance.instanceGuid
 			self.m_StaticModelGroupEntityDataGuids.partitionGuid = p_Partition.guid
@@ -235,7 +241,7 @@ function InstanceParser:FillVariations()
 			local s_Hash = l_mvdEntry.variationAssetNameHash
 			local s_Variation = {
 				hash =s_Hash,
-				name ="fuck"
+				name = self.m_ObjectVariations[s_Hash]
 			}
 
 			table.insert(self.m_Variations[l_MeshGuid], s_Variation)
