@@ -131,6 +131,7 @@ export class THREEManager {
 		this.renderer.domElement.addEventListener('mouseleave', this.onMouseLeave.bind(this));
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseOver.bind(this));
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+		document.addEventListener('mouseup', this.onMouseUp.bind(this));
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 		signals.objectChanged.connect(this.setPendingRender.bind(this)); // Object changed? setPendingRender!
 	}
@@ -143,8 +144,6 @@ export class THREEManager {
 	public onDragStop(event: any) {
 		if (this.dragging) {
 			editor.editorCore.onPreviewStop();
-			editor.editorCore.onPreviewDragStop();
-			this.dragging = false;
 		}
 	}
 

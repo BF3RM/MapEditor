@@ -156,7 +156,7 @@ export class EditorCore {
 	}
 
 	public onPreviewDrop() {
-		if (this.previewBlueprint === null) {
+		if (this.previewBlueprint === null || !this.isPreviewBlueprintSpawned) {
 			return;
 		}
 		editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
