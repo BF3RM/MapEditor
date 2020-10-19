@@ -64,4 +64,9 @@ export default class App extends Vue {
 		position: relative;
 		z-index: 0;
 	}
+	.selectBox {
+		border: 1px solid #55aaff;
+		background-color: rgba(75, 160, 255, 0.3);
+		position: fixed;
+	}
 </style>

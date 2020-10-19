@@ -11,6 +11,7 @@ import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
+import SelectionWrapper from '@/script/modules/three/SelectionWrapper';
 
 export class THREEManager {
 	public scene = new THREE.Scene();
@@ -24,6 +25,7 @@ export class THREEManager {
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
 	public inputControls = new InputControls(this.renderer.domElement);
+	public selectionWrapper = new SelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
 	public worldSpace = WORLD_SPACE.local;
 
 	private gridSnap = false;
@@ -392,6 +394,7 @@ export class THREEManager {
 	}
 
 	private async selectWithRaycast(mousePos: Vec2, multiSelection: boolean) {
+		console.log('Raycast');
 		const guid = await this.raycastSelection(mousePos) as Guid;
 
 		if (guid !== null) {

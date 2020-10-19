@@ -112,7 +112,8 @@ export class SelectionGroup extends THREE.Object3D {
 			this.deselectAll();
 		}
 
-		if (multiSelection) {
+		// Disabled multiselection deselection for now
+		/* if (multiSelection) {
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
 				// Edge case:
@@ -136,6 +137,7 @@ export class SelectionGroup extends THREE.Object3D {
 				}
 			}
 		}
+		 */
 
 		// If first object move group to its position
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
@@ -163,9 +165,11 @@ export class SelectionGroup extends THREE.Object3D {
 		if (index === -1) return;
 		signals.deselectedGameObject.emit(gameObject.guid);
 		gameObject.onDeselect();
-		this.makeParentsInvisible();
 		this.selectedGameObjects.splice(index, 1);
-		this.makeParentsVisible();
+		if (!window.vext.executing) {
+			// this.makeParentsInvisible();
+			// this.makeParentsVisible();
+		}
 	}
 
 	public makeParentsInvisible() {

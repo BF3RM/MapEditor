@@ -13,6 +13,7 @@ import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { InputControls } from '@/script/modules/InputControls';
+import { Dictionary } from 'typescript-collections';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -24,7 +25,7 @@ export class EditorCore {
 	private deltaTime: number;
 	private pendingUpdates = new Map<Guid, GameObject>();
 	private updateRequested = false;
-	public highlightedObjectGuid: Guid | null = null;
+	public highlightedObjects: Dictionary<Guid, GameObject> = new Dictionary<Guid, GameObject>();
 
 	// @ts-ignore
 	public stats = new Stats();
@@ -168,9 +169,10 @@ export class EditorCore {
 
 	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
-		this.unhighlight();
+		// this.unhighlight();
 		// When selecting nothing, deselect all if its not multi selection.
 		if (guid.equals(Guid.createEmpty())) {
+			console.log('Deselecting');
 			if (!multiSelection) {
 				editor.selectionGroup.deselectAll();
 				editor.threeManager.hideGizmo();
@@ -191,6 +193,7 @@ export class EditorCore {
 	}
 
 	public deselect(guid: Guid) {
+		console.log('Deselecting');
 		const scope = editor;
 		const gameObject = scope.gameObjects.getValue(guid);
 		if (gameObject === undefined) {
@@ -202,9 +205,9 @@ export class EditorCore {
 		}
 	}
 
-	public highlight(guid: Guid) {
+	public highlight(guid: Guid, multiple = false) {
 		// Ignore if already highlighted
-		if (this.highlightedObjectGuid === guid) {
+		if (this.highlightedObjects.containsKey(guid)) {
 			return;
 		}
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
@@ -217,19 +220,29 @@ export class EditorCore {
 			LogError('Failed to highlight gameobject: ' + guid);
 			return false;
 		}
-		this.unhighlight();
+		if (!multiple) {
+			this.unhighlight();
+		}
 		gameObject.onHighlight();
-		this.highlightedObjectGuid = guid;
+		this.highlightedObjects.setValue(guid, gameObject);
 		editor.threeManager.setPendingRender();
 	}
 
-	public unhighlight() {
-		if (this.highlightedObjectGuid == null) return;
-		const gameObject = editor.gameObjects.getValue(this.highlightedObjectGuid) as GameObject;
-		if (gameObject) {
-			gameObject.onUnhighlight();
+	public unhighlight(guid?: Guid) {
+		if (guid !== undefined) {
+			const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+			if (!gameObject.selected) {
+				gameObject.onUnhighlight();
+				this.highlightedObjects.remove(guid);
+			}
+		} else {
+			for (const gameObject of this.highlightedObjects.values()) {
+				if (!gameObject.selected) {
+					gameObject.onUnhighlight();
+					this.highlightedObjects.remove(gameObject.guid);
+				}
+			}
 		}
-		this.highlightedObjectGuid = null;
 		editor.threeManager.setPendingRender();
 	}
 }

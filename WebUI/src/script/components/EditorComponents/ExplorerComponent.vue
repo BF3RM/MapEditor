@@ -5,7 +5,7 @@
 				<div class="header">
 					<Search v-model="search"/>
 				</div>
-				<infinite-tree-component class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+				<infinite-tree-component class="scrollable datafont" ref="it" :search="search" :autoOpen="false" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
 					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
 			</EditorComponent>

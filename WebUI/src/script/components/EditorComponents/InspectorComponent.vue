@@ -170,7 +170,9 @@ export default class InspectorComponent extends EditorComponent {
 				this.scale = this.group.transform.scale.toTable();
 				this.rotation = this.group.transform.rotation.toTable();
 			}
-			this.enabled = this.group.selectedGameObjects[0].enabled;
+			if (this.group.selectedGameObjects.length > 0) {
+				this.enabled = this.group.selectedGameObjects[0].enabled;
+			}
 		});
 	}
 
