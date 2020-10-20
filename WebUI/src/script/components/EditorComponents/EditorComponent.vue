@@ -1,5 +1,5 @@
 <template>
-	<gl-component :title="title">
+	<gl-component ref="glChild">
 		<slot>
 		</slot>
 	</gl-component>
@@ -7,11 +7,16 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 import { glCustomContainer } from 'vue-golden-layout';
+import { goldenChild } from 'vue-golden-layout/roles/child';
 
 @Component
 export default class EditorComponent extends glCustomContainer {
-	@Prop({ default: true }) showHeader: boolean;
-	@Prop({ default: false }) isDestructible: boolean;
+	@Prop({ default: false }) hasHeaders: boolean;
+	@Prop({ default: false }) closable: boolean;
+	@Prop({ default: false }) hidden: boolean;
 	@Prop({ default: 'EditorComponent' }) title: string;
+
+	mounted() {
+	}
 }
 </script>
