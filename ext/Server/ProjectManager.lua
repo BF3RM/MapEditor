@@ -173,7 +173,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 	m_Logger:Write(json.encode(s_GameObjectSaveDatas))
 	m_Logger:Write("^^^^^^^^^^^^^^^^^")
 
-	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_CurrentProjectHeader.requiredBundles, s_GameObjectSaveDatas)
+	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
 	NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
 end
 

@@ -89,7 +89,6 @@ end
 
 function MapEditorClient:OnPartitionLoaded(p_Partition)
 	InstanceParser:OnPartitionLoaded(p_Partition)
-	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message)

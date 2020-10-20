@@ -13,7 +13,7 @@ function MapEditorShared:RegisterVars()
 	self.m_Variations = {}
 	self.m_MeshVariationDatabases = {}
 
-	self.m_IllegalTypes = Set {
+	self.m_IllegalTypes = Util.Set {
 		"DebrisClusterData",
 		"MeshProxyEntityData"
 	}
@@ -29,7 +29,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 	if p_Partition == nil then
 		return
 	end
-	
+
 	local s_Instances = p_Partition.instances
 
 
@@ -40,18 +40,18 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 		end
 
 		-- Catch all blueprints
-		if(l_Instance.typeInfo.name == "ObjectBlueprint" or 
+		if(l_Instance.typeInfo == ObjectBlueprint.typeInfo or
 			--l_Instance.typeInfo.name == "PrefabBlueprint" or
 			--l_Instance.typeInfo.name == "SpatialPrefabBlueprint" or
-			l_Instance.typeInfo.name == "EffectBlueprint" or
-			l_Instance.typeInfo.name == "VehicleBlueprint") then
+			l_Instance.typeInfo == EffectBlueprint.typeInfo or
+			l_Instance.typeInfo == VehicleBlueprint.typeInfo) then
 
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
 			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
 			-- We're not storing the actual instance since we'd rather look it up manually in case of a reload.
-			if(l_Instance.typeInfo.name == "ObjectBlueprint") then
+			if(l_Instance.typeInfo == ObjectBlueprint.typeInfo) then
 				if(s_Instance.object == nil or self.m_IllegalTypes[s_Instance.object.typeInfo.name] == true) then
-					return
+					goto continue
 				end
 			end
 			self.m_Blueprints[tostring(l_Instance.instanceGuid)] = {
@@ -64,21 +64,20 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 		end
 
 		-- Catch all mesh assets
-		if(l_Instance.typeInfo.super.name == "MeshAsset") then
+		if(l_Instance.typeInfo.super == MeshAsset.typeInfo) then
 			local s_Instance = MeshAsset(l_Instance)
 			self.m_Meshes[s_Instance.name:lower()] = tostring(l_Instance.instanceGuid)
 		end
 
 		-- Catch all variations
-		if(l_Instance.typeInfo.name == "MeshVariationDatabase") then
+		if(l_Instance.typeInfo == MeshVariationDatabase.typeInfo) then
 			local s_Instance = MeshVariationDatabase(l_Instance)
+			Patches:PatchMeshVariationDatabase(s_Instance)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
-		end  
+		end
 
 		::continue::
 	end
-
-
 end
 
 function MapEditorShared:FillVariations()
@@ -107,34 +106,11 @@ function MapEditorShared:FillVariations()
 			if(self.m_Variations[l_MeshGuid] ~= nil ) then
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
 				print(k)
-			else 
+			else
 				print("No variation for " .. v.name)
 			end
 		end
 	end
 end
-
-function dump(o)
-	if(o == nil) then
-		print("tried to load jack shit")
-	end
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
-function Set (list)
-  local set = {}
-  for _, l in ipairs(list) do set[l] = true end
-  return set
-end
-
 return MapEditorShared
 
