@@ -143,10 +143,10 @@ export class SelectionGroup extends THREE.Object3D {
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
 			this.setMatrix(gameObject.matrixWorld);
 		}
-		signals.selectedGameObject.emit(gameObject.guid, multiSelection, scrollTo);
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
 		this.makeParentsVisible();
+		signals.selectedGameObject.emit(gameObject.guid, multiSelection, scrollTo);
 	}
 
 	public deselectAll() {
