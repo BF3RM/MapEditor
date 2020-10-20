@@ -3,6 +3,8 @@ import { SelectionHelper } from 'three/examples/jsm/interactive/SelectionHelper'
 import { Camera, Scene, WebGLRenderer } from 'three';
 import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { GameObject } from '@/script/types/GameObject';
+import { InputControls } from '@/script/modules/InputControls';
+import { KEYCODE } from '@/script/types/Enums';
 
 export default class SelectionWrapper {
 	constructor(canvas: HTMLCanvasElement, scene: Scene, camera: Camera, renderer: WebGLRenderer) {
@@ -12,7 +14,7 @@ export default class SelectionWrapper {
 		let gizmoWasSelected = false;
 
 		canvas.addEventListener('mousedown', function (event) {
-			if (editor.threeManager.gizmoControls.selected) {
+			if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = true;
 				return;
@@ -28,7 +30,7 @@ export default class SelectionWrapper {
 		});
 
 		canvas.addEventListener('mousemove', function (event) {
-			if (editor.threeManager.gizmoControls.selected) {
+			if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = true;
 				return;
@@ -63,7 +65,7 @@ export default class SelectionWrapper {
 		});
 
 		canvas.addEventListener('mouseup', function (event) {
-			if (editor.threeManager.gizmoControls.selected || gizmoWasSelected) {
+			if (editor.threeManager.gizmoControls.selected || gizmoWasSelected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = false;
 				return;

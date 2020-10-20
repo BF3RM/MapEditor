@@ -30,7 +30,7 @@ export class THREEManager {
 
 	private gridSnap = false;
 	private highlightingEnabled = true;
-	private dragging = false;
+	public isDragSpawning = false;
 	private raycastPlacing = false;
 	private lastRaycastTime = new Date();
 	private pendingRaycast = false;
@@ -137,12 +137,12 @@ export class THREEManager {
 	}
 
 	public onDragStart(event: any, item: Blueprint) {
-		this.dragging = true;
+		this.isDragSpawning = true;
 		editor.editorCore.onPreviewDragStart(item);
 	}
 
 	public onDragStop(event: any) {
-		if (this.dragging) {
+		if (this.isDragSpawning) {
 			editor.editorCore.onPreviewStop();
 		}
 	}
@@ -152,14 +152,14 @@ export class THREEManager {
 	}
 
 	public onMouseEnter(event: any) {
-		if (this.dragging) {
+		if (this.isDragSpawning) {
 			editor.editorCore.onPreviewStart();
 		}
 	}
 
 	public onMouseOver(event: any) {
 		editor.editorCore.GetMouseToScreenPosition(event);
-		if (this.dragging) {
+		if (this.isDragSpawning) {
 			editor.editorCore.onPreviewDrag(event);
 		}
 		if (this.gizmoControls.raycastPlacing) {
@@ -168,8 +168,8 @@ export class THREEManager {
 	}
 
 	public onMouseUp(event: any) {
-		if (this.dragging) {
-			this.dragging = false;
+		if (this.isDragSpawning) {
+			this.isDragSpawning = false;
 			editor.editorCore.onPreviewDrop();
 			editor.editorCore.onPreviewDragStop();
 		}
