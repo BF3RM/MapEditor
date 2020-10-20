@@ -120,10 +120,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 	local original = CtrRef{}
 	if(p_Parent ~= nil) then
+		local partitionGuid = p_Parent.partitionGuid
+		if(partitionGuid == nil and p_Parent.partition ~= nil) then
+			partitionGuid = p_Parent.partition.guid
+		end
 		original = CtrRef {
 			typeName = p_Parent.typeInfo.name,
 			instanceGuid = s_ParentInstanceGuid,
-			partitionGuid = tostring(p_Parent.partitionGuid)
+			partitionGuid = tostring(partitionGuid)
 		}
 	end
 	local s_GameObject = GameObject{
@@ -322,6 +326,8 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		until self.m_GameObjects[tostring(s_CustomGuid)] == nil
 		p_GameObject.guid = s_CustomGuid
 	end
+	p_GameObject.localTransform = ToLocal(p_GameObject.transform, p_ParentGameObject.transform)
+	p_GameObject.parent = p_ParentGameObject
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 	table.insert(p_ParentGameObject.children, p_GameObject)
 end

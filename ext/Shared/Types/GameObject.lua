@@ -10,6 +10,7 @@ function GameObject:__init(arg)
     self.isVanilla = arg.isVanilla -- never gets sent to js
     self.gameEntities = arg.gameEntities or { }
     self.children = arg.children -- never gets sent to js
+	self.parent = arg.parent
     self.realm = arg.realm
     self.isUserModified = true
     self.userModifiedFields = {}
@@ -24,6 +25,7 @@ function GameObject:__init(arg)
     self:RegisterUserModifiableField("name", arg.name)
     self:RegisterUserModifiableField("parentData", arg.parentData)
     self:RegisterUserModifiableField("transform", arg.transform)
+	self:RegisterUserModifiableField("localTransform", arg.localTransform)
     self:RegisterUserModifiableField("variation", arg.variation)
     self:RegisterUserModifiableField("isDeleted", arg.isDeleted)
     self:RegisterUserModifiableField("isEnabled", arg.isEnabled)
@@ -196,7 +198,12 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
     end
 
     self:SetField("transform", LinearTransform(p_LinearTransform))
-
+	if(self.parent ~= nil) then
+		self.localTransform = ToLocal(self.transform, self.parent.transform)
+	else
+		print("Parent is nil?")
+		print(self.parentData.guid)
+	end
     return true
 end
 
@@ -207,6 +214,7 @@ function GameObject:GetGameObjectTransferData()
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),
         transform = self.transform,
+        localTransform = self.localTransform,
         variation = self.variation,
         isEnabled = self.isEnabled,
         isDeleted = self.isDeleted,

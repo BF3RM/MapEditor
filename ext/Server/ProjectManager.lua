@@ -159,6 +159,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		if l_GameObject:IsUserModified() == true then
 			count = count + 1
 			s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
+			print(l_GameObject.localTransform)
 		end
 		Async:Yield()
 	end
