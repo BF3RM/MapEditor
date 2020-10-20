@@ -1,3 +1,4 @@
+import {LOGLEVEL} from "@/script/types/Enums";
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
 		<div class="Container" v-if="!showNewSave">
@@ -13,23 +14,32 @@
 			<input placeholder="Project Name" v-model="newSaveName"/>
 		</div>
 		<div class="footer" v-if="!showNewSave">
-			<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
-			<button @click="NewSave()">New Save</button>
+			<div v-if="selectedProject && selectedProject.length > 0">{{selectedProject[0].mapName}}<span v-if="selectedSave"> - {{selectedSave.gameModeName}}</span></div>
+			<div>
+				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
+				<button @click="NewSave()">New Save</button>
+			</div>
 		</div>
 		<div class="footer" v-if="showNewSave">
-			<button @click="Save(true)">Save</button>
-			<button @click="showNewSave = false">Abort</button>
+			<div>
+				<button @click="Save(true)">Save</button>
+				<button @click="showNewSave = false">Abort</button>
+			</div>
+			<div>
+				<span>{{hint}}</span>
+			</div>
 		</div>
 	</WindowComponent>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { glCustomContainer } from 'vue-golden-layout';
+import { Component, Vue } from 'vue-property-decorator';
 import WindowComponent from './WindowComponent.vue';
 import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
 import { signals } from '@/script/modules/Signals';
+import { Log } from '@/script/modules/Logger';
+import { LOGLEVEL } from '@/script/types/Enums';
 
-@Component({ components: { WindowComponent } })
+	@Component({ components: { WindowComponent } })
 export default class ProjectSettingsComponent extends Vue {
 	private title = 'Project Settings';
 	private projects = [];
@@ -37,6 +47,8 @@ export default class ProjectSettingsComponent extends Vue {
 	private selectedSave: any = null;
 	private selectedProjectName = '';
 	private showNewSave = false;
+
+	private hint = '';
 	private state = {
 		visible: false
 	};
@@ -50,7 +62,7 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	private currentProjectHeader = {
-		projectName: 'Untitled Project'
+		projectName: ''
 	};
 
 	NotImplemented() {
@@ -58,8 +70,9 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	mounted() {
+		signals.saveRequested.connect(this.Save.bind(this));
 		signals.setProjectHeaders.connect(this.onGetProjects.bind(this));
-		signals.menuRegistered.emit(['File', 'New Project'], () => {
+		signals.menuRegistered.emit(['File', 'Save as'], () => {
 			this.showNewSave = true;
 			this.title = 'New Project';
 			this.state.visible = true;
@@ -71,7 +84,16 @@ export default class ProjectSettingsComponent extends Vue {
 			this.state.visible = true;
 		});
 		signals.setCurrentProjectHeader.connect((projectHeader) => {
+			this.hint = '';
 			this.currentProjectHeader = projectHeader;
+			this.selectedProjectName = projectHeader.projectName;
+			Log(LOGLEVEL.INFO, 'Loaded project: ' + projectHeader.projectName);
+			if (projectHeader.projectName !== 'Untitled Project') {
+				signals.menuRegistered.emit(['File', 'Save'], () => {
+					this.Save();
+				});
+				this.state.visible = false;
+			}
 		});
 	}
 
@@ -95,8 +117,9 @@ export default class ProjectSettingsComponent extends Vue {
 		if (newSave) {
 			(projectHeader as any).projectName = this.newSaveName;
 		}
-		console.log('Saving project as ' + (projectHeader as any).projectName);
 		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectSave', JSON.stringify(projectHeader));
+		this.hint = 'Saving...';
+		Log(LOGLEVEL.INFO, 'Saving project: ' + (projectHeader as any).projectName);
 	}
 
 	onSelectProject(project:any) {

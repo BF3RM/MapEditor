@@ -21,7 +21,7 @@ end
 
 function ProjectManager:RegisterEvents()
 	NetEvents:Subscribe('ProjectManager:RequestProjectHeaders', self, self.OnRequestProjectHeaders)
-    NetEvents:Subscribe('ProjectManager:RequestProjectHeaderUpdate', self, self.OnRequestProjectHeaderUpdate)
+    NetEvents:Subscribe('ProjectManager:RequestProjectHeaderUpdate', self, self.UpdateClientProjectHeader)
     NetEvents:Subscribe('ProjectManager:RequestProjectData', self, self.OnRequestProjectData)
     NetEvents:Subscribe('ProjectManager:RequestProjectSave', self, self.OnRequestProjectSave)
     NetEvents:Subscribe('ProjectManager:RequestProjectLoad', self, self.OnRequestProjectLoad)
@@ -37,13 +37,11 @@ end
 function ProjectManager:OnRequestProjectHeaders(p_Player)
 	if p_Player == nil then -- update all players
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+		self:UpdateClientProjectHeader(nil)
 	else
 		NetEvents:SendToLocal("MapEditorClient:ReceiveProjectHeaders", p_Player, DataBaseManager:GetProjectHeaders())
+		self:UpdateClientProjectHeader(p_Player)
 	end
-end
-
-function ProjectManager:OnRequestProjectHeaderUpdate(p_Player)
-    self:UpdateClientProjectHeader(p_Player)
 end
 
 function ProjectManager:UpdateClientProjectHeader(p_Player)
@@ -172,9 +170,15 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 	end
 	m_Logger:Write(json.encode(s_GameObjectSaveDatas))
 	m_Logger:Write("^^^^^^^^^^^^^^^^^")
-
+	self.m_CurrentProjectHeader = {
+		projectName = p_ProjectSaveData.projectName,
+		mapName = self.m_MapName,
+		gameModeName = self.m_GameMode,
+		requiredBundles = self.m_RequiredBundles
+	}
 	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
 	NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+	NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
 end
 
 -- we're creating commands from the savefile, basically imitating every step that has been undertaken

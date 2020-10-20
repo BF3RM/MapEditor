@@ -82,5 +82,6 @@ export const signals = {
 	historyChanged: new Signal(),
 	setActiveView: new Signal<(mode: VIEW) => void>(),
 	setLoadingInfo: new Signal<(info: string) => void>(),
-	setCurrentProjectHeader: new Signal<(projectHeader: any) => void>()
+	setCurrentProjectHeader: new Signal<(projectHeader: any) => void>(),
+	saveRequested: new Signal<() => void>()
 };

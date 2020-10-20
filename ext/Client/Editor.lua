@@ -137,6 +137,8 @@ function Editor:InitializeUIData(p_CommandActionResults)
 	for _, l_CommandActionResult in pairs(p_CommandActionResults) do
 		WebUpdater:AddUpdate('HandleResponse', json.decode(l_CommandActionResult))
 	end
+	NetEvents:SendLocal("ProjectManager:RequestProjectHeaders") -- Todo: move this to other class
+	NetEvents:SendLocal("ProjectManager:RequestProjectHeaderUpdate") -- Todo: move this to other class
 	self:UpdateCameraTransform()
 end
 

@@ -21,6 +21,7 @@ function MessageActions:RegisterVars()
 end
 function MessageActions:GetProjects(p_Message)
 	NetEvents:SendLocal('GetProjectHeaders')
+	return ActionResultType.Success
 end
 function MessageActions:MoveObject(p_Message)
     local gameObjectTransferData = p_Message.gameObjectTransferData
