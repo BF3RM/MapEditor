@@ -454,7 +454,7 @@ label.is-active {
 
 #toolbarRight {
 	margin-left: auto;
-	margin-right: 5vmin;
+	margin-right: 1.5em;
 }
 span {
 	user-select: none;

@@ -41,7 +41,7 @@ export default class LoadingView extends Vue {
 			display: flex;
 
 			p {
-				font-size: 1vmin;
+				font-size: 1.5em;
 				font-weight: 400;
 				margin: 0;
 
