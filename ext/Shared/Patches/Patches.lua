@@ -1,10 +1,12 @@
 class 'Patches'
-require "__shared/Patches/CommonRose"
+require "__shared/Patches/CommonRosePatcher"
+require "__shared/Patches/LevelPatcher"
 
 local m_Logger = Logger("Patches", true)
 
 function Patches:__init()
 	m_Logger:Write("Initializing Patches")
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 end
 
 function Patches:OnPartitionLoaded(p_Partition)
@@ -17,6 +19,13 @@ function Patches:OnPartitionLoaded(p_Partition)
 		if l_Instance == nil then
 			m_Logger:Write('Instance is null?')
 			goto continue
+		end
+
+		if(l_Instance.typeInfo == LevelData.typeInfo) then
+			LevelPatcher:PatchLevelData(l_Instance)
+		end
+		if(l_Instance.typeInfo == LevelDescriptionAsset.typeInfo) then
+			LevelPatcher:PatchLevelDescription(l_Instance)
 		end
 
 		--[[
