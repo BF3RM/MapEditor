@@ -119,6 +119,7 @@ export default class ExpandableTreeSlot extends Vue {
 		} else if (toggleState === 'opened') {
 			tree.closeNode(node);
 		}
+		e.stopPropagation();
 	}
 
 	@Emit('node:hover')
