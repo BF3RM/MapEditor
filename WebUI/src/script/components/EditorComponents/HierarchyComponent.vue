@@ -26,7 +26,7 @@
 									@node:click="onNodeClick" />
 			</infinite-tree-component>
 		</EditorComponent>
-		<ListComponent class="datafont" title="Explorer data"
+		<!--<ListComponent class="datafont" title="Explorer data"
 					:list="list"
 					:keyField="'instanceGuid'"
 					:headers="['Name', 'Type']"
@@ -36,7 +36,7 @@
 					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
 				</div>
 			</template>
-		</ListComponent>
+		</ListComponent>-->
 	</gl-col>
 </template>
 

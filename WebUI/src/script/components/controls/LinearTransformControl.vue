@@ -64,6 +64,7 @@ export default class LinearTransformControl extends Vue {
 <style lang="scss" scoped>
 	.transformControls {
 		display: grid;
+		padding: 10px;
 	}
 	.transformControls::v-deep .Vec3Control {
 		display: grid;

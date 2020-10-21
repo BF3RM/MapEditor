@@ -1,6 +1,6 @@
 <template>
 	<gl-row>
-		<gl-col>
+		<gl-col width="17">
 			<EditorComponent id="explorer-component" title="Project">
 				<div class="header">
 					<Search v-model="search"/>

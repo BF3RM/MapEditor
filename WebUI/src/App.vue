@@ -58,6 +58,13 @@ export default class App extends Vue {
 	.lm_splitter {
 		position: relative;
 		z-index: 0;
+		opacity: 0.5;
+	}
+	.lm_drag_handle:hover {
+		opacity: 0;
+	}
+	.lm_splitter:hover, .lm_splitter.lm_dragging {
+		background: #409EFF;
 	}
 	.lm_header {
 		overflow: visible;

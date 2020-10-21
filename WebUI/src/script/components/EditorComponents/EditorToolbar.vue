@@ -397,6 +397,7 @@ input#worldView {
 	justify-content: space-between;
 	border-bottom: 2px solid black;
 	position: relative;
+	opacity: 0.9;
 }
 .el-radio-group {
 	background-color: #2e2e2e;

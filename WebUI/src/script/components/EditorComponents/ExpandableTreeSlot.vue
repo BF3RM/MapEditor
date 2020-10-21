@@ -106,8 +106,14 @@ export default class ExpandableTreeSlot extends Vue {
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
+			if (node.type === 'folder') {
+				node.type = 'folder-open';
+			}
 			tree.openNode(node);
 		} else if (toggleState === 'opened') {
+			if (node.type === 'folder-open') {
+				node.type = 'folder';
+			}
 			tree.closeNode(node);
 		}
 	}

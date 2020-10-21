@@ -12,18 +12,22 @@
 			ref="gl"
 			class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
 			<gl-row>
-				<gl-col :width="80">
-					<gl-row :height="80">
-						<gl-col :width="20">
+				<gl-col>
+					<gl-row>
+						<gl-col :width="17">
 							<HierarchyComponent/>
 						</gl-col>
-						<gl-col id="viewport-container" width="80">
+						<gl-col id="viewport-container">
 							<ViewportComponent :showHeader="true"/>
 						</gl-col>
 					</gl-row>
 					<gl-row :height="20">
-						<ExplorerComponent :width="70"/>
-						<ConsoleComponent/>
+						<gl-col>
+							<ExplorerComponent/>
+						</gl-col>
+						<gl-col width="25">
+							<ConsoleComponent/>
+						</gl-col>
 					</gl-row>
 				</gl-col>
 				<gl-col :width="20">
@@ -95,7 +99,7 @@ export default class GoldenLayoutHolder extends Vue {
 		height: 100%;
 	}
 	#glHolder {
-		height: calc(100vh - 30px);
+		height: calc(100vh - 32px);
 		width: 100vw;
 		pointer-events: none;
 	}
