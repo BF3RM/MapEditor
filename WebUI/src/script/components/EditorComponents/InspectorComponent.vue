@@ -5,7 +5,10 @@
 				<img :class="'Large Icon Icon-' + objectType"/><input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange"><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 			</div>
 			<div class="transform-container">
-				<label class="name-label" for="name">GUID:</label><input class="guid-input" :value="gameObjectName" :disabled="true">
+				<div v-if="!multiSelection">
+					<label class="name-label" for="name">GUID:</label>
+					<input class="guid-input" :value="gameObjectGuid" :disabled="true">
+				</div>
 
 				<linear-transform-control class="lt-control" :hideLabel="false"
 										:position="position" :rotation="rotation" :scale="scale"
@@ -109,6 +112,7 @@ export default class InspectorComponent extends EditorComponent {
 
 	private onSelection() {
 		const group = window.editor.selectionGroup;
+		this.nOfObjectsInGroup = group.selectedGameObjects.length;
 		if (this.multiSelection || this.isEmpty || !group) {
 			return;
 		}
@@ -129,8 +133,6 @@ export default class InspectorComponent extends EditorComponent {
 		}
 		this.selectedVariation = selectedGameObject.variation;
 		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
-
-		this.nOfObjectsInGroup = group.selectedGameObjects.length;
 	}
 
 	get isEmpty() {
