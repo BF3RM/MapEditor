@@ -14,7 +14,7 @@
 					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
 			</div>
 			<div class="icon-container">
-				<img :class="'Icon Icon-' + node.type"/>
+				<img :class="getNodeIconClass(node)"/>
 			</div>
 			<div class="text-container">
 				<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
@@ -59,6 +59,15 @@ export default class ExpandableTreeSlot extends Vue {
 		} else {
 			return true;
 		}
+	}
+
+	getNodeIconClass(node: Node) {
+		if (node.type === 'folder') {
+			if (node.state.open) {
+				return 'Icon Icon-' + node.type + '-open';
+			}
+		}
+		return 'Icon Icon-' + node.type;
 	}
 
 	get raycastEnabled() {
@@ -106,14 +115,8 @@ export default class ExpandableTreeSlot extends Vue {
 	public ToggleNode(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		const toggleState = this.toggleState(node);
 		if (toggleState === 'closed') {
-			if (node.type === 'folder') {
-				node.type = 'folder-open';
-			}
 			tree.openNode(node);
 		} else if (toggleState === 'opened') {
-			if (node.type === 'folder-open') {
-				node.type = 'folder';
-			}
 			tree.closeNode(node);
 		}
 	}
