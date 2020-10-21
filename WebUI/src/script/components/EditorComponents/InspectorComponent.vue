@@ -71,7 +71,7 @@ export default class InspectorComponent extends EditorComponent {
 		super();
 		signals.selectionGroupChanged.connect(this.onSelectionGroupChanged.bind(this));
 		signals.selectedGameObject.connect(this.onSelection.bind(this));
-		signals.deselectedGameObject.connect(this.onSelection.bind(this));
+		signals.deselectedGameObject.connect(this.onDeSelection.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
 	}
 
@@ -107,9 +107,29 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
+	private onDeSelection() {
+		const group = window.editor.selectionGroup;
+		if (this.multiSelection || !group) {
+			return;
+		}
+		if (group.selectedGameObjects.length === 0) {
+			this.blueprintGuid = '';
+			this.blueprintPartitionGuid = '';
+			this.blueprintName = '';
+			this.gameObjectGuid = '';
+			this.gameObjectName = '';
+			this.blueprintType = '';
+			this.blueprintVariations = [];
+			this.selectedVariation = 0;
+			this.objectType = '';
+
+			this.nOfObjectsInGroup = group.selectedGameObjects.length;
+		}
+	}
+
 	private onSelection() {
 		const group = window.editor.selectionGroup;
-		if (this.multiSelection || this.isEmpty || !group) {
+		if (this.multiSelection || !group) {
 			return;
 		}
 		const selectedGameObject = group.selectedGameObjects[0];

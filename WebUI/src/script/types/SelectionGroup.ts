@@ -150,13 +150,15 @@ export class SelectionGroup extends THREE.Object3D {
 	}
 
 	public deselectAll() {
+		const previouslySelected = Object.values(this.selectedGameObjects);
 		for (const go of this.selectedGameObjects) {
 			(go as GameObject).onDeselect();
+		}
+		this.selectedGameObjects = [];
+		this.makeParentsInvisible();
+		for (const go of previouslySelected) {
 			signals.deselectedGameObject.emit(go.guid);
 		}
-
-		this.makeParentsInvisible();
-		this.selectedGameObjects = [];
 	}
 
 	// Find game object, deselect it and remove it from array.
