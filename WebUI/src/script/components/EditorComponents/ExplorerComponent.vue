@@ -13,7 +13,7 @@
 		<gl-col>
 			<ListComponent class="datafont" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 				<template slot-scope="{ item, data }" >
-					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
+					<img :class="'Icon Icon-' + item.typeName"/><Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
 				</template>
 			</ListComponent>
 		</gl-col>
@@ -170,5 +170,8 @@ export default class ExplorerComponent extends EditorComponent {
 		&:hover {
 			background-color: #343434;
 		}
+	}
+	.datafont img.Icon {
+		padding-top: 6px;
 	}
 </style>
