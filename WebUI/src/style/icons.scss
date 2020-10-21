@@ -7,6 +7,11 @@ html {
     -webkit-mask-size: contain!important;
     background-color: #9c9898;
 }
+.Large.Icon {
+  height: 30px;
+  width: 30px;
+}
+
 .selectIcon{
     -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
 }

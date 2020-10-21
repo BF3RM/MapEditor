@@ -3,36 +3,32 @@ import {INode} from "infinite-tree";
 	<EditorComponent class="inspector-component" title="Inspector">
 		<div v-if="!isEmpty">
 			<div class="header">
-				<div class="title">Entity</div>
-				<div class="enable-container">
-					<label class="enable-label" for="enabled">Enabled:</label>
-					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
-				</div>
-				<div class="transform-container">
-					<label class="name-label" for="name">GUID:</label><input class="guid-input" :value="gameObjectGuid" :disabled="true">
-					<label class="name-label" for="name">Name:</label><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
-					<linear-transform-control class="lt-control" :hideLabel="false"
-											:position="position" :rotation="rotation" :scale="scale"
-											@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
-				</div>
-				<div class="blueprint-container" v-if="!multiSelection && !isEmpty">
-					<div class="title">Blueprint</div>
-					<label class="name-label" for="bp-name">Name:</label>
-					<input class="name-input" id="bp-name" disabled="true" :value="blueprintName">
+				<img :class="'Large Icon Icon-' + objectType"/><input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange"><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
+			</div>
+			<div class="transform-container">
+				<label class="name-label" for="name">GUID:</label><input class="guid-input" :value="gameObjectGuid" :disabled="true">
 
-					<label class="name-label" for="bp-type">Type:</label>
-					<input class="name-input" id="bp-type" disabled="true" :value="blueprintType">
+				<linear-transform-control class="lt-control" :hideLabel="false"
+										:position="position" :rotation="rotation" :scale="scale"
+										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
+			</div>
+			<div class="blueprint-container" v-if="!multiSelection && !isEmpty">
+				<div class="title">Blueprint</div>
+				<label class="name-label" for="bp-name">Name:</label>
+				<input class="name-input" id="bp-name" disabled="true" :value="blueprintName">
 
-					<label class="name-label" for="bp-instance-guid">Instance GUID:</label>
-					<input class="name-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
+				<label class="name-label" for="bp-type">Type:</label>
+				<input class="name-input" id="bp-type" disabled="true" :value="blueprintType">
 
-					<label class="name-label" for="bp-partition-guid">Partition GUID:</label>
-					<input class="name-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
+				<label class="name-label" for="bp-instance-guid">Instance GUID:</label>
+				<input class="name-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
 
-					<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
-						<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
-					</el-select>
-				</div>
+				<label class="name-label" for="bp-partition-guid">Partition GUID:</label>
+				<input class="name-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
+
+				<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
+					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
+				</el-select>
 			</div>
 		</div>
 	</EditorComponent>
@@ -65,6 +61,7 @@ export default class InspectorComponent extends EditorComponent {
 	private blueprintPartitionGuid: string = '';
 	private blueprintVariations: {hash: number, name: string}[] = [];
 	private selectedVariation = 0;
+	private objectType = '';
 
 	@Ref('enableInput')
 	enableInput!: HTMLInputElement;
@@ -128,6 +125,7 @@ export default class InspectorComponent extends EditorComponent {
 			this.blueprintVariations = [{ hash: 0, name: 'default' }];
 		}
 		this.selectedVariation = selectedGameObject.variation;
+		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
 	}
 
 	get isEmpty() {
@@ -151,7 +149,8 @@ export default class InspectorComponent extends EditorComponent {
 		if (this.multiSelection) {
 			return 'Multiselection';
 		} else {
-			return this.group.selectedGameObjects[0].name;
+			const splitName = this.group.selectedGameObjects[0].name.split('/');
+			return splitName[splitName.length - 1];
 		}
 	}
 
@@ -229,6 +228,12 @@ export default class InspectorComponent extends EditorComponent {
 		width: 100%;
 	}
 	.inspector-component {
+		.header {
+			display: flex;
+		}
+		img.Large.Icon {
+			margin: 10px;
+		}
 		.title {
 			margin: 1vmin 0;
 			font-size: 1.5em;
@@ -257,6 +262,10 @@ export default class InspectorComponent extends EditorComponent {
 		.name-input {
 			margin: 1vmin 0;
 			border-radius: 0.1vmin;
+		}
+		input#enabled {
+			width: 20px;
+			margin: 13px;
 		}
 	}
 </style>

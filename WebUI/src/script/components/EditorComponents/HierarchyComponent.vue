@@ -1,5 +1,4 @@
 <template>
-	<gl-col>
 		<EditorComponent id="explorer-component" title="Scene Instances">
 			<div class="header">
 				<Search v-model="search"/>
@@ -37,7 +36,6 @@
 				</div>
 			</template>
 		</ListComponent>-->
-	</gl-col>
 </template>
 
 <script lang="ts">

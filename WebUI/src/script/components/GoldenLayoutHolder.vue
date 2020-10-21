@@ -14,20 +14,13 @@
 			<gl-row>
 				<gl-col>
 					<gl-row>
-						<gl-col :width="17">
+						<gl-col width="17">
 							<HierarchyComponent/>
 						</gl-col>
-						<gl-col id="viewport-container">
-							<ViewportComponent :showHeader="true"/>
-						</gl-col>
+						<ViewportComponent :showHeader="true"/>
 					</gl-row>
 					<gl-row :height="20">
-						<gl-col>
-							<ExplorerComponent/>
-						</gl-col>
-						<gl-col width="25">
-							<ConsoleComponent/>
-						</gl-col>
+						<ExplorerComponent/>
 					</gl-row>
 				</gl-col>
 				<gl-col :width="20">

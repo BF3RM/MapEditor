@@ -460,4 +460,8 @@ label.is-active {
 span {
 	user-select: none;
 }
+
+ul.el-menu.el-menu--horizontal.el-menu {
+	margin-right: 5px;
+}
 </style>

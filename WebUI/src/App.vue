@@ -50,7 +50,7 @@ export default class App extends Vue {
 </script>
 
 <style scoped>
-	#viewport-container * {
+	#viewport-component * {
 		background: none !important;
 	}
 </style>

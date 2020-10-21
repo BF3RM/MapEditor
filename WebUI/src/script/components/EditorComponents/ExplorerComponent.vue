@@ -10,12 +10,15 @@
 				</infinite-tree-component>
 			</EditorComponent>
 		</gl-col>
-		<gl-col>
+		<gl-col width="80">
 			<ListComponent class="datafont" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 				<template slot-scope="{ item, data }" >
 					<img :class="'Icon Icon-' + item.typeName"/><Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
 				</template>
 			</ListComponent>
+		</gl-col>
+		<gl-col>
+			<ConsoleComponent/>
 		</gl-col>
 	</gl-row>
 </template>
@@ -33,8 +36,9 @@ import ListComponent from '@/script/components/EditorComponents/ListComponent.vu
 import InfiniteTree, { Node, INode } from 'infinite-tree';
 import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
+import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
 
-@Component({ components: { ExpandableTreeSlot, EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
+@Component({ components: { ConsoleComponent, ExpandableTreeSlot, EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private treeData: INode = {
