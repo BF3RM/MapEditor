@@ -1,5 +1,5 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
+	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
 				<img :src="enabledIcnSrc"/>
@@ -8,7 +8,7 @@
 				<img :src="raycastEnabledIcnSrc"/>
 			</div>
 		</div>
-		<div class="tree-node" :style="nodeStyle(node)" @click="SelectNode($event, node, tree)">
+		<div class="tree-node" :style="nodeStyle(node)">
 			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
@@ -104,11 +104,13 @@ export default class ExpandableTreeSlot extends Vue {
 
 	@Emit('node:toggle-enable')
 	public ToggleEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		e.stopPropagation();
 		return node;
 	}
 
 	@Emit('node:toggle-raycast-enable')
 	public ToggleRaycastEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		e.stopPropagation();
 		return node;
 	}
 
