@@ -1,4 +1,3 @@
-import {INode} from "infinite-tree";
 <template>
 	<EditorComponent class="inspector-component" title="Inspector">
 		<div v-if="!isEmpty">
@@ -6,7 +5,7 @@ import {INode} from "infinite-tree";
 				<img :class="'Large Icon Icon-' + objectType"/><input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange"><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 			</div>
 			<div class="transform-container">
-				<label class="name-label" for="name">GUID:</label><input class="guid-input" :value="gameObjectGuid" :disabled="true">
+				<label class="name-label" for="name">GUID:</label><input class="guid-input" :value="gameObjectName" :disabled="true">
 
 				<linear-transform-control class="lt-control" :hideLabel="false"
 										:position="position" :rotation="rotation" :scale="scale"
@@ -49,12 +48,13 @@ import SetVariationCommand from '@/script/commands/SetVariationCommand';
 
 @Component({ components: { LinearTransformControl, EditorComponent } })
 export default class InspectorComponent extends EditorComponent {
-	private group: SelectionGroup | null = null;
 	private position: IVec3 = new Vec3().toTable();
 	private scale: IVec3 = new Vec3(1, 1, 1).toTable();
 	private rotation: IQuat = new Quat().toTable();
 	private dragging = false;
 	private enabled = true;
+	private gameObjectGuid: string = '';
+	private gameObjectName: string = '';
 	private blueprintName: string = '';
 	private blueprintType: string = '';
 	private blueprintGuid: string = '';
@@ -62,6 +62,7 @@ export default class InspectorComponent extends EditorComponent {
 	private blueprintVariations: {hash: number, name: string}[] = [];
 	private selectedVariation = 0;
 	private objectType = '';
+	private nOfObjectsInGroup = 0;
 
 	@Ref('enableInput')
 	enableInput!: HTMLInputElement;
@@ -72,16 +73,13 @@ export default class InspectorComponent extends EditorComponent {
 		signals.selectedGameObject.connect(this.onSelection.bind(this));
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
-		if (!this.group) {
-			this.group = window.editor.selectionGroup;
-		}
 	}
 
 	private onObjectChanged(gameObject: GameObject, field: string, value: any) {
-		if (!gameObject || !this.group) {
+		if (!gameObject) {
 			return;
 		}
-		if (field === 'enabled' && this.group.isSelected(gameObject) && this.group.selectedGameObjects.length === 1) {
+		if (field === 'enabled' && gameObject.selected && this.nOfObjectsInGroup === 1) {
 			this.enabled = value;
 		}
 	}
@@ -97,26 +95,31 @@ export default class InspectorComponent extends EditorComponent {
 
 	// Why is this called twice?
 	private onInput() {
-		if (this.group !== null) {
+		const group = window.editor.selectionGroup;
+		if (group !== null) {
 			// Move selection group to the new position.
-			this.group.position.set(this.position.x, this.position.y, this.position.z);
-			this.group.scale.set(this.scale.x, this.scale.y, this.scale.z);
-			this.group.rotation.setFromQuaternion(Quat.setFromTable(this.rotation));
-			this.group.updateMatrix();
-			this.group.onClientOnlyMove();
+			group.position.set(this.position.x, this.position.y, this.position.z);
+			group.scale.set(this.scale.x, this.scale.y, this.scale.z);
+			group.rotation.setFromQuaternion(Quat.setFromTable(this.rotation));
+			group.updateMatrix();
+			group.onClientOnlyMove();
 			window.editor.threeManager.setPendingRender();
 		}
 	}
 
 	private onSelection() {
-		if (this.multiSelection || this.isEmpty || !this.group) {
+		const group = window.editor.selectionGroup;
+		if (this.multiSelection || this.isEmpty || !group) {
 			return;
 		}
-		const selectedGameObject = this.group.selectedGameObjects[0];
+		const selectedGameObject = group.selectedGameObjects[0];
 		if (!selectedGameObject) return;
 		this.blueprintGuid = selectedGameObject.blueprintCtrRef.instanceGuid.toString();
 		this.blueprintPartitionGuid = selectedGameObject.blueprintCtrRef.partitionGuid.toString();
 		this.blueprintName = selectedGameObject.blueprintCtrRef.name.toString();
+		this.gameObjectGuid = selectedGameObject.guid.toString();
+		const splitName = selectedGameObject.name.split('/');
+		this.gameObjectName = splitName[splitName.length - 1];
 		this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
 		const bp = window.editor.blueprintManager.getBlueprintByGuid(selectedGameObject.blueprintCtrRef.instanceGuid);
 		if (bp) {
@@ -126,43 +129,23 @@ export default class InspectorComponent extends EditorComponent {
 		}
 		this.selectedVariation = selectedGameObject.variation;
 		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
+
+		this.nOfObjectsInGroup = group.selectedGameObjects.length;
 	}
 
 	get isEmpty() {
-		if (this.group) {
-			return (this.group.selectedGameObjects.length === 0);
-		}
-		return true;
+		return (this.nOfObjectsInGroup === 0);
 	}
 
 	get multiSelection() {
-		if (this.group) {
-			return (this.group.selectedGameObjects.length > 1);
-		}
-		return false;
+		return (this.nOfObjectsInGroup > 1);
 	}
 
 	get displayName() {
-		if (!this.group || this.isEmpty) {
+		if (this.isEmpty) {
 			return '';
 		}
-		if (this.multiSelection) {
-			return 'Multiselection';
-		} else {
-			const splitName = this.group.selectedGameObjects[0].name.split('/');
-			return splitName[splitName.length - 1];
-		}
-	}
-
-	get gameObjectGuid() {
-		if (!this.group || this.isEmpty) {
-			return '';
-		}
-		if (this.multiSelection) {
-			return 'Multiselection';
-		} else {
-			return this.group.selectedGameObjects[0].guid.toString();
-		}
+		return this.multiSelection ? 'Multiselection' : this.gameObjectName;
 	}
 
 	onStartDrag() {
@@ -172,8 +155,10 @@ export default class InspectorComponent extends EditorComponent {
 
 	onEndDrag() {
 		// console.log('Drag end');
-		if (this.group) {
-			this.group.onClientOnlyMoveEnd();
+		const group = window.editor.selectionGroup;
+
+		if (group) {
+			group.onClientOnlyMoveEnd();
 			this.dragging = false;
 		}
 	}
@@ -184,41 +169,43 @@ export default class InspectorComponent extends EditorComponent {
 
 	private onSelectionGroupChanged(group: SelectionGroup) {
 		this.$nextTick(() => {
-			if (!this.group) {
-				this.group = group;
-			}
+			const group = window.editor.selectionGroup;
 			if (!this.dragging) {
 				// Update inspector transform.
-				this.position = this.group.transform.trans.toTable();
-				this.scale = this.group.transform.scale.toTable();
-				this.rotation = this.group.transform.rotation.toTable();
+				this.position = group.transform.trans.toTable();
+				this.scale = group.transform.scale.toTable();
+				this.rotation = group.transform.rotation.toTable();
 			}
-			if (this.group.selectedGameObjects.length > 0) {
-				this.enabled = this.group.selectedGameObjects[0].enabled;
+			if (group.selectedGameObjects.length > 0) {
+				this.enabled = group.selectedGameObjects[0].enabled;
 			}
 		});
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
 		this.$nextTick(() => {
-			if (!this.group) {
+			const group = window.editor.selectionGroup;
+
+			if (!group) {
 				return;
 			}
 
 			if (this.enabled) {
-				this.group.enable();
+				group.enable();
 			} else {
-				this.group.disable();
+				group.disable();
 			}
 		});
 	}
 
 	private onNameChange(e: InputEvent) {
-		if (!this.group || this.isEmpty) {
+		const group = window.editor.selectionGroup;
+
+		if (!group || this.isEmpty) {
 			return;
 		}
 		if ((e.target as any).value) {
-			window.editor.execute(new SetObjectNameCommand(this.group.selectedGameObjects[0].getGameObjectTransferData(), (e.target as any).value));
+			window.editor.execute(new SetObjectNameCommand(group.selectedGameObjects[0].getGameObjectTransferData(), (e.target as any).value));
 		}
 	}
 }
