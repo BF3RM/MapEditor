@@ -16,6 +16,7 @@ function FreeCam:RegisterVars()
 
 	self.m_CameraYaw = 0.0
 	self.m_CameraPitch = 0.0
+	self.m_CameraRoll = 0.0
 
 	self.m_MoveX = 0.0
 	self.m_MoveY = 0.0
@@ -31,10 +32,9 @@ function FreeCam:OnLevelDestroy()
 end
 
 function FreeCam:Create()
-    print("function Freecam:Create()")
     local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
     if s_Entity == nil then
-        print("Could not spawn camera")
+        m_Logger:Error("Could not spawn camera")
         return
     end
     self.cameraData.transform = ClientUtils:GetCameraTransform()
@@ -43,7 +43,7 @@ function FreeCam:Create()
 end
 
 function FreeCam:SetCameraMode(p_Mode)
-    if self.m_Mode == CameraMode.Editor then
+    if self.m_Mode == CameraMode.Editor and p_Mode == CameraMode.FreeCam then
         self:UpdateFreeCamVars()
     end
 	--m_Logger:Write("Setting FreeCam mode to "..p_Mode)
@@ -86,15 +86,15 @@ function FreeCam:OnEnableFreeCamMovement()
     self:SetCameraMode(CameraMode.FreeCam)
 end
 
+-- Update rotation angles with the new transform
 function FreeCam:UpdateFreeCamVars()
-
     local s_Yaw, s_Pitch, s_Roll = m_RotationHelper:GetYPRfromLUF(
 			self.m_CameraData.transform.left,
 			self.m_CameraData.transform.up,
 			self.m_CameraData.transform.forward)
-
-	self.m_CameraYaw = s_Yaw
-	self.m_CameraPitch = s_Pitch
+	self.m_CameraYaw = s_Yaw - math.pi
+	self.m_CameraPitch = -(s_Pitch - math.pi)
+	self.m_CameraRoll = s_Roll - math.pi
 
     self.m_LastTransform = self.m_CameraData.transform.trans
 end
@@ -107,7 +107,6 @@ function FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 		local s_NewPitch = self.m_CameraPitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 
 		self.m_CameraYaw = s_NewYaw
-
 		if (math.abs(s_NewPitch)* 2 < math.pi) then
 			self.m_CameraPitch = s_NewPitch
 		end
@@ -196,6 +195,7 @@ function FreeCam:OnUpdateInput(p_Delta)
 		self.m_CameraData.fov = 90
 		self.m_CameraYaw = 0.0
 		self.m_CameraPitch = 0.0
+		self.m_CameraRoll = 0.0
 		self.m_CameraDistance = 1.0
 		self.m_ThirdPersonRotX = 0.0
 		self.m_ThirdPersonRotY = 0.0
@@ -271,18 +271,17 @@ end
 function FreeCam:UpdateEditor(p_Transform)
 	if self.m_Mode == CameraMode.Editor then
 		self.m_CameraData.transform = p_Transform
+		self.m_LastTransform = self.m_CameraData.transform
 	end
 end
 
 function FreeCam:UpdateFreeCamera(p_Delta)
-
-	local s_Transform = self.m_CameraData.transform
-
-	local left, up, forward = m_RotationHelper:GetLUFfromYPR(self.m_CameraYaw, self.m_CameraPitch, 0)
-
+	local left, up, forward = m_RotationHelper:GetLUFfromYPR(self.m_CameraYaw, self.m_CameraPitch, self.m_CameraRoll)
 	self.m_CameraData.transform.left = left
 	self.m_CameraData.transform.up = up
 	self.m_CameraData.transform.forward = forward
+
+	local s_Transform = self.m_CameraData.transform
 
 	-- Calculate new transform.
 	if self.m_MoveX ~= 0.0 then
