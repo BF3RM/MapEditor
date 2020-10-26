@@ -230,13 +230,14 @@ function FreeCam:UpdateCameraControls(p_Delta)
 		s_MoveZ = s_MoveZ * 0.7071 -- cos(45º)
 	end
 
+	local s_Step = self.m_RotationSpeedMultiplier / 40
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_PageDown) then
-		self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier + 1
-	elseif InputManager:WentKeyDown(InputDeviceKeys.IDK_PageUp ) then
 		if self.m_RotationSpeedMultiplier > 1 then
-			self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier - 1
+			self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier - s_Step
 		end
+	elseif InputManager:WentKeyDown(InputDeviceKeys.IDK_PageUp) then
+		self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier + s_Step
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_ArrowUp) then
@@ -255,10 +256,10 @@ function FreeCam:UpdateCameraControls(p_Delta)
 	local s_MouseWheel = InputManager:GetLevel(InputConceptIdentifiers.ConceptFreeCameraSwitchSpeed)
 
 	if self.m_Mode == CameraMode.FreeCam then
-		self.m_SpeedMultiplier = self.m_SpeedMultiplier + (s_MouseWheel * 0.1)
+		self.m_SpeedMultiplier = self.m_SpeedMultiplier + (s_MouseWheel * 0.01)
 
-		if self.m_SpeedMultiplier < 0.0001 then
-			self.m_SpeedMultiplier = 0.0001
+		if self.m_SpeedMultiplier < 0.000005 then
+			self.m_SpeedMultiplier = 0.00005
 		end
 	else
 		self.m_CameraDistance = self.m_CameraDistance + (s_MouseWheel * 0.2)
@@ -268,6 +269,7 @@ function FreeCam:UpdateCameraControls(p_Delta)
 		end
 	end
 end
+
 function FreeCam:UpdateEditor(p_Transform)
 	if self.m_Mode == CameraMode.Editor then
 		self.m_CameraData.transform = p_Transform
