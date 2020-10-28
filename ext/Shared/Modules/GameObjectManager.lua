@@ -21,7 +21,9 @@ end
 function GameObjectManager:OnLevelDestroy()
 	self:RegisterVars()
 end
-
+function GameObjectManager:GetGameObject(p_GameObjectGuid)
+	return self.m_GameObjects[tostring(p_GameObjectGuid)]
+end
 function GameObjectManager:GetGameEntities(p_EntityIds)
 	local s_GameEntities = {}
 

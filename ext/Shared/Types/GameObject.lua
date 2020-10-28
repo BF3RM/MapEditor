@@ -24,6 +24,7 @@ function GameObject:__init(arg)
     self:RegisterUserModifiableField("name", arg.name)
     self:RegisterUserModifiableField("parentData", arg.parentData)
     self:RegisterUserModifiableField("transform", arg.transform)
+	self:RegisterUserModifiableField("localTransform", arg.localTransform)
     self:RegisterUserModifiableField("variation", arg.variation)
     self:RegisterUserModifiableField("isDeleted", arg.isDeleted)
     self:RegisterUserModifiableField("isEnabled", arg.isEnabled)
@@ -195,8 +196,17 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
         end
     end
 
-    self:SetField("transform", LinearTransform(p_LinearTransform))
-
+	self:SetField("transform", LinearTransform(p_LinearTransform))
+	local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
+	if(s_Parent ~= nil) then
+		print("Set local transform: ")
+		local s_LocalTransform = ToLocal(self.transform, s_Parent.transform)
+		print(s_Parent.transform)
+		print(s_LocalTransform)
+		self:SetField("localTransform", s_LocalTransform)
+	else
+		print("Could not find parent")
+	end
     return true
 end
 
@@ -207,6 +217,7 @@ function GameObject:GetGameObjectTransferData()
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),
         transform = self.transform,
+        localTransform = self.localTransform,
         variation = self.variation,
         isEnabled = self.isEnabled,
         isDeleted = self.isDeleted,
