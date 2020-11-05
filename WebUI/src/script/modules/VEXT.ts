@@ -22,6 +22,9 @@ export default class VEXTInterface {
 		messages: object[];
 	};
 
+	public receivedCommands: any = [];
+	public receivedBlueprints: any = [];
+
 	constructor(debug: boolean) {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
@@ -130,6 +133,7 @@ export default class VEXTInterface {
 		const commandActionResults: CommandActionResult[] = [];
 		CARArray.forEach((obj: object) => {
 			commandActionResults.push(CommandActionResult.FromObject(obj));
+			this.receivedCommands.push(CommandActionResult.FromObject(obj));
 		});
 		let index = 0;
 
@@ -156,9 +160,7 @@ export default class VEXTInterface {
 	public SendEvent(eventName: string, param?: any) {
 		if (editor.debug) {
 			console.log('Sending event: ' + eventName);
-			if (param != null) {
-				console.log(param);
-			}
+			this.emulator.ReceiveEvent(eventName, param);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSON.stringify(param));
 		}
@@ -260,8 +262,9 @@ export default class VEXTInterface {
 	}
 
 	public RegisterBlueprints(blueprintsRaw: string) {
-		const blueprints = JSON.parse(blueprintsRaw);
-		editor.blueprintManager.registerBlueprints(Object.values(blueprints) as IBlueprint[]);
+		// const blueprints = JSON.parse(blueprintsRaw);
+		// this.receivedBlueprints.push(blueprints);
+		editor.blueprintManager.RegisterBlueprints(blueprintsRaw);
 	}
 
 	public MouseEnabled() {

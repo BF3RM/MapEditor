@@ -309,7 +309,9 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		primaryInstanceGuid = p_ParentGameObject.blueprintCtrRef.instanceGuid,
 		partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid
 	}
-
+	if(p_GameObject.original.partitionGuid == nil) then
+		p_GameObject.original.partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid -- TODO: Confirm that this is correct
+	end
 	p_GameObject.isVanilla = p_ParentGameObject.isVanilla
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 	if p_GameObject.isVanilla then

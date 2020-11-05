@@ -4,6 +4,10 @@
 			<div class="header">
 				<img :class="'Large Icon Icon-' + objectType"/><input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange"><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 			</div>
+			<div v-if="selectedGameObject">
+				<b>Overrides:</b>
+				<p v-for="override of selectedGameObject.overrides.keys()" :key="override">{{override}}</p>
+			</div>
 			<div class="transform-container">
 				<div v-if="!multiSelection">
 					<label class="name-label" for="name">GUID:</label>
@@ -51,6 +55,8 @@ import SetVariationCommand from '@/script/commands/SetVariationCommand';
 
 @Component({ components: { LinearTransformControl, EditorComponent } })
 export default class InspectorComponent extends EditorComponent {
+	public selectedGameObject: GameObject;
+
 	private position: IVec3 = new Vec3().toTable();
 	private scale: IVec3 = new Vec3(1, 1, 1).toTable();
 	private rotation: IQuat = new Quat().toTable();
@@ -133,6 +139,8 @@ export default class InspectorComponent extends EditorComponent {
 		}
 		this.selectedVariation = selectedGameObject.variation;
 		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
+
+		this.selectedGameObject = selectedGameObject;
 	}
 
 	get isEmpty() {

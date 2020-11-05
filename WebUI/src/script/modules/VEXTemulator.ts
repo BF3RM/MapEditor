@@ -5,10 +5,14 @@ import * as THREE from 'three';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { GameObject } from '@/script/types/GameObject';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
+import VEXTInterface from '@/script/modules/VEXT';
+import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
+import { Guid } from '@/script/types/Guid';
 
 export class VEXTemulator {
 	private commands: any;
 	private messages: any;
+	private events: any;
 
 	constructor() {
 		this.commands = {};
@@ -26,6 +30,9 @@ export class VEXTemulator {
 		this.messages.GetProjectsMessage = this.GetProjectsMessage;
 		this.messages.SetScreenToWorldPositionMessage = this.SetScreenToWorldPositionMessage;
 		this.messages.MoveObjectMessage = this.MoveObjectMessage;
+
+		this.events = {};
+		this.events.UIReloaded = this.UIReloaded;
 	}
 
 	public Receive(commands: any[]) {
@@ -59,6 +66,15 @@ export class VEXTemulator {
 			setTimeout(() => {
 				window.vext.HandleMessage(response);
 			}, 1);
+		}
+	}
+
+	public ReceiveEvent(eventName: string, param?: any) {
+		const scope = this;
+		if (scope.events[eventName] === undefined) {
+			console.error('NotImplemented: ' + eventName);
+		} else {
+			scope.events[eventName](param);
 		}
 	}
 
@@ -262,5 +278,13 @@ export class VEXTemulator {
 
 	private MoveObjectMessage(args: MoveObjectMessage) {
 		return null;
+	}
+
+	private UIReloaded() {
+		(window as any).vext.HandleResponse(JSON.parse(XP2SKybar));
+		(window as any).vext.RegisterBlueprints(XP2SKybarBlueprints);
+		setTimeout(() => {
+			editor.Select(new Guid('ED170122-0000-0000-0000-001325353053'), false, true, true);
+		}, 1);
 	}
 }

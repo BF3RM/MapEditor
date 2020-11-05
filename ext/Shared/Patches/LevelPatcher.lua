@@ -11,7 +11,6 @@ function LevelPatcher:PatchLevelData(p_LevelData)
 	s_Instance.levelDescription.isCoop = false
 	s_Instance.levelDescription.isMultiplayer = true
 	s_Instance.levelDescription.isMenu = false
-	s_Instance.levelDescription.name = 'Powmap'
 end
 
 function LevelPatcher:PatchLevelDescription(p_LevelDescription)
