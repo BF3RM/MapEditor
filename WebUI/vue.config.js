@@ -1,4 +1,5 @@
 const { VextPackPlugin } = require('vextpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 	configureWebpack: {

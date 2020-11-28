@@ -163,4 +163,21 @@ export class LinearTransform {
 	get elements() {
 		return [this.position, this.rotation, this.scale];
 	}
+
+	static fromJSON(json: EBX.JSON.LinearTransform): LinearTransform {
+		const transform = new LinearTransform();
+		if (json.right) {
+			transform.left.copy(Vec3.fromJSON(json.right.$value)); // TODO: Confirm this
+		}
+		if (json.up) {
+			transform.up.copy(Vec3.fromJSON(json.up.$value));
+		}
+		if (json.forward) {
+			transform.forward.copy(Vec3.fromJSON(json.forward.$value));
+		}
+		if (json.trans) {
+			transform.trans.copy(Vec3.fromJSON(json.trans.$value));
+		}
+		return transform;
+	}
 }

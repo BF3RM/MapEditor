@@ -31,10 +31,10 @@ export class BlueprintManager {
 				console.error('Empty blueprint??');
 			}
 		}
-		signals.blueprintsRegistered.emit(this.GetBLueprintsSorted());
+		signals.blueprintsRegistered.emit(this.GetBlueprintsSorted());
 	}
 
-	private GetBLueprintsSorted():Blueprint[] {
+	private GetBlueprintsSorted():Blueprint[] {
 		return this.blueprints.values().sort((a, b) => {
 			if (a.name < b.name) {
 				return -1;

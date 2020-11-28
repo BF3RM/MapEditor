@@ -2,6 +2,8 @@
   "compileOnSave": true,
   "buildOnSave": true,
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "module": "ESNext",
     "target": "ESNext",
     "lib": ["dom", "esnext"],

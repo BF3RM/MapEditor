@@ -21,6 +21,10 @@ export class Vec3 extends Vector3 {
 		return new this(Number(object.x), Number(object.y), Number(object.z));
 	}
 
+	static fromJSON(json: EBX.JSON.Vec3): Vec3 {
+		return new Vec3().set(json.x.$value, json.y.$value, json.z.$value);
+	}
+
 	public toTable(): IVec3 {
 		return {
 			x: this.x,

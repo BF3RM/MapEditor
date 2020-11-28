@@ -14,7 +14,6 @@ function GameEntity:__init(arg)
 	self.entity:RegisterDestroyCallback(self, self.OnDestroyed)
 end
 function GameEntity:OnDestroyed()
-	print("Entity destroyed")
 	self.entity = nil
 end
 function GameEntity:GetGameEntityTransferData()
