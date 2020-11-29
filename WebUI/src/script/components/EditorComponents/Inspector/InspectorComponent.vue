@@ -33,6 +33,7 @@
 				</el-select>
 			</div>
 			<div class="ebx-container" v-if="selectedPartition() && selectedPartition().data && selectedPartition().primaryInstance">
+				<Instance :instance="selectedPartition().primaryInstance" :partition="selectedPartition()"></Instance>
 			</div>
 		</div>
 	</EditorComponent>
@@ -50,8 +51,10 @@ import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
 import { GameObject } from '@/script/types/GameObject';
 import SetVariationCommand from '@/script/commands/SetVariationCommand';
+import Partition from './EBXComponents/Partition.vue';
+import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
 
-@Component({ components: { LinearTransformControl, EditorComponent } })
+@Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance } })
 export default class InspectorComponent extends EditorComponent {
 	public selectedGameObject: GameObject;
 
