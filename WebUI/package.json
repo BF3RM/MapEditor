@@ -15,7 +15,6 @@
     "three": "0.121.1",
     "typed-signals": "1.0.5",
     "typescript-collections": "1.3.3",
-    "venice-ebx-browser": "https://github.com/Rylius/EBX-Viewer",
     "vextpack": "^0.1.4",
     "vue": "2.6.12",
     "vue-class-component": "7.2.6",
