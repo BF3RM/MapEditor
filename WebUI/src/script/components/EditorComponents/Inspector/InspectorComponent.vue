@@ -75,7 +75,6 @@ export default class InspectorComponent extends EditorComponent {
 	private nOfObjectsInGroup = 0;
 
 	private selectedPartition() {
-		console.log(window.editor.fbdMan.getPartitionByName(this.selectedGameObject.blueprintCtrRef.name));
 		return window.editor.fbdMan.getPartitionByName(this.selectedGameObject.blueprintCtrRef.name);
 	}
 

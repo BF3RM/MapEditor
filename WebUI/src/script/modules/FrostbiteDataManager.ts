@@ -1,5 +1,5 @@
 import { signals } from '@/script/modules/Signals';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { JSZipUtils } from '@/script/libs/jszip-utils';
 import { FBBundle } from '@/script/types/gameData/FBBundle';
 import { FBSuperBundle } from '@/script/types/gameData/FBSuperBundle';
@@ -12,9 +12,9 @@ export class FrostbiteDataManager {
 	public bundles = new Dictionary<string, FBBundle>();
 	public partitions = new Dictionary<string, FBPartition>();
 
-	public assetHashes = new Dictionary<string, FBPartition>();
-	public eventHashes = new Dictionary<string, FBPartition>();
-	public InterfaceIDs = new Dictionary<string, FBPartition>();
+	public assetHashes = new Dictionary<string, string>();
+	public eventHashes = new Dictionary<string, string>();
+	public InterfaceIDs = new Dictionary<string, string>();
 
 	public partitionGuids = new Dictionary<string, FBPartition>();
 

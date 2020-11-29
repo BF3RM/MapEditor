@@ -11,7 +11,7 @@
         <div v-if="directories || files">
             <div class="content">
                 <ul>
-                    <li v-for="(dir, name) in directories">
+                    <li v-for="(dir, name) in directories" :key="name">
                         <router-link :to="`/view/${game}${cleanPath}${name}`">
                             <span class="icon"><i class="fas fa-folder"/></span>
                             {{ name }}
@@ -22,7 +22,7 @@
 
             <div class="content">
                 <ul>
-                    <li v-for="file in files">
+                    <li v-for="file in files" :key="file">
                         <router-link :to="`/view/${game}${cleanPath}${file}`">
                             <span class="icon"><i class="fas fa-file-alt"/></span>
                             {{ file | removeExt }}
@@ -41,51 +41,51 @@
 import Vue from 'vue';
 
 function resolve(data: any, path: string): { [dir: string]: string } {
-    if (!path.length) {
-        return data;
-    }
+	if (!path.length) {
+		return data;
+	}
 
-    let current = data;
-    for (const part of path.split('/')) {
-        current = current[part];
-    }
-    return current;
+	let current = data;
+	for (const part of path.split('/')) {
+		current = current[part];
+	}
+	return current;
 }
 
 export default Vue.extend({
-    name: 'Directory',
-    props: {
-        game: String,
-        path: {
-            type: String,
-            default: '',
-        },
-    },
-    data(): { loading: boolean, directories: { [dir: string]: string } | null, files: Array<string> | null } {
-        return {
-            loading: true,
-            directories: null,
-            files: null,
-        };
-    },
-    computed: {
-        cleanPath(): string {
-            let path = this.path;
-            if (!path.startsWith('/')) {
-                path = '/' + path;
-            }
-            if (!path.endsWith('/')) {
-                path += '/';
-            }
-            return path;
-        },
-    },
-    async mounted() {
-        const index = await fetch(`/${this.game}/files.json`).then(res => res.json());
-        this.directories = resolve(index.tree, this.path);
-        this.files = index.files[this.path];
-        this.loading = false;
-    },
+	name: 'Directory',
+	props: {
+		game: String,
+		path: {
+			type: String,
+			default: ''
+		}
+	},
+	data(): { loading: boolean, directories: { [dir: string]: string } | null, files: Array<string> | null } {
+		return {
+			loading: true,
+			directories: null,
+			files: null
+		};
+	},
+	computed: {
+		cleanPath(): string {
+			let path = this.path;
+			if (!path.startsWith('/')) {
+				path = '/' + path;
+			}
+			if (!path.endsWith('/')) {
+				path += '/';
+			}
+			return path;
+		}
+	},
+	async mounted() {
+		const index = await fetch(`/${this.game}/files.json`).then(res => res.json());
+		this.directories = resolve(index.tree, this.path);
+		this.files = index.files[this.path];
+		this.loading = false;
+	}
 });
 </script>
 

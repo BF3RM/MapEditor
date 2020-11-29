@@ -25,7 +25,7 @@ import Reference from '../../../../types/ebx/Reference';
 import Instance from './Instance.vue';
 import InstanceIdentifier from './InstanceIdentifier.vue';
 export default Vue.extend({
-	name: 'Reference',
+	name: 'ReferenceComponent',
 	components: {
 		InstanceIdentifier
 	},

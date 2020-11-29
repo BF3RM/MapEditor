@@ -8,13 +8,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 import { Log, LogError } from '@/script/modules/Logger';
 import VEXTInterface from '@/script/modules/VEXT';
 import Editor from '@/script/Editor';
-import TypeDocumentationLink from 'venice-ebx-browser/src/components/TypeDocumentationLink.vue';
-import Property from 'venice-ebx-browser/src/components/Property.vue';
-import Reference from 'venice-ebx-browser/src/components/Reference.vue';
-import Partition from 'venice-ebx-browser/src/components/Partition.vue';
-import Instance from 'venice-ebx-browser/src/components/Instance.vue';
-import InstanceIdentifier from 'venice-ebx-browser/src/components/InstanceIdentifier.vue';
-import Directory from 'venice-ebx-browser/src/components/Directory.vue';
+import TypeDocumentationLink from '@/script/components/EditorComponents/Inspector/EBXComponents/TypeDocumentationLink.vue';
+import Property from '@/script/components/EditorComponents/Inspector/EBXComponents/Property.vue';
+import Reference from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceComponent.vue';
+import Partition from '@/script/components/EditorComponents/Inspector/EBXComponents/Partition.vue';
+import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
+import InstanceIdentifier from '@/script/components/EditorComponents/Inspector/EBXComponents/InstanceIdentifier.vue';
+import Directory from '@/script/components/EditorComponents/Inspector/EBXComponents/Directory.vue';
 import GameRegistry, { FetchPartitionLoader } from '@/script/modules/GameRegistry';
 import { capitalize, removeExtension } from './filters';
 const locale = require('element-ui/lib/locale/lang/en');
@@ -47,7 +47,7 @@ Vue.filter('capitalize', capitalize);
 Vue.filter('removeExt', removeExtension);
 
 const registries = {
-	'venice': new GameRegistry('venice', new FetchPartitionLoader('https://ebx.rylius.de/venice/ebx', () => fetch('https://ebx.rylius.de/venice/partitions.json').then(res => res.json())))
+	'venice': new GameRegistry('venice', new FetchPartitionLoader('https://ebx.rylius.de/venice/ebx', () => fetch('/partitions.json').then(res => res.json())))
 };
 
 Vue.prototype.$registries = registries;

@@ -17,90 +17,90 @@
         </template>
 
         <template v-if="instance.fields.blueprint && instance.fields.blueprint.value">
-            <Reference :reference="instance.fields.blueprint.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.blueprint.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.physicsBlueprint && instance.fields.physicsBlueprint.value">
-            <Reference :reference="instance.fields.physicsBlueprint.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.physicsBlueprint.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.mesh && instance.fields.mesh.value">
-            <Reference :reference="instance.fields.mesh.value" :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.mesh.value" :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.effect && instance.fields.effect.value">
-            <Reference :reference="instance.fields.effect.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.effect.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.camera && instance.fields.camera.value">
-            <Reference :reference="instance.fields.camera.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.camera.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.emitter && instance.fields.emitter.value">
-            <Reference :reference="instance.fields.emitter.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.emitter.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.sound && instance.fields.sound.value">
-            <Reference :reference="instance.fields.sound.value" :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.sound.value" :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.wave && instance.fields.wave.value">
-            <Reference :reference="instance.fields.wave.value" :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.wave.value" :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.unlockAsset && instance.fields.unlockAsset.value">
-            <Reference :reference="instance.fields.unlockAsset.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.unlockAsset.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.visualEnvironment && instance.fields.visualEnvironment.value">
-            <Reference :reference="instance.fields.visualEnvironment.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.visualEnvironment.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.enlightenData && instance.fields.enlightenData.value">
-            <Reference :reference="instance.fields.enlightenData.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.enlightenData.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.asset && instance.fields.asset.value">
-            <Reference :reference="instance.fields.asset.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.asset.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.shaderInstance && instance.fields.shaderInstance.value">
-            <Reference :reference="instance.fields.shaderInstance.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.shaderInstance.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.shader && instance.fields.shader.value">
             <template v-if="instance.fields.shader.value.partitionGuid && instance.fields.shader.value.instanceGuid">
-                <Reference :reference="instance.fields.shader.value"
-                           :link="referenceLinks"></Reference>
+                <reference-component :reference="instance.fields.shader.value"
+                           :link="referenceLinks"></reference-component>
             </template>
             <template v-else>
                 <!-- SurfaceShaderInstanceDataStruct is nested -->
-                <Reference :reference="instance.fields.shader.value.shader.value"
-                           :link="referenceLinks"></Reference>
+                <reference-component :reference="instance.fields.shader.value.shader.value"
+                           :link="referenceLinks"></reference-component>
             </template>
         </template>
         <template v-else-if="instance.fields.graphAsset && instance.fields.graphAsset.value">
-            <Reference :reference="instance.fields.graphAsset.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.graphAsset.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.voEvent && instance.fields.voEvent.value">
-            <Reference :reference="instance.fields.voEvent.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.voEvent.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.customizeSoldierData && instance.fields.customizeSoldierData.value">
-            <Reference :reference="instance.fields.customizeSoldierData.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.customizeSoldierData.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.event && instance.fields.event.value">
-            <Reference :reference="instance.fields.event.value" :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.event.value" :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.skeletonAsset && instance.fields.skeletonAsset.value">
-            <Reference :reference="instance.fields.skeletonAsset.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.skeletonAsset.value"
+                       :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.mixer && instance.fields.mixer.value">
-            <Reference :reference="instance.fields.mixer.value" :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.mixer.value" :link="referenceLinks"></reference-component>
         </template>
         <template v-else-if="instance.fields.impulseResponse && instance.fields.impulseResponse.value">
-            <Reference :reference="instance.fields.impulseResponse.value"
-                       :link="referenceLinks"></Reference>
+            <reference-component :reference="instance.fields.impulseResponse.value"
+                       :link="referenceLinks"></reference-component>
         </template>
 
         <template v-if="instance.fields.team && typeof instance.fields.team.value !== 'object'">
@@ -145,7 +145,7 @@ import Vue, { PropType } from 'vue';
 import events from '../../../../../data/eventHashes.json';
 
 import Instance from '../../../../types/ebx/Instance';
-import Reference from './Reference.vue';
+import ReferenceComponent from './ReferenceComponent.vue';
 
 export default Vue.extend({
 	name: 'InstanceIdentifier',
@@ -165,7 +165,7 @@ export default Vue.extend({
 		}
 	},
 	components: {
-		Reference
+		'reference-component': ReferenceComponent
 	}
 });
 </script>
