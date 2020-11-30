@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts">
-import Vue, {PropType} from 'vue';
-import {Node} from 'rete';
+import Vue, { PropType } from 'vue';
+import { Node } from 'rete';
 // @ts-ignore
 import VueRenderPlugin from '../../../lib/rete/vue-render-plugin.common';
 
@@ -53,53 +53,53 @@ import LogicNode from './LogicNode.vue';
 import MathOpNode from './MathOpNode.vue';
 
 const simpleValueTypes = [
-    'BoolEntityData',
-    'IntEntityData',
-    'FloatEntityData',
+	'BoolEntityData',
+	'IntEntityData',
+	'FloatEntityData'
 ];
 
 const logicTypes = [
-    'NotEntityData',
-    'AndEntityData',
-    'OrEntityData',
-    'Or4EntityData',
+	'NotEntityData',
+	'AndEntityData',
+	'OrEntityData',
+	'Or4EntityData'
 ];
 
 export default Vue.extend({
-    name: 'InstanceNode',
-    mixins: [
-        VueRenderPlugin.mixin,
-    ],
-    props: {
-        node: {
-            type: Object as PropType<Node>,
-            required: true,
-        },
-    },
-    computed: {
-        partition(): Partition {
-            return this.instance.partition;
-        },
-        instance(): Instance {
-            return this.node.data.instance as Instance;
-        },
-        nodeComponent() {
-            if (simpleValueTypes.indexOf(this.instance.type) >= 0) {
-                return SimpleValueNode;
-            } else if (this.instance.type === 'CompareEntityData') {
-                return CompareNode;
-            } else if (this.instance.type === 'MathOpEntityData') {
-                return MathOpNode;
-            } else if (logicTypes.indexOf(this.instance.type) >= 0) {
-                return LogicNode;
-            }
+	name: 'InstanceNode',
+	mixins: [
+		VueRenderPlugin.mixin
+	],
+	props: {
+		node: {
+			type: Object as PropType<Node>,
+			required: true
+		}
+	},
+	computed: {
+		partition(): Partition {
+			return this.instance.partition;
+		},
+		instance(): Instance {
+			return this.node.data.instance as Instance;
+		},
+		nodeComponent() {
+			if (simpleValueTypes.indexOf(this.instance.type) >= 0) {
+				return SimpleValueNode;
+			} else if (this.instance.type === 'CompareEntityData') {
+				return CompareNode;
+			} else if (this.instance.type === 'MathOpEntityData') {
+				return MathOpNode;
+			} else if (logicTypes.indexOf(this.instance.type) >= 0) {
+				return LogicNode;
+			}
 
-            return DefaultNode;
-        },
-    },
-    components: {
-        Socket,
-    },
+			return DefaultNode;
+		}
+	},
+	components: {
+		Socket
+	}
 });
 </script>
 

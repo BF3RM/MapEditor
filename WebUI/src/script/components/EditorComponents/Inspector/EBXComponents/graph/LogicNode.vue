@@ -11,38 +11,38 @@
 </template>
 
 <script lang="ts">
-import Vue, {PropType} from 'vue';
-import {Node} from 'rete';
+import Vue, { PropType } from 'vue';
+import { Node } from 'rete';
 
 import Instance from '../../ebx/Instance';
 
 export default Vue.extend({
-    name: 'LogicNode',
-    props: {
-        node: {
-            type: Object as PropType<Node>,
-            required: true,
-        },
-        instance: {
-            type: Object as PropType<Instance>,
-            required: true,
-        },
-    },
-    computed: {
-        operator(): string {
-            switch (this.instance.type) {
-                case 'AndEntityData':
-                    return 'AND';
-                case 'NotEntityData':
-                    return 'NOT';
-                case 'OrEntityData':
-                case 'Or4EntityData':
-                    return 'OR';
-                default:
-                    return '???';
-            }
-        },
-    },
+	name: 'LogicNode',
+	props: {
+		node: {
+			type: Object as PropType<Node>,
+			required: true
+		},
+		instance: {
+			type: Object as PropType<Instance>,
+			required: true
+		}
+	},
+	computed: {
+		operator(): string {
+			switch (this.instance.type) {
+			case 'AndEntityData':
+				return 'AND';
+			case 'NotEntityData':
+				return 'NOT';
+			case 'OrEntityData':
+			case 'Or4EntityData':
+				return 'OR';
+			default:
+				return '???';
+			}
+		}
+	}
 });
 </script>
 

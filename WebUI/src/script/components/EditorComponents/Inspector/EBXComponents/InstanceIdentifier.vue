@@ -145,7 +145,6 @@ import Vue, { PropType } from 'vue';
 import events from '../../../../../data/eventHashes.json';
 
 import Instance from '../../../../types/ebx/Instance';
-import ReferenceComponent from './ReferenceComponent.vue';
 
 export default Vue.extend({
 	name: 'InstanceIdentifier',
@@ -165,7 +164,7 @@ export default Vue.extend({
 		}
 	},
 	components: {
-		'reference-component': ReferenceComponent
+		'reference-component': () => import('./ReferenceComponent.vue')
 	}
 });
 </script>

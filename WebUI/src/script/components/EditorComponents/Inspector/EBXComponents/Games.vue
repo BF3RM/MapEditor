@@ -15,6 +15,6 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-    name: 'Games',
+	name: 'Games'
 });
 </script>

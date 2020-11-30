@@ -20,54 +20,54 @@
 </template>
 
 <script lang="ts">
-import Vue, {PropType} from 'vue';
-import {Input, Output, Socket} from 'rete';
+import Vue, { PropType } from 'vue';
+import { Input, Output, Socket } from 'rete';
 // @ts-ignore
 import VueRenderPlugin from '../../../lib/rete/vue-render-plugin.common';
 
 export default Vue.extend({
-    name: 'Socket',
-    mixins: [
-        VueRenderPlugin.mixin,
-    ],
-    props: {
-        socket: {
-            type: Object as PropType<Socket>,
-            required: true,
-        },
-        input: {
-            type: Object as PropType<Input>,
-            required: false,
-        },
-        output: {
-            type: Object as PropType<Output>,
-            required: false,
-        },
-        bindSocket: {},
-    },
-    computed: {
-        type(): string {
-            if (this.input) {
-                return 'input';
-            } else if (this.output) {
-                return 'output';
-            }
+	name: 'Socket',
+	mixins: [
+		VueRenderPlugin.mixin
+	],
+	props: {
+		socket: {
+			type: Object as PropType<Socket>,
+			required: true
+		},
+		input: {
+			type: Object as PropType<Input>,
+			required: false
+		},
+		output: {
+			type: Object as PropType<Output>,
+			required: false
+		},
+		bindSocket: {}
+	},
+	computed: {
+		type(): string {
+			if (this.input) {
+				return 'input';
+			} else if (this.output) {
+				return 'output';
+			}
 
-            return 'unknown';
-        },
-        icon(): string | null {
-            switch (this.socket.name) {
-                case 'link':
-                    return 'fa-link';
-                case 'event':
-                    return 'fa-bell';
-                case 'property':
-                    return 'fa-arrow-right';
-                default:
-                    return null;
-            }
-        },
-    },
+			return 'unknown';
+		},
+		icon(): string | null {
+			switch (this.socket.name) {
+			case 'link':
+				return 'fa-link';
+			case 'event':
+				return 'fa-bell';
+			case 'property':
+				return 'fa-arrow-right';
+			default:
+				return null;
+			}
+		}
+	}
 });
 </script>
 

@@ -20,14 +20,11 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
-import TypeDocumentationLink from './TypeDocumentationLink.vue';
 import Reference from '../../../../types/ebx/Reference';
-import Instance from './Instance.vue';
-import InstanceIdentifier from './InstanceIdentifier.vue';
 export default Vue.extend({
 	name: 'ReferenceComponent',
 	components: {
-		InstanceIdentifier
+		InstanceIdentifier: () => import('./InstanceIdentifier.vue')
 	},
 	props: {
 		reference: {

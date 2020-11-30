@@ -11,38 +11,38 @@
 </template>
 
 <script lang="ts">
-import Vue, {PropType} from 'vue';
-import {Node} from 'rete';
+import Vue, { PropType } from 'vue';
+import { Node } from 'rete';
 
 import Instance from '../../ebx/Instance';
 import Field from '../../ebx/Field';
 
 const ops: { [value: string]: string } = {
-    0: '+',
-    1: '-',
-    2: '*',
-    3: '/',
-    4: 'min',
-    5: 'max',
+	0: '+',
+	1: '-',
+	2: '*',
+	3: '/',
+	4: 'min',
+	5: 'max'
 };
 
 export default Vue.extend({
-    name: 'MathOpNode',
-    props: {
-        node: {
-            type: Object as PropType<Node>,
-            required: true,
-        },
-        instance: {
-            type: Object as PropType<Instance>,
-            required: true,
-        },
-    },
-    computed: {
-        operator(): string {
-            return this.instance.fields.operators.value.map((op: Field<any>) => ops[op.value]).join(', ');
-        },
-    },
+	name: 'MathOpNode',
+	props: {
+		node: {
+			type: Object as PropType<Node>,
+			required: true
+		},
+		instance: {
+			type: Object as PropType<Instance>,
+			required: true
+		}
+	},
+	computed: {
+		operator(): string {
+			return this.instance.fields.operators.value.map((op: Field<any>) => ops[op.value]).join(', ');
+		}
+	}
 });
 </script>
 
