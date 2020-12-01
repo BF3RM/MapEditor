@@ -2,14 +2,17 @@
     <span>
         <template v-if="instance">
 			<span @click="expanded = !expanded">
-				&rarr; {{instance.type}} - {{referencePath}}
+				<div class="ReferenceBox">
+					<div class="type">&rarr; {{instance.type}}</div>
+					<div class="path">{{cleanPath()}}</div>
+				</div>
 			</span>
         </template>
         <template v-else>
             &rarr; {{referencePath}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
         </template>
-		<template v-if="expanded">
-                <instance-identifier :instance="instance" :reference-links="link"></instance-identifier>
+		<template v-if="expanded && this.$data.partition">
+                <Instance :instance="instance" :partition="this.$data.partition" :reference-links="link"></Instance>
 		</template>
         <template v-if="loading">
             (loading)
@@ -19,12 +22,14 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';
+import Partition from '@/script/types/ebx/Partition';
+import { Component } from 'vue-property-decorator';
+import Reference from '@/script/types/ebx/Reference';
 
-import Reference from '../../../../types/ebx/Reference';
-export default Vue.extend({
+@Component({
 	name: 'ReferenceComponent',
 	components: {
-		InstanceIdentifier: () => import('./InstanceIdentifier.vue')
+		Instance: () => import('./Instance.vue')
 	},
 	props: {
 		reference: {
@@ -34,9 +39,16 @@ export default Vue.extend({
 		link: {
 			type: Boolean,
 			default: () => true
+		},
+		currentPath: {
+			type: String,
+			required: false
+		},
+		methods: {
+			cleanPath: String
 		}
 	},
-	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition} {
+	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition } {
 		return {
 			loading: true,
 			instance: null,
@@ -44,23 +56,23 @@ export default Vue.extend({
 			referencePath: '',
 			partition: null
 		};
-	},
-	async mounted() {
-		try {
-			this.partition = window.editor.fbdMan.getPartition(this.reference.partitionGuid);
-			const data = this.partition.data;
-			const instance = window.editor.fbdMan.getInstance(this.reference.partitionGuid, this.reference.instanceGuid);
-			if (!instance) {
-				console.error('Failed to fetch instance');
-			}
-			this.instance = instance;
-			this.referencePath = window.editor.fbdMan.getPartitionName(this.reference.partitionGuid);
-		} catch (err) {
-			console.warn(`Failed to resolve reference ${(this.reference.partitionGuid)}/${this.reference.instanceGuid}`, err);
-			return;
-		} finally {
-			this.loading = false;
-		}
 	}
-});
+})
+export default class ReferenceComponent extends Vue {
+	mounted() {
+		this.partition = window.editor.fbdMan.getPartition(this.reference.partitionGuid);
+		if (this.partition === undefined) {
+			console.warn(`Failed to resolve reference ${(this.reference.partitionGuid)}/${this.reference.instanceGuid}`);
+		}
+		console.log(this.partition.data);
+		this.referencePath = this.$data.partition.name;
+		this.instance = this.$data.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
+		console.log(this.instance);
+		this.loading = false;
+	}
+
+	cleanPath() {
+		return this.$data.partition.fileName;
+	}
+}
 </script>

@@ -6,6 +6,7 @@ import { FBSuperBundle } from '@/script/types/gameData/FBSuperBundle';
 import { Dictionary } from 'typescript-collections';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { Guid } from '@/script/types/Guid';
+import Instance from '@/script/types/ebx/Instance';
 
 export class FrostbiteDataManager {
 	public superBundles = new Dictionary<string, FBSuperBundle>();
@@ -15,7 +16,6 @@ export class FrostbiteDataManager {
 	public assetHashes = new Dictionary<string, string>();
 	public eventHashes = new Dictionary<string, string>();
 	public InterfaceIDs = new Dictionary<string, string>();
-
 	public partitionGuids = new Dictionary<string, FBPartition>();
 
 	private files = new Dictionary<string, any>();
@@ -157,8 +157,9 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getPartitionByName(partitionName: string = '') {
-		return this.partitions.getValue(partitionName.toString().toLowerCase());
+	public getPartitionByName(partitionName: string = ''): FBPartition | undefined {
+		const partition = this.partitions.getValue(partitionName.toString().toLowerCase());
+		return partition;
 	}
 
 	public getSuperBundle(superBundleName: string) {
@@ -213,7 +214,7 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getInstance(partitionGuid: Guid, instanceGuid: Guid) {
+	public getInstance(partitionGuid: Guid, instanceGuid: Guid): Instance | undefined {
 		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
 		if (partition) {
 			return partition.getInstance(instanceGuid);

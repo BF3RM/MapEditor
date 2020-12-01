@@ -46,12 +46,6 @@ Vue.component('Directory', Directory);
 Vue.filter('capitalize', capitalize);
 Vue.filter('removeExt', removeExtension);
 
-const registries = {
-	'venice': new GameRegistry('venice', new FetchPartitionLoader('https://ebx.rylius.de/venice/ebx', () => fetch('/partitions.json').then(res => res.json())))
-};
-
-Vue.prototype.$registries = registries;
-
 new Vue({
 	render: (h) => h(App),
 	store

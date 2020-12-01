@@ -15,14 +15,13 @@
         <div class="table-container" v-if="visible">
             <table class="table is-array-element">
                 <tbody>
-                <property v-for="(value, index) in field.value"
+                <property :currentPath=currentPath v-for="(value, index) in field.value"
                           :partition="partition" :field="value" :key="index"></property>
                 </tbody>
             </table>
         </div>
     </div>
 </template>
-
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
@@ -41,6 +40,10 @@ export default Vue.extend({
 		field: {
 			type: Object as PropType<Field<any>>,
 			required: true
+		},
+		currentPath: {
+			type: String,
+			required: false
 		}
 	},
 	data() {

@@ -1,24 +1,17 @@
 <template>
     <div>
         <h4 :id="instance.guid">
-            <a :href="`https://docs.veniceunleashed.net/vext/ref/fb/${instance.type.toLowerCase()}/`">
+            <!--<a :href="`https://docs.veniceunleashed.net/vext/ref/fb/${instance.type.toLowerCase()}/`">-->
                 {{ instance.type }}
-            </a>
-            {{ instance.guid }}
+			<!--</a>
+			{{ instance.guid }}-->
             <button class="button is-small" v-if="visible" @click="visible = false">Hide</button>
             <button class="button is-small" v-else @click="visible = true">Show</button>
         </h4>
         <div class="table-container" v-if="visible">
             <table class="table is-bordered">
-                <thead>
-                <tr>
-                    <th>Property</th>
-                    <th>Value</th>
-                    <th>Type</th>
-                </tr>
-                </thead>
                 <tbody>
-					<Property v-for="(field, index) in instance.fields" :partition="partition" :field="field" :key="index"></Property>
+					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :field="field" :key="index"></Property>
                 </tbody>
             </table>
         </div>
@@ -57,6 +50,7 @@ export default Vue.extend({
 		if (location.hash && location.hash.substring(1) === this.instance.guid) {
 			this.visible = true;
 		}
+		console.log(this.$props.partition.name);
 	},
 	watch: {
 		active(guid) {

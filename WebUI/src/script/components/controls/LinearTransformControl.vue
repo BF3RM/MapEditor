@@ -1,13 +1,13 @@
 <template>
 	<div class="transformControls">
 		<div class="pos-control">
-			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 		<div class="rot-control">
-			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
 		</div>
 		<div class="scale-control">
-			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
 	</div>
 </template>
@@ -19,17 +19,12 @@ import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import QuatControl from '@/script/components/controls/QuatControl.vue';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { IQuat, Quat } from '@/script/types/primitives/Quat';
+import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
 export default class LinearTransformControl extends Vue {
-	@Prop()
-	position: IVec3;
-
-	@Prop()
-	rotation: IQuat;
-
-	@Prop()
-	scale: IVec3;
+	@Prop({ default: new LinearTransform() })
+	value: LinearTransform;
 
 	@Prop({ default: false })
 	hideLabel: boolean;

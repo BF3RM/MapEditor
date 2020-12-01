@@ -11,7 +11,7 @@
 				</div>
 
 				<linear-transform-control class="lt-control" :hideLabel="false"
-										:position="position" :rotation="rotation" :scale="scale"
+										:value="selectedGameObject.transform"
 										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
 			</div>
 			<div class="blueprint-container" v-if="!multiSelection && !isEmpty">
@@ -32,8 +32,16 @@
 					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
 				</el-select>
 			</div>
-			<div class="ebx-container" v-if="selectedPartition() && selectedPartition().data && selectedPartition().primaryInstance">
-				<Instance :instance="selectedPartition().primaryInstance" :partition="selectedPartition()"></Instance>
+			<div class="ebx-container" v-if="selectedGameObject && selectedPartition && selectedPartition.data">
+				<template v-if="selectedPartition && selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object">
+					<span>
+						<b>Object:</b>
+						<Instance :currentPath="selectedPartition.name" v-if="selectedPartition.primaryInstance.fields.object.value" :instance=getInstance(selectedPartition.primaryInstance.fields.object.value) :partition="selectedPartition"></Instance>
+					</span>
+				</template>
+				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects">
+					<ArrayProperty :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects" :partition="selectedPartition"></ArrayProperty>
+				</template>
 			</div>
 		</div>
 	</EditorComponent>
@@ -53,8 +61,11 @@ import { GameObject } from '@/script/types/GameObject';
 import SetVariationCommand from '@/script/commands/SetVariationCommand';
 import Partition from './EBXComponents/Partition.vue';
 import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
+import { FBPartition } from '@/script/types/gameData/FBPartition';
+import Reference from '@/script/types/ebx/Reference';
+import ArrayProperty from '@/script/components/EditorComponents/Inspector/EBXComponents/ArrayProperty.vue';
 
-@Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance } })
+@Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty } })
 export default class InspectorComponent extends EditorComponent {
 	public selectedGameObject: GameObject;
 
@@ -73,9 +84,10 @@ export default class InspectorComponent extends EditorComponent {
 	private selectedVariation = 0;
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
+	private selectedPartition: Partition = undefined;
 
-	private selectedPartition() {
-		return window.editor.fbdMan.getPartitionByName(this.selectedGameObject.blueprintCtrRef.name);
+	private getInstance(reference: Reference): Instance {
+		return window.editor.fbdMan.getInstance(reference.partitionGuid, reference.instanceGuid);
 	}
 
 	@Ref('enableInput')
@@ -146,6 +158,7 @@ export default class InspectorComponent extends EditorComponent {
 		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
 
 		this.selectedGameObject = selectedGameObject;
+		this.selectedPartition = window.editor.fbdMan.getPartitionByName(this.selectedGameObject.blueprintCtrRef.name);
 	}
 
 	get isEmpty() {
@@ -268,6 +281,9 @@ export default class InspectorComponent extends EditorComponent {
 		input#enabled {
 			width: 20px;
 			margin: 13px;
+		}
+		.ebx-container {
+			padding: 1em;
 		}
 	}
 </style>

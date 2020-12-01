@@ -1,5 +1,5 @@
 <template>
-    <reference-component :reference="field.value"></reference-component>
+    <reference-component :currentPath="currentPath" :reference="field.value" :partition="partition"></reference-component>
 </template>
 
 <script lang="ts">
@@ -22,6 +22,10 @@ export default Vue.extend({
 		field: {
 			type: Object as PropType<Field<any>>,
 			required: true
+		},
+		currentPath: {
+			type: String,
+			required: false
 		}
 	}
 });

@@ -13,7 +13,9 @@ module.exports = {
 				compilerFile: 'vuicc.exe',
 
 				// OPTIONAL: Specify the location where the ui.vuic should be placed, defaults to '../'
-				outputPath: '../'
+				outputPath: '../',
+
+				hotReloadSupport: process.env.NODE_ENV !== 'production'
 			})
 		]
 	}

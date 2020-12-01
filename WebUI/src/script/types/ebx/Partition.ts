@@ -22,13 +22,13 @@ export default class Partition {
 			json.$name,
 			new Guid(json.$guid)
 		);
-		console.log(json);
 		for (const data of json.$instances) {
 			partition.instances[data.$guid.toUpperCase()] = Instance.fromJSON(partition, data);
 		}
 
 		partition.primaryInstance = partition.instances[json.$primaryInstance.toUpperCase()];
 
+		console.log(partition);
 		return partition;
 	}
 }

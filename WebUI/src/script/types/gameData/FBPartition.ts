@@ -5,6 +5,7 @@ import Partition from '@/script/types/ebx/Partition';
 import Instance from '@/script/types/ebx/Instance';
 import { Dictionary } from 'typescript-collections';
 import { GameObject } from '@/script/types/GameObject';
+import Vue from 'vue';
 const axios = require('axios').default;
 
 export class FBPartition {
@@ -41,23 +42,21 @@ export class FBPartition {
 
 	public get data() {
 		if (this._data === undefined) {
-			return this.getData().then((response: AxiosResponse<EBX.JSON.Partition>) => {
-				this._data = Partition.fromJSON(this.name, response.data);
-				for (const instance of response.data.$instances) {
-					this.instances[instance.$guid] = Instance.fromJSON(this._data, instance);
-				}
-			});
+			return this.getData();
 		} else {
 			return this._data;
 		}
 	}
 
-	private getData(): Promise<AxiosResponse<EBX.JSON.Partition>> {
+	public getData(): Promise<AxiosResponse<EBX.JSON.Partition>> {
 		if (this.promise) { // In case the same thing is requested rapidly
 			return this.promise;
 		}
-		this.promise = axios.get('http://176.9.7.112:8081/' + this.name + '.json').then((response:AxiosResponse<FBPartition>) => {
-			return response;
+		this.promise = axios.get('http://176.9.7.112:8081/' + this.name + '.json').then((response: AxiosResponse<EBX.JSON.Partition>) => {
+			this._data = Partition.fromJSON(this.name, response.data);
+			for (const instance of response.data.$instances) {
+				Vue.set(this.instances, instance.$guid, Instance.fromJSON(this._data, instance));
+			}
 		});
 		return this.promise;
 	}

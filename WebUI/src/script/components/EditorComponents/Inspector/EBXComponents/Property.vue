@@ -1,16 +1,17 @@
 <template>
-    <tr>
-        <td class="is-family-code is-narrow">
-            {{ field.name }}
+    <tr v-if="field.name !== 'name'" class="row">
+        <td class="is-family-code is-narrow field-name">
+			{{ field.name }}
         </td>
-
         <template v-if="field.value === null">
             <td class="is-family-code">
                 nil
             </td>
         </template>
-        <td v-else>
-            <component :is="propertyComponent" :partition="partition" :field="field"></component>
+        <td v-else class="field-value">
+            <div>
+				<component :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value"></component>
+			</div>
         </td>
     </tr>
 </template>
@@ -27,6 +28,10 @@ import LinearTransformProperty from './LinearTransformProperty.vue';
 import ArrayProperty from './ArrayProperty.vue';
 import ReferenceProperty from './ReferenceProperty.vue';
 import ObjectProperty from './ObjectProperty.vue';
+import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
+import StringControl from '@/script/components/controls/StringControl.vue';
+import NumberControl from '@/script/components/controls/NumberControl.vue';
+import BoolControl from '@/script/components/controls/BoolControl.vue';
 
 export default Vue.extend({
 	name: 'Property',
@@ -37,6 +42,10 @@ export default Vue.extend({
 		},
 		field: {
 			type: Object as PropType<Field<any>>,
+			required: true
+		},
+		currentPath: {
+			type: String,
 			required: true
 		}
 	},
@@ -52,7 +61,18 @@ export default Vue.extend({
 			case 'Vec3':
 				return Vec3Property;
 			case 'LinearTransform':
-				return LinearTransformProperty;
+				return LinearTransformControl;
+			case 'String':
+				return StringControl;
+			case 'Single':
+			case 'Int32':
+			case 'UInt32':
+			case 'Int16':
+			case 'UInt16':
+			case 'SByte':
+				return NumberControl;
+			case 'Boolean':
+				return BoolControl;
 			case 'AntRef':
 				// TODO assetId
 				// Characters/Soldiers/MpSoldier.json
@@ -74,7 +94,15 @@ export default Vue.extend({
 		ReferenceProperty,
 		ArrayProperty,
 		Vec3Property,
-		LinearTransformProperty
+		LinearTransformProperty,
+		StringControl,
+		NumberControl,
+		BoolControl
 	}
 });
 </script>
+<style lang="scss">
+	.row {
+		display: table-row;
+	}
+</style>
