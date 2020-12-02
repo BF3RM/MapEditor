@@ -67,7 +67,7 @@ export class Blueprint implements IBlueprint {
 	}
 
 	// Changes Some/Path/BlueprintName into just BlueprintName
-	public getName() {
+	public getName(): string {
 		return this.name.substring(this.name.lastIndexOf('/') + 1);
 	}
 }
