@@ -1,10 +1,10 @@
 <template>
     <div class="value">
         <template v-if="field.value.length === 1">
-            {{ field.value.length }} element
+            [{{ field.value.length }}] element
         </template>
         <template v-else>
-            {{ field.value.length }} elements
+            [{{ field.value.length }}] elements
         </template>
 
         <template v-if="field.value.length">
@@ -22,15 +22,17 @@
         </div>
     </div>
 </template>
+
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
 import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
+import Property from '@/script/components/EditorComponents/Inspector/EBXComponents/Property.vue';
 export default Vue.extend({
 	name: 'ArrayProperty',
 	components: {
-		'property': () => import('./Property.vue')
+		Property
 	},
 	props: {
 		partition: {

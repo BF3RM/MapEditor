@@ -5,7 +5,7 @@
         </td>
         <td class="field-value">
             <div>
-				<component :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="this.field.value" @input="onChangeValue"></component>
+				<component :class="field.type" :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value" @input="onChangeValue"></component>
 			</div>
         </td>
     </tr>
@@ -17,10 +17,10 @@ import Vue, { PropType } from 'vue';
 import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
 
-import DefaultProperty from './DefaultProperty.vue';
-import ArrayProperty from './ArrayProperty.vue';
-import ReferenceProperty from './ReferenceProperty.vue';
-import ObjectProperty from './ObjectProperty.vue';
+// import DefaultProperty from './DefaultProperty.vue';
+// import ArrayProperty from './ArrayProperty.vue';
+// import ReferenceProperty from './ReferenceProperty.vue';
+// import ObjectProperty from './ObjectProperty.vue';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
 import StringControl from '@/script/components/controls/StringControl.vue';
 import NumberControl from '@/script/components/controls/NumberControl.vue';
@@ -71,25 +71,25 @@ export default Vue.extend({
 			case 'AntRef':
 				// TODO assetId
 				// Characters/Soldiers/MpSoldier.json
-				return ObjectProperty;
+				return () => import('./ObjectProperty.vue');
 			default:
 				console.log('Unknown property type: ' + this.field.type);
 				break;
 			}
 
 			if (typeof this.field.value === 'object') {
-				return ObjectProperty;
+				return () => import('./ObjectProperty.vue');
 			}
 
-			return DefaultProperty;
+			return () => import('./DefaultProperty.vue');
 		}
 	},
 	computed: {
 		propertyComponent() {
 			if (Array.isArray(this.field.value)) {
-				return ArrayProperty;
+				return () => import('./ArrayProperty.vue');
 			} else if (this.field.isReference()) {
-				return ReferenceProperty;
+				return () => import('./ReferenceProperty.vue');
 			}
 			const type = this.getType();
 
@@ -102,10 +102,6 @@ export default Vue.extend({
 		}
 	},
 	components: {
-		DefaultProperty,
-		ObjectProperty,
-		ReferenceProperty,
-		ArrayProperty,
 		StringControl,
 		NumberControl,
 		BoolControl
@@ -123,5 +119,11 @@ export default Vue.extend({
 	}
 	.field-value {
 		grid-column: 2;
+	}
+	.Int32 input, .UInt32 input, .Int16 input, .UInt16 input, .SByte input {
+		color: #66d9ef;
+	}
+	.Single input, {
+		color: #9e73c6;
 	}
 </style>

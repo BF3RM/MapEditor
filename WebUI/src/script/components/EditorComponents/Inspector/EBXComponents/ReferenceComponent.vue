@@ -3,13 +3,13 @@
         <template v-if="instance">
 			<span @click="expanded = !expanded">
 				<div class="ReferenceBox">
-					<div class="type">&rarr; {{instance.type}}</div>
+					<div class="type">{{instance.type}}</div>
 					<div class="path">{{cleanPath()}}</div>
 				</div>
 			</span>
         </template>
         <template v-else>
-            &rarr; {{cleanPath()}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
+            {{cleanPath()}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
         </template>
 		<template v-if="expanded && this.$data.partition">
                 <Instance :instance="instance" :partition="this.$data.partition" :reference-links="link"></Instance>
@@ -97,5 +97,11 @@ export default class ReferenceComponent extends Vue {
 	background-color: rgba(0, 0, 0, 0.4) !important;
 	color: #fff;
 	border-top: 1px solid rgb(0 0 0 / 40%) !important;
+}
+.type {
+	color: #f98926;
+}
+.path {
+	color: #688457;
 }
 </style>

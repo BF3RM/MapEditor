@@ -8,7 +8,7 @@
                 {{ field.value }}: {{ interfaceId }}
             </template>
             <template v-else-if="field.isEnum()">
-                <span class="has-text-grey">{{ field.type }}.</span>{{ field.enumValue }}
+				<span class="has-text-grey">{{ field.type }}.</span><span class="enum">{{ field.enumValue }}</span>
             </template>
             <template v-else>
                 {{ field.value }}
@@ -54,3 +54,9 @@ export default Vue.extend({
 	}
 });
 </script>
+
+<style lang="scss" scoped>
+.enum {
+	color: #ebff56;
+}
+</style>

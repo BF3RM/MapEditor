@@ -69,5 +69,6 @@ input[type=text].input {
 }
 .table-container {
 	border-left: 1px dotted #ffffff29;
+	padding-left: 10px;
 }
 </style>
