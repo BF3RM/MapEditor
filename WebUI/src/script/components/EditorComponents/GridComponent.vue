@@ -46,6 +46,7 @@ export default class GridComponent extends EditorComponent {
 	}
 
 	get style() {
+		// @ts-ignore
 		return `
 <style>
 .grid-container {
@@ -54,7 +55,7 @@ export default class GridComponent extends EditorComponent {
 .grid-item {
 	width: ` + this.data.scale + `em;
 }
-.grid-item .Icon{
+.grid-item .Icon {
 	width: ` + this.data.scale + `em;
 	height: ` + this.data.scale / 3 + `em;
 }

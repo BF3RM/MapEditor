@@ -68,7 +68,11 @@ input[type=text].input {
   max-width: 20%;
 }
 .table-container {
-	border-left: 1px dotted #ffffff29;
+	border-left: 1px solid #00000030;
 	padding-left: 10px;
+	background-color: #0000001c;
+	padding-bottom: 20px;
+	margin-bottom: 20px;
 }
+
 </style>

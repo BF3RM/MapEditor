@@ -1,10 +1,10 @@
 <template>
     <div class="value">
         <template v-if="field.value.length === 1">
-            [{{ field.value.length }}] element
+            {{ field.value.length }} element
         </template>
         <template v-else>
-            [{{ field.value.length }}] elements
+            {{ field.value.length }} elements
         </template>
 
         <template v-if="field.value.length">
@@ -15,7 +15,7 @@
         <div class="table-container" v-if="visible">
             <table class="table is-array-element">
                 <tbody>
-                <property :autoOpen="autoOpen" :currentPath=currentPath v-for="(value, index) in field.value"
+                <property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath v-for="(value, index) in field.value"
                           :partition="partition" :field="value" :key="index"></property>
                 </tbody>
             </table>

@@ -4,7 +4,7 @@
 			{{ titleName }}
         </td>
         <td class="field-value">
-            <div>
+            <div class="field-spacer">
 				<component :class="field.type" :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value" @input="onChangeValue"></component>
 			</div>
         </td>
@@ -101,6 +101,9 @@ export default Vue.extend({
 			};
 		},
 		titleName() {
+			if (parseInt(this.field.name)) {
+				return '[' + this.field.name + ']';
+			}
 			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(/([a-z0-9])([A-Z])/g, '$1 $2'); // Make first character uppercase and make it Title Case
 		}
 	},

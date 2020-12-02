@@ -1,6 +1,6 @@
 <template>
 	<EditorComponent class="inspector-component" title="Inspector">
-		<div v-if="!isEmpty">
+		<div v-if="!isEmpty" class="scrollable">
 			<div class="header">
 				<img :class="'Large Icon Icon-' + objectType"/><input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange"><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
 			</div>
@@ -283,7 +283,7 @@ export default class InspectorComponent extends EditorComponent {
 			margin: 13px;
 		}
 		.ebx-container {
-			padding: 1em;
+			padding-left: 1em;
 		}
 	}
 </style>
