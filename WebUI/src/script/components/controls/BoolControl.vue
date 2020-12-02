@@ -12,7 +12,7 @@ export default class BoolControl extends Vue {
 	@Prop() value: string;
 
 	onChangeValue() {
-		this.$emit('input');
+		this.$emit('input', this.value);
 	}
 }
 </script>

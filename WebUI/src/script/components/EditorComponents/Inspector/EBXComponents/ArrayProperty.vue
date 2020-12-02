@@ -15,7 +15,7 @@
         <div class="table-container" v-if="visible">
             <table class="table is-array-element">
                 <tbody>
-                <property :currentPath=currentPath v-for="(value, index) in field.value"
+                <property :autoOpen="autoOpen" :currentPath=currentPath v-for="(value, index) in field.value"
                           :partition="partition" :field="value" :key="index"></property>
                 </tbody>
             </table>
@@ -40,6 +40,10 @@ export default Vue.extend({
 		field: {
 			type: Object as PropType<Field<any>>,
 			required: true
+		},
+		autoOpen: {
+			type: Boolean,
+			required: false
 		},
 		currentPath: {
 			type: String,

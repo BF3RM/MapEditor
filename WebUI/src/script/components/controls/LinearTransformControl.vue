@@ -1,5 +1,5 @@
 <template>
-	<div class="transformControls">
+	<div class="transformControls" v-if="value">
 		<div class="pos-control">
 			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</div>
@@ -23,7 +23,7 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
 export default class LinearTransformControl extends Vue {
-	@Prop({ default: new LinearTransform() })
+	@Prop()
 	value: LinearTransform;
 
 	@Prop({ default: false })
@@ -35,7 +35,7 @@ export default class LinearTransformControl extends Vue {
 	}
 
 	onChangeValue() {
-		this.$emit('input');
+		this.$emit('input', this.value);
 	}
 
 	@Emit('quatUpdated')
@@ -63,27 +63,23 @@ export default class LinearTransformControl extends Vue {
 	}
 	.transformControls::v-deep .Vec3Control {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(4, 1fr);
 	}
-	.transformControls::v-deep b{
-		grid-row: 1;
+	.transformControls::v-deep .label{
+		grid-column: 1;
 		font-weight: bold;
 	}
 	.transformControls::v-deep .x{
-		grid-column: 1;
-		grid-row: 2;
+		grid-column: 2;
 	}
 	.transformControls::v-deep .y{
-		grid-column: 2;
-		grid-row: 2;
+		grid-column: 3;
 	}
 	.transformControls::v-deep .z {
-		grid-column: 3;
-		grid-row: 2;
+		grid-column: 4;
 	}
 	.transformControls::v-deep .w{
-		grid-column: 4;
-		grid-row: 2;
+		grid-column: 5;
 	}
 	.transformControls::v-deep input {
 		border: 0;

@@ -1,9 +1,12 @@
 <template>
-    <table class="table">
-        <tbody>
+    <div class="table">
+        <div v-if="field.value">
 			<Property v-for="(value, key) in field.value" :partition="partition" :field="value" :key="key"></Property>
-        </tbody>
-    </table>
+        </div>
+		<div v-else>
+			nil
+		</div>
+    </div>
 </template>
 
 <script lang="ts">

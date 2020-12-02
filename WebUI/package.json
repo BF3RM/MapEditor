@@ -2,6 +2,8 @@
   "private": true,
   "version": "0.0.0",
   "dependencies": {
+    "@caohenghu/vue-colorpicker": "^1.2.4",
+    "@gouch/to-title-case": "^2.2.1",
     "axios": "^0.21.0",
     "camera-controls": "1.25.0",
     "element-ui": "2.13.2",

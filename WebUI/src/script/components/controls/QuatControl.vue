@@ -1,14 +1,16 @@
 <template>
 	<div>
-		<b>{{label}}</b>
 		<template v-if="mode === 'Vec4'">
+			<div class="label">
+				<b v-if="label">{{label}}</b>
+			</div>
 			<DraggableNumberInput :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 			<DraggableNumberInput :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 			<DraggableNumberInput :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</template>
 		<template v-else>
-			<Vec3Control :hideLabel="hideLabel" :value="euler" label="" @input="onChangeValue" :step=step @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control :hideLabel="hideLabel" :value="euler" :label="label" @input="onChangeValue" :step=step @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 		</template>
 	</div>
 </template>

@@ -1,9 +1,11 @@
 <template>
 	<div class="Vec3Control">
-		<b v-if="label">{{label}}</b>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<div class="label">
+			<b v-if="label">{{label}}</b>
+		</div>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="x" dragDirection="X" :value="value.x" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="y" dragDirection="X" :value="value.y" label="Y" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="z" dragDirection="X" :value="value.z" label="Z" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
 	</div>
 </template>
 
@@ -22,7 +24,7 @@ export default class Vec3Control extends Vue {
 	@Prop({ default: false }) hideLabel: boolean;
 
 	onChangeValue() {
-		this.$emit('input');
+		this.$emit('input', this.value);
 	}
 
 	@Emit('startDrag')
@@ -40,4 +42,7 @@ export default class Vec3Control extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.Vec3Control {
+	display: flex;
+}
 </style>

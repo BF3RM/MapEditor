@@ -1,13 +1,5 @@
 <template>
     <div>
-        <h4 :id="instance.guid">
-            <!--<a :href="`https://docs.veniceunleashed.net/vext/ref/fb/${instance.type.toLowerCase()}/`">-->
-                {{ instance.type }}
-			<!--</a>
-			{{ instance.guid }}-->
-            <button class="button is-small" v-if="visible" @click="visible = false">Hide</button>
-            <button class="button is-small" v-else @click="visible = true">Show</button>
-        </h4>
         <div class="table-container" v-if="visible">
             <table class="table is-bordered">
                 <tbody>
@@ -76,6 +68,6 @@ input[type=text].input {
   max-width: 20%;
 }
 .table-container {
-	border-left: 1px dotted;
+	border-left: 1px dotted #ffffff29;
 }
 </style>

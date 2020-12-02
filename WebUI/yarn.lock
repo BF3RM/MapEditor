@@ -23,6 +23,11 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
+"@caohenghu/vue-colorpicker@^1.2.4":
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@caohenghu/vue-colorpicker/-/vue-colorpicker-1.2.4.tgz#1595f47b9e25b278c73318a812c0df9e989a90c0"
+  integrity sha512-2YvCiBOnA9IANRJtw9rqIhVeJZPRPgO9gmFi3qfNgs1IEl7PFlcRx17VD1UF2L97PEk5GaxmrfCdCY15L09UQg==
+
 "@eslint/eslintrc@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.1.3.tgz#7d1a2b2358552cc04834c0979bd4275362e37085"
@@ -115,6 +120,11 @@
     inversify "^5.0.0"
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
+
+"@gouch/to-title-case@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@gouch/to-title-case/-/to-title-case-2.2.1.tgz#44a1de1bb02351d6a0d92ec1a325000158423874"
+  integrity sha512-i/Hj91LfiE2pxYdIT0Ttdc/fIzdBwojDNQe6S6/N/Uf3xMmn0lWO+iLkAd84zs/NUGfTLsMUacDZzSy6N4jkcw==
 
 "@hapi/address@2.x.x":
   version "2.1.4"

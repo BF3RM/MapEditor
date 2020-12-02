@@ -31,6 +31,9 @@ import Reference from '@/script/types/ebx/Reference';
 	components: {
 		Instance: () => import('./Instance.vue')
 	},
+	methods: {
+		cleanPath: String
+	},
 	props: {
 		reference: {
 			type: Object as PropType<Reference>,
@@ -44,8 +47,9 @@ import Reference from '@/script/types/ebx/Reference';
 			type: String,
 			required: false
 		},
-		methods: {
-			cleanPath: String
+		autoOpen: {
+			type: Boolean,
+			required: false
 		}
 	},
 	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition } {
@@ -69,6 +73,9 @@ export default class ReferenceComponent extends Vue {
 			this.instance = this.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
 			console.log(this.instance);
 			this.loading = false;
+			if (this.autoOpen) {
+				this.expanded = true;
+			}
 		});
 	}
 
@@ -80,3 +87,15 @@ export default class ReferenceComponent extends Vue {
 	}
 }
 </script>
+<style lang="scss">
+.ReferenceBox {
+	height: 30px;
+	/* width: 100%; */
+	padding: 5px;
+	margin: 0;
+	border: 0;
+	background-color: rgba(0, 0, 0, 0.4) !important;
+	color: #fff;
+	border-top: 1px solid rgb(0 0 0 / 40%) !important;
+}
+</style>

@@ -40,7 +40,7 @@
 					</span>
 				</template>
 				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects">
-					<ArrayProperty :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects" :partition="selectedPartition"></ArrayProperty>
+					<ArrayProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects" :partition="selectedPartition"></ArrayProperty>
 				</template>
 			</div>
 		</div>

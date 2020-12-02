@@ -1,16 +1,11 @@
 <template>
     <tr v-if="field.name !== 'name'" class="row">
         <td class="is-family-code is-narrow field-name">
-			{{ field.name }}
+			{{ titleName }}
         </td>
-        <template v-if="field.value === null">
-            <td class="is-family-code">
-                nil
-            </td>
-        </template>
-        <td v-else class="field-value">
+        <td class="field-value">
             <div>
-				<component :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value"></component>
+				<component :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="this.field.value" @input="onChangeValue"></component>
 			</div>
         </td>
     </tr>
@@ -23,8 +18,6 @@ import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
 
 import DefaultProperty from './DefaultProperty.vue';
-import Vec3Property from './Vec3Property.vue';
-import LinearTransformProperty from './LinearTransformProperty.vue';
 import ArrayProperty from './ArrayProperty.vue';
 import ReferenceProperty from './ReferenceProperty.vue';
 import ObjectProperty from './ObjectProperty.vue';
@@ -33,7 +26,7 @@ import StringControl from '@/script/components/controls/StringControl.vue';
 import NumberControl from '@/script/components/controls/NumberControl.vue';
 import BoolControl from '@/script/components/controls/BoolControl.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
-
+require('@gouch/to-title-case');
 export default Vue.extend({
 	name: 'Property',
 	props: {
@@ -48,16 +41,17 @@ export default Vue.extend({
 		currentPath: {
 			type: String,
 			required: true
+		},
+		autoOpen: {
+			type: Boolean,
+			required: false
 		}
 	},
-	computed: {
-		propertyComponent() {
-			if (Array.isArray(this.field.value)) {
-				return ArrayProperty;
-			} else if (this.field.isReference()) {
-				return ReferenceProperty;
-			}
-
+	methods: {
+		onChangeValue(newValue) {
+			console.log(newValue);
+		},
+		getType() {
 			switch (this.field.type) {
 			case 'Vec3':
 				return Vec3Control;
@@ -79,6 +73,7 @@ export default Vue.extend({
 				// Characters/Soldiers/MpSoldier.json
 				return ObjectProperty;
 			default:
+				console.log('Unknown property type: ' + this.field.type);
 				break;
 			}
 
@@ -89,13 +84,28 @@ export default Vue.extend({
 			return DefaultProperty;
 		}
 	},
+	computed: {
+		propertyComponent() {
+			if (Array.isArray(this.field.value)) {
+				return ArrayProperty;
+			} else if (this.field.isReference()) {
+				return ReferenceProperty;
+			}
+			const type = this.getType();
+
+			// TODO: filter for colors
+
+			return type;
+		},
+		titleName() {
+			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(/([a-z0-9])([A-Z])/g, '$1 $2'); // Make first character uppercase and make it Title Case
+		}
+	},
 	components: {
 		DefaultProperty,
 		ObjectProperty,
 		ReferenceProperty,
 		ArrayProperty,
-		Vec3Property,
-		LinearTransformProperty,
 		StringControl,
 		NumberControl,
 		BoolControl
@@ -104,6 +114,14 @@ export default Vue.extend({
 </script>
 <style lang="scss">
 	.row {
-		display: table-row;
+		display: table-footer-group;
+	}
+
+	.field-name {
+		text-transform: capitalize;
+		grid-column: 1;
+	}
+	.field-value {
+		grid-column: 2;
 	}
 </style>

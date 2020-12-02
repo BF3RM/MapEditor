@@ -1,5 +1,5 @@
 <template>
-    <reference-component :currentPath="currentPath" :reference="field.value" :partition="partition"></reference-component>
+    <reference-component :autoOpen="autoOpen" :currentPath="currentPath" :reference="field.value" :partition="partition"></reference-component>
 </template>
 
 <script lang="ts">
@@ -25,6 +25,10 @@ export default Vue.extend({
 		},
 		currentPath: {
 			type: String,
+			required: false
+		},
+		autoOpen: {
+			type: Boolean,
 			required: false
 		}
 	}
