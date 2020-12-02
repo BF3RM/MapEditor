@@ -9,10 +9,6 @@
     "@vue/standard",
     "@vue/typescript"
   ],
-  "parserOptions": {
-    "parser": "@typescript-eslint/parser",
-    "plugins": ["typescript"]
-  },
   "rules": {
     "no-tabs": 0,
     "semi": ["error", "always"],
