@@ -14,8 +14,8 @@
 import Vue, { PropType } from 'vue';
 import { Node } from 'rete';
 
-import Instance from '../../ebx/Instance';
-import Field from '../../ebx/Field';
+import Instance from '@/script/types/ebx/Instance';
+import Field from '@/script/types/ebx/Field';
 
 const ops: { [value: string]: string } = {
 	0: '+',

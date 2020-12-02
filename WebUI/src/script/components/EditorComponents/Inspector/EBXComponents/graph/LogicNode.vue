@@ -14,7 +14,7 @@
 import Vue, { PropType } from 'vue';
 import { Node } from 'rete';
 
-import Instance from '../../ebx/Instance';
+import Instance from '@/script/types/ebx/Instance';
 
 export default Vue.extend({
 	name: 'LogicNode',

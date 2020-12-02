@@ -28,7 +28,9 @@ import Vue, { PropType } from 'vue';
 
 import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
-import Property from '@/script/components/EditorComponents/Inspector/EBXComponents/Property.vue';
+
+import Property from './Property.vue';
+
 export default Vue.extend({
 	name: 'ArrayProperty',
 	components: {

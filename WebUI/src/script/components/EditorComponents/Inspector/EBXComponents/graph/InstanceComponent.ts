@@ -1,6 +1,6 @@
 import Rete, { Node } from 'rete';
 import InstanceNode from './InstanceNode.vue';
-import Partition from '../../ebx/Partition';
+import Partition from '@/script/types/ebx/Partition';
 
 export default class InstanceComponent extends Rete.Component {
     public data: { [key: string]: any } = {};

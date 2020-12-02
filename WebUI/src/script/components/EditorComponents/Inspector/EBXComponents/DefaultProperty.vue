@@ -37,14 +37,14 @@ export default Vue.extend({
 		}
 	},
 	computed: {
-		eventId(): string | null {
+		eventId(): string | undefined {
 			if (!this.field.value) {
 				return null;
 			}
 
 			return window.editor.fbdMan.eventHashes.getValue(this.field.value);
 		},
-		interfaceId(): string | null {
+		interfaceId(): string | undefined {
 			if (!this.field.value) {
 				return null;
 			}

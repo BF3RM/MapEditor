@@ -42,8 +42,8 @@ import { Node } from 'rete';
 // @ts-ignore
 import VueRenderPlugin from '../../../lib/rete/vue-render-plugin.common';
 
-import Partition from '../../ebx/Partition';
-import Instance from '../../ebx/Instance';
+import Partition from '@/script/types/ebx/Partition';
+import Instance from '@/script/types/ebx/Instance';
 
 import DefaultNode from './DefaultNode.vue';
 import SimpleValueNode from './SimpleValueNode.vue';

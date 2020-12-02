@@ -11,8 +11,8 @@
 import Vue, { PropType } from 'vue';
 import { Node } from 'rete';
 
-import Partition from '../../ebx/Partition';
-import Instance from '../../ebx/Instance';
+import Partition from '@/script/types/ebx/Partition';
+import Instance from '@/script/types/ebx/Instance';
 
 export default Vue.extend({
 	name: 'DefaultNode',

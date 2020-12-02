@@ -51,7 +51,7 @@ export default Vue.extend({
 		onChangeValue(newValue) {
 			console.log(newValue);
 		},
-		getType() {
+		async getType() {
 			switch (this.field.type) {
 			case 'Vec3':
 				return Vec3Control;
@@ -71,17 +71,17 @@ export default Vue.extend({
 			case 'AntRef':
 				// TODO assetId
 				// Characters/Soldiers/MpSoldier.json
-				return () => import('./ObjectProperty.vue');
+				return import('./ObjectProperty.vue');
 			default:
 				console.log('Unknown property type: ' + this.field.type);
 				break;
 			}
 
 			if (typeof this.field.value === 'object') {
-				return () => import('./ObjectProperty.vue');
+				return import('./ObjectProperty.vue');
 			}
 
-			return () => import('./DefaultProperty.vue');
+			return import('./DefaultProperty.vue');
 		}
 	},
 	computed: {
@@ -91,11 +91,14 @@ export default Vue.extend({
 			} else if (this.field.isReference()) {
 				return () => import('./ReferenceProperty.vue');
 			}
-			const type = this.getType();
 
-			// TODO: filter for colors
+			return () => {
+				const type = this.getType();
 
-			return type;
+				// TODO: filter for colors
+
+				return type;
+			};
 		},
 		titleName() {
 			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(/([a-z0-9])([A-Z])/g, '$1 $2'); // Make first character uppercase and make it Title Case

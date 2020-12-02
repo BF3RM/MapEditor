@@ -15,8 +15,8 @@
 import Vue, { PropType } from 'vue';
 import { Node } from 'rete';
 
-import Instance from '../../ebx/Instance';
-import { typeNameMappings } from '../../ebx/types';
+import Instance from '@/script/types/ebx/Instance';
+import { typeNameMappings } from '@/script/types/ebx/types';
 
 export default Vue.extend({
 	name: 'SimpleValueNode',
