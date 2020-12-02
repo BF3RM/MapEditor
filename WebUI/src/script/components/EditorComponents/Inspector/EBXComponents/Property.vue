@@ -32,6 +32,7 @@ import LinearTransformControl from '@/script/components/controls/LinearTransform
 import StringControl from '@/script/components/controls/StringControl.vue';
 import NumberControl from '@/script/components/controls/NumberControl.vue';
 import BoolControl from '@/script/components/controls/BoolControl.vue';
+import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 
 export default Vue.extend({
 	name: 'Property',
@@ -59,7 +60,7 @@ export default Vue.extend({
 
 			switch (this.field.type) {
 			case 'Vec3':
-				return Vec3Property;
+				return Vec3Control;
 			case 'LinearTransform':
 				return LinearTransformControl;
 			case 'String':

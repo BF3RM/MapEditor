@@ -9,7 +9,7 @@
 			</span>
         </template>
         <template v-else>
-            &rarr; {{referencePath}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
+            &rarr; {{cleanPath()}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
         </template>
 		<template v-if="expanded && this.$data.partition">
                 <Instance :instance="instance" :partition="this.$data.partition" :reference-links="link"></Instance>
@@ -64,15 +64,19 @@ export default class ReferenceComponent extends Vue {
 		if (this.partition === undefined) {
 			console.warn(`Failed to resolve reference ${(this.reference.partitionGuid)}/${this.reference.instanceGuid}`);
 		}
-		console.log(this.partition.data);
-		this.referencePath = this.$data.partition.name;
-		this.instance = this.$data.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
-		console.log(this.instance);
-		this.loading = false;
+		this.partition.data.then((res) => {
+			this.referencePath = this.partition.name;
+			this.instance = this.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
+			console.log(this.instance);
+			this.loading = false;
+		});
 	}
 
 	cleanPath() {
-		return this.$data.partition.fileName;
+		if (this.partition) {
+			return this.partition.fileName;
+		}
+		return this.$data.referencePath;
 	}
 }
 </script>

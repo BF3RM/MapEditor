@@ -84,7 +84,7 @@ export default class InspectorComponent extends EditorComponent {
 	private selectedVariation = 0;
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
-	private selectedPartition: Partition = undefined;
+	private selectedPartition: Partition = null;
 
 	private getInstance(reference: Reference): Instance {
 		return window.editor.fbdMan.getInstance(reference.partitionGuid, reference.instanceGuid);

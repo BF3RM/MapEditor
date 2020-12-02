@@ -41,11 +41,10 @@ export class FBPartition {
 	}
 
 	public get data() {
-		if (this._data === undefined) {
-			return this.getData();
-		} else {
-			return this._data;
+		if (this.promise) { // In case the same thing is requested rapidly
+			return this.promise;
 		}
+		return this.getData();
 	}
 
 	public getData(): Promise<AxiosResponse<EBX.JSON.Partition>> {
@@ -53,10 +52,11 @@ export class FBPartition {
 			return this.promise;
 		}
 		this.promise = axios.get('http://176.9.7.112:8081/' + this.name + '.json').then((response: AxiosResponse<EBX.JSON.Partition>) => {
-			this._data = Partition.fromJSON(this.name, response.data);
+			const data = Partition.fromJSON(this.name, response.data);
 			for (const instance of response.data.$instances) {
 				Vue.set(this.instances, instance.$guid, Instance.fromJSON(this._data, instance));
 			}
+			return data;
 		});
 		return this.promise;
 	}

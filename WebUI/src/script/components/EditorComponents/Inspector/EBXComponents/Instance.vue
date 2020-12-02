@@ -75,5 +75,7 @@ export default Vue.extend({
 input[type=text].input {
   max-width: 20%;
 }
-
+.table-container {
+	border-left: 1px dotted;
+}
 </style>
