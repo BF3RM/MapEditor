@@ -12,6 +12,9 @@ input {
   color: #fff;
   border-top: 1px solid rgb(0 0 0 / 40%) !important;
 }
+input[type="text"] {
+  padding-left: 1em;
+}
 #viewport-container {
   background: none !important;
   pointer-events: none;

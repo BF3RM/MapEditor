@@ -3,7 +3,7 @@
         <template v-if="instance">
 			<span @click="expanded = !expanded">
 				<div class="ReferenceBox">
-					<div class="type">{{instance.type}}</div>
+					<div class="type">{{instance.typeName}}</div>
 					<div class="path">{{cleanPath()}}</div>
 				</div>
 			</span>
@@ -67,6 +67,7 @@ export default class ReferenceComponent extends Vue {
 		this.partition = window.editor.fbdMan.getPartition(this.reference.partitionGuid);
 		if (this.partition === undefined) {
 			console.warn(`Failed to resolve reference ${(this.reference.partitionGuid)}/${this.reference.instanceGuid}`);
+			return;
 		}
 		this.partition.data.then((res) => {
 			this.referencePath = this.partition.name;

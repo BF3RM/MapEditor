@@ -1,43 +1,46 @@
 <template>
 	<EditorComponent class="inspector-component" title="Inspector">
 		<div v-if="!isEmpty" class="scrollable">
-			<div class="header">
-				<img :class="'Large Icon Icon-' + objectType"/><input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange"><input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
-			</div>
-			<div class="transform-container">
-				<div v-if="!multiSelection">
-					<label class="name-label" for="name">GUID:</label>
-					<input class="guid-input" :value="gameObjectGuid" :disabled="true">
+			<div v-if="!multiSelection" class="bpInfo" :class="{collapsed: toggleState.info}">
+				<div @click="toggleState.info = !toggleState.info">
+					<i :class="{'el-icon-arrow-right': toggleState.info, 'el-icon-arrow-down': !toggleState.info}"></i>Info
 				</div>
+				<input class="guid-input" :value="gameObjectGuid" :disabled="true">
+				<input class="Blueprint-input" id="bp-name" disabled="true" :value="blueprintName">
+				<input class="Blueprint-input" id="bp-type" disabled="true" :value="blueprintType">
+				<field for="bp-instance-guid">Instance Guid</field>
+				<input class="Blueprint-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
+				<field for="bp-partition-guid">Partition Guid</field>
+				<input class="Blueprint-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
+			</div>
+			<div class="header">
+				<div id="IconAndEnable">
+					<img :class="'Large Icon Icon-' + objectType"/>
+					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
+				</div>
+				<div>
+					<input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
+				</div>
+			</div>
+			<div class="container transform-container">
 
 				<linear-transform-control class="lt-control" :hideLabel="false"
 										:value="selectedGameObject.transform"
 										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
 			</div>
-			<div class="blueprint-container" v-if="!multiSelection && !isEmpty">
-				<div class="title">Blueprint</div>
-				<label class="name-label" for="bp-name">Name:</label>
-				<input class="name-input" id="bp-name" disabled="true" :value="blueprintName">
-
-				<label class="name-label" for="bp-type">Type:</label>
-				<input class="name-input" id="bp-type" disabled="true" :value="blueprintType">
-
-				<label class="name-label" for="bp-instance-guid">Instance GUID:</label>
-				<input class="name-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
-
-				<label class="name-label" for="bp-partition-guid">Partition GUID:</label>
-				<input class="name-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
-
+			<div class="container variation">
 				<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
 					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
 				</el-select>
 			</div>
-			<div class="ebx-container" v-if="selectedGameObject && selectedPartition && selectedPartition.data">
+			<div class="container ebx-container" v-if="selectedGameObject && selectedPartition && selectedPartition.data">
 				<template v-if="selectedPartition && selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object">
+					<ReferenceProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object" :partition="selectedPartition"></ReferenceProperty>
+					<!--
 					<span>
-						<b>Object:</b>
 						<Instance :currentPath="selectedPartition.name" v-if="selectedPartition.primaryInstance.fields.object.value" :instance=getInstance(selectedPartition.primaryInstance.fields.object.value) :partition="selectedPartition"></Instance>
 					</span>
+					-->
 				</template>
 				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects">
 					<ArrayProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects" :partition="selectedPartition"></ArrayProperty>
@@ -63,9 +66,10 @@ import Partition from './EBXComponents/Partition.vue';
 import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import Reference from '@/script/types/ebx/Reference';
-import ArrayProperty from '@/script/components/EditorComponents/Inspector/EBXComponents/ArrayProperty.vue';
+import ArrayProperty from './EBXComponents/ArrayProperty.vue';
+import ReferenceProperty from './EBXComponents/ReferenceProperty.vue';
 
-@Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty } })
+@Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty, ReferenceProperty } })
 export default class InspectorComponent extends EditorComponent {
 	public selectedGameObject: GameObject;
 
@@ -85,6 +89,10 @@ export default class InspectorComponent extends EditorComponent {
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
 	private selectedPartition: Partition = null;
+
+	private toggleState = {
+		info: true
+	}
 
 	private getInstance(reference: Reference) {
 		return window.editor.fbdMan.getInstance(reference.partitionGuid, reference.instanceGuid);
@@ -246,11 +254,11 @@ export default class InspectorComponent extends EditorComponent {
 		.header {
 			display: flex;
 		}
-		img.Large.Icon {
+		#IconAndEnable {
 			margin: 10px;
 		}
 		.title {
-			margin: 1vmin 0;
+			margin: 1em 0;
 			font-size: 1.5em;
 			font-weight: bold;
 		}
@@ -259,24 +267,25 @@ export default class InspectorComponent extends EditorComponent {
 			flex-direction: row;
 			align-content: center;
 			.enable-label {
-				margin: 1vmin 0;
+				margin: 1em 0;
 				font-weight: bold;
 			}
 
 			.enable-input {
-				height: 1.5vmin;
-				margin: 1vmin 0;
+				height: 1.5em;
+				margin: 1em 0;
 			}
 		}
 
 		.name-label {
-			margin: 1vmin 0;
+			margin: 1em 0;
 			font-weight: bold;
 		}
 
 		.name-input {
-			margin: 1vmin 0;
-			border-radius: 0.1vmin;
+			margin: 1em 0 0 0;
+			border-radius: 0.5em;
+			padding: 0.2em 0.2em 0.2em 1em;
 		}
 		input#enabled {
 			width: 20px;
@@ -284,6 +293,10 @@ export default class InspectorComponent extends EditorComponent {
 		}
 		.ebx-container {
 			padding-left: 1em;
+		}
+		.collapsed {
+			height: 1em;
+			overflow: hidden;
 		}
 	}
 </style>

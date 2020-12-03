@@ -53,10 +53,10 @@ export default Vue.extend({
 	},
 	methods: {
 		luaFindInstanceByGuid(partition: Partition, instance: Instance) {
-			return `${instance.type}(ResourceManager:FindInstanceByGuid(Guid('${partition.guid}'), Guid('${instance.guid}')))`;
+			return `${instance.typeName}(ResourceManager:FindInstanceByGuid(Guid('${partition.guid}'), Guid('${instance.guid}')))`;
 		},
 		luaFindInstance(instance: Instance) {
-			return `${instance.type}(partition:FindInstance(Guid('${instance.guid}')))`;
+			return `${instance.typeName}(partition:FindInstance(Guid('${instance.guid}')))`;
 		}
 	}
 });
@@ -69,6 +69,8 @@ input[type=text].input {
 }
 .table-container {
 	border-left: 1px solid #00000030;
+	border-bottom: 1px solid #00000030;
+	border-bottom-left-radius: 0.5em;
 	padding-left: 10px;
 	background-color: #0000001c;
 	padding-bottom: 20px;

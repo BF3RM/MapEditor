@@ -5,7 +5,7 @@
         </td>
         <td class="field-value">
             <div class="field-spacer">
-				<component :class="field.type" :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value" @input="onChangeValue"></component>
+				<component :class="field.type" :type="typeof(field.value)" :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value" @input="onChangeValue"></component>
 			</div>
         </td>
     </tr>
@@ -125,6 +125,12 @@ export default Vue.extend({
 	}
 	.field-value {
 		grid-column: 2;
+	}
+	.value div[type=object] {
+	}
+	.field-name {
+		text-align: right;
+		padding-right: 1em;
 	}
 	.Int32 input, .UInt32 input, .Int16 input, .UInt16 input, .SByte input {
 		color: #66d9ef;

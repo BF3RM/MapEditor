@@ -70,4 +70,8 @@ export class Blueprint implements IBlueprint {
 	public get fileName(): string {
 		return this.name.substring(this.name.lastIndexOf('/') + 1);
 	}
+
+	public get id() {
+		return this.instanceGuid.toString();
+	}
 }

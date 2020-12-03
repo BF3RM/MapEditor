@@ -2,6 +2,7 @@
 	<EditorComponent class="grid-component" :title="title">
 		<div class="header">
 			<Search v-model="data.search" @search="onSearch"/>
+			<input type="range" min="1" max="14" step="0.01" v-model="data.scale"/>
 		</div>
 		<div class="grid-container">
 			<div class="grid-item" v-for="(item, index) in filteredItems()" :key="index"

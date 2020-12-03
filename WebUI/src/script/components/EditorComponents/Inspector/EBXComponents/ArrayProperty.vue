@@ -1,21 +1,20 @@
 <template>
     <div class="value">
-        <template v-if="field.value.length === 1">
-            {{ field.value.length }} element
-        </template>
-        <template v-else>
-            {{ field.value.length }} elements
-        </template>
-
-        <template v-if="field.value.length">
-            <button class="button is-small" v-if="visible" @click="visible = false">Hide</button>
-            <button class="button is-small" v-else @click="visible = true">Show</button>
-        </template>
-
+		<div @click="visible = !visible">
+			<template v-if="field.value.length">
+				<i :class="{'el-icon-arrow-down': visible, 'el-icon-arrow-right': !visible}"></i>
+			</template>
+			<template v-if="field.value.length === 1">
+				{{ field.value.length }} element
+			</template>
+			<template v-else>
+				{{ field.value.length }} elements
+			</template>
+		</div>
         <div class="table-container" v-if="visible">
             <table class="table is-array-element">
                 <tbody>
-                <property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath v-for="(value, index) in field.value"
+					<property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath v-for="(value, index) in field.value"
                           :partition="partition" :field="value" :key="index"></property>
                 </tbody>
             </table>

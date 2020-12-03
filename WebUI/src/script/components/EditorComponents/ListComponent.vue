@@ -22,6 +22,7 @@
 						:min-item-size="30"
 						@click.native="onClick(item)"
 						@mousedown.native="onMouseDown($event, item)"
+						:key-field="keyField"
 				>
 				<slot :item="item" :data="data">
 				</slot>
@@ -33,12 +34,12 @@
 <script lang="ts">
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
-import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtual-scroller';
+import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import Search from '@/script/components/widgets/Search.vue';
 import { Blueprint } from '@/script/types/Blueprint';
 
-@Component({ components: { RecycleScroller, DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
+@Component({ components: { DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ListComponent extends EditorComponent {
 	@Prop(Array) public list: {name: string}[];
 	@Prop(String) public keyField: string;

@@ -8,7 +8,7 @@ export default class Instance {
 
 	constructor(
 		public readonly guid: Frostbite.Guid,
-		public readonly type: string,
+		public readonly typeName: string,
 		public readonly baseClass: string,
 		fields: Fields
 	) {

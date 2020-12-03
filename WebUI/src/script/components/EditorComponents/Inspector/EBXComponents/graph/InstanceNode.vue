@@ -10,8 +10,8 @@
             </template>
             <template v-slot:type>
                 <h3>
-                    {{ instance.type }}
-                    <br>
+					{{ instance.typeName }}
+					<br>
                     <instance-identifier :registry="node.data.registry" :instance="instance"
                                          :reference-links="false"></instance-identifier>
                 </h3>
@@ -84,13 +84,13 @@ export default Vue.extend({
 			return this.node.data.instance as Instance;
 		},
 		nodeComponent() {
-			if (simpleValueTypes.indexOf(this.instance.type) >= 0) {
+			if (simpleValueTypes.indexOf(this.instance.typeName) >= 0) {
 				return SimpleValueNode;
-			} else if (this.instance.type === 'CompareEntityData') {
+			} else if (this.instance.typeName === 'CompareEntityData') {
 				return CompareNode;
-			} else if (this.instance.type === 'MathOpEntityData') {
+			} else if (this.instance.typeName === 'MathOpEntityData') {
 				return MathOpNode;
-			} else if (logicTypes.indexOf(this.instance.type) >= 0) {
+			} else if (logicTypes.indexOf(this.instance.typeName) >= 0) {
 				return LogicNode;
 			}
 

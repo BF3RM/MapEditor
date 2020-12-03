@@ -85,7 +85,4 @@ export default class LinearTransformControl extends Vue {
 		border: 0;
 	}
 
-	.pos-control, .rot-control, .scale-control {
-		margin: 0.5vmin 0;
-	}
 </style>

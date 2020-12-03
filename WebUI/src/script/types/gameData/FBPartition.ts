@@ -36,6 +36,10 @@ export class FBPartition {
 		return getPaths(this.name);
 	}
 
+	get id() {
+		return this.guid.toString();
+	}
+
 	get fileName() {
 		return getFilename(this.name);
 	}
