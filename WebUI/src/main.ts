@@ -19,7 +19,7 @@ const locale = require('element-ui/lib/locale/lang/en');
 
 let debugMode: boolean = false;
 if (!navigator.userAgent.includes('VeniceUnleashed')) {
-	if (window.location.ancestorOrigins[0] !== 'webui://main') {
+	if (window.location.ancestorOrigins === undefined || window.location.ancestorOrigins[0] !== 'webui://main') {
 		debugMode = true;
 	}
 }
