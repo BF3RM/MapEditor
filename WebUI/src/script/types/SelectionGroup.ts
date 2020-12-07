@@ -151,7 +151,7 @@ export class SelectionGroup extends THREE.Object3D {
 
 	public deselectAll() {
 		for (const go of this.selectedGameObjects) {
-			(go as GameObject).onDeselect();
+			(go).onDeselect();
 			signals.deselectedGameObject.emit(go.guid);
 		}
 
@@ -189,9 +189,9 @@ export class SelectionGroup extends THREE.Object3D {
 			return;
 		}
 
-		const go = this.selectedGameObjects[0] as GameObject;
+		const go = this.selectedGameObjects[0];
 		if (go.parent != null && go.parent.constructor === GameObject) {
-			this.select(go.parent as GameObject, false, true, true);
+			this.select(go.parent, false, true, true);
 		}
 	}
 

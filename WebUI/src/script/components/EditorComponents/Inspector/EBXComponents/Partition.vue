@@ -4,18 +4,6 @@
             <h2 class="title">
                 Partition {{ partition.guid }}
             </h2>
-            <div v-if="partition.primaryInstance">
-                <h3 class="subtitle">
-                    Hierarchy
-                </h3>
-                <div class="content">
-                    <ul>
-                        <li>
-                            <hierarchy-entry :instance="partition.primaryInstance"></hierarchy-entry>
-                        </li>
-                    </ul>
-                </div>
-            </div>
 <!--
             <div v-show="graphVisible">
                 <h3 class="subtitle">
@@ -49,7 +37,6 @@ import Vue from 'vue';
 
 import Partition from '../../../../types/ebx/Partition';
 import Instance from './Instance.vue';
-import HierarchyEntry from './HierarchyEntry.vue';
 // import Graph from './graph/Graph.vue';
 
 export default Vue.extend({
@@ -60,13 +47,13 @@ export default Vue.extend({
 		'guid'
 	],
 	data(): {
-        partition: Partition | null;
+        partition: Partition | undefined;
         activeInstance: string;
         types: { [type: string]: any };
         graphVisible: boolean;
         } {
 		return {
-			partition: null,
+			partition: undefined,
 			activeInstance: '',
 			types: {},
 			graphVisible: false
@@ -112,7 +99,6 @@ export default Vue.extend({
 		}
 	},
 	components: {
-		HierarchyEntry,
 		Instance
 		// Graph
 	}

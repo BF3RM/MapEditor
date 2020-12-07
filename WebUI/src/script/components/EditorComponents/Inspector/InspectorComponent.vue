@@ -42,7 +42,7 @@
 					</span>
 					-->
 				</template>
-				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects">
+				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields && selectedPartition.primaryInstance.fields.objects">
 					<ArrayProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects" :partition="selectedPartition"></ArrayProperty>
 				</template>
 			</div>
@@ -88,7 +88,7 @@ export default class InspectorComponent extends EditorComponent {
 	private selectedVariation = 0;
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
-	private selectedPartition: Partition = null;
+	private selectedPartition: FBPartition | null = null;
 
 	private toggleState = {
 		info: true
@@ -99,7 +99,7 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	@Ref('enableInput')
-	enableInput!: HTMLInputElement;
+	enableInput: HTMLInputElement;
 
 	constructor() {
 		super();

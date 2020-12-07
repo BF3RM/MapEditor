@@ -157,9 +157,9 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getPartitionByName(partitionName: string = ''): FBPartition | undefined {
+	public getPartitionByName(partitionName: string = ''): FBPartition | null {
 		const partition = this.partitions.getValue(partitionName.toString().toLowerCase());
-		return partition;
+		return partition || null;
 	}
 
 	public getSuperBundle(superBundleName: string) {

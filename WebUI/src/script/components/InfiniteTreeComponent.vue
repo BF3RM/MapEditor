@@ -33,7 +33,7 @@ const lcfirst = (str: string) => {
 @Component({ components: { RecycleScroller } })
 export default class InfiniteTreeComponent extends Vue {
 	@Ref('scroller')
-	scroller!: RecycleScroller;
+	scroller: RecycleScroller;
 
 	@Prop()
 	search: string;

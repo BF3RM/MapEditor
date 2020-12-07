@@ -112,7 +112,7 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	Save(newSave: boolean = false) {
-		const projectHeader = Object.assign({}, this.currentProjectHeader);
+		const projectHeader = { ...this.currentProjectHeader };
 		(projectHeader as any).projectName = this.selectedProjectName;
 		if (newSave) {
 			(projectHeader as any).projectName = this.newSaveName;
@@ -158,7 +158,7 @@ export default class ProjectSettingsComponent extends Vue {
 		const seconds = '0' + date.getSeconds();
 
 		// Will display time in 10:30:23 format
-		var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+		const formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 
 		return date.toDateString() + ' - ' + formattedTime;
 	}

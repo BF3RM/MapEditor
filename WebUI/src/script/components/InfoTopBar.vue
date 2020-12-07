@@ -11,10 +11,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class InfoTopBar extends Vue {
 	@Prop()
-	keyName!: string;
+	keyName: string;
 
 	@Prop()
-	description!: string;
+	description: string;
 }
 </script>
 

@@ -1,3 +1,3 @@
-declare module Frostbite {
+declare namespace Frostbite {
     type Guid = string;
 }

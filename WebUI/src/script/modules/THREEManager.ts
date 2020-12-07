@@ -451,7 +451,7 @@ export class THREEManager {
 
 						// Select its parent if possible.
 						if (gameObject.parent != null) {
-							const parent = gameObject.parent as GameObject;
+							const parent = gameObject.parent;
 							// if (!parent.raycastEnabled) {
 							// 	continue;
 							// }

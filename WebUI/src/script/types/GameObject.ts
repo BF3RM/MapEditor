@@ -187,7 +187,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	set raycastEnabled(value: boolean) {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child as GameObject).raycastEnabled = value;
+				(child).raycastEnabled = value;
 			}
 		}
 		this._raycastEnabled = value;
@@ -201,7 +201,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Enable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child as GameObject).Enable();
+				(child).Enable();
 			}
 		}
 		this._enabled = true;
@@ -211,7 +211,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Disable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child as GameObject).Disable();
+				(child).Disable();
 			}
 		}
 		this._enabled = false;
@@ -255,7 +255,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	makeParentsInvisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = false;
-			(this.parent as GameObject).makeParentsInvisible();
+			(this.parent).makeParentsInvisible();
 		}
 		editor.selectionGroup.makeParentsVisible();
 	}
@@ -263,7 +263,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	makeParentsVisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = true;
-			(this.parent as GameObject).makeParentsVisible();
+			(this.parent).makeParentsVisible();
 		}
 	}
 }

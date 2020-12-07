@@ -1,29 +1,29 @@
 <template>
-    <span>
-        <template v-if="instance">
+	<span>
+		<template v-if="instance">
 			<span @click="expanded = !expanded">
 				<div class="ReferenceBox">
 					<div class="type">{{instance.typeName}}</div>
 					<div class="path">{{cleanPath()}}</div>
 				</div>
 			</span>
-        </template>
-        <template v-else>
-            {{cleanPath()}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
-        </template>
-		<template v-if="expanded && this.$data.partition">
-                <Instance :instance="instance" :partition="this.$data.partition" :reference-links="link"></Instance>
 		</template>
-        <template v-if="loading">
-            (loading)
-        </template>
-    </span>
+		<template v-else>
+			{{cleanPath()}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
+		</template>
+		<template v-if="expanded && this.$data.partition">
+				<Instance :instance="instance" :partition="this.$data.partition" :reference-links="link"></Instance>
+		</template>
+		<template v-if="loading">
+			(loading)
+		</template>
+	</span>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import Partition from '@/script/types/ebx/Partition';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import Reference from '@/script/types/ebx/Reference';
 
 @Component({
@@ -33,26 +33,34 @@ import Reference from '@/script/types/ebx/Reference';
 	},
 	methods: {
 		cleanPath: String
-	},
-	props: {
-		reference: {
-			type: Object as PropType<Reference>,
-			required: true
-		},
-		link: {
-			type: Boolean,
-			default: () => true
-		},
-		currentPath: {
-			type: String,
-			required: false
-		},
-		autoOpen: {
-			type: Boolean,
-			required: false
-		}
-	},
-	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition } {
+	}
+})
+export default class ReferenceComponent extends Vue {
+	@Prop({
+		type: Object as PropType<Reference>,
+		required: true
+	})
+	reference: Reference;
+
+	@Prop({
+		type: Boolean,
+		default: () => true
+	})
+	link: Boolean;
+
+	@Prop({
+		type: String,
+		required: false
+	})
+	currentPath: string;
+
+	@Prop({
+		type: Boolean,
+		required: false
+	})
+	autoOpen: boolean;
+
+	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition | null } {
 		return {
 			loading: true,
 			instance: null,
@@ -61,28 +69,27 @@ import Reference from '@/script/types/ebx/Reference';
 			partition: null
 		};
 	}
-})
-export default class ReferenceComponent extends Vue {
+
 	mounted() {
-		this.partition = window.editor.fbdMan.getPartition(this.reference.partitionGuid);
-		if (this.partition === undefined) {
+		this.$data.partition = window.editor.fbdMan.getPartition(this.reference.partitionGuid);
+		if (this.$data.partition === undefined) {
 			console.warn(`Failed to resolve reference ${(this.reference.partitionGuid)}/${this.reference.instanceGuid}`);
 			return;
 		}
-		this.partition.data.then((res) => {
-			this.referencePath = this.partition.name;
-			this.instance = this.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
-			console.log(this.instance);
-			this.loading = false;
+		this.$data.partition.data.then(() => {
+			this.$data.referencePath = this.$data.partition.name;
+			this.$data.instance = this.$data.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
+			console.log(this.$data.instance);
+			this.$data.loading = false;
 			if (this.autoOpen) {
-				this.expanded = true;
+				this.$data.expanded = true;
 			}
 		});
 	}
 
 	cleanPath() {
-		if (this.partition) {
-			return this.partition.fileName;
+		if (this.$data.partition) {
+			return this.$data.partition.fileName;
 		}
 		return this.$data.referencePath;
 	}

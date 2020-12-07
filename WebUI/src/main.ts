@@ -14,14 +14,12 @@ import Reference from '@/script/components/EditorComponents/Inspector/EBXCompone
 import Partition from '@/script/components/EditorComponents/Inspector/EBXComponents/Partition.vue';
 import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
 import InstanceIdentifier from '@/script/components/EditorComponents/Inspector/EBXComponents/InstanceIdentifier.vue';
-import Directory from '@/script/components/EditorComponents/Inspector/EBXComponents/Directory.vue';
-import GameRegistry, { FetchPartitionLoader } from '@/script/modules/GameRegistry';
 import { capitalize, removeExtension } from './filters';
 const locale = require('element-ui/lib/locale/lang/en');
 
 let debugMode: boolean = false;
 if (!navigator.userAgent.includes('VeniceUnleashed')) {
-	if (window.location.ancestorOrigins === undefined || window.location.ancestorOrigins[0] !== 'webui://main') {
+	if (window.location.ancestorOrigins[0] !== 'webui://main') {
 		debugMode = true;
 	}
 }
@@ -41,7 +39,6 @@ Vue.component('Reference', Reference);
 Vue.component('Partition', Partition);
 Vue.component('Instance', Instance);
 Vue.component('InstanceIdentifier', InstanceIdentifier);
-Vue.component('Directory', Directory);
 
 Vue.filter('capitalize', capitalize);
 Vue.filter('removeExt', removeExtension);

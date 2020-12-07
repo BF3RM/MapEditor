@@ -46,25 +46,25 @@ export default class DraggableNumberInput extends Vue {
 	public isDragging = false;
 
 	@Prop({ default: 'Y', type: String })
-	private dragDirection!: 'X' | 'Y';
+	private dragDirection: 'X' | 'Y';
 
 	@Prop({ default: false, type: Boolean })
 	private hideLabel: boolean;
 
 	@Prop({ required: true, type: String })
-	private label!: string;
+	private label: string;
 
 	@Prop({ type: Number })
-	private max!: number;
+	private max: number;
 
 	@Prop({ type: Number })
-	private min!: number;
+	private min: number;
 
 	@Prop({ default: 1, type: Number })
-	private step!: number;
+	private step: number;
 
 	@Prop({ required: true, type: Number })
-	private value!: number;
+	private value: number;
 
 	@Emit('input')
 	private adjustValue(val: number | string | MouseEvent): number {
@@ -83,8 +83,8 @@ export default class DraggableNumberInput extends Vue {
 			newVal = Number(this.value + newVal);
 		} else { newVal = Number(val); }
 
-		if (!isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
-		if (!isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
+		if (!Number.isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
+		if (!Number.isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
 		return Number(newVal.toFixed(2));
 	}
 
@@ -127,7 +127,6 @@ export default class DraggableNumberInput extends Vue {
 			padding-right: 0.2em;
 		}
 		input {
-			padding: 0 1vmin;
 			border-radius: 0.3vmin;
 			padding-left: 0.5vmin;
 		}

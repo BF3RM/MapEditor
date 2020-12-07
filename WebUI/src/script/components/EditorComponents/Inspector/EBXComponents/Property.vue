@@ -48,40 +48,8 @@ export default Vue.extend({
 		}
 	},
 	methods: {
-		onChangeValue(newValue) {
+		onChangeValue(newValue: any) {
 			console.log(newValue);
-		},
-		async getType() {
-			switch (this.field.type) {
-			case 'Vec3':
-				return Vec3Control;
-			case 'LinearTransform':
-				return LinearTransformControl;
-			case 'String':
-				return StringControl;
-			case 'Single':
-			case 'Int32':
-			case 'UInt32':
-			case 'Int16':
-			case 'UInt16':
-			case 'SByte':
-				return NumberControl;
-			case 'Boolean':
-				return BoolControl;
-			case 'AntRef':
-				// TODO assetId
-				// Characters/Soldiers/MpSoldier.json
-				return import('./ObjectProperty.vue');
-			default:
-				console.log('Unknown property type: ' + this.field.type);
-				break;
-			}
-
-			if (typeof this.field.value === 'object') {
-				return import('./ObjectProperty.vue');
-			}
-
-			return import('./DefaultProperty.vue');
 		}
 	},
 	computed: {
@@ -92,13 +60,42 @@ export default Vue.extend({
 				return () => import('./ReferenceProperty.vue');
 			}
 
-			return () => {
-				const type = this.getType();
+			const type: any = async () => {
+				switch (this.field.type) {
+				case 'Vec3':
+					return Vec3Control;
+				case 'LinearTransform':
+					return LinearTransformControl;
+				case 'String':
+					return StringControl;
+				case 'Single':
+				case 'Int32':
+				case 'UInt32':
+				case 'Int16':
+				case 'UInt16':
+				case 'SByte':
+					return NumberControl;
+				case 'Boolean':
+					return BoolControl;
+				case 'AntRef':
+				// TODO assetId
+				// Characters/Soldiers/MpSoldier.json
+					return import('./ObjectProperty.vue');
+				default:
+					console.log('Unknown property type: ' + this.field.type);
+					break;
+				}
 
-				// TODO: filter for colors
+				if (typeof this.field.value === 'object') {
+					return import('./ObjectProperty.vue');
+				}
 
-				return type;
+				return import('./DefaultProperty.vue');
 			};
+
+			// TODO: filter for colors
+
+			return type;
 		},
 		titleName() {
 			if (parseInt(this.field.name)) {

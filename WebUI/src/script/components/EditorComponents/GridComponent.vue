@@ -47,21 +47,8 @@ export default class GridComponent extends EditorComponent {
 	}
 
 	get style() {
-		// @ts-ignore
-		return `
-<style>
-.grid-container {
-	grid-template-columns: repeat(auto-fit, minmax(` + this.data.scale + `em, 1fr))
-}
-.grid-item {
-	width: ` + this.data.scale + `em;
-}
-.grid-item .Icon {
-	width: ` + this.data.scale + `em;
-	height: ` + this.data.scale / 3 + `em;
-}
-</style>
-`;
+		// @ts-ignore;
+		return ' <style> .grid-container { 	grid-template-columns: repeat(auto-fit, minmax(' + this.data.scale + 'em, 1fr)) } .grid-item { 	width: ' + this.data.scale + 'em; } .grid-item .Icon { 	width: ' + this.data.scale + 'em; 	height: ' + this.data.scale / 3 + 'em; } </style> ';
 	}
 
 	get iconStyle() {

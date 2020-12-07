@@ -26,7 +26,7 @@ export class BlueprintManager {
 
 		for (const bp of blueprintArray) {
 			if (bp !== undefined && bp.name !== undefined) {
-				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp as IBlueprint);
+				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp);
 			} else {
 				console.error('Empty blueprint??');
 			}

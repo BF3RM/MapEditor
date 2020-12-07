@@ -216,16 +216,16 @@ export default class EditorToolbar extends Vue {
 					callback: entryCallback
 				} as IMenuEntry));
 				if (i === 0) {
-					this.menuBar.children.push(lastEntry!.entries!.get(currentEntry) as IMenuEntry);
+					this.menuBar.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 				} else {
-					lastEntry.children.push(lastEntry!.entries!.get(currentEntry) as IMenuEntry);
+					lastEntry.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 				}
 			}
-			if (i !== path.length - 1 && lastEntry!.entries!.get(currentEntry)!.children === null) {
-				lastEntry!.entries!.get(currentEntry)!.children = [];
-				lastEntry!.entries!.get(currentEntry)!.children.push(lastEntry!.entries!.get(currentEntry) as IMenuEntry);
+			if (i !== path.length - 1 && lastEntry.entries!.get(currentEntry)!.children === null) {
+				lastEntry.entries!.get(currentEntry)!.children = [];
+				lastEntry.entries!.get(currentEntry)!.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 			}
-			lastEntry = lastEntry!.entries!.get(currentEntry) as IMenuEntry;
+			lastEntry = lastEntry.entries!.get(currentEntry) as IMenuEntry;
 		}
 	}
 
