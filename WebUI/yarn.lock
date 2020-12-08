@@ -1660,10 +1660,10 @@ camelcase@^5.0.0, camelcase@^5.3.1:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
-camera-controls@1.25.0:
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.25.0.tgz#4dd6c08e4ba8d0b0164d60024e12a35c6227a7d9"
-  integrity sha512-twHHZ8Bp2zx8JatpmPXGN3ttVpzGeQj4p+9lz69Il3orsbcv8J812A3a3kPENE8xqvMlwyRlUJ8zwQau2gqdJA==
+camera-controls@1.25.3:
+  version "1.25.3"
+  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.25.3.tgz#c216e8499e0075f82e7452b9854b10726a7a79eb"
+  integrity sha512-hcPgd3ly69N+HU8LRsyCmDh4N5YAbyDLB2LwbwOJdFoXomvpEi1BPGIJCbHbzp/n+CrisEjgeCHJprqy7GT2Dg==
 
 caniuse-api@^3.0.0:
   version "3.0.0"
