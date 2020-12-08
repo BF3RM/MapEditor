@@ -8,9 +8,9 @@
 				<input class="guid-input" :value="gameObjectGuid" :disabled="true">
 				<input class="Blueprint-input" id="bp-name" disabled="true" :value="blueprintName">
 				<input class="Blueprint-input" id="bp-type" disabled="true" :value="blueprintType">
-				<field for="bp-instance-guid">Instance Guid</field>
+				<label for="bp-instance-guid">Instance Guid</label>
 				<input class="Blueprint-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
-				<field for="bp-partition-guid">Partition Guid</field>
+				<label for="bp-partition-guid">Partition Guid</label>
 				<input class="Blueprint-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
 			</div>
 			<div class="header">
