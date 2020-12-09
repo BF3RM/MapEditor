@@ -24,9 +24,9 @@
     "vuex": "3.5.1"
   },
   "devDependencies": {
-    "@fimbul/valtyr": "0.21.0",
-    "@fimbul/ve": "0.21.0",
-    "@fimbul/wotan": "0.21.1",
+    "@fimbul/valtyr": "0.22.0",
+    "@fimbul/ve": "0.22.0",
+    "@fimbul/wotan": "0.22.0",
     "@types/jquery": "3.5.1",
     "@types/jszip": "3.4.0",
     "@typescript-eslint/eslint-plugin": "4.3.0",
