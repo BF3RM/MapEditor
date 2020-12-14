@@ -7,7 +7,7 @@
             <div class="field-spacer">
 				<component :type="field.type" :class="field.type" :autoOpen="autoOpen"
 					:currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field"
-					:value="field.value" @input="onChangeValue($event)" :instance="instance" ></component>
+					:value="field.value" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value"></component>
 			</div>
         </td>
     </tr>
@@ -50,10 +50,15 @@ export default Vue.extend({
 		}
 	},
 	methods: {
-		onChangeValue(newValue: any) {
-			console.log(newValue);
-			console.log(this.partition);
-			console.log(this.instance);
+		onChangeValue(field: string, newValue: any) {
+			this.$emit('input', {
+				reference: {
+					partitionGuid: this.partition.guid,
+					instanceGuid: this.instance.guid
+				},
+				field: field,
+				value: newValue
+			});
 		}
 	},
 	computed: {

@@ -3,7 +3,7 @@
         <div class="table-container" v-if="visible">
             <table class="table is-bordered">
                 <tbody>
-					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :key="index"></Property>
+					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :key="index" @input="$emit('input', $event)"></Property>
                 </tbody>
             </table>
         </div>
@@ -49,14 +49,6 @@ export default Vue.extend({
 			if (guid === this.instance.guid) {
 				this.visible = true;
 			}
-		}
-	},
-	methods: {
-		luaFindInstanceByGuid(partition: Partition, instance: Instance) {
-			return `${instance.typeName}(ResourceManager:FindInstanceByGuid(Guid('${partition.guid}'), Guid('${instance.guid}')))`;
-		},
-		luaFindInstance(instance: Instance) {
-			return `${instance.typeName}(partition:FindInstance(Guid('${instance.guid}')))`;
 		}
 	}
 });

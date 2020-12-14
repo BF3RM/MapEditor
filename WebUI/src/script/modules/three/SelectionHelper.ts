@@ -35,7 +35,7 @@ export default class SelectionHelper {
 
 		this.renderer.domElement.addEventListener('mouseup', (event) => {
 			this.isDown = false;
-			this.onSelectOver(event);
+			this.onSelectOver();
 		});
 	}
 

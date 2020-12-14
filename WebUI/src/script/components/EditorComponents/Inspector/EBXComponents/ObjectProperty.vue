@@ -1,10 +1,10 @@
 <template>
     <div class="table">
         <div v-if="field.value">
-			<property v-for="(value, index) in field.value" :partition="partition" :instance="instance" :field="value" :key="index" :currentPath="currentPath"></property>
+			<property v-for="(value, index) in field.value" :partition="partition" :instance="instance" :field="value" :key="index" :currentPath="currentPath"  @input="$emit('input', $event)"></property>
         </div>
 		<div v-else>
-			<reference-component :class="field.type" :type="this.field.type" :currentPath="currentPath" :partition="partition" :field="field" :value="field.value" :instance="instance" :reference="null"></reference-component>
+			<Reference-property :class="field.type" :type="this.field.type" :currentPath="currentPath" :partition="partition" :field="field" :value="field.value" :instance="instance" :reference="null" @input="$emit('input', $event)"></Reference-property>
 		</div>
     </div>
 </template>
@@ -19,7 +19,7 @@ import Instance from '@/script/types/ebx/Instance';
 export default Vue.extend({
 	name: 'ObjectProperty',
 	components: {
-		ReferenceComponent: () => import('./ReferenceComponent.vue'),
+		ReferenceProperty: () => import('./ReferenceProperty.vue'),
 		Property: () => import('./Property.vue')
 	},
 	props: {

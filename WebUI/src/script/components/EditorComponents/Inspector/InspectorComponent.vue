@@ -33,9 +33,9 @@
 					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
 				</el-select>
 			</div>
-			<div class="container ebx-container" v-if="selectedGameObject && selectedPartition && selectedPartition.data && !multiSelection">
+			<div class="container ebx-container" v-if="selectedGameObject && selectedPartition && !multiSelection">
 				<template v-if="selectedPartition && selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object">
-					<ReferenceProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object" :partition="selectedPartition"></ReferenceProperty>
+					<reference-property @input="onEBXInput($event)" :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object" :reference="selectedPartition.primaryInstance.fields.object.value" :partition="selectedPartition"></reference-property>
 					<!--
 					<span>
 						<Instance :currentPath="selectedPartition.name" v-if="selectedPartition.primaryInstance.fields.object.value" :instance=getInstance(selectedPartition.primaryInstance.fields.object.value) :partition="selectedPartition"></Instance>
@@ -43,7 +43,7 @@
 					-->
 				</template>
 				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields && selectedPartition.primaryInstance.fields.objects">
-					<ReferenceProperty v-for="(instance, index) of selectedPartition.primaryInstance.fields.objects.value" :key="index" :autoOpen="true" :currentPath="selectedPartition.name" :field="instance" :instance="instance" :partition="selectedPartition"></ReferenceProperty>
+					<reference-property @input="onEBXInput($event)" v-for="(instance, index) of selectedPartition.primaryInstance.fields.objects.value" :key="index" :autoOpen="true" :currentPath="selectedPartition.name" :field="instance" :instance="instance" :reference="instance.value" :partition="selectedPartition"></reference-property>
 				</template>
 			</div>
 		</div>
@@ -67,7 +67,7 @@ import Instance from '@/script/components/EditorComponents/Inspector/EBXComponen
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import Reference from '@/script/types/ebx/Reference';
 import ArrayProperty from './EBXComponents/ArrayProperty.vue';
-import ReferenceProperty from './EBXComponents/ReferenceProperty.vue';
+import ReferenceProperty from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceProperty.vue';
 
 @Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty, ReferenceProperty } })
 export default class InspectorComponent extends EditorComponent {
@@ -127,6 +127,10 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.execute(command);
 	}
 
+	private onEBXInput(a: any, b: any, c: any) {
+		console.log(a, b, c);
+	}
+
 	// Why is this called twice?
 	private onInput() {
 		const group = window.editor.selectionGroup;
@@ -166,7 +170,14 @@ export default class InspectorComponent extends EditorComponent {
 		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
 
 		this.selectedGameObject = selectedGameObject;
-		this.selectedPartition = window.editor.fbdMan.getPartitionByName(this.selectedGameObject.blueprintCtrRef.name);
+		const selectedPartition = window.editor.fbdMan.getPartitionByName(this.selectedGameObject.blueprintCtrRef.name);
+		console.log('Starting request');
+		if (selectedPartition) {
+			selectedPartition.data.then((res) => {
+				console.log('yo');
+				this.selectedPartition = selectedPartition;
+			});
+		}
 	}
 
 	get isEmpty() {

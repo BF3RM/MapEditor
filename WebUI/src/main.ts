@@ -10,7 +10,7 @@ import VEXTInterface from '@/script/modules/VEXT';
 import Editor from '@/script/Editor';
 import TypeDocumentationLink from '@/script/components/EditorComponents/Inspector/EBXComponents/TypeDocumentationLink.vue';
 import Property from '@/script/components/EditorComponents/Inspector/EBXComponents/Property.vue';
-import Reference from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceComponent.vue';
+import Reference from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceProperty.vue';
 import Partition from '@/script/components/EditorComponents/Inspector/EBXComponents/Partition.vue';
 import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
 import { capitalize, removeExtension } from './filters';
