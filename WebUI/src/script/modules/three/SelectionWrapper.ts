@@ -1,10 +1,10 @@
-import { SelectionBox } from 'three/examples/jsm/interactive/SelectionBox';
-import { SelectionHelper } from 'three/examples/jsm/interactive/SelectionHelper';
 import { Camera, Scene, WebGLRenderer } from 'three';
 import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { GameObject } from '@/script/types/GameObject';
 import { InputControls } from '@/script/modules/InputControls';
 import { KEYCODE } from '@/script/types/Enums';
+import SelectionHelper from './SelectionHelper';
+import SelectionBox from './SelectionBox';
 
 export default class SelectionWrapper {
 	constructor(canvas: HTMLCanvasElement, scene: Scene, camera: Camera, renderer: WebGLRenderer) {

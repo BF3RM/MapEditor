@@ -10,7 +10,7 @@ input {
   border: 0;
   background-color: rgba(0, 0, 0, 0.4) !important;
   color: #fff;
-  border-top: 1px solid rgb(0 0 0 / 40%) !important;
+  border: none;
 }
 input[type="text"] {
   padding-left: 1em;
@@ -91,5 +91,9 @@ input[type="text"] {
 }
 input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
+}
+
+.el-input__inner {
+  border: none!important;
 }
 

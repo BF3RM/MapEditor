@@ -353,7 +353,7 @@ li.el-menu-item.separator {
 	box-sizing: border-box;
 }
 .el-select-dropdown {
-	border: 1px solid #4a4a4a;
+	border: 1px solid #151515 !important;
 	border-radius: 5px;
 	background-color: #262626;
 }
@@ -370,7 +370,6 @@ input#worldView {
 	color: #fff;
 }
 .el-select-dropdown {
-	border: 1px solid #4a4a4a!important;
 	border-radius: 5px!important;
 	background-color: #262626!important;
 }
