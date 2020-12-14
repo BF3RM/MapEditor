@@ -28,12 +28,12 @@
 										:value="selectedGameObject.transform"
 										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
 			</div>
-			<div class="container variation">
+			<div class="container variation" v-if="!multiSelection">
 				<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
 					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
 				</el-select>
 			</div>
-			<div class="container ebx-container" v-if="selectedGameObject && selectedPartition && selectedPartition.data">
+			<div class="container ebx-container" v-if="selectedGameObject && selectedPartition && selectedPartition.data && !multiSelection">
 				<template v-if="selectedPartition && selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object">
 					<ReferenceProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object" :partition="selectedPartition"></ReferenceProperty>
 					<!--
@@ -43,7 +43,7 @@
 					-->
 				</template>
 				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields && selectedPartition.primaryInstance.fields.objects">
-					<ArrayProperty :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.objects" :partition="selectedPartition"></ArrayProperty>
+					<ReferenceProperty v-for="(instance, index) of selectedPartition.primaryInstance.fields.objects.value" :key="index" :autoOpen="true" :currentPath="selectedPartition.name" :field="instance" :instance="instance" :partition="selectedPartition"></ReferenceProperty>
 				</template>
 			</div>
 		</div>

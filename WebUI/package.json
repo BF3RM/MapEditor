@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "dependencies": {
     "@caohenghu/vue-colorpicker": "^1.2.4",
-    "@gouch/to-title-case": "^2.2.1",
     "axios": "^0.21.0",
     "camera-controls": "1.25.0",
     "element-ui": "2.13.2",
@@ -23,7 +22,8 @@
     "vue-property-decorator": "9.0.0",
     "vue-router": "3.4.5",
     "vue-virtual-scroller": "1.0.10",
-    "vuex": "3.5.1"
+    "vuex": "3.5.1",
+    "yaml": "^1.10.0"
   },
   "devDependencies": {
     "@fimbul/valtyr": "0.21.0",

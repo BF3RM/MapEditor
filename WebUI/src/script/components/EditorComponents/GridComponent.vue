@@ -117,7 +117,7 @@ export default class GridComponent extends EditorComponent {
 }
 .grid-item {
 	overflow: hidden;
-	/* height: 10em; */
+	height: fit-content;
 	text-align: center;
 }
 .grid-item .Icon{

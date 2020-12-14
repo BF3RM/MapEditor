@@ -13,7 +13,6 @@ import Property from '@/script/components/EditorComponents/Inspector/EBXComponen
 import Reference from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceComponent.vue';
 import Partition from '@/script/components/EditorComponents/Inspector/EBXComponents/Partition.vue';
 import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
-import InstanceIdentifier from '@/script/components/EditorComponents/Inspector/EBXComponents/InstanceIdentifier.vue';
 import { capitalize, removeExtension } from './filters';
 const locale = require('element-ui/lib/locale/lang/en');
 
@@ -38,7 +37,6 @@ Vue.component('Property', Property);
 Vue.component('Reference', Reference);
 Vue.component('Partition', Partition);
 Vue.component('Instance', Instance);
-Vue.component('InstanceIdentifier', InstanceIdentifier);
 
 Vue.filter('capitalize', capitalize);
 Vue.filter('removeExt', removeExtension);

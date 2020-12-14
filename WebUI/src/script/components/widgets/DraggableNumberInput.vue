@@ -16,7 +16,7 @@
 				:min="min"
 				:name="inputName"
 				:step="step"
-				:value="formattedValue"
+				v-model="formattedValue"
 				@input="adjustValue($event.target.value)"
 				@blur="$emit('blur')">
 	</div>
@@ -24,6 +24,9 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator';
+import StringControl from '@/script/components/controls/StringControl.vue';
+import NumberControl from '@/script/components/controls/NumberControl.vue';
+import BoolControl from '@/script/components/controls/BoolControl.vue';
 
 @Component
 export default class DraggableNumberInput extends Vue {
@@ -66,7 +69,9 @@ export default class DraggableNumberInput extends Vue {
 	@Prop({ required: true, type: Number })
 	private value: number;
 
-	@Emit('input')
+	@Prop({ required: true, type: String })
+	private type: number;
+
 	private adjustValue(val: number | string | MouseEvent): number {
 		let newVal;
 		if (val instanceof MouseEvent) {
@@ -90,6 +95,13 @@ export default class DraggableNumberInput extends Vue {
 
 	get formattedValue() {
 		return Number(this.value.toFixed(2));
+	}
+
+	set formattedValue(inp: number) {
+		// TODO: Sanitize
+		console.log('Numba: ' + inp);
+		console.log('TODO: ' + this.type);
+		this.$emit('input', inp);
 	}
 
 	private dragEnd(): void {

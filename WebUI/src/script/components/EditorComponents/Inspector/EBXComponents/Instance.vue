@@ -3,7 +3,7 @@
         <div class="table-container" v-if="visible">
             <table class="table is-bordered">
                 <tbody>
-					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :field="field" :key="index"></Property>
+					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :key="index"></Property>
                 </tbody>
             </table>
         </div>

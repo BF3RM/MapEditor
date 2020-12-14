@@ -1,21 +1,36 @@
 <template>
 	<span>
-		<template v-if="instance">
-			<span @click="expanded = !expanded">
-				<div class="ReferenceBox">
-					<div class="type">{{instance.typeName}}</div>
-					<div class="path">{{cleanPath()}}</div>
-				</div>
-			</span>
+		<template v-if="reference">
+			<template v-if="instance">
+				<span @click="expanded = !expanded">
+					<div class="ReferenceBox">
+						<div class="type">{{instance.typeName}}</div>
+						<div class="path">{{cleanPath}}<span class="guid">{{guid}}</span></div>
+						<div v-if="instance.typeName === 'ReferenceObjectData'" class="path">
+							{{referenceObjectBlueprint}}
+						</div>
+					</div>
+				</span>
+			</template>
+			<template v-else>
+				{{cleanPath}} <span class="Guid">{{guid}}</span> - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
+			</template>
+			<template v-if="expanded && partition">
+					<Instance :instance="instance" :partition="partition" :reference-links="link"></Instance>
+			</template>
+			<template v-if="loading">
+				(loading)
+			</template>
 		</template>
 		<template v-else>
-			{{cleanPath()}} - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
-		</template>
-		<template v-if="expanded && this.$data.partition">
-				<Instance :instance="instance" :partition="this.$data.partition" :reference-links="link"></Instance>
-		</template>
-		<template v-if="loading">
-			(loading)
+			<span @click="expanded = !expanded">
+				<div class="ReferenceBox">
+					<div>
+						<div class="type">{{instance ? instance.typeName : type}}</div>
+						<div class="path null">null</div>
+					</div>
+				</div>
+			</span>
 		</template>
 	</span>
 </template>
@@ -30,15 +45,18 @@ import Reference from '@/script/types/ebx/Reference';
 	name: 'ReferenceComponent',
 	components: {
 		Instance: () => import('./Instance.vue')
-	},
-	methods: {
-		cleanPath: String
 	}
 })
 export default class ReferenceComponent extends Vue {
 	@Prop({
+		type: String,
+		required: false
+	})
+	type: string;
+
+	@Prop({
 		type: Object as PropType<Reference>,
-		required: true
+		required: false
 	})
 	reference: Reference;
 
@@ -50,7 +68,7 @@ export default class ReferenceComponent extends Vue {
 
 	@Prop({
 		type: String,
-		required: false
+		required: true
 	})
 	currentPath: string;
 
@@ -60,17 +78,23 @@ export default class ReferenceComponent extends Vue {
 	})
 	autoOpen: boolean;
 
-	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition | null } {
+	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition | null, cleanPath: string } {
 		return {
 			loading: true,
 			instance: null,
 			expanded: false,
 			referencePath: '',
-			partition: null
+			partition: null,
+			cleanPath: '',
+			guid: '',
+			referenceObjectBlueprint: ''
 		};
 	}
 
 	mounted() {
+		if (!this.reference) {
+			return;
+		}
 		this.$data.partition = window.editor.fbdMan.getPartition(this.reference.partitionGuid);
 		if (this.$data.partition === undefined) {
 			console.warn(`Failed to resolve reference ${(this.reference.partitionGuid)}/${this.reference.instanceGuid}`);
@@ -84,21 +108,31 @@ export default class ReferenceComponent extends Vue {
 			if (this.autoOpen) {
 				this.$data.expanded = true;
 			}
-		});
-	}
+			console.log(this.$data);
+			this.$data.cleanPath = './';
+			const regEx = new RegExp(this.currentPath.substring(0, this.currentPath.lastIndexOf('/')), 'ig');
+			if (this.$data.partition.name.toLowerCase() !== this.currentPath.toLowerCase()) { // If instance is not located in the current path
+				const path = this.$data.partition.name.replace(regEx, '');
+				if (path.startsWith('/')) {
+					this.$data.cleanPath = '.' + path + '/'; // Strip the path from the filename
+				} else {
+					this.$data.cleanPath = path + '/'; // Strip the path from the filename
+				}
+			}
+			this.$data.guid = this.$data.instance.guid;
 
-	cleanPath() {
-		if (this.$data.partition) {
-			return this.$data.partition.fileName;
-		}
-		return this.$data.referencePath;
+			if (this.$data.instance.typeName === 'ReferenceObjectData') {
+				this.$data.instance.fields.blueprint.value.getPartition().data.then((res) => {
+					this.$data.referenceObjectBlueprint = this.$data.instance.fields.blueprint.value.getInstance().fields.name.value;
+					this.$data.referenceObjectBlueprint = this.$data.referenceObjectBlueprint.replace(regEx, '');
+				});
+			}
+		});
 	}
 }
 </script>
 <style lang="scss">
 .ReferenceBox {
-	height: 30px;
-	/* width: 100%; */
 	padding: 5px;
 	margin: 0;
 	border: 0;
@@ -111,5 +145,11 @@ export default class ReferenceComponent extends Vue {
 }
 .path {
 	color: #688457;
+}
+.null {
+	color: #c67373;
+}
+.guid {
+	color: #3e3e3e
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
 	<div class="BoolControl">
-		<input class="enable-input" type="checkbox" id="enabled" ref="enableInput" v-model="value"/>
+		<el-checkbox v-model="value" @input="onChangeValue($event)"></el-checkbox>
 	</div>
 </template>
 

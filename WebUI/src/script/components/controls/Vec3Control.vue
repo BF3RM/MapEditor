@@ -3,9 +3,9 @@
 		<div class="label">
 			<b v-if="label">{{label}}</b>
 		</div>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="x" dragDirection="X" :value="value.x" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="y" dragDirection="X" :value="value.y" label="Y" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="z" dragDirection="X" :value="value.z" label="Z" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="x" dragDirection="X" :value="value.x" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" type="Float"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="y" dragDirection="X" :value="value.y" label="Y" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" type="Float"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="z" dragDirection="X" :value="value.z" label="Z" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" type="Float"/>
 	</div>
 </template>
 

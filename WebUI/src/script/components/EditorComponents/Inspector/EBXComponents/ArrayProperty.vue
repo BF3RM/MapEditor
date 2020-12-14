@@ -14,8 +14,9 @@
         <div class="table-container" v-if="visible">
             <table class="table is-array-element">
                 <tbody>
-					<property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath v-for="(value, index) in field.value"
-                          :partition="partition" :field="value" :key="index"></property>
+					<div v-for="(value, index) in field.value" :key="value.name">
+						<property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance"></property>
+					</div>
                 </tbody>
             </table>
         </div>
@@ -29,6 +30,7 @@ import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
 
 import Property from './Property.vue';
+import Instance from '@/script/types/ebx/Instance';
 
 export default Vue.extend({
 	name: 'ArrayProperty',
@@ -38,6 +40,10 @@ export default Vue.extend({
 	props: {
 		partition: {
 			type: Object as PropType<Partition>,
+			required: true
+		},
+		instance: {
+			type: Object as PropType<Instance>,
 			required: true
 		},
 		field: {

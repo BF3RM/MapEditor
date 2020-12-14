@@ -1,6 +1,7 @@
 <template>
 	<div class="NumberControl">
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="true" dragDirection="X" v-model="value" label="X" :step=step :min=min @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="true" dragDirection="X" :value="value" label="X"
+		:step=step :min=min @input="$emit('input', $event);" @startDrag="onStartDrag" @endDrag="onEndDrag" :type="type"/>
 	</div>
 </template>
 
@@ -13,22 +14,17 @@ import { IVec3 } from '@/script/types/primitives/Vec3';
 @Component({ components: { DraggableNumberInput } })
 export default class NumberControl extends Vue {
 	@Prop({ default: 0.014 }) step: number;
-	@Prop() value: IVec3;
+	@Prop() value: number;
 	@Prop(Number) min: number;
+	@Prop(String) type: string;
 
-	onChangeValue() {
-		this.$emit('input');
-	}
-
-	@Emit('startDrag')
-	onStartDrag(event: Event) {
-		this.onChangeValue();
+	onStartDrag(event: number) {
+		this.$emit('input', event);
 		return event;
 	}
 
-	@Emit('endDrag')
-	onEndDrag(event: Event) {
-		this.onChangeValue();
+	onEndDrag(event: number) {
+		this.$emit('input', event);
 		return event;
 	}
 }

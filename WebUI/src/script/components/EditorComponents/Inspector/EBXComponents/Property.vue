@@ -1,11 +1,13 @@
 <template>
     <tr v-if="field.name !== 'name'" class="row">
-        <td class="is-family-code is-narrow field-name">
+        <td class="is-family-code is-narrow field-name" :class="{'numbered': numberName}">
 			{{ titleName }}
         </td>
         <td class="field-value">
             <div class="field-spacer">
-				<component :class="field.type" :type="typeof(field.value)" :autoOpen="autoOpen" :currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field" :value="field.value" @input="onChangeValue"></component>
+				<component :type="field.type" :class="field.type" :autoOpen="autoOpen"
+					:currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field"
+					:value="field.value" @input="onChangeValue($event)" :instance="instance" ></component>
 			</div>
         </td>
     </tr>
@@ -17,16 +19,12 @@ import Vue, { PropType } from 'vue';
 import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
 
-// import DefaultProperty from './DefaultProperty.vue';
-// import ArrayProperty from './ArrayProperty.vue';
-// import ReferenceProperty from './ReferenceProperty.vue';
-// import ObjectProperty from './ObjectProperty.vue';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
 import StringControl from '@/script/components/controls/StringControl.vue';
 import NumberControl from '@/script/components/controls/NumberControl.vue';
 import BoolControl from '@/script/components/controls/BoolControl.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
-require('@gouch/to-title-case');
+import Instance from '@/script/types/ebx/Instance';
 export default Vue.extend({
 	name: 'Property',
 	props: {
@@ -35,12 +33,16 @@ export default Vue.extend({
 			required: true
 		},
 		field: {
-			type: Object as PropType<Field<any>>,
+			type: Object as PropType<Field<Instance>>,
+			required: true
+		},
+		instance: {
+			type: Object as PropType<Instance>,
 			required: true
 		},
 		currentPath: {
 			type: String,
-			required: false
+			required: true
 		},
 		autoOpen: {
 			type: Boolean,
@@ -50,6 +52,8 @@ export default Vue.extend({
 	methods: {
 		onChangeValue(newValue: any) {
 			console.log(newValue);
+			console.log(this.partition);
+			console.log(this.instance);
 		}
 	},
 	computed: {
@@ -85,8 +89,10 @@ export default Vue.extend({
 					console.log('Unknown property type: ' + this.field.type);
 					break;
 				}
-
-				if (typeof this.field.value === 'object') {
+				if (this.field.isEnum()) { // structs
+					return import('./EnumProperty.vue');
+				}
+				if (typeof this.field.value === 'object') { // structs
 					return import('./ObjectProperty.vue');
 				}
 
@@ -97,8 +103,11 @@ export default Vue.extend({
 
 			return type;
 		},
+		numberName() {
+			return !!parseInt(this.field.name);
+		},
 		titleName() {
-			if (parseInt(this.field.name)) {
+			if (this.numberName) {
 				return '[' + this.field.name + ']';
 			}
 			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(/([a-z0-9])([A-Z])/g, '$1 $2'); // Make first character uppercase and make it Title Case
@@ -119,15 +128,16 @@ export default Vue.extend({
 	.field-name {
 		text-transform: capitalize;
 		grid-column: 1;
+		text-align: right;
+		padding-right: 1em;
+	}
+	.field-name.numbered {
+		min-width: 0;
 	}
 	.field-value {
 		grid-column: 2;
 	}
 	.value div[type=object] {
-	}
-	.field-name {
-		text-align: right;
-		padding-right: 1em;
 	}
 	.Int32 input, .UInt32 input, .Int16 input, .UInt16 input, .SByte input {
 		color: #66d9ef;

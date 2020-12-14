@@ -56,7 +56,5 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.enum {
-	color: #ebff56;
-}
+
 </style>
