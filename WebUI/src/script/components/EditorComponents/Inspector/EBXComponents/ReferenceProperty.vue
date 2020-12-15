@@ -110,12 +110,10 @@ export default class ReferenceComponent extends Vue {
 		this.$data.partition.data.then(() => {
 			this.$data.referencePath = this.$data.partition.name;
 			this.$data.instance = this.$data.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
-			console.log(this.$data.instance);
 			this.$data.loading = false;
 			if (this.autoOpen) {
 				this.$data.expanded = true;
 			}
-			console.log(this.$data);
 			this.$data.cleanPath = './';
 			const regEx = new RegExp(this.currentPath.substring(0, this.currentPath.lastIndexOf('/')), 'ig');
 			if (this.$data.partition.name.toLowerCase() !== this.currentPath.toLowerCase()) { // If instance is not located in the current path
@@ -135,6 +133,11 @@ export default class ReferenceComponent extends Vue {
 				});
 			}
 		});
+		if (this.gameObject) {
+			for (const child of this.gameObject.children) {
+				console.log(child);
+			}
+		}
 	}
 }
 </script>

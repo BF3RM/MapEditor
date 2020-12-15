@@ -49,11 +49,6 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		return false
 	end
 
-	if self.m_Entities[p_GameObjectGuid] ~= nil then
-		m_Logger:Warning('Object with id ' .. p_GameObjectGuid .. ' already existed as a spawned entity!')
-		return false
-	end
-
 	p_Variation = p_Variation or 0
 
 	local s_Blueprint = ResourceManager:FindInstanceByGuid(Guid(tostring(p_BlueprintPartitionGuid)), Guid(tostring(p_BlueprintInstanceGuid)))
@@ -217,28 +212,31 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
-		if (self.m_Entities[l_Entity.instanceId] == nil) then -- Only happens for the direct children of the blueprint, they get yielded first
-			local s_GameEntity = GameEntity{
+		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
+		if (s_GameEntity == nil) then
+			s_GameEntity = GameEntity{
 				entity = l_Entity,
 				instanceId = l_Entity.instanceId,
 				indexInBlueprint = l_Index,
 				typeName = l_Entity.typeInfo.name,
 			}
-
-			if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
-				local s_Entity = SpatialEntity(l_Entity)
-				s_GameEntity.isSpatial = true
-				s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
-				s_GameEntity.aabb = AABB {
-					min = s_Entity.aabb.min,
-					max = s_Entity.aabb.max,
-					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
-				}
-			end
-
-			self.m_Entities[l_Entity.instanceId] = s_GameObject.guid
-			table.insert(s_GameObject.gameEntities, s_GameEntity)
+			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
+		s_GameEntity.indexInBlueprint = l_Index
+
+		if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
+			local s_Entity = SpatialEntity(l_Entity)
+			s_GameEntity.isSpatial = true
+			s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
+			s_GameEntity.aabb = AABB {
+				min = s_Entity.aabb.min,
+				max = s_Entity.aabb.max,
+				transform = ToLocal(s_Entity.aabbTransform, p_Transform)
+			}
+		end
+
+		self.m_Entities[l_Entity.instanceId] = s_GameEntity
+		table.insert(s_GameObject.gameEntities, s_GameEntity)
 	end
 
 	--- If its a root object all children are now resolved so we update WebUI.
@@ -469,4 +467,26 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false)
 	return true
 end
+
+function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
+	local s_Entity = p_Hook:Call()
+	if (not s_Entity) then
+		return
+	end
+	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
+	if (s_GameEntity == nil) then
+		s_GameEntity = GameEntity{
+			entity = s_Entity,
+			instanceId = s_Entity.instanceId,
+			typeName = s_Entity.typeInfo.name,
+		}
+	end
+	s_GameEntity.initiatorRef = CtrRef {
+		typeName = p_EntityData.typeInfo.name,
+		instanceGuid = tostring(p_EntityData.instanceGuid),
+		partitionGuid = tostring(p_EntityData.partitionGuid)
+	}
+	self.m_Entities[s_Entity.instanceId] = s_GameEntity
+end
+
 return GameObjectManager

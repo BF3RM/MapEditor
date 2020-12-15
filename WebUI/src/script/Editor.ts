@@ -364,7 +364,7 @@ export default class Editor {
 	public onSpawnedBlueprint(commandActionResult: CommandActionResult) {
 		return new Promise((resolve, reject) => {
 			const scope = this;
-			const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
+			const gameObjectTransferData = commandActionResult.gameObjectTransferData;
 			const gameObjectGuid = gameObjectTransferData.guid;
 
 			if (this.gameObjects.getValue(gameObjectGuid)) {
@@ -378,9 +378,9 @@ export default class Editor {
 			gameObject.updateTransform();
 			for (const gameEntityData of gameObjectTransferData.gameEntities) {
 				const entityData = gameEntityData;
-				// UniqueID is fucking broken. this won't work online, boi.
+
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb, entityData.initiatorRef);
 					gameObject.add(gameEntity);
 				}
 			}

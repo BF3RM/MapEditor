@@ -35,7 +35,7 @@
 			</div>
 			<div class="container ebx-container" v-if="selectedGameObject && selectedPartition && !multiSelection">
 				<template v-if="selectedPartition && selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object">
-					<reference-property @input="onEBXInput($event)" :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object" :reference="selectedPartition.primaryInstance.fields.object.value" :partition="selectedPartition"></reference-property>
+					<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="selectedPartition.name" :field="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields.object" :reference="selectedPartition.primaryInstance.fields.object.value" :partition="selectedPartition"></reference-property>
 					<!--
 					<span>
 						<Instance :currentPath="selectedPartition.name" v-if="selectedPartition.primaryInstance.fields.object.value" :instance=getInstance(selectedPartition.primaryInstance.fields.object.value) :partition="selectedPartition"></Instance>
@@ -43,7 +43,7 @@
 					-->
 				</template>
 				<template v-else-if="selectedPartition.primaryInstance && selectedPartition.primaryInstance.fields && selectedPartition.primaryInstance.fields.objects">
-					<reference-property @input="onEBXInput($event)" v-for="(instance, index) of selectedPartition.primaryInstance.fields.objects.value" :key="index" :autoOpen="true" :currentPath="selectedPartition.name" :field="instance" :instance="instance" :reference="instance.value" :partition="selectedPartition"></reference-property>
+					<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" v-for="(instance, index) of selectedPartition.primaryInstance.fields.objects.value" :key="index" :autoOpen="true" :currentPath="selectedPartition.name" :field="instance" :instance="instance" :reference="instance.value" :partition="selectedPartition"></reference-property>
 				</template>
 			</div>
 		</div>

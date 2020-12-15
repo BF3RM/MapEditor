@@ -5,6 +5,8 @@ import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { MeshBasicMaterial, Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
+import Instance from '@/script/types/ebx/Instance';
+import { CtrRef } from '@/script/types/CtrRef';
 
 export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	private static SELECTED_COLOR: THREE.Color = new THREE.Color(0xFF0000);
@@ -12,8 +14,9 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 	private instanceId: number;
 	public transform: LinearTransform;
 	private box: THREE.Box3;
+	private initiatorRef: CtrRef;
 
-	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox) {
+	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox, initiatorRef: CtrRef) {
 		const pointsGeom = new THREE.Geometry();
 		pointsGeom.vertices.push(
 			aabb.min,
@@ -63,6 +66,7 @@ export class SpatialGameEntity extends THREE.Mesh implements IGameEntity {
 
 		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
 		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
+		this.initiatorRef = initiatorRef;
 	}
 
 	public onHighlight() {

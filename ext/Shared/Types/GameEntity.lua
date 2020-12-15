@@ -10,6 +10,7 @@ function GameEntity:__init(arg)
     self.isSpatial = arg.isSpatial or false
     self.transform = arg.transform -- local transform
     self.aabb = arg.aabb
+    self.initiatorRef = arg.initiatorRef
 
 	self.entity:RegisterDestroyCallback(self, self.OnDestroyed)
 end
@@ -22,8 +23,11 @@ function GameEntity:GetGameEntityTransferData()
         instanceId = self.instanceId,
         typeName = self.typeName,
         isSpatial = self.isSpatial,
-        transform = self.transform,
+        transform = self.transform
     }
+	if(self.initiatorRef ~= nil) then
+		s_GameEntityTransferData.initiatorRef = self.initiatorRef:GetTable()
+	end
     if(self.aabb ~= nil) then
         s_GameEntityTransferData.aabb = self.aabb:GetTable()
     end
