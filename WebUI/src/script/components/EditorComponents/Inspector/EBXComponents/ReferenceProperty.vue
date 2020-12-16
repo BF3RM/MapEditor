@@ -2,15 +2,13 @@
 	<span>
 		<template v-if="reference">
 			<template v-if="instance">
-				<span @click="expanded = !expanded">
-					<div class="ReferenceBox">
-						<div class="type">{{instance.typeName}}</div>
-						<div class="path">{{cleanPath}}<span class="guid">{{guid}}</span></div>
-						<div v-if="instance.typeName === 'ReferenceObjectData'" class="path">
-							{{referenceObjectBlueprint}}
-						</div>
+				<div class="ReferenceBox" @click="expanded = !expanded">
+					<div class="type">{{instance.typeName}}</div>
+					<div class="path">{{cleanPath}}<span class="guid">{{guid}}</span></div>
+					<div v-if="instance.typeName === 'ReferenceObjectData'" class="path">
+						{{referenceObjectBlueprint}}
 					</div>
-				</span>
+				</div>
 			</template>
 			<template v-else>
 				{{cleanPath}} <span class="Guid">{{guid}}</span> - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
@@ -23,14 +21,12 @@
 			</template>
 		</template>
 		<template v-else>
-			<span @click="expanded = !expanded">
-				<div class="ReferenceBox">
-					<div>
-						<div class="type">{{instance ? instance.typeName : type}}</div>
-						<div class="path null">null</div>
-					</div>
+			<div class="ReferenceBox" @click="expanded = !expanded">
+				<div>
+					<div class="type">{{instance ? instance.typeName : type}}</div>
+					<div class="path null">null</div>
 				</div>
-			</span>
+			</div>
 		</template>
 	</span>
 </template>
@@ -127,7 +123,7 @@ export default class ReferenceComponent extends Vue {
 			this.$data.guid = this.$data.instance.guid;
 
 			if (this.$data.instance.typeName === 'ReferenceObjectData') {
-				this.$data.instance.fields.blueprint.value.getPartition().data.then((res) => {
+				this.$data.instance.fields.blueprint.value.getPartition().data.then(() => {
 					this.$data.referenceObjectBlueprint = this.$data.instance.fields.blueprint.value.getInstance().fields.name.value;
 					this.$data.referenceObjectBlueprint = this.$data.referenceObjectBlueprint.replace(regEx, '');
 				});
@@ -141,7 +137,7 @@ export default class ReferenceComponent extends Vue {
 	}
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .ReferenceBox {
 	padding: 5px;
 	margin: 0;
@@ -149,17 +145,5 @@ export default class ReferenceComponent extends Vue {
 	background-color: rgba(0, 0, 0, 0.4) !important;
 	color: #fff;
 	border-top: 1px solid rgb(0 0 0 / 40%) !important;
-}
-.type {
-	color: #f98926;
-}
-.path {
-	color: #688457;
-}
-.null {
-	color: #c67373;
-}
-.guid {
-	color: #3e3e3e
 }
 </style>

@@ -5,6 +5,7 @@ import vgl from 'vue-golden-layout';
 import '@/script/hacks/HTMLDivElement';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import './style/types.scss';
 import { Log, LogError } from '@/script/modules/Logger';
 import VEXTInterface from '@/script/modules/VEXT';
 import Editor from '@/script/Editor';

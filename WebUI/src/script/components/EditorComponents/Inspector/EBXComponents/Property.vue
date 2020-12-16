@@ -143,10 +143,4 @@ export default Vue.extend({
 	}
 	.value div[type=object] {
 	}
-	.Int32 input, .UInt32 input, .Int16 input, .UInt16 input, .SByte input {
-		color: #66d9ef;
-	}
-	.Single input, {
-		color: #9e73c6;
-	}
 </style>
