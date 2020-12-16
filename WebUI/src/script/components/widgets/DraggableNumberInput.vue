@@ -10,25 +10,25 @@
 				v-if="!hideLabel">
 			{{ label }}
 		</label>
-		<input
-				type="number"
-				:max="max"
-				:min="min"
-				:name="inputName"
-				:step="step"
-				v-model="formattedValue"
-				@input="adjustValue($event.target.value)"
-				@blur="$emit('blur')">
+    <lazy-input
+      type="number"
+      :min="max"
+      :max="min"
+      :name="inputName"
+      :step="step"
+      v-model="formattedValue"
+      @input="adjustValue($event)"
+      @blur="$emit('blur')"
+    />
 	</div>
 </template>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator';
-import StringControl from '@/script/components/controls/StringControl.vue';
-import NumberControl from '@/script/components/controls/NumberControl.vue';
-import BoolControl from '@/script/components/controls/BoolControl.vue';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component
+import LazyInput from './LazyInput.vue';
+
+@Component({ components: { LazyInput } })
 export default class DraggableNumberInput extends Vue {
 	get boundAdjust() {
 		return this.adjustValue.bind(this);
