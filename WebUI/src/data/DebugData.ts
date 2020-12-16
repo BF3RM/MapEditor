@@ -6961,7 +6961,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3867163936,
+          "instanceId": 3808264592,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -7042,6 +7042,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -7274,7 +7279,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946475216,
+          "instanceId": 3948145728,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -7355,6 +7360,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -7416,7 +7426,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946475360,
+          "instanceId": 3948145872,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -7497,6 +7507,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BB732726-18C6-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -7558,7 +7573,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946475504,
+          "instanceId": 3948146016,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -7639,6 +7654,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F17C535-07AA-11E0-B306-90A7F9DD8EAC"
           }
         }
       ],
@@ -7700,7 +7720,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946475648,
+          "instanceId": 3948146160,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -7781,6 +7801,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -7842,7 +7867,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946475792,
+          "instanceId": 3948146304,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -7923,6 +7948,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F17C535-07AA-11E0-B306-90A7F9DD8EAC"
           }
         }
       ],
@@ -7984,7 +8014,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946475936,
+          "instanceId": 3948146448,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8065,6 +8095,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BB732726-18C6-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8126,7 +8161,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476080,
+          "instanceId": 3948146592,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8207,6 +8242,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BB732726-18C6-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8268,7 +8308,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476224,
+          "instanceId": 3948146736,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8349,6 +8389,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BB732726-18C6-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8410,7 +8455,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476368,
+          "instanceId": 3948146880,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8491,6 +8536,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8552,7 +8602,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476512,
+          "instanceId": 3948147024,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8633,6 +8683,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8694,7 +8749,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476656,
+          "instanceId": 3948147168,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8775,6 +8830,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BB732726-18C6-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8836,7 +8896,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476800,
+          "instanceId": 3948147312,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -8917,6 +8977,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -8978,7 +9043,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946476944,
+          "instanceId": 3948147456,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9059,6 +9124,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -9120,7 +9190,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477088,
+          "instanceId": 3948147600,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9201,6 +9271,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -9262,7 +9337,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477232,
+          "instanceId": 3948147744,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9343,6 +9418,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -9404,7 +9484,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477376,
+          "instanceId": 3948147888,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9485,6 +9565,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F17C535-07AA-11E0-B306-90A7F9DD8EAC"
           }
         }
       ],
@@ -9546,7 +9631,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477520,
+          "instanceId": 3948148032,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9627,6 +9712,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F17C535-07AA-11E0-B306-90A7F9DD8EAC"
           }
         }
       ],
@@ -9688,7 +9778,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477664,
+          "instanceId": 3948148176,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9769,6 +9859,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -9830,7 +9925,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477808,
+          "instanceId": 3948148320,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -9911,6 +10006,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F17C535-07AA-11E0-B306-90A7F9DD8EAC"
           }
         }
       ],
@@ -9972,7 +10072,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946477952,
+          "instanceId": 3948148464,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -10053,6 +10153,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F17C535-07AA-11E0-B306-90A7F9DD8EAC"
           }
         }
       ],
@@ -10114,7 +10219,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946478096,
+          "instanceId": 3948148608,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -10195,6 +10300,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -10256,7 +10366,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946478240,
+          "instanceId": 3948148752,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -10337,6 +10447,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -10398,7 +10513,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946478384,
+          "instanceId": 3948148896,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -10479,6 +10594,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -10540,7 +10660,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946478528,
+          "instanceId": 3948149040,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -10621,6 +10741,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7A808859-18C4-11E0-947D-9E530B7FD992"
           }
         }
       ],
@@ -10739,7 +10864,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3828313968,
+          "instanceId": 3864938672,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -10820,6 +10945,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -10881,7 +11011,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810916432,
+          "instanceId": 3872509808,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -10962,6 +11092,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -11080,7 +11215,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3867149056,
+          "instanceId": 3992419600,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -11161,6 +11296,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -11279,7 +11419,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3941202208,
+          "instanceId": 3797416224,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -11360,6 +11500,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -11478,7 +11623,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3758935456,
+          "instanceId": 3815481856,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -11559,6 +11704,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -11677,7 +11827,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3912076864,
+          "instanceId": 3764196032,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -11758,6 +11908,11 @@ export const XP2SKybar = `
                 "z": -7.349461483841E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -11933,7 +12088,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3779148288,
+          "instanceId": 3766876944,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -12014,6 +12169,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "095361D0-167D-11E1-B9E3-849B05B3EA5B"
           }
         }
       ],
@@ -12076,35 +12236,35 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948048496,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 2,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
             "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
+              "_x": -3.1576896305183515E-8,
+              "_y": 0.7071068084760983,
+              "_z": -0.7071067538969933,
+              "_w": -2.8872980851199003E-8
             },
             "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
+              "x": 1.0000001192093033,
+              "y": 0.9999999403953643,
+              "z": 0.9999999403953682
             },
             "left": {
-              "x": 1,
+              "x": -1.0000001192093,
               "y": 0,
-              "z": 0
+              "z": 8.1665135098774E-8
             },
             "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
+              "x": -8.931294814829E-8,
+              "y": 2.6282872767069E-8,
+              "z": -0.99999994039536
             },
             "forward": {
               "x": 0,
-              "y": 0,
-              "z": 1
+              "y": -0.99999994039536,
+              "z": -1.2809013583137E-7
             },
             "trans": {
               "x": 0,
@@ -12125,30 +12285,30 @@ export const XP2SKybar = `
             },
             "transform": {
               "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
+                "_x": -3.1576896305183515E-8,
+                "_y": 0.7071068084760983,
+                "_z": -0.7071067538969933,
+                "_w": -2.8872980851199003E-8
               },
               "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
+                "x": 1.0000001192093033,
+                "y": 0.9999999403953643,
+                "z": 0.9999999403953682
               },
               "left": {
-                "x": 1,
+                "x": -1.0000001192093,
                 "y": 0,
-                "z": 0
+                "z": 8.1665135098774E-8
               },
               "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
+                "x": -8.931294814829E-8,
+                "y": 2.6282872767069E-8,
+                "z": -0.99999994039536
               },
               "forward": {
                 "x": 0,
-                "y": 0,
-                "z": 1
+                "y": -0.99999994039536,
+                "z": -1.2809013583137E-7
               },
               "trans": {
                 "x": 0,
@@ -12156,6 +12316,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5CCFC0F5-0420-C2CA-5B23-6074AE728A45"
           }
         }
       ],
@@ -12217,10 +12382,104 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946478672,
+          "instanceId": 3948149184,
           "indexInBlueprint": 1,
           "typeName": "LensFlareEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "00A1D3DA-1012-41A2-8F50-9EF5ED354B10"
+          }
+        },
+        {
+          "instanceId": 3948048496,
+          "indexInBlueprint": 2,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": -3.1576896305183515E-8,
+              "_y": 0.7071068084760983,
+              "_z": -0.7071067538969933,
+              "_w": -2.8872980851199003E-8
+            },
+            "_scale": {
+              "x": 1.0000001192093033,
+              "y": 0.9999999403953643,
+              "z": 0.9999999403953682
+            },
+            "left": {
+              "x": -1.0000001192093,
+              "y": 0,
+              "z": 8.1665135098774E-8
+            },
+            "up": {
+              "x": -8.931294814829E-8,
+              "y": 2.6282872767069E-8,
+              "z": -0.99999994039536
+            },
+            "forward": {
+              "x": 0,
+              "y": -0.99999994039536,
+              "z": -1.2809013583137E-7
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": -3.1576896305183515E-8,
+                "_y": 0.7071068084760983,
+                "_z": -0.7071067538969933,
+                "_w": -2.8872980851199003E-8
+              },
+              "_scale": {
+                "x": 1.0000001192093033,
+                "y": 0.9999999403953643,
+                "z": 0.9999999403953682
+              },
+              "left": {
+                "x": -1.0000001192093,
+                "y": 0,
+                "z": 8.1665135098774E-8
+              },
+              "up": {
+                "x": -8.931294814829E-8,
+                "y": 2.6282872767069E-8,
+                "z": -0.99999994039536
+              },
+              "forward": {
+                "x": 0,
+                "y": -0.99999994039536,
+                "z": -1.2809013583137E-7
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5CCFC0F5-0420-C2CA-5B23-6074AE728A45"
+          }
         }
       ],
       "isDeleted": false,
@@ -12339,7 +12598,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948048832,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -12371,7 +12630,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -12415,10 +12674,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -12480,7 +12744,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3773817104,
+          "instanceId": 3825702816,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -12561,6 +12825,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -12625,16 +12894,26 @@ export const XP2SKybar = `
           "instanceId": 3953795008,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
           "instanceId": 3953794976,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946189184,
+          "instanceId": 3946452608,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -12715,13 +12994,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953069376,
+          "instanceId": 3948048832,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953134912,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -12783,7 +13161,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948049056,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -12815,7 +13193,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -12859,10 +13237,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -12924,7 +13307,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3812884128,
+          "instanceId": 3815483792,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -13005,6 +13388,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -13069,16 +13457,26 @@ export const XP2SKybar = `
           "instanceId": 3953795200,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
           "instanceId": 3953795104,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946189440,
+          "instanceId": 3946452864,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -13159,13 +13557,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953069632,
+          "instanceId": 3948049056,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953135168,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -13227,7 +13724,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948049280,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -13259,7 +13756,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -13303,10 +13800,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -13368,7 +13870,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3812884624,
+          "instanceId": 3828284208,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -13449,6 +13951,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -13510,14 +14017,41 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953069888,
+          "instanceId": 3953795296,
           "indexInBlueprint": 1,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946189824,
+          "instanceId": 3953135424,
           "indexInBlueprint": 2,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3953795392,
+          "indexInBlueprint": 3,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3946453248,
+          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -13597,19 +14131,101 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953795296,
-          "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953795392,
-          "indexInBlueprint": 4,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "instanceId": 3948049280,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -13671,7 +14287,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948049504,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -13703,7 +14319,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -13747,10 +14363,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -13812,7 +14433,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3794729984,
+          "instanceId": 3804976032,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -13893,6 +14514,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -13954,469 +14580,40 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946190208,
+          "instanceId": 3953795488,
           "indexInBlueprint": 1,
-          "typeName": "ClientDecalEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 5,
-              "y": 0.5,
-              "z": 5
-            },
-            "left": {
-              "x": 5,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 0.5,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 5
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "max": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 5,
-                "y": 0.5,
-                "z": 5
-              },
-              "left": {
-                "x": 5,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 0.5,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 5
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
           }
         },
         {
-          "instanceId": 3953795488,
+          "instanceId": 3953135744,
           "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         },
         {
           "instanceId": 3953795584,
           "indexInBlueprint": 3,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953070208,
-          "indexInBlueprint": 5,
-          "typeName": "SoundEntity",
-          "isSpatial": false
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001938352635",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-011928944062",
-        "typeName": "SpatialPrefabBlueprint",
-        "primaryInstanceGuid": "46B82AED-DCCF-4F32-9245-95C7D71D1FC3",
-        "partitionGuid": "FC575836-F559-4EC0-B536-5273AF4B51F5"
-      },
-      "blueprintCtrRef": {
-        "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
-        "partitionGuid": "2201A624-F630-455D-B8A8-7DFFAC62589B",
-        "instanceGuid": "AE1A47B4-B71E-41BB-A0FD-897BD8F111EC"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0,
-          "_y": 0,
-          "_z": 0,
-          "_w": 1
-        },
-        "_scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "left": {
-          "x": 1,
-          "y": 0,
-          "z": 0
-        },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "forward": {
-          "x": 0,
-          "y": 0,
-          "z": 1
-        },
-        "trans": {
-          "x": 19.019874572754,
-          "y": 14.378085136414,
-          "z": 21.873481750488
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3948049728,
-          "indexInBlueprint": 1,
-          "typeName": "EffectEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "left": {
-              "x": 1,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 1
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": -1,
-              "y": -1,
-              "z": -1
-            },
-            "max": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
-              },
-              "left": {
-                "x": 1,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 1
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
           }
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001148468091",
-      "name": "Objects/InteriorDetails/OfficeDetails_01/Sprinkler_Single_02_Dest",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-011928944062",
-        "typeName": "SpatialPrefabBlueprint",
-        "primaryInstanceGuid": "46B82AED-DCCF-4F32-9245-95C7D71D1FC3",
-        "partitionGuid": "FC575836-F559-4EC0-B536-5273AF4B51F5"
-      },
-      "blueprintCtrRef": {
-        "typeName": "ObjectBlueprint",
-        "name": "Objects/InteriorDetails/OfficeDetails_01/Sprinkler_Single_02_Dest",
-        "partitionGuid": "FCDCB9F7-E0E6-4BD1-A9F9-23EA17D0DB58",
-        "instanceGuid": "2D294463-F918-4864-A6D7-EBC076E18ABE"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0,
-          "_y": 0,
-          "_z": 0,
-          "_w": 1
-        },
-        "_scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "left": {
-          "x": 1,
-          "y": 0,
-          "z": 0
-        },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "forward": {
-          "x": 0,
-          "y": 0,
-          "z": 1
-        },
-        "trans": {
-          "x": 19.019874572754,
-          "y": 14.378085136414,
-          "z": 21.873481750488
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3794730464,
-          "indexInBlueprint": 1,
-          "typeName": "ClientStaticModelEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "left": {
-              "x": 1,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 1
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": -0.059166990220547,
-              "y": -0.086709454655647,
-              "z": -0.059166986495256
-            },
-            "max": {
-              "x": 0.059166997671127,
-              "y": 0,
-              "z": 0.059166986495256
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
-              },
-              "left": {
-                "x": 1,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 1
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
-          }
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011928944062",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/Sprinkler_Prefab",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-011958315200",
-        "typeName": "WorldPartData",
-        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
-        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
-      },
-      "blueprintCtrRef": {
-        "typeName": "SpatialPrefabBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/Sprinkler_Prefab",
-        "partitionGuid": "FC575836-F559-4EC0-B536-5273AF4B51F5",
-        "instanceGuid": "46B82AED-DCCF-4F32-9245-95C7D71D1FC3"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0,
-          "_y": 0,
-          "_z": 0,
-          "_w": 1
-        },
-        "_scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "left": {
-          "x": 1,
-          "y": 0,
-          "z": 0
-        },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "forward": {
-          "x": 0,
-          "y": 0,
-          "z": 1
-        },
-        "trans": {
-          "x": 19.019874572754,
-          "y": 10.878085136414,
-          "z": 21.873481750488
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3953070464,
-          "indexInBlueprint": 1,
-          "typeName": "SoundEntity",
-          "isSpatial": false
         },
         {
-          "instanceId": 3953795776,
-          "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953795904,
-          "indexInBlueprint": 3,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3946190592,
+          "instanceId": 3946453632,
           "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -14497,6 +14694,663 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
+          }
+        },
+        {
+          "instanceId": 3948049504,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-001938352635",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-011928944062",
+        "typeName": "SpatialPrefabBlueprint",
+        "primaryInstanceGuid": "46B82AED-DCCF-4F32-9245-95C7D71D1FC3",
+        "partitionGuid": "FC575836-F559-4EC0-B536-5273AF4B51F5"
+      },
+      "blueprintCtrRef": {
+        "typeName": "EffectBlueprint",
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
+        "partitionGuid": "2201A624-F630-455D-B8A8-7DFFAC62589B",
+        "instanceGuid": "AE1A47B4-B71E-41BB-A0FD-897BD8F111EC"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0,
+          "_y": 0,
+          "_z": 0,
+          "_w": 1
+        },
+        "_scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "left": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "forward": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "trans": {
+          "x": 19.019874572754,
+          "y": 14.378085136414,
+          "z": 21.873481750488
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3948049728,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-001148468091",
+      "name": "Objects/InteriorDetails/OfficeDetails_01/Sprinkler_Single_02_Dest",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-011928944062",
+        "typeName": "SpatialPrefabBlueprint",
+        "primaryInstanceGuid": "46B82AED-DCCF-4F32-9245-95C7D71D1FC3",
+        "partitionGuid": "FC575836-F559-4EC0-B536-5273AF4B51F5"
+      },
+      "blueprintCtrRef": {
+        "typeName": "ObjectBlueprint",
+        "name": "Objects/InteriorDetails/OfficeDetails_01/Sprinkler_Single_02_Dest",
+        "partitionGuid": "FCDCB9F7-E0E6-4BD1-A9F9-23EA17D0DB58",
+        "instanceGuid": "2D294463-F918-4864-A6D7-EBC076E18ABE"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0,
+          "_y": 0,
+          "_z": 0,
+          "_w": 1
+        },
+        "_scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "left": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "forward": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "trans": {
+          "x": 19.019874572754,
+          "y": 14.378085136414,
+          "z": 21.873481750488
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3867689120,
+          "indexInBlueprint": 1,
+          "typeName": "ClientStaticModelEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.059166990220547,
+              "y": -0.086709454655647,
+              "z": -0.059166986495256
+            },
+            "max": {
+              "x": 0.059166997671127,
+              "y": 0,
+              "z": 0.059166986495256
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-011928944062",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/Sprinkler_Prefab",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-011958315200",
+        "typeName": "WorldPartData",
+        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
+        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
+      },
+      "blueprintCtrRef": {
+        "typeName": "SpatialPrefabBlueprint",
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/Sprinkler_Prefab",
+        "partitionGuid": "FC575836-F559-4EC0-B536-5273AF4B51F5",
+        "instanceGuid": "46B82AED-DCCF-4F32-9245-95C7D71D1FC3"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0,
+          "_y": 0,
+          "_z": 0,
+          "_w": 1
+        },
+        "_scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "left": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "forward": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "trans": {
+          "x": 19.019874572754,
+          "y": 10.878085136414,
+          "z": 21.873481750488
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3953795776,
+          "indexInBlueprint": 1,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3946454016,
+          "indexInBlueprint": 2,
+          "typeName": "ClientDecalEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 5,
+              "y": 0.5,
+              "z": 5
+            },
+            "left": {
+              "x": 5,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 0.5,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "max": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 5,
+                "y": 0.5,
+                "z": 5
+              },
+              "left": {
+                "x": 5,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 0.5,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 5
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
+          }
+        },
+        {
+          "instanceId": 3953795904,
+          "indexInBlueprint": 3,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3948049728,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953136000,
+          "indexInBlueprint": 5,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
           }
         }
       ],
@@ -14559,7 +15413,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948049952,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -14591,7 +15445,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -14635,10 +15489,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -14700,7 +15559,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3867215840,
+          "instanceId": 3815298048,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -14781,6 +15640,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -14845,11 +15709,27 @@ export const XP2SKybar = `
           "instanceId": 3953796160,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3946190976,
+          "instanceId": 3953796128,
           "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3946454400,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -14929,19 +15809,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953796128,
-          "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "instanceId": 3948049952,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953070720,
+          "instanceId": 3953136256,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -15003,7 +15976,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948050176,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 2,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -15035,7 +16008,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -15079,10 +16052,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -15144,7 +16122,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3867216336,
+          "instanceId": 3926344112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -15225,6 +16203,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -15286,19 +16269,107 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953070976,
-          "indexInBlueprint": 1,
-          "typeName": "SoundEntity",
-          "isSpatial": false
-        },
-        {
           "instanceId": 3953796256,
-          "indexInBlueprint": 2,
+          "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946191360,
+          "instanceId": 3948050176,
+          "indexInBlueprint": 2,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3946454784,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -15379,13 +16450,34 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
+          }
+        },
+        {
+          "instanceId": 3953136512,
+          "indexInBlueprint": 4,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
           }
         },
         {
           "instanceId": 3953796352,
-          "indexInBlueprint": 4,
+          "indexInBlueprint": 5,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         }
       ],
       "isDeleted": false,
@@ -15447,7 +16539,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948050400,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -15479,7 +16571,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -15523,10 +16615,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -15588,7 +16685,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3779149776,
+          "instanceId": 3926344608,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -15669,6 +16766,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -15733,17 +16835,27 @@ export const XP2SKybar = `
           "instanceId": 3953796544,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
           "instanceId": 3953796448,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946191744,
-          "indexInBlueprint": 4,
+          "instanceId": 3946455168,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -15823,13 +16935,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953071296,
+          "instanceId": 3948050400,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953136832,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -15891,7 +17102,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948050624,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -15923,7 +17134,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -15967,10 +17178,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -16032,7 +17248,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3779150272,
+          "instanceId": 4002108800,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -16113,6 +17329,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -16177,10 +17398,15 @@ export const XP2SKybar = `
           "instanceId": 3953796672,
           "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946192128,
+          "instanceId": 3946455552,
           "indexInBlueprint": 2,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -16261,19 +17487,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
           "instanceId": 3953795872,
           "indexInBlueprint": 3,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953071872,
+          "instanceId": 3948050624,
           "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953137408,
+          "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -16335,7 +17665,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948050848,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -16367,7 +17697,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -16411,10 +17741,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -16476,7 +17811,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995216304,
+          "instanceId": 4002109280,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -16557,6 +17892,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -16621,17 +17961,16 @@ export const XP2SKybar = `
           "instanceId": 3953796704,
           "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3953795808,
+          "instanceId": 3946455936,
           "indexInBlueprint": 2,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3946192512,
-          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -16711,13 +18050,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953072192,
-          "indexInBlueprint": 5,
+          "instanceId": 3953137728,
+          "indexInBlueprint": 3,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3953795808,
+          "indexInBlueprint": 4,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3948050848,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -16779,7 +18228,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948051072,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -16811,7 +18260,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -16855,10 +18304,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -16920,7 +18374,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995216800,
+          "instanceId": 3867517696,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -17001,6 +18455,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -17065,10 +18524,15 @@ export const XP2SKybar = `
           "instanceId": 3953796800,
           "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946192896,
+          "instanceId": 3946456320,
           "indexInBlueprint": 2,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -17149,19 +18613,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
+          }
+        },
+        {
+          "instanceId": 3953137984,
+          "indexInBlueprint": 3,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
           }
         },
         {
           "instanceId": 3953796896,
-          "indexInBlueprint": 3,
+          "indexInBlueprint": 4,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953072448,
-          "indexInBlueprint": 4,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "instanceId": 3948051072,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -17223,7 +18791,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948051296,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -17255,7 +18823,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -17299,10 +18867,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -17364,7 +18937,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3822166784,
+          "instanceId": 3867518176,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -17445,6 +19018,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -17509,16 +19087,26 @@ export const XP2SKybar = `
           "instanceId": 3953797088,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
           "instanceId": 3953796992,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946193280,
+          "instanceId": 3946456704,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -17599,13 +19187,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953072640,
+          "instanceId": 3948051296,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953138176,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -17667,7 +19354,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948051520,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -17699,7 +19386,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -17743,10 +19430,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -17808,7 +19500,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3822167264,
+          "instanceId": 3867518672,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -17889,6 +19581,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -17953,17 +19650,16 @@ export const XP2SKybar = `
           "instanceId": 3953797280,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953797184,
+          "instanceId": 3946457216,
           "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3946193792,
-          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -18043,13 +19739,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953072896,
+          "instanceId": 3953797184,
+          "indexInBlueprint": 3,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3948051520,
           "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953138432,
+          "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -18111,7 +19917,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948051744,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -18143,7 +19949,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -18187,10 +19993,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -18252,7 +20063,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3822167760,
+          "instanceId": 3867519168,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -18333,6 +20144,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -18397,11 +20213,27 @@ export const XP2SKybar = `
           "instanceId": 3953797472,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3946194176,
+          "instanceId": 3953797376,
           "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3946457600,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -18481,19 +20313,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953797376,
-          "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "instanceId": 3948051744,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953073152,
+          "instanceId": 3953138688,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -18555,7 +20480,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948051968,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -18587,7 +20512,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -18631,10 +20556,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -18696,7 +20626,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3822168256,
+          "instanceId": 3875775232,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -18777,6 +20707,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -18841,16 +20776,26 @@ export const XP2SKybar = `
           "instanceId": 3953797568,
           "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3953797664,
+          "instanceId": 3953138944,
           "indexInBlueprint": 2,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         },
         {
-          "instanceId": 3946194560,
+          "instanceId": 3946457984,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -18931,13 +20876,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953073408,
+          "instanceId": 3953797664,
           "indexInBlueprint": 4,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3948051968,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -18998,7 +21042,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3819152128,
+          "instanceId": 3875775712,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -19079,6 +21123,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "824D242E-4E76-11E1-B07D-87D950F1BBEE"
           }
         }
       ],
@@ -19221,10 +21270,15 @@ export const XP2SKybar = `
                 "z": -5.7814730780592E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "99B4B0C7-309A-40DC-A0DA-FFFD6FB0518A"
           }
         },
         {
-          "instanceId": 3819152608,
+          "instanceId": 3875776208,
           "indexInBlueprint": 2,
           "typeName": "VisualEnvironmentEntity",
           "isSpatial": true,
@@ -19305,6 +21359,11 @@ export const XP2SKybar = `
                 "z": 30.604999542236
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "46D4DD5C-8083-44DA-BFE1-800664D6F95A"
           }
         }
       ],
@@ -19366,7 +21425,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3819153328,
+          "instanceId": 3875776928,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -19447,6 +21506,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -19509,7 +21573,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948052864,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -19541,7 +21605,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 7.9699993133545,
               "z": 0
             }
           },
@@ -19585,10 +21649,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 7.9699993133545,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9D338AB0-47C3-4DDF-A130-D0EA8825D922"
           }
         }
       ],
@@ -19653,16 +21722,26 @@ export const XP2SKybar = `
           "instanceId": 3953798272,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DBE29351-6140-4792-99A4-AC6074238BBD"
+          }
         },
         {
           "instanceId": 3953798240,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4E7F3C63-F910-4138-BCE1-0DF80ABB0320"
+          }
         },
         {
-          "instanceId": 3946195200,
+          "instanceId": 3946458624,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -19743,6 +21822,100 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D694712F-6B3C-4CA0-AEF6-8C9AA8617DE3"
+          }
+        },
+        {
+          "instanceId": 3948052864,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 7.9699993133545,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 7.9699993133545,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9D338AB0-47C3-4DDF-A130-D0EA8825D922"
           }
         }
       ],
@@ -19804,7 +21977,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3819153824,
+          "instanceId": 3816661760,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -19885,6 +22058,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -19947,7 +22125,7 @@ export const XP2SKybar = `
       "gameEntities": [
         {
           "instanceId": 3948052976,
-          "indexInBlueprint": 1,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -19979,7 +22157,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 7.9699993133545,
               "z": 0
             }
           },
@@ -20023,10 +22201,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 7.9699993133545,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9D338AB0-47C3-4DDF-A130-D0EA8825D922"
           }
         }
       ],
@@ -20091,10 +22274,15 @@ export const XP2SKybar = `
           "instanceId": 3953798368,
           "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4E7F3C63-F910-4138-BCE1-0DF80ABB0320"
+          }
         },
         {
-          "instanceId": 3946195712,
+          "instanceId": 3946459136,
           "indexInBlueprint": 2,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -20175,13 +22363,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D694712F-6B3C-4CA0-AEF6-8C9AA8617DE3"
           }
         },
         {
           "instanceId": 3953798464,
           "indexInBlueprint": 3,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DBE29351-6140-4792-99A4-AC6074238BBD"
+          }
+        },
+        {
+          "instanceId": 3948052976,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 7.9699993133545,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 7.9699993133545,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9D338AB0-47C3-4DDF-A130-D0EA8825D922"
+          }
         }
       ],
       "isDeleted": false,
@@ -20323,6 +22610,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "ABDCB75E-2C2D-4BCF-86D8-A071C0828555"
           }
         }
       ],
@@ -20465,6 +22757,11 @@ export const XP2SKybar = `
                 "z": 1.2761113055149E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "377EFD78-1CDE-4521-A91A-05F171E4C307"
           }
         }
       ],
@@ -20607,6 +22904,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0464D174-43ED-4F0C-930A-D0FBE6DA0565"
           }
         }
       ],
@@ -20749,6 +23051,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "732D512C-3328-790B-98E1-8E2326F09EA8"
           }
         }
       ],
@@ -20810,7 +23117,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948054208,
+          "instanceId": 3948054320,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -20891,6 +23198,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "02CF02E2-CEE7-0BF4-E6BE-FD7CF12D03A3"
           }
         }
       ],
@@ -20952,7 +23264,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948054320,
+          "instanceId": 3948054432,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -21033,6 +23345,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A281AC96-E8C1-41C2-8EEF-4EDE10676E67"
           }
         }
       ],
@@ -21094,7 +23411,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948054544,
+          "instanceId": 3948054656,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -21175,6 +23492,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5B76D1CE-1B9E-4955-9494-9A7B1E8AAFC2"
           }
         }
       ],
@@ -21236,7 +23558,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948054768,
+          "instanceId": 3948054880,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -21317,6 +23639,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5B76D1CE-1B9E-4955-9494-9A7B1E8AAFC2"
           }
         }
       ],
@@ -21378,7 +23705,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948054880,
+          "instanceId": 3948054992,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -21459,6 +23786,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5B76D1CE-1B9E-4955-9494-9A7B1E8AAFC2"
           }
         }
       ],
@@ -21520,7 +23852,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948054992,
+          "instanceId": 3948055104,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -21601,6 +23933,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5689ED8F-76B5-40E2-992A-E913BD40ECFD"
           }
         }
       ],
@@ -21662,8 +23999,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948055216,
-          "indexInBlueprint": 1,
+          "instanceId": 3948055328,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -21695,7 +24032,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -21739,10 +24076,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -21804,7 +24146,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764247792,
+          "instanceId": 3816050720,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -21885,6 +24227,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -21946,26 +24293,30 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953799296,
+          "instanceId": 3953799360,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953799264,
+          "instanceId": 3953799328,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3953073728,
+          "instanceId": 3946460800,
           "indexInBlueprint": 3,
-          "typeName": "SoundEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3946197248,
-          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -22045,6 +24396,111 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
+          }
+        },
+        {
+          "instanceId": 3948055328,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953139200,
+          "indexInBlueprint": 5,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
           }
         }
       ],
@@ -22106,8 +24562,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948055440,
-          "indexInBlueprint": 1,
+          "instanceId": 3948055552,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -22139,7 +24595,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -22183,10 +24639,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -22248,7 +24709,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764248288,
+          "instanceId": 3816051216,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -22329,6 +24790,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -22390,13 +24856,18 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953799392,
+          "instanceId": 3953799552,
           "indexInBlueprint": 1,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3946197888,
+          "instanceId": 3946461440,
           "indexInBlueprint": 2,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -22477,19 +24948,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953799488,
+          "instanceId": 3953799456,
           "indexInBlueprint": 3,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3953073856,
-          "indexInBlueprint": 5,
+          "instanceId": 3953139328,
+          "indexInBlueprint": 4,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3948055552,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -22550,8 +25125,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948055664,
-          "indexInBlueprint": 1,
+          "instanceId": 3948055776,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -22583,7 +25158,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -22627,10 +25202,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -22692,7 +25272,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764248784,
+          "instanceId": 3816051712,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -22773,6 +25353,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -22834,8 +25419,41 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946198272,
+          "instanceId": 3953139584,
           "indexInBlueprint": 1,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3953799648,
+          "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3953799744,
+          "indexInBlueprint": 3,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3946461824,
+          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -22915,25 +25533,101 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953799584,
-          "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953799680,
-          "indexInBlueprint": 3,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953074112,
+          "instanceId": 3948055776,
           "indexInBlueprint": 5,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -22994,8 +25688,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948055888,
-          "indexInBlueprint": 1,
+          "instanceId": 3948056000,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -23027,7 +25721,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -23071,10 +25765,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -23136,7 +25835,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3841565440,
+          "instanceId": 3875950080,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -23217,6 +25916,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -23278,14 +25982,30 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953799872,
+          "instanceId": 3953139840,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         },
         {
-          "instanceId": 3946198656,
+          "instanceId": 3953799840,
           "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3946462208,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -23365,19 +26085,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953799776,
-          "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "instanceId": 3953799936,
+          "indexInBlueprint": 4,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953074368,
+          "instanceId": 3948056000,
           "indexInBlueprint": 5,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -23438,8 +26251,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948056112,
-          "indexInBlueprint": 1,
+          "instanceId": 3948056224,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -23471,7 +26284,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -23515,10 +26328,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -23580,7 +26398,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3841565920,
+          "instanceId": 3875950560,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -23661,6 +26479,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -23722,14 +26545,30 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953800064,
+          "instanceId": 3953800128,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3946198912,
+          "instanceId": 3953800032,
           "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3946462464,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -23809,19 +26648,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953799968,
-          "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "instanceId": 3948056224,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953074624,
+          "instanceId": 3953140096,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -23882,8 +26814,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948056336,
-          "indexInBlueprint": 1,
+          "instanceId": 3948056448,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -23915,7 +26847,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -23959,10 +26891,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -24024,7 +26961,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3841566416,
+          "instanceId": 3875951056,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -24105,6 +27042,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -24166,14 +27108,30 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953800160,
+          "instanceId": 3953800320,
           "indexInBlueprint": 1,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3946199296,
+          "instanceId": 3953800224,
           "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3946462848,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -24253,19 +27211,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953800256,
-          "indexInBlueprint": 3,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "instanceId": 3948056448,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953074880,
+          "instanceId": 3953140352,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -24326,8 +27377,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948056560,
-          "indexInBlueprint": 1,
+          "instanceId": 3948056672,
+          "indexInBlueprint": 2,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -24359,7 +27410,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -24403,10 +27454,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -24468,7 +27524,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3841566912,
+          "instanceId": 3875951552,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -24549,6 +27605,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -24610,19 +27671,107 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953075136,
+          "instanceId": 3953800416,
           "indexInBlueprint": 1,
-          "typeName": "SoundEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953800352,
-          "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946199680,
+          "instanceId": 3948056672,
+          "indexInBlueprint": 2,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3946463232,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -24703,13 +27852,34 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953800448,
+          "instanceId": 3953140608,
           "indexInBlueprint": 4,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3953800512,
+          "indexInBlueprint": 5,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         }
       ],
       "isDeleted": false,
@@ -24770,8 +27940,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948056784,
-          "indexInBlueprint": 1,
+          "instanceId": 3948056896,
+          "indexInBlueprint": 2,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -24803,7 +27973,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5000009536743,
               "z": 0
             }
           },
@@ -24847,10 +28017,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5000009536743,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -24912,7 +28087,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764249280,
+          "instanceId": 3857945440,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -24993,6 +28168,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -25054,20 +28234,108 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953800640,
+          "instanceId": 3953800608,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953800544,
-          "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946200064,
-          "indexInBlueprint": 4,
+          "instanceId": 3948056896,
+          "indexInBlueprint": 2,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5000009536743,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5000009536743,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3946463616,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -25147,13 +28415,34 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953075392,
-          "indexInBlueprint": 5,
+          "instanceId": 3953140864,
+          "indexInBlueprint": 4,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3953800704,
+          "indexInBlueprint": 5,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         }
       ],
       "isDeleted": false,
@@ -25214,8 +28503,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948057008,
-          "indexInBlueprint": 1,
+          "instanceId": 3948057120,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -25247,7 +28536,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -25291,10 +28580,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -25356,7 +28650,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764249776,
+          "instanceId": 3857945936,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -25437,6 +28731,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -25498,26 +28797,41 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953075648,
+          "instanceId": 3953800896,
           "indexInBlueprint": 1,
-          "typeName": "SoundEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953800832,
-          "indexInBlueprint": 2,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953800736,
-          "indexInBlueprint": 3,
+          "instanceId": 3953800800,
+          "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946200448,
-          "indexInBlueprint": 5,
+          "instanceId": 3953141120,
+          "indexInBlueprint": 3,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3946464000,
+          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -25597,6 +28911,100 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
+          }
+        },
+        {
+          "instanceId": 3948057120,
+          "indexInBlueprint": 5,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -25658,8 +29066,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948057232,
-          "indexInBlueprint": 1,
+          "instanceId": 3948057344,
+          "indexInBlueprint": 5,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -25691,7 +29099,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -25735,10 +29143,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -25800,7 +29213,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764250272,
+          "instanceId": 4002998656,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -25881,6 +29294,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -25942,14 +29360,41 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953800928,
+          "instanceId": 3953801088,
           "indexInBlueprint": 1,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3946200832,
+          "instanceId": 3953800992,
           "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
+        },
+        {
+          "instanceId": 3953141376,
+          "indexInBlueprint": 3,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
+        },
+        {
+          "instanceId": 3946464384,
+          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -26029,19 +29474,101 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953801024,
-          "indexInBlueprint": 3,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953075904,
+          "instanceId": 3948057344,
           "indexInBlueprint": 5,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         }
       ],
       "isDeleted": false,
@@ -26102,8 +29629,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948057456,
-          "indexInBlueprint": 1,
+          "instanceId": 3948057568,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -26135,7 +29662,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -26179,10 +29706,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -26244,7 +29776,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764250768,
+          "instanceId": 4002999136,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -26325,6 +29857,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -26386,13 +29923,18 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953801120,
+          "instanceId": 3953801184,
           "indexInBlueprint": 1,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946201088,
+          "instanceId": 3946464640,
           "indexInBlueprint": 2,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -26473,19 +30015,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953076160,
+          "instanceId": 3953801280,
           "indexInBlueprint": 3,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953801216,
+          "instanceId": 3948057568,
           "indexInBlueprint": 4,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953141632,
+          "indexInBlueprint": 5,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -26546,8 +30192,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948057680,
-          "indexInBlueprint": 1,
+          "instanceId": 3948057792,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -26579,7 +30225,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -26623,10 +30269,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -26688,7 +30339,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764251264,
+          "instanceId": 4002999632,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -26769,6 +30420,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -26830,20 +30486,19 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953801408,
+          "instanceId": 3953801376,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953801312,
-          "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946201472,
-          "indexInBlueprint": 3,
+          "instanceId": 3946465024,
+          "indexInBlueprint": 2,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -26923,13 +30578,123 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953076416,
+          "instanceId": 3953801472,
+          "indexInBlueprint": 3,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3948057792,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953141888,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -26990,8 +30755,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948057904,
-          "indexInBlueprint": 1,
+          "instanceId": 3948058016,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -27023,7 +30788,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -27067,10 +30832,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -27132,7 +30902,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813253888,
+          "instanceId": 4003000128,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -27213,6 +30983,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -27274,19 +31049,29 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953801600,
+          "instanceId": 3953801664,
           "indexInBlueprint": 1,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
         },
         {
-          "instanceId": 3953801504,
+          "instanceId": 3953801568,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946201856,
+          "instanceId": 3946465408,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -27367,13 +31152,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953076672,
+          "instanceId": 3948058016,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953142144,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -27434,7 +31318,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948058128,
+          "instanceId": 3948058240,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -27515,6 +31399,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -27571,148 +31460,6 @@ export const XP2SKybar = `
           "x": -21.463274002075,
           "y": 13.496660232544,
           "z": 16.005331039429
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3948058352,
-          "indexInBlueprint": 1,
-          "typeName": "EffectEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "left": {
-              "x": 1,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 1
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": -1,
-              "y": -1,
-              "z": -1
-            },
-            "max": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
-              },
-              "left": {
-                "x": 1,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 1
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
-          }
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011430598409",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-011958315200",
-        "typeName": "WorldPartData",
-        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
-        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
-      },
-      "blueprintCtrRef": {
-        "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
-        "partitionGuid": "D30E2DE6-8BF7-4C9A-967B-5082DAE27A38",
-        "instanceGuid": "D325519E-9594-4F9B-9824-58CDDF47EFC6"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0,
-          "_y": 0,
-          "_z": 0,
-          "_w": 1
-        },
-        "_scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "left": {
-          "x": 1,
-          "y": 0,
-          "z": 0
-        },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "forward": {
-          "x": 0,
-          "y": 0,
-          "z": 1
-        },
-        "trans": {
-          "x": -23.260269165039,
-          "y": 17.5462474823,
-          "z": 20.287637710571
         }
       },
       "variation": 0,
@@ -27799,6 +31546,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -27810,7 +31562,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001340201835",
+      "guid": "ED170122-0000-0000-0000-011430598409",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -27852,9 +31604,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -31.538938522339,
-          "y": 17.466871261597,
-          "z": 18.552562713623
+          "x": -23.260269165039,
+          "y": 17.5462474823,
+          "z": 20.287637710571
         }
       },
       "variation": 0,
@@ -27941,6 +31693,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -27952,7 +31709,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001471211940",
+      "guid": "ED170122-0000-0000-0000-001340201835",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -27994,9 +31751,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -14.893754005432,
-          "y": 13.35999584198,
-          "z": 16.415872573853
+          "x": -31.538938522339,
+          "y": 17.466871261597,
+          "z": 18.552562713623
         }
       },
       "variation": 0,
@@ -28083,6 +31840,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28094,7 +31856,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001233313597",
+      "guid": "ED170122-0000-0000-0000-001471211940",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -28136,9 +31898,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -30.287088394165,
-          "y": 13.938181877136,
-          "z": 16.415639877319
+          "x": -14.893754005432,
+          "y": 13.35999584198,
+          "z": 16.415872573853
         }
       },
       "variation": 0,
@@ -28225,6 +31987,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28236,7 +32003,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-000801959616",
+      "guid": "ED170122-0000-0000-0000-001233313597",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -28278,9 +32045,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -20.41930770874,
-          "y": 13.596633911133,
-          "z": 3.9954028129578
+          "x": -30.287088394165,
+          "y": 13.938181877136,
+          "z": 16.415639877319
         }
       },
       "variation": 0,
@@ -28367,6 +32134,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28378,7 +32150,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001510367169",
+      "guid": "ED170122-0000-0000-0000-000801959616",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -28420,9 +32192,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -20.220964431763,
-          "y": 17.841283798218,
-          "z": 10.588793754578
+          "x": -20.41930770874,
+          "y": 13.596633911133,
+          "z": 3.9954028129578
         }
       },
       "variation": 0,
@@ -28509,6 +32281,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28520,7 +32297,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011961575664",
+      "guid": "ED170122-0000-0000-0000-001510367169",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -28562,9 +32339,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -26.051591873169,
-          "y": 18.590435028076,
-          "z": 12.611273765564
+          "x": -20.220964431763,
+          "y": 17.841283798218,
+          "z": 10.588793754578
         }
       },
       "variation": 0,
@@ -28651,6 +32428,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28662,7 +32444,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-000879255751",
+      "guid": "ED170122-0000-0000-0000-011961575664",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -28704,9 +32486,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -8.4408082962036,
-          "y": 13.861634254456,
-          "z": 15.863721847534
+          "x": -26.051591873169,
+          "y": 18.590435028076,
+          "z": 12.611273765564
         }
       },
       "variation": 0,
@@ -28793,6 +32575,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28804,8 +32591,8 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001678841705",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_GroundMist",
+      "guid": "ED170122-0000-0000-0000-000879255751",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
         "typeName": "WorldPartData",
@@ -28814,9 +32601,9 @@ export const XP2SKybar = `
       },
       "blueprintCtrRef": {
         "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_GroundMist",
-        "partitionGuid": "A97E13CE-2FF7-49AB-9C49-C7CB0FE69627",
-        "instanceGuid": "9DDD3862-CA13-4714-A626-B702E0E5E804"
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_DarkMist",
+        "partitionGuid": "D30E2DE6-8BF7-4C9A-967B-5082DAE27A38",
+        "instanceGuid": "D325519E-9594-4F9B-9824-58CDDF47EFC6"
       },
       "transform": {
         "_rotation": {
@@ -28846,9 +32633,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -7.7138056755066,
-          "y": 11.94749546051,
-          "z": 6.682089805603
+          "x": -8.4408082962036,
+          "y": 13.861634254456,
+          "z": 15.863721847534
         }
       },
       "variation": 0,
@@ -28935,6 +32722,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D6BB6C93-DD94-424A-9726-D930E194CD88"
           }
         }
       ],
@@ -28946,8 +32738,8 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011416380127",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Palace/FX_DLC2_MP_Palace_ElectricSparkDischarge",
+      "guid": "ED170122-0000-0000-0000-001678841705",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_GroundMist",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
         "typeName": "WorldPartData",
@@ -28956,21 +32748,21 @@ export const XP2SKybar = `
       },
       "blueprintCtrRef": {
         "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Palace/FX_DLC2_MP_Palace_ElectricSparkDischarge",
-        "partitionGuid": "89C13CD9-A217-4CF4-BB5E-7187F2BCE7A1",
-        "instanceGuid": "131811DA-96AA-4371-B611-6D87D9075B3B"
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_GroundMist",
+        "partitionGuid": "A97E13CE-2FF7-49AB-9C49-C7CB0FE69627",
+        "instanceGuid": "9DDD3862-CA13-4714-A626-B702E0E5E804"
       },
       "transform": {
         "_rotation": {
-          "_x": -0.37902334969387025,
+          "_x": 0,
           "_y": 0,
           "_z": 0,
-          "_w": 0.9253871083967173
+          "_w": 1
         },
         "_scale": {
           "x": 1,
-          "y": 1.0000000056351224,
-          "z": 1.0000000056351224
+          "y": 1,
+          "z": 1
         },
         "left": {
           "x": 1,
@@ -28979,24 +32771,24 @@ export const XP2SKybar = `
         },
         "up": {
           "x": 0,
-          "y": 0.71268260478973,
-          "z": -0.70148664712906
+          "y": 1,
+          "z": 0
         },
         "forward": {
           "x": 0,
-          "y": 0.70148664712906,
-          "z": 0.71268260478973
+          "y": 0,
+          "z": 1
         },
         "trans": {
-          "x": -9.5863037109375,
-          "y": 10.942254066467,
-          "z": 6.616729259491
+          "x": -7.7138056755066,
+          "y": 11.94749546051,
+          "z": 6.682089805603
         }
       },
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948059584,
+          "instanceId": 3948059472,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -29077,6 +32869,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C0E4D9DC-B39B-46F5-AA15-5F37D698765E"
           }
         }
       ],
@@ -29088,8 +32885,8 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-012132654946",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
+      "guid": "ED170122-0000-0000-0000-011416380127",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Palace/FX_DLC2_MP_Palace_ElectricSparkDischarge",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
         "typeName": "WorldPartData",
@@ -29098,21 +32895,21 @@ export const XP2SKybar = `
       },
       "blueprintCtrRef": {
         "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
-        "partitionGuid": "D74C563C-16A5-4459-BA7F-EFA30E1A044D",
-        "instanceGuid": "FB6E8A99-44C8-42C1-B74E-D0C61E28724E"
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Palace/FX_DLC2_MP_Palace_ElectricSparkDischarge",
+        "partitionGuid": "89C13CD9-A217-4CF4-BB5E-7187F2BCE7A1",
+        "instanceGuid": "131811DA-96AA-4371-B611-6D87D9075B3B"
       },
       "transform": {
         "_rotation": {
-          "_x": 0,
+          "_x": -0.37902334969387025,
           "_y": 0,
           "_z": 0,
-          "_w": 1
+          "_w": 0.9253871083967173
         },
         "_scale": {
           "x": 1,
-          "y": 1,
-          "z": 1
+          "y": 1.0000000056351224,
+          "z": 1.0000000056351224
         },
         "left": {
           "x": 1,
@@ -29121,18 +32918,18 @@ export const XP2SKybar = `
         },
         "up": {
           "x": 0,
-          "y": 1,
-          "z": 0
+          "y": 0.71268260478973,
+          "z": -0.70148664712906
         },
         "forward": {
           "x": 0,
-          "y": 0,
-          "z": 1
+          "y": 0.70148664712906,
+          "z": 0.71268260478973
         },
         "trans": {
-          "x": 709.07257080078,
-          "y": -217.22821044922,
-          "z": 805.57415771484
+          "x": -9.5863037109375,
+          "y": 10.942254066467,
+          "z": 6.616729259491
         }
       },
       "variation": 0,
@@ -29219,6 +33016,158 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C3F514EF-FD91-427C-B4E1-08C8A3BEBF84"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-012132654946",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-011958315200",
+        "typeName": "WorldPartData",
+        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
+        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
+      },
+      "blueprintCtrRef": {
+        "typeName": "EffectBlueprint",
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
+        "partitionGuid": "D74C563C-16A5-4459-BA7F-EFA30E1A044D",
+        "instanceGuid": "FB6E8A99-44C8-42C1-B74E-D0C61E28724E"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0,
+          "_y": 0,
+          "_z": 0,
+          "_w": 1
+        },
+        "_scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "left": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "forward": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "trans": {
+          "x": 709.07257080078,
+          "y": -217.22821044922,
+          "z": 805.57415771484
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3948059808,
+          "indexInBlueprint": 1,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "78904DD7-9659-4A34-8785-DF280FA12673"
           }
         }
       ],
@@ -29280,7 +33229,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948059920,
+          "instanceId": 3948060032,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -29361,6 +33310,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5B76D1CE-1B9E-4955-9494-9A7B1E8AAFC2"
           }
         }
       ],
@@ -29422,7 +33376,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948060032,
+          "instanceId": 3948060144,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -29503,6 +33457,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "27BB8924-C6DF-4621-857C-B493D40588E5"
           }
         }
       ],
@@ -29559,148 +33518,6 @@ export const XP2SKybar = `
           "x": -28.179111480713,
           "y": 30.667572021484,
           "z": 4.2704195976257
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3948060256,
-          "indexInBlueprint": 1,
-          "typeName": "EffectEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "left": {
-              "x": 1,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 1
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": -1,
-              "y": -1,
-              "z": -1
-            },
-            "max": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
-              },
-              "left": {
-                "x": 1,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 1
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
-          }
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001858445475",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_Tower_Fire_XL",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-011958315200",
-        "typeName": "WorldPartData",
-        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
-        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
-      },
-      "blueprintCtrRef": {
-        "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_Tower_Fire_XL",
-        "partitionGuid": "F36469C8-5ED3-4693-8A1F-96D75905E018",
-        "instanceGuid": "D1DF7B69-8BF8-4DAC-AACD-D2548E12EBCA"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0,
-          "_y": 0,
-          "_z": 0,
-          "_w": 1
-        },
-        "_scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "left": {
-          "x": 1,
-          "y": 0,
-          "z": 0
-        },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "forward": {
-          "x": 0,
-          "y": 0,
-          "z": 1
-        },
-        "trans": {
-          "x": -26.856313705444,
-          "y": 34.037296295166,
-          "z": 3.7732956409454
         }
       },
       "variation": 0,
@@ -29787,6 +33604,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "27BB8924-C6DF-4621-857C-B493D40588E5"
           }
         }
       ],
@@ -29798,8 +33620,8 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001758045246",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
+      "guid": "ED170122-0000-0000-0000-001858445475",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_Tower_Fire_XL",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
         "typeName": "WorldPartData",
@@ -29808,26 +33630,26 @@ export const XP2SKybar = `
       },
       "blueprintCtrRef": {
         "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
-        "partitionGuid": "7EBC74E2-1916-4F66-849F-B1FBB3EDAF45",
-        "instanceGuid": "0B90B5B5-2F64-4AFA-B9B8-3209F80C7BDF"
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_Tower_Fire_XL",
+        "partitionGuid": "F36469C8-5ED3-4693-8A1F-96D75905E018",
+        "instanceGuid": "D1DF7B69-8BF8-4DAC-AACD-D2548E12EBCA"
       },
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": 0.635908837321551,
+          "_y": 0,
           "_z": 0,
-          "_w": 0.7717641807031168
+          "_w": 1
         },
         "_scale": {
-          "x": 1.0000000371516795,
+          "x": 1,
           "y": 1,
-          "z": 1.0000000371516795
+          "z": 1
         },
         "left": {
-          "x": 0.19123990833759,
+          "x": 1,
           "y": 0,
-          "z": -0.98154336214066
+          "z": 0
         },
         "up": {
           "x": 0,
@@ -29835,14 +33657,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": 0.98154336214066,
+          "x": 0,
           "y": 0,
-          "z": 0.19123990833759
+          "z": 1
         },
         "trans": {
-          "x": -560.60455322266,
-          "y": -42.714370727539,
-          "z": 339.11273193359
+          "x": -26.856313705444,
+          "y": 34.037296295166,
+          "z": 3.7732956409454
         }
       },
       "variation": 0,
@@ -29929,6 +33751,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "27BB8924-C6DF-4621-857C-B493D40588E5"
           }
         }
       ],
@@ -29940,7 +33767,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011419117714",
+      "guid": "ED170122-0000-0000-0000-001758045246",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -29957,19 +33784,19 @@ export const XP2SKybar = `
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": 0.6595291685806691,
+          "_y": 0.635908837321551,
           "_z": 0,
-          "_w": 0.7516789712312639
+          "_w": 0.7717641807031168
         },
         "_scale": {
-          "x": 1.0000000104997733,
+          "x": 1.0000000371516795,
           "y": 1,
-          "z": 1.0000000104997733
+          "z": 1.0000000371516795
         },
         "left": {
-          "x": 0.130042552948,
+          "x": 0.19123990833759,
           "y": 0,
-          "z": -0.99150842428207
+          "z": -0.98154336214066
         },
         "up": {
           "x": 0,
@@ -29977,20 +33804,20 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": 0.99150842428207,
+          "x": 0.98154336214066,
           "y": 0,
-          "z": 0.130042552948
+          "z": 0.19123990833759
         },
         "trans": {
-          "x": -555.64392089844,
-          "y": -48.874431610107,
-          "z": 359.03744506836
+          "x": -560.60455322266,
+          "y": -42.714370727539,
+          "z": 339.11273193359
         }
       },
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948060704,
+          "instanceId": 3948060592,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -30071,6 +33898,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
           }
         }
       ],
@@ -30082,7 +33914,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011917742082",
+      "guid": "ED170122-0000-0000-0000-011419117714",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -30099,19 +33931,19 @@ export const XP2SKybar = `
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": 0.5108483302942747,
+          "_y": 0.6595291685806691,
           "_z": 0,
-          "_w": 0.8596708576167693
+          "_w": 0.7516789712312639
         },
         "_scale": {
-          "x": 0.9999999946541213,
+          "x": 1.0000000104997733,
           "y": 1,
-          "z": 0.9999999946541213
+          "z": 1.0000000104997733
         },
         "left": {
-          "x": 0.47806796431541,
+          "x": 0.130042552948,
           "y": 0,
-          "z": -0.87832283973694
+          "z": -0.99150842428207
         },
         "up": {
           "x": 0,
@@ -30119,14 +33951,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": 0.87832283973694,
+          "x": 0.99150842428207,
           "y": 0,
-          "z": 0.47806796431541
+          "z": 0.130042552948
         },
         "trans": {
-          "x": -559.69915771484,
-          "y": -105.47197723389,
-          "z": 372.26058959961
+          "x": -555.64392089844,
+          "y": -48.874431610107,
+          "z": 359.03744506836
         }
       },
       "variation": 0,
@@ -30213,6 +34045,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
           }
         }
       ],
@@ -30224,7 +34061,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001127358930",
+      "guid": "ED170122-0000-0000-0000-011917742082",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -30241,19 +34078,19 @@ export const XP2SKybar = `
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": 0.7678216667677682,
+          "_y": 0.5108483302942747,
           "_z": 0,
-          "_w": 0.640663630965553
+          "_w": 0.8596708576167693
         },
         "_scale": {
-          "x": 1.0000000358465362,
+          "x": 0.9999999946541213,
           "y": 1,
-          "z": 1.0000000358465362
+          "z": 0.9999999946541213
         },
         "left": {
-          "x": -0.17910023033619,
+          "x": 0.47806796431541,
           "y": 0,
-          "z": -0.98383086919785
+          "z": -0.87832283973694
         },
         "up": {
           "x": 0,
@@ -30261,14 +34098,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": 0.98383086919785,
+          "x": 0.87832283973694,
           "y": 0,
-          "z": -0.17910023033619
+          "z": 0.47806796431541
         },
         "trans": {
-          "x": -562.03265380859,
-          "y": -26.963399887085,
-          "z": 348.9557800293
+          "x": -559.69915771484,
+          "y": -105.47197723389,
+          "z": 372.26058959961
         }
       },
       "variation": 0,
@@ -30355,6 +34192,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
           }
         }
       ],
@@ -30366,7 +34208,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001230133224",
+      "guid": "ED170122-0000-0000-0000-001127358930",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -30383,19 +34225,19 @@ export const XP2SKybar = `
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": 0.7823377736123326,
+          "_y": 0.7678216667677682,
           "_z": 0,
-          "_w": 0.6228544035160213
+          "_w": 0.640663630965553
         },
         "_scale": {
-          "x": 1.000000034975815,
+          "x": 1.0000000358465362,
           "y": 1,
-          "z": 1.000000034975815
+          "z": 1.0000000358465362
         },
         "left": {
-          "x": -0.22410479187965,
+          "x": -0.17910023033619,
           "y": 0,
-          "z": -0.97456508874893
+          "z": -0.98383086919785
         },
         "up": {
           "x": 0,
@@ -30403,14 +34245,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": 0.97456508874893,
+          "x": 0.98383086919785,
           "y": 0,
-          "z": -0.22410479187965
+          "z": -0.17910023033619
         },
         "trans": {
-          "x": -561.71826171875,
-          "y": -70.586990356445,
-          "z": 336.47033691406
+          "x": -562.03265380859,
+          "y": -26.963399887085,
+          "z": 348.9557800293
         }
       },
       "variation": 0,
@@ -30497,6 +34339,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
           }
         }
       ],
@@ -30508,7 +34355,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001193086244",
+      "guid": "ED170122-0000-0000-0000-001230133224",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -30525,19 +34372,19 @@ export const XP2SKybar = `
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": -0.6591129661721101,
+          "_y": 0.7823377736123326,
           "_z": 0,
-          "_w": 0.752043946737026
+          "_w": 0.6228544035160213
         },
         "_scale": {
-          "x": 1.0000000506042737,
+          "x": 1.000000034975815,
           "y": 1,
-          "z": 1.0000000506042737
+          "z": 1.000000034975815
         },
         "left": {
-          "x": 0.13114020228386,
+          "x": -0.22410479187965,
           "y": 0,
-          "z": 0.99136388301849
+          "z": -0.97456508874893
         },
         "up": {
           "x": 0,
@@ -30545,14 +34392,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": -0.99136388301849,
+          "x": 0.97456508874893,
           "y": 0,
-          "z": 0.13114020228386
+          "z": -0.22410479187965
         },
         "trans": {
-          "x": -571.43255615234,
-          "y": -71.693023681641,
-          "z": 327.32754516602
+          "x": -561.71826171875,
+          "y": -70.586990356445,
+          "z": 336.47033691406
         }
       },
       "variation": 0,
@@ -30639,6 +34486,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
           }
         }
       ],
@@ -30650,7 +34502,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001785874565",
+      "guid": "ED170122-0000-0000-0000-001193086244",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -30667,19 +34519,19 @@ export const XP2SKybar = `
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": -0.6695267251358857,
+          "_y": -0.6591129661721101,
           "_z": 0,
-          "_w": 0.742787967275195
+          "_w": 0.752043946737026
         },
         "_scale": {
-          "x": 1.0000000500248483,
+          "x": 1.0000000506042737,
           "y": 1,
-          "z": 1.0000000500248483
+          "z": 1.0000000506042737
         },
         "left": {
-          "x": 0.1034679338336,
+          "x": 0.13114020228386,
           "y": 0,
-          "z": 0.99463284015656
+          "z": 0.99136388301849
         },
         "up": {
           "x": 0,
@@ -30687,14 +34539,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": -0.99463284015656,
+          "x": -0.99136388301849,
           "y": 0,
-          "z": 0.1034679338336
+          "z": 0.13114020228386
         },
         "trans": {
-          "x": -570.83935546875,
-          "y": -37.446235656738,
-          "z": 329.34887695312
+          "x": -571.43255615234,
+          "y": -71.693023681641,
+          "z": 327.32754516602
         }
       },
       "variation": 0,
@@ -30781,6 +34633,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
           }
         }
       ],
@@ -30792,36 +34649,36 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-011028883717",
-      "name": "Levels/SP_Paris/HelicopterPolice_01/HelicopterPolice_01_simple",
+      "guid": "ED170122-0000-0000-0000-001785874565",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
       "parentData": {
-        "guid": "ED170122-0000-0000-0000-000717965284",
-        "typeName": "SpatialPrefabBlueprint",
-        "primaryInstanceGuid": "03259B5B-1819-8BAF-15C2-A2B1D811D393",
-        "partitionGuid": "F1DD2740-1683-11E1-B9E3-849B05B3EA5B"
+        "guid": "ED170122-0000-0000-0000-011958315200",
+        "typeName": "WorldPartData",
+        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
+        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
       },
       "blueprintCtrRef": {
-        "typeName": "ObjectBlueprint",
-        "name": "Levels/SP_Paris/HelicopterPolice_01/HelicopterPolice_01_simple",
-        "partitionGuid": "095361CF-167D-11E1-B9E3-849B05B3EA5B",
-        "instanceGuid": "39288F29-6BFB-5B82-475C-FEA9E45176EE"
+        "typeName": "EffectBlueprint",
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Skybar_BG_SmokePillar",
+        "partitionGuid": "7EBC74E2-1916-4F66-849F-B1FBB3EDAF45",
+        "instanceGuid": "0B90B5B5-2F64-4AFA-B9B8-3209F80C7BDF"
       },
       "transform": {
         "_rotation": {
           "_x": 0,
-          "_y": 0.9985691201192652,
+          "_y": -0.6695267251358857,
           "_z": 0,
-          "_w": 0.053476278331952655
+          "_w": 0.742787967275195
         },
         "_scale": {
-          "x": 1.000000001402424,
+          "x": 1.0000000500248483,
           "y": 1,
-          "z": 1.000000001402424
+          "z": 1.0000000500248483
         },
         "left": {
-          "x": -0.99428057670593,
+          "x": 0.1034679338336,
           "y": 0,
-          "z": -0.10679952055216
+          "z": 0.99463284015656
         },
         "up": {
           "x": 0,
@@ -30829,156 +34686,14 @@ export const XP2SKybar = `
           "z": 0
         },
         "forward": {
-          "x": 0.10679952055216,
+          "x": -0.99463284015656,
           "y": 0,
-          "z": -0.99428057670593
+          "z": 0.1034679338336
         },
         "trans": {
-          "x": -488.91949462891,
-          "y": -21.714534759521,
-          "z": 356.55700683594
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3878831920,
-          "indexInBlueprint": 1,
-          "typeName": "ClientStaticModelEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "left": {
-              "x": 1,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 1
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": -5.3822031021118,
-              "y": -2.2620601654053,
-              "z": -8.8073682785034
-            },
-            "max": {
-              "x": 5.3821954727173,
-              "y": 1.4266254901886,
-              "z": 5.3821954727173
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
-              },
-              "left": {
-                "x": 1,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 1
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
-          }
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001307785758",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_SpotlightCone",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-001930899263",
-        "typeName": "SpatialPrefabBlueprint",
-        "primaryInstanceGuid": "C05F43F6-D13E-4420-8C14-94E66B480263",
-        "partitionGuid": "4DB793D4-893B-43A0-9492-C7FB7FF457A8"
-      },
-      "blueprintCtrRef": {
-        "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_SpotlightCone",
-        "partitionGuid": "2219B9E3-16B3-11E1-9432-FBD0A35D1C29",
-        "instanceGuid": "73AB7DE4-A53A-D718-77F2-9755764AF953"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0.6453962893399195,
-          "_y": -0.04080587934698948,
-          "_z": 0.034562812742557826,
-          "_w": 0.7619737016937768
-        },
-        "_scale": {
-          "x": 1.0000001119727244,
-          "y": 0.9999999455608803,
-          "z": 0.9999999592577254
-        },
-        "left": {
-          "x": 0.99428069591522,
-          "y": -1.4384374580345E-8,
-          "z": 0.10679944604635
-        },
-        "up": {
-          "x": -0.10534382611513,
-          "y": 0.16453802585602,
-          "z": 0.98072922229767
-        },
-        "forward": {
-          "x": -0.017572592943907,
-          "y": -0.98637068271637,
-          "z": 0.16359706223011
-        },
-        "trans": {
-          "x": -488.5334777832,
-          "y": -23.715406417847,
-          "z": 352.87252807617
+          "x": -570.83935546875,
+          "y": -37.446235656738,
+          "z": 329.34887695312
         }
       },
       "variation": 0,
@@ -31065,6 +34780,305 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "87FA7676-3C9F-4FBB-9EF7-4A832A91E92D"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-011028883717",
+      "name": "Levels/SP_Paris/HelicopterPolice_01/HelicopterPolice_01_simple",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-000717965284",
+        "typeName": "SpatialPrefabBlueprint",
+        "primaryInstanceGuid": "03259B5B-1819-8BAF-15C2-A2B1D811D393",
+        "partitionGuid": "F1DD2740-1683-11E1-B9E3-849B05B3EA5B"
+      },
+      "blueprintCtrRef": {
+        "typeName": "ObjectBlueprint",
+        "name": "Levels/SP_Paris/HelicopterPolice_01/HelicopterPolice_01_simple",
+        "partitionGuid": "095361CF-167D-11E1-B9E3-849B05B3EA5B",
+        "instanceGuid": "39288F29-6BFB-5B82-475C-FEA9E45176EE"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0,
+          "_y": 0.9985691201192652,
+          "_z": 0,
+          "_w": 0.053476278331952655
+        },
+        "_scale": {
+          "x": 1.000000001402424,
+          "y": 1,
+          "z": 1.000000001402424
+        },
+        "left": {
+          "x": -0.99428057670593,
+          "y": 0,
+          "z": -0.10679952055216
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "forward": {
+          "x": 0.10679952055216,
+          "y": 0,
+          "z": -0.99428057670593
+        },
+        "trans": {
+          "x": -488.91949462891,
+          "y": -21.714534759521,
+          "z": 356.55700683594
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3807966192,
+          "indexInBlueprint": 1,
+          "typeName": "ClientStaticModelEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -5.3822031021118,
+              "y": -2.2620601654053,
+              "z": -8.8073682785034
+            },
+            "max": {
+              "x": 5.3821954727173,
+              "y": 1.4266254901886,
+              "z": 5.3821954727173
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "095361D0-167D-11E1-B9E3-849B05B3EA5B"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-001307785758",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_SpotlightCone",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-001930899263",
+        "typeName": "SpatialPrefabBlueprint",
+        "primaryInstanceGuid": "C05F43F6-D13E-4420-8C14-94E66B480263",
+        "partitionGuid": "4DB793D4-893B-43A0-9492-C7FB7FF457A8"
+      },
+      "blueprintCtrRef": {
+        "typeName": "EffectBlueprint",
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_SpotlightCone",
+        "partitionGuid": "2219B9E3-16B3-11E1-9432-FBD0A35D1C29",
+        "instanceGuid": "73AB7DE4-A53A-D718-77F2-9755764AF953"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0.6453962893399195,
+          "_y": -0.04080587934698948,
+          "_z": 0.034562812742557826,
+          "_w": 0.7619737016937768
+        },
+        "_scale": {
+          "x": 1.0000001119727244,
+          "y": 0.9999999455608803,
+          "z": 0.9999999592577254
+        },
+        "left": {
+          "x": 0.99428069591522,
+          "y": -1.4384374580345E-8,
+          "z": 0.10679944604635
+        },
+        "up": {
+          "x": -0.10534382611513,
+          "y": 0.16453802585602,
+          "z": 0.98072922229767
+        },
+        "forward": {
+          "x": -0.017572592943907,
+          "y": -0.98637068271637,
+          "z": 0.16359706223011
+        },
+        "trans": {
+          "x": -488.5334777832,
+          "y": -23.715406417847,
+          "z": 352.87252807617
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3948061488,
+          "indexInBlueprint": 2,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": -3.179782464874919E-8,
+              "_y": 0.7071068084532992,
+              "_z": -0.7071067539197924,
+              "_w": -3.111084458508913E-8
+            },
+            "_scale": {
+              "x": 1.0000001192093038,
+              "y": 0.9999999403953644,
+              "z": 0.9999999403953682
+            },
+            "left": {
+              "x": -1.0000001192093,
+              "y": 0,
+              "z": 8.799477058119E-8
+            },
+            "up": {
+              "x": -8.9937827851827E-8,
+              "y": 2.615124472527E-8,
+              "z": -0.99999994039536
+            },
+            "forward": {
+              "x": 0,
+              "y": -0.99999994039536,
+              "z": -1.280927932612E-7
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": -3.179782464874919E-8,
+                "_y": 0.7071068084532992,
+                "_z": -0.7071067539197924,
+                "_w": -3.111084458508913E-8
+              },
+              "_scale": {
+                "x": 1.0000001192093038,
+                "y": 0.9999999403953644,
+                "z": 0.9999999403953682
+              },
+              "left": {
+                "x": -1.0000001192093,
+                "y": 0,
+                "z": 8.799477058119E-8
+              },
+              "up": {
+                "x": -8.9937827851827E-8,
+                "y": 2.615124472527E-8,
+                "z": -0.99999994039536
+              },
+              "forward": {
+                "x": 0,
+                "y": -0.99999994039536,
+                "z": -1.280927932612E-7
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5CCFC0F5-0420-C2CA-5B23-6074AE728A45"
           }
         }
       ],
@@ -31126,10 +35140,104 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946498976,
+          "instanceId": 3946269248,
           "indexInBlueprint": 1,
           "typeName": "LensFlareEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "00A1D3DA-1012-41A2-8F50-9EF5ED354B10"
+          }
+        },
+        {
+          "instanceId": 3948061488,
+          "indexInBlueprint": 2,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": -3.179782464874919E-8,
+              "_y": 0.7071068084532992,
+              "_z": -0.7071067539197924,
+              "_w": -3.111084458508913E-8
+            },
+            "_scale": {
+              "x": 1.0000001192093038,
+              "y": 0.9999999403953644,
+              "z": 0.9999999403953682
+            },
+            "left": {
+              "x": -1.0000001192093,
+              "y": 0,
+              "z": 8.799477058119E-8
+            },
+            "up": {
+              "x": -8.9937827851827E-8,
+              "y": 2.615124472527E-8,
+              "z": -0.99999994039536
+            },
+            "forward": {
+              "x": 0,
+              "y": -0.99999994039536,
+              "z": -1.280927932612E-7
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": -3.179782464874919E-8,
+                "_y": 0.7071068084532992,
+                "_z": -0.7071067539197924,
+                "_w": -3.111084458508913E-8
+              },
+              "_scale": {
+                "x": 1.0000001192093038,
+                "y": 0.9999999403953644,
+                "z": 0.9999999403953682
+              },
+              "left": {
+                "x": -1.0000001192093,
+                "y": 0,
+                "z": 8.799477058119E-8
+              },
+              "up": {
+                "x": -8.9937827851827E-8,
+                "y": 2.615124472527E-8,
+                "z": -0.99999994039536
+              },
+              "forward": {
+                "x": 0,
+                "y": -0.99999994039536,
+                "z": -1.280927932612E-7
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5CCFC0F5-0420-C2CA-5B23-6074AE728A45"
+          }
         }
       ],
       "isDeleted": false,
@@ -31247,7 +35355,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948061488,
+          "instanceId": 3948061600,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -31328,6 +35436,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C0E4D9DC-B39B-46F5-AA15-5F37D698765E"
           }
         }
       ],
@@ -31389,7 +35502,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948061600,
+          "instanceId": 3948061712,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -31470,6 +35583,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0464D174-43ED-4F0C-930A-D0FBE6DA0565"
           }
         }
       ],
@@ -31531,7 +35649,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948061712,
+          "instanceId": 3948061824,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -31612,6 +35730,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E9FC712B-EE34-4148-9B71-82B579C6A1E6"
           }
         }
       ],
@@ -31668,148 +35791,6 @@ export const XP2SKybar = `
           "x": 738.97125244141,
           "y": -204.42593383789,
           "z": -677.85656738281
-        }
-      },
-      "variation": 0,
-      "gameEntities": [
-        {
-          "instanceId": 3948061936,
-          "indexInBlueprint": 1,
-          "typeName": "EffectEntity",
-          "isSpatial": true,
-          "transform": {
-            "_rotation": {
-              "_x": 0,
-              "_y": 0,
-              "_z": 0,
-              "_w": 1
-            },
-            "_scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "left": {
-              "x": 1,
-              "y": 0,
-              "z": 0
-            },
-            "up": {
-              "x": 0,
-              "y": 1,
-              "z": 0
-            },
-            "forward": {
-              "x": 0,
-              "y": 0,
-              "z": 1
-            },
-            "trans": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          "aabb": {
-            "min": {
-              "x": -1,
-              "y": -1,
-              "z": -1
-            },
-            "max": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "transform": {
-              "_rotation": {
-                "_x": 0,
-                "_y": 0,
-                "_z": 0,
-                "_w": 1
-              },
-              "_scale": {
-                "x": 1,
-                "y": 1,
-                "z": 1
-              },
-              "left": {
-                "x": 1,
-                "y": 0,
-                "z": 0
-              },
-              "up": {
-                "x": 0,
-                "y": 1,
-                "z": 0
-              },
-              "forward": {
-                "x": 0,
-                "y": 0,
-                "z": 1
-              },
-              "trans": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-              }
-            }
-          }
-        }
-      ],
-      "isDeleted": false,
-      "isEnabled": true,
-      "isVanilla": true
-    }
-  },
-  {
-    "type": "SpawnedBlueprint",
-    "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001911163120",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
-      "parentData": {
-        "guid": "ED170122-0000-0000-0000-011958315200",
-        "typeName": "WorldPartData",
-        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
-        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
-      },
-      "blueprintCtrRef": {
-        "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
-        "partitionGuid": "D74C563C-16A5-4459-BA7F-EFA30E1A044D",
-        "instanceGuid": "FB6E8A99-44C8-42C1-B74E-D0C61E28724E"
-      },
-      "transform": {
-        "_rotation": {
-          "_x": 0,
-          "_y": 0,
-          "_z": 0,
-          "_w": 1
-        },
-        "_scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "left": {
-          "x": 1,
-          "y": 0,
-          "z": 0
-        },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "forward": {
-          "x": 0,
-          "y": 0,
-          "z": 1
-        },
-        "trans": {
-          "x": -296.00567626953,
-          "y": -225.2272644043,
-          "z": -749.85705566406
         }
       },
       "variation": 0,
@@ -31896,6 +35877,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "78904DD7-9659-4A34-8785-DF280FA12673"
           }
         }
       ],
@@ -31907,7 +35893,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-000688175251",
+      "guid": "ED170122-0000-0000-0000-001911163120",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -31949,9 +35935,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -836.29821777344,
-          "y": -203.19157409668,
-          "z": -149.05780029297
+          "x": -296.00567626953,
+          "y": -225.2272644043,
+          "z": -749.85705566406
         }
       },
       "variation": 0,
@@ -32038,6 +36024,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "78904DD7-9659-4A34-8785-DF280FA12673"
           }
         }
       ],
@@ -32049,7 +36040,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001105556792",
+      "guid": "ED170122-0000-0000-0000-000688175251",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -32091,9 +36082,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -817.66613769531,
-          "y": -213.08596801758,
-          "z": 1144.2622070312
+          "x": -836.29821777344,
+          "y": -203.19157409668,
+          "z": -149.05780029297
         }
       },
       "variation": 0,
@@ -32180,6 +36171,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "78904DD7-9659-4A34-8785-DF280FA12673"
           }
         }
       ],
@@ -32191,7 +36187,7 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001297585124",
+      "guid": "ED170122-0000-0000-0000-001105556792",
       "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
       "parentData": {
         "guid": "ED170122-0000-0000-0000-011958315200",
@@ -32233,9 +36229,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": -8.1449775695801,
-          "y": -196.11349487305,
-          "z": 218.61685180664
+          "x": -817.66613769531,
+          "y": -213.08596801758,
+          "z": 1144.2622070312
         }
       },
       "variation": 0,
@@ -32322,6 +36318,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "78904DD7-9659-4A34-8785-DF280FA12673"
           }
         }
       ],
@@ -32333,19 +36334,19 @@ export const XP2SKybar = `
   {
     "type": "SpawnedBlueprint",
     "gameObjectTransferData": {
-      "guid": "ED170122-0000-0000-0000-001825561836",
-      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
+      "guid": "ED170122-0000-0000-0000-001297585124",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
       "parentData": {
-        "guid": "ED170122-0000-0000-0000-001000400605",
-        "typeName": "SpatialPrefabBlueprint",
-        "primaryInstanceGuid": "B2526FE7-594A-4B32-A69B-15E59D3C248E",
-        "partitionGuid": "CC9ABD76-5845-46D5-B047-B6254FEE8102"
+        "guid": "ED170122-0000-0000-0000-011958315200",
+        "typeName": "WorldPartData",
+        "primaryInstanceGuid": "44146ECB-4835-4A4A-979E-0A7B66CFBE1A",
+        "partitionGuid": "B70D752D-60E4-471B-AA5E-4B276300EF91"
       },
       "blueprintCtrRef": {
         "typeName": "EffectBlueprint",
-        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
-        "partitionGuid": "2201A624-F630-455D-B8A8-7DFFAC62589B",
-        "instanceGuid": "AE1A47B4-B71E-41BB-A0FD-897BD8F111EC"
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Amb_MPSkybar_BG_Smog",
+        "partitionGuid": "D74C563C-16A5-4459-BA7F-EFA30E1A044D",
+        "instanceGuid": "FB6E8A99-44C8-42C1-B74E-D0C61E28724E"
       },
       "transform": {
         "_rotation": {
@@ -32375,9 +36376,9 @@ export const XP2SKybar = `
           "z": 1
         },
         "trans": {
-          "x": 6.7098827362061,
-          "y": 14.232656478882,
-          "z": 16.897766113281
+          "x": -8.1449775695801,
+          "y": -196.11349487305,
+          "z": 218.61685180664
         }
       },
       "variation": 0,
@@ -32464,6 +36465,158 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "78904DD7-9659-4A34-8785-DF280FA12673"
+          }
+        }
+      ],
+      "isDeleted": false,
+      "isEnabled": true,
+      "isVanilla": true
+    }
+  },
+  {
+    "type": "SpawnedBlueprint",
+    "gameObjectTransferData": {
+      "guid": "ED170122-0000-0000-0000-001825561836",
+      "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
+      "parentData": {
+        "guid": "ED170122-0000-0000-0000-001000400605",
+        "typeName": "SpatialPrefabBlueprint",
+        "primaryInstanceGuid": "B2526FE7-594A-4B32-A69B-15E59D3C248E",
+        "partitionGuid": "CC9ABD76-5845-46D5-B047-B6254FEE8102"
+      },
+      "blueprintCtrRef": {
+        "typeName": "EffectBlueprint",
+        "name": "FX/DLC/XP2/Ambient/LevelSpecific/MP_Skybar/FX_DLC_Sprinkler",
+        "partitionGuid": "2201A624-F630-455D-B8A8-7DFFAC62589B",
+        "instanceGuid": "AE1A47B4-B71E-41BB-A0FD-897BD8F111EC"
+      },
+      "transform": {
+        "_rotation": {
+          "_x": 0,
+          "_y": 0,
+          "_z": 0,
+          "_w": 1
+        },
+        "_scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "left": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "forward": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "trans": {
+          "x": 6.7098827362061,
+          "y": 14.232656478882,
+          "z": 16.897766113281
+        }
+      },
+      "variation": 0,
+      "gameEntities": [
+        {
+          "instanceId": 3948062608,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.3545713424683,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.3545713424683,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -32525,7 +36678,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994666048,
+          "instanceId": 3825568384,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -32606,6 +36759,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -32667,13 +36825,29 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953803232,
-          "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "instanceId": 3953803328,
+          "indexInBlueprint": 1,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1AB6E5DB-9525-4891-8E57-EB48342DC149"
+          }
         },
         {
-          "instanceId": 3946197120,
+          "instanceId": 3953803296,
+          "indexInBlueprint": 2,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "46814289-6A8E-41F9-9B89-DA4C13DCA528"
+          }
+        },
+        {
+          "instanceId": 3946460544,
           "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -32754,19 +36928,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "39CA8998-436E-4EA8-9D00-32B9EC428802"
           }
         },
         {
-          "instanceId": 3953803264,
+          "instanceId": 3948062608,
           "indexInBlueprint": 4,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.3545713424683,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.3545713424683,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953077248,
+          "instanceId": 3953142784,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6C7B31FE-21AD-44E1-BC09-329CB95167C1"
+          }
         }
       ],
       "isDeleted": false,
@@ -32827,7 +37094,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948062720,
+          "instanceId": 3948062832,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -32860,7 +37127,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.3545713424683,
               "z": 0
             }
           },
@@ -32904,10 +37171,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.3545713424683,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -32969,7 +37241,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3812139776,
+          "instanceId": 3825568880,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -33050,6 +37322,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -33111,20 +37388,108 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953803456,
+          "instanceId": 3948062832,
+          "indexInBlueprint": 1,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.3545713424683,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.3545713424683,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953803424,
           "indexInBlueprint": 2,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953803360,
-          "indexInBlueprint": 3,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "46814289-6A8E-41F9-9B89-DA4C13DCA528"
+          }
         },
         {
-          "instanceId": 3946202368,
-          "indexInBlueprint": 4,
+          "instanceId": 3946465792,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -33204,13 +37569,34 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "39CA8998-436E-4EA8-9D00-32B9EC428802"
           }
         },
         {
-          "instanceId": 3953077504,
+          "instanceId": 3953803520,
+          "indexInBlueprint": 4,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1AB6E5DB-9525-4891-8E57-EB48342DC149"
+          }
+        },
+        {
+          "instanceId": 3953143040,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6C7B31FE-21AD-44E1-BC09-329CB95167C1"
+          }
         }
       ],
       "isDeleted": false,
@@ -33271,7 +37657,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948062944,
+          "instanceId": 3948063056,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -33304,7 +37690,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.3545713424683,
               "z": 0
             }
           },
@@ -33348,10 +37734,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.3545713424683,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -33413,7 +37804,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3812140256,
+          "instanceId": 3825569376,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -33494,6 +37885,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -33555,20 +37951,119 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953803648,
+          "instanceId": 3948063056,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.3545713424683,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.3545713424683,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953803552,
+          "instanceId": 3953803712,
           "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1AB6E5DB-9525-4891-8E57-EB48342DC149"
+          }
         },
         {
-          "instanceId": 3946195584,
+          "instanceId": 3953803616,
           "indexInBlueprint": 3,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "46814289-6A8E-41F9-9B89-DA4C13DCA528"
+          }
+        },
+        {
+          "instanceId": 3946459008,
+          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -33648,13 +38143,23 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "39CA8998-436E-4EA8-9D00-32B9EC428802"
           }
         },
         {
-          "instanceId": 3953077760,
+          "instanceId": 3953143296,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6C7B31FE-21AD-44E1-BC09-329CB95167C1"
+          }
         }
       ],
       "isDeleted": false,
@@ -33715,7 +38220,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948063168,
+          "instanceId": 3948063280,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -33748,7 +38253,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.195951461792,
               "z": 0
             }
           },
@@ -33792,10 +38297,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.195951461792,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -33857,7 +38367,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3812140752,
+          "instanceId": 3825569872,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -33938,6 +38448,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -33999,14 +38514,119 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953803936,
+          "instanceId": 3948063280,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.195951461792,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.195951461792,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3946202752,
+          "instanceId": 3953804000,
           "indexInBlueprint": 2,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A1B00526-1816-4D82-BE5E-15C3AF2DF097"
+          }
+        },
+        {
+          "instanceId": 3953803968,
+          "indexInBlueprint": 3,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B7AE984E-2202-4A13-B026-D0A6A16AAD1B"
+          }
+        },
+        {
+          "instanceId": 3946466176,
+          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -34086,19 +38706,23 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B99DC3FC-B1D9-411E-917E-6D2C25A4E85E"
           }
         },
         {
-          "instanceId": 3953803904,
-          "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953078016,
+          "instanceId": 3953143552,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7F48E8E4-C329-4C36-AD64-05D921627A9E"
+          }
         }
       ],
       "isDeleted": false,
@@ -34159,7 +38783,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948063392,
+          "instanceId": 3948063504,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -34192,7 +38816,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.195951461792,
               "z": 0
             }
           },
@@ -34236,10 +38860,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.195951461792,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -34301,7 +38930,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3812141248,
+          "instanceId": 3825570368,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -34382,6 +39011,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -34443,25 +39077,118 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953804128,
+          "instanceId": 3948063504,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.195951461792,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.195951461792,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
         },
         {
-          "instanceId": 3953804032,
+          "instanceId": 3953804192,
           "indexInBlueprint": 2,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A1B00526-1816-4D82-BE5E-15C3AF2DF097"
+          }
         },
         {
-          "instanceId": 3953078272,
+          "instanceId": 3953804096,
           "indexInBlueprint": 3,
-          "typeName": "SoundEntity",
-          "isSpatial": false
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B7AE984E-2202-4A13-B026-D0A6A16AAD1B"
+          }
         },
         {
-          "instanceId": 3946197760,
+          "instanceId": 3946461312,
           "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
@@ -34542,6 +39269,22 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B99DC3FC-B1D9-411E-917E-6D2C25A4E85E"
+          }
+        },
+        {
+          "instanceId": 3953143808,
+          "indexInBlueprint": 5,
+          "typeName": "SoundEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7F48E8E4-C329-4C36-AD64-05D921627A9E"
           }
         }
       ],
@@ -34603,8 +39346,8 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948063616,
-          "indexInBlueprint": 1,
+          "instanceId": 3948063728,
+          "indexInBlueprint": 4,
           "typeName": "EffectEntity",
           "isSpatial": true,
           "transform": {
@@ -34636,7 +39379,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.195951461792,
               "z": 0
             }
           },
@@ -34680,10 +39423,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.195951461792,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -34745,7 +39493,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994666544,
+          "instanceId": 3825570864,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -34826,6 +39574,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -34887,20 +39640,30 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953804224,
+          "instanceId": 3953804384,
+          "indexInBlueprint": 1,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A1B00526-1816-4D82-BE5E-15C3AF2DF097"
+          }
+        },
+        {
+          "instanceId": 3953804288,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B7AE984E-2202-4A13-B026-D0A6A16AAD1B"
+          }
         },
         {
-          "instanceId": 3953804320,
+          "instanceId": 3946466688,
           "indexInBlueprint": 3,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3946203264,
-          "indexInBlueprint": 4,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -34980,13 +39743,112 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B99DC3FC-B1D9-411E-917E-6D2C25A4E85E"
           }
         },
         {
-          "instanceId": 3953078528,
+          "instanceId": 3948063728,
+          "indexInBlueprint": 4,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.195951461792,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.195951461792,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953144064,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7F48E8E4-C329-4C36-AD64-05D921627A9E"
+          }
         }
       ],
       "isDeleted": false,
@@ -35047,7 +39909,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948063840,
+          "instanceId": 3948063952,
           "indexInBlueprint": 1,
           "typeName": "EffectEntity",
           "isSpatial": true,
@@ -35080,7 +39942,7 @@ export const XP2SKybar = `
             },
             "trans": {
               "x": 0,
-              "y": 0,
+              "y": 3.5,
               "z": 0
             }
           },
@@ -35124,10 +39986,15 @@ export const XP2SKybar = `
               },
               "trans": {
                 "x": 0,
-                "y": 0,
+                "y": 3.5,
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
           }
         }
       ],
@@ -35189,7 +40056,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994667040,
+          "instanceId": 3825571360,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -35270,6 +40137,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1E9B6AF2-E653-49B2-9898-6AD1521C5C13"
           }
         }
       ],
@@ -35331,20 +40203,108 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953804512,
+          "instanceId": 3948063952,
+          "indexInBlueprint": 1,
+          "typeName": "EffectEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 3.5,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -1,
+              "y": -1,
+              "z": -1
+            },
+            "max": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 3.5,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "EffectEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9267A2B3-1B71-4063-AD81-7216F99948EA"
+          }
+        },
+        {
+          "instanceId": 3953804480,
           "indexInBlueprint": 2,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3953804416,
-          "indexInBlueprint": 3,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0B3F904-394B-4851-BA4B-DAD312EF3A03"
+          }
         },
         {
-          "instanceId": 3946203648,
-          "indexInBlueprint": 4,
+          "instanceId": 3946467072,
+          "indexInBlueprint": 3,
           "typeName": "ClientDecalEntity",
           "isSpatial": true,
           "transform": {
@@ -35424,13 +40384,34 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "DecalEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5FC61111-A071-4E02-A161-680D82C601CF"
           }
         },
         {
-          "instanceId": 3953078784,
+          "instanceId": 3953804576,
+          "indexInBlueprint": 4,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EF3C9412-4454-4F86-8EC5-94C35A7EBCAA"
+          }
+        },
+        {
+          "instanceId": 3953144320,
           "indexInBlueprint": 5,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B186EB1-C214-4279-9DEF-9817F5FFB9C8"
+          }
         }
       ],
       "isDeleted": false,
@@ -35491,40 +40472,60 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948706640,
+          "instanceId": 3948772176,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3948706608,
+          "instanceId": 3948772144,
           "indexInBlueprint": 2,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3946496240,
+          "instanceId": 3946266512,
           "indexInBlueprint": 3,
           "typeName": "LensFlareEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
         },
         {
-          "instanceId": 3946496096,
+          "instanceId": 3946266368,
           "indexInBlueprint": 4,
           "typeName": "LensFlareEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
         },
         {
-          "instanceId": 3946496672,
+          "instanceId": 3946266800,
           "indexInBlueprint": 5,
           "typeName": "LensFlareEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
         },
         {
-          "instanceId": 3946496528,
+          "instanceId": 3946266944,
           "indexInBlueprint": 6,
           "typeName": "LensFlareEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
         }
       ],
       "isDeleted": false,
@@ -35583,7 +40584,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -35642,7 +40700,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994667536,
+          "instanceId": 3825572432,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -35723,6 +40781,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -35784,7 +40847,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994668320,
+          "instanceId": 3825573216,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -35865,6 +40928,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -35926,7 +40994,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994669104,
+          "instanceId": 3825574000,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -36007,6 +41075,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -36068,7 +41141,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3794695168,
+          "instanceId": 3825574784,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -36149,6 +41222,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -36666,7 +41744,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813821648,
+          "instanceId": 3762369408,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -36747,6 +41825,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -36808,7 +41891,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3794695936,
+          "instanceId": 3762370928,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -36889,6 +41972,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -36950,7 +42038,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3794697456,
+          "instanceId": 3926402960,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37031,6 +42119,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -37092,7 +42185,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764910288,
+          "instanceId": 3804800016,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37173,6 +42266,11 @@ export const XP2SKybar = `
                 "z": 1.068492849754E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -37234,7 +42332,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3788716576,
+          "instanceId": 3926404464,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37315,6 +42413,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -37376,7 +42479,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3788718096,
+          "instanceId": 3926405984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37457,6 +42560,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -37518,7 +42626,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3788719616,
+          "instanceId": 3926407504,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37599,6 +42707,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -37660,7 +42773,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3788721136,
+          "instanceId": 3926409024,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37741,6 +42854,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -37802,7 +42920,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3818439552,
+          "instanceId": 3824209728,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -37883,6 +43001,11 @@ export const XP2SKybar = `
                 "z": -3.0405828965741E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -39141,7 +44264,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3818441056,
+          "instanceId": 3824211232,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -39222,6 +44345,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -39283,7 +44411,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3818444016,
+          "instanceId": 3824214192,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -39364,6 +44492,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -39425,7 +44558,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3764911792,
+          "instanceId": 3926410544,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -39506,6 +44639,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -39567,7 +44705,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813823168,
+          "instanceId": 3824221936,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -39648,6 +44786,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -39766,7 +44909,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3788722656,
+          "instanceId": 3762372448,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -39847,6 +44990,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -39908,7 +45056,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3788723152,
+          "instanceId": 3762372944,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -39989,6 +45137,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -40107,7 +45260,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3818454144,
+          "instanceId": 3855802848,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -40188,6 +45341,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -40249,7 +45407,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3818454624,
+          "instanceId": 3855803328,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -40330,6 +45488,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -40448,7 +45611,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995621296,
+          "instanceId": 3855803824,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -40529,6 +45692,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -40590,7 +45758,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995621776,
+          "instanceId": 3855804320,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -40671,6 +45839,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -40789,7 +45962,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995622272,
+          "instanceId": 3855804816,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -40870,6 +46043,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -40931,7 +46109,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995622768,
+          "instanceId": 3855805312,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -41012,6 +46190,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -41130,7 +46313,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995623264,
+          "instanceId": 3855805808,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -41211,6 +46394,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -41272,7 +46460,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995624928,
+          "instanceId": 3855807472,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -41353,6 +46541,11 @@ export const XP2SKybar = `
                 "z": -1.6119514612001E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -41414,7 +46607,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3995635136,
+          "instanceId": 3855809136,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -41495,6 +46688,11 @@ export const XP2SKybar = `
                 "z": -2.5677664439172E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -41556,7 +46754,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994810224,
+          "instanceId": 3764154608,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -41637,6 +46835,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -41698,7 +46901,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994811872,
+          "instanceId": 3764156256,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -41779,6 +46982,11 @@ export const XP2SKybar = `
                 "z": 4.8193236068528E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -41840,7 +47048,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994813248,
+          "instanceId": 3764157632,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -41921,6 +47129,11 @@ export const XP2SKybar = `
                 "z": 2.0145520807091E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -41982,7 +47195,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994814624,
+          "instanceId": 3830446752,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42063,6 +47276,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -42124,7 +47342,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994816288,
+          "instanceId": 3830448416,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42205,6 +47423,11 @@ export const XP2SKybar = `
                 "z": 1.6287700077555E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -42266,7 +47489,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994817952,
+          "instanceId": 3830450080,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42347,6 +47570,11 @@ export const XP2SKybar = `
                 "z": -4.1632937097802E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -42408,7 +47636,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994828160,
+          "instanceId": 3830460288,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42489,6 +47717,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -42550,7 +47783,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994838352,
+          "instanceId": 3830461936,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42631,6 +47864,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -42692,7 +47930,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994840000,
+          "instanceId": 3830463600,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42773,6 +48011,11 @@ export const XP2SKybar = `
                 "z": -4.629329808381E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -42834,7 +48077,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994841376,
+          "instanceId": 3830464976,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -42915,6 +48158,11 @@ export const XP2SKybar = `
                 "z": 9.7077332839035E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -42976,7 +48224,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3994842752,
+          "instanceId": 3830466352,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43057,6 +48305,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43118,7 +48371,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813972416,
+          "instanceId": 3830468016,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43199,6 +48452,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43260,7 +48518,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813982608,
+          "instanceId": 3916007008,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43341,6 +48599,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43402,7 +48665,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813984256,
+          "instanceId": 3916008656,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43483,6 +48746,11 @@ export const XP2SKybar = `
                 "z": 6.5030505425057E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43544,7 +48812,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813985920,
+          "instanceId": 3916010320,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43625,6 +48893,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43686,7 +48959,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813996128,
+          "instanceId": 3916011984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43767,6 +49040,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43828,7 +49106,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810853136,
+          "instanceId": 3916013648,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -43909,6 +49187,11 @@ export const XP2SKybar = `
                 "z": -3.0483089830113E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -43970,7 +49253,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810854800,
+          "instanceId": 3992014880,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -44051,6 +49334,11 @@ export const XP2SKybar = `
                 "z": 1.4854997232305E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -44112,7 +49400,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810865008,
+          "instanceId": 3992025072,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -44193,6 +49481,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -44254,7 +49547,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3813997776,
+          "instanceId": 3916015312,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -44335,6 +49628,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -44396,7 +49694,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810868368,
+          "instanceId": 3764159008,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -44477,6 +49775,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -44538,7 +49841,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810868864,
+          "instanceId": 3992028432,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -44619,6 +49922,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -44737,7 +50045,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707536,
+          "instanceId": 3948773072,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -44801,7 +50109,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810869360,
+          "instanceId": 3992028928,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -44882,6 +50190,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -44943,7 +50256,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810871552,
+          "instanceId": 3992031120,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -45024,6 +50337,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -45085,7 +50403,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810872048,
+          "instanceId": 3992031616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -45166,6 +50484,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -45284,7 +50607,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707568,
+          "instanceId": 3948773104,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -45405,7 +50728,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810872544,
+          "instanceId": 3992032112,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -45486,6 +50809,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -45547,7 +50875,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810892288,
+          "instanceId": 3867565968,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -45628,6 +50956,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -45689,7 +51022,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810893936,
+          "instanceId": 3867567616,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -45770,6 +51103,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -45831,7 +51169,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763828848,
+          "instanceId": 3867569280,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -45912,6 +51250,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -46087,7 +51430,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810895600,
+          "instanceId": 3992049472,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -46168,6 +51511,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -46229,7 +51577,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763830496,
+          "instanceId": 3867571440,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -46310,6 +51658,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -46428,7 +51781,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763830992,
+          "instanceId": 3867571920,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -46509,6 +51862,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -46570,7 +51928,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763850160,
+          "instanceId": 3867599616,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -46651,6 +52009,11 @@ export const XP2SKybar = `
                 "z": 7.600640117289E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -46712,7 +52075,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763857696,
+          "instanceId": 3757166736,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -46793,6 +52156,11 @@ export const XP2SKybar = `
                 "z": 1.2633115886729E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -46854,7 +52222,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763859776,
+          "instanceId": 3757168816,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -46935,6 +52303,11 @@ export const XP2SKybar = `
                 "z": -1.8781271649004E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -46996,7 +52369,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923642992,
+          "instanceId": 3757176368,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -47077,6 +52450,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -47195,7 +52573,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923644640,
+          "instanceId": 3757178016,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -47276,6 +52654,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -47394,7 +52777,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923646016,
+          "instanceId": 3757179392,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -47475,6 +52858,11 @@ export const XP2SKybar = `
                 "z": -9.8220382938052E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -47593,7 +52981,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923655936,
+          "instanceId": 3757189312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -47674,6 +53062,11 @@ export const XP2SKybar = `
                 "z": 5.7338098713444E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -47792,7 +53185,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923657296,
+          "instanceId": 3757190672,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -47873,6 +53266,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -47991,7 +53389,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923661936,
+          "instanceId": 3757195872,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -48072,6 +53470,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -48190,7 +53593,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923664752,
+          "instanceId": 3757198688,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -48271,6 +53674,11 @@ export const XP2SKybar = `
                 "z": 2.629278128552E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -48389,7 +53797,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923667568,
+          "instanceId": 3757201504,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -48470,6 +53878,11 @@ export const XP2SKybar = `
                 "z": 7.9988922152552E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -48588,7 +54001,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923679936,
+          "instanceId": 3757213872,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -48669,6 +54082,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -48785,7 +54203,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -48844,7 +54319,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923691280,
+          "instanceId": 3757192608,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -48925,6 +54400,11 @@ export const XP2SKybar = `
                 "z": 1.6395070190356E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -48986,7 +54466,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923692048,
+          "instanceId": 3757225216,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -49067,6 +54547,11 @@ export const XP2SKybar = `
                 "z": -5.9503522109594E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -51864,7 +57349,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923692832,
+          "instanceId": 3757225984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -51945,6 +57430,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -52006,7 +57496,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923705344,
+          "instanceId": 3757238496,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52087,6 +57577,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -52148,7 +57643,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923708288,
+          "instanceId": 3757241440,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52229,6 +57724,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -52290,7 +57790,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923720656,
+          "instanceId": 3757253808,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52371,6 +57871,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -52432,7 +57937,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923732000,
+          "instanceId": 3807158816,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52513,6 +58018,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -52574,7 +58084,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923744352,
+          "instanceId": 3807171184,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52655,6 +58165,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -52716,7 +58231,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923747152,
+          "instanceId": 3807173984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52797,6 +58312,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -52858,7 +58378,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923759520,
+          "instanceId": 3807186352,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -52939,6 +58459,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -53000,7 +58525,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923659232,
+          "instanceId": 3757265152,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -53081,6 +58606,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -53142,7 +58672,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3763863248,
+          "instanceId": 3757265632,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -53223,6 +58753,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -53341,7 +58876,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923787920,
+          "instanceId": 3807214752,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -53422,6 +58957,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -53483,7 +59023,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923793104,
+          "instanceId": 3807219936,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -53564,6 +59104,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -53625,7 +59170,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923805616,
+          "instanceId": 3807232448,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -53706,6 +59251,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -53767,7 +59317,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923808560,
+          "instanceId": 3807235392,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -53848,6 +59398,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -53909,7 +59464,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923789840,
+          "instanceId": 3807216672,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -53990,6 +59545,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -54051,7 +59611,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923822176,
+          "instanceId": 3807249008,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -54132,6 +59692,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -54193,7 +59758,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923831216,
+          "instanceId": 3807258048,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -54274,6 +59839,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -54392,7 +59962,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707600,
+          "instanceId": 3948773136,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -54456,7 +60026,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923831696,
+          "instanceId": 3807258528,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -54537,6 +60107,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -54598,7 +60173,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923833888,
+          "instanceId": 3807260720,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -54679,6 +60254,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -54740,7 +60320,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923834384,
+          "instanceId": 3807261216,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -54821,6 +60401,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -54939,7 +60524,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707632,
+          "instanceId": 3948773168,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -55003,7 +60588,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923834880,
+          "instanceId": 3807261712,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -55084,6 +60669,11 @@ export const XP2SKybar = `
                 "z": -3.0287665708784E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -55145,7 +60735,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923836544,
+          "instanceId": 3807263376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -55226,6 +60816,11 @@ export const XP2SKybar = `
                 "z": 5.1406510159779E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -55287,7 +60882,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923838704,
+          "instanceId": 3807265536,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -55368,6 +60963,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -55429,7 +61029,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923848896,
+          "instanceId": 3807267184,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -55510,6 +61110,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -55628,7 +61233,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923859088,
+          "instanceId": 3807268848,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -55709,6 +61314,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -55827,7 +61437,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923860736,
+          "instanceId": 3772072688,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -55908,6 +61518,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -56026,7 +61641,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923862400,
+          "instanceId": 3772074336,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -56107,6 +61722,11 @@ export const XP2SKybar = `
                 "z": 1.6363438604117E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -56225,7 +61845,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923864064,
+          "instanceId": 3772076000,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -56306,6 +61926,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -56424,7 +62049,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923869264,
+          "instanceId": 3772081200,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -56505,6 +62130,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -56623,7 +62253,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923873344,
+          "instanceId": 3772085280,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -56704,6 +62334,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -56822,7 +62457,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923885952,
+          "instanceId": 3772097888,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -56903,6 +62538,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -57021,7 +62661,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923890032,
+          "instanceId": 3772101968,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -57102,6 +62742,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -57220,7 +62865,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923894112,
+          "instanceId": 3772106048,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -57301,6 +62946,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -57419,7 +63069,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923898192,
+          "instanceId": 3772110128,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -57500,6 +63150,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -57618,7 +63273,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923902272,
+          "instanceId": 3772114208,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -57699,6 +63354,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -57817,7 +63477,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923906352,
+          "instanceId": 3772118288,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -57898,6 +63558,11 @@ export const XP2SKybar = `
                 "z": -1.4772698619936E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -58016,7 +63681,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923917712,
+          "instanceId": 3772138176,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -58097,6 +63762,11 @@ export const XP2SKybar = `
                 "z": -2.4181865398987E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -58215,7 +63885,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765711936,
+          "instanceId": 3772149376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -58296,6 +63966,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -58414,7 +64089,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765713584,
+          "instanceId": 3772151024,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -58495,6 +64170,11 @@ export const XP2SKybar = `
                 "z": 1.3030888368348E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -58613,7 +64293,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765723792,
+          "instanceId": 3772161232,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -58694,6 +64374,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -58812,7 +64497,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765733984,
+          "instanceId": 3772171424,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -58893,6 +64578,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -59011,7 +64701,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765735488,
+          "instanceId": 3772172928,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -59092,6 +64782,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -59208,7 +64903,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -59267,7 +65019,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765745552,
+          "instanceId": 3772182992,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -59348,6 +65100,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -59409,7 +65166,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765748496,
+          "instanceId": 3772185936,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -59490,6 +65247,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -59551,7 +65313,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765751456,
+          "instanceId": 3772188896,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -59632,6 +65394,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -59693,7 +65460,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923866000,
+          "instanceId": 3772077936,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -59774,6 +65541,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -59835,7 +65607,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765763968,
+          "instanceId": 3772201408,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -59916,6 +65688,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -59977,7 +65754,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765765040,
+          "instanceId": 3772202480,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -60058,6 +65835,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -60119,7 +65901,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765783200,
+          "instanceId": 3772220640,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -60200,6 +65982,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -60261,7 +66048,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765788384,
+          "instanceId": 3772225824,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -60342,6 +66129,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -60403,7 +66195,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765791344,
+          "instanceId": 3772228784,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -60484,6 +66276,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -60545,7 +66342,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765803856,
+          "instanceId": 3772241296,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -60626,6 +66423,11 @@ export const XP2SKybar = `
                 "z": 2.5016115401399E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -60687,7 +66489,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765807920,
+          "instanceId": 3772245360,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -60768,6 +66570,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -60829,7 +66636,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765810880,
+          "instanceId": 3772248320,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -60910,6 +66717,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -60971,7 +66783,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765831920,
+          "instanceId": 3772269360,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -61052,6 +66864,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -61113,7 +66930,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765834864,
+          "instanceId": 3772272304,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -61194,6 +67011,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -61255,7 +67077,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765847376,
+          "instanceId": 3772284816,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -61336,6 +67158,11 @@ export const XP2SKybar = `
                 "z": 2.8006063246266E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -61397,7 +67224,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765850320,
+          "instanceId": 3772296304,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -61478,6 +67305,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -61539,7 +67371,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765785120,
+          "instanceId": 3772222560,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -61620,6 +67452,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -61681,7 +67518,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765785616,
+          "instanceId": 3772223056,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -61762,6 +67599,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -61880,7 +67722,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765862832,
+          "instanceId": 3772308800,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -61961,6 +67803,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -62022,7 +67869,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765871856,
+          "instanceId": 3772317824,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -62103,6 +67950,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -62221,7 +68073,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765872336,
+          "instanceId": 3772318304,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -62302,6 +68154,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -62363,7 +68220,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765877536,
+          "instanceId": 3772323504,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -62444,6 +68301,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -62505,7 +68367,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765881616,
+          "instanceId": 3772327584,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -62586,6 +68448,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -62647,7 +68514,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765891824,
+          "instanceId": 3772329248,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -62728,6 +68595,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -62789,7 +68661,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765893472,
+          "instanceId": 3772330912,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -62870,6 +68742,11 @@ export const XP2SKybar = `
                 "z": 2.7767654842137E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -62931,7 +68808,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765903680,
+          "instanceId": 3772341120,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63012,6 +68889,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -63073,7 +68955,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765913872,
+          "instanceId": 3772351312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63154,6 +69036,11 @@ export const XP2SKybar = `
                 "z": 1.2865877252466E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -63215,7 +69102,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765915520,
+          "instanceId": 3772352960,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63296,6 +69183,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -63357,7 +69249,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765916896,
+          "instanceId": 3772354336,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63438,6 +69330,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -63499,7 +69396,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765918272,
+          "instanceId": 3772355712,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63580,6 +69477,11 @@ export const XP2SKybar = `
                 "z": 9.8375558366115E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -63641,7 +69543,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765919936,
+          "instanceId": 3772357376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63722,6 +69624,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -63783,7 +69690,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765938672,
+          "instanceId": 3772367584,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -63864,6 +69771,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -63925,7 +69837,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765948864,
+          "instanceId": 3772377776,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64006,6 +69918,11 @@ export const XP2SKybar = `
                 "z": -1.2402618931873E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -64067,7 +69984,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765950512,
+          "instanceId": 3772387968,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64148,6 +70065,11 @@ export const XP2SKybar = `
                 "z": 1.3559128930751E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -64209,7 +70131,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765952176,
+          "instanceId": 3772389616,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64290,6 +70212,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -64351,7 +70278,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765953840,
+          "instanceId": 3772391280,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64432,6 +70359,11 @@ export const XP2SKybar = `
                 "z": -1.0399414662743E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -64493,7 +70425,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765955504,
+          "instanceId": 3772392944,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64574,6 +70506,11 @@ export const XP2SKybar = `
                 "z": 3.4027138440251E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -64635,7 +70572,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765957168,
+          "instanceId": 3772394608,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64716,6 +70653,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -64777,7 +70719,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765968672,
+          "instanceId": 3772397568,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -64858,6 +70800,11 @@ export const XP2SKybar = `
                 "z": -1.9940802786778E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A02F7A05-CCA7-4200-84D3-77164566A6A7"
           }
         }
       ],
@@ -64919,7 +70866,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765874272,
+          "instanceId": 3772320240,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -65000,6 +70947,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -65061,7 +71013,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765980976,
+          "instanceId": 3846845504,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -65142,6 +71094,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -65203,7 +71160,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765981472,
+          "instanceId": 3846845984,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -65284,6 +71241,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -65402,7 +71364,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707664,
+          "instanceId": 3948773200,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -65466,7 +71428,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765981968,
+          "instanceId": 3846846480,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -65547,6 +71509,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -65608,7 +71575,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765984160,
+          "instanceId": 3846848672,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -65689,6 +71656,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -65750,7 +71722,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765984656,
+          "instanceId": 3846849168,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -65831,6 +71803,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -65949,7 +71926,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707696,
+          "instanceId": 3948773232,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -66013,7 +71990,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765985152,
+          "instanceId": 3846849664,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -66094,6 +72071,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -66155,7 +72137,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765995872,
+          "instanceId": 3846860384,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -66236,6 +72218,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -66297,7 +72284,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765996368,
+          "instanceId": 3846860880,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -66378,6 +72365,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -66496,7 +72488,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707728,
+          "instanceId": 3948773264,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -66560,7 +72552,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3765996864,
+          "instanceId": 3846861376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -66641,6 +72633,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -66759,7 +72756,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766008224,
+          "instanceId": 3846864192,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -66840,6 +72837,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -66958,7 +72960,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766011024,
+          "instanceId": 3846867008,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -67039,6 +73041,11 @@ export const XP2SKybar = `
                 "z": -8.4538491762487E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -67157,7 +73164,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766023392,
+          "instanceId": 3846879376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -67238,6 +73245,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -67354,7 +73366,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -67413,7 +73482,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766025040,
+          "instanceId": 3846881024,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -67494,6 +73563,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -67555,7 +73629,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766034672,
+          "instanceId": 3846890656,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -67636,6 +73710,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -67697,7 +73776,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766035744,
+          "instanceId": 3846900272,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -67778,6 +73857,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -67839,7 +73923,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766036688,
+          "instanceId": 3846901200,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -67920,6 +74004,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -67981,7 +74070,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766037776,
+          "instanceId": 3846902288,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68062,6 +74151,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -68123,7 +74217,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3766038864,
+          "instanceId": 3846903376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68204,6 +74298,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -68265,7 +74364,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918200896,
+          "instanceId": 3846912864,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68346,6 +74445,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -68407,7 +74511,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918201984,
+          "instanceId": 3846913936,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68488,6 +74592,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -68549,7 +74658,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918203072,
+          "instanceId": 3846915024,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68630,6 +74739,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -68691,7 +74805,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918204160,
+          "instanceId": 3846916112,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68772,6 +74886,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -68833,7 +74952,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918222320,
+          "instanceId": 3846934272,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -68914,6 +75033,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -68975,7 +75099,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918231792,
+          "instanceId": 3846943744,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -69056,6 +75180,11 @@ export const XP2SKybar = `
                 "z": 1.1115428577568E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -69117,7 +75246,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918241120,
+          "instanceId": 3846944528,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -69198,6 +75327,11 @@ export const XP2SKybar = `
                 "z": 5.4525273185391E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -69259,7 +75393,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918258976,
+          "instanceId": 3846962400,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -69340,6 +75474,11 @@ export const XP2SKybar = `
                 "z": -9.4487120350095E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -69401,7 +75540,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918259760,
+          "instanceId": 3846963184,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -69482,6 +75621,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -69771,7 +75915,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918260848,
+          "instanceId": 3846964272,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -69852,6 +75996,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -69913,7 +76062,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918261936,
+          "instanceId": 3846973904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -69994,6 +76143,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -70055,7 +76209,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918264032,
+          "instanceId": 3846975984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -70136,6 +76290,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -70197,7 +76356,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918265104,
+          "instanceId": 3846977056,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -70278,6 +76437,11 @@ export const XP2SKybar = `
                 "z": -1.8911762822427E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -70339,7 +76503,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918278832,
+          "instanceId": 3846990784,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -70420,6 +76584,11 @@ export const XP2SKybar = `
                 "z": 1.1644164743529E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -70595,7 +76764,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918282912,
+          "instanceId": 3846994864,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -70676,6 +76845,11 @@ export const XP2SKybar = `
                 "z": -3.6584559381936E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -70737,7 +76911,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918275584,
+          "instanceId": 3846987536,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -70818,6 +76992,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -70993,7 +77172,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918286992,
+          "instanceId": 3846998944,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -71074,6 +77253,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -71135,7 +77319,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918289952,
+          "instanceId": 3847001904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -71216,6 +77400,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -71277,7 +77466,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918302464,
+          "instanceId": 3847014416,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -71358,6 +77547,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -71419,7 +77613,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918313952,
+          "instanceId": 3847025904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -71500,6 +77694,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -71789,7 +77988,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918326448,
+          "instanceId": 3847038400,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -71870,6 +78069,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -71931,7 +78135,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3923838208,
+          "instanceId": 3807265040,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -72012,6 +78216,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -72073,7 +78282,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918329392,
+          "instanceId": 3847041344,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -72154,6 +78363,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -72272,7 +78486,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918329888,
+          "instanceId": 3847041840,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -72353,6 +78567,11 @@ export const XP2SKybar = `
                 "z": 3.3220395323497E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -72414,7 +78633,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918341104,
+          "instanceId": 3847053056,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -72495,6 +78714,11 @@ export const XP2SKybar = `
                 "z": -2.8980480237806E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -72556,7 +78780,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918342464,
+          "instanceId": 3847054416,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -72637,6 +78861,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -72698,7 +78927,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918361200,
+          "instanceId": 3847073152,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -72779,6 +79008,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -72840,7 +79074,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918362848,
+          "instanceId": 3847074800,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -72921,6 +79155,11 @@ export const XP2SKybar = `
                 "z": -2.0204211637065E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -72982,7 +79221,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918364224,
+          "instanceId": 3847076176,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73063,6 +79302,11 @@ export const XP2SKybar = `
                 "z": 3.5446419133223E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73124,7 +79368,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918365888,
+          "instanceId": 3847077840,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73205,6 +79449,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73266,7 +79515,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918367552,
+          "instanceId": 3847079504,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73347,6 +79596,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73408,7 +79662,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918369216,
+          "instanceId": 3847081168,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73489,6 +79743,11 @@ export const XP2SKybar = `
                 "z": -3.8230822951846E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73550,7 +79809,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918387952,
+          "instanceId": 3847091376,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73631,6 +79890,11 @@ export const XP2SKybar = `
                 "z": 1.7133565677341E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73692,7 +79956,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918389600,
+          "instanceId": 3847093024,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73773,6 +80037,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73834,7 +80103,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918391264,
+          "instanceId": 3847103232,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -73915,6 +80184,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -73976,7 +80250,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918392928,
+          "instanceId": 3847104880,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -74057,6 +80331,11 @@ export const XP2SKybar = `
                 "z": -5.7336180248058E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -74118,7 +80397,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918394592,
+          "instanceId": 3847106544,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -74199,6 +80478,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -74260,7 +80544,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918396784,
+          "instanceId": 3847108736,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -74341,6 +80625,11 @@ export const XP2SKybar = `
                 "z": -1.2975821306327E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -74402,7 +80691,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918405824,
+          "instanceId": 3847117776,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -74483,6 +80772,11 @@ export const XP2SKybar = `
                 "z": -1.1527173882087E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -74601,7 +80895,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707808,
+          "instanceId": 3948773344,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -74665,7 +80959,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918406304,
+          "instanceId": 3847118256,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -74746,6 +81040,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -74807,7 +81106,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918408496,
+          "instanceId": 3847120448,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -74888,6 +81187,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -74949,7 +81253,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918408992,
+          "instanceId": 3847120944,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -75030,6 +81334,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -75148,7 +81457,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948707840,
+          "instanceId": 3948773376,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -75212,7 +81521,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918409488,
+          "instanceId": 3847121440,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -75293,6 +81602,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -75354,7 +81668,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918412448,
+          "instanceId": 3847124400,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -75435,6 +81749,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -75496,7 +81815,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918414112,
+          "instanceId": 3847126064,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -75577,6 +81896,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -75638,7 +81962,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918415776,
+          "instanceId": 3847127728,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -75719,6 +82043,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -75780,7 +82109,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918425984,
+          "instanceId": 3847137936,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -75861,6 +82190,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -75922,7 +82256,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918453232,
+          "instanceId": 3847156656,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76003,6 +82337,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -76064,7 +82403,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918454880,
+          "instanceId": 3847158304,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76145,6 +82484,11 @@ export const XP2SKybar = `
                 "z": -1.8781271649004E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -76206,7 +82550,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918456976,
+          "instanceId": 3847168944,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76287,6 +82631,11 @@ export const XP2SKybar = `
                 "z": 5.585533813246E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -76348,7 +82697,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918464528,
+          "instanceId": 3847176480,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76429,6 +82778,11 @@ export const XP2SKybar = `
                 "z": -7.7035124945724E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -76490,7 +82844,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918466608,
+          "instanceId": 3847178560,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76571,6 +82925,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7CC7BC3B-CB64-901E-1581-32EE447EDFA3"
           }
         }
       ],
@@ -76632,7 +82991,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918482688,
+          "instanceId": 3807459248,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76713,6 +83072,11 @@ export const XP2SKybar = `
                 "z": 5.4092197387945E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -76831,7 +83195,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918484336,
+          "instanceId": 3807460896,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -76912,6 +83276,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -77030,7 +83399,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918486000,
+          "instanceId": 3807462560,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -77111,6 +83480,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -77229,7 +83603,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918487664,
+          "instanceId": 3807464224,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -77310,6 +83684,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -77428,7 +83807,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918489328,
+          "instanceId": 3807465888,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -77509,6 +83888,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -77627,7 +84011,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918490992,
+          "instanceId": 3807467552,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -77708,6 +84092,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -77826,7 +84215,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918501200,
+          "instanceId": 3807477760,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -77907,6 +84296,11 @@ export const XP2SKybar = `
                 "z": 3.9319019151662E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -78025,7 +84419,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918511392,
+          "instanceId": 3807479408,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -78106,6 +84500,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -78224,7 +84623,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918513040,
+          "instanceId": 3807481072,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -78305,6 +84704,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -78423,7 +84827,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918514416,
+          "instanceId": 3807490992,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -78504,6 +84908,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -78622,7 +85031,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918524336,
+          "instanceId": 3807500896,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -78703,6 +85112,11 @@ export const XP2SKybar = `
                 "z": 2.0058230632003E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -78821,7 +85235,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918525984,
+          "instanceId": 3807502544,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -78902,6 +85316,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -79020,7 +85439,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918537344,
+          "instanceId": 3807513904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -79101,6 +85520,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -79219,7 +85643,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940688288,
+          "instanceId": 3807534784,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -79300,6 +85724,11 @@ export const XP2SKybar = `
                 "z": 2.2315759906633E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -79418,7 +85847,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940691088,
+          "instanceId": 3807537584,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -79499,6 +85928,11 @@ export const XP2SKybar = `
                 "z": 6.5563703799398E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -79617,7 +86051,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940703456,
+          "instanceId": 3807549952,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -79698,6 +86132,11 @@ export const XP2SKybar = `
                 "z": -4.5780957691477E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -79814,7 +86253,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -79873,7 +86369,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940706256,
+          "instanceId": 3847180656,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -79954,6 +86450,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -80015,7 +86516,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940707344,
+          "instanceId": 3807552752,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80096,6 +86597,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -80157,7 +86663,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3918549696,
+          "instanceId": 3807562384,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80238,6 +86744,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -80299,7 +86810,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940716976,
+          "instanceId": 3807563312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80380,6 +86891,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -80441,7 +86957,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940718048,
+          "instanceId": 3807564400,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80522,6 +87038,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -80583,7 +87104,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940727680,
+          "instanceId": 3807565488,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80664,6 +87185,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -80725,7 +87251,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940728608,
+          "instanceId": 3807566432,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80806,6 +87332,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -80867,7 +87398,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940729696,
+          "instanceId": 3807567520,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -80948,6 +87479,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -81009,7 +87545,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940739328,
+          "instanceId": 3807585680,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81090,6 +87626,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -81151,7 +87692,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940740400,
+          "instanceId": 3807586752,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81232,6 +87773,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -81293,7 +87839,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940741488,
+          "instanceId": 3807587840,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81374,6 +87920,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -81435,7 +87986,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940750976,
+          "instanceId": 3807597328,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81516,6 +88067,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -81577,7 +88133,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940752048,
+          "instanceId": 3807598400,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81658,6 +88214,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -81719,7 +88280,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940761680,
+          "instanceId": 3807608032,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81800,6 +88361,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "246C2AB9-4CD4-11E1-97F8-EAFED09B4881"
           }
         }
       ],
@@ -81861,7 +88427,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940771152,
+          "instanceId": 3807617504,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -81942,6 +88508,11 @@ export const XP2SKybar = `
                 "z": 1.1658922716151E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -82003,7 +88574,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940771936,
+          "instanceId": 3807618288,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82084,6 +88655,11 @@ export const XP2SKybar = `
                 "z": 1.1658944032433E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -82145,7 +88721,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940772736,
+          "instanceId": 3807619088,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82226,6 +88802,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -82287,7 +88868,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940773536,
+          "instanceId": 3807619888,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82368,6 +88949,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0CB11A30-4D85-11E1-AFE7-D22E6FE49D72"
           }
         }
       ],
@@ -82429,7 +89015,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940774336,
+          "instanceId": 3807620688,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82510,6 +89096,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A5335271-C05F-25B1-4B7A-7768E3E8B159"
           }
         }
       ],
@@ -82571,7 +89162,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940785696,
+          "instanceId": 3807632048,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82652,6 +89243,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A5335271-C05F-25B1-4B7A-7768E3E8B159"
           }
         }
       ],
@@ -82713,7 +89309,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940801472,
+          "instanceId": 3807647824,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82794,6 +89390,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A5335271-C05F-25B1-4B7A-7768E3E8B159"
           }
         }
       ],
@@ -82855,7 +89456,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940803264,
+          "instanceId": 3807649616,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -82936,6 +89537,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A5335271-C05F-25B1-4B7A-7768E3E8B159"
           }
         }
       ],
@@ -82997,7 +89603,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940810528,
+          "instanceId": 3807656880,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83078,6 +89684,11 @@ export const XP2SKybar = `
                 "z": -5.477581055402E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -83139,7 +89750,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940812032,
+          "instanceId": 3807658384,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83220,6 +89831,11 @@ export const XP2SKybar = `
                 "z": 4.8640060867911E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -83281,7 +89897,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940822096,
+          "instanceId": 3807659904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83362,6 +89978,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -83423,7 +90044,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940823600,
+          "instanceId": 3807661424,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83504,6 +90125,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -83565,7 +90191,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940833664,
+          "instanceId": 3807680016,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83646,6 +90272,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B7664727-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -83707,7 +90338,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940834736,
+          "instanceId": 3807681088,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83788,6 +90419,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -83849,7 +90485,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940835824,
+          "instanceId": 3807682176,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -83930,6 +90566,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B7664727-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -83991,7 +90632,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940836912,
+          "instanceId": 3807683264,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84072,6 +90713,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -84133,7 +90779,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940846544,
+          "instanceId": 3807684352,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84214,6 +90860,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -84275,7 +90926,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940849488,
+          "instanceId": 3807687312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84356,6 +91007,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -84417,7 +91073,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940860992,
+          "instanceId": 3807698816,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84498,6 +91154,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -84559,7 +91220,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940873488,
+          "instanceId": 3807711312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84640,6 +91301,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE999099-17D1-11AB-7286-52B7890D2C0F"
           }
         }
       ],
@@ -84701,7 +91367,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940876432,
+          "instanceId": 3807714256,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84782,6 +91448,11 @@ export const XP2SKybar = `
                 "z": -2.3391597991917E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -84843,7 +91514,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940887504,
+          "instanceId": 3807725328,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -84924,6 +91595,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -84985,7 +91661,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940897552,
+          "instanceId": 3807743904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85066,6 +91742,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85127,7 +91808,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940898624,
+          "instanceId": 3807744976,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85208,6 +91889,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85269,7 +91955,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940908256,
+          "instanceId": 3807754608,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85350,6 +92036,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85411,7 +92102,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940909328,
+          "instanceId": 3807755680,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85492,6 +92183,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85553,7 +92249,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940910416,
+          "instanceId": 3807756768,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85634,6 +92330,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85695,7 +92396,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940911504,
+          "instanceId": 3807757856,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85776,6 +92477,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85837,7 +92543,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940921136,
+          "instanceId": 3807758944,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -85918,6 +92624,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -85979,7 +92690,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940930752,
+          "instanceId": 3807768576,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86060,6 +92771,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86121,7 +92837,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940940368,
+          "instanceId": 3807786720,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86202,6 +92918,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86263,7 +92984,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940941440,
+          "instanceId": 3807787792,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86344,6 +93065,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86405,7 +93131,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940942528,
+          "instanceId": 3807788880,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86486,6 +93212,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86547,7 +93278,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940943616,
+          "instanceId": 3807789968,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86628,6 +93359,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86689,7 +93425,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940953248,
+          "instanceId": 3807791056,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86770,6 +93506,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86831,7 +93572,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940954320,
+          "instanceId": 3807792144,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -86912,6 +93653,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -86973,7 +93719,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940972480,
+          "instanceId": 3807793232,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87054,6 +93800,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87115,7 +93866,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940982096,
+          "instanceId": 3844629568,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87196,6 +93947,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87257,7 +94013,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940983168,
+          "instanceId": 3844639184,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87338,6 +94094,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87399,7 +94160,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940984256,
+          "instanceId": 3844640256,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87480,6 +94241,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87541,7 +94307,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940985344,
+          "instanceId": 3844641344,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87622,6 +94388,11 @@ export const XP2SKybar = `
                 "z": -3.0777780324343E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87683,7 +94454,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940986432,
+          "instanceId": 3844642432,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87764,6 +94535,11 @@ export const XP2SKybar = `
                 "z": 2.8826857345621E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87825,7 +94601,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940996064,
+          "instanceId": 3844652064,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -87906,6 +94682,11 @@ export const XP2SKybar = `
                 "z": 2.8826850240193E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "06B57906-4C17-11E1-A82C-C5082BEA1853"
           }
         }
       ],
@@ -87967,7 +94748,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3940997136,
+          "instanceId": 3844653136,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88048,6 +94829,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -88109,7 +94895,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3941007200,
+          "instanceId": 3844654656,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88190,6 +94976,11 @@ export const XP2SKybar = `
                 "z": -2.3391780956672E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7B95FC46-31C7-E7FB-C5AD-6069D760A611"
           }
         }
       ],
@@ -88251,7 +95042,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3941008704,
+          "instanceId": 3844656176,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88332,6 +95123,11 @@ export const XP2SKybar = `
                 "z": 9.4655163707102E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -88393,7 +95189,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3941014400,
+          "instanceId": 3844670416,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88474,6 +95270,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -88535,7 +95336,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772269632,
+          "instanceId": 3844702368,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88616,6 +95417,11 @@ export const XP2SKybar = `
                 "z": -7.3473671591273E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -88677,7 +95483,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772283856,
+          "instanceId": 3844716592,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88758,6 +95564,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -88819,7 +95630,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772307280,
+          "instanceId": 3844740016,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -88900,6 +95711,11 @@ export const XP2SKybar = `
                 "z": -5.7352131932475E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -88961,7 +95777,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772312960,
+          "instanceId": 3844745696,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -89042,6 +95858,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -89103,7 +95924,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772336400,
+          "instanceId": 3844769136,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -89184,6 +96005,11 @@ export const XP2SKybar = `
                 "z": -1.5883950155171E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -89245,7 +96071,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772342080,
+          "instanceId": 3844774816,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -89326,6 +96152,11 @@ export const XP2SKybar = `
                 "z": 2.142117594417E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -89387,7 +96218,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772374048,
+          "instanceId": 3844806784,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -89468,6 +96299,11 @@ export const XP2SKybar = `
                 "z": -2.3622547473678E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -89529,7 +96365,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772379728,
+          "instanceId": 3844812464,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -89610,6 +96446,11 @@ export const XP2SKybar = `
                 "z": 9.0210150460734E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -89671,7 +96512,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772403168,
+          "instanceId": 3844835904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -89752,6 +96593,11 @@ export const XP2SKybar = `
                 "z": 3.786267299688E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FAD29090-EEBD-FC1F-861A-BAD9FDF221E3"
           }
         }
       ],
@@ -90155,7 +97001,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772408848,
+          "instanceId": 3844841584,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -90236,6 +97082,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "894B4D0B-A8FB-FDED-1747-6C6F83A6A2A1"
           }
         }
       ],
@@ -90297,7 +97148,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772429264,
+          "instanceId": 3844862000,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -90378,6 +97229,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "894B4D0B-A8FB-FDED-1747-6C6F83A6A2A1"
           }
         }
       ],
@@ -90781,7 +97637,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772437376,
+          "instanceId": 3844870112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -90862,6 +97718,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7C569865-63AD-4968-ACE3-40ADE02D5B59"
           }
         }
       ],
@@ -90923,7 +97784,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772439408,
+          "instanceId": 3844871584,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -91004,6 +97865,11 @@ export const XP2SKybar = `
                 "z": -1.0511094217236E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7C569865-63AD-4968-ACE3-40ADE02D5B59"
           }
         }
       ],
@@ -91065,7 +97931,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772449984,
+          "instanceId": 3844882160,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -91146,6 +98012,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E81D2033-B01E-43DB-B5DD-37D84E4C891D"
           }
         }
       ],
@@ -91207,7 +98078,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772452944,
+          "instanceId": 3844885120,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -91288,6 +98159,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -91349,7 +98225,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772455904,
+          "instanceId": 3844888080,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -91430,6 +98306,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -91491,7 +98372,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3941028976,
+          "instanceId": 3844909120,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -91572,6 +98453,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -91633,7 +98519,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772476944,
+          "instanceId": 3844909600,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -91714,6 +98600,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -91832,7 +98723,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772477424,
+          "instanceId": 3844910096,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -91913,6 +98804,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -91974,7 +98870,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772486464,
+          "instanceId": 3844919136,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -92055,6 +98951,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -92173,7 +99074,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772486944,
+          "instanceId": 3844919616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -92254,6 +99155,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -92315,7 +99221,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772487440,
+          "instanceId": 3844920112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -92396,6 +99302,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -92514,7 +99425,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772487936,
+          "instanceId": 3844920608,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -92595,6 +99506,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -92656,7 +99572,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772488432,
+          "instanceId": 3844921104,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -92737,6 +99653,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -92855,7 +99776,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772488928,
+          "instanceId": 3844921600,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -92936,6 +99857,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -92997,7 +99923,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772497968,
+          "instanceId": 3844930640,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -93078,6 +100004,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -93196,7 +100127,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772498448,
+          "instanceId": 3844931120,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -93277,6 +100208,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -93338,7 +100274,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772498944,
+          "instanceId": 3844931616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -93419,6 +100355,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -93537,7 +100478,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772499440,
+          "instanceId": 3844932112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -93618,6 +100559,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -93679,7 +100625,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3810896096,
+          "instanceId": 3867570944,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -93760,6 +100706,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -93878,7 +100829,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772500944,
+          "instanceId": 3844933616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -93959,6 +100910,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -94020,7 +100976,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772509968,
+          "instanceId": 3844942640,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -94101,6 +101057,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -94219,7 +101180,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772510448,
+          "instanceId": 3844943120,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -94300,6 +101261,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -94361,7 +101327,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772510944,
+          "instanceId": 3844943616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -94442,6 +101408,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -94560,7 +101531,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772511440,
+          "instanceId": 3844944112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -94641,6 +101612,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -94702,7 +101678,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772511936,
+          "instanceId": 3844944608,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -94783,6 +101759,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -94901,7 +101882,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772512432,
+          "instanceId": 3844945104,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -94982,6 +101963,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -95043,7 +102029,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772521472,
+          "instanceId": 3844954144,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -95124,6 +102110,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -95242,7 +102233,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772521952,
+          "instanceId": 3844954624,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -95323,6 +102314,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -95384,7 +102380,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772523616,
+          "instanceId": 3844956288,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -95465,6 +102461,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -95526,7 +102527,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772533824,
+          "instanceId": 3844966496,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -95607,6 +102608,11 @@ export const XP2SKybar = `
                 "z": 3.8135681279527E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -95668,7 +102674,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772544016,
+          "instanceId": 3844976688,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -95749,6 +102755,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -95810,7 +102821,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772545376,
+          "instanceId": 3844978048,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -95891,6 +102902,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -95952,7 +102968,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772555296,
+          "instanceId": 3844987968,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -96033,6 +103049,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -96094,7 +103115,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772556656,
+          "instanceId": 3844989328,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -96175,6 +103196,11 @@ export const XP2SKybar = `
                 "z": -4.5318678587591E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -96236,7 +103262,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772568944,
+          "instanceId": 3845001616,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -96317,6 +103343,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -96378,7 +103409,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772570608,
+          "instanceId": 3845003280,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -96459,6 +103490,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -96520,7 +103556,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772572272,
+          "instanceId": 3845004944,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -96601,6 +103637,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -96662,7 +103703,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772573936,
+          "instanceId": 3845006608,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -96743,6 +103784,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -96804,7 +103850,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772584144,
+          "instanceId": 3845016816,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -96885,6 +103931,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -96946,7 +103997,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772585760,
+          "instanceId": 3845018432,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -97027,6 +104078,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -97088,7 +104144,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772586256,
+          "instanceId": 3845018928,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -97169,6 +104225,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -97287,7 +104348,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948708144,
+          "instanceId": 3948773680,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -97351,7 +104412,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772586752,
+          "instanceId": 3845019424,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -97432,6 +104493,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -97493,7 +104559,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772588944,
+          "instanceId": 3845021616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -97574,6 +104640,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -97635,7 +104706,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772589440,
+          "instanceId": 3845022112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -97716,6 +104787,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -97834,7 +104910,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948708176,
+          "instanceId": 3948773712,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -97898,7 +104974,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772589936,
+          "instanceId": 3845022608,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -97979,6 +105055,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -98040,7 +105121,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772592128,
+          "instanceId": 3845024800,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -98121,6 +105202,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -98182,7 +105268,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3772601168,
+          "instanceId": 3845033840,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -98263,6 +105349,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -98381,7 +105472,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948708208,
+          "instanceId": 3948773744,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -98445,7 +105536,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833462848,
+          "instanceId": 3845034320,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -98526,6 +105617,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -98587,7 +105683,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833463344,
+          "instanceId": 3845034816,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -98668,6 +105764,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -98786,7 +105887,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833463840,
+          "instanceId": 3845035312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -98867,6 +105968,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -98928,7 +106034,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833465504,
+          "instanceId": 3845036976,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99009,6 +106115,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99070,7 +106181,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833475712,
+          "instanceId": 3845038640,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99151,6 +106262,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99212,7 +106328,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833477360,
+          "instanceId": 3845040304,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99293,6 +106409,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99354,7 +106475,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833487568,
+          "instanceId": 3845059040,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99435,6 +106556,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99496,7 +106622,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833489216,
+          "instanceId": 3845060688,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99577,6 +106703,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99638,7 +106769,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833499424,
+          "instanceId": 3845070896,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99719,6 +106850,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99780,7 +106916,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833501072,
+          "instanceId": 3845072544,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -99861,6 +106997,11 @@ export const XP2SKybar = `
                 "z": 1.0271552497443E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -99922,7 +107063,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833502736,
+          "instanceId": 3845074208,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -100003,6 +107144,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A02F7A05-CCA7-4200-84D3-77164566A6A7"
           }
         }
       ],
@@ -100064,7 +107210,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833504400,
+          "instanceId": 3845075872,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -100145,6 +107291,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A02F7A05-CCA7-4200-84D3-77164566A6A7"
           }
         }
       ],
@@ -100206,7 +107357,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833523136,
+          "instanceId": 3845086080,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -100287,6 +107438,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DCB4E33D-2946-4A54-AA2C-0CBFA13CE4AF"
           }
         }
       ],
@@ -100348,7 +107504,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833523616,
+          "instanceId": 3845086560,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -100429,6 +107585,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A47A6AEE-2031-4E98-B8FF-D170512F4410"
           }
         }
       ],
@@ -100547,7 +107708,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833524112,
+          "instanceId": 3845087056,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -100628,6 +107789,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -100689,7 +107855,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833527072,
+          "instanceId": 3845090016,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -100770,6 +107936,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -100831,7 +108002,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833538288,
+          "instanceId": 3845101232,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -100912,6 +108083,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -100973,7 +108149,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833539936,
+          "instanceId": 3845111424,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -101054,6 +108230,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "38EF3431-14D9-DAFD-B097-48018535E997"
           }
         }
       ],
@@ -101115,7 +108296,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833550144,
+          "instanceId": 3845121616,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -101196,6 +108377,11 @@ export const XP2SKybar = `
                 "z": 1.6719777562457E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -101314,7 +108500,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833551792,
+          "instanceId": 3845123264,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -101395,6 +108581,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -101513,7 +108704,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833553456,
+          "instanceId": 3845124928,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -101594,6 +108785,11 @@ export const XP2SKybar = `
                 "z": -1.6822898629698E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -101712,7 +108908,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833555120,
+          "instanceId": 3845126592,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -101793,6 +108989,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -101911,7 +109112,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833556496,
+          "instanceId": 3845127968,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -101992,6 +109193,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -102110,7 +109316,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833566416,
+          "instanceId": 3845129344,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -102191,6 +109397,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -102309,7 +109520,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833576320,
+          "instanceId": 3845139264,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -102390,6 +109601,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -102508,7 +109724,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833586512,
+          "instanceId": 3845157984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -102589,6 +109805,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -102707,7 +109928,7 @@ export const XP2SKybar = `
       "variation": 1639303523,
       "gameEntities": [
         {
-          "instanceId": 3833589312,
+          "instanceId": 3845160784,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -102788,6 +110009,11 @@ export const XP2SKybar = `
                 "z": 2.1186377097138E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -102904,7 +110130,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -102963,7 +110246,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833590688,
+          "instanceId": 3845162160,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -103044,6 +110327,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4EC9F11A-12F1-11DE-B368-D6A63E90288D"
           }
         }
       ],
@@ -103105,7 +110393,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833591184,
+          "instanceId": 3845162656,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -103186,6 +110474,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4EC9F11A-12F1-11DE-B368-D6A63E90288D"
           }
         }
       ],
@@ -103247,13 +110540,18 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3953091968,
+          "instanceId": 3953157504,
           "indexInBlueprint": 1,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6F29A805-6143-4111-9801-B834988425DB"
+          }
         },
         {
-          "instanceId": 3833591680,
+          "instanceId": 3845163152,
           "indexInBlueprint": 2,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -103334,6 +110632,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3081BBA6-0256-11DE-9D45-EF50BF77C968"
           }
         }
       ],
@@ -103393,7 +110696,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -103452,7 +110812,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833600720,
+          "instanceId": 3845172192,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -103533,6 +110893,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D205883D-481E-11E1-B792-88A15BCDD28C"
           }
         }
       ],
@@ -104278,7 +111643,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833601488,
+          "instanceId": 3845172960,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -104359,6 +111724,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -104420,7 +111790,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833603680,
+          "instanceId": 3845175152,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -104501,6 +111871,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -104562,7 +111937,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833604176,
+          "instanceId": 3845175648,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -104643,6 +112018,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -104761,7 +112141,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948708240,
+          "instanceId": 3948773776,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -104825,7 +112205,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833604672,
+          "instanceId": 3845176144,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -104906,6 +112286,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDCF2017-5727-11E1-A00F-EF7D14269894"
           }
         }
       ],
@@ -104967,7 +112352,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833606864,
+          "instanceId": 3845178336,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -105048,6 +112433,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "63271DFD-14FA-489E-8830-7F81590AFCE1"
           }
         }
       ],
@@ -105109,7 +112499,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833607360,
+          "instanceId": 3845178832,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -105190,6 +112580,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "254FCB89-4918-4021-A7D1-E4EA06E3DC63"
           }
         }
       ],
@@ -105308,7 +112703,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948708272,
+          "instanceId": 3948773808,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -105372,7 +112767,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833607856,
+          "instanceId": 3845179328,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -105453,6 +112848,11 @@ export const XP2SKybar = `
                 "z": -9.5804715272152E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4EC9F11A-12F1-11DE-B368-D6A63E90288D"
           }
         }
       ],
@@ -105514,7 +112914,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833616896,
+          "instanceId": 3845188368,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -105595,6 +112995,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D94A1BB5-9123-AFDB-EF2A-9E810FEFB302"
           }
         }
       ],
@@ -105656,7 +113061,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833619840,
+          "instanceId": 3845191312,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -105737,6 +113142,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -105855,7 +113265,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833621360,
+          "instanceId": 3845192832,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -105936,6 +113346,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -106054,7 +113469,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833622880,
+          "instanceId": 3845194352,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -106135,6 +113550,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -106253,7 +113673,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833624400,
+          "instanceId": 3845195872,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -106334,6 +113754,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -106452,7 +113877,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833625920,
+          "instanceId": 3845197392,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -106533,6 +113958,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -106651,7 +114081,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833644512,
+          "instanceId": 3845215984,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -106732,6 +114162,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -106850,7 +114285,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833646016,
+          "instanceId": 3845217488,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -106931,6 +114366,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1130BB45-C12D-2C07-9AB3-411D8340FDEB"
           }
         }
       ],
@@ -107049,7 +114489,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833651216,
+          "instanceId": 3845222688,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -107130,6 +114570,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -107248,7 +114693,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833663584,
+          "instanceId": 3845235056,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -107329,6 +114774,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "506FA38A-96E0-B71A-043B-4469EEC3D682"
           }
         }
       ],
@@ -107447,7 +114897,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833666384,
+          "instanceId": 3845237856,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -107528,6 +114978,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -107646,7 +115101,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833677600,
+          "instanceId": 3845249072,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -107727,6 +115182,11 @@ export const XP2SKybar = `
                 "z": -1.4243610735321E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -107845,7 +115305,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833696320,
+          "instanceId": 3845267792,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -107926,6 +115386,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -108044,7 +115509,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833697824,
+          "instanceId": 3845269296,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -108125,6 +115590,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -108241,7 +115711,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -108300,7 +115827,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833699344,
+          "instanceId": 3845270816,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -108381,6 +115908,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -108499,7 +116031,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833709552,
+          "instanceId": 3845272480,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -108580,6 +116112,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -108698,7 +116235,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833710912,
+          "instanceId": 3845273856,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -108779,6 +116316,11 @@ export const XP2SKybar = `
                 "z": -1.4243610735321E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -108897,7 +116439,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833712576,
+          "instanceId": 3845284064,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -108978,6 +116520,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -109096,7 +116643,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833722784,
+          "instanceId": 3845294256,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -109177,6 +116724,11 @@ export const XP2SKybar = `
                 "z": -1.8762040809861E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "992ABB16-430C-D54E-5A87-BBEF0F976E3E"
           }
         }
       ],
@@ -109295,7 +116847,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833724432,
+          "instanceId": 3845295904,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -109376,6 +116928,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "564E4BAE-5472-7DDC-7676-B145C5771361"
           }
         }
       ],
@@ -109494,7 +117051,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833725808,
+          "instanceId": 3845297280,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -109575,6 +117132,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -109693,7 +117255,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833727328,
+          "instanceId": 3845298800,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -109774,6 +117336,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -109892,7 +117459,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833728848,
+          "instanceId": 3845300320,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -109973,6 +117540,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -110091,7 +117663,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833738912,
+          "instanceId": 3762815040,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -110172,6 +117744,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -110290,7 +117867,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833748960,
+          "instanceId": 3762825104,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -110371,6 +117948,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -110489,7 +118071,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833750464,
+          "instanceId": 3762835152,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -110570,6 +118152,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -110688,7 +118275,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833751984,
+          "instanceId": 3762836656,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -110769,6 +118356,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -110887,7 +118479,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833753504,
+          "instanceId": 3762838176,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -110968,6 +118560,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -111086,7 +118683,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833755024,
+          "instanceId": 3762839696,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -111167,6 +118764,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -111285,7 +118887,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833756544,
+          "instanceId": 3762841216,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -111366,6 +118968,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -111484,7 +119091,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833766608,
+          "instanceId": 3762851280,
           "indexInBlueprint": 1,
           "typeName": "ClientBreakableModelEntity",
           "isSpatial": true,
@@ -111565,6 +119172,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "BreakableModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5378F32B-75DD-49FC-826C-0A4ACAC46FFD"
           }
         }
       ],
@@ -111681,7 +119293,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -111740,7 +119409,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833647952,
+          "instanceId": 3845219424,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -111821,6 +119490,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -111882,7 +119556,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833648448,
+          "instanceId": 3845219920,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -111963,6 +119637,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112024,7 +119703,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833785184,
+          "instanceId": 3845301840,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112105,6 +119784,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112166,7 +119850,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833785664,
+          "instanceId": 3845302336,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112247,6 +119931,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112308,7 +119997,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833786160,
+          "instanceId": 3762869856,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112389,6 +120078,11 @@ export const XP2SKybar = `
                 "z": -3.6447158890951E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112450,7 +120144,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833795200,
+          "instanceId": 3762878880,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112531,6 +120225,11 @@ export const XP2SKybar = `
                 "z": -1.1449728276602E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112592,7 +120291,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833795680,
+          "instanceId": 3762879360,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112673,6 +120372,11 @@ export const XP2SKybar = `
                 "z": 1.0464253819009E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112734,7 +120438,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833796176,
+          "instanceId": 3762879856,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112815,6 +120519,11 @@ export const XP2SKybar = `
                 "z": -3.7121466789358E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -112876,7 +120585,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833796672,
+          "instanceId": 3762880352,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -112957,6 +120666,11 @@ export const XP2SKybar = `
                 "z": -3.4004685289801E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113018,7 +120732,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833805712,
+          "instanceId": 3762889392,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113099,6 +120813,11 @@ export const XP2SKybar = `
                 "z": 8.9810228587339E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113160,7 +120879,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833806192,
+          "instanceId": 3762889872,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113241,6 +120960,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113302,7 +121026,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833806688,
+          "instanceId": 3762898912,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113383,6 +121107,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113444,7 +121173,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833807184,
+          "instanceId": 3762899392,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113525,6 +121254,11 @@ export const XP2SKybar = `
                 "z": -6.5307676777593E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113586,7 +121320,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833807680,
+          "instanceId": 3762899888,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113667,6 +121401,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113728,7 +121467,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833808176,
+          "instanceId": 3762900384,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113809,6 +121548,11 @@ export const XP2SKybar = `
                 "z": 5.9702767885028E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -113870,7 +121614,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833808672,
+          "instanceId": 3762900880,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -113951,6 +121695,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114012,7 +121761,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833809168,
+          "instanceId": 3762901376,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114093,6 +121842,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114154,7 +121908,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833809664,
+          "instanceId": 3762910416,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114235,6 +121989,11 @@ export const XP2SKybar = `
                 "z": -2.1640283875968E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114296,7 +122055,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833810160,
+          "instanceId": 3762910896,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114377,6 +122136,11 @@ export const XP2SKybar = `
                 "z": -1.0316033183244E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114438,7 +122202,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833810656,
+          "instanceId": 3762911392,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114519,6 +122283,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114580,7 +122349,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833811152,
+          "instanceId": 3762911888,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114661,6 +122430,11 @@ export const XP2SKybar = `
                 "z": 1.2485600109358E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114722,7 +122496,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3833811648,
+          "instanceId": 3762912384,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114803,6 +122577,11 @@ export const XP2SKybar = `
                 "z": 5.635542379423E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -114864,7 +122643,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795010288,
+          "instanceId": 3762912880,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -114945,6 +122724,11 @@ export const XP2SKybar = `
                 "z": 1.1468019067706E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115006,7 +122790,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795019312,
+          "instanceId": 3762921920,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115087,6 +122871,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115148,7 +122937,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795019792,
+          "instanceId": 3762922400,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115229,6 +123018,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115290,7 +123084,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795020288,
+          "instanceId": 3762922896,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115371,6 +123165,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115432,7 +123231,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795020784,
+          "instanceId": 3762923392,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115513,6 +123312,11 @@ export const XP2SKybar = `
                 "z": 9.724476512929E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115574,7 +123378,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795021280,
+          "instanceId": 3762923888,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115655,6 +123459,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115716,7 +123525,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795021776,
+          "instanceId": 3762924384,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115797,6 +123606,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -115858,7 +123672,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795030816,
+          "instanceId": 3762933424,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -115939,6 +123753,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116000,7 +123819,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795031296,
+          "instanceId": 3762933904,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116081,6 +123900,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116142,7 +123966,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795031792,
+          "instanceId": 3762934400,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116223,6 +124047,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116284,7 +124113,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795032288,
+          "instanceId": 3762934896,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116365,6 +124194,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116426,7 +124260,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795032784,
+          "instanceId": 3762935392,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116507,6 +124341,11 @@ export const XP2SKybar = `
                 "z": -8.4979035364086E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116568,7 +124407,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795033280,
+          "instanceId": 3762935888,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116649,6 +124488,11 @@ export const XP2SKybar = `
                 "z": 3.4230382084388E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116710,7 +124554,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795042320,
+          "instanceId": 3762944928,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116791,6 +124635,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116852,7 +124701,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795042800,
+          "instanceId": 3762945408,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -116933,6 +124782,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -116994,7 +124848,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795043296,
+          "instanceId": 3762945904,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117075,6 +124929,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117136,7 +124995,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795043792,
+          "instanceId": 3762946400,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117217,6 +125076,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117278,7 +125142,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795044288,
+          "instanceId": 3762946896,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117359,6 +125223,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117420,7 +125289,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795044784,
+          "instanceId": 3762947392,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117501,6 +125370,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117562,7 +125436,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795053824,
+          "instanceId": 3762956432,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117643,6 +125517,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117704,7 +125583,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795054304,
+          "instanceId": 3762956912,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117785,6 +125664,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117846,7 +125730,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795054800,
+          "instanceId": 3762957408,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -117927,6 +125811,11 @@ export const XP2SKybar = `
                 "z": -5.0397056838847E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -117988,7 +125877,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795055296,
+          "instanceId": 3762957904,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118069,6 +125958,11 @@ export const XP2SKybar = `
                 "z": -6.2792531707601E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118130,7 +126024,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795055792,
+          "instanceId": 3762958400,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118211,6 +126105,11 @@ export const XP2SKybar = `
                 "z": -2.5483865329079E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118272,7 +126171,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795056288,
+          "instanceId": 3762958896,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118353,6 +126252,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118414,7 +126318,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795065328,
+          "instanceId": 3762967936,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118495,6 +126399,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118556,7 +126465,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795065808,
+          "instanceId": 3762968416,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118637,6 +126546,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118698,7 +126612,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795066304,
+          "instanceId": 3762968912,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118779,6 +126693,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118840,7 +126759,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795066800,
+          "instanceId": 3762969408,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -118921,6 +126840,11 @@ export const XP2SKybar = `
                 "z": 4.0623014285757E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -118982,7 +126906,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795067296,
+          "instanceId": 3762969904,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119063,6 +126987,11 @@ export const XP2SKybar = `
                 "z": 1.5307452372326E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119124,7 +127053,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795067792,
+          "instanceId": 3762970400,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119205,6 +127134,11 @@ export const XP2SKybar = `
                 "z": 3.1729570082462E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119266,7 +127200,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795076832,
+          "instanceId": 3762979440,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119347,6 +127281,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119408,7 +127347,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795077312,
+          "instanceId": 3762979920,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119489,6 +127428,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119550,7 +127494,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795077808,
+          "instanceId": 3762980416,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119631,6 +127575,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119692,7 +127641,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795078304,
+          "instanceId": 3762980912,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119773,6 +127722,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119834,7 +127788,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795078800,
+          "instanceId": 3762981408,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -119915,6 +127869,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -119976,7 +127935,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795079296,
+          "instanceId": 3762981904,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -120057,6 +128016,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -120118,7 +128082,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795088336,
+          "instanceId": 3762990944,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -120199,6 +128163,11 @@ export const XP2SKybar = `
                 "z": 2.9786238542329E-7
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -120260,7 +128229,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795088816,
+          "instanceId": 3762991424,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -120341,6 +128310,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -120402,7 +128376,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795089312,
+          "instanceId": 3762991920,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -120483,6 +128457,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -120544,7 +128523,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795089808,
+          "instanceId": 3762992416,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -120625,6 +128604,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B818BDCD-A04B-4DEC-BC08-4EADF9014314"
           }
         }
       ],
@@ -120684,7 +128668,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -120741,7 +128782,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -120798,7 +128896,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -120857,7 +129012,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795090880,
+          "instanceId": 3762992912,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -120938,6 +129093,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "120F3E3D-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -120999,7 +129159,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795093216,
+          "instanceId": 3762995248,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -121080,6 +129240,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -121198,7 +129363,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795104368,
+          "instanceId": 3763006400,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -121279,6 +129444,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -121397,7 +129567,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795106992,
+          "instanceId": 3763009024,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -121478,6 +129648,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -121596,7 +129771,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795109616,
+          "instanceId": 3763011648,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -121677,6 +129852,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -121795,7 +129975,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795112240,
+          "instanceId": 3763014272,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -121876,6 +130056,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -121994,7 +130179,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795114864,
+          "instanceId": 3763016896,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -122075,6 +130260,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -122193,7 +130383,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795117488,
+          "instanceId": 3763019520,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -122274,6 +130464,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -122392,7 +130587,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795128640,
+          "instanceId": 3763030672,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -122473,6 +130668,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -122591,7 +130791,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795131264,
+          "instanceId": 3763033296,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -122672,6 +130872,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -122790,7 +130995,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795133888,
+          "instanceId": 3763035920,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -122871,6 +131076,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -122989,7 +131199,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795136512,
+          "instanceId": 3763038544,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -123070,6 +131280,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -123188,7 +131403,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795139136,
+          "instanceId": 3763041168,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -123269,6 +131484,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -123387,7 +131607,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795141760,
+          "instanceId": 3763043792,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -123468,6 +131688,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -123586,7 +131811,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795152912,
+          "instanceId": 3763054944,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -123667,6 +131892,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -123785,7 +132015,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795155536,
+          "instanceId": 3763057568,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -123866,6 +132096,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -123984,7 +132219,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795158160,
+          "instanceId": 3763060192,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -124065,6 +132300,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -124183,7 +132423,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795160784,
+          "instanceId": 3763062816,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -124264,6 +132504,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -124382,7 +132627,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795163408,
+          "instanceId": 3763065440,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -124463,6 +132708,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -124581,7 +132831,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795166032,
+          "instanceId": 3763068064,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -124662,6 +132912,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -124780,7 +133035,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795177184,
+          "instanceId": 3763079216,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -124861,6 +133116,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -124979,7 +133239,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795179808,
+          "instanceId": 3763081840,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -125060,6 +133320,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -125178,7 +133443,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795182432,
+          "instanceId": 3763084464,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -125259,6 +133524,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -125377,7 +133647,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795185056,
+          "instanceId": 3763087088,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -125458,6 +133728,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -125576,7 +133851,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795187680,
+          "instanceId": 3763089712,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -125657,6 +133932,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -125775,7 +134055,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795190304,
+          "instanceId": 3763092336,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -125856,6 +134136,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -125974,7 +134259,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795201456,
+          "instanceId": 3763103488,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -126055,6 +134340,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -126173,7 +134463,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795204080,
+          "instanceId": 3763106112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -126254,6 +134544,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -126372,7 +134667,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795206704,
+          "instanceId": 3763108736,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -126453,6 +134748,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -126571,7 +134871,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795209328,
+          "instanceId": 3763111360,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -126652,6 +134952,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -126770,7 +135075,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795211952,
+          "instanceId": 3763113984,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -126851,6 +135156,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -126969,7 +135279,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795216032,
+          "instanceId": 3763118064,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -127050,6 +135360,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "120F3E3D-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -127168,7 +135483,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795226896,
+          "instanceId": 3763128928,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -127249,6 +135564,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "120F3E3D-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -127367,7 +135687,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795229232,
+          "instanceId": 3763131264,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -127448,6 +135768,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "120F3E3D-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -127566,7 +135891,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795231568,
+          "instanceId": 3763133600,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -127647,6 +135972,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "120F3E3D-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -127765,7 +136095,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795233904,
+          "instanceId": 3763135936,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -127846,6 +136176,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "120F3E3D-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -127964,7 +136299,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795236240,
+          "instanceId": 3763138272,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -128045,6 +136380,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -128106,16 +136446,26 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945664448,
+          "instanceId": 3945795584,
           "indexInBlueprint": 1,
           "typeName": "ObjectVariationSwitchEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "ObjectVariationSwitchEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1D50A6CF-6BBF-403A-A7D4-5AF4B570CA1C"
+          }
         },
         {
           "instanceId": 3946838528,
           "indexInBlueprint": 2,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1043495A-3E11-4A6C-B63D-870B547FD474"
+          }
         }
       ],
       "isDeleted": false,
@@ -128176,7 +136526,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795239904,
+          "instanceId": 3763141936,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -128257,6 +136607,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "24D26520-4E4F-11E1-B349-A847622E08BF"
           }
         }
       ],
@@ -128660,7 +137015,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795251056,
+          "instanceId": 3763153088,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -128741,6 +137096,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -128802,7 +137162,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795251696,
+          "instanceId": 3763153728,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -128883,6 +137243,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -129001,7 +137366,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795252192,
+          "instanceId": 3763154224,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -129082,6 +137447,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -129143,7 +137513,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795252832,
+          "instanceId": 3763154864,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -129224,6 +137594,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -129342,7 +137717,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795253328,
+          "instanceId": 3763155360,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -129423,6 +137798,11 @@ export const XP2SKybar = `
                 "z": -6.0677045610191E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -129484,7 +137864,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795253968,
+          "instanceId": 3763156000,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -129565,6 +137945,11 @@ export const XP2SKybar = `
                 "z": -6.0677045610191E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -129683,7 +138068,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795254464,
+          "instanceId": 3763156496,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -129764,6 +138149,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -129825,7 +138215,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795255104,
+          "instanceId": 3763157136,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -129906,6 +138296,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -130081,7 +138476,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795255600,
+          "instanceId": 3763157632,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -130162,6 +138557,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -130223,7 +138623,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795256240,
+          "instanceId": 3763158272,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -130304,6 +138704,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -130422,7 +138827,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795256736,
+          "instanceId": 3763158768,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -130503,6 +138908,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -130564,7 +138974,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795265920,
+          "instanceId": 3763167952,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -130645,6 +139055,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -130763,7 +139178,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795266400,
+          "instanceId": 3763168432,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -130844,6 +139259,11 @@ export const XP2SKybar = `
                 "z": -3.0413076501645E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -130905,7 +139325,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795267040,
+          "instanceId": 3763169072,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -130986,6 +139406,11 @@ export const XP2SKybar = `
                 "z": -3.0413076501645E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -131104,7 +139529,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795267536,
+          "instanceId": 3763169568,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -131185,6 +139610,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -131246,7 +139676,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795268176,
+          "instanceId": 3763170208,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -131327,6 +139757,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -131502,7 +139937,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795268672,
+          "instanceId": 3763170704,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -131583,6 +140018,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -131644,7 +140084,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795269312,
+          "instanceId": 3763171344,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -131725,6 +140165,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -131843,7 +140288,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795269808,
+          "instanceId": 3763171840,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -131924,6 +140369,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -131985,7 +140435,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795270448,
+          "instanceId": 3763172480,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -132066,6 +140516,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -132184,7 +140639,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795270944,
+          "instanceId": 3763172976,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -132265,6 +140720,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -132326,7 +140786,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795271584,
+          "instanceId": 3763173616,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -132407,6 +140867,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -132525,7 +140990,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795272080,
+          "instanceId": 3763174112,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -132606,6 +141071,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -132667,7 +141137,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795281264,
+          "instanceId": 3763183296,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -132748,6 +141218,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -132923,7 +141398,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795281744,
+          "instanceId": 3763183776,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -133004,6 +141479,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -133065,7 +141545,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795282384,
+          "instanceId": 3763184416,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -133146,6 +141626,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -133264,7 +141749,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795282880,
+          "instanceId": 3763184912,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -133345,6 +141830,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -133406,7 +141896,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795283520,
+          "instanceId": 3763185552,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -133487,6 +141977,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -133605,7 +142100,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795284016,
+          "instanceId": 3763186048,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -133686,6 +142181,11 @@ export const XP2SKybar = `
                 "z": -2.8283022146525E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -133747,7 +142247,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795284656,
+          "instanceId": 3763186688,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -133828,6 +142328,11 @@ export const XP2SKybar = `
                 "z": -2.8283022146525E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -133946,7 +142451,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795285152,
+          "instanceId": 3763187184,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -134027,6 +142532,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3E888547-5D69-11E1-A19A-CB001EEC093C"
           }
         }
       ],
@@ -134088,7 +142598,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795285792,
+          "instanceId": 3763187824,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -134169,6 +142679,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E3EC1725-5DF7-11E1-8A36-E4E1348D162B"
           }
         }
       ],
@@ -134344,7 +142859,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795286288,
+          "instanceId": 3763188320,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -134425,6 +142940,11 @@ export const XP2SKybar = `
                 "z": -9.6823473683116E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -134600,7 +143120,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795286784,
+          "instanceId": 3763188816,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -134681,6 +143201,11 @@ export const XP2SKybar = `
                 "z": -1.0536306049858E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -134856,7 +143381,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795287280,
+          "instanceId": 3763189312,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -134937,6 +143462,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -135112,7 +143642,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795287776,
+          "instanceId": 3763189808,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -135193,6 +143723,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -135368,7 +143903,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795288272,
+          "instanceId": 3763190304,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -135449,6 +143984,11 @@ export const XP2SKybar = `
                 "z": 1.1332680571741E-8
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -135624,7 +144164,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795288768,
+          "instanceId": 3763190800,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -135705,6 +144245,11 @@ export const XP2SKybar = `
                 "z": -2.7145201642043E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -135880,7 +144425,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795289264,
+          "instanceId": 3763191296,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -135961,6 +144506,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9294033B-41CC-11E1-87E0-9235582E23D4"
           }
         }
       ],
@@ -136191,7 +144741,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -136250,7 +144857,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795289760,
+          "instanceId": 3763191792,
           "indexInBlueprint": 1,
           "typeName": "VisualEnvironmentEntity",
           "isSpatial": true,
@@ -136331,6 +144938,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1DAC7407-208C-42B5-BBFF-1B39290B5123"
           }
         }
       ],
@@ -136390,7 +145002,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -136447,7 +145116,64 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 3,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -136506,10 +145232,71 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946992256,
-          "indexInBlueprint": 5,
-          "typeName": "ClientSubLevelEntity",
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
           "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
         }
       ],
       "isDeleted": false,
@@ -136568,7 +145355,75 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -136627,7 +145482,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3795292592,
+          "instanceId": 3763194624,
           "indexInBlueprint": 1,
           "typeName": "VisualEnvironmentEntity",
           "isSpatial": true,
@@ -136708,6 +145563,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
           }
         }
       ],
@@ -136767,7 +145627,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -136826,7 +145843,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946503584,
+          "instanceId": 3946273856,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -136907,6 +145924,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -136968,7 +145990,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946503728,
+          "instanceId": 3946274000,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -137049,6 +146071,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -137110,7 +146137,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946503872,
+          "instanceId": 3946274144,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -137191,6 +146218,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -137252,7 +146284,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946504016,
+          "instanceId": 3946274288,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -137333,6 +146365,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -137394,7 +146431,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946504160,
+          "instanceId": 3946274432,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -137475,6 +146512,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -137536,7 +146578,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946504304,
+          "instanceId": 3946274576,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -137617,6 +146659,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -137678,7 +146725,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946504448,
+          "instanceId": 3946274720,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -137759,6 +146806,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "249B5AFB-06B5-11E0-A001-954E33DD9B0B"
           }
         }
       ],
@@ -137818,7 +146870,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -137875,7 +147084,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -137932,7 +147298,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -137989,7 +147512,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -138046,7 +147726,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -138103,7 +147940,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -138160,7 +148154,164 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3948772176,
+          "indexInBlueprint": 1,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3948772144,
+          "indexInBlueprint": 2,
+          "typeName": "EntityBusBridge",
+          "isSpatial": false
+        },
+        {
+          "instanceId": 3947024416,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E031587A-9C68-4A85-A05E-204F6C8122DA"
+          }
+        },
+        {
+          "instanceId": 3946266512,
+          "indexInBlueprint": 4,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "32EE6DEB-C16A-4DCE-B8E5-D4D28229643F"
+          }
+        },
+        {
+          "instanceId": 3946266368,
+          "indexInBlueprint": 5,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA82257F-E047-49AE-80E9-0FFFE346CF2E"
+          }
+        },
+        {
+          "instanceId": 3946266800,
+          "indexInBlueprint": 6,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA950D8D-DA85-40F0-9354-16D0033BF356"
+          }
+        },
+        {
+          "instanceId": 3946266944,
+          "indexInBlueprint": 7,
+          "typeName": "LensFlareEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LensFlareEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9135C24F-6A07-45F6-A7A9-CE06E3399F7C"
+          }
+        },
+        {
+          "instanceId": 3763194624,
+          "indexInBlueprint": 8,
+          "typeName": "VisualEnvironmentEntity",
+          "isSpatial": true,
+          "transform": {
+            "_rotation": {
+              "_x": 0,
+              "_y": 0,
+              "_z": 0,
+              "_w": 1
+            },
+            "_scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "left": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "up": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "forward": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "trans": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "aabb": {
+            "min": {
+              "x": -0.5,
+              "y": -0.5,
+              "z": -0.5
+            },
+            "max": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            },
+            "transform": {
+              "_rotation": {
+                "_x": 0,
+                "_y": 0,
+                "_z": 0,
+                "_w": 1
+              },
+              "_scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              },
+              "left": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              },
+              "up": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              },
+              "forward": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              },
+              "trans": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          "initiatorRef": {
+            "typeName": "VisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CF104034-D5F0-2BD5-2DA5-6467D4427916"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -138219,22 +148370,37 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946993120,
+          "instanceId": 3947025376,
           "indexInBlueprint": 1,
           "typeName": "ClientSubLevelEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "251192C0-9292-401D-B292-0757AFCFFDB3"
+          }
         },
         {
-          "instanceId": 3946993024,
+          "instanceId": 3947025280,
           "indexInBlueprint": 2,
           "typeName": "ClientSubLevelEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B0E1E6B7-77D9-4F59-BC9F-2BFE2C9B1DBB"
+          }
         },
         {
-          "instanceId": 3946993216,
+          "instanceId": 3947025184,
           "indexInBlueprint": 3,
           "typeName": "ClientSubLevelEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "511A5D17-3EEC-4FB3-8DBA-6B3C48407C33"
+          }
         }
       ],
       "isDeleted": false,
@@ -138293,7 +148459,41 @@ export const XP2SKybar = `
         }
       },
       "variation": 0,
-      "gameEntities": [],
+      "gameEntities": [
+        {
+          "instanceId": 3947025376,
+          "indexInBlueprint": 1,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "251192C0-9292-401D-B292-0757AFCFFDB3"
+          }
+        },
+        {
+          "instanceId": 3947025280,
+          "indexInBlueprint": 2,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B0E1E6B7-77D9-4F59-BC9F-2BFE2C9B1DBB"
+          }
+        },
+        {
+          "instanceId": 3947025184,
+          "indexInBlueprint": 3,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "511A5D17-3EEC-4FB3-8DBA-6B3C48407C33"
+          }
+        }
+      ],
       "isDeleted": false,
       "isEnabled": true,
       "isVanilla": true
@@ -138352,10 +148552,48 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946993312,
+          "instanceId": 3947025376,
+          "indexInBlueprint": 1,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "251192C0-9292-401D-B292-0757AFCFFDB3"
+          }
+        },
+        {
+          "instanceId": 3947025280,
+          "indexInBlueprint": 2,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B0E1E6B7-77D9-4F59-BC9F-2BFE2C9B1DBB"
+          }
+        },
+        {
+          "instanceId": 3947025184,
           "indexInBlueprint": 3,
           "typeName": "ClientSubLevelEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "511A5D17-3EEC-4FB3-8DBA-6B3C48407C33"
+          }
+        },
+        {
+          "instanceId": 3947025472,
+          "indexInBlueprint": 4,
+          "typeName": "ClientSubLevelEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SubWorldReferenceObjectData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1CD87850-8C17-402E-ADF7-505585EE2705"
+          }
         }
       ],
       "isDeleted": false,
@@ -138530,7 +148768,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3946504880,
+          "instanceId": 3946275152,
           "indexInBlueprint": 1,
           "typeName": "MeshProxyEntity",
           "isSpatial": true,
@@ -138611,6 +148849,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "MeshProxyEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "45C3BFCE-F3E8-475C-91B8-AE95061C2E57"
           }
         }
       ],
@@ -138672,7 +148915,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3843117712,
+          "instanceId": 3924677296,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -138753,6 +148996,11 @@ export const XP2SKybar = `
                 "z": 1.6373817857129E-9
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0AD6284A-9274-11E0-B66D-8C5A10A76E54"
           }
         }
       ],
@@ -138814,7 +149062,7 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3843118192,
+          "instanceId": 3924677792,
           "indexInBlueprint": 1,
           "typeName": "ClientStaticModelEntity",
           "isSpatial": true,
@@ -138895,6 +149143,11 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "StaticModelEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "36F339C5-C749-11E0-ABFA-BD1C98CDBFEF"
           }
         }
       ],
@@ -138956,26 +149209,52 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945677280,
+          "instanceId": 3945808352,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "ClientCameraEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CameraEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "528655FC-2653-4D5B-B55D-E6CBF997FC19"
+          }
         },
         {
-          "instanceId": 3945677216,
+          "instanceId": 3945808320,
           "indexInBlueprint": 2,
           "typeName": "ClientCameraEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CameraEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1A6A464C-F2C0-447B-BFA6-F79EEA9BAC57"
+          }
         },
         {
-          "instanceId": 3945677184,
+          "instanceId": 3945808480,
           "indexInBlueprint": 3,
-          "typeName": "ClientCameraEntity",
-          "isSpatial": false
+          "typeName": "CompareFloatEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareFloatEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5B65164C-A417-4661-B22E-61C8756475AD"
+          }
         },
         {
-          "instanceId": 3946066128,
+          "instanceId": 3945808416,
           "indexInBlueprint": 4,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "72DFCEC9-805B-42F6-B9B5-9B85D25C3734"
+          }
+        },
+        {
+          "instanceId": 3946197200,
+          "indexInBlueprint": 5,
           "typeName": "SpotLightEntity",
           "isSpatial": true,
           "transform": {
@@ -139055,13 +149334,12 @@ export const XP2SKybar = `
                 "z": 3.9086494445801
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "SpotLightEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B0AA64B2-3E52-460F-B971-27369BF613BD"
           }
-        },
-        {
-          "instanceId": 3945677344,
-          "indexInBlueprint": 5,
-          "typeName": "CompareFloatEntity",
-          "isSpatial": false
         }
       ],
       "isDeleted": false,
@@ -139122,46 +149400,76 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948715472,
+          "instanceId": 3945475968,
           "indexInBlueprint": 1,
+          "typeName": "ClientPlayerCameraEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "PlayerCameraEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DC3A15D4-7887-4B43-B326-500F49753CE4"
+          }
+        },
+        {
+          "instanceId": 3948781008,
+          "indexInBlueprint": 2,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945343616,
-          "indexInBlueprint": 2,
-          "typeName": "ClientPlayerCameraEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945677536,
+          "instanceId": 3945808608,
           "indexInBlueprint": 3,
-          "typeName": "EventGateEntity",
-          "isSpatial": false
+          "typeName": "ClientFadeEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B3E83182-483B-4E97-BC90-AB7E2813552A"
+          }
         },
         {
-          "instanceId": 3945677504,
+          "instanceId": 3945808448,
           "indexInBlueprint": 4,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7F6A8E45-B074-4467-AD05-AE68D2ABDC1D"
+          }
         },
         {
-          "instanceId": 3945677472,
+          "instanceId": 3945476096,
           "indexInBlueprint": 5,
-          "typeName": "ClientFadeEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945677312,
-          "indexInBlueprint": 6,
-          "typeName": "ClientFadeEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945343744,
-          "indexInBlueprint": 7,
           "typeName": "ClientPlayerCameraEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "PlayerCameraEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "19722A02-C921-4FCF-B9C7-BC0130A75C3F"
+          }
+        },
+        {
+          "instanceId": 3945808672,
+          "indexInBlueprint": 6,
+          "typeName": "EventGateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C5A15ED5-9540-488C-9173-34D6D99EB1B0"
+          }
+        },
+        {
+          "instanceId": 3945808640,
+          "indexInBlueprint": 7,
+          "typeName": "ClientFadeEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "2F6AA75F-25D8-44FA-BBE0-1A7A6A239FA2"
+          }
         }
       ],
       "isDeleted": false,
@@ -139222,40 +149530,70 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945599488,
+          "instanceId": 3945730560,
           "indexInBlueprint": 1,
           "typeName": "SequenceEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SequenceEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3D06D784-744C-4405-B271-E1544E248F4D"
+          }
         },
         {
-          "instanceId": 3945678048,
+          "instanceId": 3945809024,
           "indexInBlueprint": 2,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5EF93B2A-0025-49A6-A46D-DE1ECE16AED9"
+          }
         },
         {
-          "instanceId": 3945677888,
+          "instanceId": 3945808992,
           "indexInBlueprint": 3,
-          "typeName": "ClientFadeEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945677856,
-          "indexInBlueprint": 4,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "18044B74-7849-4DB9-9192-45A2BB8A2ED8"
+          }
         },
         {
-          "instanceId": 3945678112,
-          "indexInBlueprint": 5,
+          "instanceId": 3945809248,
+          "indexInBlueprint": 4,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "081D911A-0559-4F60-9BBE-FD845302A222"
+          }
         },
         {
-          "instanceId": 3945678080,
-          "indexInBlueprint": 6,
+          "instanceId": 3945809216,
+          "indexInBlueprint": 5,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE42B1AB-5B31-4219-805F-E0F496C5DA84"
+          }
+        },
+        {
+          "instanceId": 3945809184,
+          "indexInBlueprint": 6,
+          "typeName": "ClientFadeEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "89C2AC90-06B7-40F1-ABFE-480EA4987128"
+          }
         }
       ],
       "isDeleted": false,
@@ -139316,52 +149654,92 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945599680,
+          "instanceId": 3945730752,
           "indexInBlueprint": 1,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0047C675-053C-4D84-860E-661555D20D27"
+          }
         },
         {
-          "instanceId": 3945678304,
+          "instanceId": 3945730176,
           "indexInBlueprint": 2,
-          "typeName": "PlatformSplitterEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945678272,
-          "indexInBlueprint": 3,
-          "typeName": "SoundStateEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945678240,
-          "indexInBlueprint": 4,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945599104,
-          "indexInBlueprint": 5,
           "typeName": "SequenceEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SequenceEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5C57D80A-DC4F-485B-9EF8-E71CCFE71494"
+          }
         },
         {
-          "instanceId": 3945808720,
+          "instanceId": 3945809376,
+          "indexInBlueprint": 3,
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D0BE2EBB-FEF5-44B0-8D14-4E1F13159E37"
+          }
+        },
+        {
+          "instanceId": 3945809504,
+          "indexInBlueprint": 4,
+          "typeName": "ClientPlayerFilterEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "PlayerFilterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EA3ACFAE-8CD5-4F36-BE5B-3100E07744A7"
+          }
+        },
+        {
+          "instanceId": 3945809472,
+          "indexInBlueprint": 5,
+          "typeName": "ClientPlayerFilterEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "PlayerFilterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "03201936-95B7-4E73-AD63-7BB4C16CFCE3"
+          }
+        },
+        {
+          "instanceId": 3946169712,
           "indexInBlueprint": 6,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "14A062AE-1599-418F-AB8D-DBBF8477C38C"
+          }
         },
         {
-          "instanceId": 3945678368,
+          "instanceId": 3945809440,
           "indexInBlueprint": 7,
-          "typeName": "ClientPlayerFilterEntity",
-          "isSpatial": false
+          "typeName": "PlatformSplitterEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "PlatformSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3453B567-3F30-46D1-A8CE-F5298E93447C"
+          }
         },
         {
-          "instanceId": 3945678336,
+          "instanceId": 3945809408,
           "indexInBlueprint": 8,
-          "typeName": "ClientPlayerFilterEntity",
-          "isSpatial": false
+          "typeName": "SoundStateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundStateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C4B06128-1AB1-4D12-BA58-BEFFAD625EF9"
+          }
         }
       ],
       "isDeleted": false,
@@ -139422,13 +149800,13 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948715840,
+          "instanceId": 3948781376,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3948715808,
+          "instanceId": 3948781344,
           "indexInBlueprint": 2,
           "typeName": "EntityBusBridge",
           "isSpatial": false
@@ -139492,244 +149870,444 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945808912,
+          "instanceId": 3946169904,
           "indexInBlueprint": 1,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "072126AE-F782-4941-AF4B-39318FDBB033"
+          }
         },
         {
-          "instanceId": 3945809104,
+          "instanceId": 3946170096,
           "indexInBlueprint": 2,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1D116DBB-DFA6-48CA-BA42-8ECA16EDE8B0"
+          }
         },
         {
-          "instanceId": 3945809056,
+          "instanceId": 3946170048,
           "indexInBlueprint": 3,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B68A432B-A6B7-4307-9BBE-8944E7B6AC64"
+          }
         },
         {
-          "instanceId": 3945808960,
+          "instanceId": 3946169952,
           "indexInBlueprint": 4,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9768E966-8D3B-49AA-ACF6-E7795B5DF142"
+          }
         },
         {
-          "instanceId": 3945809392,
+          "instanceId": 3946170144,
           "indexInBlueprint": 5,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "99241085-D232-485F-8E6E-307A9C105931"
+          }
         },
         {
-          "instanceId": 3945680832,
+          "instanceId": 3946170336,
           "indexInBlueprint": 6,
-          "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "typeName": "VoiceOverEventEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3AE325B3-C775-4022-95A4-F7F6F48050E8"
+          }
         },
         {
-          "instanceId": 3945680768,
+          "instanceId": 3945812192,
           "indexInBlueprint": 7,
           "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B3907B9D-A7F5-4266-819D-36DF5FECAB79"
+          }
         },
         {
-          "instanceId": 3945680704,
+          "instanceId": 3945812064,
           "indexInBlueprint": 8,
           "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "90989F00-E301-4CBE-BEE4-5C6CD867A87C"
+          }
         },
         {
-          "instanceId": 3945809152,
+          "instanceId": 3946170288,
           "indexInBlueprint": 9,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "04101F48-2E9D-4DF7-9702-4A4C0A930CB9"
+          }
         },
         {
-          "instanceId": 3945809344,
+          "instanceId": 3946170576,
           "indexInBlueprint": 10,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "21ABEA53-BA18-4006-8601-D8395C73F014"
+          }
         },
         {
-          "instanceId": 3945809296,
+          "instanceId": 3946170384,
           "indexInBlueprint": 11,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "F0ECC63A-89B8-4BE0-9C72-FD540BA359D7"
+          }
         },
         {
-          "instanceId": 3945809632,
+          "instanceId": 3945811904,
           "indexInBlueprint": 12,
-          "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "typeName": "CompareIntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FF077C71-2551-443A-800A-605CC66EA438"
+          }
         },
         {
-          "instanceId": 3945809440,
+          "instanceId": 3945811840,
           "indexInBlueprint": 13,
-          "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "typeName": "CompareIntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "85FAC404-E5F6-4EFB-9944-EAE4D78FFEE6"
+          }
         },
         {
-          "instanceId": 3945809488,
+          "instanceId": 3946170432,
           "indexInBlueprint": 14,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE825864-9FF1-48AF-B1E7-26105850D711"
+          }
         },
         {
-          "instanceId": 3945809536,
+          "instanceId": 3946170480,
           "indexInBlueprint": 15,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C2009AF9-4B3D-4A00-A4A6-B5AFABE5F028"
+          }
         },
         {
-          "instanceId": 3945809584,
+          "instanceId": 3945811872,
           "indexInBlueprint": 16,
-          "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "typeName": "CompareIntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "53110D78-DBD3-4E69-9E6C-2A7AC8598E11"
+          }
         },
         {
-          "instanceId": 3945809872,
+          "instanceId": 3945811808,
           "indexInBlueprint": 17,
-          "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "typeName": "CompareIntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "49A96511-6C00-45DA-AEE2-0122D8B7EA0D"
+          }
         },
         {
-          "instanceId": 3945809680,
+          "instanceId": 3946170528,
           "indexInBlueprint": 18,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FCAAC435-7C69-4FE9-8B4F-21A373D6197C"
+          }
         },
         {
-          "instanceId": 3945809776,
+          "instanceId": 3946170816,
           "indexInBlueprint": 19,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "82E18EF8-D3C9-4E70-A7BC-CC85CDA51210"
+          }
         },
         {
-          "instanceId": 3945809824,
+          "instanceId": 3946170624,
           "indexInBlueprint": 20,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "08C04294-B4AC-4DB5-9FB1-4BAC513B8EE6"
+          }
         },
         {
-          "instanceId": 3945809920,
+          "instanceId": 3946170864,
           "indexInBlueprint": 21,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "649E130B-026A-4EA6-8278-54E897B4AB8B"
+          }
         },
         {
-          "instanceId": 3945810160,
+          "instanceId": 3946170672,
           "indexInBlueprint": 22,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7BAC11B7-A7B1-44A7-92B8-A36C26976710"
+          }
         },
         {
-          "instanceId": 3945809968,
+          "instanceId": 3946170768,
           "indexInBlueprint": 23,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "41D8C3DB-C2DA-4157-BE98-5CD48A384AD7"
+          }
         },
         {
-          "instanceId": 3945810016,
+          "instanceId": 3945812256,
           "indexInBlueprint": 24,
-          "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "typeName": "CompareIntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "61F85A2D-01AA-4631-A3A9-1B95C16469B7"
+          }
         },
         {
-          "instanceId": 3945810064,
+          "instanceId": 3946170912,
           "indexInBlueprint": 25,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9CF32D2E-A69B-479C-A902-D0E126948E5F"
+          }
         },
         {
-          "instanceId": 3945810400,
+          "instanceId": 3946170960,
           "indexInBlueprint": 26,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E5BB9528-C97C-4A95-8F80-6EF91109F744"
+          }
         },
         {
-          "instanceId": 3945810208,
+          "instanceId": 3945812224,
           "indexInBlueprint": 27,
-          "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "typeName": "CompareIntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE81E30E-6C19-4792-A420-3C6DF91A696F"
+          }
         },
         {
-          "instanceId": 3945810256,
+          "instanceId": 3946171008,
           "indexInBlueprint": 28,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D8DFC500-BFD9-41E5-A388-B191C917EEE3"
+          }
         },
         {
-          "instanceId": 3945810304,
+          "instanceId": 3946171056,
           "indexInBlueprint": 29,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E792B558-7687-446F-AC0B-E3E87FAD5D04"
+          }
         },
         {
-          "instanceId": 3945680736,
+          "instanceId": 3946171344,
           "indexInBlueprint": 30,
-          "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "typeName": "VoiceOverEventEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "28BA8018-F234-4E73-823A-E6934035DF35"
+          }
         },
         {
-          "instanceId": 3945680672,
+          "instanceId": 3946171152,
           "indexInBlueprint": 31,
-          "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "typeName": "VoiceOverEventEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "8850D8DF-E0B2-40D0-B164-57A39D0BFB25"
+          }
         },
         {
-          "instanceId": 3945809728,
+          "instanceId": 3946171200,
           "indexInBlueprint": 32,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "F9EB3737-0C86-4C3C-A7E7-57645105225D"
+          }
         },
         {
-          "instanceId": 3945810352,
+          "instanceId": 3946171248,
           "indexInBlueprint": 33,
           "typeName": "VoiceOverEventEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BB344F17-F783-4CB7-8837-151F99D22B56"
+          }
         },
         {
-          "instanceId": 3945681088,
+          "instanceId": 3946171296,
           "indexInBlueprint": 34,
-          "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "typeName": "VoiceOverEventEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0F6A75BE-FAEA-4EEA-9ED8-A37326015364"
+          }
         },
         {
-          "instanceId": 3945681024,
+          "instanceId": 3946170720,
           "indexInBlueprint": 35,
-          "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "typeName": "VoiceOverEventEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C7D38E47-657A-49B0-9325-C79E951E6AE3"
+          }
         },
         {
-          "instanceId": 3945680960,
+          "instanceId": 3945812160,
           "indexInBlueprint": 36,
           "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "301AD366-9288-41D7-B3A5-D8098158891D"
+          }
         },
         {
-          "instanceId": 3945680896,
+          "instanceId": 3945812096,
           "indexInBlueprint": 37,
           "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A58F0650-F1CC-48C4-A547-7B0848703496"
+          }
         },
         {
-          "instanceId": 3945681120,
+          "instanceId": 3945812032,
           "indexInBlueprint": 38,
           "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "2BF1C244-E294-46B2-A336-C9B6E82A7D5B"
+          }
         },
         {
-          "instanceId": 3945681056,
+          "instanceId": 3945811968,
           "indexInBlueprint": 39,
           "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareIntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "85D2E1E4-58A8-430E-9771-5C5852D823FF"
+          }
         },
         {
-          "instanceId": 3945680928,
+          "instanceId": 3946171392,
           "indexInBlueprint": 40,
-          "typeName": "CompareIntEntity",
-          "isSpatial": false
+          "typeName": "VoiceOverEventEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "VoiceOverEventEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "F981AF95-CE96-4053-A4D0-02B768CB1A57"
+          }
         }
       ],
       "isDeleted": false,
@@ -139847,31 +150425,51 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945681568,
+          "instanceId": 3945812704,
           "indexInBlueprint": 1,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "93FD8048-687D-4D94-BBEF-26774291CEB9"
+          }
         },
         {
-          "instanceId": 3945681632,
+          "instanceId": 3945812672,
           "indexInBlueprint": 2,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681536,
-          "indexInBlueprint": 3,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D4B260AF-66E0-4618-8365-2C0966EB0729"
+          }
         },
         {
-          "instanceId": 3945681600,
+          "instanceId": 3945809056,
+          "indexInBlueprint": 3,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E59FEE5A-2714-44A1-9CB5-3E98F1E7FDF7"
+          }
+        },
+        {
+          "instanceId": 3945813024,
           "indexInBlueprint": 4,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "SoundStateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundStateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "759E94AC-4079-46B8-BECA-0F783E866EBD"
+          }
         },
         {
-          "instanceId": 3910838176,
+          "instanceId": 3760149152,
           "indexInBlueprint": 5,
           "typeName": "ClientUIEndOfRoundEntity",
           "isSpatial": true,
@@ -139952,55 +150550,100 @@ export const XP2SKybar = `
                 "z": 0
               }
             }
+          },
+          "initiatorRef": {
+            "typeName": "UIEndOfRoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E8F2B62A-5214-4F26-98F9-C64EA35210E4"
           }
         },
         {
-          "instanceId": 3945677920,
+          "instanceId": 3945812928,
           "indexInBlueprint": 6,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "typeName": "BoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "BoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CE1AC41B-679A-499E-AC5F-87A177A11F73"
+          }
         },
         {
-          "instanceId": 3945681856,
+          "instanceId": 3945812736,
           "indexInBlueprint": 7,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681792,
-          "indexInBlueprint": 8,
-          "typeName": "BoolEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681728,
-          "indexInBlueprint": 9,
-          "typeName": "CompareBoolEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681888,
-          "indexInBlueprint": 10,
-          "typeName": "SoundStateEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681824,
-          "indexInBlueprint": 11,
-          "typeName": "BoolEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681696,
-          "indexInBlueprint": 12,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D489A728-E711-4939-B871-946FD1D8B9F8"
+          }
         },
         {
-          "instanceId": 3945681984,
-          "indexInBlueprint": 13,
+          "instanceId": 3945812864,
+          "indexInBlueprint": 8,
+          "typeName": "CompareBoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareBoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "AE6942BD-3A3E-4BEA-91EC-25A0BB9B5DAC"
+          }
+        },
+        {
+          "instanceId": 3945812960,
+          "indexInBlueprint": 9,
+          "typeName": "BoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "BoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6E4211C0-F1B6-49AE-A4B8-EE93EA12E632"
+          }
+        },
+        {
+          "instanceId": 3945812768,
+          "indexInBlueprint": 10,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "486762BE-F6D7-4B89-8753-CE97702CC312"
+          }
+        },
+        {
+          "instanceId": 3945812832,
+          "indexInBlueprint": 11,
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D5C85606-C278-4C8E-ABFC-35EE93C5E5FE"
+          }
+        },
+        {
+          "instanceId": 3945813120,
+          "indexInBlueprint": 12,
           "typeName": "EventGateEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "8348B2E4-434F-4BED-A8F1-75B662986E47"
+          }
+        },
+        {
+          "instanceId": 3945812992,
+          "indexInBlueprint": 13,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "2FE68AB4-999F-42D8-BF17-92058CAEB65B"
+          }
         }
       ],
       "isDeleted": false,
@@ -140061,46 +150704,81 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945682400,
+          "instanceId": 3945813472,
           "indexInBlueprint": 1,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "typeName": "DelayEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "2C423F78-0D73-4394-BC60-4BED30F998F3"
+          }
         },
         {
-          "instanceId": 3945682336,
+          "instanceId": 3945813376,
           "indexInBlueprint": 2,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6137EE08-C204-4B4D-89E2-39C9A78C792C"
+          }
         },
         {
-          "instanceId": 3945682240,
+          "instanceId": 3945813344,
           "indexInBlueprint": 3,
-          "typeName": "DelayEntity",
-          "isSpatial": false
+          "typeName": "EventGateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0B65B60C-CD0D-4C89-9E1E-2CC535D36D18"
+          }
         },
         {
-          "instanceId": 3945682208,
+          "instanceId": 3945813312,
           "indexInBlueprint": 4,
           "typeName": "EventGateEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4E7DD6FE-C32F-4835-AD2F-184740AFFE52"
+          }
         },
         {
-          "instanceId": 3945682176,
+          "instanceId": 3945813600,
           "indexInBlueprint": 5,
-          "typeName": "EventGateEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945682464,
-          "indexInBlueprint": 6,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E66232D5-C591-4444-BFE3-5D507AE6A615"
+          }
         },
         {
-          "instanceId": 3945682432,
-          "indexInBlueprint": 7,
+          "instanceId": 3945813568,
+          "indexInBlueprint": 6,
           "typeName": "EventSplitterEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "61A6810E-C05D-4FAB-9C9C-C4DFB8A1DA7D"
+          }
+        },
+        {
+          "instanceId": 3945813536,
+          "indexInBlueprint": 7,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "02611C3B-7513-4238-899B-8CEF62A611BB"
+          }
         }
       ],
       "isDeleted": false,
@@ -140161,22 +150839,37 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945682816,
+          "instanceId": 3945731648,
           "indexInBlueprint": 1,
-          "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "typeName": "SequenceEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SequenceEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "88B82033-4E34-46B3-AE14-2E50CF1C8300"
+          }
         },
         {
-          "instanceId": 3945600576,
+          "instanceId": 3945731584,
           "indexInBlueprint": 2,
           "typeName": "SequenceEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SequenceEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D193C7DB-CFE9-41FA-8112-6FE0BD08D59C"
+          }
         },
         {
-          "instanceId": 3945600512,
+          "instanceId": 3945813952,
           "indexInBlueprint": 3,
-          "typeName": "SequenceEntity",
-          "isSpatial": false
+          "typeName": "LogicVisualEnvironmentEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A17FCE78-E904-4833-98F8-50BE77EFCC41"
+          }
         }
       ],
       "isDeleted": false,
@@ -140237,27 +150930,42 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948717056,
+          "instanceId": 3945813984,
           "indexInBlueprint": 1,
-          "typeName": "EntityBusBridge",
-          "isSpatial": false
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "EDF20470-4AD7-44BC-96E1-9DF61989BE58"
+          }
         },
         {
-          "instanceId": 3945682656,
+          "instanceId": 3945813792,
           "indexInBlueprint": 2,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B9437F95-2EBC-4F22-A5F6-F4D0F1331A5E"
+          }
         },
         {
-          "instanceId": 3945682624,
+          "instanceId": 3945813760,
           "indexInBlueprint": 3,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4EFAFFC5-F2BA-4DD2-A5AB-EBAE267E5AD8"
+          }
         },
         {
-          "instanceId": 3945682848,
+          "instanceId": 3948782592,
           "indexInBlueprint": 4,
-          "typeName": "ClientUIGraphEntity",
+          "typeName": "EntityBusBridge",
           "isSpatial": false
         }
       ],
@@ -140319,22 +151027,37 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945600896,
+          "instanceId": 3945731968,
           "indexInBlueprint": 1,
           "typeName": "SequenceEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SequenceEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "88B82033-4E34-46B3-AE14-2E50CF1C8300"
+          }
         },
         {
-          "instanceId": 3945600832,
+          "instanceId": 3945731904,
           "indexInBlueprint": 2,
           "typeName": "SequenceEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SequenceEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "D193C7DB-CFE9-41FA-8112-6FE0BD08D59C"
+          }
         },
         {
-          "instanceId": 3945683104,
+          "instanceId": 3945814240,
           "indexInBlueprint": 3,
           "typeName": "LogicVisualEnvironmentEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "LogicVisualEnvironmentEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A17FCE78-E904-4833-98F8-50BE77EFCC41"
+          }
         }
       ],
       "isDeleted": false,
@@ -140395,88 +151118,153 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945682912,
+          "instanceId": 3945814048,
           "indexInBlueprint": 1,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "31DAEA00-29DD-4524-9E90-5BB82037749F"
+          }
         },
         {
-          "instanceId": 3945682976,
+          "instanceId": 3945814112,
           "indexInBlueprint": 2,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B4CA31B8-195C-423F-8738-DBF7100AABC5"
+          }
         },
         {
-          "instanceId": 3945683040,
+          "instanceId": 3945814176,
           "indexInBlueprint": 3,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "DAABC826-2ED1-4CE4-8C01-E9E996798532"
+          }
         },
         {
-          "instanceId": 3945683168,
+          "instanceId": 3945814080,
           "indexInBlueprint": 4,
-          "typeName": "EventSplitterEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945682944,
-          "indexInBlueprint": 5,
           "typeName": "PlatformSplitterEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "PlatformSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "8D22B504-1A8F-41A3-8E5F-324787BB7222"
+          }
         },
         {
-          "instanceId": 3945683008,
-          "indexInBlueprint": 6,
+          "instanceId": 3945814144,
+          "indexInBlueprint": 5,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BD3E4E58-D737-4FE1-A222-5842C0FE5D27"
+          }
         },
         {
-          "instanceId": 3948717168,
-          "indexInBlueprint": 7,
+          "instanceId": 3948782704,
+          "indexInBlueprint": 6,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945683392,
+          "instanceId": 3945814464,
+          "indexInBlueprint": 7,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "5C1E9F44-EE8D-41AC-A7C6-A1B6F304451A"
+          }
+        },
+        {
+          "instanceId": 3945814400,
           "indexInBlueprint": 8,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945683328,
-          "indexInBlueprint": 9,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945683264,
-          "indexInBlueprint": 10,
           "typeName": "EventSplitterEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9A1D7438-C65B-4318-92CC-2A1E9EBE5114"
+          }
         },
         {
-          "instanceId": 3945683200,
+          "instanceId": 3945814336,
+          "indexInBlueprint": 9,
+          "typeName": "EventSplitterEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "2DD06331-7987-4683-A50E-4079C9678CAE"
+          }
+        },
+        {
+          "instanceId": 3945814496,
+          "indexInBlueprint": 10,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E85314DD-78E2-4BF0-BA03-92FA22E82207"
+          }
+        },
+        {
+          "instanceId": 3945814368,
           "indexInBlueprint": 11,
           "typeName": "EventSplitterEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B80A8705-B044-4E85-97F5-2E57C2CA4A87"
+          }
         },
         {
-          "instanceId": 3945683424,
+          "instanceId": 3945814304,
           "indexInBlueprint": 12,
           "typeName": "EventSplitterEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "40B4DFDE-6AAD-485F-8ADB-8DCFCBD6E117"
+          }
         },
         {
-          "instanceId": 3945683360,
+          "instanceId": 3945814528,
           "indexInBlueprint": 13,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9E2ACE64-715B-4E92-8377-C98E6399F893"
+          }
         },
         {
-          "instanceId": 3945683232,
+          "instanceId": 3945814560,
           "indexInBlueprint": 14,
           "typeName": "EventSplitterEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "55015963-4123-4004-BE61-9D5C04553DEF"
+          }
         }
       ],
       "isDeleted": false,
@@ -140537,58 +151325,103 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945683616,
+          "instanceId": 3945814752,
           "indexInBlueprint": 1,
           "typeName": "CompareBoolEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareBoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "3AC32741-F450-43C4-BAD2-42B3E9D83A89"
+          }
         },
         {
-          "instanceId": 3945683680,
+          "instanceId": 3945814816,
           "indexInBlueprint": 2,
           "typeName": "CompareBoolEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareBoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7BE77206-DF8C-4B17-9B40-3350852F99C4"
+          }
         },
         {
-          "instanceId": 3945683648,
+          "instanceId": 3945814944,
           "indexInBlueprint": 3,
-          "typeName": "CompareBoolEntity",
-          "isSpatial": false
+          "typeName": "BoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "BoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "503E579B-7749-40F8-A100-0B265734D77B"
+          }
         },
         {
-          "instanceId": 3945683936,
+          "instanceId": 3945815008,
           "indexInBlueprint": 4,
-          "typeName": "EventGateEntity",
-          "isSpatial": false
+          "typeName": "BoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "BoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "311F11CE-4CAA-4480-8F79-257FB209D7FF"
+          }
         },
         {
-          "instanceId": 3945683808,
+          "instanceId": 3945814784,
           "indexInBlueprint": 5,
-          "typeName": "BoolEntity",
-          "isSpatial": false
+          "typeName": "CompareBoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "CompareBoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E75B1C1C-2D5E-4EA3-B818-E245AE9EE081"
+          }
         },
         {
-          "instanceId": 3945683872,
+          "instanceId": 3945814848,
           "indexInBlueprint": 6,
-          "typeName": "BoolEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945683712,
-          "indexInBlueprint": 7,
           "typeName": "EventGateEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "B2274662-C6A8-4BCE-9717-A6CDF35CC1DF"
+          }
         },
         {
-          "instanceId": 3945683776,
-          "indexInBlueprint": 8,
+          "instanceId": 3945814912,
+          "indexInBlueprint": 7,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1BCF0FA9-287C-4991-ADCD-E78B104A2031"
+          }
         },
         {
-          "instanceId": 3945683840,
-          "indexInBlueprint": 9,
+          "instanceId": 3945814976,
+          "indexInBlueprint": 8,
           "typeName": "BoolEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "BoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A3461B2A-235C-44CD-8206-BF2298181C91"
+          }
+        },
+        {
+          "instanceId": 3945815072,
+          "indexInBlueprint": 9,
+          "typeName": "EventGateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "4B24E053-094B-4AF2-A1A6-E4488CEC386B"
+          }
         }
       ],
       "isDeleted": false,
@@ -140649,130 +151482,210 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945681312,
+          "instanceId": 3945812448,
           "indexInBlueprint": 1,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "F57E6ED5-9CA3-49F9-B374-158EB8021F72"
+          }
         },
         {
-          "instanceId": 3945681376,
+          "instanceId": 3945812512,
           "indexInBlueprint": 2,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "31C52EE8-E880-4C83-AB98-326B8BCAC91A"
+          }
         },
         {
-          "instanceId": 3948716912,
+          "instanceId": 3948782448,
           "indexInBlueprint": 3,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3948716976,
+          "instanceId": 3948782512,
           "indexInBlueprint": 4,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945684224,
+          "instanceId": 3945815232,
           "indexInBlueprint": 5,
-          "typeName": "EventGateEntity",
-          "isSpatial": false
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "6D64CD68-CD5D-463D-8184-FF7A2D031F64"
+          }
         },
         {
-          "instanceId": 3948716960,
+          "instanceId": 3945815168,
           "indexInBlueprint": 6,
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C01C125B-CEF1-4C88-80CF-428280E96FC5"
+          }
+        },
+        {
+          "instanceId": 3945815104,
+          "indexInBlueprint": 7,
+          "typeName": "SoundStateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundStateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C75E0F55-DC7D-4A46-B638-524E570340C3"
+          }
+        },
+        {
+          "instanceId": 3948782496,
+          "indexInBlueprint": 8,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945682016,
-          "indexInBlueprint": 7,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945681664,
-          "indexInBlueprint": 8,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945682496,
+          "instanceId": 3945813152,
           "indexInBlueprint": 9,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "A5B6F1F4-CFC0-498B-B4AC-3044F573C460"
+          }
         },
         {
-          "instanceId": 3948717104,
+          "instanceId": 3945812800,
           "indexInBlueprint": 10,
-          "typeName": "EntityBusBridge",
-          "isSpatial": false
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "0A417135-65B7-4A06-A3F7-EC3D16DE300F"
+          }
         },
         {
-          "instanceId": 3945683456,
+          "instanceId": 3945813632,
           "indexInBlueprint": 11,
-          "typeName": "EventSplitterEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945683488,
-          "indexInBlueprint": 12,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "43000DA7-61D6-4F78-975A-72E8A62AE296"
+          }
         },
         {
-          "instanceId": 3948717216,
-          "indexInBlueprint": 13,
+          "instanceId": 3948782640,
+          "indexInBlueprint": 12,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945684160,
+          "instanceId": 3945814592,
+          "indexInBlueprint": 13,
+          "typeName": "EventSplitterEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventSplitterEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "C81C6F10-8499-4B6C-81FF-18C0781D456A"
+          }
+        },
+        {
+          "instanceId": 3945814624,
           "indexInBlueprint": 14,
-          "typeName": "EventGateEntity",
-          "isSpatial": false
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "BE8A9229-0600-4D1C-81FA-EDB505DAD60A"
+          }
         },
         {
-          "instanceId": 3945684096,
+          "instanceId": 3948782752,
           "indexInBlueprint": 15,
-          "typeName": "ClientUIGraphEntity",
+          "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945684032,
+          "instanceId": 3945815264,
           "indexInBlueprint": 16,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "typeName": "EventGateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "16C267B3-1D9C-47B0-A732-9571E310DC29"
+          }
         },
         {
-          "instanceId": 3945683968,
+          "instanceId": 3945815200,
           "indexInBlueprint": 17,
-          "typeName": "SoundStateEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945684192,
-          "indexInBlueprint": 18,
           "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "05F406DB-2D1E-4B18-959F-C29878B1DEEC"
+          }
         },
         {
-          "instanceId": 3945684128,
+          "instanceId": 3945815136,
+          "indexInBlueprint": 18,
+          "typeName": "SoundStateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundStateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E6B4AC5B-C492-435C-BFBB-9571C949179A"
+          }
+        },
+        {
+          "instanceId": 3945815360,
           "indexInBlueprint": 19,
           "typeName": "EventGateEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "726CFFAE-D386-4399-808E-7F4D0BEC2AF5"
+          }
         },
         {
-          "instanceId": 3945684064,
+          "instanceId": 3945815296,
           "indexInBlueprint": 20,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
+          "typeName": "EventGateEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "94798D71-F368-4372-901B-D8644AB3F249"
+          }
         },
         {
-          "instanceId": 3945684000,
+          "instanceId": 3945815328,
           "indexInBlueprint": 21,
-          "typeName": "SoundStateEntity",
-          "isSpatial": false
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "385BA923-FB1B-4E64-AF11-9F5569FD31E0"
+          }
         }
       ],
       "isDeleted": false,
@@ -140833,22 +151746,37 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945682304,
+          "instanceId": 3945813440,
           "indexInBlueprint": 1,
           "typeName": "EventGateEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E8D29BAC-D3B9-47B8-81BC-6D9C7DA1571F"
+          }
         },
         {
-          "instanceId": 3945682272,
+          "instanceId": 3945813408,
           "indexInBlueprint": 2,
           "typeName": "EventGateEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "EventGateEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "1C235286-37BF-4031-BC3B-2EA8B15548B5"
+          }
         },
         {
-          "instanceId": 3945684608,
+          "instanceId": 3945815744,
           "indexInBlueprint": 3,
           "typeName": "DelayEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "DelayEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "73C933C3-8EC2-4FBC-A84B-1BEBDE3405BF"
+          }
         }
       ],
       "isDeleted": false,
@@ -140909,10 +151837,15 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3945601408,
+          "instanceId": 3945732480,
           "indexInBlueprint": 1,
           "typeName": "SoundEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "SoundEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FF711687-2185-486C-93ED-D170FC6FECAF"
+          }
         }
       ],
       "isDeleted": false,
@@ -140973,58 +151906,83 @@ export const XP2SKybar = `
       "variation": 0,
       "gameEntities": [
         {
-          "instanceId": 3948717312,
+          "instanceId": 3948782848,
           "indexInBlueprint": 1,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3948715360,
+          "instanceId": 3948780896,
           "indexInBlueprint": 2,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3948715728,
+          "instanceId": 3945815392,
           "indexInBlueprint": 3,
+          "typeName": "BoolEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "BoolEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "7DF0B0A0-21BA-4916-820F-FC7D79A1E621"
+          }
+        },
+        {
+          "instanceId": 3945815456,
+          "indexInBlueprint": 4,
+          "typeName": "IntEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "IntEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "9D5D46B2-F9DB-4EE5-8B89-76BADEEC2D95"
+          }
+        },
+        {
+          "instanceId": 3948781264,
+          "indexInBlueprint": 5,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945681184,
-          "indexInBlueprint": 4,
-          "typeName": "ClientUIGraphEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945684256,
-          "indexInBlueprint": 5,
-          "typeName": "BoolEntity",
-          "isSpatial": false
-        },
-        {
-          "instanceId": 3945684320,
+          "instanceId": 3945812320,
           "indexInBlueprint": 6,
-          "typeName": "IntEntity",
-          "isSpatial": false
+          "typeName": "ClientUIGraphEntity",
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "UIGraphEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "CDCDCC3B-CA79-4DB3-8351-40AAA606ED16"
+          }
         },
         {
-          "instanceId": 3948716848,
+          "instanceId": 3948782384,
           "indexInBlueprint": 7,
           "typeName": "EntityBusBridge",
           "isSpatial": false
         },
         {
-          "instanceId": 3945684672,
+          "instanceId": 3945815808,
           "indexInBlueprint": 8,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "FBC6449C-2F01-4493-9E7A-D18D74503B8B"
+          }
         },
         {
-          "instanceId": 3945684704,
+          "instanceId": 3945815840,
           "indexInBlueprint": 9,
           "typeName": "ClientFadeEntity",
-          "isSpatial": false
+          "isSpatial": false,
+          "initiatorRef": {
+            "typeName": "FadeEntityData",
+            "partitionGuid": "00000000-0000-0000-0000-000000000000",
+            "instanceGuid": "E5ED3C84-B9E2-4A79-A50F-3F2F0DC85D93"
+          }
         }
       ],
       "isDeleted": false,

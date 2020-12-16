@@ -12,6 +12,9 @@ import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
+import Instance from '@/script/types/ebx/Instance';
+import Partition from '@/script/types/ebx/Partition';
+import { FBPartition } from '@/script/types/gameData/FBPartition';
 
 /*
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -32,6 +35,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	private _enabled: boolean = true;
 	private _raycastEnabled: boolean = true;
 	public parent: GameObject;
+	public instance: Instance;
 
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
@@ -57,6 +61,16 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 		this.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
 		this.layers.disable(RAYCAST_LAYER.GAMEENTITY);
+	}
+
+	public get partition(): Promise<FBPartition> | null {
+		const partition = window.editor.fbdMan.getPartitionByName(this.blueprintCtrRef.name);
+		if (!partition) {
+			return null;
+		}
+		return partition.data.then((res) => {
+			return partition;
+		});
 	}
 
 	public static CreateWithTransferData(gameObjectTransferData: GameObjectTransferData) {
@@ -226,6 +240,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.selected = true;
 		this.visible = true;
 		this.makeParentsVisible();
+
 		this.children.forEach(go => (go as GameObject).onSelect());
 	}
 
