@@ -20,6 +20,7 @@ import QuatControl from '@/script/components/controls/QuatControl.vue';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { Quat } from '@/script/types/primitives/Quat';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { Matrix4 } from 'three';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
 export default class LinearTransformControl extends Vue {
@@ -28,6 +29,9 @@ export default class LinearTransformControl extends Vue {
 
 	@Prop({ default: false })
 	hideLabel: boolean;
+
+	@Prop({ default: null })
+	parentTransform: LinearTransform;
 
 	onChangePosition(newPos: Vec3) {
 		const newVal = this.value.clone();
@@ -46,7 +50,6 @@ export default class LinearTransformControl extends Vue {
 	onChangeRotation(newRotation: Quat) {
 		const newVal = this.value.clone();
 		newVal.rotation = newRotation;
-
 		this.$emit('input', newVal);
 	}
 }

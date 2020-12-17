@@ -1,6 +1,6 @@
 <template>
 	<EditorComponent class="inspector-component" title="Inspector">
-		<div v-if="!isEmpty" class="scrollable">
+		<div class="scrollable">
 			<div v-if="!multiSelection" class="bpInfo" :class="{collapsed: toggleState.info}">
 				<div @click="toggleState.info = !toggleState.info">
 					<i :class="{'el-icon-arrow-right': toggleState.info, 'el-icon-arrow-down': !toggleState.info}"></i>Info
@@ -18,20 +18,24 @@
 					<img :class="'Large Icon Icon-' + objectType"/>
 					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 				</div>
-				<div>
-					<input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
+				<div id="NameAndVariation">
+					<div id="Name">
+						<input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
+					</div>
+					<div id="Variation" class="container variation" v-if="!multiSelection">
+						<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
+							<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name ? variation.name : 'Default variation'" :value="variation.hash"/>
+						</el-select>
+					</div>
 				</div>
 			</div>
 			<div class="container transform-container">
-
-				<linear-transform-control class="lt-control" :hideLabel="false"
-										:value="transform"
-										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @blur="onEndDrag"/>
-			</div>
-			<div class="container variation" v-if="!multiSelection">
-				<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
-					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
-				</el-select>
+				<template v-if="worldSpace === 'local'">
+					<linear-transform-control class="lt-control" :hideLabel="false" :value="localTransform" @input="onLocalInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @blur="onEndDrag"/>
+				</template>
+				<template v-else>
+					<linear-transform-control class="lt-control" :hideLabel="false" :value="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @blur="onEndDrag"/>
+				</template>
 			</div>
 			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
 				<Promised :promise="partition">
@@ -43,7 +47,7 @@
 							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
 						</div>
 						<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
-							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" v-for="(instance, index) of data.primaryInstance.fields.objects.value" :key="index" :autoOpen="false" :currentPath="data.name" :field="instance" :instance="instance" :reference="instance.value" :partition="data"></reference-property>
+							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" v-for="(instance, index) of data.primaryInstance.fields.objects.value" :key="index" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="instance" :instance="instance" :reference="instance.value" :partition="data"></reference-property>
 						</div>
 					</template>
 					<template v-slot:rejected="error">
@@ -73,6 +77,7 @@ import ArrayProperty from './EBXComponents/ArrayProperty.vue';
 import ReferenceProperty from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceProperty.vue';
 import { Promised } from 'vue-promised';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { WORLD_SPACE } from '@/script/types/Enums';
 
 @Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty, ReferenceProperty, Promised } })
 export default class InspectorComponent extends EditorComponent {
@@ -97,9 +102,9 @@ export default class InspectorComponent extends EditorComponent {
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
 	private partition: any;
-	private childCount: number;
-
+	private worldSpace: WORLD_SPACE = WORLD_SPACE.world;
 	private transform: LinearTransform = new LinearTransform();
+	private localTransform: LinearTransform = new LinearTransform();
 
 	private toggleState = {
 		info: true
@@ -118,6 +123,11 @@ export default class InspectorComponent extends EditorComponent {
 		signals.selectedGameObject.connect(this.onSelection.bind(this));
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
+		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
+	}
+
+	private onWorldSpaceUpdated(ws: WORLD_SPACE) {
+		this.worldSpace = ws;
 	}
 
 	private onObjectChanged(gameObject: GameObject, field: string, value: any) {
@@ -142,7 +152,6 @@ export default class InspectorComponent extends EditorComponent {
 		console.log(a, b, c);
 	}
 
-	// Why is this called twice?
 	private onInput(newTrans: LinearTransform) {
 		const group = window.editor.selectionGroup;
 		if (group !== null) {
@@ -151,6 +160,18 @@ export default class InspectorComponent extends EditorComponent {
 			group.scale.set(newTrans.scale.x, newTrans.scale.y, newTrans.scale.z);
 			group.rotation.setFromQuaternion(newTrans.rotation);
 
+			group.updateMatrix();
+			group.onClientOnlyMove();
+
+			window.editor.threeManager.setPendingRender();
+		}
+	}
+
+	private onLocalInput(newTrans: LinearTransform) {
+		const group = window.editor.selectionGroup;
+		if (group !== null) {
+			// Move selection group to the new position.
+			group.setMatrix(newTrans.toMatrix());
 			group.updateMatrix();
 			group.onClientOnlyMove();
 
@@ -225,6 +246,7 @@ export default class InspectorComponent extends EditorComponent {
 			}
 			if (group.selectedGameObjects.length > 0) {
 				this.enabled = group.selectedGameObjects[0].enabled;
+				this.localTransform = group.selectedGameObjects[0].localTransform;
 			}
 		});
 	}
@@ -266,7 +288,14 @@ export default class InspectorComponent extends EditorComponent {
 			display: flex;
 		}
 		#IconAndEnable {
+			width: 21%;
 			margin: 10px;
+		}
+		#NameAndVariation {
+			width: 100%;
+		}
+		#Variation {
+			margin-top: 1em;
 		}
 		.title {
 			margin: 1em 0;

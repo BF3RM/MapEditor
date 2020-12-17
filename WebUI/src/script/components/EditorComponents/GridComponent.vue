@@ -4,7 +4,7 @@
 			<Search v-model="data.search" @search="onSearch"/>
 			<input type="range" min="5" max="14" step="1" v-model="data.scale"/>
 		</div>
-		<div class="container">
+		<div class="container scrollable">
 			<div class="grid-container" v-if="data.scale > 5">
 				<div class="grid-item" v-for="(item, index) in filteredItems()" :key="index"
 					@click="onClick(item)"
@@ -17,7 +17,7 @@
 				<DynamicScroller
 					ref="scroller"
 					:items="filteredItems()"
-					class="scrollable"
+					class=""
 					:min-item-size="30"
 					:key-field="keyField"
 				>

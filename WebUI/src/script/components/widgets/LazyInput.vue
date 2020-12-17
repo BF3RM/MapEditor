@@ -6,7 +6,7 @@
          :step="step"
          @input="onInput"
          @blur="onBlur"
-         @focus="dirty = true" />
+         @focus="dirty = true"/>
 </template>
 
 <script lang="ts">
@@ -19,7 +19,8 @@ export default Vue.extend({
 		type: String,
 		min: [String, Number],
 		max: [String, Number],
-		step: [String, Number]
+		step: [String, Number],
+		forceDirty: Boolean
 	},
 	data: () => ({
 		inputValue: '' as any,
@@ -39,7 +40,7 @@ export default Vue.extend({
 	},
 	watch: {
 		value(newVal) {
-			if (!this.dirty) {
+			if (!this.dirty && !this.forceDirty) {
 				this.inputValue = newVal;
 			}
 		}

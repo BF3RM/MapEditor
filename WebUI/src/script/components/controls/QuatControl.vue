@@ -10,7 +10,7 @@
 			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" @input="onChangeValue('w', $event)"/>
 		</template>
 		<template v-else>
-			<Vec3Control :hideLabel="hideLabel" :value="euler" :label="label" @input="onChangeEuler" :step="step"/>
+			<Vec3Control :hideLabel="hideLabel" v-model="euler" :label="label" @input="onChangeEuler" :step="step"/>
 		</template>
 	</div>
 </template>
@@ -34,7 +34,14 @@ export default class QuatControl extends Vue {
 	@Prop({ default: 'Vec4' }) mode: string;
 	@Prop({ default: false }) hideLabel: boolean;
 
-	private euler: Vec3 = new Vec3();
+	private euler: Vec3;
+	get euler(): Vec3 {
+		return new Euler().setFromQuaternion(this.value);
+	}
+
+	set euler(newEulerVec3: Quat) {
+		this.value.setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
+	}
 
 	@Watch('value')
 	onValueChange(newValue: Quat) {

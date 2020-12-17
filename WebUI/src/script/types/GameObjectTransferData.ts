@@ -17,6 +17,8 @@ export class GameObjectTransferData {
 	public isDeleted: boolean;
 	public isEnabled: boolean;
 	public isVanilla: boolean;
+	public isUserModified: boolean;
+	public originalRef: CtrRef;
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {
@@ -33,6 +35,8 @@ export class GameObjectTransferData {
 		this.isDeleted = args.isDeleted;
 		this.isEnabled = args.isEnabled;
 		this.isVanilla = args.isVanilla;
+		this.isUserModified = args.isUserModified;
+		this.originalRef = args.originalRef;
 	}
 
 	public static FromTable(table: any) {
@@ -49,6 +53,9 @@ export class GameObjectTransferData {
 				value = Guid.parse(value.toString());
 				break;
 			case 'blueprintCtrRef':
+				value = new CtrRef().setFromTable(value);
+				break;
+			case 'originalRef':
 				value = new CtrRef().setFromTable(value);
 				break;
 			case 'transform':

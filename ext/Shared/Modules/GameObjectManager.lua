@@ -115,12 +115,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if (s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
 		return
 	end
-	local original = CtrRef{}
+	local originalRef = CtrRef{}
 	if(p_Parent ~= nil) then
-		original = CtrRef {
+		originalRef = CtrRef {
 			typeName = p_Parent.typeInfo.name,
 			instanceGuid = s_ParentInstanceGuid,
-			partitionGuid = tostring(p_Parent.partitionGuid)
+			partitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
 		}
 	end
 	local s_GameObject = GameObject{
@@ -135,7 +135,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		gameEntities = {},
 		children = {},
 		realm = Realm.Realm_ClientAndServer,
-		original = original
+		originalRef = originalRef
 	}
 	if(self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil) then
 		s_GameObject.creatorName = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].creatorName
@@ -211,30 +211,38 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	end
 
+
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
-		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
+		local s_GameEntity = self.m_Entities[l_Entity.instanceId] -- We catch the
 		if (s_GameEntity == nil) then
 			s_GameEntity = GameEntity{
 				entity = l_Entity,
 				instanceId = l_Entity.instanceId,
-				indexInBlueprint = l_Index,
 				typeName = l_Entity.typeInfo.name,
 			}
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
-		s_GameEntity.indexInBlueprint = l_Index
 
-		if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
-			local s_Entity = SpatialEntity(l_Entity)
-			s_GameEntity.isSpatial = true
-			s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
-			s_GameEntity.aabb = AABB {
-				min = s_Entity.aabb.min,
-				max = s_Entity.aabb.max,
-				transform = ToLocal(s_Entity.aabbTransform, p_Transform)
-			}
+		if(s_GameEntity.indexInBlueprint == nil) then -- GameEntity hasn't been processed yet.
+			s_GameEntity.indexInBlueprint = l_Index
+			if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
+				local s_Entity = SpatialEntity(l_Entity)
+				s_GameEntity.isSpatial = true
+				s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
+				s_GameEntity.aabb = AABB {
+					min = s_Entity.aabb.min,
+					max = s_Entity.aabb.max,
+					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
+				}
+			end
+			if (s_GameEntity.initiatorRef == nil and s_GameEntity.data) then
+				s_GameEntity.initiatorRef = CtrRef {
+					typeName = s_GameEntity.data.typeInfo.name,
+					instanceGuid = tostring(s_GameEntity.data.instanceGuid),
+					partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
+				}
+			end
 		end
-
 		self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		table.insert(s_GameObject.gameEntities, s_GameEntity)
 	end
@@ -307,8 +315,8 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		primaryInstanceGuid = p_ParentGameObject.blueprintCtrRef.instanceGuid,
 		partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid
 	}
-	if(p_GameObject.original.partitionGuid == nil) then
-		p_GameObject.original.partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid -- TODO: Confirm that this is correct
+	if(p_GameObject.originalRef.partitionGuid == nil) then
+		p_GameObject.originalRef.partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid -- TODO: Confirm that this is correct
 	end
 	p_GameObject.isVanilla = p_ParentGameObject.isVanilla
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
@@ -484,7 +492,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	s_GameEntity.initiatorRef = CtrRef {
 		typeName = p_EntityData.typeInfo.name,
 		instanceGuid = tostring(p_EntityData.instanceGuid),
-		partitionGuid = tostring(p_EntityData.partitionGuid)
+		partitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid)
 	}
 	self.m_Entities[s_Entity.instanceId] = s_GameEntity
 end

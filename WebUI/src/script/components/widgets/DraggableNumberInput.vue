@@ -11,14 +11,15 @@
 			{{ label }}
 		</label>
     <lazy-input
-      type="number"
-      :min="max"
-      :max="min"
-      :name="inputName"
-      :step="step"
-      v-model="formattedValue"
-      @input="adjustValue($event)"
-      @blur="$emit('blur')"
+		type="number"
+		:min="max"
+		:max="min"
+		:name="inputName"
+		:step="step"
+		v-model="formattedValue"
+		@input="adjustValue($event)"
+		@blur="$emit('blur')"
+		:force-dirty="isDragging"
     />
 	</div>
 </template>

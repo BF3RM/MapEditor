@@ -35,11 +35,21 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	private _enabled: boolean = true;
 	private _raycastEnabled: boolean = true;
 	public parent: GameObject;
-	public instance: Instance;
+	public isUserModified: boolean;
+	public originalRef: CtrRef | undefined;
+
+	public get localTransform(): LinearTransform {
+		const parentWorldInverse = new THREE.Matrix4().getInverse(this.parent.matrixWorld);
+		return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+	}
+
+	public set localTransform(newValue: LinearTransform) {
+		this.matrix = newValue.toMatrix();
+	}
 
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
-		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false) {
+		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false, isUserModified: boolean = false, originalRef: CtrRef | undefined = undefined) {
 		super();
 
 		this.guid = guid;
@@ -54,7 +64,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;
-
+		this.isUserModified = isUserModified;
+		this.originalRef = originalRef;
 		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
@@ -82,7 +93,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.blueprintCtrRef,
 			gameObjectTransferData.variation,
 			gameObjectTransferData.gameEntities,
-			gameObjectTransferData.isVanilla
+			gameObjectTransferData.isVanilla,
+			gameObjectTransferData.isUserModified,
+			gameObjectTransferData.originalRef
 		);
 	}
 
@@ -180,6 +193,18 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public setTransform(linearTransform: LinearTransform) {
 		this.transform = linearTransform;
 		this.updateTransform();
+		if (this.originalRef !== undefined && this.parent.partition) {
+			this.parent.partition.then((res) => {
+				// @ts-ignore
+				const instance = res.getInstance(this.originalRef.instanceGuid);
+				console.log(instance);
+				if (instance) {
+					console.log(instance.fields.blueprintTransform.value);
+					instance.fields.blueprintTransform.value.set(new LinearTransform().setFromMatrix(this.matrix));
+					console.log(instance.fields.blueprintTransform.value);
+				}
+			});
+		}
 		editor.threeManager.setPendingRender();
 		editor.threeManager.nextFrame(() => signals.objectChanged.emit(this, 'transform', linearTransform));
 	}

@@ -13,7 +13,7 @@ function GameObject:__init(arg)
     self.realm = arg.realm
     self.isUserModified = true
     self.userModifiedFields = {}
-	self.original = arg.original
+	self.originalRef = arg.originalRef
 	self.localTransform = arg.localTransform
     --self.name = arg.name
     --self.parentData = arg.parentData
@@ -224,7 +224,8 @@ function GameObject:GetGameObjectTransferData()
         creatorName = self.creatorName,
         isVanilla = self.isVanilla,
         realm = self.realm,
-        isUserModified = self.isUserModified
+        isUserModified = self.isUserModified,
+        originalRef = self.originalRef:GetTable()
         -- entities have to be set externally
     }
 

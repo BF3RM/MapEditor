@@ -129,11 +129,6 @@ export default class ReferenceComponent extends Vue {
 				});
 			}
 		});
-		if (this.gameObject) {
-			for (const child of this.gameObject.children) {
-				console.log(child);
-			}
-		}
 	}
 }
 </script>

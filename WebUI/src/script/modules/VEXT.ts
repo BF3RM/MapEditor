@@ -159,7 +159,6 @@ export default class VEXTInterface {
 
 	public SendEvent(eventName: string, param?: any) {
 		if (editor.debug) {
-			console.log('Sending event: ' + eventName);
 			this.emulator.ReceiveEvent(eventName, param);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSON.stringify(param));
