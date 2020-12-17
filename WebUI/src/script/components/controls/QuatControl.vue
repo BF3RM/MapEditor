@@ -4,13 +4,13 @@
 			<div class="label">
 				<b v-if="label">{{label}}</b>
 			</div>
-			<DraggableNumberInput :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
-			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" @input="onChangeValue"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" @input="onChangeValue"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" @input="onChangeValue"/>
+			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" @input="onChangeValue"/>
 		</template>
 		<template v-else>
-			<Vec3Control :hideLabel="hideLabel" :value="euler" :label="label" @input="onChangeValue" :step=step @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control :hideLabel="hideLabel" :value="euler" :label="label" @input="onChangeEuler" :step="step"/>
 		</template>
 	</div>
 </template>
@@ -34,31 +34,28 @@ export default class QuatControl extends Vue {
 	@Prop({ default: 'Vec4' }) mode: string;
 	@Prop({ default: false }) hideLabel: boolean;
 
-	private euler: IVec3 = new Vec3().toTable();
-
-	@Emit('startDrag')
-	onStartDrag(event: Event) {
-		return event;
-	}
-
-	@Emit('endDrag')
-	onEndDrag(event: Event) {
-		return event;
-	}
+	private euler: Vec3 = new Vec3();
 
 	@Watch('value')
 	onValueChange(newValue: IQuat) {
 		const newEuler = new Euler().setFromQuaternion(Quat.setFromTable(newValue));
-		this.euler = new Vec3(newEuler.x * RAD2DEG, newEuler.y * RAD2DEG, newEuler.z * RAD2DEG).toTable();
+		this.euler = new Vec3(newEuler.x * RAD2DEG, newEuler.y * RAD2DEG, newEuler.z * RAD2DEG);
 	}
 
-	@Emit('input')
-	onChangeValue() {
-		if (this.mode !== 'Vec4') {
-			const newQuat = new Quat().setFromEuler(new Euler(this.euler.x * DEG2RAD, this.euler.y * DEG2RAD, this.euler.z * DEG2RAD));
-			const a = (newQuat as Quat).toTable();
-			this.$emit('quat-updated', a);
-		}
+	onChangeEuler(newEulerVec3: Vec3) {
+		const newVal = new Quat().setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
+		this.$emit('input', newVal);
+	}
+
+	// @Emit('input')
+	onChangeValue(newVal: Vec3) {
+		console.warn('QuatControl: Vec4 not supported yet!');
+		// if (this.mode !== 'Vec4') {
+		// 	const newQuat = new Quat().setFromEuler(new Euler(this.euler.x * DEG2RAD, this.euler.y * DEG2RAD, this.euler.z * DEG2RAD));
+		// 	const a = (newQuat as Quat).toTable();
+		// 	this.$emit('quat-updated', a);
+		// }
+		// TODO...
 	}
 }
 </script>

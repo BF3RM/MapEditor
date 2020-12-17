@@ -1,13 +1,13 @@
 <template>
 	<div class="transformControls" v-if="value">
 		<div class="pos-control">
-			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.position" label="Position" :step=0.014 @input="onChangePosition" />
 		</div>
 		<div class="rot-control">
-			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeRotation" mode="Euler" />
 		</div>
 		<div class="scale-control">
-			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.scale" label="Scale" :min=0.01 @input="onChangeScale" :step=0.014 />
 		</div>
 	</div>
 </template>
@@ -38,6 +38,27 @@ export default class LinearTransformControl extends Vue {
 		this.$emit('input', this.value);
 	}
 
+	onChangePosition(newPos: Vec3) {
+		const newVal = this.value.clone();
+		newVal.position = newPos;
+
+		this.$emit('input', newVal);
+	}
+
+	onChangeScale(newScale: Vec3) {
+		const newVal = this.value.clone();
+		newVal.scale = newScale;
+
+		this.$emit('input', newVal);
+	}
+
+	onChangeRotation(newRotation: Quat) {
+		const newVal = this.value.clone();
+		newVal.rotation = newRotation;
+
+		this.$emit('input', newVal);
+	}
+
 	@Emit('quatUpdated')
 	quatUpdated(newQuat: IQuat) {
 		return newQuat;
@@ -52,6 +73,10 @@ export default class LinearTransformControl extends Vue {
 	onEndDrag(event: Event) {
 		this.onChangeValue();
 		return event;
+	}
+
+	mounted() {
+		console.log(this.value);
 	}
 }
 </script>

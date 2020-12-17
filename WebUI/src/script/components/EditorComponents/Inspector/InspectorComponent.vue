@@ -25,8 +25,8 @@
 			<div class="container transform-container">
 
 				<linear-transform-control class="lt-control" :hideLabel="false"
-										:value="selectedGameObject.transform"
-										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @quatUpdated="quatUpdated" @blur="onEndDrag"/>
+										:value="transform"
+										@input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @blur="onEndDrag"/>
 			</div>
 			<div class="container variation" v-if="!multiSelection">
 				<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
@@ -58,8 +58,6 @@ import { signals } from '@/script/modules/Signals';
 import SetObjectNameCommand from '@/script/commands/SetObjectNameCommand';
 import LinearTransformControl from '@/script/components/controls/LinearTransformControl.vue';
 import { SelectionGroup } from '@/script/types/SelectionGroup';
-import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
-import { IQuat, Quat } from '@/script/types/primitives/Quat';
 import { GameObject } from '@/script/types/GameObject';
 import SetVariationCommand from '@/script/commands/SetVariationCommand';
 import Partition from './EBXComponents/Partition.vue';
@@ -69,14 +67,12 @@ import Reference from '@/script/types/ebx/Reference';
 import ArrayProperty from './EBXComponents/ArrayProperty.vue';
 import ReferenceProperty from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceProperty.vue';
 import { Promised, usePromise } from 'vue-promised';
+import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty, ReferenceProperty, Promised } })
 export default class InspectorComponent extends EditorComponent {
 	public selectedGameObject: GameObject;
 
-	private position: IVec3 = new Vec3().toTable();
-	private scale: IVec3 = new Vec3(1, 1, 1).toTable();
-	private rotation: IQuat = new Quat().toTable();
 	private dragging = false;
 	private enabled = true;
 	private gameObjectGuid: string = '';
@@ -90,6 +86,8 @@ export default class InspectorComponent extends EditorComponent {
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
 	private partition: any;
+
+	private transform: LinearTransform = new LinearTransform();
 
 	private toggleState = {
 		info: true
@@ -133,15 +131,17 @@ export default class InspectorComponent extends EditorComponent {
 	}
 
 	// Why is this called twice?
-	private onInput() {
+	private onInput(newTrans: LinearTransform) {
 		const group = window.editor.selectionGroup;
 		if (group !== null) {
 			// Move selection group to the new position.
-			group.position.set(this.position.x, this.position.y, this.position.z);
-			group.scale.set(this.scale.x, this.scale.y, this.scale.z);
-			group.rotation.setFromQuaternion(Quat.setFromTable(this.rotation));
+			group.position.set(newTrans.position.x, newTrans.position.y, newTrans.position.z);
+			group.scale.set(newTrans.scale.x, newTrans.scale.y, newTrans.scale.z);
+			group.rotation.setFromQuaternion(newTrans.rotation);
+
 			group.updateMatrix();
 			group.onClientOnlyMove();
+
 			window.editor.threeManager.setPendingRender();
 		}
 	}
@@ -207,18 +207,12 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
-	private quatUpdated(newQuat: IQuat) {
-		this.rotation = newQuat;
-	}
-
 	private onSelectionGroupChanged(group: SelectionGroup) {
 		this.$nextTick(() => {
 			const group = window.editor.selectionGroup;
 			if (!this.dragging) {
 				// Update inspector transform.
-				this.position = group.transform.trans.toTable();
-				this.scale = group.transform.scale.toTable();
-				this.rotation = group.transform.rotation.toTable();
+				this.transform = group.transform;
 			}
 			if (group.selectedGameObjects.length > 0) {
 				this.enabled = group.selectedGameObjects[0].enabled;

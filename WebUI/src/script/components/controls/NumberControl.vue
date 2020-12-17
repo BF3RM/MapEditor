@@ -6,10 +6,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
-import { Vector3 } from 'three';
-import { IVec3 } from '@/script/types/primitives/Vec3';
 
 @Component({ components: { DraggableNumberInput } })
 export default class NumberControl extends Vue {

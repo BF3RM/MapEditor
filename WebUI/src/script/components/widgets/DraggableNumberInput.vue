@@ -94,14 +94,14 @@ export default class DraggableNumberInput extends Vue {
 	}
 
 	get formattedValue() {
-		return Number(this.value.toFixed(2));
+		return this.value.toFixed(2);
 	}
 
-	set formattedValue(inp: number) {
+	set formattedValue(inp: string) {
 		// TODO: Sanitize
 		console.log('Numba: ' + inp);
 		console.log('TODO: ' + this.type);
-		this.$emit('input', inp);
+		this.$emit('input', Number.parseFloat(inp));
 	}
 
 	private dragEnd(): void {
