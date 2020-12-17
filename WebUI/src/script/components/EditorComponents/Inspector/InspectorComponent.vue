@@ -30,12 +30,22 @@
 				</div>
 			</div>
 			<div class="container transform-container">
-				<template v-if="worldSpace === 'local'">
-					<linear-transform-control class="lt-control" :hideLabel="false" :value="localTransform" @input="onLocalInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @blur="onEndDrag"/>
-				</template>
-				<template v-else>
-					<linear-transform-control class="lt-control" :hideLabel="false" :value="transform" @input="onInput" @startDrag="onStartDrag" @endDrag="onEndDrag" @blur="onEndDrag"/>
-				</template>
+					<linear-transform-control
+							v-if="worldSpace === 'local'"
+							class="lt-control"
+							:hideLabel="false"
+							:value="localTransform"
+							@input="onLocalInput"
+							@dragend="onEndDrag"
+							@blur="onEndDrag" />
+					<linear-transform-control
+							v-else
+							class="lt-control"
+							:hideLabel="false"
+							:value="transform"
+							@input="onInput"
+							@dragend="onEndDrag"
+							@blur="onEndDrag" />
 			</div>
 			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
 				<Promised :promise="partition">
@@ -87,9 +97,8 @@ export default class InspectorComponent extends EditorComponent {
 		};
 	}
 
-	public selectedGameObject: GameObject;
+	public selectedGameObject: GameObject | null = null;
 
-	private dragging = false;
 	private enabled = true;
 	private gameObjectGuid: string = '';
 	private gameObjectName: string = '';
@@ -222,33 +231,23 @@ export default class InspectorComponent extends EditorComponent {
 		return this.multiSelection ? 'Multiselection' : this.gameObjectName;
 	}
 
-	onStartDrag() {
-		// console.log('Drag start');
-		this.dragging = true;
-	}
-
 	onEndDrag() {
-		// console.log('Drag end');
 		const group = window.editor.selectionGroup;
 
 		if (group) {
 			group.onClientOnlyMoveEnd();
-			this.dragging = false;
 		}
 	}
 
-	private onSelectionGroupChanged(group: SelectionGroup) {
-		this.$nextTick(() => {
-			const group = window.editor.selectionGroup;
-			if (!this.dragging) {
-				// Update inspector transform.
-				this.transform = group.transform;
-			}
-			if (group.selectedGameObjects.length > 0) {
-				this.enabled = group.selectedGameObjects[0].enabled;
-				this.localTransform = group.selectedGameObjects[0].localTransform;
-			}
-		});
+	private onSelectionGroupChanged() {
+		const group = window.editor.selectionGroup;
+		// Update inspector transform.
+		this.transform = group.transform;
+
+		if (group.selectedGameObjects.length > 0) {
+			this.enabled = group.selectedGameObjects[0].enabled;
+			this.localTransform = group.selectedGameObjects[0].localTransform;
+		}
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.

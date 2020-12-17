@@ -3,9 +3,45 @@
 		<div class="label">
 			<b v-if="label">{{label}}</b>
 		</div>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="x" dragDirection="X" :value="value.x" label="X" :step=step :min=min @input="onChangeValue('x', $event)" type="Float"/>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="y" dragDirection="X" :value="value.y" label="Y" :step=step :min=min @input="onChangeValue('y', $event)" type="Float"/>
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="hideLabel" class="z" dragDirection="X" :value="value.z" label="Z" :step=step :min=min @input="onChangeValue('z', $event)" type="Float"/>
+		<DraggableNumberInput
+				class="x"
+				label="X"
+				type="Float"
+				dragDirection="X"
+				:hideLabel="hideLabel"
+				:value="value.x"
+				:step=step
+				:min=min
+				@input="onChangeValue('x', $event)"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')" />
+		<DraggableNumberInput
+				class="y"
+				label="Y"
+				type="Float"
+				dragDirection="X"
+				:hideLabel="hideLabel"
+				:value="value.y"
+				:step=step
+				:min=min
+				@input="onChangeValue('y', $event)"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')" />
+		<DraggableNumberInput
+				class="z"
+				type="Float"
+				label="Z"
+				dragDirection="X"
+				:hideLabel="hideLabel"
+				:value="value.z"
+				:step=step
+				:min=min
+				@input="onChangeValue('z', $event)"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')" />
 	</div>
 </template>
 

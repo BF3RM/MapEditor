@@ -10,13 +10,21 @@
 			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" @input="onChangeValue('w', $event)"/>
 		</template>
 		<template v-else>
-			<Vec3Control :hideLabel="hideLabel" v-model="euler" :label="label" @input="onChangeEuler" :step="step"/>
+			<Vec3Control
+					v-model="euler"
+					:hideLabel="hideLabel"
+					:label="label"
+					:step="step"
+					@input="onChangeEuler"
+					@blur="$emit('blur')"
+					@dragstart="$emit('dragstart')"
+					@dragend="$emit('dragend')" />
 		</template>
 	</div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import { Quat } from '@/script/types/primitives/Quat';
 import { Vec3 } from '@/script/types/primitives/Vec3';
@@ -42,12 +50,6 @@ export default class QuatControl extends Vue {
 	set euler(newEulerVec3: Vec3) {
 		this.value.setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
 	}
-
-	// @Watch('value')
-	// onValueChange(newValue: Quat) {
-	// 	const newEuler = new Euler().setFromQuaternion(newValue);
-	// 	this.euler = new Vec3(newEuler.x * RAD2DEG, newEuler.y * RAD2DEG, newEuler.z * RAD2DEG);
-	// }
 
 	onChangeEuler(newEulerVec3: Vec3) {
 		const newVal = new Quat().setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));

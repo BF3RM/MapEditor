@@ -101,23 +101,24 @@ export default class DraggableNumberInput extends Vue {
 		return Number(this.value).toFixed(2);
 	}
 
-	private dragEnd(): void {
-		console.log('dragend');
-
-		document.body.style.cursor = '';
-		document.body.style.userSelect = '';
-
-		document.removeEventListener('mousemove', this.boundAdjust);
-	}
-
 	private dragStart(): void {
-		console.log('dragstart');
-
 		document.body.style.cursor = this.cursorDirection;
 		document.body.style.userSelect = 'none';
 
 		document.addEventListener('mousemove', this.boundAdjust);
 		document.addEventListener('mouseup', this.boundEnd);
+
+		this.$emit('dragstart');
+	}
+
+	private dragEnd(): void {
+		document.body.style.cursor = '';
+		document.body.style.userSelect = '';
+
+		document.removeEventListener('mousemove', this.boundAdjust);
+		document.removeEventListener('mouseup', this.boundEnd);
+
+		this.$emit('dragend');
 	}
 }
 </script>
