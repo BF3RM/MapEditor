@@ -19,8 +19,7 @@ export default Vue.extend({
 		type: String,
 		min: [String, Number],
 		max: [String, Number],
-		step: [String, Number],
-		forceDirty: Boolean
+		step: [String, Number]
 	},
 	data: () => ({
 		inputValue: '' as any,
@@ -40,7 +39,7 @@ export default Vue.extend({
 	},
 	watch: {
 		value(newVal) {
-			if (!this.dirty && !this.forceDirty) {
+			if (!this.dirty) {
 				this.inputValue = newVal;
 			}
 		}

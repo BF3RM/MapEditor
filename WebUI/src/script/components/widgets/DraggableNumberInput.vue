@@ -17,9 +17,7 @@
 		:name="inputName"
 		:step="step"
 		v-model="formattedValue"
-		@input="adjustValue($event)"
 		@blur="$emit('blur')"
-		:force-dirty="isDragging"
     />
 	</div>
 </template>
@@ -32,7 +30,7 @@ import LazyInput from './LazyInput.vue';
 @Component({ components: { LazyInput } })
 export default class DraggableNumberInput extends Vue {
 	get boundAdjust() {
-		return this.adjustValue.bind(this);
+		return this.onDrag.bind(this);
 	}
 
 	get boundEnd() {
@@ -46,8 +44,6 @@ export default class DraggableNumberInput extends Vue {
 	get inputName(): string {
 		return `draggable-number-${this.label.toLowerCase().replace(' ', '-')}`;
 	}
-
-	public isDragging = false;
 
 	@Prop({ default: 'Y', type: String })
 	private dragDirection: 'X' | 'Y';
@@ -73,59 +69,55 @@ export default class DraggableNumberInput extends Vue {
 	@Prop({ required: true, type: String })
 	private type: number;
 
-	private adjustValue(val: number | string | MouseEvent): number {
-		let newVal;
-		if (val instanceof MouseEvent) {
-			if (val.clientX > window.innerWidth - 2) {
-				console.log('Right edge');
-				window.editor.threeManager.inputControls.TeleportMouse(val, 'left');
-			}
-			if (val.clientX < 2) {
-				console.log('Left edge');
-				window.editor.threeManager.inputControls.TeleportMouse(val, 'right');
-			}
+	set formattedValue(val: string) {
+		let newVal = val === '' ? 0 : Number(val);
 
-			newVal = this.dragDirection === 'Y' ? -window.editor.threeManager.inputControls.movementY * this.step : window.editor.threeManager.inputControls.movementX * this.step;
-			newVal = Number(this.value + newVal);
-		} else { newVal = Number(val); }
 		if (!Number.isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
 		if (!Number.isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
-		this.formattedValue = newVal.toFixed(2);
+
+		// TODO: Sanitize
+		console.log('Numba: ' + newVal);
+		console.log('TODO: ' + this.type);
+		this.$emit('input', newVal);
+	}
+
+	private onDrag(event: MouseEvent) {
+		if (event.clientX > window.innerWidth - 2) {
+			console.log('Right edge');
+			window.editor.threeManager.inputControls.TeleportMouse(event, 'left');
+		}
+
+		if (event.clientX < 2) {
+			console.log('Left edge');
+			window.editor.threeManager.inputControls.TeleportMouse(event, 'right');
+		}
+
+		const newValDelta = this.dragDirection === 'Y' ? -window.editor.threeManager.inputControls.movementY * this.step : window.editor.threeManager.inputControls.movementX * this.step;
+
+		this.formattedValue = (this.value + newValDelta).toFixed(2);
 	}
 
 	get formattedValue() {
 		return Number(this.value).toFixed(2);
 	}
 
-	set formattedValue(inp: string) {
-		// TODO: Sanitize
-		console.log('Numba: ' + inp);
-		console.log('TODO: ' + this.type);
-		this.$emit('input', Number.parseFloat(inp));
-	}
-
 	private dragEnd(): void {
 		console.log('dragend');
-		this.isDragging = false;
 
 		document.body.style.cursor = '';
 		document.body.style.userSelect = '';
 
 		document.removeEventListener('mousemove', this.boundAdjust);
-		document.removeEventListener('mouseup', this.boundEnd);
-		this.$emit('end-drag');
 	}
 
 	private dragStart(): void {
 		console.log('dragstart');
-		this.isDragging = true;
 
 		document.body.style.cursor = this.cursorDirection;
 		document.body.style.userSelect = 'none';
 
 		document.addEventListener('mousemove', this.boundAdjust);
 		document.addEventListener('mouseup', this.boundEnd);
-		this.$emit('start-drag');
 	}
 }
 </script>
