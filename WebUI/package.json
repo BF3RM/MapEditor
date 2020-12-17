@@ -47,7 +47,7 @@
     "sass-loader": "10.0.2",
     "typescript": "3.9.7",
     "vue-template-compiler": "2.6.12",
-    "webpack": "4.44.2"
+    "webpack": "5.11.0"
   },
   "scripts": {
     "serve": "vue-cli-service serve --mode development",
