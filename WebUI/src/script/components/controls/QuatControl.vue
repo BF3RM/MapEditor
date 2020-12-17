@@ -34,20 +34,20 @@ export default class QuatControl extends Vue {
 	@Prop({ default: 'Vec4' }) mode: string;
 	@Prop({ default: false }) hideLabel: boolean;
 
-	private euler: Vec3;
 	get euler(): Vec3 {
-		return new Euler().setFromQuaternion(this.value);
+		const newEuler = new Euler().setFromQuaternion(this.value);
+		return new Vec3(newEuler.x * RAD2DEG, newEuler.y * RAD2DEG, newEuler.z * RAD2DEG);
 	}
 
-	set euler(newEulerVec3: Quat) {
+	set euler(newEulerVec3: Vec3) {
 		this.value.setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
 	}
 
-	@Watch('value')
-	onValueChange(newValue: Quat) {
-		const newEuler = new Euler().setFromQuaternion(newValue);
-		this.euler = new Vec3(newEuler.x * RAD2DEG, newEuler.y * RAD2DEG, newEuler.z * RAD2DEG);
-	}
+	// @Watch('value')
+	// onValueChange(newValue: Quat) {
+	// 	const newEuler = new Euler().setFromQuaternion(newValue);
+	// 	this.euler = new Vec3(newEuler.x * RAD2DEG, newEuler.y * RAD2DEG, newEuler.z * RAD2DEG);
+	// }
 
 	onChangeEuler(newEulerVec3: Vec3) {
 		const newVal = new Quat().setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
