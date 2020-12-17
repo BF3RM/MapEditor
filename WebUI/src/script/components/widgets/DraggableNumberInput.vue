@@ -12,8 +12,8 @@
 		</label>
     <lazy-input
 		type="number"
-		:min="max"
-		:max="min"
+		:min="min"
+		:max="max"
 		:name="inputName"
 		:step="step"
 		v-model="formattedValue"
