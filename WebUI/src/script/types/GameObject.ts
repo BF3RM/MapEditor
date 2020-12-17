@@ -240,7 +240,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.selected = true;
 		this.visible = true;
 		this.makeParentsVisible();
-
 		this.children.forEach(go => (go as GameObject).onSelect());
 	}
 

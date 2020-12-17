@@ -87,14 +87,13 @@ export default class DraggableNumberInput extends Vue {
 			newVal = this.dragDirection === 'Y' ? -window.editor.threeManager.inputControls.movementY * this.step : window.editor.threeManager.inputControls.movementX * this.step;
 			newVal = Number(this.value + newVal);
 		} else { newVal = Number(val); }
-
 		if (!Number.isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
 		if (!Number.isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
-		return Number(newVal.toFixed(2));
+		this.formattedValue = newVal.toFixed(2);
 	}
 
 	get formattedValue() {
-		return this.value.toFixed(2);
+		return Number(this.value).toFixed(2);
 	}
 
 	set formattedValue(inp: string) {
@@ -105,6 +104,7 @@ export default class DraggableNumberInput extends Vue {
 	}
 
 	private dragEnd(): void {
+		console.log('dragend');
 		this.isDragging = false;
 
 		document.body.style.cursor = '';
@@ -116,6 +116,7 @@ export default class DraggableNumberInput extends Vue {
 	}
 
 	private dragStart(): void {
+		console.log('dragstart');
 		this.isDragging = true;
 
 		document.body.style.cursor = this.cursorDirection;

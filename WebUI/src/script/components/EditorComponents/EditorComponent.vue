@@ -1,5 +1,5 @@
 <template>
-	<gl-component ref="glChild">
+	<gl-component ref="glChild" class="EditorComponent">
 		<slot>
 		</slot>
 	</gl-component>
@@ -20,3 +20,14 @@ export default class EditorComponent extends glCustomContainer {
 	}
 }
 </script>
+<style lang="scss">
+.EditorComponent {
+	.header {
+		display: flex;
+
+		input[type="range"] {
+			width: 10em;
+		}
+	}
+}
+</style>

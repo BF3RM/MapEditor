@@ -1,9 +1,22 @@
 <template>
     <div class="value">
-		<el-select v-model="enumValue" @input="onInput($event)">
-			<el-option v-for="(option, index) in options.values" :key="option.value" :value="option.value"><span class="enum">{{ cleanType(index) }}</span></el-option>
+		<el-select v-model="enumValue" @focus="getEnums" @input="onInput($event)">
+			<template v-if="options">
+				<Promised :promise="options">
+					<template v-slot="data">
+						<span>
+							<el-option v-for="(option, index) in data.values" :key="option.value" :value="option.value"><span class="enum">{{ cleanType(index) }}</span></el-option>
+						</span>
+					</template>
+					<template v-slot:rejected="error">
+						<p>Error: {{ error.message }}</p>
+					</template>
+				</Promised>
+			</template>
+			<template v-else>
+				<el-option :value="-1">Loading...</el-option>
+			</template>
 		</el-select>
-
     </div>
 </template>
 
@@ -14,12 +27,14 @@ import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
 
 import Instance from '@/script/types/ebx/Instance';
+import { Promised } from 'vue-promised';
 const YAML = require('yaml');
 const axios = require('axios').default;
 
 export default Vue.extend({
 	name: 'EnumProperty',
 	components: {
+		'Promised': Promised
 	},
 	props: {
 		partition: {
@@ -35,17 +50,26 @@ export default Vue.extend({
 			required: true
 		}
 	},
-	data() {
-		return {
-			options: []
-		};
-	},
+	data: () => ({
+		options: null
+	}),
 	methods: {
 		onInput(value: number) {
 			console.log(value);
 		},
 		cleanType(index: string) {
 			return index.replace(this.field.type + '_', '');
+		},
+		getEnums() {
+			console.log('Grabbing enums');
+			// eslint-disable-next-line vue/no-async-in-computed-properties
+			this.$data.options = axios.get('https://raw.githubusercontent.com/EmulatorNexus/VU-Docs/master/types/fb/' + this.field.type + '.yaml').then((res: any) => {
+				console.log(YAML.parse(res.data));
+				console.log(this.$data.options);
+				return YAML.parse(res.data);
+			}).catch((e: any) => {
+				console.log(e);
+			});
 		}
 	},
 	computed: {
@@ -57,14 +81,6 @@ export default Vue.extend({
 				console.log('Attempted to set enum');
 			}
 		}
-	},
-	mounted() {
-		axios.get('https://raw.githubusercontent.com/EmulatorNexus/VU-Docs/master/types/fb/' + this.field.type + '.yaml').then((res) => {
-			console.log(YAML.parse(res.data));
-			this.$data.options = YAML.parse(res.data);
-		}).catch((e) => {
-			console.log(e);
-		});
 	}
 });
 </script>

@@ -146,7 +146,7 @@ export default class VEXTInterface {
 			if (index === commandActionResults.length - 1) {
 				scope.executing = false;
 			}
-			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type);
+			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type, commandActionResult.type);
 
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;

@@ -2,14 +2,40 @@
 	<EditorComponent class="grid-component" :title="title">
 		<div class="header">
 			<Search v-model="data.search" @search="onSearch"/>
-			<input type="range" min="1" max="14" step="0.01" v-model="data.scale"/>
+			<input type="range" min="5" max="14" step="1" v-model="data.scale"/>
 		</div>
-		<div class="grid-container">
-			<div class="grid-item" v-for="(item, index) in filteredItems()" :key="index"
-							@click="onClick(item)"
-							@mousedown="onMouseDown($event, item)">
-				<slot :item="item" :data="data">
-				</slot>
+		<div class="container">
+			<div class="grid-container" v-if="data.scale > 5">
+				<div class="grid-item" v-for="(item, index) in filteredItems()" :key="index"
+					@click="onClick(item)"
+					@mousedown="onMouseDown($event, item)">
+					<slot name="grid" :item="item" :data="data">
+					</slot>
+				</div>
+			</div>
+			<div class="list-container" v-else>
+				<DynamicScroller
+					ref="scroller"
+					:items="filteredItems()"
+					class="scrollable"
+					:min-item-size="30"
+					:key-field="keyField"
+				>
+					<DynamicScrollerItem
+						class="tr"
+						slot-scope="{ item, index, active }"
+						:item="item"
+						:active="active"
+						:size-dependencies="[item.expanded]"
+						:min-item-size="30"
+						@click.native="onClick(item)"
+						@mousedown.native="onMouseDown($event, item)"
+						:key-field="keyField"
+					>
+						<slot name="list" :item="item" :data="data">
+						</slot>
+					</DynamicScrollerItem>
+				</DynamicScroller>
 			</div>
 		</div>
 		<div v-html="style">
@@ -122,5 +148,28 @@ export default class GridComponent extends EditorComponent {
 }
 .grid-item .Icon{
 	padding-top: 1em;
+}
+
+.list-component {
+	user-select: none;
+
+	.header {
+		font-weight: bold;
+		display:flex;
+		padding: 0.2vmin;
+		border-bottom: solid 1px #4a4a4a;
+	}
+	.scrollable {
+		height: 100%;
+		width: 100%;
+	}
+
+	.tr {
+		cursor: move;
+	}
+}
+
+.rightAlign {
+	text-align: right;
 }
 </style>

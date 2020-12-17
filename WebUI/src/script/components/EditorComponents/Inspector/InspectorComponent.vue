@@ -33,18 +33,23 @@
 					<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name" :value="variation.hash"/>
 				</el-select>
 			</div>
-			<div class="container ebx-container" v-if="selectedGameObject && partition && !multiSelection">
-				<template v-if="partition && partition.value && partition.value.primaryInstance.fields.object">
-					<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="partition.value.name" :field="partition.value.primaryInstance && partition.value.primaryInstance.fields.object" :reference="partition.value.primaryInstance.fields.object.value" :partition="partition.value"></reference-property>
-					<!--
-					<span>
-						<Instance :currentPath="selectedPartition.name" v-if="selectedPartition.primaryInstance.fields.object.value" :instance=getInstance(selectedPartition.primaryInstance.fields.object.value) :partition="selectedPartition"></Instance>
-					</span>
-					-->
-				</template>
-				<template v-else-if="partition.value && partition.value.primaryInstance && partition.value.primaryInstance.fields && partition.value.primaryInstance.fields.objects">
-					<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" v-for="(instance, index) of partition.value.primaryInstance.fields.objects.value" :key="index" :autoOpen="true" :currentPath="partition.value.name" :field="instance" :instance="instance" :reference="instance.value" :partition="partition.value"></reference-property>
-				</template>
+			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
+				<Promised :promise="partition">
+					<template v-slot:pending>
+						<p>Loading...</p>
+					</template>
+					<template v-slot="data">
+						<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
+							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
+						</div>
+						<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
+							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" v-for="(instance, index) of data.primaryInstance.fields.objects.value" :key="index" :autoOpen="false" :currentPath="data.name" :field="instance" :instance="instance" :reference="instance.value" :partition="data"></reference-property>
+						</div>
+					</template>
+					<template v-slot:rejected="error">
+						<p>Error: {{ error.message }}</p>
+					</template>
+				</Promised>
 			</div>
 		</div>
 	</EditorComponent>
@@ -66,11 +71,17 @@ import { FBPartition } from '@/script/types/gameData/FBPartition';
 import Reference from '@/script/types/ebx/Reference';
 import ArrayProperty from './EBXComponents/ArrayProperty.vue';
 import ReferenceProperty from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceProperty.vue';
-import { Promised, usePromise } from 'vue-promised';
+import { Promised } from 'vue-promised';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty, ReferenceProperty, Promised } })
 export default class InspectorComponent extends EditorComponent {
+	data() {
+		return {
+			partition: undefined
+		};
+	}
+
 	public selectedGameObject: GameObject;
 
 	private dragging = false;
@@ -86,6 +97,7 @@ export default class InspectorComponent extends EditorComponent {
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
 	private partition: any;
+	private childCount: number;
 
 	private transform: LinearTransform = new LinearTransform();
 
@@ -171,10 +183,7 @@ export default class InspectorComponent extends EditorComponent {
 		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
 
 		this.selectedGameObject = selectedGameObject;
-		const { data, error, isPending, isDelayElapsed } = usePromise(this.selectedGameObject.partition);
-		if (data) {
-			this.partition = data;
-		}
+		this.$data.partition = this.selectedGameObject.partition;
 	}
 
 	get isEmpty() {

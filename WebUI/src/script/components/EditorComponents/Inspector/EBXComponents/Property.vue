@@ -126,9 +126,6 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss" scoped>
-	.row {
-		display: table-footer-group;
-	}
 	.field-name {
 		text-transform: capitalize;
 		grid-column: 1;

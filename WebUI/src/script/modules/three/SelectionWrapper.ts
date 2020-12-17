@@ -13,7 +13,7 @@ export default class SelectionWrapper {
 
 		let gizmoWasSelected = false;
 
-		canvas.addEventListener('mousedown', function (event) {
+		document.addEventListener('mousedown', function (event) {
 			if (event.which !== 1 || !event.shiftKey || editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = true;
@@ -31,7 +31,7 @@ export default class SelectionWrapper {
 				0.5);
 		});
 
-		canvas.addEventListener('mousemove', function (event) {
+		document.addEventListener('mousemove', function (event) {
 			if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = true;
@@ -66,7 +66,7 @@ export default class SelectionWrapper {
 			}
 		});
 
-		canvas.addEventListener('mouseup', function (event) {
+		document.addEventListener('mouseup', function (event) {
 			if (event.which !== 1 || editor.threeManager.gizmoControls.selected || gizmoWasSelected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
 				helper.isDown = false;
 				gizmoWasSelected = false;
