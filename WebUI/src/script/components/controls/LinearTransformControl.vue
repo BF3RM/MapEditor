@@ -4,7 +4,7 @@
 			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.position" label="Position" :step=0.014 @input="onChangePosition" />
 		</div>
 		<div class="rot-control">
-			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeRotation" mode="Euler" />
+			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.rotation" label="Rotation" :step=0.14 @input="onChangeRotation" mode="Euler" />
 		</div>
 		<div class="scale-control">
 			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="value.scale" label="Scale" :min=0.01 @input="onChangeScale" :step=0.014 />
@@ -13,12 +13,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import QuatControl from '@/script/components/controls/QuatControl.vue';
-import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
-import { IQuat, Quat } from '@/script/types/primitives/Quat';
+import { Vec3 } from '@/script/types/primitives/Vec3';
+import { Quat } from '@/script/types/primitives/Quat';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
@@ -28,15 +28,6 @@ export default class LinearTransformControl extends Vue {
 
 	@Prop({ default: false })
 	hideLabel: boolean;
-
-	@Emit('update:rotation')
-	quadUpdate(newVal: IQuat) {
-		return newVal;
-	}
-
-	onChangeValue() {
-		this.$emit('input', this.value);
-	}
 
 	onChangePosition(newPos: Vec3) {
 		const newVal = this.value.clone();
@@ -57,26 +48,6 @@ export default class LinearTransformControl extends Vue {
 		newVal.rotation = newRotation;
 
 		this.$emit('input', newVal);
-	}
-
-	@Emit('quatUpdated')
-	quatUpdated(newQuat: IQuat) {
-		return newQuat;
-	}
-
-	@Emit('startDrag')
-	onStartDrag(event: Event) {
-		return event;
-	}
-
-	@Emit('endDrag')
-	onEndDrag(event: Event) {
-		this.onChangeValue();
-		return event;
-	}
-
-	mounted() {
-		console.log(this.value);
 	}
 }
 </script>
