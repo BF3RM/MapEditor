@@ -8,6 +8,8 @@ UIManager = require "UIManager"
 MessageActions = require "MessageActions"
 ClientTransactionManager = require "ClientTransactionManager"
 ClientGameObjectManager = require "ClientGameObjectManager"
+EBXManager = require "__shared/Modules/EBXManager"
+
 GameObjectManager = GameObjectManager(Realm.Realm_Client)
 
 EditorCommon = EditorCommon(Realm.Realm_Client)

@@ -25,6 +25,7 @@ import NumberControl from '@/script/components/controls/NumberControl.vue';
 import BoolControl from '@/script/components/controls/BoolControl.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import Instance from '@/script/types/ebx/Instance';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 export default Vue.extend({
 	name: 'Property',
 	props: {
@@ -57,8 +58,10 @@ export default Vue.extend({
 					instanceGuid: this.instance.guid
 				},
 				field: field,
-				value: newValue
-			});
+				type: this.field.type,
+				value: newValue,
+				oldValue: this.field.value
+			} as IEBXFieldData);
 		}
 	},
 	computed: {

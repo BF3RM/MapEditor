@@ -6,6 +6,7 @@ ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"
 DataBaseManager = require "DataBaseManager"
 ServerGameObjectManager = require "ServerGameObjectManager"
+EBXManager = require "__shared/Modules/EBXManager"
 GameObjectManager = GameObjectManager(Realm.Realm_Server)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)

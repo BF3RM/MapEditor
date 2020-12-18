@@ -11,6 +11,9 @@ end
 function GameObjectManager:RegisterVars()
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
+	self.m_PendingBlueprint = {}
+
+
 	self.m_Entities = {}
 	self.m_VanillaGameObjectGuids = {}
 
@@ -172,8 +175,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
-			self.m_GameObjects[tostring(s_GameObject.guid)] = nil
-			return
+			self:ResolveRootObject(s_GameObject)
 		else
 			m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
@@ -197,13 +199,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_ReferenceObjectDatas[tostring(s_Blueprint.object.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = s_Blueprint.object.typeInfo.name }
 		end
 	end
-
+	self.m_PendingBlueprint[s_BlueprintPartitionGuid] = s_GameObject
 	---^^^^ This is parent to children / top to bottom ^^^^
 	local s_EntityBus = p_Hook:Call()
 	---vvvv This is children to parent / bottom to top vvvv
 
 	-- Custom object have to be manually initialized.
 	if not s_GameObject.isVanilla then
+		--print("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
 		for _,l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
 			l_Entity:Init(self.m_Realm, true)
@@ -213,7 +216,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
-		local s_GameEntity = self.m_Entities[l_Entity.instanceId] -- We catch the
+		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
 		if (s_GameEntity == nil) then
 			s_GameEntity = GameEntity{
 				entity = l_Entity,
@@ -222,7 +225,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			}
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
-
+		--print(l_Entity.typeInfo.name)
 		if(s_GameEntity.indexInBlueprint == nil) then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
 			if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
@@ -234,6 +237,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					max = s_Entity.aabb.max,
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
 				}
+			else
+				s_GameEntity.isSpatial = false
 			end
 			if (s_GameEntity.initiatorRef == nil and s_GameEntity.data) then
 				s_GameEntity.initiatorRef = CtrRef {
@@ -242,9 +247,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
 				}
 			end
+			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
-		self.m_Entities[l_Entity.instanceId] = s_GameEntity
-		table.insert(s_GameObject.gameEntities, s_GameEntity)
 	end
 
 	--- If its a root object all children are now resolved so we update WebUI.
@@ -275,6 +279,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
 		if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
+			--print("Spawning: " .. s_GameObject.guid)
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
@@ -481,6 +486,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	if (not s_Entity) then
 		return
 	end
+	--print("Spawning entity: " ..p_EntityData.typeInfo.name)
 	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
 	if (s_GameEntity == nil) then
 		s_GameEntity = GameEntity{
@@ -489,12 +495,20 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 			typeName = s_Entity.typeInfo.name,
 		}
 	end
+	--print("Entity instance id: " .. s_Entity.instanceId)
+	local s_PartitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid);
 	s_GameEntity.initiatorRef = CtrRef {
 		typeName = p_EntityData.typeInfo.name,
 		instanceGuid = tostring(p_EntityData.instanceGuid),
-		partitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid)
+		partitionGuid = s_PartitionGuid
 	}
 	self.m_Entities[s_Entity.instanceId] = s_GameEntity
+	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
+	if(s_PendingGameObject) then
+		--print("Added pending:")
+		--print(s_PendingGameObject.name)
+		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
+	end
 end
 
 return GameObjectManager

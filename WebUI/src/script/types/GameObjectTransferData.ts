@@ -19,6 +19,7 @@ export class GameObjectTransferData {
 	public isVanilla: boolean;
 	public isUserModified: boolean;
 	public originalRef: CtrRef;
+	public overrides: any[];
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {
@@ -37,6 +38,7 @@ export class GameObjectTransferData {
 		this.isVanilla = args.isVanilla;
 		this.isUserModified = args.isUserModified;
 		this.originalRef = args.originalRef;
+		this.overrides = args.overrides;
 	}
 
 	public static FromTable(table: any) {

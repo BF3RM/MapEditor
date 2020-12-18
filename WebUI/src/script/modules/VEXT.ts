@@ -116,7 +116,7 @@ export default class VEXTInterface {
 		}
 		const scope = this;
 		for (const command of commands) {
-			console.log(command.type);
+			console.log(command);
 		}
 		if (editor.debug) {
 			scope.emulator.Receive(commands);

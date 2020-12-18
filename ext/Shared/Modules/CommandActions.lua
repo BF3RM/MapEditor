@@ -19,6 +19,7 @@ function CommandActions:RegisterVars()
 	self.EnableBlueprintCommand = self.EnableBlueprint
 	self.DisableBlueprintCommand = self.DisableBlueprint
 	self.SetVariationCommand = self.SetVariation
+	self.SetEBXFieldCommand = self.SetEBXField
 end
 
 function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
@@ -238,7 +239,7 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 
 	local s_Result = GameObjectManager:SetVariation(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.variation)
 	if (s_Result == false) then
-		m_Logger:Write("Failed to set variation for object " .. p_Command.gameObjectTransferData.guid)
+		m_Logger:Error("Failed to set variation for object " .. p_Command.gameObjectTransferData.guid)
 		return nil, ActionResultType.Failure
 	end
 
@@ -256,4 +257,30 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 	return s_CommandActionResult, ActionResultType.Success
 end
 
+function CommandActions:SetEBXField(p_Command)
+	if (p_Command.gameObjectTransferData == nil) then
+		m_Logger:Error("The SetEBXFieldCommand needs to have a valid gameObjectTransferData set.")
+		return
+	end
+
+
+	local s_Result = EBXManager:SetField(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData)
+	if (s_Result == false) then
+		m_Logger:Error("Failed to set variation for object " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
+	end
+
+	local s_GameObjectTransferData = {
+		guid = p_Command.gameObjectTransferData.guid,
+		variation = p_Command.gameObjectTransferData.variation
+	}
+
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = "SetVariation",
+		gameObjectTransferData = s_GameObjectTransferData
+	}
+
+	return s_CommandActionResult, ActionResultType.Success
+end
 return CommandActions

@@ -27,6 +27,10 @@
 							<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name ? variation.name : 'Default variation'" :value="variation.hash"/>
 						</el-select>
 					</div>
+					<div v-if="selectedGameObject">
+						<b>Overrides:</b>
+						<p v-for="(value, key) of selectedGameObject.overrides.values()" :key="key">{{value.field}}</p>
+					</div>
 				</div>
 			</div>
 			<div class="container transform-container">
@@ -80,7 +84,6 @@ import { SelectionGroup } from '@/script/types/SelectionGroup';
 import { GameObject } from '@/script/types/GameObject';
 import SetVariationCommand from '@/script/commands/SetVariationCommand';
 import Partition from './EBXComponents/Partition.vue';
-import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/Instance.vue';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import Reference from '@/script/types/ebx/Reference';
 import ArrayProperty from './EBXComponents/ArrayProperty.vue';
@@ -88,8 +91,11 @@ import ReferenceProperty from '@/script/components/EditorComponents/Inspector/EB
 import { Promised } from 'vue-promised';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { WORLD_SPACE } from '@/script/types/Enums';
+import { CtrRef } from '@/script/types/CtrRef';
+import SetEBXFieldCommand from '@/script/commands/SetEBXFieldCommand';
+import Instance from '@/script/types/ebx/Instance';
 
-@Component({ components: { LinearTransformControl, EditorComponent, Partition, Instance, ArrayProperty, ReferenceProperty, Promised } })
+@Component({ components: { LinearTransformControl, EditorComponent, Partition, ArrayProperty, ReferenceProperty, Promised } })
 export default class InspectorComponent extends EditorComponent {
 	data() {
 		return {
@@ -157,8 +163,12 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.execute(command);
 	}
 
-	private onEBXInput(a: any, b: any, c: any) {
-		console.log(a, b, c);
+	private onEBXInput(value: { field: string, type: string, ref: CtrRef, value: any, oldValue: any }) {
+		console.log(value);
+		if (this.selectedGameObject) {
+			value.guid = this.selectedGameObject.guid;
+		}
+		window.editor.execute(new SetEBXFieldCommand(value));
 	}
 
 	private onInput(newTrans: LinearTransform) {

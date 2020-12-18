@@ -222,8 +222,12 @@ export class FrostbiteDataManager {
 		return null;
 	}
 
-	public getPartition(partitionGuid: Guid) {
-		return this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
+	public getPartition(partitionGuid: Guid): FBPartition | null {
+		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
+		if (partition) {
+			return partition;
+		}
+		return null;
 	}
 
 	public getPartitionName(partitionGuid: Guid): string {

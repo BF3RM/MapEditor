@@ -18,7 +18,7 @@ import Instance from '../../../../types/ebx/Instance';
 import Property from './Property.vue';
 
 export default Vue.extend({
-	name: 'Instance',
+	name: 'InstanceProperty',
 	components: {
 		Property
 	},

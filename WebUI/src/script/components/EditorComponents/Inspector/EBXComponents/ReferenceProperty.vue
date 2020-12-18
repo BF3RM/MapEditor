@@ -14,7 +14,7 @@
 				{{cleanPath}} <span class="Guid">{{guid}}</span> - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
 			</template>
 			<template v-if="expanded && partition">
-					<Instance :instance="instance" :partition="partition" :reference-links="link" @input="$emit('input', $event)"></Instance>
+					<InstanceProperty :instance="instance" :partition="partition" :reference-links="link" @input="$emit('input', $event)"></InstanceProperty>
 			</template>
 			<template v-if="loading">
 				(loading)
@@ -41,7 +41,7 @@ import { GameObject } from '@/script/types/GameObject';
 @Component({
 	name: 'ReferenceProperty',
 	components: {
-		Instance: () => import('./Instance.vue')
+		InstanceProperty: () => import('./InstanceProperty.vue')
 	}
 })
 export default class ReferenceComponent extends Vue {

@@ -11,11 +11,11 @@ export default class Reference {
 		this.instanceGuid = new Guid(instanceGuid);
 	}
 
-	public getInstance(): Instance | undefined {
+	public getInstance(): Instance | null {
 		return window.editor.fbdMan.getInstance(this.partitionGuid, this.instanceGuid);
 	}
 
-	public getPartition(): FBPartition | undefined {
+	public getPartition(): FBPartition | null {
 		return window.editor.fbdMan.getPartition(this.partitionGuid);
 	}
 }

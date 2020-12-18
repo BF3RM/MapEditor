@@ -20,9 +20,9 @@
 
             <ul class="content">
                 <li v-for="instance in partition.instances" :key="instance.guid">
-                    <instance :key="instance.guid"
+                    <InstanceProperty :key="instance.guid"
                               :partition="partition" :instance="instance"
-                              :active="activeInstance"></instance>
+                              :active="activeInstance"></InstanceProperty>
                 </li>
             </ul>
         </div>
@@ -36,7 +36,7 @@
 import Vue from 'vue';
 
 import Partition from '../../../../types/ebx/Partition';
-import Instance from './Instance.vue';
+import InstanceProperty from './InstanceProperty.vue';
 // import Graph from './graph/Graph.vue';
 
 export default Vue.extend({
@@ -99,7 +99,7 @@ export default Vue.extend({
 		}
 	},
 	components: {
-		Instance
+		InstanceProperty
 		// Graph
 	}
 });

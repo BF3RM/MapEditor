@@ -15,6 +15,8 @@ import { RAYCAST_LAYER } from '@/script/types/Enums';
 import Instance from '@/script/types/ebx/Instance';
 import Partition from '@/script/types/ebx/Partition';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
+import { Dictionary } from 'typescript-collections';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 /*
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -37,6 +39,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public parent: GameObject;
 	public isUserModified: boolean;
 	public originalRef: CtrRef | undefined;
+	public overrides = new Dictionary<string, IEBXFieldData>(); // guid, field
 
 	public get localTransform(): LinearTransform {
 		const parentWorldInverse = new THREE.Matrix4().getInverse(this.parent.matrixWorld);
@@ -133,7 +136,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			blueprintCtrRef: this.blueprintCtrRef,
 			parentData: this.parentData,
 			transform: this.transform,
-			variation: this.variation
+			variation: this.variation,
+			overrides: this.overrides
 		});
 	}
 
@@ -191,6 +195,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	public setTransform(linearTransform: LinearTransform) {
+		const oldTransform = this.transform.clone();
 		this.transform = linearTransform;
 		this.updateTransform();
 		if (this.originalRef !== undefined && this.parent.partition) {
@@ -199,14 +204,27 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 				const instance = res.getInstance(this.originalRef.instanceGuid);
 				console.log(instance);
 				if (instance) {
-					console.log(instance.fields.blueprintTransform.value);
-					instance.fields.blueprintTransform.value.set(new LinearTransform().setFromMatrix(this.matrix));
+					const transform = new LinearTransform().setFromMatrix(this.matrix);
+					if (this.originalRef) {
+						this.parent.setOverride(this.originalRef, { guid: this.guid, reference: this.originalRef, field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform' });
+					}
+					instance.fields.blueprintTransform.value.set(transform);
+
 					console.log(instance.fields.blueprintTransform.value);
 				}
 			});
 		}
 		editor.threeManager.setPendingRender();
 		editor.threeManager.nextFrame(() => signals.objectChanged.emit(this, 'transform', linearTransform));
+	}
+
+	public setOverride(ref: CtrRef, override: IEBXFieldData) {
+		if (this.overrides.getValue(override.field) !== undefined) {
+			// @ts-ignore
+			this.overrides.getValue(override.field).value = override;
+		} else {
+			this.overrides.setValue(override.field, override);
+		}
 	}
 
 	public setName(name: string) {

@@ -86,4 +86,8 @@ export default class Field<Type> {
 			json.$enumValue
 		);
 	}
+
+	setValue(newValue: any) {
+		this.value = newValue;
+	}
 }

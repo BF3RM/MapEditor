@@ -55,7 +55,7 @@ export default Vue.extend({
 	}),
 	methods: {
 		onInput(value: number) {
-			console.log(value);
+			this.$emit('input', value);
 		},
 		cleanType(index: string) {
 			return index.replace(this.field.type + '_', '');
