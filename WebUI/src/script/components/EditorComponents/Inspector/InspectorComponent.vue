@@ -27,9 +27,13 @@
 							<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name ? variation.name : 'Default variation'" :value="variation.hash"/>
 						</el-select>
 					</div>
-					<div v-if="selectedGameObject && selectedGameObject.overrides.values().length > 0">
+					<div v-if="selectedGameObject">
 						<b>Overrides:</b>
 						<p v-for="(value, key) of selectedGameObject.overrides.values()" :key="key">{{value.field}}</p>
+						<div v-if="selectedGameObject.overrides.values().length > 0">
+<!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
+<!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
+						</div>
 					</div>
 				</div>
 			</div>
@@ -61,7 +65,7 @@
 							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
 						</div>
 						<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
-							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" v-for="(instance, index) of data.primaryInstance.fields.objects.value" :key="index" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="instance" :instance="instance" :reference="instance.value" :partition="data"></reference-property>
+							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event, index)" v-for="(instance, index) of data.primaryInstance.fields.objects.value" :key="index" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="instance" :instance="instance" :reference="instance.value" :partition="data"></reference-property>
 						</div>
 					</template>
 					<template v-slot:rejected="error">
@@ -163,12 +167,23 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.execute(command);
 	}
 
-	private onEBXInput(value: IEBXFieldData) {
-		console.log(value);
+	private onEBXInput(value: IEBXFieldData, index: string = '') {
 		if (this.selectedGameObject) {
 			value.guid = this.selectedGameObject.guid;
+
+			if (index !== '') {
+				window.editor.execute(new SetEBXFieldCommand({
+					guid: this.selectedGameObject.guid,
+					reference: this.selectedGameObject.originalRef,
+					field: 'objects',
+					type: 'array',
+					index: Number(index),
+					value: value
+				}));
+			} else {
+				window.editor.execute(new SetEBXFieldCommand(value));
+			}
 		}
-		window.editor.execute(new SetEBXFieldCommand(value));
 	}
 
 	private onInput(newTrans: LinearTransform) {

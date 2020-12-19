@@ -227,6 +227,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
+	public ApplyOverrides() {
+	}
+
 	public setName(name: string) {
 		this.name = name;
 		signals.objectChanged.emit(this, 'name', name);

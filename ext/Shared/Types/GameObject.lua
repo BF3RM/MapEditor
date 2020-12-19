@@ -251,9 +251,23 @@ function GameObject:GetEntities()
 
     return s_Entities
 end
-
-function GameObject:SetOverride(field, value, type)
-	self.overrides[field] = {field, value, type}
+function GameObject:SetOverrides(p_Overrides)
+	for _,v in pairs(p_Overrides) do
+		self:SetOverride(v.field, v.reference, v.type, v.value)
+	end
+	return true
 end
+function GameObject:SetOverride(p_Field, p_Reference, p_Type, p_Value)
+	local s_Result = EBXManager:SetField(self, p_Field, p_Reference, p_Type, p_Value)
+	if(s_Result) then
+		self.overrides[p_Field] = {p_Field, p_Reference, p_Type, p_Value}
+	end
+	return s_Result
+end
+
+function GameObject:hasOverrides()
+	return #pairs(self.overrides) > 0
+end
+
 
 return GameObject

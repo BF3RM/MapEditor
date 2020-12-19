@@ -26,7 +26,7 @@ export default Vue.extend({
 		inputValue: '' as any,
 		dirty: false
 	}),
-	
+
 	methods: {
 		onBlur() {
 			if (isNaN(this.$props.value)) {

@@ -1,6 +1,6 @@
 class 'MapEditorShared'
 Async = require "__shared/Util/Async"
-
+require "__shared/Util/DataContainerExt"
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
 --require "__shared/Modules/ObjectManager"
@@ -28,6 +28,7 @@ require "__shared/Patches/Patches"
 
 require "__shared/Config"
 local m_Logger = Logger("MapEditorShared", true)
+DataContainerExt = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")

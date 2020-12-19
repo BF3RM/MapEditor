@@ -262,11 +262,21 @@ function CommandActions:SetEBXField(p_Command)
 		m_Logger:Error("The SetEBXFieldCommand needs to have a valid gameObjectTransferData set.")
 		return
 	end
+	local s_Result = nil
 
+	if(p_Command.gameObjectTransferData.guid) then -- Override only this instance
+		local s_GameObject = GameObjectManager:GetGameObject(p_Command.gameObjectTransferData.guid)
+		if(not s_GameObject) then
+			m_Logger:Warning('Could not find GameObject: ' .. p_GameObjectGuid)
+			return nil, ActionResultType.Failure
+		end
+		s_Result = GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
+	else
+		--s_Result = EBXManager:SetFields(nil, p_Command.gameObjectTransferData.overrides)
+	end
 
-	local s_Result = EBXManager:SetField(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData)
 	if (s_Result == false) then
-		m_Logger:Error("Failed to set variation for object " .. p_Command.gameObjectTransferData.guid)
+		m_Logger:Error("Failed to set field: " .. p_Command.gameObjectTransferData.overrides.type .. p_Command.gameObjectTransferData.overrides.field)
 		return nil, ActionResultType.Failure
 	end
 

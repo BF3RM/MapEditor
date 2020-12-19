@@ -14,39 +14,19 @@ end
 function EBXManager:OnLevelDestroy()
 	self:RegisterVars()
 end
-function EBXManager:SetField(p_GameObjectGuid, p_GameObjectTransferData)
-	local s_GameObject = GameObjectManager:GetGameObject(p_GameObjectGuid)
-	if(not s_GameObject) then
-		m_Logger:Warning('Could not find GameObject: ' .. p_GameObjectGuid)
-		return nil, ActionResultType.Failure
+function EBXManager:SetFields(p_Overrides)
+	for _,v in pairs(p_Overrides) do
+		self:SetField(v.field, v.reference, v.type, v.value)
 	end
-	local s_InstanceGuid = p_GameObjectTransferData.overrides[1].reference.instanceGuid;
-	local s_Instance = ResourceManager:FindInstanceByGuid(Guid(p_GameObjectTransferData.overrides[1].reference.partitionGuid), Guid(s_InstanceGuid))
-	if(not s_Instance) then
-		--print("This shit fucked y'all:")
-		--print(p_GameObjectTransferData.reference.partitionGuid)
-		--print(p_GameObjectTransferData.reference.instanceGuid)
-		return nil, ActionResultType.Failure
-	end
-	--print(p_GameObjectTransferData)
-	s_Instance = _G[s_Instance.typeInfo.name](s_Instance)
-	for _, l_Override in pairs(p_GameObjectTransferData.overrides) do
-		if (l_Override.reference.instanceGuid ~= s_InstanceGuid) then
-			s_Instance = ResourceManager:FindInstanceByGuid(Guid(l_Override.reference.partitionGuid), Guid(l_Override.reference.instanceGuid))
+end
+
+function EBXManager:SetField(p_Field, reference, p_Type, p_Value)
+	local s_Instance = p_GameObject.originalRef:Get()
+	if(s_Instance) then
+		if(isPrintable(p_Type)) then
+			local s_Value = ParseType(l_Override.type, l_Override.value)
+			s_Instance[l_Override.field] = s_Value
 		end
-		if(s_Instance.isReadOnly) then
-			s_Instance:MakeWritable()
-		end
-		--print('Original value:')
-		--print(s_Instance[l_Override.field] )
-		local s_Value = ParseType(l_Override.type, l_Override.value)
-		--print(s_Value)
-		s_Instance[l_Override.field] = s_Value
-		--print("Changed value: ")
-		--print(l_Override.value)
-		s_GameObject:SetOverride(l_Override.field, l_Override.value, l_Override.type)
-		s_GameObject:Disable()
-		s_GameObject:Enable()
 	end
 end
 

@@ -15,7 +15,7 @@
             <table class="table is-array-element">
                 <tbody>
 					<div v-for="(value, index) in field.value" :key="value.name">
-						<property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance"></property>
+						<property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
 					</div>
                 </tbody>
             </table>
@@ -57,6 +57,11 @@ export default Vue.extend({
 		currentPath: {
 			type: String,
 			required: false
+		}
+	},
+	methods: {
+		onInput(event: any, index: number) {
+			this.$emit('input', event);
 		}
 	},
 	data() {
