@@ -37,7 +37,8 @@ export default class VEXTInterface {
 			SetTransform: signals.setTransform.emit,
 			SetVariation: signals.setVariation.emit,
 			EnabledBlueprint: signals.enabledBlueprint.emit,
-			DisabledBlueprint: signals.disabledBlueprint.emit
+			DisabledBlueprint: signals.disabledBlueprint.emit,
+			SetField: signals.setEBXField.emit
 		};
 
 		this.messages = {

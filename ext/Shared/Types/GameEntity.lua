@@ -75,7 +75,6 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
             s_Entity.transform = LinearTransform(p_LinearTransform)
         else
             s_Entity.transform = ToWorld(self.transform, LinearTransform(p_LinearTransform))
-
             if(p_UpdateCollision and p_Enabled) then
                 s_Entity:FireEvent("Disable")
                 s_Entity:FireEvent("Enable")

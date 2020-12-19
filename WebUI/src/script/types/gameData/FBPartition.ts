@@ -12,6 +12,7 @@ export class FBPartition {
 	public typeName: string;
 	public instanceCount: number;
 	public _data: any = undefined;
+	public isLoaded = false;
 
 	private promise: Promise<AxiosResponse<EBX.JSON.Partition>>;
 	constructor(
@@ -58,6 +59,7 @@ export class FBPartition {
 		this.promise = axios.get('http://176.9.7.112:8081/' + this.name + '.json').then((response: AxiosResponse<EBX.JSON.Partition>) => {
 			const data = Partition.fromJSON(this.name, response.data);
 			for (const instance of response.data.$instances) {
+				this.isLoaded = true;
 				Vue.set(this.instances, instance.$guid, Instance.fromJSON(this._data, instance));
 			}
 			return data;

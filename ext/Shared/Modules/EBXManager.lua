@@ -44,6 +44,9 @@ function EBXManager:SetField(p_GameObjectGuid, p_GameObjectTransferData)
 		s_Instance[l_Override.field] = s_Value
 		--print("Changed value: ")
 		--print(l_Override.value)
+		s_GameObject:SetOverride(l_Override.field, l_Override.value, l_Override.type)
+		s_GameObject:Disable()
+		s_GameObject:Enable()
 	end
 end
 

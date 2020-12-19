@@ -33,6 +33,8 @@ export const signals = {
 	enabledBlueprint: new Signal(),
 	disabledBlueprint: new Signal(),
 
+	setEBXField: new Signal(),
+
 	createGroupRequested: new Signal(),
 	createdGroup: new Signal(),
 	deletedGroup: new Signal(),

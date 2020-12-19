@@ -1,12 +1,13 @@
 <template>
   <input v-model="inputValue"
-         :type="type"
-         :min="min"
-         :max="max"
-         :step="step"
-         @input="onInput"
-         @blur="onBlur"
-         @focus="dirty = true"/>
+		:class="{'error': (isNaN(value))}"
+		:type="type"
+		:min="min"
+		:max="max"
+		:step="step"
+		@input="onInput"
+		@blur="onBlur"
+		@focus="dirty = true"/>
 </template>
 
 <script lang="ts">
@@ -27,6 +28,9 @@ export default Vue.extend({
 	}),
 	methods: {
 		onBlur() {
+			if (isNaN(this.value)) {
+				return;
+			}
 			this.dirty = false;
 			if (this.inputValue !== this.value) {
 				this.inputValue = this.value;
@@ -34,6 +38,9 @@ export default Vue.extend({
 			this.$emit('blur');
 		},
 		onInput() {
+			if (isNaN(this.value)) {
+				return;
+			}
 			this.$emit('input', this.inputValue);
 		}
 	},

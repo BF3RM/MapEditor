@@ -55,7 +55,7 @@ export default class EditorToolbar extends Vue {
 	private worldView = 0;
 	private tool = (window).editor.threeManager.gizmoMode;
 	private worldSpace = (window).editor.threeManager.worldSpace;
-	private worldSpaces = ['local', 'world'];
+	private worldSpaces = ['world', 'local'];
 	private tools = ['select', 'translate', 'rotate', 'scale'];
 
 	private windows = [];

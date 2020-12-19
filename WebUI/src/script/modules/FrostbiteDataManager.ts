@@ -7,6 +7,8 @@ import { Dictionary } from 'typescript-collections';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { Guid } from '@/script/types/Guid';
 import Instance from '@/script/types/ebx/Instance';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
+import { CommandActionResult } from '@/script/types/CommandActionResult';
 
 export class FrostbiteDataManager {
 	public superBundles = new Dictionary<string, FBSuperBundle>();
@@ -37,6 +39,7 @@ export class FrostbiteDataManager {
 
 		signals.editor.Initializing.connect(this._onEditorInitializing.bind(this));
 		signals.editor.Ready.connect(this._onEditorReady.bind(this));
+		signals.setEBXField.connect(this.onSetEBXField.bind(this));
 
 		this._Init();
 	}
@@ -233,5 +236,18 @@ export class FrostbiteDataManager {
 	public getPartitionName(partitionGuid: Guid): string {
 		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
 		return partition ? partition.name : '';
+	}
+
+	private onSetEBXField(commandActionResult: CommandActionResult) {
+		// IEBXFieldData
+		for (const override of commandActionResult.gameObjectTransferData.overrides) {
+			const partition = this.getPartition(override.reference.partitionGuid);
+			if (partition && partition.isLoaded) {
+				const reference = override.reference.Resolve();
+				if (reference) {
+					reference.fields[override.field].value = override.value;
+				}
+			}
+		}
 	}
 }

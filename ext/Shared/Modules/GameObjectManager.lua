@@ -209,7 +209,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		--print("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
 		for _,l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
-			l_Entity:Init(self.m_Realm, true)
+			-- l_Entity:Init(self.m_Realm, true)
 			--l_Entity:Init(Realm.Realm_ClientAndServer, true)
 		end
 	end
@@ -237,8 +237,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					max = s_Entity.aabb.max,
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
 				}
-			else
-				s_GameEntity.isSpatial = false
 			end
 			if (s_GameEntity.initiatorRef == nil and s_GameEntity.data) then
 				s_GameEntity.initiatorRef = CtrRef {
@@ -486,7 +484,6 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	if (not s_Entity) then
 		return
 	end
-	--print("Spawning entity: " ..p_EntityData.typeInfo.name)
 	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
 	if (s_GameEntity == nil) then
 		s_GameEntity = GameEntity{
@@ -507,6 +504,20 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	if(s_PendingGameObject) then
 		--print("Added pending:")
 		--print(s_PendingGameObject.name)
+		if(s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
+			local s_Entity = SpatialEntity(s_Entity)
+			if(s_Entity:Is("SpotLightEntity")) then
+				print(s_Entity.transform)
+			end
+			s_GameEntity.isSpatial = true
+			s_GameEntity.transform = ToLocal(s_Entity.transform, s_PendingGameObject.transform)
+			s_GameEntity.aabb = AABB {
+				min = s_Entity.aabb.min,
+				max = s_Entity.aabb.max,
+				transform = ToLocal(s_Entity.aabbTransform, s_PendingGameObject.transform)
+			}
+		end
+
 		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
 	end
 end

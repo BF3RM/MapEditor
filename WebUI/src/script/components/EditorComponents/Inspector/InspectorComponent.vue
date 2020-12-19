@@ -27,7 +27,7 @@
 							<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name ? variation.name : 'Default variation'" :value="variation.hash"/>
 						</el-select>
 					</div>
-					<div v-if="selectedGameObject">
+					<div v-if="selectedGameObject && selectedGameObject.overrides.values().length > 0">
 						<b>Overrides:</b>
 						<p v-for="(value, key) of selectedGameObject.overrides.values()" :key="key">{{value.field}}</p>
 					</div>
@@ -92,7 +92,7 @@ import { Promised } from 'vue-promised';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { WORLD_SPACE } from '@/script/types/Enums';
 import { CtrRef } from '@/script/types/CtrRef';
-import SetEBXFieldCommand from '@/script/commands/SetEBXFieldCommand';
+import SetEBXFieldCommand, { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import Instance from '@/script/types/ebx/Instance';
 
 @Component({ components: { LinearTransformControl, EditorComponent, Partition, ArrayProperty, ReferenceProperty, Promised } })
@@ -117,7 +117,7 @@ export default class InspectorComponent extends EditorComponent {
 	private objectType = '';
 	private nOfObjectsInGroup = 0;
 	private partition: any;
-	private worldSpace: WORLD_SPACE = WORLD_SPACE.world;
+	private worldSpace: WORLD_SPACE = WORLD_SPACE.local;
 	private transform: LinearTransform = new LinearTransform();
 	private localTransform: LinearTransform = new LinearTransform();
 
@@ -163,7 +163,7 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.execute(command);
 	}
 
-	private onEBXInput(value: { field: string, type: string, ref: CtrRef, value: any, oldValue: any }) {
+	private onEBXInput(value: IEBXFieldData) {
 		console.log(value);
 		if (this.selectedGameObject) {
 			value.guid = this.selectedGameObject.guid;

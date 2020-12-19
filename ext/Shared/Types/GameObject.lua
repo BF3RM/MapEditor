@@ -15,6 +15,11 @@ function GameObject:__init(arg)
     self.userModifiedFields = {}
 	self.originalRef = arg.originalRef
 	self.localTransform = arg.localTransform
+	if (arg.overrides) then
+		self.overrides = arg.overrides
+	else
+		self.overrides = {}
+	end
     --self.name = arg.name
     --self.parentData = arg.parentData
     --self.transform = arg.transform  -- world transform
@@ -199,10 +204,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 	self:SetField("transform", LinearTransform(p_LinearTransform))
 	local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
 	if(s_Parent ~= nil) then
-		print("Set local transform: ")
 		local s_LocalTransform = ToLocal(self.transform, s_Parent.transform)
-		print(s_Parent.transform)
-		print(s_LocalTransform)
 		self:SetField("localTransform", s_LocalTransform)
 	else
 		print("Could not find parent")
@@ -225,7 +227,8 @@ function GameObject:GetGameObjectTransferData()
         isVanilla = self.isVanilla,
         realm = self.realm,
         isUserModified = self.isUserModified,
-        originalRef = self.originalRef:GetTable()
+        originalRef = self.originalRef:GetTable(),
+        overrides = self.overrides
         -- entities have to be set externally
     }
 
@@ -249,5 +252,8 @@ function GameObject:GetEntities()
     return s_Entities
 end
 
+function GameObject:SetOverride(field, value, type)
+	self.overrides[field] = {field, value, type}
+end
 
 return GameObject

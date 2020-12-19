@@ -272,12 +272,12 @@ function CommandActions:SetEBXField(p_Command)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
-		variation = p_Command.gameObjectTransferData.variation
+		overrides = p_Command.gameObjectTransferData.overrides
 	}
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "SetVariation",
+		type = "SetField",
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 
