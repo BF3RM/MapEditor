@@ -26,9 +26,10 @@ export default Vue.extend({
 		inputValue: '' as any,
 		dirty: false
 	}),
+	
 	methods: {
 		onBlur() {
-			if (isNaN(this.value)) {
+			if (isNaN(this.$props.value)) {
 				return;
 			}
 			this.dirty = false;
@@ -38,7 +39,7 @@ export default Vue.extend({
 			this.$emit('blur');
 		},
 		onInput() {
-			if (isNaN(this.value)) {
+			if (isNaN(this.$props.value)) {
 				return;
 			}
 			this.$emit('input', this.inputValue);

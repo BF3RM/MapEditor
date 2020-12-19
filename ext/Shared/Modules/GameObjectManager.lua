@@ -506,9 +506,6 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		--print(s_PendingGameObject.name)
 		if(s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
 			local s_Entity = SpatialEntity(s_Entity)
-			if(s_Entity:Is("SpotLightEntity")) then
-				print(s_Entity.transform)
-			end
 			s_GameEntity.isSpatial = true
 			s_GameEntity.transform = ToLocal(s_Entity.transform, s_PendingGameObject.transform)
 			s_GameEntity.aabb = AABB {

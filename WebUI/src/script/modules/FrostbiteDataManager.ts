@@ -9,6 +9,7 @@ import { Guid } from '@/script/types/Guid';
 import Instance from '@/script/types/ebx/Instance';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
+import { CtrRef } from '@/script/types/CtrRef';
 
 export class FrostbiteDataManager {
 	public superBundles = new Dictionary<string, FBSuperBundle>();
@@ -220,7 +221,7 @@ export class FrostbiteDataManager {
 	public getInstance(partitionGuid: Guid, instanceGuid: Guid): Instance | null {
 		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
 		if (partition) {
-			return partition.getInstance(instanceGuid);
+			return partition.getInstance(instanceGuid.toString().toLowerCase());
 		}
 		return null;
 	}
@@ -243,9 +244,9 @@ export class FrostbiteDataManager {
 		for (const override of commandActionResult.gameObjectTransferData.overrides) {
 			const partition = this.getPartition(override.reference.partitionGuid);
 			if (partition && partition.isLoaded) {
-				const reference = override.reference.Resolve();
+				const reference = partition.getInstance(override.reference.instanceGuid);
 				if (reference) {
-					reference.fields[override.field].value = override.value;
+					reference.fields[override.field].value = override.value; // TODO: Parse values
 				}
 			}
 		}

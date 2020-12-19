@@ -252,7 +252,7 @@ export class VEXTemulator {
 
 	private SetEBXField(commandActionResult: CommandActionResult) {
 		return {
-			type: 'SetEBXField',
+			type: 'SetField',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid,
 				overrides: commandActionResult.gameObjectTransferData.overrides

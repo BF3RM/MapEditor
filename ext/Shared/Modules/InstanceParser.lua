@@ -129,8 +129,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			-- If the map uses both the autogen and the original prefab, use the original prefab instead.
 			if(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] ~= nil) then
 				if(s_Autogen == false) then
-					print("Replacing Autogen: " .. s_PrimaryInstance.name)
-					print(l_Instance.instanceGuid)
+					m_Logger:Write("Replacing Autogen: " .. s_PrimaryInstance.name .. " - " .. tostring(l_Instance.instanceGuid))
 					self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
 				end
 			else

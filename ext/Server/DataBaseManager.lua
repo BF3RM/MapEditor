@@ -50,7 +50,7 @@ function DataBaseManager:CreateOrUpdateDatabase()
 		CREATE UNIQUE INDEX IF NOT EXISTS ]] .. m_ProjectName_Unique_Index .. [[ ON ]] .. m_DB_Header_Table_Name ..  [[(]] .. m_ProjectName_Text_Column_Name .. [[);
 	]]
 
-	m_Logger:Write(createProjectHeaderTableQuery)
+	-- m_Logger:Write(createProjectHeaderTableQuery)
 
 	if not SQL:Query(createProjectHeaderTableQuery) then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
