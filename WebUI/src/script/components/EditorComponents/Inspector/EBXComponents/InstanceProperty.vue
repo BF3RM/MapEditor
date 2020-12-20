@@ -38,33 +38,19 @@ export default Vue.extend({
 				return { field: 'none', type: 'none', value: {} };
 			},
 			required: false
-		},
-		active: String
+		}
 	},
 	data() {
 		return {
 			visible: true
 		};
 	},
-	mounted() {
-		if (location.hash && location.hash.substring(1) === this.instance.guid) {
-			this.visible = true;
-		}
-		console.log(this.$props.partition.name);
-	},
 	methods: {
 		getOverrides(field: string): any {
 			if (this.$props.overrides) {
-				return this.$props.overrides.field === field ? this.$props.overrides.value : null;
+				return this.$props.overrides.field === field ? this.$props.overrides.value : { field: 'none', type: 'none', value: {} };
 			}
-			return null;
-		}
-	},
-	watch: {
-		active(guid) {
-			if (guid === this.instance.guid) {
-				this.visible = true;
-			}
+			return { field: 'none', type: 'none', value: {} };
 		}
 	}
 });

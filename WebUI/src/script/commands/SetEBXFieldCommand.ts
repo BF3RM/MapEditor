@@ -6,8 +6,8 @@ import Field from '@/script/types/ebx/Field';
 import { Guid } from '@/script/types/Guid';
 
 export interface IEBXFieldData {
-	guid: Guid,
-	reference: CtrRef | undefined,
+	guid?: Guid,
+	reference?: CtrRef | undefined,
 	field: string,
 	type: string,
 	value: any,

@@ -221,7 +221,7 @@ export class FrostbiteDataManager {
 	public getInstance(partitionGuid: Guid, instanceGuid: Guid): Instance | null {
 		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
 		if (partition) {
-			return partition.getInstance(instanceGuid.toString().toLowerCase());
+			return partition.getInstance(instanceGuid);
 		}
 		return null;
 	}

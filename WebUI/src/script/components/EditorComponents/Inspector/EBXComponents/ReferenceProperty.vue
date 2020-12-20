@@ -14,7 +14,7 @@
 				{{cleanPath}} <span class="Guid">{{guid}}</span> - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
 			</template>
 			<template v-if="expanded && partition">
-					<InstanceProperty :overrides="overrides.value" :instance="instance" :partition="partition" :reference-links="link" @input="$emit('input', $event)"></InstanceProperty>
+					<InstanceProperty :overrides="overrides" :instance="instance" :partition="partition" :reference-links="link" @input="$emit('input', $event)"></InstanceProperty>
 			</template>
 			<template v-if="loading">
 				(loading)

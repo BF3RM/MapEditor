@@ -7,7 +7,7 @@
             <div class="field-spacer">
 				<component :type="field.type" :class="field.type" :autoOpen="autoOpen"
 					:currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field"
-					:value="getValue()" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value"></component>
+					:value="getValue()" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value" :overrides="getOverrides()"></component>
 			</div>
         </td>
     </tr>
@@ -26,6 +26,8 @@ import BoolControl from '@/script/components/controls/BoolControl.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import Instance from '@/script/types/ebx/Instance';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
+import { CtrRef } from '@/script/types/CtrRef';
+import { isPrintable } from '@/script/modules/Utils';
 export default Vue.extend({
 	name: 'Property',
 	props: {
@@ -50,7 +52,7 @@ export default Vue.extend({
 			required: false
 		},
 		overrides: {
-			type: Object as PropType<IEBXFieldData>,
+			type: undefined,
 			default() {
 				return { field: 'none', type: 'none', value: {} };
 			},
@@ -60,10 +62,12 @@ export default Vue.extend({
 	methods: {
 		onChangeValue(field: string, newValue: any) {
 			this.$emit('input', {
-				reference: {
-					partitionGuid: this.partition.guid,
-					instanceGuid: this.instance.guid
-				},
+				reference: new CtrRef(
+					undefined,
+					undefined,
+					this.partition.guid,
+					this.instance.guid
+				),
 				field: field,
 				type: this.field.type,
 				value: newValue,
@@ -72,9 +76,27 @@ export default Vue.extend({
 		},
 		getValue() {
 			if (this.overrides && this.overrides.field !== 'none') {
-				return this.overrides.value;
+				if (isNaN(this.overrides as any)) {
+					return (this.overrides as IEBXFieldData).value;
+				} else {
+					return this.overrides;
+				}
 			}
 			return this.field.value;
+		},
+		getOverrides() {
+			if (this.overrides && this.overrides.field !== 'none') {
+				if (isNaN(this.overrides as any)) {
+					if (this.field.isReference()) {
+						return this.overrides;
+					}
+					if (isPrintable(this.overrides.type)) {
+						return this.overrides.value;
+					}
+					return this.overrides;
+				}
+			}
+			return { field: 'none', type: 'none', value: {} };
 		}
 	},
 	computed: {
@@ -102,10 +124,6 @@ export default Vue.extend({
 					return NumberControl;
 				case 'Boolean':
 					return BoolControl;
-				case 'AntRef':
-				// TODO assetId
-				// Characters/Soldiers/MpSoldier.json
-					return import('./ObjectProperty.vue');
 				default:
 					console.log('Unknown property type: ' + this.field.type);
 					break;

@@ -327,19 +327,17 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
-	public getEBXOverrides() {
-		const blueprint = this.blueprintCtrRef.Resolve();
-		if (blueprint) {
-			let overrides = null;
-			if (blueprint.typeName === 'PrefabBlueprint') {
-				overrides = this.overrides.getValue('objects');
-			} else {
-				overrides = this.overrides.getValue('object');
-			}
-			if (overrides) {
-				return overrides.value;
-			}
-			return null;
+	public get EBXOverrides() {
+		const type = this.blueprintCtrRef.typeName;
+		let overrides = null;
+		if (type === 'PrefabBlueprint') {
+			overrides = this.overrides.getValue('objects');
+		} else {
+			overrides = this.overrides.getValue('object');
 		}
+		if (overrides) {
+			return overrides.value;
+		}
+		return overrides;
 	}
 }

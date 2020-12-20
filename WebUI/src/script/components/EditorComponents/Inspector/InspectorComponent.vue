@@ -62,10 +62,10 @@
 					</template>
 					<template v-slot="data">
 						<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
-							<reference-property :overrides="selectedGameObject.getEBXOverrides()" :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
+							<reference-property :overrides="selectedGameObject.EBXOverrides" :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
 						</div>
 						<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
-							<array-property :overrides="selectedGameObject.getEBXOverrides()" :gameObject="selectedGameObject" @input="onEBXInput($event, true)" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="data.primaryInstance.fields.objects" :instance="data.primaryInstance" :reference="data.primaryInstance" :partition="data"></array-property>
+							<array-property :overrides="selectedGameObject.EBXOverrides" :gameObject="selectedGameObject" @input="onEBXInput($event, true)" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="data.primaryInstance.fields.objects" :instance="data.primaryInstance" :reference="data.primaryInstance" :partition="data"></array-property>
 						</div>
 					</template>
 					<template v-slot:rejected="error">

@@ -15,7 +15,7 @@
             <table class="table is-array-element">
                 <tbody>
 					<div v-for="(value, index) in field.value" :key="value.name">
-						<property :overrides="overrides.value" class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
+						<property :overrides="getOverrides(value.name)" class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
 					</div>
                 </tbody>
             </table>
@@ -70,6 +70,12 @@ export default Vue.extend({
 	methods: {
 		onInput(event: any, index: number) {
 			this.$emit('input', event);
+		},
+		getOverrides(field: string): any {
+			if (this.$props.overrides) {
+				return this.$props.overrides.field === field ? this.$props.overrides.value : { field: 'none', type: 'none', value: {} };
+			}
+			return { field: 'none', type: 'none', value: {} };
 		}
 	},
 	data() {

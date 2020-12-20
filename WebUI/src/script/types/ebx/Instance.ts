@@ -1,5 +1,6 @@
 import Field from './Field';
 import Partition from './Partition';
+import { Guid } from '@/script/types/Guid';
 
 type Fields = { [name: string]: Field<any> }
 
@@ -7,7 +8,7 @@ export default class Instance {
 	public readonly fields: Fields;
 
 	constructor(
-		public readonly guid: Frostbite.Guid,
+		public readonly guid: Guid,
 		public readonly typeName: string,
 		public readonly baseClass: string,
 		fields: Fields
@@ -24,7 +25,7 @@ export default class Instance {
 		}
 
 		return new Instance(
-			json.$guid.toUpperCase(),
+			new Guid(json.$guid),
 			json.$type,
 			json.$baseClass,
 			fields
