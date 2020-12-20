@@ -270,7 +270,7 @@ function CommandActions:SetEBXField(p_Command)
 			m_Logger:Warning('Could not find GameObject: ' .. p_GameObjectGuid)
 			return nil, ActionResultType.Failure
 		end
-		s_Result = GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
+		s_Result = s_GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
 	else
 		--s_Result = EBXManager:SetFields(nil, p_Command.gameObjectTransferData.overrides)
 	end
@@ -290,7 +290,6 @@ function CommandActions:SetEBXField(p_Command)
 		type = "SetField",
 		gameObjectTransferData = s_GameObjectTransferData
 	}
-
 	return s_CommandActionResult, ActionResultType.Success
 end
 return CommandActions

@@ -15,7 +15,7 @@
             <table class="table is-array-element">
                 <tbody>
 					<div v-for="(value, index) in field.value" :key="value.name">
-						<property class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
+						<property :overrides="overrides.value" class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
 					</div>
                 </tbody>
             </table>
@@ -31,6 +31,7 @@ import Field from '../../../../types/ebx/Field';
 
 import Property from './Property.vue';
 import Instance from '@/script/types/ebx/Instance';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export default Vue.extend({
 	name: 'ArrayProperty',
@@ -56,6 +57,13 @@ export default Vue.extend({
 		},
 		currentPath: {
 			type: String,
+			required: false
+		},
+		overrides: {
+			type: Object as PropType<IEBXFieldData>,
+			default() {
+				return { field: 'none', type: 'none', value: {} };
+			},
 			required: false
 		}
 	},

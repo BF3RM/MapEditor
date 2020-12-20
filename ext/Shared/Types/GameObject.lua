@@ -20,6 +20,7 @@ function GameObject:__init(arg)
 	else
 		self.overrides = {}
 	end
+	self.internalBlueprint = nil
     --self.name = arg.name
     --self.parentData = arg.parentData
     --self.transform = arg.transform  -- world transform
@@ -252,17 +253,22 @@ function GameObject:GetEntities()
     return s_Entities
 end
 function GameObject:SetOverrides(p_Overrides)
-	for _,v in pairs(p_Overrides) do
-		self:SetOverride(v.field, v.reference, v.type, v.value)
+	if( not self.internalBlueprint) then
+		print(self:GetGameObjectTransferData())
+		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
+	end
+	for _,l_Field in pairs(p_Overrides) do
+		self:SetOverride(l_Field)
 	end
 	return true
 end
-function GameObject:SetOverride(p_Field, p_Reference, p_Type, p_Value)
-	local s_Result = EBXManager:SetField(self, p_Field, p_Reference, p_Type, p_Value)
-	if(s_Result) then
-		self.overrides[p_Field] = {p_Field, p_Reference, p_Type, p_Value}
+function GameObject:SetOverride(p_Field)
+	local s_Path = EBXManager:SetField(self.internalBlueprint, p_Field, '')
+	if(s_Path) then
+		print(s_Path)
+		self.overrides[s_Path] = p_Field
 	end
-	return s_Result
+	return s_Path ~= ''
 end
 
 function GameObject:hasOverrides()

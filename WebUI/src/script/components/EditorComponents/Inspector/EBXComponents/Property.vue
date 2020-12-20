@@ -7,7 +7,7 @@
             <div class="field-spacer">
 				<component :type="field.type" :class="field.type" :autoOpen="autoOpen"
 					:currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field"
-					:value="field.value" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value"></component>
+					:value="getValue()" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value"></component>
 			</div>
         </td>
     </tr>
@@ -48,6 +48,13 @@ export default Vue.extend({
 		autoOpen: {
 			type: Boolean,
 			required: false
+		},
+		overrides: {
+			type: Object as PropType<IEBXFieldData>,
+			default() {
+				return { field: 'none', type: 'none', value: {} };
+			},
+			required: false
 		}
 	},
 	methods: {
@@ -62,6 +69,12 @@ export default Vue.extend({
 				value: newValue,
 				oldValue: this.field.value
 			} as IEBXFieldData);
+		},
+		getValue() {
+			if (this.overrides && this.overrides.field !== 'none') {
+				return this.overrides.value;
+			}
+			return this.field.value;
 		}
 	},
 	computed: {

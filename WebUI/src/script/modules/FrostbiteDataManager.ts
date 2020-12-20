@@ -245,12 +245,13 @@ export class FrostbiteDataManager {
 			const partition = this.getPartition(override.reference.partitionGuid);
 			const gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
 			if (gameObject) {
-				gameObject.setOverride(new CtrRef(undefined, undefined, new Guid(override.reference.partitionGuid), new Guid(override.reference.instanceGuid)), override);
-			}
-			if (partition && partition.isLoaded) {
-				const reference = partition.getInstance(override.reference.instanceGuid);
-				if (reference) {
-					// reference.fields[override.field].value = override.value; // TODO: Parse values
+				gameObject.setOverride(override);
+			} else {
+				if (partition && partition.isLoaded) {
+					const reference = partition.getInstance(override.reference.instanceGuid);
+					if (reference) {
+						reference.fields[override.field].value = override.value; // TODO: Parse values
+					}
 				}
 			}
 		}

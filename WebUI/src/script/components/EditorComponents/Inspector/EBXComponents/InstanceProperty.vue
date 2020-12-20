@@ -3,7 +3,7 @@
         <div class="table-container" v-if="visible">
             <table class="table is-bordered">
                 <tbody>
-					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :key="index" @input="$emit('input', $event)"></Property>
+					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :overrides="getOverrides(field.name)" :key="index" @input="$emit('input', $event)"></Property>
                 </tbody>
             </table>
         </div>
@@ -16,6 +16,7 @@ import Vue, { PropType } from 'vue';
 import Partition from '../../../../types/ebx/Partition';
 import Instance from '../../../../types/ebx/Instance';
 import Property from './Property.vue';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export default Vue.extend({
 	name: 'InstanceProperty',
@@ -31,6 +32,13 @@ export default Vue.extend({
 			type: Object as PropType<Instance>,
 			required: true
 		},
+		overrides: {
+			type: Object as PropType<IEBXFieldData>,
+			default() {
+				return { field: 'none', type: 'none', value: {} };
+			},
+			required: false
+		},
 		active: String
 	},
 	data() {
@@ -43,6 +51,14 @@ export default Vue.extend({
 			this.visible = true;
 		}
 		console.log(this.$props.partition.name);
+	},
+	methods: {
+		getOverrides(field: string): any {
+			if (this.$props.overrides) {
+				return this.$props.overrides.field === field ? this.$props.overrides.value : null;
+			}
+			return null;
+		}
 	},
 	watch: {
 		active(guid) {

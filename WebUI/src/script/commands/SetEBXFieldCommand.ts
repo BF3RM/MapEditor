@@ -7,11 +7,11 @@ import { Guid } from '@/script/types/Guid';
 
 export interface IEBXFieldData {
 	guid: Guid,
-	reference: CtrRef,
+	reference: CtrRef | undefined,
 	field: string,
 	type: string,
 	value: any,
-	oldValue: any,
+	oldValue: any | undefined,
 }
 
 export default class SetEBXFieldCommand extends Command {
@@ -39,6 +39,7 @@ export default class SetEBXFieldCommand extends Command {
 			overrides: {
 				field: this.EBXFieldUpdateData.field,
 				value: this.EBXFieldUpdateData.oldValue,
+				type: this.EBXFieldUpdateData.type,
 				reference: this.EBXFieldUpdateData.reference
 			}
 		});

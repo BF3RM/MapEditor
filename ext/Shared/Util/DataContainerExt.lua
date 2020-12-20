@@ -564,6 +564,7 @@ end
 
 function isPrintable( typ )
 	if typ == "CString" or
+		typ == "Single" or
 		typ == "Float8" or
 		typ == "Float16" or
 		typ == "Float32" or

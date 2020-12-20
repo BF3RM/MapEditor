@@ -1,8 +1,8 @@
 class 'MapEditorShared'
 Async = require "__shared/Util/Async"
-require "__shared/Util/DataContainerExt"
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
+require "__shared/Util/DataContainerExt"
 --require "__shared/Modules/ObjectManager"
 require "__shared/Modules/GameObjectManager"
 require "__shared/Modules/CommandActions"

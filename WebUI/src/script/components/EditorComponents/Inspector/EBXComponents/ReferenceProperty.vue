@@ -14,7 +14,7 @@
 				{{cleanPath}} <span class="Guid">{{guid}}</span> - {{ reference.partitionGuid }} / {{ reference.instanceGuid }}
 			</template>
 			<template v-if="expanded && partition">
-					<InstanceProperty :instance="instance" :partition="partition" :reference-links="link" @input="$emit('input', $event)"></InstanceProperty>
+					<InstanceProperty :overrides="overrides.value" :instance="instance" :partition="partition" :reference-links="link" @input="$emit('input', $event)"></InstanceProperty>
 			</template>
 			<template v-if="loading">
 				(loading)
@@ -37,11 +37,21 @@ import Partition from '@/script/types/ebx/Partition';
 import { Component, Prop } from 'vue-property-decorator';
 import Reference from '@/script/types/ebx/Reference';
 import { GameObject } from '@/script/types/GameObject';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 @Component({
 	name: 'ReferenceProperty',
 	components: {
 		InstanceProperty: () => import('./InstanceProperty.vue')
+	},
+	props: {
+		overrides: {
+			type: Object as PropType<IEBXFieldData>,
+			default() {
+				return { field: 'none', type: 'none', value: {} };
+			},
+			required: false
+		}
 	}
 })
 export default class ReferenceComponent extends Vue {

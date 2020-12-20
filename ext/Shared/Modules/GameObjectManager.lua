@@ -118,7 +118,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if (s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
 		return
 	end
-	local originalRef = CtrRef{}
+	local originalRef = CtrRef({})
 	if(p_Parent ~= nil) then
 		originalRef = CtrRef {
 			typeName = p_Parent.typeInfo.name,
@@ -209,7 +209,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		--print("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
 		for _,l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
-			-- l_Entity:Init(self.m_Realm, true)
+			l_Entity:Init(self.m_Realm, true)
 			--l_Entity:Init(Realm.Realm_ClientAndServer, true)
 		end
 	end

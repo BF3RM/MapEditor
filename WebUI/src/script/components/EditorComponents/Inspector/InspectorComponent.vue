@@ -29,7 +29,7 @@
 					</div>
 					<div v-if="selectedGameObject">
 						<b>Overrides:</b>
-						<p v-for="(value, key) of selectedGameObject.overrides.values()" :key="key">{{value.field}}</p>
+						<p v-for="(value, key) of selectedGameObject.overrides.values()" :key="key">{{value}}</p>
 						<div v-if="selectedGameObject.overrides.values().length > 0">
 <!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
 <!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
@@ -62,10 +62,10 @@
 					</template>
 					<template v-slot="data">
 						<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
-							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
+							<reference-property :overrides="selectedGameObject.getEBXOverrides()" :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
 						</div>
 						<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
-							<reference-property :gameObject="selectedGameObject" @input="onEBXInput($event, index)" v-for="(instance, index) of data.primaryInstance.fields.objects.value" :key="index" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="instance" :instance="instance" :reference="instance.value" :partition="data"></reference-property>
+							<array-property :overrides="selectedGameObject.getEBXOverrides()" :gameObject="selectedGameObject" @input="onEBXInput($event, true)" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="data.primaryInstance.fields.objects" :instance="data.primaryInstance" :reference="data.primaryInstance" :partition="data"></array-property>
 						</div>
 					</template>
 					<template v-slot:rejected="error">
@@ -167,21 +167,25 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.execute(command);
 	}
 
-	private onEBXInput(value: IEBXFieldData, index: string = '') {
+	private onEBXInput(value: IEBXFieldData, addObjectsField = false) {
 		if (this.selectedGameObject) {
 			value.guid = this.selectedGameObject.guid;
-
-			if (index !== '') {
+			if (addObjectsField) {
 				window.editor.execute(new SetEBXFieldCommand({
 					guid: this.selectedGameObject.guid,
 					reference: this.selectedGameObject.originalRef,
 					field: 'objects',
-					type: 'array',
-					index: Number(index),
+					type: 'GameObjectData',
 					value: value
 				}));
 			} else {
-				window.editor.execute(new SetEBXFieldCommand(value));
+				window.editor.execute(new SetEBXFieldCommand({
+					guid: this.selectedGameObject.guid,
+					reference: this.selectedGameObject.originalRef,
+					field: 'object',
+					type: 'GameObjectData',
+					value: value
+				}));
 			}
 		}
 	}

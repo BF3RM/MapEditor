@@ -143,9 +143,7 @@ end
 
 function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
 	-- TODO: check player's permission once that is implemented
-
-	Async:Start(function() self:SaveProjectCoroutine(p_ProjectSaveData)
-	end)
+	self:SaveProjectCoroutine(p_ProjectSaveData)
 end
 
 function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
@@ -160,7 +158,6 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 			count = count + 1
 			s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
 		end
-		Async:Yield()
 	end
 
 	m_Logger:Write("vvvvvvvvvvvvvvvvv")

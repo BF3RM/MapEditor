@@ -20,10 +20,13 @@ function GameObjectSaveData:__init(p_GameObject)
     if not p_GameObject.isEnabled then
         self.isEnabled = false
     end
+	if(p_GameObject.originalRef) then
+		self.originalRef = p_GameObject.originalRef
+	end
 end
 
 function GameObjectSaveData:GetAsTable()
-    return {
+    local out = {
         guid = self.guid,
         name = self.name,
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
@@ -34,8 +37,11 @@ function GameObjectSaveData:GetAsTable()
         isDeleted = self.isDeleted,
         isEnabled = self.isEnabled,
         isVanilla = self.isVanilla,
-        original = self.original:GetTable(),
 	}
+	if(self.originalRef) then
+		out.originalRef = self.originalRef:GetTable()
+	end
+	return out
 end
 
 return GameObjectSaveData

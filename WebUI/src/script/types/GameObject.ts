@@ -218,10 +218,10 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		editor.threeManager.nextFrame(() => signals.objectChanged.emit(this, 'transform', linearTransform));
 	}
 
-	public setOverride(ref: CtrRef, override: IEBXFieldData) {
+	public setOverride(override: IEBXFieldData) {
 		if (this.overrides.getValue(override.field) !== undefined) {
 			// @ts-ignore
-			this.overrides.getValue(override.field).value = override;
+			this.overrides.getValue(override.field).value = override.value;
 		} else {
 			this.overrides.setValue(override.field, override);
 		}
@@ -324,6 +324,22 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = true;
 			(this.parent).makeParentsVisible();
+		}
+	}
+
+	public getEBXOverrides() {
+		const blueprint = this.blueprintCtrRef.Resolve();
+		if (blueprint) {
+			let overrides = null;
+			if (blueprint.typeName === 'PrefabBlueprint') {
+				overrides = this.overrides.getValue('objects');
+			} else {
+				overrides = this.overrides.getValue('object');
+			}
+			if (overrides) {
+				return overrides.value;
+			}
+			return null;
 		}
 	}
 }
