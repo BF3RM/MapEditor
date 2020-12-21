@@ -17,7 +17,7 @@ import Partition from '@/script/types/ebx/Partition';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { Dictionary } from 'typescript-collections';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
-import { isPrintable } from '@/script/modules/Utils';
+import { isPrintable, mergeDeep } from '@/script/modules/Utils';
 const merge = require('deepmerge');
 
 /*
@@ -208,7 +208,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 				if (instance) {
 					const transform = new LinearTransform().setFromMatrix(this.matrix);
 					if (this.originalRef) {
-						this.parent.setOverride({ field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform', values: [] });
+						this.parent.setOverride({ field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform' });
 					}
 					instance.fields.blueprintTransform.value.set(transform);
 				}
@@ -219,15 +219,22 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	private _GetPath(field: IEBXFieldData, path: string): string {
-		if (field.values && field.values.length > 0) {
-			return this._GetPath(field.values[0], path + '.' + field.field);
+		if (!isPrintable(field.type)) {
+			if (path === '') {
+				path = field.field;
+			} else {
+				path = path + '.' + field.field;
+			}
+			return this._GetPath(field.value, path);
+		}
+		if (path === '') {
+			return field.field;
 		}
 		return path + '.' + field.field;
 	}
 
 	public setOverride(newOverride: IEBXFieldData) {
 		const path = this._GetPath(newOverride, '');
-		console.log(path);
 		this.overrides.setValue(path, newOverride);
 	}
 
@@ -332,12 +339,34 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
-	public get EBXOverrides():IEBXFieldData[] {
-		let out = {} as IEBXFieldData;
+	private MergeOverride(out: any, override: IEBXFieldData): Object {
+		if (out[override.field]) {
+			if (isPrintable(override.type)) {
+				out[override.field].value = override.value;
+				return out;
+			} else {
+				return this.MergeOverride(out[override.field], override.value);
+			}
+		} else {
+			if (isPrintable(override.type)) {
+				out[override.field] = override.value;
+			} else {
+				out[override.field] = {};
+				return this.MergeOverride(out[override.field], override.value);
+			}
+			return out;
+		}
+	}
+
+	public get EBXOverrides():any {
+		const out = {};
 		for (const override of this.overrides.values()) {
-			out = merge(out, override);
+			this.MergeOverride(out, override);
 		}
 		console.log(out);
-		return <IEBXFieldData[]>out.values;
+		if (this.blueprintCtrRef.typeName === 'PrefabBlueprint') {
+			return out.objects;
+		}
+		return out.object;
 	}
 }

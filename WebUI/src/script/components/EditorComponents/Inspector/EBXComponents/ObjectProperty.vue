@@ -41,24 +41,18 @@ export default Vue.extend({
 			required: true
 		},
 		overrides: {
-			type: Array as PropType<IEBXFieldData[]>,
+			type: Object,
 			default() {
-				return [];
+				return {};
 			},
 			required: false
 		}
 	},
 	methods: {
 		getOverrides(field: string): any {
-			if (this.overrides && this.overrides.length > 0) {
-				for (const override of this.overrides) {
-					if (override.field === field) {
-						return override.values;
-					}
-				}
-				return [{ field: 'none', type: 'none', values: [] }];
+			if (this.overrides) {
+				return this.overrides[field];
 			}
-			return [{ field: 'none', type: 'none', values: [] }];
 		}
 	}
 });

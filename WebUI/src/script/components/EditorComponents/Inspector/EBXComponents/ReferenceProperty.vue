@@ -46,9 +46,9 @@ import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 	},
 	props: {
 		overrides: {
-			type: Array as PropType<IEBXFieldData[]>,
+			type: Object,
 			default() {
-				return [];
+				return {};
 			},
 			required: false
 		}

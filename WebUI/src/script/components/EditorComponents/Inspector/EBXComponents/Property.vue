@@ -1,6 +1,6 @@
 <template>
     <tr v-if="field.name !== 'name'" class="row">
-        <td class="is-family-code is-narrow field-name" :class="{'numbered': numberName}">
+        <td class="is-family-code is-narrow field-name" :class="{'numbered': !isNaN(Number(field.name))}">
 			{{ titleName }}
         </td>
         <td class="field-value">
@@ -52,9 +52,9 @@ export default Vue.extend({
 			required: false
 		},
 		overrides: {
-			type: Array as PropType<IEBXFieldData[]>,
+			type: undefined,
 			default() {
-				return [];
+				return null;
 			},
 			required: false
 		}
@@ -70,33 +70,21 @@ export default Vue.extend({
 				),
 				field: field,
 				type: this.field.type,
+				value: newValue,
 				oldValue: this.field.value
 			};
-			if (isPrintable(this.field.type)) {
-				out.value = newValue;
-			} else {
-				out.values = [newValue];
-			}
 			this.$emit('input', out);
 		},
 		getValue() {
-			if (this.overrides && this.overrides.length > 0 && this.overrides[0].field !== 'none') {
-				// eslint-disable-next-line no-unreachable-loop
-				for (const override of this.overrides) {
-					if (override.value) {
-						return override.value;
-					} else {
-						return (override as IEBXFieldData).values;
-					}
-				}
+			if (this.overrides) {
+				return this.overrides;
 			}
 			return this.field.value;
 		},
 		getOverrides() {
-			if (this.$props.overrides) {
-				return this.$props.overrides;
+			if (this.overrides) {
+				return this.overrides;
 			}
-			return [{ field: 'none', type: 'none', values: {} }];
 		}
 	},
 	computed: {

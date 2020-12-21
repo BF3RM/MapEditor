@@ -176,7 +176,7 @@ export default class InspectorComponent extends EditorComponent {
 					reference: this.selectedGameObject.originalRef,
 					field: 'objects',
 					type: 'GameObjectData',
-					values: [value]
+					value: value
 				}));
 			} else {
 				window.editor.execute(new SetEBXFieldCommand({
@@ -184,7 +184,7 @@ export default class InspectorComponent extends EditorComponent {
 					reference: this.selectedGameObject.originalRef,
 					field: 'object',
 					type: 'GameObjectData',
-					values: [value]
+					value: value
 				}));
 			}
 		}

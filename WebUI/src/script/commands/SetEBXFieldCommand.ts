@@ -9,7 +9,6 @@ export interface IEBXFieldData {
 	reference?: CtrRef | undefined,
 	field: string,
 	type: string,
-	values?: IEBXFieldData[] | any,
 	value?: any,
 	oldValue?: any | undefined,
 }
@@ -25,7 +24,6 @@ export default class SetEBXFieldCommand extends Command {
 			overrides: [{
 				field: this.EBXFieldUpdateData.field,
 				value: this.EBXFieldUpdateData.value,
-				values: this.EBXFieldUpdateData.values,
 				type: this.EBXFieldUpdateData.type,
 				reference: this.EBXFieldUpdateData.reference
 			}]
@@ -39,7 +37,6 @@ export default class SetEBXFieldCommand extends Command {
 			overrides: [{
 				field: this.EBXFieldUpdateData.field,
 				value: this.EBXFieldUpdateData.oldValue,
-				values: this.EBXFieldUpdateData.values,
 				type: this.EBXFieldUpdateData.type,
 				reference: this.EBXFieldUpdateData.reference
 			}]
