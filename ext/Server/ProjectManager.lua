@@ -114,8 +114,6 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
     local s_MapName = self.m_CurrentProjectHeader.mapName
     local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
-	print(self.m_CurrentProjectHeader)
-	print(tostring(self.m_CurrentProjectHeader))
     if s_MapName == nil or
             Maps[s_MapName] == nil or
             s_GameModeName == nil or
@@ -135,7 +133,6 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	else
 		RCON:SendCommand('mapList.clear')
 		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
-		print(out)
 		RCON:SendCommand('mapList.runNextRound')
 	end
 

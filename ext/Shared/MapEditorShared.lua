@@ -1,7 +1,7 @@
 class 'MapEditorShared'
 
 function MapEditorShared:__init()
-	print("Initializing MapEditorShared")
+	m_Logger:Write("Initializing MapEditorShared")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
@@ -35,7 +35,6 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 
 	for _, l_Instance in ipairs(s_Instances) do
 		if l_Instance == nil then
-			print('Instance is null?')
 			goto continue
 		end
 
@@ -105,7 +104,6 @@ function MapEditorShared:FillVariations()
 
 			if(self.m_Variations[l_MeshGuid] ~= nil ) then
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
-				print(k)
 			else
 				print("No variation for " .. v.name)
 			end

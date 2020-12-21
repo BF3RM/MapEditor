@@ -160,7 +160,7 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
     if self.gameEntities ~= nil then
         for _, l_GameEntity in pairs(self.gameEntities) do
             if l_GameEntity ~= nil then
-                l_GameEntity:Destroy()
+                l_GameEntity:Disable()
             end
         end
     end
@@ -256,8 +256,10 @@ function GameObject:SetOverrides(p_Overrides)
 	if( not self.internalBlueprint) then
 		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
 	end
+	print("Setting overrides")
 	for k,l_Field in pairs(p_Overrides) do
 		print(k)
+		print(l_Field)
 		self:SetOverride(l_Field)
 	end
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
@@ -274,7 +276,10 @@ function GameObject:SetOverride(p_Field)
 end
 
 function GameObject:HasOverrides()
-	return GetLength(self.overrides) > 0
+	if(self.overrides) then
+		return GetLength(self.overrides) > 0
+	end
+	return false
 end
 
 

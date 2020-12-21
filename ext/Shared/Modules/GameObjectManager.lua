@@ -68,10 +68,8 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
 	else
 		local s_PreviewSpawnParentData = GameObjectParentData{
-			guid = "previewSpawn",
+			guid = Guid(),
 			typeName = "previewSpawn",
-			primaryInstanceGuid = "previewSpawn",
-			partitionGuid = "previewSpawn",
 		}
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
 		m_Logger:WriteTable(s_PreviewSpawnParentData)
@@ -288,8 +286,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		s_GameObject:SetTransform(LinearTransform(), true)
 		s_GameObject:SetTransform(p_Transform, false)
 	end
-	if(GetLength(s_GameObject.overrides) > 0) then
-		print("Patching GameObject")
+	if(s_GameObject:HasOverrides()) then
+		print("Patching GameObject: " .. tostring(s_GameObject.guid))
 		s_GameObject:SetOverrides(s_GameObject.overrides)
 	end
 end
@@ -389,7 +387,6 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 		s_GameObject:MarkAsDeleted()
 	else
 		s_GameObject:Destroy()
-
 		self.m_GameObjects[tostring(p_Guid)] = nil
 	end
 
