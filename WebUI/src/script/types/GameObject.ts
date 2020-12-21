@@ -44,7 +44,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
 
 	public get localTransform(): LinearTransform {
-		const parentWorldInverse = new THREE.Matrix4().getInverse(this.parent.matrixWorld);
+		const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
 		return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
 	}
 

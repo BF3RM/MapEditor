@@ -242,11 +242,11 @@ export class FrostbiteDataManager {
 	private onSetEBXField(commandActionResult: CommandActionResult) {
 		// IEBXFieldData
 		for (const override of commandActionResult.gameObjectTransferData.overrides) {
-			const partition = this.getPartition(override.reference.partitionGuid);
 			const gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
 			if (gameObject) {
 				gameObject.setOverride(override);
-			} else {
+			} else if (override.reference) {
+				const partition = this.getPartition(override.reference.partitionGuid);
 				if (partition && partition.isLoaded) {
 					const reference = partition.getInstance(override.reference.instanceGuid);
 					if (reference) {

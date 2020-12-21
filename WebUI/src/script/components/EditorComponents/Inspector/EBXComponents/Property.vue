@@ -82,6 +82,7 @@ export default Vue.extend({
 		},
 		getValue() {
 			if (this.overrides && this.overrides.length > 0 && this.overrides[0].field !== 'none') {
+				// eslint-disable-next-line no-unreachable-loop
 				for (const override of this.overrides) {
 					if (override.value) {
 						return override.value;

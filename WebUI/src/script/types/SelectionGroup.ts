@@ -64,7 +64,7 @@ export class SelectionGroup extends THREE.Object3D {
 		const selectionGroupWorld = oldMatrix;
 		const selectionGroupWorldNew = newMatrix;
 
-		const selectionOldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld);
+		const selectionOldMatrixInverse = new THREE.Matrix4().copy(selectionGroupWorld).invert();
 		const transformMatrix = new THREE.Matrix4().multiplyMatrices(selectionGroupWorldNew, selectionOldMatrixInverse);
 		const childLocal = new THREE.Matrix4();
 		const childLocalNew = new THREE.Matrix4();
