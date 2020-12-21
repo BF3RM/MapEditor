@@ -23,6 +23,9 @@ function GameObjectSaveData:__init(p_GameObject)
 	if(p_GameObject.originalRef) then
 		self.originalRef = p_GameObject.originalRef
 	end
+	if(p_GameObject.overrides) then
+		self.overrides = p_GameObject.overrides
+	end
 end
 
 function GameObjectSaveData:GetAsTable()
@@ -40,6 +43,9 @@ function GameObjectSaveData:GetAsTable()
 	}
 	if(self.originalRef) then
 		out.originalRef = self.originalRef:GetTable()
+	end
+	if(self.overrides) then
+		out.overrides = self.overrides
 	end
 	return out
 end

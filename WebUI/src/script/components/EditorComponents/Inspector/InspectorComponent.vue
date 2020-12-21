@@ -56,6 +56,7 @@
 							@blur="onEndDrag" />
 			</div>
 			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
+				<b>Experimental features, use with caution.</b>
 				<Promised :promise="partition">
 					<template v-slot:pending>
 						<p>Loading...</p>

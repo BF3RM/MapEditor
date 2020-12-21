@@ -154,7 +154,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 
 	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
-		if l_GameObject:IsUserModified() == true then
+		if l_GameObject:IsUserModified() == true or l_GameObject:HasOverrides() then
 			count = count + 1
 			s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
 		end

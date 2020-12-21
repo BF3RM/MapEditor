@@ -35,13 +35,17 @@ function GameEntity:GetGameEntityTransferData()
 end
 
 function GameEntity:Disable()
-    self.entity:FireEvent("Disable")
-    self.entity:FireEvent("Stop")
+	if(self.entity) then
+		self.entity:FireEvent("Disable")
+		self.entity:FireEvent("Stop")
+	end
 end
 
 function GameEntity:Enable()
-    self.entity:FireEvent("Enable")
-    self.entity:FireEvent("Start")
+	if(self.entity) then
+		self.entity:FireEvent("Enable")
+		self.entity:FireEvent("Start")
+	end
 end
 
 function GameEntity:Destroy()
@@ -58,12 +62,10 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
     local s_Entity = self.entity
 
     if(s_Entity == nil) then
-        m_Logger:Error("Entity is nil?")
-        return false
+        return true
     end
 
     if (not s_Entity:Is("SpatialEntity"))then
-        m_Logger:Warning("Entity is not spatial")
         return true
     end
 

@@ -7,9 +7,7 @@ import { Dictionary } from 'typescript-collections';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { Guid } from '@/script/types/Guid';
 import Instance from '@/script/types/ebx/Instance';
-import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
-import { CtrRef } from '@/script/types/CtrRef';
 
 export class FrostbiteDataManager {
 	public superBundles = new Dictionary<string, FBSuperBundle>();
@@ -85,7 +83,7 @@ export class FrostbiteDataManager {
 			// @ts-ignore
 			this.data.file(fileNameJson).async('string').then((text) => {
 				this.files.setValue(fileName.toLowerCase(), JSON.parse(text));
-				console.log('Loading ' + fileName);
+				window.vext.SetLoadingInfo('Loading ' + fileName);
 				this._HandleFile(fileName.toLowerCase());
 			});
 		});

@@ -199,7 +199,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_ReferenceObjectDatas[tostring(s_Blueprint.object.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = s_Blueprint.object.typeInfo.name }
 		end
 	end
-	self.m_PendingBlueprint[s_BlueprintPartitionGuid] = s_GameObject
+	if(s_BlueprintPartitionGuid) then
+		self.m_PendingBlueprint[s_BlueprintPartitionGuid] = s_GameObject
+	end
 	---^^^^ This is parent to children / top to bottom ^^^^
 	local s_EntityBus = p_Hook:Call()
 	---vvvv This is children to parent / bottom to top vvvv
@@ -505,7 +507,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		--print("Added pending:")
 		--print(s_PendingGameObject.name)
 		if(s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
-			local s_Entity = SpatialEntity(s_Entity)
+			s_Entity = SpatialEntity(s_Entity)
 			s_GameEntity.isSpatial = true
 			s_GameEntity.transform = ToLocal(s_Entity.transform, s_PendingGameObject.transform)
 			s_GameEntity.aabb = AABB {
