@@ -71,10 +71,10 @@ function ParseType(p_Type, p_Val)
 		return tonumber(p_Val)
 	end
 	if(p_Type == "Vec2") then -- Vec2
-		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
+		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y))
 	end
 	if(p_Type == "Vec3") then -- Vec3
-		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
+		return Vec3(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z))
 	end
 	if(p_Type == "Vec4") then -- Vec3
 		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
