@@ -37,7 +37,8 @@ export default class VEXTInterface {
 			SetTransform: signals.setTransform.emit,
 			SetVariation: signals.setVariation.emit,
 			EnabledBlueprint: signals.enabledBlueprint.emit,
-			DisabledBlueprint: signals.disabledBlueprint.emit
+			DisabledBlueprint: signals.disabledBlueprint.emit,
+			SetField: signals.setEBXField.emit
 		};
 
 		this.messages = {
@@ -116,7 +117,7 @@ export default class VEXTInterface {
 		}
 		const scope = this;
 		for (const command of commands) {
-			console.log(command.type);
+			console.log(command);
 		}
 		if (editor.debug) {
 			scope.emulator.Receive(commands);
@@ -146,7 +147,7 @@ export default class VEXTInterface {
 			if (index === commandActionResults.length - 1) {
 				scope.executing = false;
 			}
-			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type);
+			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type, commandActionResult.type);
 
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;
@@ -159,7 +160,6 @@ export default class VEXTInterface {
 
 	public SendEvent(eventName: string, param?: any) {
 		if (editor.debug) {
-			console.log('Sending event: ' + eventName);
 			this.emulator.ReceiveEvent(eventName, param);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSON.stringify(param));
@@ -202,7 +202,7 @@ export default class VEXTInterface {
 
 	public WebUpdateBatch(updates: any[]) {
 		// console.log('[VEXT] WebUpdateBatch');
-		console.log(updates);
+		console.log(JSON.stringify(updates));
 		updates.forEach((obj: any) => {
 			(this as any)[obj.path](obj.payload);
 		});

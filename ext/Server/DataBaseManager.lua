@@ -50,7 +50,7 @@ function DataBaseManager:CreateOrUpdateDatabase()
 		CREATE UNIQUE INDEX IF NOT EXISTS ]] .. m_ProjectName_Unique_Index .. [[ ON ]] .. m_DB_Header_Table_Name ..  [[(]] .. m_ProjectName_Text_Column_Name .. [[);
 	]]
 
-	m_Logger:Write(createProjectHeaderTableQuery)
+	-- m_Logger:Write(createProjectHeaderTableQuery)
 
 	if not SQL:Query(createProjectHeaderTableQuery) then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
@@ -65,8 +65,6 @@ function DataBaseManager:CreateOrUpdateDatabase()
             ]] .. m_SaveFile_Text_Column_Name .. [[ TEXT
 		);
 	]]
-
-	m_Logger:Write(createProjectDataTableQuery)
 
     if not SQL:Query(createProjectDataTableQuery) then
         m_Logger:Error('Failed to execute query: ' .. SQL:Error())
@@ -104,7 +102,6 @@ function DataBaseManager:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeN
 
 	local s_Query = [[INSERT OR REPLACE INTO ]] .. m_DB_Header_Table_Name .. [[ (]] .. m_ProjectName_Text_Column_Name .. [[, ]] .. m_MapName_Text_Column_Name .. [[, ]] .. m_GameModeName_Text_Column_Name .. [[, ]] .. m_RequiredBundles_Text_Column_Name .. [[, ]] .. m_TimeStamp_Text_Column_Name .. [[) VALUES (?, ?, ?, ?, ?)]]
 
-	m_Logger:Write(s_Query)
 	m_Logger:Write("Inserting values:")
 	m_Logger:Write(p_ProjectName .. " | " .. p_MapName .. " | " .. p_GameModeName .. " | " ..  p_RequiredBundlesJson .. " | " .. tostring(p_TimeStamp))
 
@@ -134,11 +131,7 @@ function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
 end
 
 function DataBaseManager:GetProjectHeaders()
-	m_Logger:Write("GetProjectHeaders()")
-
 	local s_ProjectHeaderRows = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name)
-
-	m_Logger:Write(s_ProjectHeaderRows)
 
 	if not s_ProjectHeaderRows then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())

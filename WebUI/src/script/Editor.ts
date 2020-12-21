@@ -156,7 +156,7 @@ export default class Editor {
 			target = this.getGameObjectByGuid(guid);
 		} else {
 			target = this.selectionGroup;
-			if ((target as SelectionGroup).selectedGameObjects.length === 0) {
+			if ((target).selectedGameObjects.length === 0) {
 				return;
 			} // Nothing specified, nothing selected. skip.
 		}
@@ -309,7 +309,7 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
 		if (gameObject !== undefined) {
-			(gameObject as GameObject).setName(gameObjectTransferData.name);
+			(gameObject).setName(gameObjectTransferData.name);
 		}
 	}
 
@@ -317,7 +317,7 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
-			(gameObject as GameObject).setTransform(gameObjectTransferData.transform);
+			(gameObject).setTransform(gameObjectTransferData.transform);
 			if (gameObject.parent) {
 				gameObject.parent.updateMatrixWorld();
 				if (this.selectionGroup.isSelected(gameObject)) {
@@ -333,7 +333,7 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
 		if (gameObject !== undefined) {
-			(gameObject as GameObject).setVariation(gameObjectTransferData.variation);
+			(gameObject).setVariation(gameObjectTransferData.variation);
 		}
 	}
 
@@ -364,7 +364,7 @@ export default class Editor {
 	public onSpawnedBlueprint(commandActionResult: CommandActionResult) {
 		return new Promise((resolve, reject) => {
 			const scope = this;
-			const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
+			const gameObjectTransferData = commandActionResult.gameObjectTransferData;
 			const gameObjectGuid = gameObjectTransferData.guid;
 
 			if (this.gameObjects.getValue(gameObjectGuid)) {
@@ -378,9 +378,9 @@ export default class Editor {
 			gameObject.updateTransform();
 			for (const gameEntityData of gameObjectTransferData.gameEntities) {
 				const entityData = gameEntityData;
-				// UniqueID is fucking broken. this won't work online, boi.
+
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb);
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb, entityData.initiatorRef);
 					gameObject.add(gameEntity);
 				}
 			}

@@ -23,8 +23,8 @@
 <script lang="ts">
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
-import InfiniteTree, { INode, Node } from 'infinite-tree';
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import InfiniteTree, { Node } from 'infinite-tree';
+import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator';
 
 const lcfirst = (str: string) => {
 	str += '';
@@ -33,7 +33,7 @@ const lcfirst = (str: string) => {
 @Component({ components: { RecycleScroller } })
 export default class InfiniteTreeComponent extends Vue {
 	@Ref('scroller')
-	scroller!: RecycleScroller;
+	scroller: RecycleScroller;
 
 	@Prop()
 	search: string;
@@ -156,8 +156,7 @@ export default class InfiniteTreeComponent extends Vue {
 		if (tree === undefined) {
 			return [];
 		}
-		const out = tree.nodes.filter((node) => !(node.state.filtered === false));
-		return out;
+		return tree.nodes.filter((node) => !(node.state.filtered === false));
 	}
 
 	private nodes: Node[] = [];

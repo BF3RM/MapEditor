@@ -10,11 +10,11 @@ function GameEntity:__init(arg)
     self.isSpatial = arg.isSpatial or false
     self.transform = arg.transform -- local transform
     self.aabb = arg.aabb
+    self.initiatorRef = arg.initiatorRef
 
 	self.entity:RegisterDestroyCallback(self, self.OnDestroyed)
 end
 function GameEntity:OnDestroyed()
-	-- print("Entity destroyed")
 	self.entity = nil
 end
 function GameEntity:GetGameEntityTransferData()
@@ -23,8 +23,11 @@ function GameEntity:GetGameEntityTransferData()
         instanceId = self.instanceId,
         typeName = self.typeName,
         isSpatial = self.isSpatial,
-        transform = self.transform,
+        transform = self.transform
     }
+	if(self.initiatorRef ~= nil) then
+		s_GameEntityTransferData.initiatorRef = self.initiatorRef:GetTable()
+	end
     if(self.aabb ~= nil) then
         s_GameEntityTransferData.aabb = self.aabb:GetTable()
     end
@@ -32,18 +35,24 @@ function GameEntity:GetGameEntityTransferData()
 end
 
 function GameEntity:Disable()
-    self.entity:FireEvent("Disable")
-    self.entity:FireEvent("Stop")
+	if(self.entity) then
+		self.entity:FireEvent("Disable")
+		self.entity:FireEvent("Stop")
+	end
 end
 
 function GameEntity:Enable()
-    self.entity:FireEvent("Enable")
-    self.entity:FireEvent("Start")
+	if(self.entity) then
+		self.entity:FireEvent("Enable")
+		self.entity:FireEvent("Start")
+	end
 end
 
 function GameEntity:Destroy()
     m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
-    self.entity:Destroy()
+	if (self.entity) then
+		self.entity:Destroy()
+	end
     GameObjectManager.m_Entities[self.instanceId] = nil
 end
 
@@ -53,12 +62,10 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
     local s_Entity = self.entity
 
     if(s_Entity == nil) then
-        m_Logger:Error("Entity is nil?")
-        return false
+        return true
     end
 
     if (not s_Entity:Is("SpatialEntity"))then
-        m_Logger:Warning("Entity is not spatial")
         return true
     end
 
@@ -70,7 +77,6 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
             s_Entity.transform = LinearTransform(p_LinearTransform)
         else
             s_Entity.transform = ToWorld(self.transform, LinearTransform(p_LinearTransform))
-
             if(p_UpdateCollision and p_Enabled) then
                 s_Entity:FireEvent("Disable")
                 s_Entity:FireEvent("Enable")

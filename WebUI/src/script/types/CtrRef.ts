@@ -1,4 +1,5 @@
 import { Guid } from '@/script/types/Guid';
+import Instance from '@/script/types/ebx/Instance';
 
 export class CtrRef {
 	public typeName: string;
@@ -24,5 +25,9 @@ export class CtrRef {
 
 	public clone() {
 		return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
+	}
+
+	public Resolve(): Instance | null {
+		return editor.fbdMan.getInstance(this.partitionGuid, this.instanceGuid);
 	}
 }

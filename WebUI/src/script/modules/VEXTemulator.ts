@@ -1,13 +1,10 @@
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { LogError } from '@/script/modules/Logger';
 import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
-import * as THREE from 'three';
-import { RAYCAST_LAYER } from '@/script/types/Enums';
-import { GameObject } from '@/script/types/GameObject';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
-import VEXTInterface from '@/script/modules/VEXT';
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { Guid } from '@/script/types/Guid';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export class VEXTemulator {
 	private commands: any;
@@ -25,6 +22,7 @@ export class VEXTemulator {
 		this.commands.SetVariationCommand = this.SetVariation;
 		this.commands.EnableBlueprintCommand = this.EnableBlueprint;
 		this.commands.DisableBlueprintCommand = this.DisableBlueprint;
+		this.commands.SetEBXFieldCommand = this.SetEBXField;
 
 		this.messages = {};
 		this.messages.GetProjectsMessage = this.GetProjectsMessage;
@@ -33,6 +31,8 @@ export class VEXTemulator {
 
 		this.events = {};
 		this.events.UIReloaded = this.UIReloaded;
+		this.events.controlUpdate = () => {};
+		this.events.controlStart = () => {};
 	}
 
 	public Receive(commands: any[]) {
@@ -89,7 +89,7 @@ export class VEXTemulator {
 	}
 
 	private CreateGroup(commandActionResult: CommandActionResult) {
-		const response = {
+		return {
 			type: 'CreatedGroup',
 			sender: commandActionResult.sender,
 
@@ -98,7 +98,6 @@ export class VEXTemulator {
 				name: commandActionResult.gameObjectTransferData.name
 			}
 		};
-		return response;
 	}
 
 	private DestroyGroup(command: any) {
@@ -110,7 +109,7 @@ export class VEXTemulator {
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
 		// command.gameObjectTransferData.transform = command.gameObjectTransferData.transform.toTable();
-		const response = {
+		return {
 			sender: commandActionResult.sender,
 			type: 'SpawnedBlueprint',
 			gameObjectTransferData: {
@@ -192,71 +191,74 @@ export class VEXTemulator {
 				variation: commandActionResult.gameObjectTransferData.variation
 			}
 		};
-		return response;
 	}
 
 	private SetTransform(commandActionResult: CommandActionResult) {
-		const response = {
+		return {
 			type: 'SetTransform',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid,
 				transform: commandActionResult.gameObjectTransferData.transform.toTable()
 			}
 		};
-		return response;
 	}
 
 	private DestroyBlueprint(commandActionResult: CommandActionResult) {
 		// Delete all children of blueprint
-		const response = {
+		return {
 			type: 'DeletedBlueprint',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid
 			}
 		};
-		return response;
 	}
 
 	private SetObjectName(commandActionResult: CommandActionResult) {
-		const response = {
+		return {
 			type: 'SetObjectName',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid,
 				name: commandActionResult.gameObjectTransferData.name
 			}
 		};
-		return response;
 	}
 
 	private SetVariation(commandActionResult: CommandActionResult) {
-		const response = {
+		return {
 			type: 'SetVariation',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid,
 				variation: commandActionResult.gameObjectTransferData.variation
 			}
 		};
-		return response;
 	}
 
 	private EnableBlueprint(commandActionResult: CommandActionResult) {
-		const response = {
+		return {
 			type: 'EnabledBlueprint',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid
 			}
 		};
-		return response;
 	}
 
 	private DisableBlueprint(commandActionResult: CommandActionResult) {
-		const response = {
+		return {
 			type: 'DisabledBlueprint',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid
 			}
 		};
-		return response;
+	}
+
+	private SetEBXField(commandActionResult: CommandActionResult) {
+		return {
+			type: 'SetField',
+			gameObjectTransferData: {
+				guid: commandActionResult.gameObjectTransferData.guid,
+				overrides: commandActionResult.gameObjectTransferData.overrides
+			}
+		};
 	}
 
 	private SetScreenToWorldPositionMessage(args: SetScreenToWorldTransformMessage) {

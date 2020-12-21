@@ -12,6 +12,7 @@ import '@/style/style.scss';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 import './style/icons.scss';
+
 import Editor from '@/script/Editor';
 import { Log, LogError } from '@/script/modules/Logger';
 import ActiveView from '@/script/components/Views/ActiveView.vue';

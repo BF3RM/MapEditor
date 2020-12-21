@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Color, Vector3 } from 'three';
 
 export interface IVec3 {
 	x: number,
@@ -19,6 +19,10 @@ export class Vec3 extends Vector3 {
 
 	public static setFromTable(object: IVec3) {
 		return new this(Number(object.x), Number(object.y), Number(object.z));
+	}
+
+	static fromJSON(json: EBX.JSON.Vec3): Vec3 {
+		return new Vec3().set(json.x.$value, json.y.$value, json.z.$value);
 	}
 
 	public toTable(): IVec3 {

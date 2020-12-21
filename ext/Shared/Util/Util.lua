@@ -66,11 +66,9 @@ function DecodeParams(p_Table)
 					Vec3(s_Value.trans.x, s_Value.trans.y, s_Value.trans.z))
 
 			p_Table[s_Key] = s_LinearTransform
-
-		elseif type(s_Value) == "table" then
+			elseif type(s_Value) == "table" then
 			s_Value = DecodeParams(s_Value)
 		end
-
 	end
 
 	return p_Table
@@ -275,7 +273,7 @@ end
 
 function dump(o)
 	if(o == nil) then
-		print("tried to load jack shit")
+		print("No table?")
 	end
 	if type(o) == 'table' then
 		local s = '{ '

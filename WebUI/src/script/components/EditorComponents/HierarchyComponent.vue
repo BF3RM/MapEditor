@@ -87,7 +87,7 @@ export default class HierarchyComponent extends EditorComponent {
 	private existingParents = new Map<string, INode[]>();
 
 	@Ref('infiniteTreeComponent')
-	infiniteTreeComponent!: any;
+	infiniteTreeComponent: any;
 
 	constructor() {
 		super();
@@ -103,7 +103,7 @@ export default class HierarchyComponent extends EditorComponent {
 
 	public mounted() {
 		if (this.infiniteTreeComponent !== undefined) {
-			this.tree = (this.infiniteTreeComponent as any).tree as InfiniteTree;
+			this.tree = (this.infiniteTreeComponent).tree as InfiniteTree;
 		}
 	}
 

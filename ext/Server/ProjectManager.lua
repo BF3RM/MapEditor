@@ -114,8 +114,6 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
     local s_MapName = self.m_CurrentProjectHeader.mapName
     local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
-	print(self.m_CurrentProjectHeader)
-	print(tostring(self.m_CurrentProjectHeader))
     if s_MapName == nil or
             Maps[s_MapName] == nil or
             s_GameModeName == nil or
@@ -135,7 +133,6 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	else
 		RCON:SendCommand('mapList.clear')
 		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
-		print(out)
 		RCON:SendCommand('mapList.runNextRound')
 	end
 
@@ -143,9 +140,7 @@ end
 
 function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
 	-- TODO: check player's permission once that is implemented
-
-	Async:Start(function() self:SaveProjectCoroutine(p_ProjectSaveData)
-	end)
+	self:SaveProjectCoroutine(p_ProjectSaveData)
 end
 
 function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
@@ -156,11 +151,10 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 
 	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
-		if l_GameObject:IsUserModified() == true then
+		if l_GameObject:IsUserModified() == true or l_GameObject:HasOverrides() then
 			count = count + 1
 			s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
 		end
-		Async:Yield()
 	end
 
 	m_Logger:Write("vvvvvvvvvvvvvvvvv")
@@ -230,7 +224,8 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
                     variation = l_GameObjectSaveData.variation,
                     gameEntities = {},
                     isEnabled = l_GameObjectSaveData.isEnabled or true,
-                    isDeleted = l_GameObjectSaveData.isDeleted or false
+                    isDeleted = l_GameObjectSaveData.isDeleted or false,
+                    overrides = l_GameObjectSaveData.overrides or nil
                 }
             }
 

@@ -41,7 +41,7 @@ import ExplorerComponent from '@/script/components/EditorComponents/ExplorerComp
 import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
 import ViewportComponent from '@/script/components/EditorComponents/ViewportComponent.vue';
 import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
-import InspectorComponent from '@/script/components/EditorComponents/InspectorComponent.vue';
+import InspectorComponent from '@/script/components/EditorComponents/Inspector/InspectorComponent.vue';
 import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
 import PerfectScrollbar from 'perfect-scrollbar';
 

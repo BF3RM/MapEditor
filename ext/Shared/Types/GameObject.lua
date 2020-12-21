@@ -13,21 +13,29 @@ function GameObject:__init(arg)
     self.realm = arg.realm
     self.isUserModified = true
     self.userModifiedFields = {}
-	self.original = arg.original
+	self.originalRef = arg.originalRef
 	self.localTransform = arg.localTransform
+	if (arg.overrides) then
+		self.overrides = arg.overrides
+	else
+		self.overrides = {}
+	end
+	self.internalBlueprint = nil
     --self.name = arg.name
     --self.parentData = arg.parentData
     --self.transform = arg.transform  -- world transform
     --self.variation = arg.variation
     --self.isDeleted = arg.isDeleted --> only vanilla objects, dont appear in the browser anymore. entities get disabled, because we cannot destroy them
     --self.isEnabled = arg.isEnabled
+
     self:RegisterUserModifiableField("name", arg.name)
     self:RegisterUserModifiableField("parentData", arg.parentData)
     self:RegisterUserModifiableField("transform", arg.transform)
 	self:RegisterUserModifiableField("localTransform", arg.localTransform)
     self:RegisterUserModifiableField("variation", arg.variation)
     self:RegisterUserModifiableField("isDeleted", arg.isDeleted)
-    self:RegisterUserModifiableField("isEnabled", arg.isEnabled)
+	self:RegisterUserModifiableField("isEnabled", arg.isEnabled)
+	self:RegisterUserModifiableField("overrides", self.overrides)
 end
 
 function GameObject:RegisterUserModifiableField(p_FieldName, p_DefaultValue)
@@ -35,12 +43,13 @@ function GameObject:RegisterUserModifiableField(p_FieldName, p_DefaultValue)
     self[p_FieldName .. m_TraceableField_Suffix] = p_DefaultValue
 end
 
-function GameObject:SetField(p_FieldName, p_NewValue)
+function GameObject:SetField(p_FieldName, p_NewValue, p_AutoModified)
     self[p_FieldName] = p_NewValue
     local originalValue = self[p_FieldName .. m_TraceableField_Suffix]
     local newValue = self[p_FieldName]
-
-    self.userModifiedFields[p_FieldName] = newValue ~= originalValue
+	if(not p_AutoModified) then
+		self.userModifiedFields[p_FieldName] = newValue ~= originalValue
+	end
 end
 
 function GameObject:IsUserModified()
@@ -58,10 +67,10 @@ function GameObject:IsUserModified()
     return false
 end
 
-function GameObject:Disable()
+function GameObject:Disable(p_AutoModified)
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
-            l_ChildGameObject:Disable()
+            l_ChildGameObject:Disable(true)
         end
     end
 
@@ -72,14 +81,13 @@ function GameObject:Disable()
             end
         end
     end
-
-    self:SetField("isEnabled", false)
+	self:SetField("isEnabled", false, p_AutoModified)
 end
 
-function GameObject:Enable()
+function GameObject:Enable(p_AutoModified)
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
-            l_ChildGameObject:Enable()
+            l_ChildGameObject:Enable(true)
         end
     end
 
@@ -90,11 +98,10 @@ function GameObject:Enable()
             end
         end
     end
-
-    self:SetField("isEnabled", true)
+	self:SetField("isEnabled", true, p_AutoModified)
 end
 
-function GameObject:MarkAsDeleted()
+function GameObject:MarkAsDeleted(p_AutoModified)
     if (self.isVanilla == false) then
         m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
         return
@@ -102,7 +109,7 @@ function GameObject:MarkAsDeleted()
 
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
-            l_ChildGameObject:MarkAsDeleted()
+            l_ChildGameObject:MarkAsDeleted(true)
         end
     end
 
@@ -113,11 +120,10 @@ function GameObject:MarkAsDeleted()
             end
         end
     end
-
-    self:SetField("isDeleted", true)
+	self:SetField("isDeleted", true, p_AutoModified)
 end
 
-function GameObject:MarkAsUndeleted()
+function GameObject:MarkAsUndeleted(p_AutoModified)
     if (self.isVanilla == false) then
         m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
         return
@@ -125,7 +131,7 @@ function GameObject:MarkAsUndeleted()
 
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
-            l_ChildGameObject:MarkAsUndeleted()
+            l_ChildGameObject:MarkAsUndeleted(true)
         end
     end
 
@@ -136,8 +142,7 @@ function GameObject:MarkAsUndeleted()
             end
         end
     end
-
-    self:SetField("isDeleted", false)
+	self:SetField("isDeleted", false, p_AutoModified)
 end
 
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
@@ -155,13 +160,13 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
     if self.gameEntities ~= nil then
         for _, l_GameEntity in pairs(self.gameEntities) do
             if l_GameEntity ~= nil then
-                l_GameEntity:Destroy()
+                l_GameEntity:Disable()
             end
         end
     end
 end
 
-function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
+function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoModified)
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             if(l_ChildGameObject == nil) then
@@ -174,7 +179,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 	        l_ChildGameObject.localTransform = s_Offset
             local s_LinearTransform = ToWorld(s_Offset, p_LinearTransform)
 
-            local s_Response = l_ChildGameObject:SetTransform(s_LinearTransform, p_UpdateCollision)
+            local s_Response = l_ChildGameObject:SetTransform(s_LinearTransform, p_UpdateCollision, true)
 
             if not s_Response then
                 return false
@@ -195,17 +200,15 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
             end
         end
     end
-
-	self:SetField("transform", LinearTransform(p_LinearTransform))
-	local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
-	if(s_Parent ~= nil) then
-		print("Set local transform: ")
-		local s_LocalTransform = ToLocal(self.transform, s_Parent.transform)
-		print(s_Parent.transform)
-		print(s_LocalTransform)
-		self:SetField("localTransform", s_LocalTransform)
-	else
-		print("Could not find parent")
+	self:SetField("transform", LinearTransform(p_LinearTransform), p_AutoModified)
+	if(tostring(self.parentData.guid) ~= "00000000-0000-0000-0000-000000000000") then
+		local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
+		if(s_Parent ~= nil) then
+			local s_LocalTransform = ToLocal(self.transform, s_Parent.transform)
+			self:SetField("localTransform", s_LocalTransform, p_AutoModified)
+		else
+			print("Could not find parent")
+		end
 	end
     return true
 end
@@ -224,7 +227,9 @@ function GameObject:GetGameObjectTransferData()
         creatorName = self.creatorName,
         isVanilla = self.isVanilla,
         realm = self.realm,
-        isUserModified = self.isUserModified
+        isUserModified = self.isUserModified,
+        originalRef = self.originalRef:GetTable(),
+        overrides = self.overrides
         -- entities have to be set externally
     }
 
@@ -246,6 +251,35 @@ function GameObject:GetEntities()
     end
 
     return s_Entities
+end
+function GameObject:SetOverrides(p_Overrides)
+	if( not self.internalBlueprint) then
+		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
+	end
+	print("Setting overrides")
+	for k,l_Field in pairs(p_Overrides) do
+		print(k)
+		print(l_Field)
+		self:SetOverride(l_Field)
+	end
+	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
+	return true
+end
+function GameObject:SetOverride(p_Field)
+	local s_Path = EBXManager:SetField(self.internalBlueprint, p_Field, '')
+	if(s_Path) then
+		self.overrides[s_Path] = p_Field
+	end
+	self:Disable(true)
+	self:Enable(true)
+	return  s_Path ~= '', s_Path
+end
+
+function GameObject:HasOverrides()
+	if(self.overrides) then
+		return GetLength(self.overrides) > 0
+	end
+	return false
 end
 
 

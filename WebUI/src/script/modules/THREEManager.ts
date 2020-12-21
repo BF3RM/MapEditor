@@ -26,7 +26,7 @@ export class THREEManager {
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
 	public inputControls = new InputControls(this.renderer.domElement);
 	public selectionWrapper = new SelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
-	public worldSpace = WORLD_SPACE.local;
+	public worldSpace = WORLD_SPACE.world;
 
 	private gridSnap = false;
 	private highlightingEnabled = true;
@@ -451,7 +451,7 @@ export class THREEManager {
 
 						// Select its parent if possible.
 						if (gameObject.parent != null) {
-							const parent = gameObject.parent as GameObject;
+							const parent = gameObject.parent;
 							// if (!parent.raycastEnabled) {
 							// 	continue;
 							// }

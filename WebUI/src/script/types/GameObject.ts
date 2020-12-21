@@ -1,5 +1,4 @@
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
-import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { Guid } from '@/script/types/Guid';
 import { CtrRef } from '@/script/types/CtrRef';
@@ -8,10 +7,12 @@ import { GameEntityData } from '@/script/types/GameEntityData';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
-import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
-import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
+import { FBPartition } from '@/script/types/gameData/FBPartition';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
+import { isPrintable } from '@/script/modules/Utils';
+const merge = require('deepmerge');
 
 /*
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -32,10 +33,23 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	private _enabled: boolean = true;
 	private _raycastEnabled: boolean = true;
 	public parent: GameObject;
+	public isUserModified: boolean;
+	public originalRef: CtrRef | undefined;
+	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
+	public overrides: { [path: string]: IEBXFieldData } = {}
+
+	public get localTransform(): LinearTransform {
+		const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
+		return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+	}
+
+	public set localTransform(newValue: LinearTransform) {
+		this.matrix = newValue.toMatrix();
+	}
 
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
-		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false) {
+		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false, isUserModified: boolean = false, originalRef: CtrRef | undefined = undefined) {
 		super();
 
 		this.guid = guid;
@@ -50,13 +64,24 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;
-
+		this.isUserModified = isUserModified;
+		this.originalRef = originalRef;
 		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
 
 		this.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
 		this.layers.disable(RAYCAST_LAYER.GAMEENTITY);
+	}
+
+	public get partition(): Promise<FBPartition> | null {
+		const partition = window.editor.fbdMan.getPartitionByName(this.blueprintCtrRef.name);
+		if (!partition) {
+			return null;
+		}
+		return partition.data.then((res) => {
+			return partition;
+		});
 	}
 
 	public static CreateWithTransferData(gameObjectTransferData: GameObjectTransferData) {
@@ -68,7 +93,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.blueprintCtrRef,
 			gameObjectTransferData.variation,
 			gameObjectTransferData.gameEntities,
-			gameObjectTransferData.isVanilla
+			gameObjectTransferData.isVanilla,
+			gameObjectTransferData.isUserModified,
+			gameObjectTransferData.originalRef
 		);
 	}
 
@@ -106,7 +133,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			blueprintCtrRef: this.blueprintCtrRef,
 			parentData: this.parentData,
 			transform: this.transform,
-			variation: this.variation
+			variation: this.variation,
+			overrides: this.overrides
 		});
 	}
 
@@ -164,10 +192,56 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	public setTransform(linearTransform: LinearTransform) {
+		const oldTransform = this.transform.clone();
 		this.transform = linearTransform;
 		this.updateTransform();
+		if (this.originalRef !== undefined && this.parent.partition) {
+			this.parent.partition.then((res) => {
+				// @ts-ignore
+				const instance = res.getInstance(this.originalRef.instanceGuid);
+				console.log(instance);
+				if (instance) {
+					const transform = new LinearTransform().setFromMatrix(this.matrix);
+					if (this.originalRef) {
+						this.parent.setOverride({ field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform' });
+					}
+					instance.fields.blueprintTransform.value.set(transform);
+				}
+			});
+		}
 		editor.threeManager.setPendingRender();
 		editor.threeManager.nextFrame(() => signals.objectChanged.emit(this, 'transform', linearTransform));
+	}
+
+	private _GetPath(field: IEBXFieldData, path: string): string {
+		if (!isPrintable(field.type)) {
+			if (path === '') {
+				path = field.field;
+			} else {
+				path = path + '.' + field.field;
+			}
+			return this._GetPath(field.value, path);
+		}
+		if (path === '') {
+			return field.field;
+		}
+		return path + '.' + field.field;
+	}
+
+	public setOverride(newOverride: IEBXFieldData) {
+		const path = this._GetPath(newOverride, '');
+
+		this.overrides = {
+			...this.overrides,
+			[path]: newOverride
+		};
+
+		console.log(this.overrides);
+		// this.overrides.setValue(path, newOverride);
+	}
+
+	public ApplyOverrides() {
+
 	}
 
 	public setName(name: string) {
@@ -187,7 +261,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	set raycastEnabled(value: boolean) {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child as GameObject).raycastEnabled = value;
+				(child).raycastEnabled = value;
 			}
 		}
 		this._raycastEnabled = value;
@@ -201,7 +275,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Enable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child as GameObject).Enable();
+				(child).Enable();
 			}
 		}
 		this._enabled = true;
@@ -211,7 +285,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Disable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child as GameObject).Disable();
+				(child).Disable();
 			}
 		}
 		this._enabled = false;
@@ -255,7 +329,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	makeParentsInvisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = false;
-			(this.parent as GameObject).makeParentsInvisible();
+			(this.parent).makeParentsInvisible();
 		}
 		editor.selectionGroup.makeParentsVisible();
 	}
@@ -263,7 +337,38 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	makeParentsVisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = true;
-			(this.parent as GameObject).makeParentsVisible();
+			(this.parent).makeParentsVisible();
 		}
+	}
+
+	private MergeOverride(out: any, override: IEBXFieldData): Object {
+		if (out[override.field]) {
+			if (isPrintable(override.type)) {
+				out[override.field].value = override.value;
+				return out;
+			} else {
+				return this.MergeOverride(out[override.field], override.value);
+			}
+		} else {
+			if (isPrintable(override.type)) {
+				out[override.field] = override.value;
+			} else {
+				out[override.field] = {};
+				return this.MergeOverride(out[override.field], override.value);
+			}
+			return out;
+		}
+	}
+
+	public get EBXOverrides(): any {
+		const out: any = {};
+		for (const override of Object.values(this.overrides)) {
+			this.MergeOverride(out, override);
+		}
+		console.log(out);
+		if (this.blueprintCtrRef.typeName === 'PrefabBlueprint') {
+			return out.objects;
+		}
+		return out.object;
 	}
 }

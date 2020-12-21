@@ -6,6 +6,7 @@ ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"
 DataBaseManager = require "DataBaseManager"
 ServerGameObjectManager = require "ServerGameObjectManager"
+EBXManager = require "__shared/Modules/EBXManager"
 GameObjectManager = GameObjectManager(Realm.Realm_Server)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
@@ -32,6 +33,7 @@ function MapEditorServer:RegisterEvents()
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 
 ----------- Debug ----------------
@@ -86,6 +88,10 @@ end
 
 function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+end
+
+function MapEditorServer:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
+	GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
 end
 
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)

@@ -20,7 +20,8 @@ function CommandActionResult:__init(arg)
 
     self.type = arg.type
     self.sender = arg.sender
-    self.gameObjectTransferData = arg.gameObjectTransferData
+	self.gameObjectTransferData = arg.gameObjectTransferData
+	self.ebxFieldData = arg.ebxFieldData
 end
 
 return CommandActionResult

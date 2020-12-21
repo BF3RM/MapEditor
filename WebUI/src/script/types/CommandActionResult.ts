@@ -3,7 +3,7 @@ import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 export class CommandActionResult {
 	public type: string;
 	public sender: string;
-	public gameObjectTransferData: any;
+	public gameObjectTransferData: GameObjectTransferData;
 
 	constructor(type: string, name: string, gameObjectTransferData: GameObjectTransferData) {
 		this.type = type;

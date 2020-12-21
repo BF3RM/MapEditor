@@ -16,6 +16,7 @@ function GameObjectTransferData:__init(arg)
     self.creatorName = arg.creatorName
     self.isVanilla = arg.isVanilla
     self.isUserModified = arg.isUserModified
+	self.overrides = arg.overrides
 end
 
 function GameObjectTransferData:GetGameObject()
@@ -32,6 +33,7 @@ function GameObjectTransferData:GetGameObject()
         isVanilla = self.isVanilla,
         realm = self.realm,
         isUserModified = self.isUserModified,
+        overrides = self.overrides
     }
 
     return s_GameObject

@@ -10,25 +10,27 @@
 				v-if="!hideLabel">
 			{{ label }}
 		</label>
-		<input
-				type="number"
-				:max="max"
-				:min="min"
-				:name="inputName"
-				:step="step"
-				:value="formattedValue"
-				@input="adjustValue($event.target.value)"
-				@blur="$emit('blur')">
+    <lazy-input
+		type="number"
+		:min="min"
+		:max="max"
+		:name="inputName"
+		:step="step"
+		v-model="formattedValue"
+		@blur="$emit('blur')"
+    />
 	</div>
 </template>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component
+import LazyInput from './LazyInput.vue';
+
+@Component({ components: { LazyInput } })
 export default class DraggableNumberInput extends Vue {
 	get boundAdjust() {
-		return this.adjustValue.bind(this);
+		return this.onDrag.bind(this);
 	}
 
 	get boundEnd() {
@@ -43,75 +45,80 @@ export default class DraggableNumberInput extends Vue {
 		return `draggable-number-${this.label.toLowerCase().replace(' ', '-')}`;
 	}
 
-	public isDragging = false;
-
 	@Prop({ default: 'Y', type: String })
-	private dragDirection!: 'X' | 'Y';
+	private dragDirection: 'X' | 'Y';
 
 	@Prop({ default: false, type: Boolean })
 	private hideLabel: boolean;
 
 	@Prop({ required: true, type: String })
-	private label!: string;
+	private label: string;
 
 	@Prop({ type: Number })
-	private max!: number;
+	private max: number;
 
 	@Prop({ type: Number })
-	private min!: number;
+	private min: number;
 
 	@Prop({ default: 1, type: Number })
-	private step!: number;
+	private step: number;
 
 	@Prop({ required: true, type: Number })
-	private value!: number;
+	private value: number;
 
-	@Emit('input')
-	private adjustValue(val: number | string | MouseEvent): number {
-		let newVal;
-		if (val instanceof MouseEvent) {
-			if (val.clientX > window.innerWidth - 2) {
-				console.log('Right edge');
-				window.editor.threeManager.inputControls.TeleportMouse(val, 'left');
-			}
-			if (val.clientX < 2) {
-				console.log('Left edge');
-				window.editor.threeManager.inputControls.TeleportMouse(val, 'right');
-			}
+	@Prop({ required: true, type: String })
+	private type: number;
 
-			newVal = this.dragDirection === 'Y' ? -window.editor.threeManager.inputControls.movementY * this.step : window.editor.threeManager.inputControls.movementX * this.step;
-			newVal = Number(this.value + newVal);
-		} else { newVal = Number(val); }
+	set formattedValue(val: string) {
+		let newVal = val === '' ? 0 : Number(val);
 
-		if (!isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
-		if (!isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
-		return Number(newVal.toFixed(2));
+		if (!Number.isNaN(this.min) && newVal < this.min) { newVal = Math.max(newVal, this.min); }
+		if (!Number.isNaN(this.max) && newVal > this.max) { newVal = Math.min(newVal, this.max); }
+
+		// TODO: Sanitize
+		console.log('Numba: ' + newVal);
+		console.log('TODO: ' + this.type);
+		this.$emit('input', newVal);
+	}
+
+	private onDrag(event: MouseEvent) {
+		if (event.clientX > window.innerWidth - 2) {
+			console.log('Right edge');
+			window.editor.threeManager.inputControls.TeleportMouse(event, 'left');
+		}
+
+		if (event.clientX < 2) {
+			console.log('Left edge');
+			window.editor.threeManager.inputControls.TeleportMouse(event, 'right');
+		}
+
+		const newValDelta = this.dragDirection === 'Y' ? -window.editor.threeManager.inputControls.movementY * this.step : window.editor.threeManager.inputControls.movementX * this.step;
+
+		this.formattedValue = (this.value + newValDelta).toFixed(2);
 	}
 
 	get formattedValue() {
-		return Number(this.value.toFixed(2));
-	}
-
-	private dragEnd(): void {
-		this.isDragging = false;
-
-		document.body.style.cursor = '';
-		document.body.style.userSelect = '';
-
-		document.removeEventListener('mousemove', this.boundAdjust);
-		document.removeEventListener('mouseup', this.boundEnd);
-		this.$emit('end-drag');
+		return Number(this.value).toFixed(2);
 	}
 
 	private dragStart(): void {
-		this.isDragging = true;
-
 		document.body.style.cursor = this.cursorDirection;
 		document.body.style.userSelect = 'none';
 
 		document.addEventListener('mousemove', this.boundAdjust);
 		document.addEventListener('mouseup', this.boundEnd);
-		this.$emit('start-drag');
+
+		this.$emit('dragstart');
+	}
+
+	private dragEnd(): void {
+		document.body.style.cursor = '';
+		document.body.style.userSelect = '';
+
+		document.removeEventListener('mousemove', this.boundAdjust);
+		document.removeEventListener('mouseup', this.boundEnd);
+
+		this.$emit('dragend');
 	}
 }
 </script>
@@ -121,11 +128,12 @@ export default class DraggableNumberInput extends Vue {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		padding-top: 0.2em;
 		label {
-			padding: 0 1vmin;
+			padding-left: 0.4em;
+			padding-right: 0.2em;
 		}
 		input {
-			padding: 0 1vmin;
 			border-radius: 0.3vmin;
 			padding-left: 0.5vmin;
 		}

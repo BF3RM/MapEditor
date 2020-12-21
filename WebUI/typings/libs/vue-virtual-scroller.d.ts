@@ -124,7 +124,6 @@ declare module 'vue-virtual-scroller' {
 		public unuseView(view: any, ...args: any[]): void;
 
 		public updateVisibleItems(checkItem: any): any;
-
 	}
 	export class DynamicScroller extends Vue {
 		public components: {
@@ -279,7 +278,6 @@ declare module 'vue-virtual-scroller' {
 
 		public simpleArray(): any;
 
-
 		public forceUpdate(...args: any[]): void;
 
 		public getItemSize(item: any, ...args: any[]): any;
@@ -291,7 +289,6 @@ declare module 'vue-virtual-scroller' {
 		public scrollToBottom(): void;
 
 		public scrollToItem(index: any): void;
-
 	}
 	export class DynamicScrollerItem extends Vue {
 		public inject: string[];
@@ -340,7 +337,6 @@ declare module 'vue-virtual-scroller' {
 
 		public size(): any;
 
-
 		public computeSize(id: any): void;
 
 		public getBounds(): any;
@@ -352,7 +348,5 @@ declare module 'vue-virtual-scroller' {
 		public updateSize(): void;
 
 		public updateWatchData(): void;
-
 	}
 }
-
