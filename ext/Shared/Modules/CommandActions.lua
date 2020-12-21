@@ -262,7 +262,7 @@ function CommandActions:SetEBXField(p_Command)
 		m_Logger:Error("The SetEBXFieldCommand needs to have a valid gameObjectTransferData set.")
 		return
 	end
-	local s_Result = nil
+	local s_Result, s_Path = nil
 
 	if(p_Command.gameObjectTransferData.guid) then -- Override only this instance
 		local s_GameObject = GameObjectManager:GetGameObject(p_Command.gameObjectTransferData.guid)
@@ -270,7 +270,7 @@ function CommandActions:SetEBXField(p_Command)
 			m_Logger:Warning('Could not find GameObject: ' .. p_GameObjectGuid)
 			return nil, ActionResultType.Failure
 		end
-		s_Result = s_GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
+		s_Result, s_Path = s_GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
 	else
 		--s_Result = EBXManager:SetFields(nil, p_Command.gameObjectTransferData.overrides)
 	end
@@ -280,6 +280,7 @@ function CommandActions:SetEBXField(p_Command)
 		return nil, ActionResultType.Failure
 	end
 
+	p_Command.gameObjectTransferData.overrides.path = s_Path
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		overrides = p_Command.gameObjectTransferData.overrides

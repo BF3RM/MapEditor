@@ -582,7 +582,8 @@ function isPrintable( typ )
 		typ == "Vec3" or
 		typ == "Vec4" or
 		typ == "Boolean" or
-		typ == "Guid" then
+		typ == "Guid" or
+		typ == "SByte" then
 		return true
 	end
 	return false

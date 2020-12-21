@@ -29,8 +29,8 @@
 					</div>
 					<div v-if="selectedGameObject">
 						<b>Overrides:</b>
-						<p v-for="(value, key) of selectedGameObject.overrides.values()" :key="key">{{value}}</p>
-						<div v-if="selectedGameObject.overrides.values().length > 0">
+						<p v-for="(value, key) of selectedGameObject.overrides.keys()" :key="key">{{value}}</p>
+						<div v-if="selectedGameObject.overrides.keys().length > 0">
 <!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
 <!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
 						</div>
@@ -176,7 +176,7 @@ export default class InspectorComponent extends EditorComponent {
 					reference: this.selectedGameObject.originalRef,
 					field: 'objects',
 					type: 'GameObjectData',
-					value: value
+					values: [value]
 				}));
 			} else {
 				window.editor.execute(new SetEBXFieldCommand({
@@ -184,7 +184,7 @@ export default class InspectorComponent extends EditorComponent {
 					reference: this.selectedGameObject.originalRef,
 					field: 'object',
 					type: 'GameObjectData',
-					value: value
+					values: [value]
 				}));
 			}
 		}

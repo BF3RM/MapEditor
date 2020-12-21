@@ -28,6 +28,7 @@ import Instance from '@/script/types/ebx/Instance';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { CtrRef } from '@/script/types/CtrRef';
 import { isPrintable } from '@/script/modules/Utils';
+import Reference from '@/script/types/ebx/Reference';
 export default Vue.extend({
 	name: 'Property',
 	props: {
@@ -52,16 +53,16 @@ export default Vue.extend({
 			required: false
 		},
 		overrides: {
-			type: undefined,
+			type: undefined as PropType<IEBXFieldData[]>,
 			default() {
-				return { field: 'none', type: 'none', value: {} };
+				return [] as [{ field: 'none', type: 'none', values: [] }];
 			},
 			required: false
 		}
 	},
 	methods: {
 		onChangeValue(field: string, newValue: any) {
-			this.$emit('input', {
+			const out = {
 				reference: new CtrRef(
 					undefined,
 					undefined,
@@ -70,33 +71,32 @@ export default Vue.extend({
 				),
 				field: field,
 				type: this.field.type,
-				value: newValue,
 				oldValue: this.field.value
-			} as IEBXFieldData);
+			};
+			if (isPrintable(this.field.type)) {
+				out.value = newValue;
+			} else {
+				out.values = [newValue];
+			}
+			this.$emit('input', out);
 		},
 		getValue() {
-			if (this.overrides && this.overrides.field !== 'none') {
-				if (isNaN(this.overrides as any)) {
-					return (this.overrides as IEBXFieldData).value;
-				} else {
-					return this.overrides;
+			if (this.overrides && this.overrides.length > 0 && this.overrides[0].field !== 'none') {
+				for (const override of this.overrides) {
+					if (override.value) {
+						return override.value;
+					} else {
+						return (override as IEBXFieldData).values;
+					}
 				}
 			}
 			return this.field.value;
 		},
 		getOverrides() {
-			if (this.overrides && this.overrides.field !== 'none') {
-				if (isNaN(this.overrides as any)) {
-					if (this.field.isReference()) {
-						return this.overrides;
-					}
-					if (isPrintable(this.overrides.type)) {
-						return this.overrides.value;
-					}
-					return this.overrides;
-				}
+			if (this.$props.overrides) {
+				return this.$props.overrides;
 			}
-			return { field: 'none', type: 'none', value: {} };
+			return [{ field: 'none', type: 'none', values: {} }];
 		}
 	},
 	computed: {
@@ -131,11 +131,7 @@ export default Vue.extend({
 				if (this.field.isEnum()) { // structs
 					return import('./EnumProperty.vue');
 				}
-				if (typeof this.field.value === 'object') { // structs
-					return import('./ObjectProperty.vue');
-				}
-
-				return import('./DefaultProperty.vue');
+				return import('./ObjectProperty.vue');
 			};
 
 			// TODO: filter for colors

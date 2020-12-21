@@ -5,6 +5,7 @@ import { GameEntityData } from '@/script/types/GameEntityData';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { Guid } from '@/script/types/Guid';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export class GameObjectTransferData {
 	public guid: any;
@@ -19,7 +20,7 @@ export class GameObjectTransferData {
 	public isVanilla: boolean;
 	public isUserModified: boolean;
 	public originalRef: CtrRef;
-	public overrides: any[];
+	public overrides: IEBXFieldData[];
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {

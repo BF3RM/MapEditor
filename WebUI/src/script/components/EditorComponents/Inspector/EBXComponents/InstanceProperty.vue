@@ -33,9 +33,9 @@ export default Vue.extend({
 			required: true
 		},
 		overrides: {
-			type: Object as PropType<IEBXFieldData>,
+			type: Array as PropType<IEBXFieldData[]>,
 			default() {
-				return { field: 'none', type: 'none', value: {} };
+				return [] as [{ field: 'none', type: 'none', values: [] }];
 			},
 			required: false
 		}
@@ -47,10 +47,15 @@ export default Vue.extend({
 	},
 	methods: {
 		getOverrides(field: string): any {
-			if (this.$props.overrides) {
-				return this.$props.overrides.field === field ? this.$props.overrides.value : { field: 'none', type: 'none', value: {} };
+			if (this.$props.overrides && this.$props.overrides.length > 0) {
+				for (const override of this.$props.overrides) {
+					if (override.field === field) {
+						return [override];
+					}
+				}
+				return [{ field: 'none', type: 'none', values: [] }];
 			}
-			return { field: 'none', type: 'none', value: {} };
+			return [{ field: 'none', type: 'none', values: [] }];
 		}
 	}
 });

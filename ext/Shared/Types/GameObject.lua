@@ -268,7 +268,7 @@ function GameObject:SetOverride(p_Field)
 		print(s_Path)
 		self.overrides[s_Path] = p_Field
 	end
-	return s_Path ~= ''
+	return  s_Path ~= '', s_Path
 end
 
 function GameObject:hasOverrides()

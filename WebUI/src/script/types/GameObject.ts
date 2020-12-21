@@ -17,6 +17,8 @@ import Partition from '@/script/types/ebx/Partition';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { Dictionary } from 'typescript-collections';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
+import { isPrintable } from '@/script/modules/Utils';
+const merge = require('deepmerge');
 
 /*
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -39,7 +41,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public parent: GameObject;
 	public isUserModified: boolean;
 	public originalRef: CtrRef | undefined;
-	public overrides = new Dictionary<string, IEBXFieldData>(); // guid, field
+	public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
 
 	public get localTransform(): LinearTransform {
 		const parentWorldInverse = new THREE.Matrix4().getInverse(this.parent.matrixWorld);
@@ -206,11 +208,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 				if (instance) {
 					const transform = new LinearTransform().setFromMatrix(this.matrix);
 					if (this.originalRef) {
-						this.parent.setOverride(this.originalRef, { guid: this.guid, reference: this.originalRef, field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform' });
+						this.parent.setOverride({ field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform', values: [] });
 					}
 					instance.fields.blueprintTransform.value.set(transform);
-
-					console.log(instance.fields.blueprintTransform.value);
 				}
 			});
 		}
@@ -218,16 +218,21 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		editor.threeManager.nextFrame(() => signals.objectChanged.emit(this, 'transform', linearTransform));
 	}
 
-	public setOverride(override: IEBXFieldData) {
-		if (this.overrides.getValue(override.field) !== undefined) {
-			// @ts-ignore
-			this.overrides.getValue(override.field).value = override.value;
-		} else {
-			this.overrides.setValue(override.field, override);
+	private _GetPath(field: IEBXFieldData, path: string): string {
+		if (field.values && field.values.length > 0) {
+			return this._GetPath(field.values[0], path + '.' + field.field);
 		}
+		return path + '.' + field.field;
+	}
+
+	public setOverride(newOverride: IEBXFieldData) {
+		const path = this._GetPath(newOverride, '');
+		console.log(path);
+		this.overrides.setValue(path, newOverride);
 	}
 
 	public ApplyOverrides() {
+
 	}
 
 	public setName(name: string) {
@@ -327,17 +332,12 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
-	public get EBXOverrides() {
-		const type = this.blueprintCtrRef.typeName;
-		let overrides = null;
-		if (type === 'PrefabBlueprint') {
-			overrides = this.overrides.getValue('objects');
-		} else {
-			overrides = this.overrides.getValue('object');
+	public get EBXOverrides():IEBXFieldData[] {
+		let out = {} as IEBXFieldData;
+		for (const override of this.overrides.values()) {
+			out = merge(out, override);
 		}
-		if (overrides) {
-			return overrides.value;
-		}
-		return overrides;
+		console.log(out);
+		return <IEBXFieldData[]>out.values;
 	}
 }

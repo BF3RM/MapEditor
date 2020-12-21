@@ -19,24 +19,26 @@ export function getFilename(path: string) {
 	}).reverse()[0];
 }
 export function isPrintable(type: string) {
-	return (type === 'CString' ||
-		type === 'Single' ||
-		type === 'Float8' ||
-		type === 'Float16' ||
-		type === 'Float32' ||
-		type === 'Float64' ||
-		type === 'Int8' ||
-		type === 'Int16' ||
-		type === 'Int32' ||
-		type === 'Int64' ||
-		type === 'Uint8' ||
-		type === 'Uint16' ||
-		type === 'Uint32' ||
-		type === 'Uint64' ||
-		type === 'LinearTransform' ||
-		type === 'Vec2' ||
-		type === 'Vec3' ||
-		type === 'Vec4' ||
-		type === 'Boolean' ||
-		type === 'Guid');
+	type = type.toLowerCase();
+	return (type === 'cstring' ||
+		type === 'single' ||
+		type === 'float8' ||
+		type === 'float16' ||
+		type === 'float32' ||
+		type === 'float64' ||
+		type === 'int8' ||
+		type === 'int16' ||
+		type === 'int32' ||
+		type === 'int64' ||
+		type === 'uint8' ||
+		type === 'uint16' ||
+		type === 'uint32' ||
+		type === 'uint64' ||
+		type === 'lineartransform' ||
+		type === 'vec2' ||
+		type === 'vec3' ||
+		type === 'vec4' ||
+		type === 'boolean' ||
+		type === 'guid' ||
+		type === 'sbyte');
 }

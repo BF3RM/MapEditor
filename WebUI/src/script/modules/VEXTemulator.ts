@@ -4,6 +4,7 @@ import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToW
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { Guid } from '@/script/types/Guid';
+import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export class VEXTemulator {
 	private commands: any;
