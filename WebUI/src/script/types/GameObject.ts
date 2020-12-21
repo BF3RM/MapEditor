@@ -1,5 +1,4 @@
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
-import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { Guid } from '@/script/types/Guid';
 import { CtrRef } from '@/script/types/CtrRef';
@@ -8,16 +7,11 @@ import { GameEntityData } from '@/script/types/GameEntityData';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
-import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
-import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
-import Instance from '@/script/types/ebx/Instance';
-import Partition from '@/script/types/ebx/Partition';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
-import { Dictionary } from 'typescript-collections';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
-import { isPrintable, mergeDeep } from '@/script/modules/Utils';
+import { isPrintable } from '@/script/modules/Utils';
 const merge = require('deepmerge');
 
 /*
@@ -41,7 +35,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public parent: GameObject;
 	public isUserModified: boolean;
 	public originalRef: CtrRef | undefined;
-	public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
+	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
+	public overrides: { [path: string]: IEBXFieldData } = {}
 
 	public get localTransform(): LinearTransform {
 		const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
@@ -235,7 +230,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	public setOverride(newOverride: IEBXFieldData) {
 		const path = this._GetPath(newOverride, '');
-		this.overrides.setValue(path, newOverride);
+
+		this.overrides = {
+			...this.overrides,
+			[path]: newOverride
+		};
+
+		console.log(this.overrides);
+		// this.overrides.setValue(path, newOverride);
 	}
 
 	public ApplyOverrides() {
@@ -360,7 +362,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	public get EBXOverrides():any {
 		const out = {};
-		for (const override of this.overrides.values()) {
+		for (const override of Object.values(this.overrides)) {
 			this.MergeOverride(out, override);
 		}
 		console.log(out);

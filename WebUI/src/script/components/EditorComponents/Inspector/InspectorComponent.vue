@@ -29,8 +29,8 @@
 					</div>
 					<div v-if="selectedGameObject">
 						<b>Overrides:</b>
-						<p v-for="(value, key) of selectedGameObject.overrides.keys()" :key="key">{{value}}</p>
-						<div v-if="selectedGameObject.overrides.keys().length > 0">
+						<p v-for="(value, key) of Object.keys(selectedGameObject.overrides)" :key="key">{{value}}</p>
+						<div v-if="Object.keys(selectedGameObject.overrides).length > 0">
 <!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
 <!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
 						</div>
@@ -209,7 +209,11 @@ export default class InspectorComponent extends EditorComponent {
 		const group = window.editor.selectionGroup;
 		if (group !== null) {
 			// Move selection group to the new position.
-			group.setMatrix(newTrans.toMatrix());
+			// group.setMatrix(newTrans.toMatrix());
+			group.position.set(newTrans.position.x, newTrans.position.y, newTrans.position.z);
+			group.scale.set(newTrans.scale.x, newTrans.scale.y, newTrans.scale.z);
+			group.rotation.setFromQuaternion(newTrans.rotation);
+
 			group.updateMatrix();
 			group.onClientOnlyMove();
 
@@ -275,7 +279,9 @@ export default class InspectorComponent extends EditorComponent {
 
 		if (group.selectedGameObjects.length > 0) {
 			this.enabled = group.selectedGameObjects[0].enabled;
+
 			this.localTransform = group.selectedGameObjects[0].localTransform;
+			console.log('localTransform updated');
 		}
 	}
 
