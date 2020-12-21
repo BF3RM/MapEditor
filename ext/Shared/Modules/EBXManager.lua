@@ -16,6 +16,8 @@ function EBXManager:OnLevelDestroy()
 end
 function EBXManager:SetFields(p_Overrides)
 	for _,v in pairs(p_Overrides) do
+		print(_)
+		print(v)
 		self:SetField(v.field, v.reference, v.type, v.value)
 	end
 end
@@ -69,13 +71,13 @@ function ParseType(p_Type, p_Val)
 		return tonumber(p_Val)
 	end
 	if(p_Type == "Vec2") then -- Vec2
-		return Vec3(p_Val.x, p_Val.y)
+		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
 	end
 	if(p_Type == "Vec3") then -- Vec3
-		return Vec3(p_Val.x, p_Val.y, p_Val.z)
+		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
 	end
 	if(p_Type == "Vec4") then -- Vec3
-		return Vec3(p_Val.x, p_Val.y, p_Val.z, p_Val.w)
+		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
 	end
 	if(p_Type == "Enum") then -- Enum
 		return tonumber(p_Val)  -- Value

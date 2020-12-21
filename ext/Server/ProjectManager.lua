@@ -227,7 +227,8 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
                     variation = l_GameObjectSaveData.variation,
                     gameEntities = {},
                     isEnabled = l_GameObjectSaveData.isEnabled or true,
-                    isDeleted = l_GameObjectSaveData.isDeleted or false
+                    isDeleted = l_GameObjectSaveData.isDeleted or false,
+                    overrides = l_GameObjectSaveData.overrides or nil
                 }
             }
 

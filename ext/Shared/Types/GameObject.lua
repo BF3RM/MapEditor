@@ -254,10 +254,10 @@ function GameObject:GetEntities()
 end
 function GameObject:SetOverrides(p_Overrides)
 	if( not self.internalBlueprint) then
-		print(self:GetGameObjectTransferData())
 		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
 	end
-	for _,l_Field in pairs(p_Overrides) do
+	for k,l_Field in pairs(p_Overrides) do
+		print(k)
 		self:SetOverride(l_Field)
 	end
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.

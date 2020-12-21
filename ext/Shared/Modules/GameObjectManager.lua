@@ -43,7 +43,7 @@ function GameObjectManager:GetGameEntities(p_EntityIds)
 	return s_GameEntities
 end
 
-function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
+function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
 			p_BlueprintInstanceGuid == nil or
 			p_LinearTransform == nil then
@@ -65,7 +65,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
 	m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
 	if p_IsPreviewSpawn == false then
-		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData }
+		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
 	else
 		local s_PreviewSpawnParentData = GameObjectParentData{
 			guid = "previewSpawn",
@@ -75,7 +75,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		}
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
 		m_Logger:WriteTable(s_PreviewSpawnParentData)
-		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData }
+		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides }
 	end
 
 	local s_Params = EntityCreationParams()
@@ -138,10 +138,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		gameEntities = {},
 		children = {},
 		realm = Realm.Realm_ClientAndServer,
-		originalRef = originalRef
+		originalRef = originalRef,
 	}
 	if(self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil) then
 		s_GameObject.creatorName = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].creatorName
+		s_GameObject.overrides = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].overrides
 	end
 
 
@@ -286,6 +287,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if(s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000') then -- Set collision to 0,0,0 so we don't hit the same object over and over
 		s_GameObject:SetTransform(LinearTransform(), true)
 		s_GameObject:SetTransform(p_Transform, false)
+	end
+	if(GetLength(s_GameObject.overrides) > 0) then
+		print("Patching GameObject")
+		s_GameObject:SetOverrides(s_GameObject.overrides)
 	end
 end
 
@@ -477,7 +482,7 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 
 	self:DeleteGameObject(p_Guid)
 	--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
-	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false)
+	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false, s_TransferData.overrides)
 	return true
 end
 

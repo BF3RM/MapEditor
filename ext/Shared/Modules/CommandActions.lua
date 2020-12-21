@@ -41,7 +41,9 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 																s_GameObjectTransferData.parentData,
 																s_GameObjectTransferData.transform,
 																s_GameObjectTransferData.variation,
-												false)
+																false,
+																s_GameObjectTransferData.overrides
+	)
 
 	if(s_SpawnResult == false) then
 		-- Send error to webui

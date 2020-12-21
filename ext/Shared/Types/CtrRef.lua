@@ -19,7 +19,6 @@ function CtrRef:GetTable()
 end
 
 function CtrRef:Get()
-	print("gettting")
 	local s_Instance = ResourceManager:FindInstanceByGuid(Guid(self.partitionGuid), Guid(self.instanceGuid))
 	-- TODO: More resolving for custom objects or whatever? Idk
 	if(s_Instance) then

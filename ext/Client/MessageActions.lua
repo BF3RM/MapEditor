@@ -72,7 +72,9 @@ function MessageActions:PreviewSpawn(p_Message, p_Arguments)
                                                                nil,
                                                                s_GameObjectTransferData.transform,
                                                                s_GameObjectTransferData.variation,
-                                                                true)
+                                                                true, s_GameObjectTransferData.overrides
+
+    )
 
     if s_Result == false then
         return ActionResultType.Failure
