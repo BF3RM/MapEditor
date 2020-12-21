@@ -13,11 +13,11 @@
 		</div>
         <div class="table-container" v-if="visible">
             <table class="table is-array-element">
-                <tbody>
-					<div v-for="(value, index) in field.value" :key="value.name">
+                <div>
+					<div v-for="value in field.value" :key="value.name">
 						<property :overrides="getOverrides(value.name)" class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
 					</div>
-                </tbody>
+                </div>
             </table>
         </div>
     </div>
@@ -62,13 +62,13 @@ export default Vue.extend({
 		overrides: {
 			type: Array as PropType<IEBXFieldData[]>,
 			default() {
-				return [] as [{ field: 'none', type: 'none', values: [] }];
+				return [];
 			},
 			required: false
 		}
 	},
 	methods: {
-		onInput(event: any, index: number) {
+		onInput(event: any) {
 			this.$emit('input', event);
 		},
 		getOverrides(field: string): any {

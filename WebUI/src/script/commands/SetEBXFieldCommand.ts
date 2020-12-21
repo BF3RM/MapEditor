@@ -2,18 +2,16 @@ import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { VextCommand } from '@/script/types/VextCommand';
 import Command from '@/script/libs/three/Command';
 import { CtrRef } from '@/script/types/CtrRef';
-import Field from '@/script/types/ebx/Field';
 import { Guid } from '@/script/types/Guid';
-import { Dictionary } from 'typescript-collections';
 
 export interface IEBXFieldData {
 	guid?: Guid,
 	reference?: CtrRef | undefined,
 	field: string,
 	type: string,
-	values: IEBXFieldData[] | any,
-	value: any,
-	oldValue: any | undefined,
+	values?: IEBXFieldData[] | any,
+	value?: any,
+	oldValue?: any | undefined,
 }
 export default class SetEBXFieldCommand extends Command {
 	constructor(public EBXFieldUpdateData: IEBXFieldData) {

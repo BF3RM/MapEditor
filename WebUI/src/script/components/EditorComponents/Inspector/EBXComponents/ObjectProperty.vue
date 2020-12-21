@@ -1,7 +1,7 @@
 <template>
     <div class="table">
         <div v-if="field.value">
-			<property v-for="(value, index) in field.value" :key="value.name" :overrides="getOverrides(value.name)" :partition="partition" :instance="instance" :field="value"  :currentPath="currentPath"  @input="$emit('input', $event)"></property>
+			<property v-for="value in field.value" :key="value.name" :overrides="getOverrides(value.name)" :partition="partition" :instance="instance" :field="value"  :currentPath="currentPath"  @input="$emit('input', $event)"></property>
         </div>
 		<div v-else>
 			<Reference-property :overrides="getOverrides(field.name)" :class="field.type" :type="field.type" :currentPath="currentPath" :partition="partition" :field="field" :value="field.value" :instance="instance" :reference="null" @input="$emit('input', $event)"></Reference-property>
@@ -43,7 +43,7 @@ export default Vue.extend({
 		overrides: {
 			type: Array as PropType<IEBXFieldData[]>,
 			default() {
-				return [] as [{ field: 'none', type: 'none', values: [] }];
+				return [];
 			},
 			required: false
 		}

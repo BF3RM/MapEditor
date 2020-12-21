@@ -35,7 +35,7 @@ export default Vue.extend({
 		overrides: {
 			type: Array as PropType<IEBXFieldData[]>,
 			default() {
-				return [] as [{ field: 'none', type: 'none', values: [] }];
+				return [];
 			},
 			required: false
 		}

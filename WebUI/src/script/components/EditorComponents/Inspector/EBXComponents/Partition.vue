@@ -21,8 +21,7 @@
             <ul class="content">
                 <li v-for="instance in partition.instances" :key="instance.guid">
                     <InstanceProperty :key="instance.guid"
-                              :partition="partition" :instance="instance"
-                              :active="activeInstance"></InstanceProperty>
+                              :partition="partition" :instance="instance"></InstanceProperty>
                 </li>
             </ul>
         </div>
@@ -48,13 +47,11 @@ export default Vue.extend({
 	],
 	data(): {
         partition: Partition | undefined;
-        activeInstance: string;
         types: { [type: string]: any };
         graphVisible: boolean;
         } {
 		return {
 			partition: undefined,
-			activeInstance: '',
 			types: {},
 			graphVisible: false
 		};
@@ -71,23 +68,15 @@ export default Vue.extend({
 	},
 	mounted() {
 		console.log('yo');
-		this.partition = window.editor.fbdMan.getPartition(this.$props.path);
-		console.log(this.$props.path);
-		if (this.partition && Object.keys(this.partition.instances).length === 1 && this.activeInstance === '') {
-			this.activeInstance = this.partition.instances[Object.keys(this.partition.instances)[0]].guid;
-		}
+
+		const partition = window.editor.fbdMan.getPartition(this.$props.path);
+		this.partition = partition || undefined;
 	},
 	watch: {
-		$route(to) {
-			if (to.hash) {
-				this.activeInstance = to.hash.substring(1);
-			} else {
-				this.activeInstance = '';
-			}
-		},
 		path(to) {
 			console.log(to);
-			this.partition = window.editor.fbdMan.getPartition(to);
+			const partition = window.editor.fbdMan.getPartition(to);
+			this.partition = partition || undefined;
 		}
 	},
 	methods: {

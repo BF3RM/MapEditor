@@ -28,7 +28,6 @@ import Instance from '@/script/types/ebx/Instance';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { CtrRef } from '@/script/types/CtrRef';
 import { isPrintable } from '@/script/modules/Utils';
-import Reference from '@/script/types/ebx/Reference';
 export default Vue.extend({
 	name: 'Property',
 	props: {
@@ -53,16 +52,16 @@ export default Vue.extend({
 			required: false
 		},
 		overrides: {
-			type: undefined as PropType<IEBXFieldData[]>,
+			type: Array as PropType<IEBXFieldData[]>,
 			default() {
-				return [] as [{ field: 'none', type: 'none', values: [] }];
+				return [];
 			},
 			required: false
 		}
 	},
 	methods: {
 		onChangeValue(field: string, newValue: any) {
-			const out = {
+			const out: IEBXFieldData = {
 				reference: new CtrRef(
 					undefined,
 					undefined,
@@ -139,11 +138,8 @@ export default Vue.extend({
 
 			return type;
 		},
-		numberName() {
-			return !!parseInt(this.field.name);
-		},
 		titleName() {
-			if (this.numberName) {
+			if (!isNaN(Number(this.field.name))) {
 				return '[' + this.field.name + ']';
 			}
 			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(/([a-z0-9])([A-Z])/g, '$1 $2'); // Make first character uppercase and make it Title Case

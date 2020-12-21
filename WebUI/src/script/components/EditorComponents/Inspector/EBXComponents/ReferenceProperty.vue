@@ -48,7 +48,7 @@ import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 		overrides: {
 			type: Array as PropType<IEBXFieldData[]>,
 			default() {
-				return [] as [{ field: 'none', type: 'none', values: [] }];
+				return [];
 			},
 			required: false
 		}
@@ -91,7 +91,7 @@ export default class ReferenceComponent extends Vue {
 	})
 	autoOpen: boolean;
 
-	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition | null, cleanPath: string } {
+	data(): { loading: boolean, instance: any | null, expanded: false, referencePath: string, partition: Partition | null, cleanPath: string, guid: string, referenceObjectBlueprint: string } {
 		return {
 			loading: true,
 			instance: null,
