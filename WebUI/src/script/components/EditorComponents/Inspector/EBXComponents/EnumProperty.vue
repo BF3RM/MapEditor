@@ -75,7 +75,7 @@ export default Vue.extend({
 	computed: {
 		enumValue: {
 			get() {
-				return this.field.enumValue.replace(this.field.type + '_', '');
+				return this.field.enumValue!.replace(this.field.type + '_', '');
 			},
 			set() {
 				console.log('Attempted to set enum');

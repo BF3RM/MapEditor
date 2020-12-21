@@ -360,8 +360,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
-	public get EBXOverrides():any {
-		const out = {};
+	public get EBXOverrides(): any {
+		const out: any = {};
 		for (const override of Object.values(this.overrides)) {
 			this.MergeOverride(out, override);
 		}

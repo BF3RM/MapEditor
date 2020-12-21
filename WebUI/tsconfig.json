@@ -30,7 +30,8 @@
         "src/modules/*"
       ]
     },
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "skipLibCheck": true
   },
   "include": [
     "typings/**/*",
