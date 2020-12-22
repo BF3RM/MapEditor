@@ -8730,10 +8730,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vextpack@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/vextpack/-/vextpack-0.1.4.tgz#2606627137cb03b7a3df32bb17f24e0ce9e685a8"
-  integrity sha512-qxClRBUGtArLRrISIyvM6zk0Hz5qePgARpmzBnZimAS7A/1MFN9ruiBJr2plKBgW9H63whnwTu3/1+qdGUJkpw==
+vextpack@0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/vextpack/-/vextpack-0.1.5.tgz#998585a96d00dec56b101ff1dc760d59fb524a54"
+  integrity sha512-hZw1W6oQAfByFKcTKKKgvQonQZYtNxABERDgvklJqEG44M1BmIEM66kJtv8fwq49rjep4vlAfc7mdWBSH8KReg==
 
 vm-browserify@^1.0.1:
   version "1.1.2"
