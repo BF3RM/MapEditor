@@ -16,7 +16,7 @@
 									:tree="tree"
 									:search="search"
 									:content="node.content"
-									:nodeText="node.name + ' (' + node.children.length + ')'"
+									:nodeText="nodeText(node)"
 									:selected="node.state.selected"
 									@node:toggle-enable="onNodeToggleEnable"
 									@node:toggle-raycast-enable="onNodeToggleRaycastEnable"
@@ -52,6 +52,7 @@ import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
 import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
+import { REALM } from '@/script/types/Enums';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent } })
 
@@ -63,7 +64,8 @@ export default class HierarchyComponent extends EditorComponent {
 		'children': [],
 		'content': [{
 			'enabled': true,
-			'raycastEnabled': true
+			'raycastEnabled': true,
+			'realm': REALM.CLIENT_AND_SERVER
 		}]
 	}, {
 		'type': 'folder',
@@ -72,7 +74,8 @@ export default class HierarchyComponent extends EditorComponent {
 		'children': [],
 		'content': [{
 			'enabled': true,
-			'raycastEnabled': true
+			'raycastEnabled': true,
+			'realm': REALM.CLIENT_AND_SERVER
 		}]
 	}];
 
@@ -116,9 +119,14 @@ export default class HierarchyComponent extends EditorComponent {
 			content: [{
 				parentGuid: gameObject.parentData.guid,
 				enabled: gameObject.enabled,
-				raycastEnabled: gameObject.raycastEnabled
+				raycastEnabled: gameObject.raycastEnabled,
+				realm: gameObject.realm
 			}]
 		};
+	}
+
+	nodeText(node: Node) {
+		return (node.children.length === 0) ? node.name : node.name + ' (' + node.children.length + ')';
 	}
 
 	onDeletedBlueprint(commandActionResult: CommandActionResult) {

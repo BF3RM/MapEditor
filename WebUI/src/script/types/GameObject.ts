@@ -12,6 +12,8 @@ import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
+import { REALM } from '@/script/types/Enums';
+
 const merge = require('deepmerge');
 
 /*
@@ -37,6 +39,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public originalRef: CtrRef | undefined;
 	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
 	public overrides: { [path: string]: IEBXFieldData } = {}
+	public realm: REALM;
 
 	public get localTransform(): LinearTransform {
 		const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
@@ -49,7 +52,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
-		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [], isVanilla: boolean = false, isUserModified: boolean = false, originalRef: CtrRef | undefined = undefined) {
+		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [],
+		isVanilla: boolean = false, isUserModified: boolean = false,
+		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER){
 		super();
 
 		this.guid = guid;
@@ -66,6 +71,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.visible = false;
 		this.isUserModified = isUserModified;
 		this.originalRef = originalRef;
+		this.realm = realm;
 		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
@@ -95,7 +101,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.gameEntities,
 			gameObjectTransferData.isVanilla,
 			gameObjectTransferData.isUserModified,
-			gameObjectTransferData.originalRef
+			gameObjectTransferData.originalRef,
+			gameObjectTransferData.realm
 		);
 	}
 
@@ -134,7 +141,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			parentData: this.parentData,
 			transform: this.transform,
 			variation: this.variation,
-			overrides: this.overrides
+			overrides: this.overrides,
+			realm: this.realm
 		});
 	}
 

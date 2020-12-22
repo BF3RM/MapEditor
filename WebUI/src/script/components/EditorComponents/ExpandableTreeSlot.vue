@@ -21,6 +21,12 @@
 				<span class="slot-text" v-else>
 					{{ nodeText }}
 				</span>
+				<div class="slot-client-server-only" v-if="clientOnly">
+					client-only
+				</div>
+				<div class="slot-client-server-only" v-if="serverOnly">
+					server-only
+				</div>
 			</div>
 		</div>
 	</div>
@@ -29,6 +35,7 @@
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
+import { REALM } from '@/script/types/Enums';
 
 @Component({ components: { Highlighter } })
 export default class ExpandableTreeSlot extends Vue {
@@ -58,6 +65,22 @@ export default class ExpandableTreeSlot extends Vue {
 			return this.content[0].enabled;
 		} else {
 			return true;
+		}
+	}
+
+	get clientOnly() {
+		if (this.content && this.content[0]) {
+			return this.content[0].realm === REALM.CLIENT;
+		} else {
+			return false;
+		}
+	}
+
+	get serverOnly() {
+		if (this.content && this.content[0]) {
+			return this.content[0].realm === REALM.SERVER;
+		} else {
+			return false;
 		}
 	}
 
@@ -162,6 +185,7 @@ export default class ExpandableTreeSlot extends Vue {
 	.tree-node {
 		display: flex;
 		font-family: sans-serif;
+		flex-direction: row;
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
@@ -169,8 +193,10 @@ export default class ExpandableTreeSlot extends Vue {
 		/*white-space: nowrap;*/
 
 		.text-container {
-      width: available;
-      overflow: hidden;
+			display: flex;
+			flex-direction: row;
+			width: available;
+			overflow: hidden;
 		}
 		.expand-container img {
 			transition: transform 0.1s;
@@ -199,6 +225,12 @@ export default class ExpandableTreeSlot extends Vue {
 
 		.slot-text {
 			margin-left: 5px;
+		}
+		.slot-client-server-only {
+			border: 1px solid gray;
+			padding: 0 2px;
+			border-radius: 3px;
+			margin: 0 5px;
 		}
 	}
 </style>
