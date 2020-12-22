@@ -309,7 +309,9 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		p_GameObject.isVanilla = true
 
-		table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
+
 	end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
@@ -330,7 +332,8 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 	if p_GameObject.isVanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
-		table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
 	else
 		local i = 1
 		local s_CustomGuid
@@ -355,7 +358,7 @@ function GameObjectManager:AddGameObjectToTable(p_GameObject)
 		m_Logger:Warning("GAMEOBJECT WITH SAME GUID ALREADY EXISTS: " ..  guidAsString)
 	end
 
-	m_Logger:Write(tostring(p_GameObject.guid) .. " | " .. p_GameObject.name .. " | " .. tostring(p_GameObject.transform.trans))
+	--m_Logger:Write(tostring(p_GameObject.guid) .. " | " .. p_GameObject.name .. " | " .. tostring(p_GameObject.transform.trans))
 
 	self.m_GameObjects[guidAsString] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end

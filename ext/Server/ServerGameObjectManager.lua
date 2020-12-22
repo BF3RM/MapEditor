@@ -9,6 +9,14 @@ function ServerGameObjectManager:__init()
 end
 
 function ServerGameObjectManager:RegisterVars()
+	self:ResetVars()
+end
+
+function ServerGameObjectManager:OnLevelDestroy()
+	self:ResetVars()
+end
+
+function ServerGameObjectManager:ResetVars()
 	self.m_FirstPlayerLoaded = false
 	self.m_UnresolvedClientOnlyChildren = {}
 end
@@ -24,7 +32,7 @@ function ServerGameObjectManager:ClientReady(p_Player)
 	end
 	m_Logger:Write("Fist player ready, sending vanilla gameobjects guids")
 
-	--NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
+	NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
 end
 
 function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
@@ -52,7 +60,7 @@ function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
     local s_GuidString = tostring(s_GameObject.guid)
 
     if (GameObjectManager.m_GameObjects[s_GuidString] ~= nil) then
-        m_Logger:Warning("Already had a client only object received with the same guid")
+        m_Logger:Warning("Already had a client-only object received with the same guid")
         return
     end
 
