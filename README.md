@@ -30,6 +30,7 @@ Once in freecam, hold right click and:
 - Shift to move camera faster
 - Scrollwheel to change camera speed
 - Page up/down to change rotation speed
+- Arrow up/down to change FOV
 
 In freecam, without holding right click:
 
