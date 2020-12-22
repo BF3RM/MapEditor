@@ -8,11 +8,10 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { RAYCAST_LAYER } from '@/script/types/Enums';
+import { RAYCAST_LAYER, REALM } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
-import { REALM } from '@/script/types/Enums';
 
 const merge = require('deepmerge');
 
@@ -54,9 +53,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
 		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [],
 		isVanilla: boolean = false, isUserModified: boolean = false,
-		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER){
+		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER) {
 		super();
-
 		this.guid = guid;
 		this.name = name;
 		this.transform = transform;
