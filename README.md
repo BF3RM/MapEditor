@@ -8,7 +8,7 @@ It's not recommended to start any project yet, but if you still want to set up a
 Public releases will have the compiled UI available for download. 
 
 ## Developer set-up
-- Install [nodejs](https://nodejs.org/en/) version 13. Version 14 will give you errors.
+- Install [nodejs](https://nodejs.org/en/).
 - Install [yarn](https://yarnpkg.com/).
 - Place the UI compiler (``vuicc.exe``) in ``.../Server/Admin/`` folder.
 - Download MapEditor files and place them in  ``.../Server/Admin/Mods``. Path should look like ``.../Server/Admin/Mods/MapEditor``.
