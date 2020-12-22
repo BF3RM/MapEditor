@@ -257,14 +257,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			-- TODO: update blueprint data with the correct realm if its client or server only
 			if self.m_Realm == Realm.Realm_Server then
 				m_Logger:Write(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
-				for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
-					m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
-				end
+				-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
+				-- 	m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
+				-- end
 			elseif self.m_Realm == Realm.Realm_Client then
 				m_Logger:Write(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
-				for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
-					m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
-				end
+				-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
+				-- 	m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
+				-- end
 			end
 
 			self.m_ReferenceObjectDatas = {}

@@ -78,7 +78,6 @@ end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
-	ClientTransactionManager:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnLoaded()
@@ -96,6 +95,7 @@ end
 
 function MapEditorClient:OnEngineMessage(p_Message)
 	Editor:OnEngineMessage(p_Message)
+	ClientTransactionManager:OnEngineMessage(p_Message)
 end
 
 function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
