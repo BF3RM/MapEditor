@@ -30,7 +30,7 @@ end
 
 function ServerGameObjectManager:ClientReady(p_Player)
 	if self.m_FirstPlayerLoaded then
-		-- TODO: update client with server and client only stuff
+		NetEvents:SendToLocal('ClientGameObjectManager:ClientOnlyGuids', p_Player, self.m_ClientOnlyGameObjectGuids)
 	else
 		m_Logger:Write("Fist player ready, sending vanilla gameobjects guids")
 		NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
