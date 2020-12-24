@@ -3,18 +3,30 @@ class 'EditorCommon'
 local m_Logger = Logger("EditorCommon", true)
 
 
-function EditorCommon:__init()
+function EditorCommon:__init(p_Realm)
     m_Logger:Write("Initializing EditorCommon")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
 function EditorCommon:RegisterVars()
 	self.timeStopped = false
+	self.shouldStopTime = false
 end
 function EditorCommon:RegisterEvents()
-	--Events:Subscribe('Engine:Update', self, self.StopTime)
+	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
+end
+function EditorCommon:OnUpdatePass(p_Delta, p_Pass)
+	if(p_Pass ~= UpdatePass.UpdatePass_PostSim) then
+		return
+	end
+	if(self.timeStopped) then
+		return
+	end
+	if(self.shouldStopTime) then
+		self:StopTime()
+	end
 end
 function EditorCommon:StopTime()
 	if(not self.timeStopped) then
@@ -26,6 +38,7 @@ function EditorCommon:StopTime()
 			s_Setting.timeScale = 0
 			print('Stopped time!')
 			self.timeStopped = true
+			self.shouldStopTime = false
 		end
 	end
 end
@@ -39,6 +52,7 @@ function EditorCommon:StepTime()
 			s_Setting.timeScale = 1
 			print('Stepping time!')
 			self.timeStopped = false
+			self.shouldStopTime = true
 		end
 	end
 end

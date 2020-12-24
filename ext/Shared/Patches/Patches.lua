@@ -1,8 +1,6 @@
 class 'Patches'
 require "__shared/Patches/CommonRosePatcher"
 require "__shared/Patches/LevelPatcher"
-require "__shared/Patches/SequencePatcher"
-require "__shared/Patches/HealthStatePatcher"
 
 local m_Logger = Logger("Patches", true)
 
@@ -28,12 +26,6 @@ function Patches:OnPartitionLoaded(p_Partition)
 		end
 		if(l_Instance.typeInfo == LevelDescriptionAsset.typeInfo) then
 			LevelPatcher:PatchLevelDescription(l_Instance)
-		end
-		if(l_Instance.typeInfo == SequenceEntityData.typeInfo) then
-			SequencePatcher:PatchSequence(l_Instance)
-		end
-		if(l_Instance.typeInfo == HealthStateData.typeInfo) then
-			HealthStatePatcher:PatchHealthStateData(l_Instance)
 		end
 		--[[
 		if(l_Instance.typeInfo.name == "DynamicModelEntityData") then

@@ -120,6 +120,7 @@ function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 		elseif (s_ActionResultType == ActionResultType.Queue) then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue, l_Command)
+			EditorCommon:StepTime()
 		elseif (s_ActionResultType == ActionResultType.Failure) then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)

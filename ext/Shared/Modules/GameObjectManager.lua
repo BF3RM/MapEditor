@@ -68,7 +68,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
 	else
 		local s_PreviewSpawnParentData = GameObjectParentData{
-			guid = Guid(),
+			guid = Guid('00000000-0000-0000-0000-000000000000'),
 			typeName = "previewSpawn",
 		}
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
