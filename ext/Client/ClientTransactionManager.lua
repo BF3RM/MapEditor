@@ -27,6 +27,7 @@ end
 
 function ClientTransactionManager:RegisterEvents()
 	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
+	Events:Subscribe('ClientGameObjectManager:UpdateGameObjectRealm', self, self.OnUpdateGameObjectRealm)
 
 	NetEvents:Subscribe('ServerTransactionManager:CommandsInvoked', self, self.OnServerCommandsInvoked)
 	NetEvents:Subscribe('ServerTransactionManager:SyncClientContext', self, self.OnSyncClientContext)
@@ -330,6 +331,16 @@ function ClientTransactionManager:OnGameObjectReady(p_GameObject)
 	end
 
 	self.m_CommandActionResults = { }
+end
+
+function ClientTransactionManager:OnUpdateGameObjectRealm(s_GameObject)
+	if s_GameObject == nil then
+		m_Logger:Error("OnUpdateGameObjectRealm: GameObject is nil")
+	end
+	WebUpdater:AddUpdate('HandleRealmUpdate', {
+		guid = tostring(s_GameObject.guid),
+		realm = s_GameObject.realm
+	})
 end
 
 function ClientTransactionManager:OnSendCommandsToServer(p_Commands)

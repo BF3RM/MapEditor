@@ -347,6 +347,16 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	table.insert(p_ParentGameObject.children, p_GameObject)
 end
 
+function GameObjectManager:UpdateGameObjectRealm(p_Guid, p_Realm)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+	if s_GameObject == nil then
+		m_Logger:Error('Tried to update realm of a gameobject that doesn\'t exist')
+		return
+	end
+
+	s_GameObject.realm = p_Realm
+end
+
 function GameObjectManager:GetVanillaGameObjectsGuids()
 	return self.m_VanillaGameObjectGuids
 end
@@ -355,7 +365,7 @@ function GameObjectManager:AddGameObjectToTable(p_GameObject)
 	local guidAsString = tostring(p_GameObject.guid)
 
 	if (self.m_GameObjects[guidAsString] ~= nil) then
-		m_Logger:Warning("GAMEOBJECT WITH SAME GUID ALREADY EXISTS: " ..  guidAsString)
+		m_Logger:Warning("GameObject with the same guid already exists: " ..  guidAsString)
 	end
 
 	--m_Logger:Write(tostring(p_GameObject.guid) .. " | " .. p_GameObject.name .. " | " .. tostring(p_GameObject.transform.trans))

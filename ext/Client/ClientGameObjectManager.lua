@@ -7,9 +7,9 @@ function ClientGameObjectManager:__init()
 	self:RegisterEvents()
 end
 
-
 function ClientGameObjectManager:RegisterEvents()
 	NetEvents:Subscribe("ClientGameObjectManager:ServerGameObjectsGuids", self, self.OnServerGameObjectsGuidsReceived)
+	NetEvents:Subscribe("ClientGameObjectManager:ClientOnlyGuids", self, self.OnClientOnlyGuidsReceived)
 end
 
 --- Called when this client is done loading. We compare server and client guids to check which objects are client or server
@@ -39,26 +39,14 @@ function ClientGameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsG
 	m_Logger:Write("Done resolving")
 end
 
----- TODO: Find better algorithm
------ Returns array with values of the new table that are not on the original table.
---function ClientGameObjectManager:FindMissingValues(p_OriginalTable, p_NewTable)
---	local s_MissingValues = {}
---	for _, l_OriginalValue in pairs(p_OriginalTable) do
---		local s_Found = false
---
---		for _, l_NewValue in pairs(p_NewTable) do
---			if l_OriginalValue == l_NewValue then
---				s_Found = true
---				break
---			end
---		end
---
---		if not s_Found then
---			table.insert(s_MissingValues, l_OriginalValue)
---		end
---	end
---	return s_MissingValues
---end
+function ClientGameObjectManager:OnClientOnlyGuidsReceived(p_ClientOnlyGuids)
+	m_Logger:Write('Received client only guids, updating their realm.')
+	for l_GuidString, l_Guid in pairs(p_ClientOnlyGuids) do
+		GameObjectManager:UpdateGameObjectRealm(l_GuidString, Realm.Realm_Client)
+		local s_GameObject = GameObjectManager:GetGameObject(l_GuidString)
+		Events:DispatchLocal('ClientGameObjectManager:UpdateGameObjectRealm', s_GameObject)
+	end
+end
 
 --- Returns array with values of the new table that are not on the original table.
 function ClientGameObjectManager:FindMissingValues(p_OriginalTable, p_NewTable)

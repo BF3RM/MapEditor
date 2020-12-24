@@ -5,8 +5,7 @@ import { signals } from '@/script/modules/Signals';
 import { VextCommand } from '@/script/types/VextCommand';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
-import { IBlueprint } from '@/script/interfaces/IBlueprint';
-import { EDITOR_MODE, LOGLEVEL, VIEW } from '@/script/types/Enums';
+import { EDITOR_MODE, LOGLEVEL, REALM, VIEW } from '@/script/types/Enums';
 import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
 
 export default class VEXTInterface {
@@ -156,6 +155,10 @@ export default class VEXTInterface {
 		setTimeout(() => {
 			scope.doneExecuting = true;
 		}, 1);
+	}
+
+	public HandleRealmUpdate(payload: any) {
+		editor.UpdateGameObjectRealm(payload.guid, payload.realm);
 	}
 
 	public SendEvent(eventName: string, param?: any) {

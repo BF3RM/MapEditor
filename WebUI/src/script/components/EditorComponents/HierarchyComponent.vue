@@ -289,7 +289,6 @@ export default class HierarchyComponent extends EditorComponent {
 				if (node.content && node.content[0]) {
 					node.content[0].enabled = value;
 				}
-				// This doesnt work, data is not updated reactively
 			}
 		}
 
@@ -299,7 +298,15 @@ export default class HierarchyComponent extends EditorComponent {
 				if (node.content && node.content[0]) {
 					node.content[0].raycastEnabled = value;
 				}
-				// This doesnt work, data is not updated reactively
+			}
+		}
+
+		if (field === 'realm') {
+			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
+			if (node) {
+				if (node.content && node.content[0]) {
+					node.content[0].realm = value;
+				}
 			}
 		}
 	}

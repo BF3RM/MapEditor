@@ -19,6 +19,8 @@ end
 function ServerGameObjectManager:ResetVars()
 	self.m_FirstPlayerLoaded = false
 	self.m_UnresolvedClientOnlyChildren = {}
+	self.m_ClientOnlyGameObjectGuids = {}
+	self.m_ServerOnlyGameObjectGuids = {}
 end
 
 function ServerGameObjectManager:RegisterEvents()
@@ -28,11 +30,11 @@ end
 
 function ServerGameObjectManager:ClientReady(p_Player)
 	if self.m_FirstPlayerLoaded then
-		return
+		-- TODO: update client with server and client only stuff
+	else
+		m_Logger:Write("Fist player ready, sending vanilla gameobjects guids")
+		NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
 	end
-	m_Logger:Write("Fist player ready, sending vanilla gameobjects guids")
-
-	NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
 end
 
 function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
@@ -53,6 +55,8 @@ function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p
 	for _, l_TransferData in pairs(p_TransferDatas) do
 		self:ProcessClientOnlyGameObject(l_TransferData)
 	end
+
+	NetEvents:BroadcastLocal('ClientGameObjectManager:ClientOnlyGuids', self.m_ClientOnlyGameObjectGuids)
 end
 
 function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
@@ -92,7 +96,10 @@ function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
 		self.m_UnresolvedClientOnlyChildren[s_GuidString] = { }
     end
 
+	self.m_ClientOnlyGameObjectGuids[tostring(s_GameObject.guid)] = s_GameObject.guid
+
 	GameObjectManager:AddGameObjectToTable(s_GameObject)
+
     --m_Logger:Write("Added client only gameobject on server (without gameEntities), guid: " .. s_GuidString)
 end
 

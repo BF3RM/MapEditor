@@ -260,6 +260,11 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		signals.objectChanged.emit(this, 'variation', key);
 	}
 
+	public setRealm(realm: REALM) {
+		this.realm = realm;
+		signals.objectChanged.emit(this, 'realm', realm);
+	}
+
 	public getLinearTransform() {
 		new LinearTransform().setFromMatrix(this.matrixWorld);
 	}

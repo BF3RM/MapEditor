@@ -25,9 +25,7 @@ import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
-import { GenerateBlueprints } from '@/script/modules/DebugData';
-import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
-import { EDITOR_MODE } from '@/script/types/Enums';
+import { EDITOR_MODE, REALM } from '@/script/types/Enums';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
@@ -239,6 +237,16 @@ export default class Editor {
 		});
 
 		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
+	}
+
+	public UpdateGameObjectRealm(guidString: string, realm: REALM) {
+		const guid: Guid = new Guid(guidString);
+		const go = this.getGameObjectByGuid(guid);
+		if (go) {
+			go.setRealm(realm);
+		} else {
+			console.error('Tried updatig realm of a gameobject that doesn\'t exist. Guid: ' + guidString);
+		}
 	}
 
 	public DeleteSelected() {
