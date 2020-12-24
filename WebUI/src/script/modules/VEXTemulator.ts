@@ -5,6 +5,7 @@ import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
+import SetPlayModeCommand from '@/script/commands/SetPlayModeCommand';
 
 export class VEXTemulator {
 	private commands: any;
@@ -23,6 +24,7 @@ export class VEXTemulator {
 		this.commands.EnableBlueprintCommand = this.EnableBlueprint;
 		this.commands.DisableBlueprintCommand = this.DisableBlueprint;
 		this.commands.SetEBXFieldCommand = this.SetEBXField;
+		this.commands.SetPlayModeCommand = this.SetPlayMode;
 
 		this.messages = {};
 		this.messages.GetProjectsMessage = this.GetProjectsMessage;
@@ -102,6 +104,15 @@ export class VEXTemulator {
 
 	private DestroyGroup(command: any) {
 		LogError('NotImplemented');
+	}
+
+	private SetPlayMode(commandActionResult: CommandActionResult) {
+		return {
+			type: 'SetPlaymode',
+			gameObjectTransferData: {
+				name: commandActionResult.gameObjectTransferData.playMode
+			}
+		};
 	}
 
 	private SpawnBlueprint(commandActionResult: CommandActionResult) {

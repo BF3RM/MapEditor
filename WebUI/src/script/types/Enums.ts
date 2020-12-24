@@ -121,6 +121,11 @@ export enum WORLD_SPACE {
 	local = 'local',
 	world = 'world',
 }
+export enum PLAY_MODE {
+	play = 'Play',
+	pause = 'Pause',
+	reset = 'Reset',
+}
 
 export enum GIZMO_MODE {
 	select = 'select',

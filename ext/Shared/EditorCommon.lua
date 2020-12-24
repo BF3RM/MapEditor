@@ -28,6 +28,33 @@ function EditorCommon:OnUpdatePass(p_Delta, p_Pass)
 		self:StopTime()
 	end
 end
+function EditorCommon:SetPlayMode(playmode)
+	if(playmode == 'pause') then
+		self:StopTime()
+		return true
+	elseif(playmode == 'play') then
+		self:PlayTime()
+		return true
+	elseif(playmode == 'reset') then
+		print('todo')
+		self:StopTime()
+		return false
+	end
+end
+function EditorCommon:PlayTime()
+	if(self.timeStopped) then
+		local s_Setting = ResourceManager:GetSettings("GameTimeSettings")
+		if(s_Setting == nil) then
+			print("No setting")
+		else
+			s_Setting = GameTimeSettings(s_Setting)
+			s_Setting.timeScale = 1
+			print('Playing time!')
+			self.timeStopped = false
+			self.shouldStopTime = false
+		end
+	end
+end
 function EditorCommon:StopTime()
 	if(not self.timeStopped) then
 		local s_Setting = ResourceManager:GetSettings("GameTimeSettings")

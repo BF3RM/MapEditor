@@ -20,6 +20,7 @@ function CommandActions:RegisterVars()
 	self.DisableBlueprintCommand = self.DisableBlueprint
 	self.SetVariationCommand = self.SetVariation
 	self.SetEBXFieldCommand = self.SetEBXField
+	self.SetPlayModeCommand = self.SetPlayMode
 end
 
 function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
@@ -292,6 +293,16 @@ function CommandActions:SetEBXField(p_Command)
 		sender = p_Command.sender,
 		type = "SetField",
 		gameObjectTransferData = s_GameObjectTransferData
+	}
+	return s_CommandActionResult, ActionResultType.Success
+end
+function CommandActions:SetPlayMode(p_Command)
+	print(p_Command.gameObjectTransferData)
+	EditorCommon:SetPlayMode(p_Command.gameObjectTransferData.playMode)
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = "SetPlayMode",
+		gameObjectTransferData = p_Command.gameObjectTransferData
 	}
 	return s_CommandActionResult, ActionResultType.Success
 end

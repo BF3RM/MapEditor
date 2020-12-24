@@ -3,7 +3,7 @@ import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { Guid } from '@/script/types/Guid';
 
 import { GameObject } from '@/script/types/GameObject';
-import { EDITOR_MODE, GIZMO_MODE, VIEW, WORLD_SPACE } from '@/script/types/Enums';
+import { EDITOR_MODE, GIZMO_MODE, PLAY_MODE, VIEW, WORLD_SPACE } from '@/script/types/Enums';
 
 export const signals = {
 	editor: {
@@ -24,6 +24,7 @@ export const signals = {
 
 	gizmoModeChanged: new Signal<(mode: GIZMO_MODE) => void>(),
 	worldSpaceChanged: new Signal<(mode: WORLD_SPACE) => void>(),
+	playModeChanged: new Signal<(mode: PLAY_MODE) => void>(),
 	objectChanged: new Signal<(gameObject: GameObject, field: string, value: any) => void>(),
 
 	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),

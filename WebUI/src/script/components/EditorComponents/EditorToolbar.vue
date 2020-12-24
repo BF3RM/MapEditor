@@ -27,9 +27,13 @@
 				</el-radio-group>
 			</div>
 			<div id="toolbarCenter">
-				<key-tip
+				<el-radio-group v-model="playMode" @change="onChangePlayMode">
+					<el-radio-button v-for="item in playModes" :key="item" :label="item" :id="item"/>
+				</el-radio-group>
+				<!--<key-tip
 					:keys="'F1'"
 					:description="'Enable play mode'"/>
+					-->
 			</div>
 			<div id="toolbarRight">
 				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
@@ -46,9 +50,11 @@ import { signals } from '@/script/modules/Signals';
 import IMenuEntry from '@/script/interfaces/IMenuEntry';
 import RecursiveMenubar from '@/script/components/widgets/RecursiveMenubar.vue';
 import { SetViewModeMessage } from '@/script/messages/SetViewModeMessage';
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, PLAY_MODE, WORLD_SPACE } from '@/script/types/Enums';
 import InfoTopBar from '@/script/components/InfoTopBar.vue';
 import KeyTip from '@/script/components/KeyTip.vue';
+import { VextCommand } from '@/script/types/VextCommand';
+import SetPlayModeCommand from '@/script/commands/SetPlayModeCommand';
 
 @Component({ components: { InfoTopBar, RecursiveMenubar, KeyTip } })
 export default class EditorToolbar extends Vue {
@@ -56,8 +62,10 @@ export default class EditorToolbar extends Vue {
 	private tool = (window).editor.threeManager.gizmoMode;
 	private worldSpace = (window).editor.threeManager.worldSpace;
 	private worldSpaces = ['world', 'local'];
+	private playModes = ['play', 'pause', 'reset'];
 	private tools = ['select', 'translate', 'rotate', 'scale'];
 
+	private playMode = 'pause';
 	private windows = [];
 	private menuBar: IMenuEntry = {
 		type: 'menu',
@@ -172,7 +180,19 @@ export default class EditorToolbar extends Vue {
 	private mounted() {
 		signals.gizmoModeChanged.connect(this.onGizmoModeUpdated.bind(this));
 		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
+		signals.playModeChanged.connect(this.onPlayModeUpdated.bind(this)); //
 		signals.menuRegistered.connect(this.onMenuRegistered.bind(this));
+	}
+
+	private onChangePlayMode(newPlayMode: PLAY_MODE) {
+		console.log(newPlayMode);
+		const command = new SetPlayModeCommand(newPlayMode);
+		command.execute();
+	}
+
+	private onPlayModeUpdated(message: SetPlayModeCommand) {
+		console.log('Play mode changed');
+		this.playMode = message.playMode;
 	}
 
 	private onSelectMenu(key: string, keyPath: string[]) {

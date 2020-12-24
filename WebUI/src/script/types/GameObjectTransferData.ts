@@ -6,7 +6,7 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { Guid } from '@/script/types/Guid';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
-import { REALM } from '@/script/types/Enums';
+import { PLAY_MODE, REALM } from '@/script/types/Enums';
 
 export class GameObjectTransferData {
 	public guid: any;
@@ -23,6 +23,7 @@ export class GameObjectTransferData {
 	public originalRef: CtrRef;
 	public overrides: IEBXFieldData[];
 	public realm: REALM;
+	public playMode: PLAY_MODE;
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {
@@ -43,6 +44,7 @@ export class GameObjectTransferData {
 		this.originalRef = args.originalRef;
 		this.overrides = args.overrides;
 		this.realm = args.realm;
+		this.playMode = args.playMode;
 	}
 
 	public static FromTable(table: any) {

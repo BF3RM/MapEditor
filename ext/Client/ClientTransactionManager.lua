@@ -1,6 +1,7 @@
 class 'ClientTransactionManager'
 
 local m_Logger = Logger("ClientTransactionManager", true)
+MessageActions = require "MessageActions"
 
 function ClientTransactionManager:__init()
 	m_Logger:Write("Initializing ClientTransactionManager")
