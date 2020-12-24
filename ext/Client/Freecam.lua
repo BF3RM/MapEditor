@@ -22,7 +22,7 @@ function FreeCam:RegisterVars()
 	self.m_MoveY = 0.0
 	self.m_MoveZ = 0.0
 	self.m_SpeedMultiplier = 1.917
-	self.m_RotationSpeedMultiplier = 200
+	self.m_RotationSpeedMultiplier = 0.3
 	self.m_Sprint = false
 
 	self.m_LastSpectatedPlayer = 0
@@ -100,16 +100,45 @@ function FreeCam:UpdateFreeCamVars()
 end
 
 function FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-
 	if self.m_Camera ~= nil and self.m_Mode == CameraMode.FreeCam then
 
-		local s_NewYaw   = self.m_CameraYaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
-		local s_NewPitch = self.m_CameraPitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		local s_NewYaw   = self.m_CameraYaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (self.m_RotationSpeedMultiplier)
+		local s_NewPitch = self.m_CameraPitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (self.m_RotationSpeedMultiplier)
 
 		self.m_CameraYaw = s_NewYaw
 		if (math.abs(s_NewPitch)* 2 < math.pi) then
 			self.m_CameraPitch = s_NewPitch
 		end
+
+		-- Update the controls.
+		self:UpdateCameraControls(p_DeltaTime, p_Cache)
+
+
+		-- Update FreeCam
+		if self.m_Mode == CameraMode.FreeCam then
+			self:UpdateFreeCamera(p_DeltaTime)
+		end
+
+		if InputManager:IsKeyDown(InputDeviceKeys.IDK_F3) then
+			--m_Logger:Write("Reseting camera")
+			self.m_CameraData.transform.left = Vec3(1,0,0)
+			self.m_CameraData.transform.up = Vec3(0,1,0)
+			self.m_CameraData.transform.forward = Vec3(0,0,1)
+			self.m_CameraData.fov = 90
+			self.m_CameraYaw = 0.0
+			self.m_CameraPitch = 0.0
+			self.m_CameraRoll = 0.0
+			self.m_CameraDistance = 1.0
+			self.m_ThirdPersonRotX = 0.0
+			self.m_ThirdPersonRotY = 0.0
+
+		end
+		-- Reset movement.
+		self.m_RotateX = 0.0
+		self.m_RotateY = 0.0
+		self.m_MoveX = 0.0
+		self.m_MoveY = 0.0
+		self.m_MoveZ = 0.0
 	end
 end
 
@@ -174,49 +203,15 @@ function FreeCam:RotateX(p_Transform, p_Vector)
 	)
 end
 
-function FreeCam:OnUpdateInput(p_Delta)
-	if self.m_Mode == CameraMode.FirstPerson or self.m_Mode == CameraMode.Editor then
-		return
-	end
 
-	-- Update the controls.
-	self:UpdateCameraControls(p_Delta)
-
-	-- Update FreeCam
-	if self.m_Mode == CameraMode.FreeCam then
-		self:UpdateFreeCamera(p_Delta)
-	end
-
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F3) then
-		--m_Logger:Write("Reseting camera")
-		self.m_CameraData.transform.left = Vec3(1,0,0)
-		self.m_CameraData.transform.up = Vec3(0,1,0)
-		self.m_CameraData.transform.forward = Vec3(0,0,1)
-		self.m_CameraData.fov = 90
-		self.m_CameraYaw = 0.0
-		self.m_CameraPitch = 0.0
-		self.m_CameraRoll = 0.0
-		self.m_CameraDistance = 1.0
-		self.m_ThirdPersonRotX = 0.0
-		self.m_ThirdPersonRotY = 0.0
-
-	end
-	-- Reset movement.
-	self.m_RotateX = 0.0
-	self.m_RotateY = 0.0
-	self.m_MoveX = 0.0
-	self.m_MoveY = 0.0
-	self.m_MoveZ = 0.0
-end
-
-function FreeCam:UpdateCameraControls(p_Delta)
+function FreeCam:UpdateCameraControls(p_Delta, p_Cache)
 	if self.m_Mode == CameraMode.FirstPerson then
 		return
 	end
 
-	local s_MoveX = InputManager:GetLevel(InputConceptIdentifiers.ConceptMoveLR)
+	local s_MoveX =  p_Cache:GetLevel(InputConceptIdentifiers.ConceptMoveLR)
 	local s_MoveY = 0.0
-	local s_MoveZ = -InputManager:GetLevel(InputConceptIdentifiers.ConceptMoveFB)
+	local s_MoveZ = -p_Cache:GetLevel(InputConceptIdentifiers.ConceptMoveFB)
 
 	if InputManager:IsKeyDown(InputDeviceKeys.IDK_E) then
 		s_MoveY = 1.0
@@ -230,19 +225,19 @@ function FreeCam:UpdateCameraControls(p_Delta)
 		s_MoveZ = s_MoveZ * 0.7071 -- cos(45º)
 	end
 
-	local s_Step = self.m_RotationSpeedMultiplier / 40
+	local s_Step = self.m_RotationSpeedMultiplier / 10
 
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_PageDown) then
-		if self.m_RotationSpeedMultiplier > 1 then
+	if InputManager:IsKeyDown(InputDeviceKeys.IDK_PageDown) then
+		if self.m_RotationSpeedMultiplier > 0.01 then
 			self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier - s_Step
 		end
-	elseif InputManager:WentKeyDown(InputDeviceKeys.IDK_PageUp) then
+	elseif InputManager:IsKeyDown(InputDeviceKeys.IDK_PageUp) then
 		self.m_RotationSpeedMultiplier = self.m_RotationSpeedMultiplier + s_Step
 	end
 
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_ArrowUp) then
+	if InputManager:IsKeyDown(InputDeviceKeys.IDK_ArrowUp) then
 		self:SetCameraFOV(self:GetCameraFOV() + 5)
-	elseif InputManager:WentKeyDown(InputDeviceKeys.IDK_ArrowDown) then
+	elseif InputManager:IsKeyDown(InputDeviceKeys.IDK_ArrowDown) then
 		self:SetCameraFOV(self:GetCameraFOV() - 5)
 	end
 
@@ -253,7 +248,7 @@ function FreeCam:UpdateCameraControls(p_Delta)
 	-- Camera speed and distance controls.
 	self.m_Sprint = InputManager:IsKeyDown(InputDeviceKeys.IDK_LeftShift)
 
-	local s_MouseWheel = InputManager:GetLevel(InputConceptIdentifiers.ConceptFreeCameraSwitchSpeed)
+	local s_MouseWheel = p_Cache:GetLevel(InputConceptIdentifiers.ConceptFreeCameraSwitchSpeed)
 
 	if self.m_Mode == CameraMode.FreeCam then
 		self.m_SpeedMultiplier = self.m_SpeedMultiplier + (s_MouseWheel * 0.01)

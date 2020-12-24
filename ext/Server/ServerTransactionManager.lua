@@ -120,7 +120,6 @@ function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 		elseif (s_ActionResultType == ActionResultType.Queue) then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue, l_Command)
-
 		elseif (s_ActionResultType == ActionResultType.Failure) then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
@@ -132,6 +131,7 @@ function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 	if (#s_CommandActionResults > 0) then
 		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(p_Commands), #self.m_Transactions)
 	end
+
 end
 
 return ServerTransactionManager()

@@ -5,16 +5,76 @@ local m_Logger = Logger("EditorCommon", true)
 
 function EditorCommon:__init()
     m_Logger:Write("Initializing EditorCommon")
-    self:RegisterVars()
+	self:RegisterVars()
+	self:RegisterEvents()
 end
-
 function EditorCommon:RegisterVars()
-
+	self.timeStopped = false
 end
+function EditorCommon:RegisterEvents()
+	--Events:Subscribe('Engine:Update', self, self.StopTime)
+	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
+end
+function EditorCommon:StopTime()
+	if(not self.timeStopped) then
+		local s_Setting = ResourceManager:GetSettings("GameTimeSettings")
+		if(s_Setting == nil) then
+			print("No setting")
+		else
+			s_Setting = GameTimeSettings(s_Setting)
+			s_Setting.timeScale = 0
+			print('Stopped time!')
+			self.timeStopped = true
+		end
+	end
+end
+function EditorCommon:StepTime()
+	if(self.timeStopped) then
+		local s_Setting = ResourceManager:GetSettings("GameTimeSettings")
+		if(s_Setting == nil) then
+			print("No setting")
+		else
+			s_Setting = GameTimeSettings(s_Setting)
+			s_Setting.timeScale = 1
+			print('Stepping time!')
+			self.timeStopped = false
+		end
+	end
+end
+function EditorCommon:OnEngineMessage(p_Message)
+	if p_Message.type == MessageType.ClientLoadLevelMessage or p_Message.type == MessageType.ServerLoadLevelMessage then
+		self:StopTime()
+	end
+	if p_Message.type == MessageType.CoreEnteredIngameMessage then
+		print("CoreEnteredIngameMessage")
+		local iterator = EntityManager:GetIterator('ClientFadeEntity')
+		local entity = iterator:Next()
+		while entity ~= nil do
+			entity:FireEvent("FadeIn")
+			entity = iterator:Next()
+		end
 
+		iterator = EntityManager:GetIterator('ClientUIGraphEntity')
+		entity = iterator:Next()
+		while entity ~= nil do
+			entity:FireEvent("ExitUIGraph")
+			entity = iterator:Next()
+		end
+		UIManager:EnableFreeCam()
+	end
+end
 
 function EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
-
+	if (p_Data:Is("FadeEntityData")) then
+		print("Fade entity created")
+		print(p_Data.instanceGuid)
+		p_Hook:Return(nil)
+	end
+	if(p_Data.instanceGuid == Guid('A17FCE78-E904-4833-98F8-50BE77EFCC41')) then
+		print("Removing UI background")
+		p_Hook:Return(nil)
+	end
 end
 
 function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectHeader)

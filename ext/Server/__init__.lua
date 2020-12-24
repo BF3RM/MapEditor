@@ -101,7 +101,8 @@ function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 end
 
 function MapEditorServer:OnPlayerAuthenticated(p_Player)
-
+	print("Player Authenticated: " .. p_Player.name)
+	p_Player:Fade(0, false)
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)

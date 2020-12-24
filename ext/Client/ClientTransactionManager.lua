@@ -249,6 +249,7 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 		WebUpdater:AddUpdate('HandleResponse', s_CommandActionResults)
 		table.insert(self.m_ExecutedCommandActions, json.encode(s_CommandActionResults))
 	end
+
 end
 function ClientTransactionManager:GetExecutedCommandActions()
 	return self.m_ExecutedCommandActions

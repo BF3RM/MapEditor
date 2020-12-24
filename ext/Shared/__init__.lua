@@ -30,8 +30,4 @@ require "__shared/Config"
 local m_Logger = Logger("MapEditorShared", true)
 DataContainerExt = Logger("MapEditorShared", true)
 
-function MapEditorShared:__init()
-	m_Logger:Write("Initializing MapEditorShared")
-end
-
 return MapEditorShared()

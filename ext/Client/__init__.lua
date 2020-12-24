@@ -3,8 +3,8 @@ class 'MapEditorClient'
 local m_Logger = Logger("MapEditorClient", true)
 WebUpdater = require "WebUpdater"
 FreeCam = require "Freecam"
-Editor = require "Editor"
 UIManager = require "UIManager"
+Editor = require "Editor"
 MessageActions = require "MessageActions"
 ClientTransactionManager = require "ClientTransactionManager"
 ClientGameObjectManager = require "ClientGameObjectManager"
@@ -29,7 +29,6 @@ end
 
 function MapEditorClient:RegisterEvents()
 	--Game events
-	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
 	Events:Subscribe('Extension:Loaded', self, self.OnLoaded)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	Events:Subscribe('Engine:Update', self, self.OnUpdate)
@@ -104,11 +103,7 @@ end
 
 function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 	FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-end
-
-function MapEditorClient:OnUpdateInput(p_Delta)
-	FreeCam:OnUpdateInput(p_Delta)
-	UIManager:OnUpdateInput(p_Delta)
+	UIManager:OnInputPreUpdate(p_Hook, p_Cache, p_DeltaTime)
 end
 
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)

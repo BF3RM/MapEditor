@@ -17,7 +17,7 @@ function UIManager:RegisterEvents()
 end
 
 function UIManager:OnLoadingComplete()
-	self:SetEditorMode(EditorMode.Playing)
+	-- self:SetEditorMode(EditorMode.Playing)
 end
 
 function UIManager:OnLevelDestroy()
@@ -50,17 +50,17 @@ function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGrap
 	end
 end
 
-function UIManager:OnUpdateInput(p_Delta)
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
-		if self.m_ActiveMode == EditorMode.Editor then
-			self:DisableFreeCam()
-		elseif self.m_ActiveMode == EditorMode.Playing then
-			self:EnableFreeCam()
-		end
-	end
+function UIManager:OnInputPreUpdate(p_Hook, p_Cache, p_DeltaTime)
+	-- if p_Cache:GetLevel(InputDeviceKeys.IDK_F1) > 0 then
+	-- 	if self.m_ActiveMode == EditorMode.Editor then
+	-- 		self:DisableFreeCam()
+	-- 	elseif self.m_ActiveMode == EditorMode.Playing then
+	-- 		self:EnableFreeCam()
+	-- 	end
+	-- end
 
 	-- We let go of right mouse button. Activate the UI again.
-	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
+	if p_Cache:GetLevel(InputConceptIdentifiers.ConceptAltFire) ~= 0 then
 		self:DisableFreeCamMovement()
 		Editor:SetPendingRaycast(RaycastType.Camera)
 	end
@@ -89,15 +89,13 @@ function UIManager:OnDisableEditorMode()
 end
 
 function UIManager:EnableFreeCam()
-	if self.m_ActiveMode ~= EditorMode.Playing then
-		return
-	end
-
 	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 	-- Don't change to freecam if the player isnt alive, maybe add message saying so?
-	if s_LocalPlayer == nil or s_LocalPlayer.soldier == nil then
+	if s_LocalPlayer == nil then
+		print("Local player does not exist")
 		return
 	end
+	print("Enabling freecam")
 
 	NetEvents:SendLocal('EnableInputRestriction')
 
@@ -111,9 +109,7 @@ function UIManager:EnableFreeCam()
 end
 
 function UIManager:DisableFreeCam()
-	if self.m_ActiveMode ~= EditorMode.Editor then
-		return
-	end
+	print("Disabling freecam")
 	NetEvents:SendLocal('DisableInputRestriction')
 	FreeCam:Disable()
 	self:SetEditorMode(EditorMode.Playing)
