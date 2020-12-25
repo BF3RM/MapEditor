@@ -123,6 +123,7 @@ function MapEditorClient:OnLevelDestroy()
 	GameObjectManager:OnLevelDestroy()
 	FreeCam:OnLevelDestroy()
 	ClientTransactionManager:OnLevelDestroy()
+	ClientGameObjectManager:OnLevelDestroy()
 	UIManager:OnLevelDestroy()
 end
 

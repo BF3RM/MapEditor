@@ -311,8 +311,10 @@ function ClientTransactionManager:CreateCommandActionResultsRecursively(p_GameOb
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
 
-	for _, s_ChildGameObject in pairs(p_GameObject.children) do
-		self:CreateCommandActionResultsRecursively(s_ChildGameObject)
+	if p_GameObject.children then
+		for _, s_ChildGameObject in pairs(p_GameObject.children) do
+			self:CreateCommandActionResultsRecursively(s_ChildGameObject)
+		end
 	end
 
 	table.insert(self.m_CommandActionResults, s_CommandActionResult)
