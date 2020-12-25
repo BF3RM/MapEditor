@@ -11,7 +11,7 @@ end
 function FreeCam:RegisterVars()
 	self.m_Mode = CameraMode.FirstPerson
 	self.m_Camera = nil
-	self.m_CameraData = CameraEntityData()
+	self.m_CameraData = nil
 	self.m_LastTransform = nil
 
 	self.m_CameraYaw = 0.0
@@ -31,16 +31,6 @@ function FreeCam:OnLevelDestroy()
 	self:RegisterVars()
 end
 
-function FreeCam:Create()
-    local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
-    if s_Entity == nil then
-        m_Logger:Error("Could not spawn camera")
-        return
-    end
-    self.cameraData.transform = ClientUtils:GetCameraTransform()
-    self.cameraData.fov = 90
-    self.camera = s_Entity
-end
 
 function FreeCam:SetCameraMode(p_Mode)
     if self.m_Mode == CameraMode.Editor and p_Mode == CameraMode.FreeCam then
@@ -143,6 +133,7 @@ function FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 end
 
 function FreeCam:Create()
+	self.m_CameraData = CameraEntityData()
 	local s_Entity = EntityManager:CreateEntity(self.m_CameraData, LinearTransform())
 	if s_Entity == nil then
 		m_Logger:Error("Could not spawn camera")
