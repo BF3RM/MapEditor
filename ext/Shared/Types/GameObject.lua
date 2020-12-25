@@ -9,17 +9,13 @@ function GameObject:__init(arg)
     self.blueprintCtrRef = arg.blueprintCtrRef
     self.isVanilla = arg.isVanilla -- never gets sent to js
     self.gameEntities = arg.gameEntities or { }
-    self.children = arg.children -- never gets sent to js
+    self.children = arg.children or {} -- never gets sent to js
     self.realm = arg.realm
     self.isUserModified = true
     self.userModifiedFields = {}
-	self.originalRef = arg.originalRef
+	self.originalRef = arg.originalRef  -- never gets sent to js
 	self.localTransform = arg.localTransform
-	if (arg.overrides) then
-		self.overrides = arg.overrides
-	else
-		self.overrides = {}
-	end
+    self.overrides = arg.overrides or {}
 	self.internalBlueprint = nil
     --self.name = arg.name
     --self.parentData = arg.parentData
@@ -228,7 +224,6 @@ function GameObject:GetGameObjectTransferData()
         isVanilla = self.isVanilla,
         realm = self.realm,
         isUserModified = self.isUserModified,
-        originalRef = self.originalRef:GetTable(),
         overrides = self.overrides
         -- entities have to be set externally
     }
