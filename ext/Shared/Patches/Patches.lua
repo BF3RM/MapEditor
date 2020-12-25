@@ -1,15 +1,29 @@
 class 'Patches'
 require "__shared/Patches/CommonRosePatcher"
 require "__shared/Patches/LevelPatcher"
-require "__shared/Patches/VegetationPatcher"
+VegetationPatcher = require "__shared/Patches/VegetationPatcher"
 
 local m_Logger = Logger("Patches", true)
 
 function Patches:__init()
 	m_Logger:Write("Initializing Patches")
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
-
+function Patches:OnEntityCreate(p_Hook, p_Data, p_Transform)
+	if (p_Data:Is("FadeEntityData")) then
+		print("Fade entity created")
+		print(p_Data.instanceGuid)
+		p_Hook:Return(nil)
+	end
+	if(p_Data.instanceGuid == Guid('A17FCE78-E904-4833-98F8-50BE77EFCC41')) then
+		print("Removing UI background")
+		p_Hook:Return(nil)
+	end
+	if(p_Data.typeInfo == VegetationTreeEntityData.typeInfo) then
+		p_Hook:Pass(VegetationPatcher:PatchVegetationTree(p_Data), p_Transform)
+	end
+end
 function Patches:OnPartitionLoaded(p_Partition)
 	if p_Partition == nil then
 		return
@@ -27,9 +41,6 @@ function Patches:OnPartitionLoaded(p_Partition)
 		end
 		if(l_Instance.typeInfo == LevelDescriptionAsset.typeInfo) then
 			LevelPatcher:PatchLevelDescription(l_Instance)
-		end
-		if(l_Instance.typeInfo == VegetationTreeEntityData.typeInfo) then
-			VegetationPatcher:PatchVegetationTree(l_Instance)
 		end
 
 		--[[

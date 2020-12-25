@@ -15,7 +15,6 @@ end
 function EditorCommon:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
-	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 function EditorCommon:OnUpdatePass(p_Delta, p_Pass)
 	if(p_Pass ~= UpdatePass.UpdatePass_PostSim) then
@@ -103,18 +102,6 @@ function EditorCommon:OnEngineMessage(p_Message)
 			entity = iterator:Next()
 		end
 		UIManager:EnableFreeCam()
-	end
-end
-
-function EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	if (p_Data:Is("FadeEntityData")) then
-		print("Fade entity created")
-		print(p_Data.instanceGuid)
-		p_Hook:Return(nil)
-	end
-	if(p_Data.instanceGuid == Guid('A17FCE78-E904-4833-98F8-50BE77EFCC41')) then
-		print("Removing UI background")
-		p_Hook:Return(nil)
 	end
 end
 
