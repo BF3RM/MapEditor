@@ -1,20 +1,34 @@
-import {LOGLEVEL} from "@/script/types/Enums";
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
 		<div class="Container" v-if="!showNewSave">
 			<ul class="projectList">
 				<li v-if="projects.length === 0">No saved projects</li>
-				<li v-else v-for="(project, projectName) in projects" v-bind:key="projectName" @click="onSelectProject(project)" :class="selectedProjectName === projectName ? 'selected' : null">{{projectName}}</li>
+				<li v-else
+					v-for="(project, projectName) in projects"
+					v-bind:key="projectName"
+					@click="onSelectProject(project)"
+					:class="selectedProjectName === projectName ? 'selected' : ''">
+					{{projectName}}
+				</li>
 			</ul>
 			<ul v-if="selectedProject" class="saveList">
-				<li v-for="(project) in selectedProject" v-bind:key="project.timeStamp" @click="selectSave(project)" :class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : null">{{FormatTime(project.timeStamp)}}</li>
+				<li v-for="(project) in selectedProject"
+					v-bind:key="project.timeStamp"
+					@click="selectSave(project)"
+					:class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : ''">
+					{{FormatTime(project.timeStamp)}}</li>
 			</ul>
 		</div>
 		<div class="Container" v-if="showNewSave">
 			<input placeholder="Project Name" v-model="newSaveName"/>
 		</div>
 		<div class="footer" v-if="!showNewSave">
-			<div v-if="selectedProject && selectedProject.length > 0">{{selectedProject[0].mapName}}<span v-if="selectedSave"> - {{selectedSave.gameModeName}}</span></div>
+			<div class="saveInfo" v-if="selectedProject && selectedProject.length > 0">
+				<span>Selected save info:</span>
+				Map name: {{selectedProject[0].mapName}}
+				<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
+<!--				<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
+			</div>
 			<div>
 				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
 				<button @click="NewSave()">New Save</button>
@@ -125,8 +139,8 @@ export default class ProjectSettingsComponent extends Vue {
 	onSelectProject(project:any) {
 		console.log(project);
 		this.selectedProject = project;
+		this.selectedSave = project[0];
 		this.selectedProjectName = project[0].projectName;
-		this.$forceUpdate();
 	}
 
 	onGetProjects(availableProjects: any) {
@@ -167,6 +181,8 @@ export default class ProjectSettingsComponent extends Vue {
 <style lang="scss" scoped>
 	.Container{
 		display: grid;
+		min-width: 30vmin;
+		min-height: 20vmin;
 	}
 	.projectList {
 		grid-column: 1;
@@ -178,7 +194,16 @@ export default class ProjectSettingsComponent extends Vue {
 		padding: 5px;
 	}
 
+	.saveInfo{
+		background-color: #2e2e2e;
+		padding: 8px;
+		width: available;
+		display: flex;
+		flex-direction: column;
+	}
+
 	.selected {
-		background-color: #111;
+		background-color: #404040;
+		color: #409EFF;
 	}
 </style>
