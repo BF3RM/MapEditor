@@ -1,7 +1,6 @@
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { LogError } from '@/script/modules/Logger';
-import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
-import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
+import { SetScreenToWorldTransformMessage, MoveObjectMessage } from '@/script/messages/MessagesIndex';
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
@@ -26,6 +25,7 @@ export class VEXTemulator {
 
 		this.messages = {};
 		this.messages.GetProjectsMessage = this.GetProjectsMessage;
+		this.messages.RequestProjectDataMessage = this.RequestProjectDataMessage;
 		this.messages.SetScreenToWorldPositionMessage = this.SetScreenToWorldPositionMessage;
 		this.messages.MoveObjectMessage = this.MoveObjectMessage;
 
@@ -86,6 +86,10 @@ export class VEXTemulator {
 			{ id: 5, projectName: 'NewdebugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245947322 },
 			{ id: 6, projectName: 'NewdebugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245948322 }];
 		return { type: 'SetProjectHeaders', payload: save };
+	}
+
+	private RequestProjectDataMessage(projectId: number) {
+		return { type: 'SetProjectData', payload: 'hjhjhjkhjkhkhjhkj' };
 	}
 
 	private CreateGroup(commandActionResult: CommandActionResult) {

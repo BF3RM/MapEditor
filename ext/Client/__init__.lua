@@ -49,10 +49,6 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:UIReloaded', self, self.OnUIReloaded)
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessages)
-	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
-	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
-	Events:Subscribe('MapEditor:RequestProjectDelete', self, self.OnRequestProjectDelete)
-	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
 
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
 	Events:Subscribe('MapEditor:DisableEditorMode', self, self.OnDisableEditorMode)
@@ -167,6 +163,7 @@ end
 
 function MapEditorClient:OnReceiveProjectData(p_ProjectData)
 	-- TODO: Handle properly in the project admin view
+	WebUpdater:AddUpdate('SetProjectData', p_ProjectData)
 end
 
 function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
@@ -183,27 +180,6 @@ end
 
 function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
 	WebUpdater:AddUpdate('SetProjectHeaders', p_ProjectHeaders)
-end
-
-function MapEditorClient:OnRequestProjectSave(p_ProjectHeaderDataJson)
-	local s_ProjectHeaderData = DecodeParams(json.decode(p_ProjectHeaderDataJson))
-	print(s_ProjectHeaderData)
-	NetEvents:SendLocal("ProjectManager:RequestProjectSave", s_ProjectHeaderData)
-end
-
-function MapEditorClient:OnRequestProjectLoad(p_ProjectId)
-	m_Logger:Write("Load requested: " .. p_ProjectId)
-	NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_ProjectId)
-end
-
-function MapEditorClient:OnRequestProjectDelete(p_ProjectId)
-	m_Logger:Write("Delete requested: " .. p_ProjectId)
-	NetEvents:SendLocal("ProjectManager:RequestProjectDelete", p_ProjectId)
-end
-
-function MapEditorClient:OnRequestProjectData(p_ProjectId)
-	m_Logger:Write("Project Data requested: " .. p_ProjectId)
-	NetEvents:SendLocal("ProjectManager:RequestProjectData", p_ProjectId)
 end
 
 function MapEditorClient:OnEnableFreeCamMovement()

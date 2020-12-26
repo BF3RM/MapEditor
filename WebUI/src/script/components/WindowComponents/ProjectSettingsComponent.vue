@@ -32,6 +32,8 @@
 			<div>
 				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
 				<button @click="NewSave()">New Save</button>
+				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="Export">Export</button>
+
 			</div>
 		</div>
 		<div class="footer" v-if="showNewSave">
@@ -48,7 +50,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import WindowComponent from './WindowComponent.vue';
-import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
+import { GetProjectsMessage, RequestSaveProjectMessage, RequestLoadProjectMessage, RequestProjectDataMessage } from '@/script/messages/MessagesIndex';
 import { signals } from '@/script/modules/Signals';
 import { Log } from '@/script/modules/Logger';
 import { LOGLEVEL } from '@/script/types/Enums';
@@ -109,6 +111,10 @@ export default class ProjectSettingsComponent extends Vue {
 				this.state.visible = false;
 			}
 		});
+		signals.setProjectData.connect((projectData: any) => {
+			this.hint = '';
+			Log(LOGLEVEL.INFO, 'Received project data successfully');
+		});
 	}
 
 	selectSave(project: any) {
@@ -117,7 +123,7 @@ export default class ProjectSettingsComponent extends Vue {
 
 	loadSave() {
 		console.log('Loading save: ' + this.selectedSave.projectName);
-		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectLoad', this.selectedSave.id);
+		window.vext.SendMessage(new RequestLoadProjectMessage(this.selectedSave.id));
 	}
 
 	NewSave() {
@@ -131,12 +137,19 @@ export default class ProjectSettingsComponent extends Vue {
 		if (newSave) {
 			(projectHeader as any).projectName = this.newSaveName;
 		}
-		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectSave', JSON.stringify(projectHeader));
+		window.vext.SendMessage(new RequestSaveProjectMessage(JSON.stringify(projectHeader)));
 		this.hint = 'Saving...';
 		Log(LOGLEVEL.INFO, 'Saving project: ' + (projectHeader as any).projectName);
 	}
 
-	onSelectProject(project:any) {
+	Export() {
+		const projectHeader = { ...this.currentProjectHeader };
+		(projectHeader as any).projectName = this.selectedProjectName;
+		this.hint = 'Retrieving save...';
+		window.vext.SendMessage(new RequestProjectDataMessage(this.selectedSave.id));
+	}
+
+	onSelectProject(project: any) {
 		console.log(project);
 		this.selectedProject = project;
 		this.selectedSave = project[0];

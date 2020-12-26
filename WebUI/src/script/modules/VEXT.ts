@@ -47,9 +47,9 @@ export default class VEXTInterface {
 			SetScreenToWorldPositionMessage: this.SetScreenToWorldPosition,
 			SetUpdateRateMessage: signals.setUpdateRateMessage.emit,
 			GetProjectsMessage: signals.getProjects.emit,
-			SetProjectHeaders: signals.setProjectHeaders.emit
-			// 'SelectedGameObject':	   signals.selectedGameObject.emit,
-			// 'DeselectedGameObject':	signals.deselectedGameObject.emit,
+			SetProjectHeaders: signals.setProjectHeaders.emit,
+			SetProjectData: signals.setProjectData.emit,
+			SetCurrentProjectHeader: signals.setCurrentProjectHeader.emit
 		};
 		this.paused = false;
 		this.executing = false;
@@ -225,7 +225,6 @@ export default class VEXTInterface {
 			message = JSON.parse(messageRaw);
 			console.log(message.type);
 		}
-
 		if (this.messages[message.type] === undefined) {
 			window.LogError('Failed to call a null message signal: ' + message.type);
 			return;
@@ -271,6 +270,10 @@ export default class VEXTInterface {
 
 	SetCurrentProjectHeader(header: any) {
 		signals.setCurrentProjectHeader.emit(header);
+	}
+
+	SetProjectData(projectData: any) {
+		signals.setProjectData.emit(projectData);
 	}
 
 	public EditorModeChanged(mode: EDITOR_MODE) {

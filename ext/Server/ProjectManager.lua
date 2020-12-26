@@ -60,15 +60,15 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
     end
 end
 
-function ServerTransactionManager:OnRequestProjectData(p_Player, p_ProjectId)
-    m_Logger:Write("Data requested: " .. p_ProjectName)
+function ProjectManager:OnRequestProjectData(p_Player, p_ProjectId)
+    m_Logger:Write("Data requested: " .. p_ProjectId)
 
     local s_ProjectDataJson = DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 
     NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectDataJson)
 end
 
-function ServerTransactionManager:OnRequestProjectDelete(p_ProjectId)
+function ProjectManager:OnRequestProjectDelete(p_ProjectId)
     m_Logger:Write("Delete requested: " .. p_ProjectId)
 
     --TODO: if the project that gets deleted is the currently loaded project, we need to clear all data and reload an empty map.

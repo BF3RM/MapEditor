@@ -1,15 +1,12 @@
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
-import { PreviewDestroyMessage } from './messages/PreviewDestroyMessage';
 import { Blueprint } from '@/script/types/Blueprint';
 import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
 import { LogError } from '@/script/modules/Logger';
 import { signals } from '@/script/modules/Signals';
-import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
+import { SetScreenToWorldTransformMessage, PreviewDestroyMessage, MoveObjectMessage, PreviewSpawnMessage } from '@/script/messages/MessagesIndex';
 import { Vec3 } from '@/script/types/primitives/Vec3';
-import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
-import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { InputControls } from '@/script/modules/InputControls';
