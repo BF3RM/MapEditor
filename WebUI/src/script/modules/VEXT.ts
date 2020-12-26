@@ -194,7 +194,6 @@ export default class VEXTInterface {
 		if (editor.debug) {
 			// window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
 			// window.Log(LOGLEVEL.VERBOSE, messages);
-			// We don't handle messages in VEXTEmulator yet
 			scope.emulator.ReceiveMessage(messages);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
@@ -231,15 +230,7 @@ export default class VEXTInterface {
 			window.LogError('Failed to call a null message signal: ' + message.type);
 			return;
 		}
-		if (emulator) {
-			const scope = this;
-			// delay to simulate tick increase.
-			setTimeout(() => {
-				scope.messages[message.type](message);
-			}, 1);
-		} else {
-			this.commands[message.type](message);
-		}
+		this.messages[message.type](message.payload);
 		editor.threeManager.setPendingRender();
 	}
 

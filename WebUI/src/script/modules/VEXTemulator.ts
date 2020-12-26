@@ -79,13 +79,13 @@ export class VEXTemulator {
 	}
 
 	private GetProjectsMessage() {
-		const save = [{ id: 1, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245943322 },
-			{ id: 2, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245944322 },
-			{ id: 3, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245945322 },
-			{ id: 4, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245946322 },
-			{ id: 5, project_name: 'NewdebugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245947322 },
-			{ id: 6, project_name: 'NewdebugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245948322 }];
-		return { type: 'GetProjectsMessage', value: save };
+		const save = [{ id: 1, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245943322 },
+			{ id: 2, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245944322 },
+			{ id: 3, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245945322 },
+			{ id: 4, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245946322 },
+			{ id: 5, projectName: 'NewdebugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245947322 },
+			{ id: 6, projectName: 'NewdebugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245948322 }];
+		return { type: 'SetProjectHeaders', payload: save };
 	}
 
 	private CreateGroup(commandActionResult: CommandActionResult) {
