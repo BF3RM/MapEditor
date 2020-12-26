@@ -161,7 +161,6 @@ function DataBaseManager:GetProjectHeader(p_ProjectId)
 	m_Logger:Write("GetProjectHeader()" .. p_ProjectId)
 
 	local s_ProjectHeaderRow = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE '.. 'id' .. ' = ' .. p_ProjectId .. ' LIMIT 1')
-	-- m_Logger:Write(s_ProjectHeaderRow)
 
 	if not s_ProjectHeaderRow then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
@@ -183,16 +182,25 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 	p_ProjectId = tostring(math.floor(p_ProjectId))
 	m_Logger:Write("GetProjectDataByProjectId()" .. p_ProjectId)
 
-	local projectDataJson = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. p_ProjectId .. ' LIMIT 1')
-
-	-- m_Logger:Write(projectDataJson)
-
-	if not projectDataJson then
+	local s_ProjectDataTable = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. p_ProjectId .. ' LIMIT 1')
+	if not s_ProjectDataTable then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
 		return
 	end
 
-	return projectDataJson
+	local s_ProjectData = s_ProjectDataTable[1][m_SaveFile_Text_Column_Name]
+
+	if not s_ProjectData then
+		m_Logger:Error('Failed to get project save file')
+		return
+	end
+
+	local s_Header = self:GetProjectHeader(p_ProjectId)
+
+	return {
+		header = s_Header,
+		data = s_ProjectData
+	}
 end
 
 function DataBaseManager:DeleteProject(p_ProjectId)

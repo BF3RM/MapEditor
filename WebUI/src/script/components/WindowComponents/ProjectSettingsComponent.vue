@@ -1,48 +1,68 @@
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
-		<div class="Container" v-if="!showNewSave">
-			<ul class="projectList">
-				<li v-if="projects.length === 0">No saved projects</li>
-				<li v-else
-					v-for="(project, projectName) in projects"
-					v-bind:key="projectName"
-					@click="onSelectProject(project)"
-					:class="selectedProjectName === projectName ? 'selected' : ''">
-					{{projectName}}
-				</li>
-			</ul>
-			<ul v-if="selectedProject" class="saveList">
-				<li v-for="(project) in selectedProject"
-					v-bind:key="project.timeStamp"
-					@click="selectSave(project)"
-					:class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : ''">
-					{{FormatTime(project.timeStamp)}}</li>
-			</ul>
-		</div>
-		<div class="Container" v-if="showNewSave">
-			<input placeholder="Project Name" v-model="newSaveName"/>
-		</div>
-		<div class="footer" v-if="!showNewSave">
-			<div class="saveInfo" v-if="selectedProject && selectedProject.length > 0">
-				<span>Selected save info:</span>
-				Map name: {{selectedProject[0].mapName}}
-				<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
-<!--				<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
+		<div v-if="showNewSave">
+			<div class="Container">
+				<input placeholder="Project Name" v-model="newSaveName"/>
 			</div>
-			<div>
-				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
-				<button @click="NewSave()">New Save</button>
-				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="Export">Export</button>
+			<div class="footer">
+				<div>
+					<button @click="Save(true)">Save</button>
+					<button @click="showNewSave = false">Abort</button>
+				</div>
+				<div>
+					<span>{{hint}}</span>
+				</div>
+			</div>
+		</div>
+		<div v-else-if="showExportWindow">
+			<div class="Container">
+				<input class="projectDataInput" readonly placeholder="Loading..."
+					@focus="$event.target.select()" v-model="projectData"
+				/>
+			</div>
+			<div class="footer">
+				<div>
+					<div>
+<!--						<button @click="CopyToClipboard">Copy</button> Not supported in VU yet-->
+						<button @click="CloseExportWindow">Close</button>
+					</div>
+					<span>{{hint}}</span>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<div class="Container">
+				<ul class="projectList">
+					<li v-if="projects.length === 0">No saved projects</li>
+					<li v-else
+						v-for="(project, projectName) in projects"
+						v-bind:key="projectName"
+						@click="onSelectProject(project)"
+						:class="selectedProjectName === projectName ? 'selected' : ''">
+						{{projectName}}
+					</li>
+				</ul>
+				<ul v-if="selectedProject" class="saveList">
+					<li v-for="(project) in selectedProject"
+						v-bind:key="project.timeStamp"
+						@click="selectSave(project)"
+						:class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : ''">
+						{{FormatTime(project.timeStamp)}}</li>
+				</ul>
+			</div>
+			<div class="footer">
+				<div class="saveInfo" v-if="selectedProject && selectedProject.length > 0">
+					<span>Selected save info:</span>
+					Map name: {{selectedProject[0].mapName}}
+					<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
+					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
+				</div>
+				<div>
+					<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
+					<button @click="NewSave()">New Save</button>
+					<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="Export">Export</button>
 
-			</div>
-		</div>
-		<div class="footer" v-if="showNewSave">
-			<div>
-				<button @click="Save(true)">Save</button>
-				<button @click="showNewSave = false">Abort</button>
-			</div>
-			<div>
-				<span>{{hint}}</span>
+				</div>
 			</div>
 		</div>
 	</WindowComponent>
@@ -63,6 +83,8 @@ export default class ProjectSettingsComponent extends Vue {
 	private selectedSave: any = null;
 	private selectedProjectName = '';
 	private showNewSave = false;
+	private showExportWindow = false;
+	private projectData = '';
 
 	private hint = '';
 	private state = {
@@ -112,7 +134,8 @@ export default class ProjectSettingsComponent extends Vue {
 			}
 		});
 		signals.setProjectData.connect((projectData: any) => {
-			this.hint = '';
+			this.hint = 'Select all and copy (CTRL+C)';
+			this.projectData = JSON.stringify(projectData);
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
 		});
 	}
@@ -146,7 +169,23 @@ export default class ProjectSettingsComponent extends Vue {
 		const projectHeader = { ...this.currentProjectHeader };
 		(projectHeader as any).projectName = this.selectedProjectName;
 		this.hint = 'Retrieving save...';
+		this.showExportWindow = true;
 		window.vext.SendMessage(new RequestProjectDataMessage(this.selectedSave.id));
+	}
+
+	CopyToClipboard() {
+		navigator.clipboard.writeText(this.projectData).then(function() {
+			console.log('Async: Copying to clipboard was successful!');
+		}, function(err) {
+			console.error('Async: Could not copy text: ', err);
+		});
+		this.CloseExportWindow();
+	}
+
+	CloseExportWindow() {
+		this.hint = '';
+		this.showExportWindow = false;
+		this.projectData = '';
 	}
 
 	onSelectProject(project: any) {
@@ -196,6 +235,10 @@ export default class ProjectSettingsComponent extends Vue {
 		display: grid;
 		min-width: 30vmin;
 		min-height: 20vmin;
+
+		.projectDataInput {
+			height: 100%;
+		}
 	}
 	.projectList {
 		grid-column: 1;

@@ -4,7 +4,7 @@
 		<div id="ViewportContainer"></div>
 		<GoldenLayoutHolder/>
 		<div class="overlays">
-			<ProjectSettingsComponent>sup</ProjectSettingsComponent>
+			<ProjectSettingsComponent></ProjectSettingsComponent>
 		</div>
 	</div>
 </template>
