@@ -29,8 +29,6 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Player:Chat', self, self.OnChat)
 	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
 
-	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
-
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
@@ -110,10 +108,6 @@ function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
 	end
 end
 ----------- Editor functions----------------
-
-function MapEditorServer:OnGameObjectReady(p_GameObject)
-	--ServerTransactionManager:OnGameObjectReady(p_GameObject)
-end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, false)

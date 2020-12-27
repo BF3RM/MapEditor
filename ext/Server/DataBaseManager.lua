@@ -208,11 +208,23 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 	local s_ProjectData = s_ProjectDataTable[1][m_SaveFile_Text_Column_Name]
 
 	if not s_ProjectData then
-		m_Logger:Error('Failed to get project save file')
+		m_Logger:Error('Failed to get project data')
 		return
 	end
 
+	return s_ProjectData
+end
+
+function DataBaseManager:GetProjectByProjectId(p_ProjectId)
+	p_ProjectId = tostring(math.floor(p_ProjectId))
+	m_Logger:Write("GetProjectByProjectId()" .. p_ProjectId)
+
+	local s_ProjectData = self:GetProjectDataByProjectId(p_ProjectId)
 	local s_Header = self:GetProjectHeader(p_ProjectId)
+
+	if s_ProjectData == nil or s_Header == nil then
+		m_Logger:Error('Failed to get project save')
+	end
 
 	return {
 		[m_ExportHeaderName] = s_Header,

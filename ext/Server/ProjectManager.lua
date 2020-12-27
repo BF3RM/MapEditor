@@ -117,7 +117,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
             -- Load User Data from Database
             local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
             --self:UpdateLevelFromOldSaveFile(s_SaveFile)
-            self:CreateAndExecuteImitationCommands(DecodeParams(json.decode(s_ProjectSaveData.data)))
+            self:CreateAndExecuteImitationCommands(DecodeParams(json.decode(s_ProjectSaveData)))
         end
     end
 end
@@ -126,10 +126,16 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     m_Logger:Write("Load requested: " .. p_ProjectId)
     -- TODO: check player's permission once that is implemented
 
-    self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectId)
+	local s_Project = DataBaseManager:GetProjectByProjectId(p_ProjectId)
 
-    local s_MapName = self.m_CurrentProjectHeader.mapName
-    local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
+	if s_Project == nil then
+		m_Logger:Error('Failed to get project with id '..tostring(p_ProjectId))
+	end
+
+	self.m_CurrentProjectHeader = s_Project.header
+
+    local s_MapName = s_Project.header.mapName
+    local s_GameModeName = s_Project.header.gameModeName
     if s_MapName == nil or
             Maps[s_MapName] == nil or
             s_GameModeName == nil or
@@ -143,15 +149,14 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     -- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
     -- Invoke Restart
 	if(self.m_MapName == s_MapName) then
-		local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
-		Events:Dispatch('MapLoader:LoadLevel', { header = self.m_CurrentProjectHeader.header, data = DecodeParams(json.decode(s_ProjectSaveData.data)), vanillaOnly = true })
+		local s_ProjectSaveData = DecodeParams(json.decode(s_Project.data))
+		Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_ProjectSaveData, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
 		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
 		RCON:SendCommand('mapList.runNextRound')
 	end
-
 end
 
 function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
