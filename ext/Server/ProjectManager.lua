@@ -64,9 +64,9 @@ end
 function ProjectManager:OnRequestProjectData(p_Player, p_ProjectId)
     m_Logger:Write("Data requested: " .. p_ProjectId)
 
-    local s_ProjectDataJson = DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
+    local s_ProjectData = DataBaseManager:GetProjectByProjectId(p_ProjectId)
 
-    NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectDataJson)
+    NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectData)
 end
 
 function ProjectManager:OnRequestProjectDelete(p_ProjectId)
