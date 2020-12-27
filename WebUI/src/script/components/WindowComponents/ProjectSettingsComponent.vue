@@ -58,10 +58,10 @@
 					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
 				</div>
 				<div>
-					<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
+					<button :disabled="buttonsDisabled" @click="loadSave()">Load</button>
 					<button @click="NewSave()">New Save</button>
-					<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="Export">Export</button>
-
+					<button :disabled="buttonsDisabled" @click="Export">Export</button>
+					<button :disabled="buttonsDisabled" @click="Delete">Delete</button>
 				</div>
 			</div>
 		</div>
@@ -70,7 +70,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import WindowComponent from './WindowComponent.vue';
-import { GetProjectsMessage, RequestSaveProjectMessage, RequestLoadProjectMessage, RequestProjectDataMessage } from '@/script/messages/MessagesIndex';
+import { GetProjectsMessage, RequestSaveProjectMessage, RequestDeleteProjectMessage, RequestLoadProjectMessage, RequestProjectDataMessage } from '@/script/messages/MessagesIndex';
 import { signals } from '@/script/modules/Signals';
 import { Log } from '@/script/modules/Logger';
 import { LOGLEVEL } from '@/script/types/Enums';
@@ -90,6 +90,10 @@ export default class ProjectSettingsComponent extends Vue {
 	private state = {
 		visible: false
 	};
+
+	get buttonsDisabled() {
+		return this.projects.length === 0 || this.selectedProject === null || this.selectedSave == null;
+	}
 
 	get newSaveName() {
 		return (this.currentProjectHeader as any).projectName;
@@ -166,11 +170,13 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	Export() {
-		const projectHeader = { ...this.currentProjectHeader };
-		(projectHeader as any).projectName = this.selectedProjectName;
 		this.hint = 'Retrieving save...';
 		this.showExportWindow = true;
 		window.vext.SendMessage(new RequestProjectDataMessage(this.selectedSave.id));
+	}
+
+	Delete() {
+		window.vext.SendMessage(new RequestDeleteProjectMessage(this.selectedSave.id));
 	}
 
 	CopyToClipboard() {

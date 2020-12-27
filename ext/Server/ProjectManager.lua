@@ -69,12 +69,15 @@ function ProjectManager:OnRequestProjectData(p_Player, p_ProjectId)
     NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectData)
 end
 
-function ProjectManager:OnRequestProjectDelete(p_ProjectId)
+function ProjectManager:OnRequestProjectDelete(p_Player, p_ProjectId)
     m_Logger:Write("Delete requested: " .. p_ProjectId)
 
     --TODO: if the project that gets deleted is the currently loaded project, we need to clear all data and reload an empty map.
 
-    DataBaseManager:DeleteProject(p_ProjectId)
+	local s_Success = DataBaseManager:DeleteProject(p_ProjectId)
+	if s_Success then
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+	end
 end
 
 function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
@@ -83,6 +86,8 @@ function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
 	local s_Success, s_Msg = DataBaseManager:ImportProject(p_ProjectDataJSON)
 	if s_Success then
 		m_Logger:Write('Correctly imported save file')
+		-- Update clients with new save.
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
 	else
 		m_Logger:Write('Error importing save file: '..s_Msg)
 	end

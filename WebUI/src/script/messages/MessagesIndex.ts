@@ -14,3 +14,4 @@ export * from './TeleportMouseMessage';
 export * from './RequestLoadProjectMessage';
 export * from './RequestProjectDataMessage';
 export * from './RequestImportProjectMessage';
+export * from './RequestDeleteProjectMessage';

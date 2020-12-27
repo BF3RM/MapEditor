@@ -7,7 +7,7 @@
 		<div class="footer">
 			<div>
 				<button @click="Load">Load</button>
-				<button @click="Close">Abort</button>
+				<button @click="Close">Close</button>
 			</div>
 		</div>
 	</WindowComponent>

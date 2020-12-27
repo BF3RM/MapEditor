@@ -265,14 +265,16 @@ end
 function DataBaseManager:DeleteProject(p_ProjectId)
 	m_Logger:Write("DeleteProject()" .. p_ProjectId)
 
-	local s_ProjectHeader = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE ' .. 'id' .. ' = ' .. p_ProjectId)
+	local s_ProjectHeader = self:GetProjectHeader(p_ProjectId)
 
 	if not s_ProjectHeader then
-		m_Logger:Error("Invalid project name")
+		m_Logger:Error("Invalid project id")
+		return false
 	end
 
-	SQL:Query('DELETE FROM ' .. m_DB_Header_Table_Name .. ' WHERE id = "' .. s_ProjectHeader["id"]) -- this should cascade delete the according data table
+	SQL:Query('DELETE FROM ' .. m_DB_Header_Table_Name .. ' WHERE id = ' .. s_ProjectHeader.id) -- this should cascade delete the according data table
 	-- SQL:Query('DELETE FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = "' .. s_ProjectHeader["id"])
+	return true
 end
 
 return DataBaseManager()
