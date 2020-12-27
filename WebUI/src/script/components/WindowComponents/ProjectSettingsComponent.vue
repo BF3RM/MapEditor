@@ -38,7 +38,7 @@
 						v-for="(project, projectName) in projects"
 						v-bind:key="projectName"
 						@click="onSelectProject(project)"
-						:class="selectedProjectName === projectName ? 'selected' : ''">
+						:class="{ selected: selectedProjectName === projectName, current: currentProjectHeader.projectName === projectName }">
 						{{projectName}}
 					</li>
 				</ul>
@@ -46,7 +46,8 @@
 					<li v-for="(project) in selectedProject"
 						v-bind:key="project.timeStamp"
 						@click="selectSave(project)"
-						:class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : ''">
+						:class="{ selected: selectedSave !== null && selectedSave.timeStamp === project.timeStamp,
+							current: project.timeStamp === currentProjectHeader.timeStamp }">
 						{{FormatTime(project.timeStamp)}}</li>
 				</ul>
 			</div>
@@ -104,7 +105,8 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	private currentProjectHeader = {
-		projectName: ''
+		projectName: '',
+		timeStamp: 0
 	};
 
 	NotImplemented() {
@@ -267,5 +269,9 @@ export default class ProjectSettingsComponent extends Vue {
 	.selected {
 		background-color: #404040;
 		color: #409EFF;
+	}
+
+	.current {
+		background-color: #404040;
 	}
 </style>
