@@ -4,7 +4,8 @@
 		<div id="ViewportContainer"></div>
 		<GoldenLayoutHolder/>
 		<div class="overlays">
-			<ProjectSettingsComponent></ProjectSettingsComponent>
+			<ProjectSettingsComponent/>
+			<ImportProjectComponent/>
 		</div>
 	</div>
 </template>
@@ -14,9 +15,11 @@ import { Component, Vue } from 'vue-property-decorator';
 import EditorToolbar from '../EditorComponents/EditorToolbar.vue';
 import ProjectSettingsComponent from '../WindowComponents/ProjectSettingsComponent.vue';
 import GoldenLayoutHolder from '@/script/components/GoldenLayoutHolder.vue';
+import ImportProjectComponent from '@/script/components/WindowComponents/ImportProjectComponent.vue';
 
 @Component({
 	components: {
+		ImportProjectComponent,
 		GoldenLayoutHolder,
 		EditorToolbar,
 		ProjectSettingsComponent

@@ -22,6 +22,7 @@ export const signals = {
 	getProjects: new Signal(),
 	setProjectHeaders: new Signal(),
 	setProjectData: new Signal(),
+	projectImportFinished: new Signal(),
 
 	gizmoModeChanged: new Signal<(mode: GIZMO_MODE) => void>(),
 	worldSpaceChanged: new Signal<(mode: WORLD_SPACE) => void>(),

@@ -22,6 +22,7 @@ function MessageActions:RegisterVars()
     self.RequestLoadProjectMessage = self.RequestLoadProject
     self.RequestDeleteProjectMessage = self.RequestDeleteProject
     self.RequestProjectDataMessage = self.RequestProjectData
+    self.RequestImportProjectMessage = self.RequestImportProject
 end
 
 function MessageActions:GetProjects(p_Message)
@@ -32,6 +33,12 @@ end
 function MessageActions:RequestLoadProject(p_Message)
     m_Logger:Write("Load requested: " .. p_Message.projectId)
     NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_Message.projectId)
+    return ActionResultType.Success
+end
+
+function MessageActions:RequestImportProject(p_Message)
+    m_Logger:Write("Importing requested")
+    NetEvents:SendLocal("ProjectManager:RequestProjectImport", p_Message.projectDataJSON)
     return ActionResultType.Success
 end
 

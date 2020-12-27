@@ -272,6 +272,10 @@ export default class VEXTInterface {
 		signals.setCurrentProjectHeader.emit(header);
 	}
 
+	public ProjectImportFinished(msg: string) {
+		signals.projectImportFinished.emit(msg);
+	}
+
 	SetProjectData(projectData: any) {
 		signals.setProjectData.emit(projectData);
 	}

@@ -26,6 +26,7 @@ function ProjectManager:RegisterEvents()
     NetEvents:Subscribe('ProjectManager:RequestProjectSave', self, self.OnRequestProjectSave)
     NetEvents:Subscribe('ProjectManager:RequestProjectLoad', self, self.OnRequestProjectLoad)
     NetEvents:Subscribe('ProjectManager:RequestProjectDelete', self, self.OnRequestProjectDelete)
+    NetEvents:Subscribe('ProjectManager:RequestProjectImport', self, self.OnRequestProjectImport)
 end
 
 function ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
@@ -74,6 +75,21 @@ function ProjectManager:OnRequestProjectDelete(p_ProjectId)
     --TODO: if the project that gets deleted is the currently loaded project, we need to clear all data and reload an empty map.
 
     DataBaseManager:DeleteProject(p_ProjectId)
+end
+
+function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
+	m_Logger:Write("Import requested")
+
+	local s_Success, s_Msg = DataBaseManager:ImportProject(p_ProjectDataJSON)
+	if s_Success then
+		m_Logger:Write('Correctly imported save file')
+	else
+		m_Logger:Write('Error importing save file: '..s_Msg)
+	end
+
+	s_Msg = s_Msg or 'Successfully imported save file.'
+
+	NetEvents:SendToLocal("MapEditorClient:ProjectImportFinished", p_Player, s_Msg)
 end
 
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
@@ -170,9 +186,13 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		gameModeName = self.m_GameMode,
 		requiredBundles = self.m_RequiredBundles
 	}
-	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
-	NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
-	NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
+	if s_Success then
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+	else
+		m_Logger:Error(s_Msg)
+	end
 end
 
 -- we're creating commands from the savefile, basically imitating every step that has been undertaken

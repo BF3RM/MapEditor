@@ -44,6 +44,7 @@ function MapEditorClient:RegisterEvents()
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectHeaders', self, self.OnReceiveProjectHeaders)
 	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
+	NetEvents:Subscribe('MapEditorClient:ProjectImportFinished', self, self.OnProjectImportFinished)
 
 	-- WebUI events
 	Events:Subscribe('MapEditor:UIReloaded', self, self.OnUIReloaded)
@@ -166,9 +167,8 @@ function MapEditorClient:OnReceiveProjectData(p_ProjectData)
 	WebUpdater:AddUpdate('SetProjectData', p_ProjectData)
 end
 
-function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
-	-- TODO: set project header
-	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_ProjectHeader)
+function MapEditorClient:OnProjectImportFinished(p_Msg)
+	WebUpdater:AddUpdate('ProjectImportFinished', p_Msg)
 end
 
 ----------- WebUI functions----------------
