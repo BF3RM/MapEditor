@@ -144,7 +144,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     -- Invoke Restart
 	if(self.m_MapName == s_MapName) then
 		local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
-		Events:Dispatch('MapLoader:LoadLevel', {header = self.m_CurrentProjectHeader, data = DecodeParams(json.decode(s_ProjectSaveData.data)), vanillaOnly = true})
+		Events:Dispatch('MapLoader:LoadLevel', { header = self.m_CurrentProjectHeader.header, data = DecodeParams(json.decode(s_ProjectSaveData.data)), vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
