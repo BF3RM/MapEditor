@@ -84,7 +84,7 @@ function EditorCommon:StepTime()
 end
 function EditorCommon:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.ClientLoadLevelMessage or p_Message.type == MessageType.ServerLoadLevelMessage then
-		self:StopTime()
+		-- self:StopTime()
 	end
 	if p_Message.type == MessageType.CoreEnteredIngameMessage then
 		print("CoreEnteredIngameMessage")
