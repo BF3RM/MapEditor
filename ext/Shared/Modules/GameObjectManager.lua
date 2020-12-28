@@ -43,7 +43,7 @@ function GameObjectManager:GetGameEntities(p_EntityIds)
 	return s_GameEntities
 end
 
-function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
+function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides, p_Silent)
 	if p_BlueprintPartitionGuid == nil or
 			p_BlueprintInstanceGuid == nil or
 			p_LinearTransform == nil then
@@ -73,7 +73,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		}
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
 		m_Logger:WriteTable(s_PreviewSpawnParentData)
-		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides }
+		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides, silent = p_Silent }
 	end
 
 	local s_Params = EntityCreationParams()
@@ -249,7 +249,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
 	end
-
+	local s_PendingBlueprint = self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)]
 	--- If its a root object all children are now resolved so we update WebUI.
 	if s_GameObject.parentData.guid == nil then
 		local s_UnresolvedRODCount = GetLength(self.m_ReferenceObjectDatas)
@@ -270,16 +270,21 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_ReferenceObjectDatas = {}
 		end
 		if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
-			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+			if s_PendingBlueprint == nil or (s_PendingBlueprint ~= nil and s_PendingBlueprint.silent == nil) then
+				Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+			end
 		end
 	end
 
 	--- If its a root custom object we remove it from pending and call ready event.
-	if self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] ~= nil then
+	if s_PendingBlueprint ~= nil then
+		local s_Silent = s_PendingBlueprint.silent
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
-		if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
-			--print("Spawning: " .. s_GameObject.guid)
-			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+		if(s_Silent == nil) then
+			if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
+				--print("Spawning: " .. s_GameObject.guid)
+				Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+			end
 		end
 	end
 	if(s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000') then -- Set collision to 0,0,0 so we don't hit the same object over and over
@@ -486,15 +491,37 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
 		return false
 	end
+	s_GameObject:SetField('variation', p_Variation)
 	local s_TransferData = s_GameObject:GetGameObjectTransferData()
-	s_TransferData.variation = p_Variation
 
 	self:DeleteGameObject(p_Guid)
 	--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
-	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false, s_TransferData.overrides)
+	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false, s_TransferData.overrides, true)
 	return true
 end
+function GameObjectManager:SetOverrides(p_Guid, p_Overrides)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
+	if s_GameObject == nil then
+		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
+		return false
+	end
+	local s_Success, s_NeedsRespawn = s_GameObject:SetOverrides(p_Overrides)
+	if(s_Success) then
+		if(s_NeedsRespawn) then
+			print("Respawning blueprint since internal blueprint has changed")
+			local s_TransferData = s_GameObject:GetGameObjectTransferData()
+			self:DeleteGameObject(p_Guid)
+			--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
+			self:InvokeBlueprintSpawn(p_Guid, "server", s_GameObject.internalBlueprint.partitionGuid, s_GameObject.internalBlueprint.instanceGuid, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, false, s_TransferData.overrides, true)
+		else
+			s_GameObject:Disable(true)
+			s_GameObject:Enable(true)
+		end
+		return true
+	end
+	return false
+end
 function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_Entity = p_Hook:Call()
 	if (not s_Entity) then

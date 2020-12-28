@@ -142,11 +142,7 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
 end
 
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
-    if (self.isVanilla == true) then
-        m_Logger:Error("Cant destroy vanilla object, use disable instead")
-        return
-    end
-
+	self:Disable()
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:Destroy()
@@ -156,7 +152,7 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
     if self.gameEntities ~= nil then
         for _, l_GameEntity in pairs(self.gameEntities) do
             if l_GameEntity ~= nil then
-                l_GameEntity:Disable()
+                l_GameEntity:Destroy()
             end
         end
     end
@@ -248,25 +244,43 @@ function GameObject:GetEntities()
     return s_Entities
 end
 function GameObject:SetOverrides(p_Overrides)
+	local s_ShouldRespawn = false
+	local s_Blueprint = nil
 	if( not self.internalBlueprint) then
-		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
+		local s_BP = self.blueprintCtrRef:Get()
+		print(self.blueprintCtrRef.partitionGuid)
+		print(s_BP)
+		local s_BPPartition = ResourceManager:FindDatabasePartition(Guid(self.blueprintCtrRef.partitionGuid))
+		print(s_BPPartition)
+		local s_ClonedBlueprint = s_BP:Clone(Guid(self.guid))
+		s_BPPartition:AddInstance(s_ClonedBlueprint)
+		print("Blueprint cloned:")
+		print(s_ClonedBlueprint)
+		self.internalBlueprint = CtrRef {
+			typeName = s_ClonedBlueprint.typeInfo.name,
+			instanceGuid = s_ClonedBlueprint.instanceGuid,
+			partitionGuid = s_BPPartition.guid
+		}
+		s_Blueprint = s_ClonedBlueprint
+		s_ShouldRespawn = true
+	end
+	if (not s_Blueprint) then
+		s_Blueprint = self.internalBlueprint:Get()
 	end
 	print("Setting overrides")
 	for k,l_Field in pairs(p_Overrides) do
 		print(k)
 		print(l_Field)
-		self:SetOverride(l_Field)
+		self:SetOverride(s_Blueprint, l_Field, self.guid)
 	end
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
-	return true
+	return true, s_ShouldRespawn
 end
-function GameObject:SetOverride(p_Field)
-	local s_Path = EBXManager:SetField(self.internalBlueprint, p_Field, '')
+function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid)
+	local s_Path = EBXManager:SetField(p_Instance, p_Field, '', p_RootGuid)
 	if(s_Path) then
 		self.overrides[s_Path] = p_Field
 	end
-	self:Disable(true)
-	self:Enable(true)
 	return  s_Path ~= '', s_Path
 end
 

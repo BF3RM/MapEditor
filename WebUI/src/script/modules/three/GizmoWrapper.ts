@@ -80,7 +80,7 @@ export default class GizmoWrapper extends TransformControls {
 	}
 
 	private onEditorReady() {
-		this.setSpace(WORLD_SPACE.local as string);
+		this.setSpace(WORLD_SPACE.world as string);
 		editor.threeManager.attachToScene(this);
 		this.attach(editor.selectionGroup);
 		this.visible = true;

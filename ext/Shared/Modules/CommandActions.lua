@@ -267,12 +267,7 @@ function CommandActions:SetEBXField(p_Command)
 	local s_Result, s_Path = nil
 
 	if(p_Command.gameObjectTransferData.guid) then -- Override only this instance
-		local s_GameObject = GameObjectManager:GetGameObject(p_Command.gameObjectTransferData.guid)
-		if(not s_GameObject) then
-			m_Logger:Warning('Could not find GameObject: ' .. p_GameObjectGuid)
-			return nil, ActionResultType.Failure
-		end
-		s_Result, s_Path = s_GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
+		local s_GameObject = GameObjectManager:SetOverrides(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.overrides)
 	else
 		--s_Result = EBXManager:SetFields(nil, p_Command.gameObjectTransferData.overrides)
 	end

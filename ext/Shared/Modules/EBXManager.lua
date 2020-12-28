@@ -9,6 +9,7 @@ function EBXManager:__init(p_Realm)
 end
 
 function EBXManager:RegisterVars()
+	self.m_ClonedInstances = {}
 end
 
 function EBXManager:OnLevelDestroy()
@@ -22,29 +23,40 @@ function EBXManager:SetFields(p_Overrides)
 	end
 end
 
-function EBXManager:SetField(p_Instance, p_Field, p_Path)
+function EBXManager:SetField(p_Instance, p_Field, p_Path, p_RootGuid)
 	print(p_Path .. "/" .. p_Field.field)
 	if(p_Instance) then
-		if(p_Instance.instanceGuid ~= nil) then
-			p_Instance:MakeWritable()
+		if(p_Instance.typeInfo ~= nil) then
 			p_Instance = _G[p_Instance.typeInfo.name](p_Instance)
 		end
 		if(isPrintable(p_Field.type)) then -- Set value directly
 			p_Instance[p_Field.field] = ParseType(p_Field.type, p_Field.value)
 			return p_Path .. '.' .. p_Field.field
 		else
+			if (p_Instance[p_Field.field] and p_Instance[p_Field.field].instanceGuid) then
+				if(self.m_ClonedInstances[tostring(p_RootGuid)] == nil) then
+					self.m_ClonedInstances[tostring(p_RootGuid)] = {}
+				end
+				local s_ClonedInstance = _G[p_Instance[p_Field.field].typeInfo.name](p_Instance[p_Field.field]:Clone());
+				print("Cloning!")
+				print(p_Instance[p_Field.field])
+				print(s_ClonedInstance)
+				self.m_ClonedInstances[tostring(p_RootGuid)][tostring(p_Instance.instanceGuid)] = s_ClonedInstance
+				p_Instance[p_Field.field] = s_ClonedInstance
+			end
 			local s_TypeInfo = p_Instance.typeInfo
 			if(s_TypeInfo) then
 				if(s_TypeInfo.array) then -- Go to the array index
-					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path + '.' + p_Field.field)
+					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path + '.' + p_Field.field, p_RootGuid)
 				elseif(s_TypeInfo.enum) then
 					p_Instance[p_Field.field] = number(p_Field.value)
 					return p_Path .. '.' .. p_Field.field
 				else
-					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field)
+					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field, p_RootGuid)
 				end
-			else-- It's not a primitive value and it's not an array, so it's either an instance or a struct. Either way, process that bitch.
-				return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field)
+				-- Instance?
+			else-- It's not a primitive value, it's not an array, it doesn't have typeInfo, so it's a struct.?
+				return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field, p_RootGuid)
 			end
 		end
 	else
