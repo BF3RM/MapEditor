@@ -24,22 +24,37 @@ function ServerGameObjectManager:ResetVars()
 end
 
 function ServerGameObjectManager:RegisterEvents()
-	NetEvents:Subscribe("ServerGameObjectManager:ServerOnlyGameObjectsGuids", self, self.OnServerOnlyGameObjectsGuids)
+	NetEvents:Subscribe("ServerGameObjectManager:ServerOnlyGameObjectsGuids", self, self.OnServerOnlyGameObjectsGuidsReceived)
 	NetEvents:Subscribe("ServerGameObjectManager:ClientOnlyGameObjectsTransferData", self, self.OnClientOnlyGameObjectsTransferData)
 end
 
 function ServerGameObjectManager:ClientReady(p_Player)
+	if p_Player == nil then
+		return
+	end
+
+	-- If this isn't the first player we send the client only and server only objects directly
 	if self.m_FirstPlayerLoaded then
 		NetEvents:SendToLocal('ClientGameObjectManager:ClientOnlyGuids', p_Player, self.m_ClientOnlyGameObjectGuids)
+		local s_ServerOnlyTransferDatas = self:GetServerOnlyGameObjectsTransferDatas(self.m_ServerOnlyGameObjectGuids)
+		NetEvents:SendToLocal("ClientGameObjectManager:ServerOnlyGameObjectsTransferData", p_Player, s_ServerOnlyTransferDatas)
+	-- If this is the first player we calculate which objects are server or client only
 	else
 		m_Logger:Write("Fist player ready, sending vanilla GameObjects guids")
 		NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
 	end
 end
 
-function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
-	-- Might not be needed, haven't found server-only objects yet
-	m_Logger:Write("Received ".. #p_Guids .." server-only GameObjects")
+function ServerGameObjectManager:OnServerOnlyGameObjectsGuidsReceived(p_Player, p_Guids)
+	m_Logger:Write("Received ".. #p_Guids .." server-only GameObjects, updating all clients")
+	local s_ServerOnlyTransferDatas = self:GetServerOnlyGameObjectsTransferDatas(p_Guids)
+
+	-- Set the flag to true, so players that connect after get the info directly instead of comparing like the first client
+	self.m_FirstPlayerLoaded = true
+	NetEvents:SendToLocal("ClientGameObjectManager:ServerOnlyGameObjectsTransferData", p_Player, s_ServerOnlyTransferDatas)
+end
+
+function ServerGameObjectManager:GetServerOnlyGameObjectsTransferDatas(p_Guids)
 	local s_ServerOnlyGameObjectTransferDatas = {}
 
 	for _, l_GuidString in pairs(p_Guids) do
@@ -54,8 +69,7 @@ function ServerGameObjectManager:OnServerOnlyGameObjectsGuids(p_Player, p_Guids)
 		end
 	end
 
-	-- Send TransferDatas to clients, so they GameObjects are created on client as well.
-	NetEvents:BroadcastLocal("ClientGameObjectManager:ServerOnlyGameObjectsTransferData", s_ServerOnlyGameObjectTransferDatas)
+	return s_ServerOnlyGameObjectTransferDatas
 end
 
 function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p_TransferDatas)
@@ -64,7 +78,8 @@ function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p
 		return
 	end
 
-	self.m_FirstPlayerLoaded = true
+	-- We dont set self.m_FirstPlayerLoaded to true until server-only are processed too, which
+	-- is updated in the next netevent.
 
 	m_Logger:Write("Received ".. #p_TransferDatas .." client-only GameObjects")
 

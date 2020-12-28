@@ -1,32 +1,69 @@
-import {LOGLEVEL} from "@/script/types/Enums";
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
-		<div class="Container" v-if="!showNewSave">
-			<ul class="projectList">
-				<li v-if="projects.length === 0">No saved projects</li>
-				<li v-else v-for="(project, projectName) in projects" v-bind:key="projectName" @click="onSelectProject(project)" :class="selectedProjectName === projectName ? 'selected' : null">{{projectName}}</li>
-			</ul>
-			<ul v-if="selectedProject" class="saveList">
-				<li v-for="(project) in selectedProject" v-bind:key="project.timeStamp" @click="selectSave(project)" :class="selectedSave !== null && selectedSave.timeStamp === project.timeStamp ? 'selected' : null">{{FormatTime(project.timeStamp)}}</li>
-			</ul>
-		</div>
-		<div class="Container" v-if="showNewSave">
-			<input placeholder="Project Name" v-model="newSaveName"/>
-		</div>
-		<div class="footer" v-if="!showNewSave">
-			<div v-if="selectedProject && selectedProject.length > 0">{{selectedProject[0].mapName}}<span v-if="selectedSave"> - {{selectedSave.gameModeName}}</span></div>
-			<div>
-				<button :disabled="projects.length === 0 || selectedProject === null || selectedSave == null" @click="loadSave()">Load</button>
-				<button @click="NewSave()">New Save</button>
+		<div v-if="showNewSave">
+			<div class="Container">
+				<input placeholder="Project Name" v-model="newSaveName"/>
+			</div>
+			<div class="footer">
+				<div>
+					<button @click="Save(true)">Save</button>
+					<button @click="showNewSave = false">Abort</button>
+				</div>
+				<div>
+					<span>{{hint}}</span>
+				</div>
 			</div>
 		</div>
-		<div class="footer" v-if="showNewSave">
-			<div>
-				<button @click="Save(true)">Save</button>
-				<button @click="showNewSave = false">Abort</button>
+		<div v-else-if="showExportWindow">
+			<div class="Container">
+				<input class="projectDataInput" readonly placeholder="Loading..."
+					@focus="$event.target.select()" v-model="projectData"
+				/>
 			</div>
-			<div>
-				<span>{{hint}}</span>
+			<div class="footer">
+				<div>
+					<div>
+<!--						<button @click="CopyToClipboard">Copy</button> Not supported in VU yet-->
+						<button @click="CloseExportWindow">Close</button>
+					</div>
+					<span>{{hint}}</span>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<div class="Container">
+				<ul class="projectList">
+					<li v-if="projects.length === 0">No saved projects</li>
+					<li v-else
+						v-for="(project, projectName) in projects"
+						v-bind:key="projectName"
+						@click="onSelectProject(project)"
+						:class="{ selected: selectedProjectName === projectName, current: currentProjectHeader.projectName === projectName }">
+						{{projectName}}
+					</li>
+				</ul>
+				<ul v-if="selectedProject" class="saveList">
+					<li v-for="(project) in selectedProject"
+						v-bind:key="project.timeStamp"
+						@click="selectSave(project)"
+						:class="{ selected: selectedSave !== null && selectedSave.timeStamp === project.timeStamp,
+							current: project.timeStamp === currentProjectHeader.timeStamp }">
+						{{FormatTime(project.timeStamp)}}</li>
+				</ul>
+			</div>
+			<div class="footer">
+				<div class="saveInfo" v-if="selectedProject && selectedProject.length > 0">
+					<span>Selected save info:</span>
+					Map name: {{selectedProject[0].mapName}}
+					<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
+					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
+				</div>
+				<div>
+					<button :disabled="buttonsDisabled" @click="loadSave()">Load</button>
+					<button @click="NewSave()">New Save</button>
+					<button :disabled="buttonsDisabled" @click="Export">Export</button>
+					<button :disabled="buttonsDisabled" @click="Delete">Delete</button>
+				</div>
 			</div>
 		</div>
 	</WindowComponent>
@@ -34,7 +71,7 @@ import {LOGLEVEL} from "@/script/types/Enums";
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import WindowComponent from './WindowComponent.vue';
-import { GetProjectsMessage } from '@/script/messages/GetProjectsMessage';
+import { GetProjectsMessage, RequestSaveProjectMessage, RequestDeleteProjectMessage, RequestLoadProjectMessage, RequestProjectDataMessage } from '@/script/messages/MessagesIndex';
 import { signals } from '@/script/modules/Signals';
 import { Log } from '@/script/modules/Logger';
 import { LOGLEVEL } from '@/script/types/Enums';
@@ -47,11 +84,17 @@ export default class ProjectSettingsComponent extends Vue {
 	private selectedSave: any = null;
 	private selectedProjectName = '';
 	private showNewSave = false;
+	private showExportWindow = false;
+	private projectData = '';
 
 	private hint = '';
 	private state = {
 		visible: false
 	};
+
+	get buttonsDisabled() {
+		return this.projects.length === 0 || this.selectedProject === null || this.selectedSave == null;
+	}
 
 	get newSaveName() {
 		return (this.currentProjectHeader as any).projectName;
@@ -62,7 +105,8 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	private currentProjectHeader = {
-		projectName: ''
+		projectName: '',
+		timeStamp: 0
 	};
 
 	NotImplemented() {
@@ -95,6 +139,11 @@ export default class ProjectSettingsComponent extends Vue {
 				this.state.visible = false;
 			}
 		});
+		signals.setProjectData.connect((projectData: any) => {
+			this.hint = 'Select all and copy (CTRL+C)';
+			this.projectData = JSON.stringify(projectData);
+			Log(LOGLEVEL.INFO, 'Received project data successfully');
+		});
 	}
 
 	selectSave(project: any) {
@@ -103,7 +152,7 @@ export default class ProjectSettingsComponent extends Vue {
 
 	loadSave() {
 		console.log('Loading save: ' + this.selectedSave.projectName);
-		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectLoad', this.selectedSave.id);
+		window.vext.SendMessage(new RequestLoadProjectMessage(this.selectedSave.id));
 	}
 
 	NewSave() {
@@ -117,16 +166,41 @@ export default class ProjectSettingsComponent extends Vue {
 		if (newSave) {
 			(projectHeader as any).projectName = this.newSaveName;
 		}
-		(window as any).WebUI.Call('DispatchEventLocal', 'MapEditor:RequestProjectSave', JSON.stringify(projectHeader));
+		window.vext.SendMessage(new RequestSaveProjectMessage(JSON.stringify(projectHeader)));
 		this.hint = 'Saving...';
 		Log(LOGLEVEL.INFO, 'Saving project: ' + (projectHeader as any).projectName);
 	}
 
-	onSelectProject(project:any) {
+	Export() {
+		this.hint = 'Retrieving save...';
+		this.showExportWindow = true;
+		window.vext.SendMessage(new RequestProjectDataMessage(this.selectedSave.id));
+	}
+
+	Delete() {
+		window.vext.SendMessage(new RequestDeleteProjectMessage(this.selectedSave.id));
+	}
+
+	CopyToClipboard() {
+		navigator.clipboard.writeText(this.projectData).then(function() {
+			console.log('Async: Copying to clipboard was successful!');
+		}, function(err) {
+			console.error('Async: Could not copy text: ', err);
+		});
+		this.CloseExportWindow();
+	}
+
+	CloseExportWindow() {
+		this.hint = '';
+		this.showExportWindow = false;
+		this.projectData = '';
+	}
+
+	onSelectProject(project: any) {
 		console.log(project);
 		this.selectedProject = project;
+		this.selectedSave = project[0];
 		this.selectedProjectName = project[0].projectName;
-		this.$forceUpdate();
 	}
 
 	onGetProjects(availableProjects: any) {
@@ -167,6 +241,12 @@ export default class ProjectSettingsComponent extends Vue {
 <style lang="scss" scoped>
 	.Container{
 		display: grid;
+		min-width: 30vmin;
+		min-height: 20vmin;
+
+		.projectDataInput {
+			height: 100%;
+		}
 	}
 	.projectList {
 		grid-column: 1;
@@ -178,7 +258,20 @@ export default class ProjectSettingsComponent extends Vue {
 		padding: 5px;
 	}
 
+	.saveInfo{
+		background-color: #2e2e2e;
+		padding: 8px;
+		width: available;
+		display: flex;
+		flex-direction: column;
+	}
+
 	.selected {
-		background-color: #111;
+		background-color: #404040;
+		color: #409EFF;
+	}
+
+	.current {
+		background-color: #404040;
 	}
 </style>

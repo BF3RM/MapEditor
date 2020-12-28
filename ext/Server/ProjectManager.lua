@@ -26,6 +26,7 @@ function ProjectManager:RegisterEvents()
     NetEvents:Subscribe('ProjectManager:RequestProjectSave', self, self.OnRequestProjectSave)
     NetEvents:Subscribe('ProjectManager:RequestProjectLoad', self, self.OnRequestProjectLoad)
     NetEvents:Subscribe('ProjectManager:RequestProjectDelete', self, self.OnRequestProjectDelete)
+    NetEvents:Subscribe('ProjectManager:RequestProjectImport', self, self.OnRequestProjectImport)
 end
 
 function ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
@@ -60,20 +61,40 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
     end
 end
 
-function ServerTransactionManager:OnRequestProjectData(p_Player, p_ProjectId)
-    m_Logger:Write("Data requested: " .. p_ProjectName)
+function ProjectManager:OnRequestProjectData(p_Player, p_ProjectId)
+    m_Logger:Write("Data requested: " .. p_ProjectId)
 
-    local s_ProjectDataJson = DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
+    local s_ProjectData = DataBaseManager:GetProjectByProjectId(p_ProjectId)
 
-    NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectDataJson)
+    NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectData)
 end
 
-function ServerTransactionManager:OnRequestProjectDelete(p_ProjectId)
+function ProjectManager:OnRequestProjectDelete(p_Player, p_ProjectId)
     m_Logger:Write("Delete requested: " .. p_ProjectId)
 
     --TODO: if the project that gets deleted is the currently loaded project, we need to clear all data and reload an empty map.
 
-    DataBaseManager:DeleteProject(p_ProjectId)
+	local s_Success = DataBaseManager:DeleteProject(p_ProjectId)
+	if s_Success then
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+	end
+end
+
+function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
+	m_Logger:Write("Import requested")
+
+	local s_Success, s_Msg = DataBaseManager:ImportProject(p_ProjectDataJSON)
+	if s_Success then
+		m_Logger:Write('Correctly imported save file')
+		-- Update clients with new save.
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+	else
+		m_Logger:Write('Error importing save file: '..s_Msg)
+	end
+
+	s_Msg = s_Msg or 'Successfully imported save file.'
+
+	NetEvents:SendToLocal("MapEditorClient:ProjectImportFinished", p_Player, s_Msg)
 end
 
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
@@ -101,7 +122,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
             -- Load User Data from Database
             local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
             --self:UpdateLevelFromOldSaveFile(s_SaveFile)
-            self:CreateAndExecuteImitationCommands(DecodeParams(json.decode(s_ProjectSaveData[1].save_file_json)))
+            self:CreateAndExecuteImitationCommands(DecodeParams(json.decode(s_ProjectSaveData)))
         end
     end
 end
@@ -110,10 +131,16 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     m_Logger:Write("Load requested: " .. p_ProjectId)
     -- TODO: check player's permission once that is implemented
 
-    self.m_CurrentProjectHeader = DataBaseManager:GetProjectHeader(p_ProjectId)
+	local s_Project = DataBaseManager:GetProjectByProjectId(p_ProjectId)
 
-    local s_MapName = self.m_CurrentProjectHeader.mapName
-    local s_GameModeName = self.m_CurrentProjectHeader.gameModeName
+	if s_Project == nil then
+		m_Logger:Error('Failed to get project with id '..tostring(p_ProjectId))
+	end
+
+	self.m_CurrentProjectHeader = s_Project.header
+
+    local s_MapName = s_Project.header.mapName
+    local s_GameModeName = s_Project.header.gameModeName
     if s_MapName == nil or
             Maps[s_MapName] == nil or
             s_GameModeName == nil or
@@ -127,15 +154,14 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     -- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
     -- Invoke Restart
 	if(self.m_MapName == s_MapName) then
-		local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
-		Events:Dispatch('MapLoader:LoadLevel', {header = self.m_CurrentProjectHeader, data = DecodeParams(json.decode(s_ProjectSaveData[1].save_file_json)), vanillaOnly = true})
+		local s_ProjectSaveData = DecodeParams(json.decode(s_Project.data))
+		Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_ProjectSaveData, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
 		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
 		RCON:SendCommand('mapList.runNextRound')
 	end
-
 end
 
 function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
@@ -170,9 +196,13 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		gameModeName = self.m_GameMode,
 		requiredBundles = self.m_RequiredBundles
 	}
-	DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
-	NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
-	NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
+	if s_Success then
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
+		NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
+	else
+		m_Logger:Error(s_Msg)
+	end
 end
 
 -- we're creating commands from the savefile, basically imitating every step that has been undertaken

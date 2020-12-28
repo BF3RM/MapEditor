@@ -47,9 +47,9 @@ export default class VEXTInterface {
 			SetScreenToWorldPositionMessage: this.SetScreenToWorldPosition,
 			SetUpdateRateMessage: signals.setUpdateRateMessage.emit,
 			GetProjectsMessage: signals.getProjects.emit,
-			SetProjectHeaders: signals.setProjectHeaders.emit
-			// 'SelectedGameObject':	   signals.selectedGameObject.emit,
-			// 'DeselectedGameObject':	signals.deselectedGameObject.emit,
+			SetProjectHeaders: signals.setProjectHeaders.emit,
+			SetProjectData: signals.setProjectData.emit,
+			SetCurrentProjectHeader: signals.setCurrentProjectHeader.emit
 		};
 		this.paused = false;
 		this.executing = false;
@@ -194,7 +194,6 @@ export default class VEXTInterface {
 		if (editor.debug) {
 			// window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
 			// window.Log(LOGLEVEL.VERBOSE, messages);
-			// We don't handle messages in VEXTEmulator yet
 			scope.emulator.ReceiveMessage(messages);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
@@ -226,20 +225,11 @@ export default class VEXTInterface {
 			message = JSON.parse(messageRaw);
 			console.log(message.type);
 		}
-
 		if (this.messages[message.type] === undefined) {
 			window.LogError('Failed to call a null message signal: ' + message.type);
 			return;
 		}
-		if (emulator) {
-			const scope = this;
-			// delay to simulate tick increase.
-			setTimeout(() => {
-				scope.messages[message.type](message);
-			}, 1);
-		} else {
-			this.commands[message.type](message);
-		}
+		this.messages[message.type](message.payload);
 		editor.threeManager.setPendingRender();
 	}
 
@@ -280,6 +270,14 @@ export default class VEXTInterface {
 
 	SetCurrentProjectHeader(header: any) {
 		signals.setCurrentProjectHeader.emit(header);
+	}
+
+	public ProjectImportFinished(msg: string) {
+		signals.projectImportFinished.emit(msg);
+	}
+
+	SetProjectData(projectData: any) {
+		signals.setProjectData.emit(projectData);
 	}
 
 	public EditorModeChanged(mode: EDITOR_MODE) {

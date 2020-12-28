@@ -1,7 +1,6 @@
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 import { LogError } from '@/script/modules/Logger';
-import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
-import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
+import { SetScreenToWorldTransformMessage, MoveObjectMessage } from '@/script/messages/MessagesIndex';
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
@@ -28,6 +27,7 @@ export class VEXTemulator {
 
 		this.messages = {};
 		this.messages.GetProjectsMessage = this.GetProjectsMessage;
+		this.messages.RequestProjectDataMessage = this.RequestProjectDataMessage;
 		this.messages.SetScreenToWorldPositionMessage = this.SetScreenToWorldPositionMessage;
 		this.messages.MoveObjectMessage = this.MoveObjectMessage;
 
@@ -81,13 +81,17 @@ export class VEXTemulator {
 	}
 
 	private GetProjectsMessage() {
-		const save = [{ id: 1, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245943322 },
-			{ id: 2, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245944322 },
-			{ id: 3, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245945322 },
-			{ id: 4, project_name: 'debugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245946322 },
-			{ id: 5, project_name: 'NewdebugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245947322 },
-			{ id: 6, project_name: 'NewdebugProject', map_name: 'XP2_Skybar', gamemode_name: 'ConquestLargeC0', required_bundles: 'none', timestamp: 1592245948322 }];
-		return { type: 'GetProjectsMessage', value: save };
+		const save = [{ id: 1, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245943322 },
+			{ id: 2, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245944322 },
+			{ id: 3, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245945322 },
+			{ id: 4, projectName: 'debugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245946322 },
+			{ id: 5, projectName: 'NewdebugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245947322 },
+			{ id: 6, projectName: 'NewdebugProject', mapName: 'XP2_Skybar', gameModeName: 'ConquestLargeC0', requiredBundles: 'none', timeStamp: 1592245948322 }];
+		return { type: 'SetProjectHeaders', payload: save };
+	}
+
+	private RequestProjectDataMessage(projectId: number) {
+		return { type: 'SetProjectData', payload: '{"data":"{\\"ED170122-0000-0000-0000-000872916384\\":{\\"transform\\":{\\"left\\":{\\"x\\":1,\\"y\\":0,\\"z\\":0},\\"up\\":{\\"x\\":0,\\"y\\":1,\\"z\\":0},\\"forward\\":{\\"x\\":0,\\"y\\":0,\\"z\\":1},\\"trans\\":{\\"x\\":37.279998779297,\\"y\\":10.239999771118,\\"z\\":16.945972442627}},\\"parentData\\":{\\"primaryInstanceGuid\\":\\"C1F25548-8EF2-4AB5-A79F-D88726713BAE\\",\\"partitionGuid\\":\\"663F36CF-79CC-452E-9B29-7F01E9167849\\",\\"typeName\\":\\"WorldPartData\\",\\"guid\\":\\"ED170122-0000-0000-0000-012043136906\\"},\\"guid\\":\\"ED170122-0000-0000-0000-000872916384\\",\\"variation\\":0,\\"name\\":\\"XP2\\\\/Objects\\\\/SkybarPlanters_01\\\\/SkybarPlanterSquare_01\\",\\"overrides\\":{},\\"isVanilla\\":true,\\"originalRef\\":{\\"partitionGuid\\":\\"663F36CF-79CC-452E-9B29-7F01E9167849\\",\\"typeName\\":\\"ReferenceObjectData\\",\\"instanceGuid\\":\\"4B209482-31AB-4C46-838F-56DF09754B70\\"},\\"blueprintCtrRef\\":{\\"name\\":\\"XP2\\\\/Objects\\\\/SkybarPlanters_01\\\\/SkybarPlanterSquare_01\\",\\"partitionGuid\\":\\"91531887-598A-11E1-B16D-E6BABDB94B75\\",\\"typeName\\":\\"ObjectBlueprint\\",\\"instanceGuid\\":\\"24225227-7FD5-0C8C-BD8D-AB007C5B5C7C\\"},\\"localTransform\\":{\\"left\\":{\\"x\\":1,\\"y\\":0,\\"z\\":0},\\"up\\":{\\"x\\":0,\\"y\\":1,\\"z\\":0},\\"forward\\":{\\"x\\":0,\\"y\\":0,\\"z\\":1},\\"trans\\":{\\"x\\":37.279998779297,\\"y\\":10.239999771118,\\"z\\":16.945972442627}}}}","header":{"requiredBundles":"{\\"Levels\\\\/MP_Subway\\\\/MP_Subway_Settings_win32\\":true,\\"Levels\\\\/XP2_Skybar\\\\/TeamDM\\":true,\\"gameconfigurations\\\\/game\\":true,\\"Levels\\\\/XP2_Skybar\\\\/XP2_Skybar\\":true,\\"Levels\\\\/XP2_Skybar\\\\/DeathMatch\\":true}","timeStamp":1608906842811,"id":1,"mapName":"XP2_Skybar","gameModeName":"TeamDeathMatchC0","projectName":"1"}}' };
 	}
 
 	private CreateGroup(commandActionResult: CommandActionResult) {
