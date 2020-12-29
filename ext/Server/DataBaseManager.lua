@@ -162,7 +162,7 @@ function DataBaseManager:GetProjectHeaders()
 			projectName = row[m_ProjectName_Text_Column_Name],
 			mapName = row[m_MapName_Text_Column_Name],
 			gameModeName = row[m_GameModeName_Text_Column_Name],
-			requiredBundles = row[m_RequiredBundles_Text_Column_Name],
+			requiredBundles = json.decode(row[m_RequiredBundles_Text_Column_Name]),
 			timeStamp = row[m_TimeStamp_Text_Column_Name],
 			id = row['id']
 		}
@@ -187,7 +187,7 @@ function DataBaseManager:GetProjectHeader(p_ProjectId)
 		projectName = s_ProjectHeaderRow[1][m_ProjectName_Text_Column_Name],
 		mapName = s_ProjectHeaderRow[1][m_MapName_Text_Column_Name],
 		gameModeName = s_ProjectHeaderRow[1][m_GameModeName_Text_Column_Name],
-		requiredBundles = s_ProjectHeaderRow[1][m_RequiredBundles_Text_Column_Name],
+		requiredBundles = json.decode(s_ProjectHeaderRow[1][m_RequiredBundles_Text_Column_Name]),
 		timeStamp = s_ProjectHeaderRow[1][m_TimeStamp_Text_Column_Name],
 		id = s_ProjectHeaderRow[1]['id']
 	}
@@ -205,10 +205,17 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 		return
 	end
 
-	local s_ProjectData = s_ProjectDataTable[1][m_SaveFile_Text_Column_Name]
+	local s_ProjectDataJSON = s_ProjectDataTable[1][m_SaveFile_Text_Column_Name]
+
+	if not s_ProjectDataJSON then
+		m_Logger:Error('Failed to get project data')
+		return
+	end
+
+	local s_ProjectData = DecodeParams(json.decode(s_ProjectDataJSON))
 
 	if not s_ProjectData then
-		m_Logger:Error('Failed to get project data')
+		m_Logger:Error('Failed to decode project data')
 		return
 	end
 
@@ -224,6 +231,7 @@ function DataBaseManager:GetProjectByProjectId(p_ProjectId)
 
 	if s_ProjectData == nil or s_Header == nil then
 		m_Logger:Error('Failed to get project save')
+		return
 	end
 
 	return {

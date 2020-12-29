@@ -122,7 +122,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
             -- Load User Data from Database
             local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
             --self:UpdateLevelFromOldSaveFile(s_SaveFile)
-            self:CreateAndExecuteImitationCommands(DecodeParams(json.decode(s_ProjectSaveData)))
+            self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
         end
     end
 end
@@ -154,8 +154,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     -- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
     -- Invoke Restart
 	if(self.m_MapName == s_MapName) then
-		local s_ProjectSaveData = DecodeParams(json.decode(s_Project.data))
-		Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_ProjectSaveData, vanillaOnly = true })
+		Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
@@ -218,7 +217,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
         local s_Command
 
         --If it's a vanilla object we move it or we delete it. If not we spawn a new object.
-        if IsVanilla(l_Guid) then
+        if l_GameObjectSaveData.isVanilla then
             --[[if l_GameObjectSaveData.isDeleted then
                 s_Command = {
                     sender = "LoadingSaveFile",
