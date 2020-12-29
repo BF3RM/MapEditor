@@ -268,7 +268,7 @@ export default class VEXTInterface {
 		signals.setProjectHeaders.emit(headers);
 	}
 
-	SetCurrentProjectHeader(header: any) {
+	public SetCurrentProjectHeader(header: any) {
 		signals.setCurrentProjectHeader.emit(header);
 	}
 

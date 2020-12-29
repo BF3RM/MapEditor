@@ -182,6 +182,10 @@ function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
 	WebUpdater:AddUpdate('SetProjectHeaders', p_ProjectHeaders)
 end
 
+function MapEditorClient:OnReceiveCurrentProjectHeader(p_CurrentProjectHeader)
+	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_CurrentProjectHeader)
+end
+
 function MapEditorClient:OnEnableFreeCamMovement()
 	UIManager:OnEnableFreeCamMovement()
 	FreeCam:OnEnableFreeCamMovement()
