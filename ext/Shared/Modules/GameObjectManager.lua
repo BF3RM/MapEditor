@@ -63,7 +63,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
 	local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
 
-	m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
+	-- m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
 	if p_IsPreviewSpawn == false then
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
 	else
@@ -176,7 +176,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
 			self:ResolveRootObject(s_GameObject)
 		else
-			m_Logger:Write('Found custom object without parent')
+			--m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
 			self:ResolveRootObject(s_GameObject)
 		end

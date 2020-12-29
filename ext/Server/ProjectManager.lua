@@ -183,13 +183,13 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		end
 	end
 
-	m_Logger:Write("vvvvvvvvvvvvvvvvv")
-	m_Logger:Write("GameObjectSaveDatas: " .. count)
-	for _, gameObjectSaveData in pairs(s_GameObjectSaveDatas) do
-		m_Logger:Write(tostring(gameObjectSaveData.guid) .. " | " .. gameObjectSaveData.name)
-	end
-	m_Logger:Write(json.encode(s_GameObjectSaveDatas))
-	m_Logger:Write("^^^^^^^^^^^^^^^^^")
+	-- m_Logger:Write("vvvvvvvvvvvvvvvvv")
+	-- m_Logger:Write("GameObjectSaveDatas: " .. count)
+	-- for _, gameObjectSaveData in pairs(s_GameObjectSaveDatas) do
+	-- 	m_Logger:Write(tostring(gameObjectSaveData.guid) .. " | " .. gameObjectSaveData.name)
+	-- end
+	-- m_Logger:Write(json.encode(s_GameObjectSaveDatas))
+	-- m_Logger:Write("^^^^^^^^^^^^^^^^^")
 	self.m_CurrentProjectHeader = {
 		projectName = p_ProjectSaveData.projectName,
 		mapName = self.m_MapName,

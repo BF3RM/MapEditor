@@ -132,7 +132,7 @@ end
 
 function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
 	m_Logger:Write("SaveProjectData() " .. tostring(p_HeaderId))
-	m_Logger:Write(p_GameObjectSaveDatasJson)
+	--m_Logger:Write(p_GameObjectSaveDatasJson)
 
 	local s_Query = 'INSERT INTO ' .. m_DB_Data_Table_Name .. ' (' .. m_ProjectHeader_Id_Column_Name .. ', ' .. m_SaveFile_Text_Column_Name .. ') VALUES (?, ?)'
 
