@@ -37,24 +37,24 @@
 					<li v-else
 						v-for="(project, projectName) in projects"
 						v-bind:key="projectName"
-						@click="onSelectProject(project)"
+						@click="onSelectProject(projectName)"
 						:class="{ selected: selectedProjectName === projectName, current: currentProjectHeader.projectName === projectName }">
 						{{projectName}}
 					</li>
 				</ul>
 				<ul v-if="selectedProject" class="saveList">
-					<li v-for="(project) in selectedProject"
-						v-bind:key="project.timeStamp"
-						@click="selectSave(project)"
-						:class="{ selected: selectedSave !== null && selectedSave.timeStamp === project.timeStamp,
-							current: project.timeStamp === currentProjectHeader.timeStamp }">
-						{{FormatTime(project.timeStamp)}}</li>
+					<li v-for="(save, index) in selectedProject"
+						v-bind:key="save.timeStamp"
+						@click="selectSave(index)"
+						:class="{ selected: selectedSave && selectedSave.timeStamp === save.timeStamp,
+							current: save.timeStamp === currentProjectHeader.timeStamp }">
+						{{FormatTime(save.timeStamp)}}</li>
 				</ul>
 			</div>
 			<div class="footer">
-				<div class="saveInfo" v-if="selectedProject && selectedProject.length > 0">
+				<div class="saveInfo" v-if="selectedSave">
 					<span>Selected save info:</span>
-					Map name: {{selectedProject[0].mapName}}
+					Map name: {{selectedSave.mapName}}
 					<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
 					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
 				</div>
@@ -79,10 +79,9 @@ import { LOGLEVEL } from '@/script/types/Enums';
 	@Component({ components: { WindowComponent } })
 export default class ProjectSettingsComponent extends Vue {
 	private title = 'Project Settings';
-	private projects = [];
-	private selectedProject: any = null;
-	private selectedSave: any = null;
-	private selectedProjectName = '';
+	private projects = {};
+	private selectedProjectName: string = '';
+	private selectedSaveIndex: number = 0;
 	private showNewSave = false;
 	private showExportWindow = false;
 	private projectData = '';
@@ -92,8 +91,24 @@ export default class ProjectSettingsComponent extends Vue {
 		visible: false
 	};
 
+	get projectsArray() {
+		return Object.values(this.projects);
+	}
+
+	get selectedProject(): object[] | null {
+		return (this.projects as any)[this.selectedProjectName];
+	}
+
+	get selectedSave(): object | null {
+		const project = this.selectedProject;
+		if (project) {
+			return (project as any)[this.selectedSaveIndex];
+		}
+		return null;
+	}
+
 	get buttonsDisabled() {
-		return this.projects.length === 0 || this.selectedProject === null || this.selectedSave == null;
+		return this.projectsArray.length === 0 || this.selectedProject === null || this.selectedSave == null;
 	}
 
 	get newSaveName() {
@@ -121,10 +136,10 @@ export default class ProjectSettingsComponent extends Vue {
 			this.title = 'New Project';
 			this.state.visible = true;
 		});
-		signals.menuRegistered.emit(['File', 'Load Project'], () => {
+		signals.menuRegistered.emit(['File', 'Project Settings'], () => {
 			window.vext.SendMessage(new GetProjectsMessage());
 			this.showNewSave = false;
-			this.title = 'Load Project';
+			this.title = 'Project Settings';
 			this.state.visible = true;
 		});
 		signals.setCurrentProjectHeader.connect((projectHeader) => {
@@ -146,13 +161,15 @@ export default class ProjectSettingsComponent extends Vue {
 		});
 	}
 
-	selectSave(project: any) {
-		this.selectedSave = project;
+	selectSave(index: number) {
+		this.selectedSaveIndex = index;
 	}
 
 	loadSave() {
-		console.log('Loading save: ' + this.selectedSave.projectName);
-		window.vext.SendMessage(new RequestLoadProjectMessage(this.selectedSave.id));
+		if (this.selectedSave) {
+			console.log('Loading save: ' + (this.selectedSave as any).projectName);
+			window.vext.SendMessage(new RequestLoadProjectMessage((this.selectedSave as any).id));
+		}
 	}
 
 	NewSave() {
@@ -174,11 +191,11 @@ export default class ProjectSettingsComponent extends Vue {
 	Export() {
 		this.hint = 'Retrieving save...';
 		this.showExportWindow = true;
-		window.vext.SendMessage(new RequestProjectDataMessage(this.selectedSave.id));
+		window.vext.SendMessage(new RequestProjectDataMessage((this.selectedSave as any).id));
 	}
 
 	Delete() {
-		window.vext.SendMessage(new RequestDeleteProjectMessage(this.selectedSave.id));
+		window.vext.SendMessage(new RequestDeleteProjectMessage((this.selectedSave as any).id));
 	}
 
 	CopyToClipboard() {
@@ -196,11 +213,9 @@ export default class ProjectSettingsComponent extends Vue {
 		this.projectData = '';
 	}
 
-	onSelectProject(project: any) {
-		console.log(project);
-		this.selectedProject = project;
-		this.selectedSave = project[0];
-		this.selectedProjectName = project[0].projectName;
+	onSelectProject(projectName: string) {
+		this.selectedProjectName = projectName;
+		this.selectedSaveIndex = 0;
 	}
 
 	onGetProjects(availableProjects: any) {
@@ -213,10 +228,9 @@ export default class ProjectSettingsComponent extends Vue {
 				}
 				projects[project.projectName].push(project);
 			}
-			this.projects = projects;
 		}
-
-		console.log(this.projects);
+		// Object.assign(this.projects, projects);
+		this.projects = projects;
 	}
 
 	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
