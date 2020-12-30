@@ -6,7 +6,7 @@
 		</div>
 		<div class="footer">
 			<div>
-				<button @click="Load">Load</button>
+				<button @click="Import">Import</button>
 				<button @click="Close">Close</button>
 			</div>
 		</div>
@@ -45,7 +45,7 @@ export default class ImportProjectComponent extends Vue {
 		return true;
 	}
 
-	Load() {
+	Import() {
 		if (this.isValidJSON(this.projectDataJSON)) {
 			this.displayMessage = 'Valid text format, validating...';
 			window.vext.SendMessage(new RequestImportProjectMessage(this.projectDataJSON));
