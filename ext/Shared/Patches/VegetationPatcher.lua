@@ -11,18 +11,26 @@ function VegetationPatcher:RegisterVars()
 end
 function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 	local s_Instance = VegetationTreeEntityData(p_VegetationTree)
-	local s_ReplacementData = StaticModelEntityData(p_VegetationTree.instanceGuid)
+	local s_ReplacementData = self.m_Replacements[tostring(s_Instance.instanceGuid)]
+
+	if s_ReplacementData then
+		return s_ReplacementData
+	else
+		s_ReplacementData = StaticModelEntityData(p_VegetationTree.instanceGuid)
+	end
+
 	s_ReplacementData.transform = s_Instance.transform
 	s_ReplacementData.enabled = true
 	local s_BoneCount = 0
 	for k,v in pairs(s_Instance.basePoseTransforms) do
-	--	s_ReplacementData.basePoseTransforms:add(v)
+		--s_ReplacementData.basePoseTransforms:add(v)
 		s_BoneCount = s_BoneCount + 1
 	end
 	s_ReplacementData.boneCount = s_BoneCount
 	s_ReplacementData.transform = s_Instance.transform
 	s_ReplacementData.visible = true
-	self.m_Replacements[tostring(s_ReplacementData.instanceGuid)] = s_ReplacementData
+
+	self.m_Replacements[tostring(s_Instance.instanceGuid)] = s_ReplacementData
 	if (s_Instance.mesh.isLazyLoaded) then
 		s_Instance.mesh:RegisterLoadHandlerOnce(function(p_Mesh)
 			s_ReplacementData.mesh = MeshAsset(p_Mesh)
