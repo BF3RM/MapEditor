@@ -3,13 +3,20 @@ require "__shared/Patches/CommonRosePatcher"
 require "__shared/Patches/LevelPatcher"
 require "__shared/Patches/SequencePatcher"
 require "__shared/Patches/HealthStatePatcher"
-require "__shared/Patches/VegetationPatcher"
+VegetationPatcher = require "__shared/Patches/VegetationPatcher"
 
 local m_Logger = Logger("Patches", true)
 
 function Patches:__init()
 	m_Logger:Write("Initializing Patches")
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
+end
+
+function Patches:OnEntityCreate(p_Hook, p_Data, p_Transform)
+	if(p_Data.typeInfo == VegetationTreeEntityData.typeInfo) then
+		p_Hook:Pass(VegetationPatcher:PatchVegetationTree(p_Data), p_Transform)
+	end
 end
 
 function Patches:OnPartitionLoaded(p_Partition)
@@ -36,10 +43,6 @@ function Patches:OnPartitionLoaded(p_Partition)
 		end
 		if(l_Instance.typeInfo == HealthStateData.typeInfo) then
 			HealthStatePatcher:PatchHealthStateData(l_Instance)
-		end
-
-		if(l_Instance.typeInfo == VegetationTreeEntityData.typeInfo) then
-			VegetationPatcher:PatchVegetationTree(l_Instance)
 		end
 
 		--[[
