@@ -1,5 +1,5 @@
 class 'MapEditorShared'
-Async = require "__shared/Util/Async"
+Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
 require "__shared/Util/DataContainerExt"

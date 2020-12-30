@@ -1,51 +1,51 @@
-class 'Async'
+class 'Coroutiner'
 
-function Async:__init()
-	print("Initializing Async")
+function Coroutiner:__init()
+	print("Initializing Coroutiner")
 	self:RegisterVars()
 	self:RegisterEvents()
 end
 
-function Async:RegisterVars()
+function Coroutiner:RegisterVars()
 	self.m_Tasks = {}
 end
 
-function Async:RegisterEvents()
+function Coroutiner:RegisterEvents()
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
 end
 
-function Async:Yield()
+function Coroutiner:Yield()
 	coroutine.yield()
 end
 
-function Async:Start(p_Task)
+function Coroutiner:Start(p_Task)
 	local s_Task = {
 		id = #self.m_Tasks + 1,
 		task = p_Task,
 		time = 0,
-		state = AsyncState.Suspended,
+		state = CoroutineState.Suspended,
 		coroutine = nil
 	}
 	s_Task.coroutine = coroutine.create(function()
-		s_Task.state = AsyncState.Running
+		s_Task.state = CoroutineState.Running
 		s_Task.task()
-		s_Task.state = AsyncState.Dead
+		s_Task.state = CoroutineState.Dead
 	end)
 	table.insert(self.m_Tasks, s_Task)
 end
 
-function Async:OnEngineUpdate(p_Delta)
+function Coroutiner:OnEngineUpdate(p_Delta)
 	local s_TasksToHandle = #self.m_Tasks
 	for _, task in pairs(self.m_Tasks) do
-		if (task.state == AsyncState.Suspended) then -- If suspended, resume task
+		if (task.state == CoroutineState.Suspended) then -- If suspended, resume task
 			print("Running task")
 			coroutine.resume(task.coroutine)
 		end
-		if (task.state == AsyncState.Running) then -- Task is already running I guess
+		if (task.state == CoroutineState.Running) then -- Task is already running I guess
 			coroutine.resume(task.coroutine)
 			task.time = task.time + p_Delta
 		end
-		if (task.state == AsyncState.Dead) then -- Task is dead
+		if (task.state == CoroutineState.Dead) then -- Task is dead
 			s_TasksToHandle = s_TasksToHandle - 1
 		end
 	end
@@ -55,5 +55,5 @@ function Async:OnEngineUpdate(p_Delta)
 	end
 end
 
-return Async()
+return Coroutiner()
 

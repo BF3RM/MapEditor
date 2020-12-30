@@ -29,7 +29,7 @@ ActionResultType = {
 	Queue = 3
 }
 
-AsyncState = {
+CoroutineState = {
 	Scheduled = "scheduled",
 	Suspended = "suspended",
 	Running = "running",
