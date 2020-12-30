@@ -24,7 +24,7 @@ require "__shared/Types/GameObject"
 require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
-require "__shared/Patches/Patches"
+Patches = require "__shared/Patches/Patches"
 
 require "__shared/Config"
 local m_Logger = Logger("MapEditorShared", true)
@@ -32,6 +32,12 @@ DataContainerExt = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
+	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 end
+
+function MapEditorShared:OnLevelDestroy()
+	Patches:OnLevelDestroy()
+end
+
 
 return MapEditorShared()

@@ -19,6 +19,10 @@ function Patches:OnEntityCreate(p_Hook, p_Data, p_Transform)
 	end
 end
 
+function Patches:OnLevelDestroy()
+	VegetationPatcher:OnLevelDestroy()
+end
+
 function Patches:OnPartitionLoaded(p_Partition)
 	if p_Partition == nil then
 		return

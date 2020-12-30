@@ -9,6 +9,11 @@ end
 function VegetationPatcher:RegisterVars()
 	self.m_Replacements = {}
 end
+
+function VegetationPatcher:OnLevelDestroy()
+	self.m_Replacements = {}
+end
+
 function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 	local s_Instance = VegetationTreeEntityData(p_VegetationTree)
 	local s_ReplacementData = self.m_Replacements[tostring(s_Instance.instanceGuid)]
