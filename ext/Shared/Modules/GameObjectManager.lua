@@ -313,7 +313,6 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
 
 	end
-
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 end
 
@@ -530,6 +529,11 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 				max = s_Entity.aabb.max,
 				transform = ToLocal(s_Entity.aabbTransform, s_PendingGameObject.transform)
 			}
+		end
+
+		-- Set custom objects' entities enabled by default.
+		if not s_PendingGameObject.isVanilla then
+			s_GameEntity:Enable()
 		end
 
 		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
