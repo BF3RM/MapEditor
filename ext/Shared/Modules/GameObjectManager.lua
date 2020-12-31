@@ -532,8 +532,9 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		end
 
 		-- Set custom objects' entities enabled by default.
-		if not s_PendingGameObject.isVanilla then
-			s_GameEntity:Enable()
+		if not s_PendingGameObject.isVanilla and
+				(s_Entity:Is('ClientStaticModelEntity') or s_Entity:Is('ServerStaticModelEntity')) then
+			s_Entity:FireEvent('Enable')
 		end
 
 		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)

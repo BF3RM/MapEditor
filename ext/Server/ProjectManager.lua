@@ -210,9 +210,9 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
     for _, l_GameObjectSaveData in pairs(p_ProjectSaveData) do
 	    local l_Guid = l_GameObjectSaveData.guid
-        if (GameObjectManager.m_GameObjects[l_Guid] == nil) then
-            m_Logger:Error("GameObject with Guid " .. tostring(l_Guid) .. " not found in GameObjectManager.")
-        end
+        --if (GameObjectManager.m_GameObjects[l_Guid] == nil) then
+        --    m_Logger:Error("GameObject with Guid " .. tostring(l_Guid) .. " not found in GameObjectManager.")
+        --end
 
         local s_Command
 
