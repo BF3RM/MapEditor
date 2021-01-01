@@ -1,38 +1,41 @@
-class 'VegetationPatcher'
-local m_Logger = Logger("VegetationPatcher", true)
+class 'DynamicModelPatcher'
+local m_Logger = Logger("DynamicModelPatcher", true)
 
-function VegetationPatcher:__init()
+function DynamicModelPatcher:__init()
 	m_Logger:Write("Initializing Vegetation Patches")
 	self:RegisterVars()
 end
 
-function VegetationPatcher:RegisterVars()
+function DynamicModelPatcher:RegisterVars()
 	self.m_Replacements = {}
 end
 
-function VegetationPatcher:OnLevelDestroy()
+function DynamicModelPatcher:OnLevelDestroy()
 	self.m_Replacements = {}
 end
 
-function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
-	local s_Instance = VegetationTreeEntityData(p_VegetationTree)
+function DynamicModelPatcher:Patch(p_DynamicModel)
+	local s_Instance = DynamicModelEntityData(p_DynamicModel)
 	local s_ReplacementData = self.m_Replacements[tostring(s_Instance.instanceGuid)]
 
 	if s_ReplacementData then
 		return s_ReplacementData
 	else
-		s_ReplacementData = StaticModelEntityData(p_VegetationTree.instanceGuid)
-	end
-	local s_BoneCount = 0
-	for k,v in pairs(s_Instance.basePoseTransforms) do
-		--s_ReplacementData.basePoseTransforms:add(v)
-		s_BoneCount = s_BoneCount + 1
+		s_ReplacementData = StaticModelEntityData(p_DynamicModel.instanceGuid)
 	end
 
 	s_ReplacementData.transform = s_Instance.transform
 	s_ReplacementData.enabled = true
-	s_ReplacementData.boneCount = s_BoneCount
 	s_ReplacementData.visible = true
+
+	--[[ Don't think this is necessary
+	for k,v in pairs(s_Instance.components) do
+		print(k)
+		s_ReplacementData.components:add(v)
+	end
+	s_ReplacementData.runtimeComponentCount = s_Instance.runtimeComponentCount
+	s_ReplacementData.physicsData = s_Instance.physicsData
+	]]
 
 	self.m_Replacements[tostring(s_Instance.instanceGuid)] = s_ReplacementData
 	if (s_Instance.mesh.isLazyLoaded) then
@@ -46,4 +49,4 @@ function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 end
 
 
-return VegetationPatcher()
+return DynamicModelPatcher()

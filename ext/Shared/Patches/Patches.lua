@@ -4,6 +4,7 @@ require "__shared/Patches/LevelPatcher"
 require "__shared/Patches/SequencePatcher"
 require "__shared/Patches/HealthStatePatcher"
 VegetationPatcher = require "__shared/Patches/VegetationPatcher"
+DynamicModelPatcher = require "__shared/Patches/DynamicModelPatcher"
 
 local m_Logger = Logger("Patches", true)
 
@@ -35,52 +36,18 @@ function Patches:OnPartitionLoaded(p_Partition)
 			goto continue
 		end
 
-		if(l_Instance.typeInfo == LevelData.typeInfo) then
+		if l_Instance:Is('LevelData') then
 			LevelPatcher:PatchLevelData(l_Instance)
-		end
-		if(l_Instance.typeInfo == LevelDescriptionAsset.typeInfo) then
+		elseif l_Instance:Is('LevelDescriptionAsset') then
 			LevelPatcher:PatchLevelDescription(l_Instance)
-		end
-
-		if(l_Instance.typeInfo == SequenceEntityData.typeInfo) then
+		elseif l_Instance:Is('SequenceEntityData') then
 			SequencePatcher:PatchSequence(l_Instance)
-		end
-		if(l_Instance.typeInfo == HealthStateData.typeInfo) then
+		elseif l_Instance:Is('HealthStateData') then
 			HealthStatePatcher:PatchHealthStateData(l_Instance)
+		elseif l_Instance:Is('DynamicModelEntityData') then
+			DynamicModelPatcher:Patch(l_Instance)
 		end
 
-		--[[
-		if(l_Instance.typeInfo.name == "DynamicModelEntityData") then
-			local s_Instance = DynamicModelEntityData(l_Instance)
-			local s_StaticModel = StaticModelEntityData(s_Instance.instanceGuid)
-			s_StaticModel.indexInBlueprint = s_Instance.indexInBlueprint
-			s_StaticModel.transform = s_Instance.transform
-			s_StaticModel.enabled = true
-			s_StaticModel.visible = true
-			if(s_Instance.mesh.isLazyLoaded) then
-				s_Instance.mesh:RegisterLoadHandlerOnce(function(ctr)
-					s_StaticModel.mesh = _G[ctr.typeInfo.name](ctr)
-				end)
-			else
-				s_StaticModel.mesh = s_Instance.mesh
-			end
-			for k,v in pairs(s_Instance.components) do
-				print(k)
-				s_StaticModel.components:add(v)
-			end
-			s_StaticModel.runtimeComponentCount = s_Instance.runtimeComponentCount
-			s_StaticModel.physicsData = s_Instance.physicsData
-
-			p_Partition:ReplaceInstance(l_Instance, s_StaticModel, true)
-			if(p_Partition.primaryInstance.typeInfo.name == "ObjectBlueprint") then
-				local s_PrimaryInstance = ObjectBlueprint(p_Partition.primaryInstance)
-				s_PrimaryInstance:MakeWritable()
-				s_PrimaryInstance.object = s_StaticModel
-			else
-				print(s_PrimaryInstance.typeInfo.name)
-			end
-		end
-		-]]
 		::continue::
 	end
 end
