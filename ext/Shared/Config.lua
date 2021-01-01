@@ -1,3 +1,5 @@
 ME_CONFIG = {
-	LOAD_VANILLA = true
+	LOAD_VANILLA = true,
+	LOGGER_ENABLED = true,
+	LOGGER_PRINT_ALL = false
 }

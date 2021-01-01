@@ -1,8 +1,10 @@
 class 'MapEditorShared'
+
+require "__shared/Config"
 Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Logger"
 require "__shared/Util/Util"
-require "__shared/Util/DataContainerExt"
+DataContainerExt = require "__shared/Util/DataContainerExt"
 --require "__shared/Modules/ObjectManager"
 require "__shared/Modules/GameObjectManager"
 require "__shared/Modules/CommandActions"
@@ -26,9 +28,7 @@ require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
 Patches = require "__shared/Patches/Patches"
 
-require "__shared/Config"
 local m_Logger = Logger("MapEditorShared", true)
-DataContainerExt = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")

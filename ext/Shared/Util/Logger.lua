@@ -1,7 +1,5 @@
 class "Logger"
 
-local LOGGER_ENABLED = true
-local LOGGER_PRINT_ALL = false
 
 function Logger:__init(p_ClassName, p_ActivateLogging)
 	if type(p_ClassName) ~= "string" then
@@ -18,11 +16,11 @@ function Logger:__init(p_ClassName, p_ActivateLogging)
 end
 
 function Logger:Write(p_Message)
-	if not LOGGER_ENABLED then
+	if not ME_CONFIG.LOGGER_ENABLED then
 		return
 	end
 
-	if LOGGER_PRINT_ALL == true and self.className ~= nil then
+	if ME_CONFIG.LOGGER_PRINT_ALL == true and self.className ~= nil then
 		goto continue
 
 	elseif self.debug == false or
