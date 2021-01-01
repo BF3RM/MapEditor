@@ -265,7 +265,13 @@ export default class HierarchyComponent extends EditorComponent {
 	private onNodeClick(o: any) {
 		const guid = Guid.parse(o.nodeId.toString());
 		if (guid.isEmpty()) return;
-		window.editor.Select(guid, o.event.ctrlKey, false, true);
+		if (o.event.detail === 1) {
+			// Click
+			window.editor.Select(guid, o.event.ctrlKey, false, true);
+		} else if (o.event.detail === 2) {
+			// Double Click
+			window.editor.Focus(guid);
+		}
 	}
 
 	private shouldSelectNode(node: Node) {
