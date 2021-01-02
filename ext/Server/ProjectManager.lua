@@ -178,7 +178,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
 		if l_GameObject:IsUserModified() == true or l_GameObject:HasOverrides() then
 			count = count + 1
-			s_GameObjectSaveDatas[tostring(l_GameObject.guid)] = GameObjectSaveData(l_GameObject):GetAsTable()
+			table.insert(s_GameObjectSaveDatas,  GameObjectSaveData(l_GameObject):GetAsTable())
 		end
 	end
 
