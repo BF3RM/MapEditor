@@ -194,7 +194,7 @@ export default class HierarchyComponent extends EditorComponent {
 		const currentNode = this.tree.getNodeById(guid.toString());
 		// console.log(isMultipleSelection);
 		currentNode.state.selected = true;
-		if (guid.equals(Guid.createEmpty())) {
+		if (guid.isEmpty()) {
 			this.list = [];
 			this.selected = [];
 			return;

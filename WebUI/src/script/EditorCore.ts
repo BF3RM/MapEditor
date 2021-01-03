@@ -168,7 +168,7 @@ export class EditorCore {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 		// this.unhighlight();
 		// When selecting nothing, deselect all if its not multi selection.
-		if (guid.equals(Guid.createEmpty())) {
+		if (guid.isEmpty()) {
 			console.log('Deselecting');
 			if (!multiSelection) {
 				editor.selectionGroup.deselectAll();

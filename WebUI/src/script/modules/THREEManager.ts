@@ -48,6 +48,8 @@ export class THREEManager {
 	private clock = new THREE.Clock();
 	private cameraHasMoved: boolean;
 
+	private raycaster = new THREE.Raycaster();
+
 	constructor(debugMode: boolean) {
 		this.scene.name = 'scene';
 		signals.editor.Ready.connect(this.initialize.bind(this));
@@ -72,6 +74,8 @@ export class THREEManager {
 		} else {
 			console.error('Unable to find ViewPort');
 		}
+		this.raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
+		this.raycaster.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
 			const planeSize = 100;
@@ -392,105 +396,94 @@ export class THREEManager {
 		}
 	}
 
-	private async selectWithRaycast(mousePos: Vec2, multiSelection: boolean) {
-		console.log('Raycast');
-		const guid = await this.raycastSelection(mousePos) as Guid;
-
-		if (guid !== null) {
-			editor.Select(guid, multiSelection, true);
-		} else {
-			editor.Select(Guid.createEmpty(), multiSelection);
-		}
+	private selectWithRaycast(mousePos: Vec2, multiSelection: boolean) {
+		this.raycastSelection(mousePos).then((guid: Guid | null) => {
+			if (guid !== null) {
+				editor.Select(guid, multiSelection, true);
+			} else {
+				editor.Select(Guid.createEmpty(), multiSelection);
+			}
+		});
 	}
 
-	private async highlightWithRaycast(mousePos: Vec2) {
+	private highlightWithRaycast(mousePos: Vec2) {
 		const now = new Date();
 		if ((now.getTime() - this.lastRaycastTime.getTime() >= 100) && !this.pendingRaycast) {
 			this.pendingRaycast = true;
-			const guid = await this.raycastSelection(mousePos) as Guid;
-			if (guid !== null) {
-				editor.editorCore.highlight(guid);
-			} else {
-				editor.editorCore.unhighlight();
-			}
-			this.lastRaycastTime = now;
-			this.pendingRaycast = false;
-			this.setPendingRender();
+			this.raycastSelection(mousePos).then((guid: Guid | null) => {
+				if (guid !== null) {
+					editor.editorCore.highlight(guid);
+				} else {
+					editor.editorCore.unhighlight();
+				}
+				this.lastRaycastTime = now;
+				this.pendingRaycast = false;
+				this.setPendingRender();
+			});
 		}
 	}
 
 	// TODO: Clean up
-	public raycastSelection(mousePos: Vec2) {
-		return new Promise((resolve) => {
-			const raycaster = new THREE.Raycaster();
-			raycaster.setFromCamera(mousePos, this.camera);
-			let hitSelf: GameObject | null = null;
+	public async raycastSelection(mousePos: Vec2) {
+		this.raycaster.setFromCamera(mousePos, this.camera);
+		let hitSelf: GameObject | null = null;
 
-			// Only check raycast collisions with GameEntities
-			raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
-			raycaster.layers.enable(RAYCAST_LAYER.GAMEENTITY);
-			const intersects = raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
-			if (intersects.length > 0) {
-				// console.log('hit ' + (intersects.length) + ' objects');
-				for (const element of intersects.sort((a, b) => {
-					return a.distance - b.distance;
-				})) {
-					if (element.object == null || element.object.parent == null) {
+		// Only check raycast collisions with GameEntities
+
+		const intersects = this.raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
+		if (intersects.length > 0) {
+			// console.log('hit ' + (intersects.length) + ' objects');
+			for (const element of intersects.sort((a, b) => {
+				return a.distance - b.distance;
+			})) {
+				if (element.object == null || element.object.parent == null) {
+					continue;
+				}
+				if (element.object.parent.constructor === GameObject && (element.object.parent as any).name !== 'Gameplay/Logic/ShowRoom') {
+					const gameObject = element.object.parent as GameObject;
+					if (editor.selectionGroup.isSelected(gameObject)) {
+						hitSelf = gameObject;
 						continue;
 					}
-					if (element.object.parent.constructor === GameObject && (element.object.parent as any).name !== 'Gameplay/Logic/ShowRoom') {
-						const gameObject = element.object.parent as GameObject;
-						if (editor.selectionGroup.isSelected(gameObject)) {
-							hitSelf = gameObject;
+
+					if (!gameObject.raycastEnabled) {
+						continue;
+					}
+
+					// Select its parent if possible.
+					if (gameObject.parent != null) {
+						const parent = gameObject.parent;
+						// if (!parent.raycastEnabled) {
+						// 	continue;
+						// }
+						if (editor.selectionGroup.isSelected(parent)) {
+							console.log('Hit self ' + parent.guid);
+							hitSelf = parent;
 							continue;
 						}
-
-						if (!gameObject.raycastEnabled) {
-							continue;
-						}
-
-						// Select its parent if possible.
-						if (gameObject.parent != null) {
-							const parent = gameObject.parent;
-							// if (!parent.raycastEnabled) {
-							// 	continue;
-							// }
-							if (editor.selectionGroup.isSelected(parent)) {
-								console.log('Hit self ' + parent.guid);
-								hitSelf = parent;
-								continue;
-							}
-							if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
-									(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
-									!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
-									!parent.raycastEnabled) {
-								resolve(parent.guid);
-								return parent.guid;
-							}
-						}
-						// Else we select the GameObject.
-						if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
-							resolve(gameObject.guid);
-							return gameObject.guid;
+						if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
+								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
+								!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
+								!parent.raycastEnabled) {
+							return parent.guid;
 						}
 					}
+					// Else we select the GameObject.
+					if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
+						return gameObject.guid;
+					}
 				}
-				// A selected GameObject was hit.
-				if (hitSelf !== null) {
-					resolve(hitSelf.guid);
-					return hitSelf.guid;
-				} else { // Didn't hit any GameObjects
-					resolve(null);
-					return null;
-				}
-			} else {
-				// console.log("no hit")
-				resolve(null);
+			}
+			// A selected GameObject was hit.
+			if (hitSelf !== null) {
+				return hitSelf.guid;
+			} else { // Didn't hit any GameObjects
 				return null;
 			}
-			resolve(null);
+		} else {
+			// console.log("no hit")
 			return null;
-		});
+		}
 	}
 
 	public getMouse3D(e: MouseEvent) {
