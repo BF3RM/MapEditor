@@ -267,7 +267,7 @@ function CommandActions:SetEBXField(p_Command)
 	local s_Result, s_Path = nil
 
 	if(p_Command.gameObjectTransferData.guid) then -- Override only this instance
-		local s_GameObject = GameObjectManager:SetOverrides(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.overrides)
+		GameObjectManager:SetOverrides(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.overrides)
 	else
 		--s_Result = EBXManager:SetFields(nil, p_Command.gameObjectTransferData.overrides)
 	end
