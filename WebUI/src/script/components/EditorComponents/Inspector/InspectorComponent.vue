@@ -237,17 +237,17 @@ export default class InspectorComponent extends EditorComponent {
 		const splitName = selectedGameObject.name.split('/');
 		this.gameObjectName = splitName[splitName.length - 1];
 		this.blueprintType = selectedGameObject.blueprintCtrRef.typeName.toString();
-		const bp = window.editor.blueprintManager.getBlueprintByGuid(selectedGameObject.blueprintCtrRef.instanceGuid);
-		if (bp) {
-			this.blueprintVariations = bp.variations;
-		} else {
-			this.blueprintVariations = [{ hash: 0, name: 'default' }];
-		}
-		this.selectedVariation = selectedGameObject.variation;
-		this.objectType = selectedGameObject.blueprintCtrRef.typeName;
-
-		this.selectedGameObject = selectedGameObject;
-		this.$data.partition = this.selectedGameObject.partition;
+		// const bp = window.editor.blueprintManager.getBlueprintByGuid(selectedGameObject.blueprintCtrRef.instanceGuid);
+		// if (bp) {
+		// 	this.blueprintVariations = bp.variations;
+		// } else {
+		// 	this.blueprintVariations = [{ hash: 0, name: 'default' }];
+		// }
+		// this.selectedVariation = selectedGameObject.variation;
+		// this.objectType = selectedGameObject.blueprintCtrRef.typeName;
+		//
+		// this.selectedGameObject = selectedGameObject;
+		// this.$data.partition = this.selectedGameObject.partition;
 	}
 
 	get isEmpty() {
