@@ -4,4 +4,4 @@ ui.vuic
 WebUI/debugData/*
 WebUI/data/*.json
 node_modules/
-mod.db
+*.db
