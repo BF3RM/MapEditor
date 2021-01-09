@@ -21,7 +21,7 @@ export class Blueprint implements IBlueprint {
 
 	public getDefaultVariation() {
 		const scope = this;
-		if (scope.hasVariation()) {
+		if (scope.hasVariations()) {
 			return this.variations[0].hash;
 		} else {
 			return 0;
@@ -32,20 +32,18 @@ export class Blueprint implements IBlueprint {
 		this.favorited = favStatus;
 	}
 
-	public hasVariation() {
-		return !(Object.keys(this.variations).length === 0);
+	public hasVariations() {
+		return this.variations.length !== 0;
 	}
 
 	public isVariationValid(variation: number) {
 		const scope = this;
-		return (scope.hasVariation() /* && scope.getVariation(variation) !== undefined */);
-		// Always returns 0
+		return (scope.hasVariations() && scope.getVariation(variation));
 	}
 
-	public getVariation(hash: string) {
+	public getVariation(hash: number) {
 		const scope = this;
-		return scope.variations[hash];
-		// tsk tsk tsk
+		return scope.variations.find((e: any) => e.hash === hash);
 	}
 
 	public fromObject(object: any) {
