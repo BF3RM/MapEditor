@@ -190,6 +190,33 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 	end
 end
 
+function InstanceParser:IsValidVariation(p_InstanceGuid, p_VariationHash)
+	local s_Blueprint = self.m_Blueprints[tostring(p_InstanceGuid)]
+	if not s_Blueprint then
+		m_Logger:Error('Could not find blueprint with instanceGuid: '.. tostring(p_InstanceGuid))
+		return false
+	end
+
+	for _, l_Variation in pairs(s_Blueprint.variations) do
+		if p_VariationHash == l_Variation.hash then
+			return true
+		end
+	end
+	return false
+end
+
+function InstanceParser:GetDefaultVariation(p_InstanceGuid)
+	local s_Blueprint = self.m_Blueprints[tostring(p_InstanceGuid)]
+	if not s_Blueprint then
+		m_Logger:Error('Could not find blueprint with instanceGuid: '.. tostring(p_InstanceGuid))
+		return nil
+	end
+
+	if s_Blueprint.variations[1] then
+		return s_Blueprint.variations[1].hash
+	end
+end
+
 function InstanceParser:FillVariations()
 	--m_Logger:Write("FILL")
     --m_Logger:Write(#self.m_MeshVariationDatabases)

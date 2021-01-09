@@ -11,6 +11,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { InputControls } from '@/script/modules/InputControls';
 import { Dictionary } from 'typescript-collections';
+import SpawnBlueprintCommand from '@/script/commands/SpawnBlueprintCommand';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -150,6 +151,24 @@ export class EditorCore {
 		const gameObjectTransferData = new GameObjectTransferData({ guid: editor.config.PreviewGameObjectGuid });
 		window.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = false;
+	}
+
+	public CopySelectedObjects(): SpawnBlueprintCommand[] {
+		const commands: SpawnBlueprintCommand[] = [];
+		editor.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
+			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+			gameObjectTransferData.guid = Guid.create();
+			const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
+			// Make sure the variation is valid, otherwise set default one.
+			if (bp) {
+				if (!bp.isVariationValid(gameObjectTransferData.variation)) {
+					gameObjectTransferData.variation = bp.getDefaultVariation();
+				}
+			}
+			// TODO: if ParentData is a vanilla object then set it to custom_root. Maybe do it on Lua?
+			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+		});
+		return commands;
 	}
 
 	public onPreviewDrop() {
