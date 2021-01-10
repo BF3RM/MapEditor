@@ -256,7 +256,8 @@ function FreeCam:UpdateCameraControls(p_Delta)
 	local s_MouseWheel = InputManager:GetLevel(InputConceptIdentifiers.ConceptFreeCameraSwitchSpeed)
 
 	if self.m_Mode == CameraMode.FreeCam then
-		self.m_SpeedMultiplier = self.m_SpeedMultiplier + (s_MouseWheel * 0.01)
+		local s_Step = s_MouseWheel * self.m_SpeedMultiplier / 20
+		self.m_SpeedMultiplier = self.m_SpeedMultiplier + s_Step
 
 		if self.m_SpeedMultiplier < 0.000005 then
 			self.m_SpeedMultiplier = 0.00005
