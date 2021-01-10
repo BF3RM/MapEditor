@@ -160,7 +160,7 @@ function MessageActions:PreviewMove(p_Message)
     end
 end
 function MessageActions:TeleportMouse(p_Message)
-	print(p_Message)
+	m_Logger:Write(p_Message)
 	local newCoords = p_Message.coordinates
 	if(p_Message.direction == "right") then
 		newCoords.x = ClientUtils:GetWindowSize().x - 5;

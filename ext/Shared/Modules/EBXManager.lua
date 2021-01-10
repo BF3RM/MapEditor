@@ -17,19 +17,20 @@ function EBXManager:OnLevelDestroy()
 end
 function EBXManager:SetFields(p_Overrides)
 	for _,v in pairs(p_Overrides) do
-		print(_)
-		print(v)
+		m_Logger:Write(_)
+		m_Logger:Write(v)
 		self:SetField(v.field, v.reference, v.type, v.value)
 	end
 end
 
 function EBXManager:SetField(p_Instance, p_Field, p_Path, p_RootGuid)
-	print(p_Path .. "/" .. p_Field.field)
+	m_Logger:Write(p_Path .. "/" .. p_Field.field)
 	if(p_Instance) then
 		if(p_Instance.typeInfo ~= nil) then
 			p_Instance = _G[p_Instance.typeInfo.name](p_Instance)
 		end
 		if(isPrintable(p_Field.type)) then -- Set value directly
+			print("Set " .. p_Field.field .. " to " .. tostring(p_Field.value))
 			p_Instance[p_Field.field] = ParseType(p_Field.type, p_Field.value)
 			return p_Path .. '.' .. p_Field.field
 		else
@@ -38,24 +39,28 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path, p_RootGuid)
 					self.m_ClonedInstances[tostring(p_RootGuid)] = {}
 				end
 				local s_ClonedInstance = _G[p_Instance[p_Field.field].typeInfo.name](p_Instance[p_Field.field]:Clone());
-				print("Cloning!")
-				print(p_Instance[p_Field.field])
-				print(s_ClonedInstance)
+				m_Logger:Write("Cloning!")
+				m_Logger:Write(p_Instance[p_Field.field])
+				m_Logger:Write(s_ClonedInstance)
 				self.m_ClonedInstances[tostring(p_RootGuid)][tostring(p_Instance.instanceGuid)] = s_ClonedInstance
 				p_Instance[p_Field.field] = s_ClonedInstance
 			end
 			local s_TypeInfo = p_Instance.typeInfo
 			if(s_TypeInfo) then
 				if(s_TypeInfo.array) then -- Go to the array index
+					print("Stepped into array")
 					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path + '.' + p_Field.field, p_RootGuid)
 				elseif(s_TypeInfo.enum) then
+					print("Set enum: " .. p_Field.value)
 					p_Instance[p_Field.field] = number(p_Field.value)
 					return p_Path .. '.' .. p_Field.field
 				else
+					print("Stepping into reference")
 					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field, p_RootGuid)
 				end
 				-- Instance?
 			else-- It's not a primitive value, it's not an array, it doesn't have typeInfo, so it's a struct.?
+				print("Stepping intos struct")
 				return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field, p_RootGuid)
 			end
 		end
@@ -65,8 +70,8 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path, p_RootGuid)
 end
 
 function ParseType(p_Type, p_Val)
-	--print(p_Type)
-	--print(p_Val)
+	--m_Logger:Write(p_Type)
+	--m_Logger:Write(p_Val)
 	if(p_Type == "Boolean") then
 		if(p_Val == "true") then
 			return true

@@ -18,7 +18,7 @@ CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
 
 function MapEditorClient:__init()
-	print("Initializing MapEditorClient")
+	m_Logger:Write("Initializing MapEditorClient")
 	self:RegisterVars()
 	self:RegisterEvents()
 end

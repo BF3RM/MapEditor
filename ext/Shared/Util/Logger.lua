@@ -46,6 +46,7 @@ end
 
 function Logger:Warning(p_Message)
 	if self.className == nil then
+		print("[unknwon] ERROR: " .. tostring(p_Message))
 		return
 	end
 
@@ -54,6 +55,7 @@ end
 
 function Logger:Error(p_Message)
 	if self.className == nil then
+		print("[unknwon] ERROR: " .. tostring(p_Message))
 		return
 	end
 

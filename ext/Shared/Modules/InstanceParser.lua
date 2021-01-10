@@ -39,7 +39,9 @@ end
 function InstanceParser:GetPartition(p_InstanceGuid)
     return self.m_BlueprintInstances[tostring(p_InstanceGuid)]
 end
-
+function InstanceParser:SetPartition(p_PartitionGuid, p_InstanceGuid)
+	self.m_BlueprintInstances[tostring(p_InstanceGuid)] = tostring(p_PartitionGuid)
+end
 function InstanceParser:GetPrimaryInstance(p_PartitionGuid)
 	return self.m_PrimaryInstances[tostring(p_PartitionGuid)]
 end
@@ -133,7 +135,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			--		self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
 			--	end
 			--else
-			self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
+	        self:SetPartition(p_Partition.guid, l_Instance.instanceGuid)
 			--end
 		end
 
@@ -179,7 +181,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 
 		if(l_Instance.typeInfo.name == "LevelData") then
 			local s_Instance = LevelData(l_Instance)
-			print(s_Instance.name)
+			m_Logger:Write(s_Instance.name)
 			self.m_LevelDatas[tostring(l_Instance.instanceGuid)] = {
 				partitionGuid = tostring(p_Partition.guid),
 				instanceGuid = tostring(l_Instance.instanceGuid),

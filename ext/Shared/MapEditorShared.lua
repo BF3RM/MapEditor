@@ -46,7 +46,7 @@ function MapEditorShared:OnPartitionLoaded(p_Partition)
 			l_Instance.typeInfo == VehicleBlueprint.typeInfo) then
 
 			local s_Instance = _G[l_Instance.typeInfo.name](l_Instance)
-			-- print(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
+			-- m_Logger:Write(tostring(l_Instance.instanceGuid).." --- "..tostring(p_Partition.guid))
 			-- We're not storing the actual instance since we'd rather look it up manually in case of a reload.
 			if(l_Instance.typeInfo == ObjectBlueprint.typeInfo) then
 				if(s_Instance.object == nil or self.m_IllegalTypes[s_Instance.object.typeInfo.name] == true) then
@@ -98,14 +98,14 @@ function MapEditorShared:FillVariations()
 	end
 	for k, v in pairs(self.m_Blueprints) do
 		if(self.m_Meshes[v.name:lower() .. "_mesh"] == nil) then
-			print("Missing: " .. v.name .. "_mesh")
+			m_Logger:Write("Missing: " .. v.name .. "_mesh")
 		else
 			local l_MeshGuid = self.m_Meshes[v.name:lower() .. "_mesh"]
 
 			if(self.m_Variations[l_MeshGuid] ~= nil ) then
 				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
 			else
-				print("No variation for " .. v.name)
+				m_Logger:Write("No variation for " .. v.name)
 			end
 		end
 	end

@@ -33,7 +33,6 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end
 
 	local s_GameObjectTransferData = p_Command.gameObjectTransferData
-
 	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
 																p_Command.sender,
 																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
@@ -105,7 +104,7 @@ function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
 	if(p_UpdatePass ~= UpdatePass.UpdatePass_PreSim) then
 		return nil, ActionResultType.Queue
 	end
-	print("UndeleteBlueprint with guid " .. p_Command.gameObjectTransferData.guid)
+	m_Logger:Write("UndeleteBlueprint with guid " .. p_Command.gameObjectTransferData.guid)
 	if not IsVanilla(p_Command.gameObjectTransferData.guid) then
 		return CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end

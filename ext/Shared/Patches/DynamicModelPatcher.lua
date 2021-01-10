@@ -30,7 +30,7 @@ function DynamicModelPatcher:Patch(p_DynamicModel)
 
 	--[[ Don't think this is necessary
 	for k,v in pairs(s_Instance.components) do
-		print(k)
+		m_Logger:Write(k)
 		s_ReplacementData.components:add(v)
 	end
 	s_ReplacementData.runtimeComponentCount = s_Instance.runtimeComponentCount

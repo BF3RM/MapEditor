@@ -54,7 +54,7 @@ end
 
 function DecodeParams(p_Table)
     if(p_Table == nil) then
-        print("No table received")
+        m_Logger:Write("No table received")
         return false
 	end
 	for s_Key, s_Value in pairs(p_Table) do
@@ -178,7 +178,7 @@ end
 
 function dus_MatrixParent(o)
 	if(o == nil) then
-		print("tried to load jack shit")
+		m_Logger:Write("tried to load jack shit")
 	end
 	if type(o) == 'table' then
 		local s = '{ '
@@ -234,7 +234,7 @@ function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	local hashAsString = tostring(intHash)
 	hashAsString = hashAsString:gsub('-', '1')
 
-	--print("created hash" .. hashAsString)
+	--m_Logger:Write("created hash" .. hashAsString)
 
 	return PadAndCreateGuid(hashAsString)
 end
@@ -273,7 +273,7 @@ end
 
 function dump(o)
 	if(o == nil) then
-		print("No table?")
+		m_Logger:Write("No table?")
 	end
 	if type(o) == 'table' then
 		local s = '{ '

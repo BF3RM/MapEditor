@@ -13,12 +13,14 @@ function CtrRef:GetTable()
     return {
         typeName = self.typeName,
         name = self.name,
-        partitionGuid = self.partitionGuid,
-        instanceGuid = self.instanceGuid
+        partitionGuid = tostring(self.partitionGuid),
+        instanceGuid = tostring(self.instanceGuid)
     }
 end
 
 function CtrRef:Get()
+	m_Logger:Write(self.partitionGuid)
+	m_Logger:Write(self.instanceGuid)
 	local s_Instance = ResourceManager:FindInstanceByGuid(Guid(self.partitionGuid), Guid(self.instanceGuid))
 	-- TODO: More resolving for custom objects or whatever? Idk
 	if(s_Instance) then

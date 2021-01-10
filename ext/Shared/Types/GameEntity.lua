@@ -49,8 +49,8 @@ function GameEntity:Enable()
 end
 
 function GameEntity:Destroy()
-    m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
 	if (self.entity) then
+		m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
 		self.entity:Destroy()
 	end
     GameObjectManager.m_Entities[self.instanceId] = nil

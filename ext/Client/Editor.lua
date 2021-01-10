@@ -35,7 +35,7 @@ function Editor:OnEngineMessage(p_Message)
 		NetEvents:SendLocal("ProjectManager:RequestProjectHeaders") -- Todo: move this to other class
 		NetEvents:SendLocal("ProjectManager:RequestProjectHeaderUpdate") -- Todo: move this to other class
 		WebUpdater:AddUpdate('SetPlayerName', s_LocalPlayer.name)
-		print("Set player name to: " .. s_LocalPlayer.name)
+		m_Logger:Write("Set player name to: " .. s_LocalPlayer.name)
 	end
 end
 
