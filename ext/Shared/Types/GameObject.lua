@@ -227,56 +227,63 @@ function GameObject:GetEntities()
 
     return s_Entities
 end
-function GameObject:CloneBlueprint()
-	local s_BP = self.blueprintCtrRef:Get()
-	local s_BPPartition = ResourceManager:FindDatabasePartition(Guid(self.blueprintCtrRef.partitionGuid))
-	print(self.blueprintCtrRef.partitionGuid)
-	print(self.guid)
-	print(tostring(s_BP))
-	local s_ClonedBlueprint = s_BP:Clone(Guid(self.guid))
-	s_BPPartition:AddInstance(s_ClonedBlueprint)
-	m_Logger:Write(self.blueprintCtrRef.partitionGuid)
-	m_Logger:Write(self.guid)
-	InstanceParser:SetPartition(self.blueprintCtrRef.partitionGuid, self.guid)
-	m_Logger:Write("Blueprint cloned:")
-	m_Logger:Write(s_ClonedBlueprint)
-	self.internalBlueprint = CtrRef {
-		typeName = s_ClonedBlueprint.typeInfo.name,
-		instanceGuid = self.guid,
-		partitionGuid = self.blueprintCtrRef.partitionGuid
-	}
-	return s_ClonedBlueprint
-end
+
 function GameObject:SetOverrides(p_Overrides)
 	print("Setting overrides of gameobject.")
 	local s_ShouldRespawn = false
 	local s_Blueprint = nil
 	if (self.internalBlueprint == nil) then
-		s_Blueprint = self:CloneBlueprint()
-		s_ShouldRespawn = true
+		print("Internal blueprint not set. Respawn this gameobject! Blueprint will be cloned and overrides will be set at spawn.")
+		if(self:HasOverrides()) then
+			print("We already have overrides set, but no internal blueprint yet? How is this possible?")
+		end
+		self:SetField('overrides', p_Overrides) -- Setting overrides
+		return true, true, self:GetGameObjectTransferData()
 	else
 		s_Blueprint = self.internalBlueprint:Get()
 	end
+	if(s_Blueprint == nil) then
+		print("Failed to get blueprint?")
+		print(self.internalBlueprint.instanceGuid)
+		print(self.internalBlueprint.partitionGuid)
+		return false, false
+	else
+		print("Applying overrides to: ")
+		print(self.internalBlueprint.instanceGuid)
+		print(self.internalBlueprint.partitionGuid)
+	end
+	local s_PartitionInstanceGuid = InstanceParser:GetPartition(Guid(s_Blueprint.instanceGuid))
+	print(s_PartitionInstanceGuid)
+	local s_Partition = ResourceManager:FindDatabasePartition(Guid(s_PartitionInstanceGuid))
 	m_Logger:Write("Setting overrides: " .. tostring(s_Blueprint.instanceGuid))
 	for k,l_Field in pairs(p_Overrides) do
 		m_Logger:Write(k)
 		m_Logger:Write(l_Field)
-		self:SetOverride(s_Blueprint, l_Field, self.guid)
+		local s_Success, s_Path, s_DemandsRespawn = self:SetOverride(s_Blueprint, l_Field, self.guid, s_Partition)
+		if (s_Success and s_DemandsRespawn) then
+			print("Overrides demands respawn")
+			s_ShouldRespawn = true
+		end
 	end
+	print("Finished setting overrides. Should respawn: " .. tostring(s_ShouldRespawn))
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
 	if(s_ShouldRespawn) then
+		print("Set overrides, but GameObject should respawn since we changed references...")
 		return true, s_ShouldRespawn, self:GetGameObjectTransferData()
 	else
-		return true, s_ShouldRespawn
+		return true, false
 	end
 end
-function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid)
-	local s_Path = EBXManager:SetField(p_Instance, p_Field, '', p_RootGuid)
+function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid, p_Partition)
+	local s_Path, s_RequiresRespawn = EBXManager:SetField(p_Instance, p_Field, '', p_RootGuid, p_Partition, false)
 	if(s_Path) then
 		print(s_Path)
 		self.overrides[s_Path] = p_Field
 	end
-	return s_Path ~= '', s_Path
+	if(s_RequiresRespawn) then
+		print("Requires respawn!!")
+	end
+	return s_Path ~= '', s_Path, s_RequiresRespawn
 end
 
 function GameObject:HasOverrides()

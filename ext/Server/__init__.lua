@@ -71,6 +71,7 @@ end
 
 function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	--ServerTransactionManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 end
 
@@ -80,7 +81,6 @@ function MapEditorServer:OnLevelDestroy()
 	ServerTransactionManager:OnLevelDestroy()
 	ServerGameObjectManager:OnLevelDestroy()
 end
-
 function MapEditorServer:OnPartitionLoaded(p_Partition)
 	InstanceParser:OnPartitionLoaded(p_Partition)
 end

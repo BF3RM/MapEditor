@@ -53,7 +53,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
 		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [],
 		isVanilla: boolean = false, isUserModified: boolean = false,
-		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER) {
+		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER, overrides: IEBXFieldData[]) {
 		super();
 		this.guid = guid;
 		this.name = name;
@@ -70,6 +70,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.isUserModified = isUserModified;
 		this.originalRef = originalRef;
 		this.realm = realm;
+		Object.assign(this.overrides, overrides);
 		// this.completeBoundingBox = new THREE.Box3();
 		// Update the matrix after initialization.
 		this.updateMatrix();
@@ -100,7 +101,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.isVanilla,
 			gameObjectTransferData.isUserModified,
 			gameObjectTransferData.originalRef,
-			gameObjectTransferData.realm
+			gameObjectTransferData.realm,
+			gameObjectTransferData.overrides
 		);
 	}
 

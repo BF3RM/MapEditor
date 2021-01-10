@@ -17,14 +17,14 @@ export class Guid {
 		return new Guid();
 	}
 
-	private static validator = /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/i;
+	private static validator = /^[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}$/i;
 
 	private static gen(count: number) {
 		let out: string = '';
 		for (let i: number = 0; i < count; i++) {
 			out += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 		}
-		return out;
+		return out.toUpperCase();
 	}
 
 	private value: string = Guid.EMPTY;
