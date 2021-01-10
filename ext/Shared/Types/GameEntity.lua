@@ -14,6 +14,11 @@ function GameEntity:__init(arg)
 
 	self.entity:RegisterDestroyCallback(self, self.OnDestroyed)
 end
+
+function GameEntity:__gc()
+	self.entity = nil
+end
+
 function GameEntity:OnDestroyed()
 	self.entity = nil
 end

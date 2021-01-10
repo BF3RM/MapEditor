@@ -20,7 +20,7 @@ export class THREEManager {
 		antialias: true
 	});
 
-	public camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 1000);
+	public camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
