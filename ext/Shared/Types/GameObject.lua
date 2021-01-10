@@ -41,9 +41,9 @@ end
 
 function GameObject:SetField(p_FieldName, p_NewValue, p_AutoModified)
     self[p_FieldName] = p_NewValue
-    local originalValue = self[p_FieldName .. m_TraceableField_Suffix]
-    local newValue = self[p_FieldName]
 	if(not p_AutoModified) then
+	    local originalValue = self[p_FieldName .. m_TraceableField_Suffix]
+        local newValue = self[p_FieldName]
 		self.userModifiedFields[p_FieldName] = newValue ~= originalValue
 	end
 end
@@ -102,18 +102,10 @@ function GameObject:MarkAsDeleted(p_AutoModified)
         m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
         return
     end
-
+	self:Disable(p_AutoModified)
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:MarkAsDeleted(true)
-        end
-    end
-
-    if self.gameEntities ~= nil then
-        for _, l_GameEntity in pairs(self.gameEntities) do
-            if l_GameEntity ~= nil then
-                l_GameEntity:Disable()
-            end
         end
     end
 	self:SetField("isDeleted", true, p_AutoModified)
@@ -124,18 +116,10 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
         m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
         return
     end
-
+	self:Enable(p_AutoModified)
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:MarkAsUndeleted(true)
-        end
-    end
-
-    if self.gameEntities ~= nil then
-        for _, l_GameEntity in pairs(self.gameEntities) do
-            if l_GameEntity ~= nil then
-                l_GameEntity:Enable()
-            end
         end
     end
 	self:SetField("isDeleted", false, p_AutoModified)
@@ -199,7 +183,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoMod
 			local s_LocalTransform = ToLocal(self.transform, s_Parent.transform)
 			self:SetField("localTransform", s_LocalTransform, p_AutoModified)
 		else
-			print("Could not find parent")
+			m_Logger:Write("Could not find parent")
 		end
 	end
     return true
@@ -243,45 +227,56 @@ function GameObject:GetEntities()
 
     return s_Entities
 end
+function GameObject:CloneBlueprint()
+	local s_BP = self.blueprintCtrRef:Get()
+	local s_BPPartition = ResourceManager:FindDatabasePartition(Guid(self.blueprintCtrRef.partitionGuid))
+	print(self.blueprintCtrRef.partitionGuid)
+	print(self.guid)
+	print(tostring(s_BP))
+	local s_ClonedBlueprint = s_BP:Clone(Guid(self.guid))
+	s_BPPartition:AddInstance(s_ClonedBlueprint)
+	m_Logger:Write(self.blueprintCtrRef.partitionGuid)
+	m_Logger:Write(self.guid)
+	InstanceParser:SetPartition(self.blueprintCtrRef.partitionGuid, self.guid)
+	m_Logger:Write("Blueprint cloned:")
+	m_Logger:Write(s_ClonedBlueprint)
+	self.internalBlueprint = CtrRef {
+		typeName = s_ClonedBlueprint.typeInfo.name,
+		instanceGuid = self.guid,
+		partitionGuid = self.blueprintCtrRef.partitionGuid
+	}
+	return s_ClonedBlueprint
+end
 function GameObject:SetOverrides(p_Overrides)
+	print("Setting overrides of gameobject.")
 	local s_ShouldRespawn = false
 	local s_Blueprint = nil
-	if( not self.internalBlueprint) then
-		local s_BP = self.blueprintCtrRef:Get()
-		print(self.blueprintCtrRef.partitionGuid)
-		print(s_BP)
-		local s_BPPartition = ResourceManager:FindDatabasePartition(Guid(self.blueprintCtrRef.partitionGuid))
-		print(s_BPPartition)
-		local s_ClonedBlueprint = s_BP:Clone(Guid(self.guid))
-		s_BPPartition:AddInstance(s_ClonedBlueprint)
-		print("Blueprint cloned:")
-		print(s_ClonedBlueprint)
-		self.internalBlueprint = CtrRef {
-			typeName = s_ClonedBlueprint.typeInfo.name,
-			instanceGuid = s_ClonedBlueprint.instanceGuid,
-			partitionGuid = s_BPPartition.guid
-		}
-		s_Blueprint = s_ClonedBlueprint
+	if (self.internalBlueprint == nil) then
+		s_Blueprint = self:CloneBlueprint()
 		s_ShouldRespawn = true
-	end
-	if (not s_Blueprint) then
+	else
 		s_Blueprint = self.internalBlueprint:Get()
 	end
-	print("Setting overrides")
+	m_Logger:Write("Setting overrides: " .. tostring(s_Blueprint.instanceGuid))
 	for k,l_Field in pairs(p_Overrides) do
-		print(k)
-		print(l_Field)
+		m_Logger:Write(k)
+		m_Logger:Write(l_Field)
 		self:SetOverride(s_Blueprint, l_Field, self.guid)
 	end
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
-	return true, s_ShouldRespawn
+	if(s_ShouldRespawn) then
+		return true, s_ShouldRespawn, self:GetGameObjectTransferData()
+	else
+		return true, s_ShouldRespawn
+	end
 end
 function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid)
 	local s_Path = EBXManager:SetField(p_Instance, p_Field, '', p_RootGuid)
 	if(s_Path) then
+		print(s_Path)
 		self.overrides[s_Path] = p_Field
 	end
-	return  s_Path ~= '', s_Path
+	return s_Path ~= '', s_Path
 end
 
 function GameObject:HasOverrides()

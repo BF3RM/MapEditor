@@ -51,7 +51,12 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		m_Logger:Error('InvokeBlueprintSpawn: One or more parameters are nil.')
 		return false
 	end
-
+	if(p_Overrides and GetLength(p_Overrides) > 0) then
+		print(p_Overrides)
+		p_BlueprintInstanceGuid = p_GameObjectGuid -- We have overrides for this gameobject and have created a custom blueprint that we want to spawn. It's added to the original partition.
+	end
+	print(p_BlueprintPartitionGuid)
+	print(p_BlueprintInstanceGuid)
 	p_Variation = p_Variation or 0
 
 	local s_Blueprint = ResourceManager:FindInstanceByGuid(Guid(tostring(p_BlueprintPartitionGuid)), Guid(tostring(p_BlueprintInstanceGuid)))
@@ -82,13 +87,29 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
 
 	local s_EntityBus = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
-
+	local s_GameObject = GameObjectManager:GetGameObject(p_GameObjectGuid)
 	if s_EntityBus == nil then
 		m_Logger:Error("Spawning failed")
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = nil
 		return false
 	end
+	if(s_GameObject) then
 
+		print("Found custom spawned GameObject")
+
+		for k,v in pairs(s_EntityBus.entities) do
+			print(v.typeInfo.name)
+		end
+		if(p_Overrides) then
+			print("Referencing internal blueprint:")
+			print(p_BlueprintPartitionGuid)
+			print(p_BlueprintInstanceGuid)
+			s_GameObject.internalBlueprint = CtrRef{
+				partitionGuid = p_BlueprintPartitionGuid,
+				instanceGuid = p_GameObjectGuid
+			} -- We have overrides for this gameobject and have created a custom blueprint that we want to spawn. It's added to the original partition.
+		end
+	end
 	return true
 end
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
@@ -105,12 +126,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 	local s_ParentInstanceGuid
 	local s_ParentPartitionGuid
-	local s_ParentPrimaryInstance
 
 	if (p_Parent ~= nil) then
 		s_ParentInstanceGuid = tostring(p_Parent.instanceGuid)
 		s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
-		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
 	end
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
 	if (s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
@@ -207,7 +226,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 	-- Custom object have to be manually initialized.
 	if not s_GameObject.isVanilla then
-		--print("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
+		--m_Logger:Write("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
 		for _,l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
 			l_Entity:Init(self.m_Realm, true)
@@ -226,7 +245,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			}
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
-		--print(l_Entity.typeInfo.name)
+		--m_Logger:Write(l_Entity.typeInfo.name)
 		if(s_GameEntity.indexInBlueprint == nil) then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
 			if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
@@ -280,17 +299,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if s_PendingBlueprint ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
 		if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
-			--print("Spawning: " .. s_GameObject.guid)
+			--m_Logger:Write("Spawning: " .. s_GameObject.guid)
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
 	if(s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000') then -- Set collision to 0,0,0 so we don't hit the same object over and over
 		s_GameObject:SetTransform(LinearTransform(), true)
 		s_GameObject:SetTransform(p_Transform, false)
-	end
-	if(s_GameObject:HasOverrides()) then
-		print("Patching GameObject: " .. tostring(s_GameObject.guid))
-		s_GameObject:SetOverrides(s_GameObject.overrides)
 	end
 end
 
@@ -398,6 +413,7 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 	end
 
 	if (s_GameObject.isVanilla) then
+		print("Marking as deleted")
 		s_GameObject:MarkAsDeleted()
 	else
 		s_GameObject:Destroy()
@@ -497,33 +513,54 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	return true
 end
 function GameObjectManager:SetOverrides(p_Guid, p_Overrides)
+	print("Setting overrides:")
+	print(p_Guid)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if s_GameObject == nil then
 		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
 		return false
 	end
-	local s_Success, s_NeedsRespawn = s_GameObject:SetOverrides(p_Overrides)
+	local s_Success, s_NeedsRespawn, s_TransferData = s_GameObject:SetOverrides(p_Overrides)
 	if(s_Success) then
 		if(s_NeedsRespawn) then
-			print("Respawning blueprint since internal blueprint has changed")
-			local s_TransferData = s_GameObject:GetGameObjectTransferData()
-			self:DeleteGameObject(p_Guid)
-			--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
-			-- TODO: Handle internalBlurpint instead
-			self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, false, s_TransferData.overrides)
+			if(not s_TransferData) then
+				print("No transferdata!")
+			end
+			m_Logger:Write("Respawning blueprint since internal blueprint has changed")
+			--print("Deleting")
+			--self:DeleteGameObject(p_Guid)
+			----function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
+			---- TODO: Handle internalBluepint instead
+			--print("Respawning")
+
+			-- This shit doesn't work. It's called straight away
+			Timer:Tick(function()
+				print("Spawning blueprint!")
+				self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, false, s_TransferData.overrides)
+				local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+
+				if s_GameObject == nil then
+					m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
+					return false
+				end
+			end)
 		else
-			s_GameObject:Disable(true)
-			s_GameObject:Enable(true)
+			m_Logger:Write("Refreshing")
+			self:RefreshGameObject(p_Guid)
 		end
 		return true
 	end
+	m_Logger:Write("Failed to set overrides.")
 	return false
 end
 function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_Entity = p_Hook:Call()
 	if (not s_Entity) then
+		print("No entity?")
 		return
+	else
+		print(s_Entity.typeInfo.name)
 	end
 	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
 	if (s_GameEntity == nil) then
@@ -533,7 +570,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 			typeName = s_Entity.typeInfo.name,
 		}
 	end
-	--print("Entity instance id: " .. s_Entity.instanceId)
+	--m_Logger:Write("Entity instance id: " .. s_Entity.instanceId)
 	local s_PartitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid);
 	s_GameEntity.initiatorRef = CtrRef {
 		typeName = p_EntityData.typeInfo.name,
@@ -543,8 +580,8 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	self.m_Entities[s_Entity.instanceId] = s_GameEntity
 	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 	if(s_PendingGameObject) then
-		--print("Added pending:")
-		--print(s_PendingGameObject.name)
+		--m_Logger:Write("Added pending:")
+		--m_Logger:Write(s_PendingGameObject.name)
 		if(s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
 			s_Entity = SpatialEntity(s_Entity)
 			s_GameEntity.isSpatial = true
@@ -565,5 +602,13 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
 	end
 end
-
+function GameObjectManager:RefreshGameObject(p_Guid)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+	if(s_GameObject) then
+		s_GameObject:Disable(true)
+		s_GameObject:Enable(true)
+	else
+		print("Could not find GameObject")
+	end
+end
 return GameObjectManager

@@ -259,6 +259,7 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 end
 
 function CommandActions:SetEBXField(p_Command)
+	print("Setting field")
 	if (p_Command.gameObjectTransferData == nil) then
 		m_Logger:Error("The SetEBXFieldCommand needs to have a valid gameObjectTransferData set.")
 		return
@@ -266,9 +267,13 @@ function CommandActions:SetEBXField(p_Command)
 	local s_Result, s_Path = nil
 
 	if(p_Command.gameObjectTransferData.guid) then -- Override only this instance
+		print("Setting datas to gamobject")
 		GameObjectManager:SetOverrides(p_Command.gameObjectTransferData.guid, p_Command.gameObjectTransferData.overrides)
 	else
-		--s_Result = EBXManager:SetFields(nil, p_Command.gameObjectTransferData.overrides)
+		--TODO: Store EBX changes
+		print("No guid supplied?")
+		print(dump(p_Command))
+		s_Result = EBXManager:SetFields(p_Command.gameObjectTransferData.overrides)
 	end
 
 	if (s_Result == false) then

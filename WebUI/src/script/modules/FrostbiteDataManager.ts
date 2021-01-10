@@ -83,7 +83,6 @@ export class FrostbiteDataManager {
 			// @ts-ignore
 			this.data.file(fileNameJson).async('string').then((text) => {
 				this.files.setValue(fileName.toLowerCase(), JSON.parse(text));
-				window.vext.SetLoadingInfo('Loading ' + fileName);
 				this._HandleFile(fileName.toLowerCase());
 			});
 		});

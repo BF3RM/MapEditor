@@ -6,17 +6,16 @@
 					ref="scroller"
 					:min-item-size="16"
 	>
-		<div slot-scope="{ item,index }">
-			<slot
-				class="text-slot"
-				v-bind="{
-					node: item,
-					tree: tree,
-					index: index,
-					data: data
-				}"
-			/>
-		</div>
+		<slot
+			class="text-slot"
+			slot-scope="{ item,index }"
+			v-bind="{
+				node: item,
+				tree: tree,
+				index: index,
+				data: data
+			}"
+		/>
 	</RecycleScroller>
 </template>
 
