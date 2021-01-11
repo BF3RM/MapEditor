@@ -51,7 +51,7 @@
     "eslint-plugin-vue": "7.3.0",
     "node-sass": "5.0.0",
     "sass": "1.30.0",
-    "sass-loader": "10.1.0",
+    "sass-loader": "10.1.1",
     "typescript": "4.1.3",
     "vextpack": "0.1.5",
     "vue-template-compiler": "2.6.12",
