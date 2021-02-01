@@ -116,10 +116,18 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	end
 	if(s_GameObject) then
 		print("Found custom spawned GameObject")
-
-		for k,v in pairs(s_EntityBus.entities) do
-			print(v.typeInfo.name)
+		print("Doing check")
+		if s_EntityBus ~= nil then
+			print("Did check was not nil")
+			print(s_EntityBus.entities)
+			for k,v in pairs(s_EntityBus.entities) do
+				print(k)
+				print(v.typeInfo.name)
+			end
+		else
+			print("Entitybus nil??")
 		end
+		print("Yodeleihuuu")
 		if(p_Overrides and s_OverrideBlueprint) then
 			print("Referencing internal blueprint:")
 			print(p_BlueprintPartitionGuid)
@@ -262,7 +270,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	local s_EntityBus = p_Hook:Call()
 	---vvvv This is children to parent / bottom to top vvvv
 	m_Logger:Write('Spawn called')
+	if(s_EntityBus == nil) then
+		print("Entitybus is nil:")
+	else
+		print("Entitybus length: " .. GetLength(s_EntityBus.entities))
 
+	end
 	-- Custom object have to be manually initialized.
 	if not s_GameObject.isVanilla then
 		--m_Logger:Write("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
@@ -273,7 +286,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	end
 
-
+	if(s_EntityBus == nil) then
+		print("Entitybus is nil:")
+	else
+		print("Entitybus length: " .. GetLength(s_EntityBus.entities))
+	end
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
 		if (s_GameEntity == nil) then
@@ -347,6 +364,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		s_GameObject:SetTransform(p_Transform, false)
 	end
 	print("Spawned: " .. s_Blueprint.name .. " | Guid: " .. tostring(s_GameObject.guid))
+	p_Hook:Return(s_EntityBus)
 end
 
 function GameObjectManager:ResolveRootObject(p_GameObject)
