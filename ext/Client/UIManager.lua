@@ -59,6 +59,17 @@ function UIManager:OnUpdateInput(p_Delta)
 		end
 	end
 
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
+		if self.m_ActiveMode == EditorMode.Editor then
+			local s_NewSoldierTransform = ClientUtils:GetCameraTransform()
+			s_NewSoldierTransform.trans.y = s_NewSoldierTransform.trans.y - 1.8
+			s_NewSoldierTransform.forward = Vec3(s_NewSoldierTransform.forward.x * -1, s_NewSoldierTransform.forward.y * -1, s_NewSoldierTransform.forward.z * -1)
+
+			NetEvents:SendLocal("TeleportSoldierToPosition", s_NewSoldierTransform)
+			self:DisableFreeCam()
+		end
+	end
+
 	-- We let go of right mouse button. Activate the UI again.
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
 		self:DisableFreeCamMovement()
