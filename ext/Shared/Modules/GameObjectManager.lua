@@ -105,21 +105,25 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.transform = p_LinearTransform
 	s_Params.variationNameHash = p_Variation
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
+
 	print("Spawing")
 	local s_EntityBus = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 	print("Spawned")
+
 	local s_GameObject = GameObjectManager:GetGameObject(p_GameObjectGuid)
+
 	if s_EntityBus == nil then
-		m_Logger:Error("Spawning failed")
-		self.m_PendingCustomBlueprintGuids[tostring(p_BlueprintInstanceGuid)] = nil
-		return false
+		m_Logger:Write("A blueprint was spawned that did not contain an entitybus / any entities")
+		-- self.m_PendingCustomBlueprintGuids[tostring(p_BlueprintInstanceGuid)] = nil
 	end
-	if(s_GameObject) then
+
+	if s_GameObject then
 		print("Found custom spawned GameObject")
 
-		for k,v in pairs(s_EntityBus.entities) do
+		for _,v in pairs(s_EntityBus.entities) do
 			print(v.typeInfo.name)
 		end
+
 		if(p_Overrides and s_OverrideBlueprint) then
 			print("Referencing internal blueprint:")
 			print(p_BlueprintPartitionGuid)
@@ -129,27 +133,34 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 				instanceGuid = p_GameObjectGuid
 			} -- We have overrides for this gameobject and have created a custom blueprint that we want to spawn. It's added to the original partition.
 		end
+
 		if (p_Overrides and GetLength(p_Overrides) > 0) then
 			print("Setting overrides on newly spawned gameObject")
+
 			if (s_OverrideBlueprint) then
 				print("GameObject spawned as a clone of an other blueprint, setting internalblueprint.")
 				s_GameObject.internalBlueprint = s_OverrideBlueprintCtrRef
 			end
+
 			self:SetOverrides(p_GameObjectGuid, p_Overrides)
 		end
 	else
 		print("Could not find GameObject")
 	end
+
 	return true
 end
+
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 	-- We dont load vanilla objects if the flag is active
 	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 		return
 	end
+
 	if p_Parent ~= nil and p_Parent.instanceGuid == Guid('FE9BF899-0000-0000-FF64-00FF64076739') then
 		m_Logger:Write("Loading havok WorldPartData")
 	end
+
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
 	local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
 	--local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
@@ -157,22 +168,26 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	local s_ParentInstanceGuid
 	local s_ParentPartitionGuid
 
-	if (p_Parent ~= nil) then
+	if p_Parent ~= nil then
 		s_ParentInstanceGuid = tostring(p_Parent.instanceGuid)
 		s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
 	end
+
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
 	if (s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData") then
 		return
 	end
+
 	local originalRef = CtrRef({})
-	if(p_Parent ~= nil) then
+
+	if p_Parent ~= nil then
 		originalRef = CtrRef {
 			typeName = p_Parent.typeInfo.name,
 			instanceGuid = s_ParentInstanceGuid,
 			partitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
 		}
 	end
+
 	local s_GameObject = GameObject{
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
@@ -187,11 +202,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		realm = Realm.Realm_ClientAndServer,
 		originalRef = originalRef,
 	}
-	if(self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil) then
+
+	if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil then
 		s_GameObject.creatorName = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].creatorName
 		s_GameObject.overrides = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].overrides
 	end
-
 
 	s_GameObject.blueprintCtrRef = CtrRef {
 		typeName = p_Blueprint.typeInfo.name,
@@ -199,6 +214,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		partitionGuid = s_BlueprintPartitionGuid,
 		instanceGuid = s_BlueprintInstanceGuid
 	}
+
 	self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
 
 	--- Resolve the parent
@@ -236,14 +252,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 	--- Save ReferenceObjectDatas that the blueprint might have, to resolve parents of descendants.
 	--For prefabs:
-	if (s_Blueprint.objects ~= nil) then
+	if s_Blueprint.objects ~= nil then
 		m_Logger:Write('Is Prefab')
 		for _, l_Member in pairs(s_Blueprint.objects) do
 			if l_Member:Is('ReferenceObjectData') then
 				self.m_ReferenceObjectDatas[tostring(l_Member.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = l_Member.typeInfo.name }
 			end
 		end
-	elseif (s_Blueprint.object ~= nil) then
+	elseif s_Blueprint.object ~= nil then
 		m_Logger:Write('Is ObjectBlueprint')
 		if s_Blueprint.object:Is('ReferenceObjectData') then
 			self.m_ReferenceObjectDatas[tostring(s_Blueprint.object.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = s_Blueprint.object.typeInfo.name }
@@ -253,9 +269,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		print(tostring(s_Blueprint))
 		print(tostring(s_Blueprint.typeInfo.name))
 	end
-	if(s_BlueprintPartitionGuid) then
+
+	if s_BlueprintPartitionGuid then
 		self.m_PendingBlueprint[s_BlueprintPartitionGuid] = s_GameObject
+	else
+		m_Logger:Warning("s_BlueprintPartitionGuid was nil")
 	end
+
 	m_Logger:Write('Calling spawn')
 
 	---^^^^ This is parent to children / top to bottom ^^^^
@@ -273,7 +293,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	end
 
-
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
 		if (s_GameEntity == nil) then
@@ -287,6 +306,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		--m_Logger:Write(l_Entity.typeInfo.name)
 		if(s_GameEntity.indexInBlueprint == nil) then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
+			
 			if(l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
 				local s_Entity = SpatialEntity(l_Entity)
 				s_GameEntity.isSpatial = true
@@ -297,6 +317,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
 				}
 			end
+
 			if (s_GameEntity.initiatorRef == nil and s_GameEntity.data) then
 				s_GameEntity.initiatorRef = CtrRef {
 					typeName = s_GameEntity.data.typeInfo.name,
@@ -304,9 +325,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
 				}
 			end
+
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
 	end
+
 	local s_PendingBlueprint = self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)]
 	--- If its a root object all children are now resolved so we update WebUI.
 	if s_GameObject.parentData.guid == nil then
@@ -327,7 +350,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 			self.m_ReferenceObjectDatas = {}
 		end
-		if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
+
+		if s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000' then
 			if s_PendingBlueprint == nil then
 				Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 			end
@@ -337,15 +361,18 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	--- If its a root custom object we remove it from pending and call ready event.
 	if s_PendingBlueprint ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
-		if(s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000') then
+
+		if s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000' then
 			--m_Logger:Write("Spawning: " .. s_GameObject.guid)
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
-	if(s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000') then -- Set collision to 0,0,0 so we don't hit the same object over and over
+
+	if s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000' then -- Set collision to 0,0,0 so we don't hit the same object over and over
 		s_GameObject:SetTransform(LinearTransform(), true)
 		s_GameObject:SetTransform(p_Transform, false)
 	end
+
 	print("Spawned: " .. s_Blueprint.name .. " | Guid: " .. tostring(s_GameObject.guid))
 end
 
