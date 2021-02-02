@@ -164,7 +164,7 @@ export default class InspectorComponent extends EditorComponent {
 		if (window.editor.selectionGroup.selectedGameObjects.length !== 1) {
 			return;
 		}
-		const command = new SetVariationCommand(window.editor.selectionGroup.selectedGameObjects[0].getTransferData(), newVariation);
+		const command = new SetVariationCommand(window.editor.selectionGroup.selectedGameObjects[0].getGameObjectTransferData(), newVariation);
 		window.editor.execute(command);
 	}
 
@@ -309,7 +309,7 @@ export default class InspectorComponent extends EditorComponent {
 			return;
 		}
 		if ((e.target as any).value) {
-			window.editor.execute(new SetObjectNameCommand(group.selectedGameObjects[0].getTransferData(), (e.target as any).value));
+			window.editor.execute(new SetObjectNameCommand(group.selectedGameObjects[0].getGameObjectTransferData(), (e.target as any).value));
 		}
 	}
 }

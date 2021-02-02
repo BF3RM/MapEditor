@@ -1,16 +1,16 @@
 import Command from '../libs/three/Command';
-import { TransferData } from '@/script/types/TransferData';
+import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { VextCommand } from '@/script/types/VextCommand';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 export class SetTransformCommand extends Command {
-	constructor(private gameObjectTransferData: TransferData, private newTransform: LinearTransform) {
+	constructor(private gameObjectTransferData: GameObjectTransferData, private newTransform: LinearTransform) {
 		super('SetTransformCommand');
 		this.name = 'Set transform';
 	}
 
 	public execute() {
-		const gameObjectTransferData = new TransferData({
+		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid,
 			transform: this.newTransform
 		});
@@ -18,7 +18,7 @@ export class SetTransformCommand extends Command {
 	}
 
 	public undo() {
-		const gameObjectTransferData = new TransferData({
+		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid,
 			transform: this.gameObjectTransferData.transform
 		});

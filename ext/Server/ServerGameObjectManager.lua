@@ -55,7 +55,7 @@ function ServerGameObjectManager:OnServerOnlyGameObjectsGuidsReceived(p_Player, 
 end
 
 function ServerGameObjectManager:GetServerOnlyGameObjectsTransferDatas(p_Guids)
-	local s_ServerOnlyTransferDatas = {}
+	local s_ServerOnlyGameObjectTransferDatas = {}
 
 	for _, l_GuidString in pairs(p_Guids) do
 		self.m_ServerOnlyGameObjectGuids[tostring(l_GuidString)] = l_GuidString
@@ -65,11 +65,11 @@ function ServerGameObjectManager:GetServerOnlyGameObjectsTransferDatas(p_Guids)
 			m_Logger:Error('Received guid of a server-only object that doesn\' exist')
 		else
 			GameObjectManager:UpdateGameObjectRealm(l_GuidString, Realm.Realm_Server)
-			table.insert(s_ServerOnlyTransferDatas, s_GameObject:GetTransferData())
+			table.insert(s_ServerOnlyGameObjectTransferDatas, s_GameObject:GetGameObjectTransferData())
 		end
 	end
 
-	return s_ServerOnlyTransferDatas
+	return s_ServerOnlyGameObjectTransferDatas
 end
 
 function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p_TransferDatas)
@@ -91,7 +91,7 @@ function ServerGameObjectManager:OnClientOnlyGameObjectsTransferData(p_Player, p
 end
 
 function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
-    local s_GameObject = TransferData(p_TransferData):GetGameObject()
+    local s_GameObject = GameObjectTransferData(p_TransferData):GetGameObject()
     local s_GuidString = tostring(s_GameObject.guid)
 
     if (GameObjectManager:GetGameObject(s_GuidString) ~= nil) then

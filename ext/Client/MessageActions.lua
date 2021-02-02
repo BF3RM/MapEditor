@@ -100,20 +100,20 @@ function MessageActions:SetScreenToWorldPosition(p_Message)
 end
 
 function MessageActions:PreviewSpawn(p_Message, p_Arguments)
-    local s_TransferData = p_Message.gameObjectTransferData
+    local s_GameObjectTransferData = p_Message.gameObjectTransferData
 
-    if (s_TransferData == nil) then
+    if (s_GameObjectTransferData == nil) then
         m_Logger:Error("gameObjectTransferData must be set on PreviewSpawn")
     end
 
-    local s_Result = GameObjectManager:InvokeBlueprintSpawn(s_TransferData.guid,
+    local s_Result = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
                                                                "previewSpawn",
-                                                               s_TransferData.blueprintCtrRef.partitionGuid,
-                                                               s_TransferData.blueprintCtrRef.instanceGuid,
+                                                               s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
+                                                               s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
                                                                nil,
-                                                               s_TransferData.transform,
-                                                               s_TransferData.variation,
-                                                                true, s_TransferData.overrides
+                                                               s_GameObjectTransferData.transform,
+                                                               s_GameObjectTransferData.variation,
+                                                                true, s_GameObjectTransferData.overrides
 
     )
 

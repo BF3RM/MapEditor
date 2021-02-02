@@ -1,4 +1,4 @@
-import { TransferData } from '@/script/types/TransferData';
+import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { VextCommand } from '@/script/types/VextCommand';
 import Command from '@/script/libs/three/Command';
 import { CtrRef } from '@/script/types/CtrRef';
@@ -22,7 +22,7 @@ export default class SetEBXFieldCommand extends Command {
 	}
 
 	public execute() {
-		const gameObjectTransferData = new TransferData({
+		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.EBXFieldUpdateData.guid,
 			overrides: [{
 				field: this.EBXFieldUpdateData.field,
@@ -35,7 +35,7 @@ export default class SetEBXFieldCommand extends Command {
 	}
 
 	public undo() {
-		const gameObjectTransferData = new TransferData({
+		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.EBXFieldUpdateData.guid,
 			overrides: [{
 				field: this.EBXFieldUpdateData.field,

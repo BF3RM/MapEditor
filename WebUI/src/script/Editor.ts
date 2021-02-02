@@ -19,7 +19,7 @@ import { THREEManager } from './modules/THREEManager';
 import { EditorCore } from './EditorCore';
 import { SpatialGameEntity } from './types/SpatialGameEntity';
 import { CommandActionResult } from './types/CommandActionResult';
-import { TransferData } from './types/TransferData';
+import { GameObjectTransferData } from './types/GameObjectTransferData';
 import { GameObject } from './types/GameObject';
 import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
@@ -209,7 +209,7 @@ export default class Editor {
 
 		// Spawn blueprint
 		// window.Log(LOGLEVEL.VERBOSE, 'Spawning blueprint: ' + blueprint.instanceGuid);
-		const gameObjectTransferData = new TransferData({
+		const gameObjectTransferData = new GameObjectTransferData({
 			guid: Guid.create(),
 			name: blueprint.name,
 			parentData,
@@ -238,7 +238,7 @@ export default class Editor {
 		const commands: Command[] = [];
 		this.selectionGroup.selectedGameObjects.forEach((selectedGameObject) => {
 			if (selectedGameObject) {
-				commands.push(new DeleteBlueprintCommand(selectedGameObject.getTransferData()));
+				commands.push(new DeleteBlueprintCommand(selectedGameObject.getGameObjectTransferData()));
 			}
 		});
 
@@ -248,14 +248,14 @@ export default class Editor {
 	}
 
 	public Enable(guid: Guid) {
-		const command = new EnableBlueprintCommand(new TransferData({
+		const command = new EnableBlueprintCommand(new GameObjectTransferData({
 			guid: guid
 		}));
 		this.execute(command);
 	}
 
 	public Disable(guid: Guid) {
-		const command = new DisableBlueprintCommand(new TransferData({
+		const command = new DisableBlueprintCommand(new GameObjectTransferData({
 			guid: guid
 		}));
 		this.execute(command);
@@ -298,16 +298,16 @@ export default class Editor {
 	}
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.gameObjectTransferData as TransferData;
-		const gameObject = this.editorCore.getGameObjectFromTransferData(gameObjectTransferData, 'onSetObjectName');
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
 		if (gameObject !== undefined) {
 			(gameObject).setName(gameObjectTransferData.name);
 		}
 	}
 
 	public onSetTransform(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.gameObjectTransferData as TransferData;
-		const gameObject = this.editorCore.getGameObjectFromTransferData(gameObjectTransferData, 'onSetTransform');
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
 		if (gameObject !== undefined) {
 			(gameObject).setTransform(gameObjectTransferData.transform);
 			if (gameObject.parent) {
@@ -322,15 +322,15 @@ export default class Editor {
 	}
 
 	public onSetVariation(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.gameObjectTransferData as TransferData;
-		const gameObject = this.editorCore.getGameObjectFromTransferData(gameObjectTransferData, 'onSetVariation');
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
 		if (gameObject !== undefined) {
 			(gameObject).setVariation(gameObjectTransferData.variation);
 		}
 	}
 
 	public onDeletedBlueprint(commandActionResult: CommandActionResult) {
-		const gameObjectTransferData = commandActionResult.gameObjectTransferData as TransferData;
+		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const gameObject = this.gameObjects.getValue(gameObjectGuid);
 		if (gameObject === undefined) {

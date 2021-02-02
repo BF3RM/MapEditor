@@ -1,8 +1,8 @@
-class 'TransferData'
+class 'GameObjectTransferData'
 
-local m_Logger = Logger("TransferData", true)
+local m_Logger = Logger("GameObjectTransferData", true)
 
-function TransferData:__init(arg)
+function GameObjectTransferData:__init(arg)
     self.guid = arg.guid
     self.name = arg.name
     self.blueprintCtrRef = arg.blueprintCtrRef
@@ -19,7 +19,7 @@ function TransferData:__init(arg)
 	self.overrides = arg.overrides
 end
 
-function TransferData:GetGameObject()
+function GameObjectTransferData:GetGameObject()
     local s_GameObject = GameObject{
         guid = self.guid,
         name = self.name,
@@ -39,4 +39,4 @@ function TransferData:GetGameObject()
     return s_GameObject
 end
 
-return TransferData
+return GameObjectTransferData

@@ -1,11 +1,11 @@
-import { TransferData } from '@/script/types/TransferData';
+import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 
 export class CommandActionResult {
 	public type: string;
 	public sender: string;
-	public gameObjectTransferData: TransferData;
+	public gameObjectTransferData: GameObjectTransferData;
 
-	constructor(type: string, name: string, gameObjectTransferData: TransferData) {
+	constructor(type: string, name: string, gameObjectTransferData: GameObjectTransferData) {
 		this.type = type;
 		this.sender = name;
 		this.gameObjectTransferData = gameObjectTransferData;
@@ -14,7 +14,7 @@ export class CommandActionResult {
 	public static FromObject(table: any) {
 		const type = table.type;
 		const sender = table.sender;
-		const gameObjectTransferData = TransferData.FromTable(table.gameObjectTransferData);
+		const gameObjectTransferData = GameObjectTransferData.FromTable(table.gameObjectTransferData);
 
 		return new CommandActionResult(type, sender, gameObjectTransferData);
 	}

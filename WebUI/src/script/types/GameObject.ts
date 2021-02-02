@@ -1,4 +1,4 @@
-import { TransferData } from '@/script/types/TransferData';
+import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
 import { Guid } from '@/script/types/Guid';
 import { CtrRef } from '@/script/types/CtrRef';
@@ -89,7 +89,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		});
 	}
 
-	public static CreateWithTransferData(gameObjectTransferData: TransferData) {
+	public static CreateWithTransferData(gameObjectTransferData: GameObjectTransferData) {
 		return new this(
 			gameObjectTransferData.guid,
 			gameObjectTransferData.name,
@@ -133,8 +133,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		return !this.transform.toMatrix().equals(this.matrixWorld);
 	}
 
-	public getTransferData() {
-		return new TransferData({
+	public getGameObjectTransferData() {
+		return new GameObjectTransferData({
 			guid: this.guid,
 			name: this.name,
 			blueprintCtrRef: this.blueprintCtrRef,
@@ -163,7 +163,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const changes: any = {};
 		// Add more realtime-updates here.
 		if (scope.hasMoved()) {
-			const gameObjectTransferData = new TransferData({
+			const gameObjectTransferData = new GameObjectTransferData({
 				guid: scope.guid,
 				transform: new LinearTransform().setFromMatrix(scope.matrixWorld)
 			});
