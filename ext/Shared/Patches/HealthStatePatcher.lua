@@ -1,5 +1,5 @@
 class 'HealthStatePatcher'
-local m_Logger = Logger("HealthStatePatcher", true)
+local m_Logger = Logger("HealthStatePatcher", false)
 
 function HealthStatePatcher:__init()
 	m_Logger:Write("Initializing Patches")

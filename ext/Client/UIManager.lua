@@ -35,19 +35,19 @@ function UIManager:OnLevelDestroy()
 end
 ----------- Game functions----------------
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
-	self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
+	-- self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 end
 
 function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
-	local s_Screen = UIGraphAsset(p_Screen)
+	-- local s_Screen = UIGraphAsset(p_Screen)
 
-	if s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
-		s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
-		s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
-		s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
+	-- if s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
+	-- 	s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
+	-- 	s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
+	-- 	s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
 
-		p_Hook:Return(nil)
-	end
+	-- 	p_Hook:Return(nil)
+	-- end
 end
 
 function UIManager:OnUpdateInput(p_Delta)

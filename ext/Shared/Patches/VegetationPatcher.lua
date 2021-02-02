@@ -1,5 +1,6 @@
 class 'VegetationPatcher'
-local m_Logger = Logger("VegetationPatcher", true)
+
+local m_Logger = Logger("VegetationPatcher", false)
 
 function VegetationPatcher:__init()
 	m_Logger:Write("Initializing Vegetation Patches")
@@ -23,8 +24,10 @@ function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 	else
 		s_ReplacementData = StaticModelEntityData(p_VegetationTree.instanceGuid)
 	end
+
 	local s_BoneCount = 0
-	for k,v in pairs(s_Instance.basePoseTransforms) do
+
+	for _,_ in pairs(s_Instance.basePoseTransforms) do
 		--s_ReplacementData.basePoseTransforms:add(v)
 		s_BoneCount = s_BoneCount + 1
 	end
@@ -42,6 +45,7 @@ function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 	else
 		s_ReplacementData.mesh = MeshAsset(s_Instance.mesh)
 	end
+
 	return s_ReplacementData
 end
 

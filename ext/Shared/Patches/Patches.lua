@@ -1,27 +1,34 @@
 class 'Patches'
-require "__shared/Patches/CommonRosePatcher"
-require "__shared/Patches/LevelPatcher"
-require "__shared/Patches/SequencePatcher"
-require "__shared/Patches/HealthStatePatcher"
-VegetationPatcher = require "__shared/Patches/VegetationPatcher"
-DynamicModelPatcher = require "__shared/Patches/DynamicModelPatcher"
 
-local m_Logger = Logger("Patches", true)
+require "__shared/Patches/CommonRosePatcher"
+
+local m_LevelPatcher = require "__shared/Patches/LevelPatcher"
+local m_SequencePatcher = require "__shared/Patches/SequencePatcher"
+local m_HealthStatePatcher = require "__shared/Patches/HealthStatePatcher"
+local m_PreRoundPatcher = require "__shared/Patches/PreRoundPatcher"
+local m_VegetationPatcher = require "__shared/Patches/VegetationPatcher"
+local m_DynamicModelPatcher = require "__shared/Patches/DynamicModelPatcher"
+
+local m_Logger = Logger("Patches", false)
 
 function Patches:__init()
 	m_Logger:Write("Initializing Patches")
-	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 
 function Patches:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	if(p_Data.typeInfo == VegetationTreeEntityData.typeInfo) then
-		p_Hook:Pass(VegetationPatcher:PatchVegetationTree(p_Data), p_Transform)
+	if p_Data.typeInfo == VegetationTreeEntityData.typeInfo then
+		p_Hook:Pass(m_VegetationPatcher:PatchVegetationTree(p_Data), p_Transform)
 	end
 end
 
+function Patches:OnLevelLoaded(p_MapName, p_GameModeName)
+	m_PreRoundPatcher:PatchPreRound()
+end
+
 function Patches:OnLevelDestroy()
-	VegetationPatcher:OnLevelDestroy()
+	m_VegetationPatcher:OnLevelDestroy()
+	m_DynamicModelPatcher:OnLevelDestroy()
 end
 
 function Patches:OnPartitionLoaded(p_Partition)
@@ -30,25 +37,22 @@ function Patches:OnPartitionLoaded(p_Partition)
 	end
 
 	local s_Instances = p_Partition.instances
-	for _, l_Instance in ipairs(s_Instances) do
-		if l_Instance == nil then
-			m_Logger:Write('Instance is null?')
-			goto continue
-		end
 
+	for _, l_Instance in pairs(s_Instances) do
 		if l_Instance:Is('LevelData') then
-			LevelPatcher:PatchLevelData(l_Instance)
+			m_LevelPatcher:PatchLevelData(l_Instance)
 		elseif l_Instance:Is('LevelDescriptionAsset') then
-			LevelPatcher:PatchLevelDescription(l_Instance)
+			m_LevelPatcher:PatchLevelDescription(l_Instance)
 		elseif l_Instance:Is('SequenceEntityData') then
-			SequencePatcher:PatchSequence(l_Instance)
+			m_SequencePatcher:PatchSequence(l_Instance)
 		elseif l_Instance:Is('HealthStateData') then
-			HealthStatePatcher:PatchHealthStateData(l_Instance)
+			m_HealthStatePatcher:PatchHealthStateData(l_Instance)
 		elseif l_Instance:Is('DynamicModelEntityData') then
-			DynamicModelPatcher:Patch(l_Instance)
+			m_DynamicModelPatcher:Patch(l_Instance)
+		elseif l_Instance:Is('PreRoundEntityData') then
+			m_PreRoundPatcher:PatchPreRoundEntityData(l_Instance)
 		end
-
-		::continue::
 	end
 end
+
 return Patches()

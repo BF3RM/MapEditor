@@ -2,7 +2,7 @@ class 'DynamicModelPatcher'
 local m_Logger = Logger("DynamicModelPatcher", true)
 
 function DynamicModelPatcher:__init()
-	m_Logger:Write("Initializing Vegetation Patches")
+	m_Logger:Write("Initializing DynamicModelPatcher")
 	self:RegisterVars()
 end
 

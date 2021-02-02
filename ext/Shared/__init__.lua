@@ -26,18 +26,27 @@ require "__shared/Types/GameObject"
 require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
-Patches = require "__shared/Patches/Patches"
+local m_Patches = require "__shared/Patches/Patches"
 
 local m_Logger = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
+	Events:Subscribe('Level:Loaded', self, self.OnLevelLoaded)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+end
+
+function MapEditorShared:OnLevelLoaded(p_MapName, p_GameModeName)
+	m_Patches:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorShared:OnLevelDestroy()
-	Patches:OnLevelDestroy()
+	m_Patches:OnLevelDestroy()
 end
 
+function MapEditorShared:OnPartitionLoaded(p_Partition)
+	m_Patches:OnPartitionLoaded(p_Partition)
+end
 
 return MapEditorShared()
