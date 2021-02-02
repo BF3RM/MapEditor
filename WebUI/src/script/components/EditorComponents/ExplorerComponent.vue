@@ -12,17 +12,13 @@
 			<gl-stack :width="90">
 				<GridComponent class="datafont" :right-align="true" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 					<template v-slot:grid="{ item, data }" >
-						<div class="GridEntry">
-							<img :class="'Icon Icon-' + item.typeName"/>
-							<div><Highlighter class="name" :text="item.fileName" :search="data.search"/></div>
-						</div>
+						<img :class="'Icon Icon-' + item.typeName"/>
+						<div><Highlighter class="name" :text="item.fileName" :search="data.search"/></div>
 					</template>
 					<template v-slot:list="{ item, data }" >
-						<div class="ListEntry">
-							<img :class="'Icon Icon-' + item.typeName"/>
-							<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search"/></div>
-							<div class="td type">{{item.typeName}}</div>
-						</div>
+						<img :class="'Icon Icon-' + item.typeName"/>
+						<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search"/></div>
+						<div class="td type">{{item.typeName}}</div>
 					</template>
 				</GridComponent>
 				<ConsoleComponent/>
@@ -189,8 +185,5 @@ export default class ExplorerComponent extends EditorComponent {
 	}
 	.type {
 		text-align: right;
-	}
-	.ListEntry:hover, .GridEntry:hover {
-		background-color: #343434;
 	}
 </style>
