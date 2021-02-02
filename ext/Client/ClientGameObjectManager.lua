@@ -37,7 +37,7 @@ function ClientGameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsG
 	local s_ServerOnlyGuids, m = self:FindMissingValues(s_ServerGuids, s_ClientGuids) -- Might not be needed, havent found server-only objects yet
 	m_Logger:Write("Found ".. m .." server-only GameObjects")
 
-	local s_ClientOnlyGameObjectTransferDatas = {}
+	local s_ClientOnlyTransferDatas = {}
 
 	for _, l_Guid in pairs(s_ClientOnlyGuids) do
 		local s_GameObject = GameObjectManager.m_GameObjects[tostring(l_Guid)]
@@ -45,10 +45,10 @@ function ClientGameObjectManager:OnServerGameObjectsGuidsReceived(p_GameObjectsG
 			m_Logger:Error("Couldn't find client-only GameObject with guid: ".. tostring(l_Guid))
 		else
 			s_GameObject.realm = Realm.Realm_Client
-			table.insert(s_ClientOnlyGameObjectTransferDatas, s_GameObject:GetGameObjectTransferData())
+			table.insert(s_ClientOnlyTransferDatas, s_GameObject:GetTransferData())
 		end
 	end
-	NetEvents:SendLocal("ServerGameObjectManager:ClientOnlyGameObjectsTransferData", s_ClientOnlyGameObjectTransferDatas)
+	NetEvents:SendLocal("ServerGameObjectManager:ClientOnlyGameObjectsTransferData", s_ClientOnlyTransferDatas)
 	NetEvents:SendLocal("ServerGameObjectManager:ServerOnlyGameObjectsGuids", s_ServerOnlyGuids)
 	m_Logger:Write("Done resolving")
 end
@@ -61,7 +61,7 @@ function ClientGameObjectManager:OnServerOnlyGameObjectsTransferData(p_TransferD
 end
 
 function ClientGameObjectManager:ProcessServerOnlyGameObject(p_TransferData)
-	local s_GameObject = GameObjectTransferData(p_TransferData):GetGameObject()
+	local s_GameObject = TransferData(p_TransferData):GetGameObject()
 	local s_GuidString = tostring(s_GameObject.guid)
 
 	if (GameObjectManager:GetGameObject(s_GuidString) ~= nil) then

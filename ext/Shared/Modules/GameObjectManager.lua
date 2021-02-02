@@ -582,7 +582,7 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 		return false
 	end
 	s_GameObject:SetField('variation', p_Variation)
-	local s_TransferData = s_GameObject:GetGameObjectTransferData()
+	local s_TransferData = s_GameObject:GetTransferData()
 
 	self:DeleteGameObject(p_Guid)
 	--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)

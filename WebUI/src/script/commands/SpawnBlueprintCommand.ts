@@ -1,9 +1,9 @@
 import Command from '../libs/three/Command';
-import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
+import { TransferData } from '@/script/types/TransferData';
 import { VextCommand } from '@/script/types/VextCommand';
 
 export default class SpawnBlueprintCommand extends Command {
-	constructor(public gameObjectTransferData: GameObjectTransferData) {
+	constructor(public gameObjectTransferData: TransferData) {
 		super('SpawnBlueprintCommand');
 		this.name = 'Spawn Blueprint: ' + gameObjectTransferData.name;
 	}
@@ -13,7 +13,7 @@ export default class SpawnBlueprintCommand extends Command {
 	}
 
 	public undo() {
-		const gameObjectTransferData = new GameObjectTransferData({
+		const gameObjectTransferData = new TransferData({
 			guid: this.gameObjectTransferData.guid
 		});
 		window.vext.SendCommand(new VextCommand('DeleteBlueprintCommand', gameObjectTransferData));

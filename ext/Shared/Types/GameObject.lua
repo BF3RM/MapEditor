@@ -189,8 +189,8 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoMod
     return true
 end
 
-function GameObject:GetGameObjectTransferData()
-    local s_GameObjectTransferData = {
+function GameObject:GetTransferData()
+    local s_TransferData = {
         guid = self.guid,
         name = self.name,
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
@@ -213,9 +213,9 @@ function GameObject:GetGameObjectTransferData()
         table.insert(s_GameEntityTransferDatas, l_GameEntity:GetGameEntityTransferData())
     end
 
-    s_GameObjectTransferData.gameEntities = s_GameEntityTransferDatas
+    s_TransferData.gameEntities = s_GameEntityTransferDatas
 
-    return s_GameObjectTransferData
+    return s_TransferData
 end
 
 function GameObject:GetEntities()
@@ -238,7 +238,7 @@ function GameObject:SetOverrides(p_Overrides)
 			print("We already have overrides set, but no internal blueprint yet? How is this possible?")
 		end
 		self:SetField('overrides', p_Overrides) -- Setting overrides
-		return true, true, self:GetGameObjectTransferData()
+		return true, true, self:GetTransferData()
 	else
 		s_Blueprint = self.internalBlueprint:Get()
 	end
@@ -291,7 +291,7 @@ function GameObject:HasOverrides()
 end
 
 function GameObject:Respawn()
-	local s_TransferData = self:GetGameObjectTransferData()
+	local s_TransferData = self:GetTransferData()
 	m_Logger:Write("Respawning blueprint since references have changed.")
 	print("Deleting")
 	GameObjectManager:DeleteGameObject(self.guid)

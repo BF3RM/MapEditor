@@ -16,7 +16,7 @@ function ClientTransactionManager:RegisterVars()
 	};
 
 	self.m_TransactionId = 0
-	--self.m_GameObjectTransferDatas = {}
+	--self.m_TransferDatas = {}
 	self.m_CommandActionResults = {}
 	self.m_ExecutedCommandActions = {}
 end
@@ -64,18 +64,18 @@ end
 
 --- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
 --- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
-function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTransferDatas)
+function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedTransferDatas)
 	local s_Commands = {}
 
-	for s_Guid, s_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
+	for s_Guid, s_TransferData in pairs(p_UpdatedTransferDatas) do
 		local s_Command
 		local s_GameObject = GameObjectManager.m_GameObjects[s_Guid]
 
 		if (s_GameObject == nil) then
-			if (s_GameObjectTransferData ~= nil and s_GameObjectTransferData.isDeleted == false) then
+			if (s_TransferData ~= nil and s_TransferData.isDeleted == false) then
 				s_Command = {
 					type = "SpawnBlueprintCommand",
-					gameObjectTransferData = s_GameObjectTransferData
+					gameObjectTransferData = s_TransferData
 				}
 
 				table.insert(s_Commands, s_Command)
@@ -83,7 +83,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 				m_Logger:Error("Object desynced: " .. tostring(s_Guid))
 			end
 		else
-			if (s_GameObjectTransferData == nil or s_GameObjectTransferData.isDeleted == true) then
+			if (s_TransferData == nil or s_TransferData.isDeleted == true) then
 				s_Command = {
 					type = "DeleteBlueprintCommand",
 					gameObjectTransferData = {
@@ -92,26 +92,26 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 				}
 
 				table.insert(s_Commands, s_Command)
-			elseif (s_GameObject.isDeleted == true and s_GameObjectTransferData.isDeleted == false) then
+			elseif (s_GameObject.isDeleted == true and s_TransferData.isDeleted == false) then
 				s_Command = {
 					type = "UndeleteBlueprintCommand",
-					gameObjectTransferData = s_GameObjectTransferData
+					gameObjectTransferData = s_TransferData
 				}
 
 				table.insert(s_Commands, s_Command)
 			else
-				local s_ComparisonGameObjectTransferData = s_GameObject:GetGameObjectTransferData()
-				local s_Changes = GetChanges(s_ComparisonGameObjectTransferData, s_GameObjectTransferData)
+				local s_ComparisonTransferData = s_GameObject:GetTransferData()
+				local s_Changes = GetChanges(s_ComparisonTransferData, s_TransferData)
 
 				for _, change in pairs(s_Changes) do
 
 					if change == "transform" then
 						s_Command = {
 							type = "SetTransformCommand",
-							gameObjectTransferData = s_GameObjectTransferData
+							gameObjectTransferData = s_TransferData
 						}
 					elseif change == "isEnabled" then
-						if (s_GameObjectTransferData.isEnabled) then
+						if (s_TransferData.isEnabled) then
 							s_Command = {
 								type = "EnableBlueprintCommand",
 								gameObjectTransferData = {
@@ -131,7 +131,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 							type = "SetVariationCommand",
 							gameObjectTransferData = {
 								guid = s_Guid,
-								variation = s_GameObjectTransferData.variation
+								variation = s_TransferData.variation
 							}
 						}
 					elseif change == "name" then
@@ -139,16 +139,16 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 							type = "SetObjectNameCommand",
 							gameObjectTransferData = {
 								guid = s_Guid,
-								name = s_GameObjectTransferData.name
+								name = s_TransferData.name
 							}
 						}
 					elseif change == "gameEntities" then
 						m_Logger:Write("Before: ")
-						m_Logger:WriteTable(s_ComparisonGameObjectTransferData.gameEntities)
+						m_Logger:WriteTable(s_ComparisonTransferData.gameEntities)
 						m_Logger:Write("--------------")
 
 						m_Logger:Write("Updated Game Entities: ")
-						m_Logger:WriteTable(s_GameObjectTransferData.gameEntities)
+						m_Logger:WriteTable(s_TransferData.gameEntities)
 						m_Logger:Write("--------------")
 
 					elseif change == "parentData" then
@@ -223,16 +223,16 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
-			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
+			local s_TransferData = s_CommandActionResult.gameObjectTransferData
 
 			-- Spawned objects are sent when they are ready on OnGameObjectReady
 			if l_Command.type ~= "SpawnBlueprintCommand" then
 				table.insert(s_CommandActionResults, s_CommandActionResult)
 			end
 
-			local s_Guid = s_GameObjectTransferData.guid
+			local s_Guid = s_TransferData.guid
 			-- TODO: Dont store all gameobjecttransferdatas, we have the gameobjectmanager.gameobjects for that.
-			--self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
+			--self.m_TransferDatas[s_Guid] = MergeTransferData(self.m_TransferDatas[s_Guid], s_TransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
 
 		elseif (s_ActionResultType == ActionResultType.Queue) then
 			m_Logger:Write("Queued command: " .. l_Command.type)
@@ -303,12 +303,12 @@ function ClientTransactionManager:UpdateTransactionId(p_TransactionId, p_IsFirst
 end
 
 function ClientTransactionManager:CreateCommandActionResultsRecursively(p_GameObject)
-	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
+	local s_TransferData = p_GameObject:GetTransferData()
 
 	local s_CommandActionResult = {
 		sender = p_GameObject.creatorName,
 		type = 'SpawnedBlueprint',
-		gameObjectTransferData = s_GameObjectTransferData,
+		gameObjectTransferData = s_TransferData,
 	}
 
 	if p_GameObject.children then

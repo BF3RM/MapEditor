@@ -1,8 +1,8 @@
-import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
+import { TransferData } from '@/script/types/TransferData';
 import { Message } from '@/script/messages/Message';
 
 export class MoveObjectMessage extends Message {
-	constructor(private gameObjectTransferData: GameObjectTransferData) {
+	constructor(private gameObjectTransferData: TransferData) {
 		super('MoveObjectMessage');
 	}
 }

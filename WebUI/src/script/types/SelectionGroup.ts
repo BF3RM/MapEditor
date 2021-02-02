@@ -2,7 +2,7 @@ import { GameObject } from '@/script/types/GameObject';
 import * as THREE from 'three';
 import { signals } from '@/script/modules/Signals';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
-import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
+import { TransferData } from '@/script/types/TransferData';
 import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
@@ -36,7 +36,7 @@ export class SelectionGroup extends THREE.Object3D {
 				return; // No position change
 			}
 			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
-			const command = new SetTransformCommand(new GameObjectTransferData({
+			const command = new SetTransformCommand(new TransferData({
 				guid: gameObject.guid,
 				transform: gameObject.transform
 			}), transform);
@@ -203,7 +203,7 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
-			const command = new EnableBlueprintCommand(new GameObjectTransferData({
+			const command = new EnableBlueprintCommand(new TransferData({
 				guid: gameObject.guid
 			}));
 			commands.push(command);
@@ -224,7 +224,7 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
-			const command = new DisableBlueprintCommand(new GameObjectTransferData({
+			const command = new DisableBlueprintCommand(new TransferData({
 				guid: gameObject.guid
 			}));
 			commands.push(command);

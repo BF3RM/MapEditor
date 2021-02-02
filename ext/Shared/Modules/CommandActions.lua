@@ -32,16 +32,16 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Queue
 	end
 
-	local s_GameObjectTransferData = p_Command.gameObjectTransferData
-	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
+	local s_TransferData = p_Command.gameObjectTransferData
+	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_TransferData.guid,
 																p_Command.sender,
-																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
-																s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
-																s_GameObjectTransferData.parentData,
-																s_GameObjectTransferData.transform,
-																s_GameObjectTransferData.variation,
+																s_TransferData.blueprintCtrRef.partitionGuid,
+																s_TransferData.blueprintCtrRef.instanceGuid,
+																s_TransferData.parentData,
+																s_TransferData.transform,
+																s_TransferData.variation,
 																false,
-																s_GameObjectTransferData.overrides
+																s_TransferData.overrides
 	)
 
 	if(s_SpawnResult == false) then
@@ -50,15 +50,15 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_ResultGameObjectTransferData = {
-		guid = s_GameObjectTransferData.guid,
-		name = s_GameObjectTransferData.name,
+	local s_ResultTransferData = {
+		guid = s_TransferData.guid,
+		name = s_TransferData.name,
 	}
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = 'SpawnedBlueprint',
-		gameObjectTransferData = s_ResultGameObjectTransferData,
+		gameObjectTransferData = s_ResultTransferData,
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -81,7 +81,7 @@ function CommandActions:DeleteBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		isDeleted = true
 	}
@@ -89,7 +89,7 @@ function CommandActions:DeleteBlueprint(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "DeletedBlueprint", -- TODO: powback rename DestroyBlueprint -> DeletedBlueprint / DeletedBlueprint -> DeletedBlueprint
-		gameObjectTransferData = s_GameObjectTransferData
+		gameObjectTransferData = s_TransferData
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -116,12 +116,12 @@ function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = GameObjectManager.m_GameObjects[p_Command.gameObjectTransferData.guid]:GetGameObjectTransferData()
+	local s_TransferData = GameObjectManager.m_GameObjects[p_Command.gameObjectTransferData.guid]:GetTransferData()
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "SpawnedBlueprint",
-		gameObjectTransferData =  s_GameObjectTransferData,
+		gameObjectTransferData =  s_TransferData,
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -140,7 +140,7 @@ function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		isEnabled = true
 	}
@@ -148,7 +148,7 @@ function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "EnabledBlueprint",
-		gameObjectTransferData =  s_GameObjectTransferData,
+		gameObjectTransferData =  s_TransferData,
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -167,7 +167,7 @@ function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		isEnabled = false
 	}
@@ -175,7 +175,7 @@ function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "DisabledBlueprint",
-		gameObjectTransferData = s_GameObjectTransferData,
+		gameObjectTransferData = s_TransferData,
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -192,14 +192,14 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 	}
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = 'SelectedGameObject',
-		gameObjectTransferData = s_GameObjectTransferData,
+		gameObjectTransferData = s_TransferData,
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -217,7 +217,7 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		transform = p_Command.gameObjectTransferData.transform
 	}
@@ -225,7 +225,7 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "SetTransform",
-		gameObjectTransferData = s_GameObjectTransferData
+		gameObjectTransferData = s_TransferData
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -244,7 +244,7 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 		return nil, ActionResultType.Failure
 	end
 
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		variation = p_Command.gameObjectTransferData.variation
 	}
@@ -252,7 +252,7 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "SetVariation",
-		gameObjectTransferData = s_GameObjectTransferData
+		gameObjectTransferData = s_TransferData
 	}
 
 	return s_CommandActionResult, ActionResultType.Success
@@ -282,7 +282,7 @@ function CommandActions:SetEBXField(p_Command)
 	end
 
 	p_Command.gameObjectTransferData.overrides.path = s_Path
-	local s_GameObjectTransferData = {
+	local s_TransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
 		overrides = p_Command.gameObjectTransferData.overrides
 	}
@@ -290,7 +290,7 @@ function CommandActions:SetEBXField(p_Command)
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
 		type = "SetField",
-		gameObjectTransferData = s_GameObjectTransferData
+		gameObjectTransferData = s_TransferData
 	}
 	return s_CommandActionResult, ActionResultType.Success
 end

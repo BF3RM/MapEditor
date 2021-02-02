@@ -8,7 +8,7 @@ import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { REALM } from '@/script/types/Enums';
 
-export class GameObjectTransferData {
+export class TransferData {
 	public guid: any;
 	public name: any;
 	public parentData: GameObjectParentData | any;
@@ -26,7 +26,7 @@ export class GameObjectTransferData {
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {
-			LogError('Attempted to create a GameObjectTransferData without a specified GUID');
+			LogError('Attempted to create a TransferData without a specified GUID');
 		}
 
 		this.guid = args.guid;
@@ -47,7 +47,7 @@ export class GameObjectTransferData {
 
 	public static FromTable(table: any) {
 		if (table.guid === undefined) {
-			LogError('Attempted to create a GameObjectTransferData without a specified GUID');
+			LogError('Attempted to create a TransferData without a specified GUID');
 		}
 		const gameEntities = [] as GameEntityData[];
 		const args: any[string] = [];
@@ -84,6 +84,6 @@ export class GameObjectTransferData {
 			(args)[key] = value;
 		});
 
-		return new GameObjectTransferData(args);
+		return new TransferData(args);
 	}
 }

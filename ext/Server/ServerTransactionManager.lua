@@ -43,16 +43,16 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
         return
     end
 
-    local s_UpdatedGameObjectTransferDatas = {}
+    local s_UpdatedTransferDatas = {}
 
     for l_TransactionId = p_TransactionId + 1, #self.m_Transactions do
         local s_Guid = self.m_Transactions[l_TransactionId]
         if s_Guid ~= nil then
 			local s_GameObject = GameObjectManager.m_GameObjects[s_Guid]
 			if (s_GameObject == nil) then
-				s_UpdatedGameObjectTransferDatas[s_Guid] = nil
+				s_UpdatedTransferDatas[s_Guid] = nil
 			else
-				s_UpdatedGameObjectTransferDatas[s_Guid] = s_GameObject:GetGameObjectTransferData()
+				s_UpdatedTransferDatas[s_Guid] = s_GameObject:GetTransferData()
 			end
         else
             m_Logger:Write("Transaction not found " .. tostring(l_TransactionId))
@@ -61,7 +61,7 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
 
     -- TODO: Change to 2 arguments when this is fixed https://github.com/EmulatorNexus/VeniceUnleashed/issues/451
     NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, {
-		transferDatas = s_UpdatedGameObjectTransferDatas,
+		transferDatas = s_UpdatedTransferDatas,
 		lastTransactionId = #self.m_Transactions
 	})
 end
@@ -109,13 +109,13 @@ function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
-			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
+			local s_TransferData = s_CommandActionResult.gameObjectTransferData
 			table.insert(s_CommandActionResults, s_CommandActionResult)
 
-			--local s_Guid = s_GameObjectTransferData.guid
-			--self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
+			--local s_Guid = s_TransferData.guid
+			--self.m_TransferDatas[s_Guid] = MergeTransferData(self.m_TransferDatas[s_Guid], s_TransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
 
-			table.insert(self.m_Transactions, s_GameObjectTransferData.guid) -- Store that this transaction has happened.
+			table.insert(self.m_Transactions, s_TransferData.guid) -- Store that this transaction has happened.
 
 		elseif (s_ActionResultType == ActionResultType.Queue) then
 			m_Logger:Write("Queued command: " .. l_Command.type)

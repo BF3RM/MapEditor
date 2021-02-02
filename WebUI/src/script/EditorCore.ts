@@ -1,5 +1,5 @@
 import { LinearTransform } from './types/primitives/LinearTransform';
-import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
+import { TransferData } from '@/script/types/TransferData';
 import { Blueprint } from '@/script/types/Blueprint';
 import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
@@ -90,11 +90,11 @@ export class EditorCore {
 		this.pendingUpdates.set(guid, gameObject);
 	}
 
-	public getGameObjectFromGameObjectTransferData(gameObjectTransferData: GameObjectTransferData, callerName: string) {
+	public getGameObjectFromTransferData(gameObjectTransferData: TransferData, callerName: string) {
 		const gameObject = editor.getGameObjectByGuid(gameObjectTransferData.guid);
 
 		if (gameObject === undefined) {
-			window.LogError(callerName + ': Couldn\'t find the GameObject for GameObjectTransferData. Name: ' + gameObjectTransferData.name + ' | Guid: ' + gameObjectTransferData.guid);
+			window.LogError(callerName + ': Couldn\'t find the GameObject for TransferData. Name: ' + gameObjectTransferData.name + ' | Guid: ' + gameObjectTransferData.guid);
 			return;
 		}
 		return gameObject;
@@ -117,7 +117,7 @@ export class EditorCore {
 			return;
 		}
 
-		const gameObjectTransferData = new GameObjectTransferData({
+		const gameObjectTransferData = new TransferData({
 			guid: editor.config.PreviewGameObjectGuid,
 			transform: this.screenToWorldTransform.clone()
 		});
@@ -136,7 +136,7 @@ export class EditorCore {
 			return;
 		}
 
-		const gameObjectTransferData = new GameObjectTransferData({
+		const gameObjectTransferData = new TransferData({
 			guid: editor.config.PreviewGameObjectGuid,
 			blueprintCtrRef: this.previewBlueprint.getCtrRef(),
 			transform: this.screenToWorldTransform.clone(),
@@ -148,7 +148,7 @@ export class EditorCore {
 	}
 
 	public onPreviewStop() {
-		const gameObjectTransferData = new GameObjectTransferData({ guid: editor.config.PreviewGameObjectGuid });
+		const gameObjectTransferData = new TransferData({ guid: editor.config.PreviewGameObjectGuid });
 		window.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = false;
 	}
@@ -156,7 +156,7 @@ export class EditorCore {
 	public CopySelectedObjects(): SpawnBlueprintCommand[] {
 		const commands: SpawnBlueprintCommand[] = [];
 		editor.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
-			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+			const gameObjectTransferData = childGameObject.getTransferData();
 			gameObjectTransferData.guid = Guid.create();
 			const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
 			// Make sure the variation is valid, otherwise set default one.
@@ -177,7 +177,7 @@ export class EditorCore {
 		}
 		editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
 
-		const gameObjectTransferData = new GameObjectTransferData({ guid: editor.config.PreviewGameObjectGuid });
+		const gameObjectTransferData = new TransferData({ guid: editor.config.PreviewGameObjectGuid });
 		window.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
 		this.isPreviewBlueprintSpawned = false;
 		this.previewBlueprint = null;
