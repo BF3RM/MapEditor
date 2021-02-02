@@ -21,6 +21,7 @@ end
 function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
+	NetEvents:Subscribe('TeleportSoldierToPosition', self, self.OnTeleportSoldierToPosition)
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
@@ -114,6 +115,14 @@ end
 
 function MapEditorServer:OnDisableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, true)
+end
+
+function MapEditorServer:OnTeleportSoldierToPosition(p_Player, p_NewTransform)
+	if p_Player.soldier == nil then
+		return
+	end
+
+	p_Player.soldier:SetTransform(p_NewTransform)
 end
 
 return MapEditorServer()
