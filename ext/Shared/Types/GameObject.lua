@@ -269,7 +269,7 @@ function GameObject:SetOverrides(p_Overrides)
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
 	if(s_ShouldRespawn) then
 		print("Set overrides, but GameObject should respawn since we changed references...")
-		return true, s_ShouldRespawn, self:GetGameObjectTransferData()
+		return true, s_ShouldRespawn
 	else
 		return true, false
 	end
@@ -279,9 +279,6 @@ function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid, p_Partition)
 	if(s_Path) then
 		print(s_Path)
 		self.overrides[s_Path] = p_Field
-	end
-	if(s_RequiresRespawn) then
-		print("Requires respawn!!")
 	end
 	return s_Path ~= '', s_Path, s_RequiresRespawn
 end
@@ -293,5 +290,22 @@ function GameObject:HasOverrides()
 	return false
 end
 
+function GameObject:Respawn()
+	local s_TransferData = self:GetGameObjectTransferData()
+	m_Logger:Write("Respawning blueprint since references have changed.")
+	print("Deleting")
+	GameObjectManager:DeleteGameObject(self.guid)
+
+	-- This shit doesn't work. It's called straight away
+	print("Respawning blueprint!")
+	GameObjectManager:InvokeBlueprintSpawn(self.guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, false, s_TransferData.overrides)
+	local s_GameObject = self.m_GameObjects[tostring(self.guid)]
+
+	if s_GameObject == nil then
+		m_Logger:Error('Object with id ' .. tostring(self.guid) .. ' does not exist (yet)')
+		return false
+	end
+	return true
+end
 
 return GameObject

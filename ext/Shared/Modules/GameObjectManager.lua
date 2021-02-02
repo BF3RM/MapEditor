@@ -573,6 +573,7 @@ function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateColli
 
 	return s_GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 end
+
 function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
@@ -588,6 +589,17 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false, s_TransferData.overrides)
 	return true
 end
+
+function GameObjectManager:SetEBXField(p_Guid, p_EBXField)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+	if s_GameObject == nil then
+		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
+		return false
+	end
+	print(dump(p_EBXField))
+	return self:SetOverrides(p_Guid, {p_EBXField})
+end
+
 function GameObjectManager:SetOverrides(p_Guid, p_Overrides)
 	print("Setting overrides:")
 	print(p_Guid)
@@ -597,28 +609,10 @@ function GameObjectManager:SetOverrides(p_Guid, p_Overrides)
 		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
 		return false
 	end
-	local s_Success, s_NeedsRespawn, s_TransferData = s_GameObject:SetOverrides(p_Overrides)
+	local s_Success, s_NeedsRespawn = s_GameObject:SetOverrides(p_Overrides)
 	if(s_Success) then
 		if(s_NeedsRespawn) then
-			if(not s_TransferData) then
-				print("No transferdata!")
-			end
-			m_Logger:Write("Respawning blueprint since references have changed.")
-			print("Deleting")
-			self:DeleteGameObject(p_Guid)
-			----function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
-			---- TODO: Handle internalBluepint instead
-			--print("Respawning")
-
-			-- This shit doesn't work. It's called straight away
-			print("Spawning blueprint!")
-			self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, false, s_TransferData.overrides)
-			local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
-
-			if s_GameObject == nil then
-				m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist (yet)')
-				return true
-			end
+			s_GameObject:Respawn()
 		else
 			m_Logger:Write("Refreshing")
 			self:RefreshGameObject(p_Guid)
@@ -628,6 +622,7 @@ function GameObjectManager:SetOverrides(p_Guid, p_Overrides)
 	m_Logger:Write("Failed to set overrides.")
 	return false
 end
+
 function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_Entity = p_Hook:Call()
 	if (not s_Entity) then
@@ -676,6 +671,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
 	end
 end
+
 function GameObjectManager:RefreshGameObject(p_Guid)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 	if(s_GameObject) then
