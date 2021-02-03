@@ -51,13 +51,17 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		m_Logger:Error('InvokeBlueprintSpawn: One or more parameters are nil.')
 		return false
 	end
+
 	local s_Blueprint = ResourceManager:FindInstanceByGuid(Guid(tostring(p_BlueprintPartitionGuid)), Guid(tostring(p_BlueprintInstanceGuid)))
 	local s_OverrideBlueprint = nil
 	local s_OverrideBlueprintCtrRef = nil
+
 	if (p_Overrides and GetLength(p_Overrides) > 0) then
 		print(p_Overrides)
+
 		s_OverrideBlueprint = ResourceManager:FindInstanceByGuid(Guid(tostring(p_BlueprintPartitionGuid)), Guid(tostring(p_GameObjectGuid)))
-		if(s_OverrideBlueprint) then
+
+		if (s_OverrideBlueprint) then
 			print("Found override blueprint")
 			print(tostring(s_OverrideBlueprint))
 			s_Blueprint = s_OverrideBlueprint
@@ -72,14 +76,16 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 				instanceGuid = p_BlueprintInstanceGuid,
 				partitionGuid = p_BlueprintPartitionGuid
 			}, p_GameObjectGuid)
+
 			s_OverrideBlueprint = s_Blueprint
 			p_BlueprintInstanceGuid = Guid(p_GameObjectGuid) -- We have overrides for this gameobject and have created a custom blueprint that we want to spawn. It's added to the original partition.
 		end
 	end
+
 	print(p_BlueprintPartitionGuid)
 	print(p_BlueprintInstanceGuid)
-	p_Variation = p_Variation or 0
 
+	p_Variation = p_Variation or 0
 
 	if s_Blueprint == nil then
 		m_Logger:Error("Couldn't find the specified instance: Partition: " .. tostring(p_BlueprintPartitionGuid) .. " | Instance: " .. tostring(p_BlueprintInstanceGuid))
@@ -96,8 +102,10 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 			guid = Guid('00000000-0000-0000-0000-000000000000'), -- Root
 			typeName = "previewSpawn",
 		}
+
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
 		m_Logger:WriteTable(s_PreviewSpawnParentData)
+
 		self.m_PendingCustomBlueprintGuids[tostring(p_BlueprintInstanceGuid)] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides }
 	end
 
@@ -124,7 +132,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 			print(v.typeInfo.name)
 		end
 
-		if(p_Overrides and s_OverrideBlueprint) then
+		if (p_Overrides and s_OverrideBlueprint) then
 			print("Referencing internal blueprint:")
 			print(p_BlueprintPartitionGuid)
 			print(tostring(p_BlueprintInstanceGuid))

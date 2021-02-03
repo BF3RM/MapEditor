@@ -41,7 +41,7 @@ end
 
 function GameObject:SetField(p_FieldName, p_NewValue, p_AutoModified)
     self[p_FieldName] = p_NewValue
-	if(not p_AutoModified) then
+	if (not p_AutoModified) then
 	    local originalValue = self[p_FieldName .. m_TraceableField_Suffix]
         local newValue = self[p_FieldName]
 		self.userModifiedFields[p_FieldName] = newValue ~= originalValue
@@ -77,6 +77,7 @@ function GameObject:Disable(p_AutoModified)
             end
         end
     end
+
 	self:SetField("isEnabled", false, p_AutoModified)
 end
 
@@ -94,6 +95,7 @@ function GameObject:Enable(p_AutoModified)
             end
         end
     end
+
 	self:SetField("isEnabled", true, p_AutoModified)
 end
 
@@ -102,12 +104,15 @@ function GameObject:MarkAsDeleted(p_AutoModified)
         m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
         return
     end
-	self:Disable(p_AutoModified)
+
+    self:Disable(p_AutoModified)
+
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:MarkAsDeleted(true)
         end
     end
+
 	self:SetField("isDeleted", true, p_AutoModified)
 end
 
@@ -116,17 +121,21 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
         m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
         return
     end
-	self:Enable(p_AutoModified)
+
+    self:Enable(p_AutoModified)
+
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:MarkAsUndeleted(true)
         end
     end
+
 	self:SetField("isDeleted", false, p_AutoModified)
 end
 
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
-	self:Disable()
+    self:Disable()
+
     if self.children ~= nil then
         for _, l_ChildGameObject in pairs(self.children) do
             l_ChildGameObject:Destroy()
@@ -165,10 +174,12 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoMod
 
     if self.gameEntities ~= nil then
         for _, l_GameEntity in pairs(self.gameEntities) do
-            if(l_GameEntity == nil) then
+
+            if (l_GameEntity == nil) then
                 m_Logger:Error("GameEntity is nil?")
                 return false
             end
+
             local response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, self.isEnabled)
 
             if not response then
@@ -176,16 +187,20 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoMod
             end
         end
     end
-	self:SetField("transform", LinearTransform(p_LinearTransform), p_AutoModified)
-	if(tostring(self.parentData.guid) ~= "00000000-0000-0000-0000-000000000000") then
-		local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
-		if(s_Parent ~= nil) then
+
+    self:SetField("transform", LinearTransform(p_LinearTransform), p_AutoModified)
+
+	if (tostring(self.parentData.guid) ~= "00000000-0000-0000-0000-000000000000") then
+        local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
+
+		if (s_Parent ~= nil) then
 			local s_LocalTransform = ToLocal(self.transform, s_Parent.transform)
 			self:SetField("localTransform", s_LocalTransform, p_AutoModified)
 		else
 			m_Logger:Write("Could not find parent")
 		end
-	end
+    end
+
     return true
 end
 
@@ -209,6 +224,7 @@ function GameObject:GetGameObjectTransferData()
     }
 
     local s_GameEntityTransferDatas = { }
+
     for _, l_GameEntity in pairs(self.gameEntities) do
         table.insert(s_GameEntityTransferDatas, l_GameEntity:GetGameEntityTransferData())
     end
@@ -231,18 +247,20 @@ end
 function GameObject:SetOverrides(p_Overrides)
 	print("Setting overrides of gameobject.")
 	local s_ShouldRespawn = false
-	local s_Blueprint = nil
+    local s_Blueprint = nil
+
 	if (self.internalBlueprint == nil) then
 		print("Internal blueprint not set. Respawn this gameobject! Blueprint will be cloned and overrides will be set at spawn.")
 		if(self:HasOverrides()) then
 			print("We already have overrides set, but no internal blueprint yet? How is this possible?")
 		end
 		self:SetField('overrides', p_Overrides) -- Setting overrides
-		return true, true, self:GetGameObjectTransferData()
+		return true, true
 	else
 		s_Blueprint = self.internalBlueprint:Get()
-	end
-	if(s_Blueprint == nil) then
+    end
+
+	if (s_Blueprint == nil) then
 		print("Failed to get blueprint?")
 		print(self.internalBlueprint.instanceGuid)
 		print(self.internalBlueprint.partitionGuid)
@@ -251,11 +269,13 @@ function GameObject:SetOverrides(p_Overrides)
 		print("Applying overrides to: ")
 		print(self.internalBlueprint.instanceGuid)
 		print(self.internalBlueprint.partitionGuid)
-	end
+    end
+
 	local s_PartitionInstanceGuid = InstanceParser:GetPartition(Guid(s_Blueprint.instanceGuid))
 	print(s_PartitionInstanceGuid)
 	local s_Partition = ResourceManager:FindDatabasePartition(Guid(s_PartitionInstanceGuid))
-	m_Logger:Write("Setting overrides: " .. tostring(s_Blueprint.instanceGuid))
+    m_Logger:Write("Setting overrides: " .. tostring(s_Blueprint.instanceGuid))
+
 	for k,l_Field in pairs(p_Overrides) do
 		m_Logger:Write(k)
 		m_Logger:Write(l_Field)
@@ -264,9 +284,11 @@ function GameObject:SetOverrides(p_Overrides)
 			print("Overrides demands respawn")
 			s_ShouldRespawn = true
 		end
-	end
+    end
+
 	print("Finished setting overrides. Should respawn: " .. tostring(s_ShouldRespawn))
-	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
+    self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
+
 	if(s_ShouldRespawn) then
 		print("Set overrides, but GameObject should respawn since we changed references...")
 		return true, s_ShouldRespawn
@@ -274,6 +296,7 @@ function GameObject:SetOverrides(p_Overrides)
 		return true, false
 	end
 end
+
 function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid, p_Partition)
 	local s_Path, s_RequiresRespawn = EBXManager:SetField(p_Instance, p_Field, '', p_RootGuid, p_Partition, false)
 	if(s_Path) then
@@ -304,7 +327,8 @@ function GameObject:Respawn()
 	if s_GameObject == nil then
 		m_Logger:Error('Object with id ' .. tostring(self.guid) .. ' does not exist (yet)')
 		return false
-	end
+    end
+
 	return true
 end
 

@@ -19,22 +19,29 @@ function EBXManager:CloneBlueprint(p_BlueprintCtrRef, p_Guid)
 	print("Cloning blueprint: " .. tostring(p_BlueprintCtrRef.instanceGuid))
 	local s_BP = p_BlueprintCtrRef:Get()
 	local s_BPPartition = ResourceManager:FindDatabasePartition(Guid(p_BlueprintCtrRef.partitionGuid))
+
 	print(p_BlueprintCtrRef.partitionGuid)
 	print(p_Guid)
 	print(tostring(s_BP))
+
 	local s_ClonedBlueprint = s_BP:Clone(Guid(p_Guid))
+
 	s_BPPartition:AddInstance(s_ClonedBlueprint)
+
 	InstanceParser:SetPartition(p_BlueprintCtrRef.partitionGuid, p_Guid)
+
 	m_Logger:Write(p_BlueprintCtrRef.partitionGuid)
 	m_Logger:Write(p_Guid)
 	m_Logger:Write("Blueprint cloned:")
 	m_Logger:Write(s_ClonedBlueprint)
+
 	return s_ClonedBlueprint, CtrRef {
 		typeName = s_ClonedBlueprint.typeInfo.name,
 		instanceGuid = tostring(p_Guid),
 		partitionGuid = p_BlueprintCtrRef.partitionGuid
 	}
 end
+
 function EBXManager:SetFields(p_Overrides)
 	print("SetFields Notimplemented")
 	--for _,v in pairs(p_Overrides) do
