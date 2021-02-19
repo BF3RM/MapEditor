@@ -30,9 +30,9 @@
     "yaml": "^1.10.0"
   },
   "devDependencies": {
-    "@fimbul/valtyr": "0.22.0",
-    "@fimbul/ve": "0.22.0",
-    "@fimbul/wotan": "0.22.0",
+    "@fimbul/valtyr": "0.24.0",
+    "@fimbul/ve": "0.24.0",
+    "@fimbul/wotan": "0.24.0",
     "@types/jquery": "3.5.5",
     "@types/jszip": "3.4.1",
     "@typescript-eslint/eslint-plugin": "4.10.0",
