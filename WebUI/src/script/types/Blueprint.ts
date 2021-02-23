@@ -33,7 +33,7 @@ export class Blueprint implements IBlueprint {
 	}
 
 	public hasVariations() {
-		return Object.keys(this.variations).length !== 0;
+		return this.variations.length !== 0;
 	}
 
 	public isVariationValid(variation: number) {
@@ -43,12 +43,6 @@ export class Blueprint implements IBlueprint {
 
 	public getVariation(hash: number) {
 		const scope = this;
-		if (Object.keys(this.variations).length === 0) {
-			return {
-				hash: 0,
-				name: 'unknown'
-			};
-		}
 		return scope.variations.find((e: any) => e.hash === hash);
 	}
 
