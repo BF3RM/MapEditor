@@ -35,19 +35,20 @@ function UIManager:OnLevelDestroy()
 end
 ----------- Game functions----------------
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
-	-- self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
+	if self.m_ActiveMode == EditorMode.Editor then
+		self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
+	end
 end
 
 function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
-	-- local s_Screen = UIGraphAsset(p_Screen)
-
-	-- if s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
-	-- 	s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
-	-- 	s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
-	-- 	s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
-
-	-- 	p_Hook:Return(nil)
-	-- end
+	local s_Screen = UIGraphAsset(p_Screen)
+	if s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
+			s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
+			s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
+		p_Hook:Return(nil)
+	else
+		print(s_Screen.name)
+	end
 end
 
 function UIManager:OnUpdateInput(p_Delta)
@@ -99,6 +100,24 @@ function UIManager:OnDisableEditorMode()
 	self:DisableFreeCam()
 end
 
+function UIManager:SetUIState(p_Visibility)
+	local s_clientUIGraphEntityIterator = EntityManager:GetIterator("ClientUIGraphEntity")
+
+	local s_clientUIGraphEntity = s_clientUIGraphEntityIterator:Next()
+	while s_clientUIGraphEntity do
+		if s_clientUIGraphEntity.data.instanceGuid == Guid('B9437F95-2EBC-4F22-A5F6-F4D0F1331A5E') then
+			s_clientUIGraphEntity = Entity(s_clientUIGraphEntity)
+			if p_Visibility then
+				s_clientUIGraphEntity:FireEvent('ShowCrosshair')
+			else
+				s_clientUIGraphEntity:FireEvent('HideCrosshair')
+			end
+			return
+		end
+		s_clientUIGraphEntity = s_clientUIGraphEntityIterator:Next()
+	end
+end
+
 function UIManager:EnableFreeCam()
 	if self.m_ActiveMode ~= EditorMode.Playing then
 		return
@@ -109,6 +128,7 @@ function UIManager:EnableFreeCam()
 	if s_LocalPlayer == nil or s_LocalPlayer.soldier == nil then
 		return
 	end
+	self:SetUIState(false)
 
 	NetEvents:SendLocal('EnableInputRestriction')
 
@@ -129,8 +149,8 @@ function UIManager:DisableFreeCam()
 	FreeCam:Disable()
 	self:SetEditorMode(EditorMode.Playing)
 	WebUI:DisableMouse()
-
 	self:EnableFreeCamMovement()
+	self:SetUIState(true)
 end
 
 function UIManager:OnUIReloaded()

@@ -301,7 +301,7 @@ function GameObject:SetOverride(p_Instance, p_Field, p_RootGuid, p_Partition)
 	local s_Path, s_RequiresRespawn = EBXManager:SetField(p_Instance, p_Field, '', p_RootGuid, p_Partition, false)
 	if(s_Path) then
 		print(s_Path)
-		self.overrides[s_Path] = p_Field
+		MergeTables(self.overrides, p_Field)
 	end
 	return s_Path ~= '', s_Path, s_RequiresRespawn
 end
