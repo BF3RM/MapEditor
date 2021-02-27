@@ -4053,12 +4053,10 @@ globule@^1.0.0:
     lodash "~4.17.10"
     minimatch "~3.0.2"
 
-golden-layout@1.5.9:
-  version "1.5.9"
-  resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-1.5.9.tgz#a39bc1f6a67e6f886b797c016dd924e9426ba77f"
-  integrity sha1-o5vB9qZ+b4hreXwBbdkk6UJrp38=
-  dependencies:
-    jquery "*"
+golden-layout@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-2.0.2.tgz#1fb84ba4a271431001a51f3025324846aaf445ec"
+  integrity sha512-8cbyGzGGIGmfPCKAJ2g5Duy431lAEhZiverCwnCiMnobQN7UISqClPd0sGnS5gmyBj9VRPgPMZcRfoiRapTMHg==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.2, graceful-fs@^4.2.3, graceful-fs@^4.2.4:
   version "4.2.4"
@@ -4965,7 +4963,7 @@ jest-worker@^26.6.1:
     merge-stream "^2.0.0"
     supports-color "^7.0.0"
 
-jquery@*, jquery@3.5.1, jquery@>=1.9.1, jquery@^3.5.0:
+jquery@3.5.1, jquery@>=1.9.1, jquery@^3.5.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.1.tgz#d7b4d08e1bfdb86ad2f1a3d039ea17304717abb5"
   integrity sha512-XwIBPqcMn57FxfT+Go5pzySnm4KWkT1Tv7gjrpT1srtf8Weynl6R273VJ5GjkRb51IzMp5nbaPjJXMWeju2MKg==
