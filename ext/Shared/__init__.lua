@@ -37,7 +37,7 @@ end
 
 function MapEditorShared:OnLevelDestroy()
 	Patches:OnLevelDestroy()
+	InstanceParser:OnLevelDestroy()
 end
-
 
 return MapEditorShared()
