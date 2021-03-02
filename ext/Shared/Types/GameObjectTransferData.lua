@@ -14,7 +14,7 @@ function GameObjectTransferData:__init(arg)
     self.isEnabled = arg.isEnabled
     self.realm = arg.realm
     self.creatorName = arg.creatorName
-    self.isVanilla = arg.isVanilla
+    self.origin = arg.origin
     self.isUserModified = arg.isUserModified
 	self.overrides = arg.overrides
 end
@@ -30,7 +30,7 @@ function GameObjectTransferData:GetGameObject()
         isEnabled = self.isEnabled,
         isDeleted = self.isDeleted,
         creatorName = self.creatorName,
-        isVanilla = self.isVanilla,
+        origin = self.origin,
         realm = self.realm,
         isUserModified = self.isUserModified,
         overrides = self.overrides

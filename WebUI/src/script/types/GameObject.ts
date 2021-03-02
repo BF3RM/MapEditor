@@ -8,7 +8,7 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { RAYCAST_LAYER, REALM } from '@/script/types/Enums';
+import { GAMEOBJECT_ORIGIN, RAYCAST_LAYER, REALM } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
@@ -27,7 +27,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public blueprintCtrRef: CtrRef;
 	public variation: number;
 	public gameEntitiesData: GameEntityData[];
-	public isVanilla: boolean;
+	public origin: GAMEOBJECT_ORIGIN;
 	public selected: boolean = false;
 	public highlighted: boolean = false;
 	// private completeBoundingBox: THREE.Box3;
@@ -52,7 +52,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
 		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [],
-		isVanilla: boolean = false, isUserModified: boolean = false,
+		origin: GAMEOBJECT_ORIGIN = GAMEOBJECT_ORIGIN.CUSTOM, isUserModified: boolean = false,
 		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER) {
 		super();
 		this.guid = guid;
@@ -63,7 +63,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.variation = variation;
 		this.children = [];
 		this.gameEntitiesData = gameEntities;
-		this.isVanilla = isVanilla;
+		this.origin = origin;
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;
@@ -97,7 +97,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.blueprintCtrRef,
 			gameObjectTransferData.variation,
 			gameObjectTransferData.gameEntities,
-			gameObjectTransferData.isVanilla,
+			gameObjectTransferData.origin,
 			gameObjectTransferData.isUserModified,
 			gameObjectTransferData.originalRef,
 			gameObjectTransferData.realm
