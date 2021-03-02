@@ -327,7 +327,7 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	if(p_GameObject.originalRef.partitionGuid == nil) then
 		p_GameObject.originalRef.partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid -- TODO: Confirm that this is correct
 	end
-	p_GameObject.type = p_ParentGameObject.type
+	p_GameObject.origin = p_ParentGameObject.origin
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 	if p_GameObject.origin == GameObjectOriginType.Vanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
@@ -341,6 +341,7 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 			i = i + 1
 		until self.m_GameObjects[tostring(s_CustomGuid)] == nil
 		p_GameObject.guid = s_CustomGuid
+		p_GameObject.origin = GameObjectOriginType.CustomChild
 	end
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 	table.insert(p_ParentGameObject.children, p_GameObject)

@@ -142,7 +142,7 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
 end
 
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
-    if (self.origin ~= GameObjectOriginType.Vanilla) then
+    if (self.origin == GameObjectOriginType.Vanilla) then
         m_Logger:Error("Cant destroy vanilla object, use disable instead")
         return
     end
