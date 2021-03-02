@@ -216,8 +216,11 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
         local s_Command
 
-        --If it's a vanilla object we move it or we delete it. If not we spawn a new object.
-        if l_GameObjectSaveData.isVanilla then
+        -- If it's a vanilla object we move it or we delete it. If not we spawn a new object.
+		-- "isVanilla" is from the old save format. New is "origin"
+        if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
+				l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild or
+				l_GameObjectSaveData.isVanilla then
             --[[if l_GameObjectSaveData.isDeleted then
                 s_Command = {
                     sender = "LoadingSaveFile",

@@ -130,7 +130,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		parentData = GameObjectParentData{},
 		transform = p_Transform,
 		variation = p_Variation,
-		isVanilla = true,
+		origin = GameObjectOriginType.Vanilla,
 		isDeleted = false,
 		isEnabled = true,
 		gameEntities = {},
@@ -206,7 +206,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	---vvvv This is children to parent / bottom to top vvvv
 
 	-- Custom object have to be manually initialized.
-	if not s_GameObject.isVanilla then
+	if not s_GameObject.origin == GameObjectOriginType.Vanilla then
 		--print("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
 		for _,l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
@@ -304,10 +304,10 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 			partitionGuid = s_PendingInfo.parentData.partitionGuid
 		}
 		p_GameObject.guid = s_PendingInfo.customGuid
-		p_GameObject.isVanilla = false
+		p_GameObject.origin = GameObjectOriginType.Custom
 	else -- This is a vanilla root object
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
-		p_GameObject.isVanilla = true
+		p_GameObject.origin = GameObjectOriginType.Vanilla
 
 		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
@@ -327,9 +327,9 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	if(p_GameObject.originalRef.partitionGuid == nil) then
 		p_GameObject.originalRef.partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid -- TODO: Confirm that this is correct
 	end
-	p_GameObject.isVanilla = p_ParentGameObject.isVanilla
+	p_GameObject.origin = p_ParentGameObject.origin
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
-	if p_GameObject.isVanilla then
+	if p_GameObject.origin == GameObjectOriginType.Vanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
@@ -341,6 +341,7 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 			i = i + 1
 		until self.m_GameObjects[tostring(s_CustomGuid)] == nil
 		p_GameObject.guid = s_CustomGuid
+		p_GameObject.origin = GameObjectOriginType.CustomChild
 	end
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 	table.insert(p_ParentGameObject.children, p_GameObject)
@@ -395,7 +396,7 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 		return true
 	end
 
-	if (s_GameObject.isVanilla) then
+	if (s_GameObject.origin == GameObjectOriginType.Vanilla) then
 		s_GameObject:MarkAsDeleted()
 	else
 		s_GameObject:Destroy()
@@ -418,7 +419,7 @@ function GameObjectManager:UndeleteBlueprint(p_Guid)
 		return false
 	end
 
-	if (s_GameObject.isVanilla == false) then
+	if (s_GameObject.origin == GameObjectOriginType.Vanilla) then
 		m_Logger:Error("GameObject was not a vanilla object " .. p_Guid)
 		return false
 	end
@@ -532,7 +533,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		end
 
 		-- Set custom objects' entities enabled by default.
-		if not s_PendingGameObject.isVanilla and
+		if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla and
 				(s_Entity:Is('ClientStaticModelEntity') or s_Entity:Is('ServerStaticModelEntity')) then
 			s_Entity:FireEvent('Enable')
 		end

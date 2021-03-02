@@ -25,7 +25,7 @@ import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
-import { EDITOR_MODE, REALM } from '@/script/types/Enums';
+import { EDITOR_MODE, GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
@@ -411,7 +411,7 @@ export default class Editor {
 					this.missingParent.remove(gameObjectGuid);
 				}
 			}
-			if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
+			if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && gameObject.origin !== GAMEOBJECT_ORIGIN.VANILLA) {
 				// Make selection happen after all signals have been handled
 				this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
 			}

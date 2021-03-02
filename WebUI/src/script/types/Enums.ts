@@ -15,6 +15,12 @@ export enum MOUSE_BUTTONS {
 	MIDDLE_CLICK = 4
 }
 
+export enum GAMEOBJECT_ORIGIN {
+	VANILLA = 1,
+	CUSTOM = 2,
+	CUSTOM_CHILD = 3
+}
+
 export enum KEYCODE {
 	BACKSPACE = 8,
 	TAB = 9,

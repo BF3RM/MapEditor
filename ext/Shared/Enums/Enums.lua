@@ -10,10 +10,10 @@ RaycastType = {
 	Mouse = 2
 }
 
-GameObjectType = {
-	ClientOnly = 1,
-	ServerOnly = 2,
-	ClientAndSerer = 3
+GameObjectOriginType = {
+	Vanilla = 1,
+	Custom = 2,
+	CustomChild = 3
 }
 
 EditorMode = {
@@ -35,3 +35,4 @@ CoroutineState = {
 	Running = "running",
 	Dead = "dead"
 }
+

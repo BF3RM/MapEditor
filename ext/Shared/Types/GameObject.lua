@@ -7,7 +7,7 @@ function GameObject:__init(arg)
     self.guid = arg.guid
     self.creatorName = arg.creatorName -- never gets sent to js
     self.blueprintCtrRef = arg.blueprintCtrRef
-    self.isVanilla = arg.isVanilla -- never gets sent to js
+    self.origin = arg.origin -- never gets sent to js
     self.gameEntities = arg.gameEntities or { }
     self.children = arg.children or {} -- never gets sent to js
     self.realm = arg.realm
@@ -49,7 +49,7 @@ function GameObject:SetField(p_FieldName, p_NewValue, p_AutoModified)
 end
 
 function GameObject:IsUserModified()
-    if (self.isVanilla == false) then
+    if (self.origin ~= GameObjectOriginType.Vanilla) then
         return true
     end
 
@@ -98,7 +98,7 @@ function GameObject:Enable(p_AutoModified)
 end
 
 function GameObject:MarkAsDeleted(p_AutoModified)
-    if (self.isVanilla == false) then
+    if (self.origin ~= GameObjectOriginType.Vanilla) then
         m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
         return
     end
@@ -120,7 +120,7 @@ function GameObject:MarkAsDeleted(p_AutoModified)
 end
 
 function GameObject:MarkAsUndeleted(p_AutoModified)
-    if (self.isVanilla == false) then
+    if (self.origin ~= GameObjectOriginType.Vanilla) then
         m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
         return
     end
@@ -142,7 +142,7 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
 end
 
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
-    if (self.isVanilla == true) then
+    if (self.origin == GameObjectOriginType.Vanilla) then
         m_Logger:Error("Cant destroy vanilla object, use disable instead")
         return
     end
@@ -221,7 +221,7 @@ function GameObject:GetGameObjectTransferData()
         isEnabled = self.isEnabled,
         isDeleted = self.isDeleted,
         creatorName = self.creatorName,
-        isVanilla = self.isVanilla,
+        origin = self.origin,
         realm = self.realm,
         isUserModified = self.isUserModified,
         overrides = self.overrides
