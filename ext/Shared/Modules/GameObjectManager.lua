@@ -520,6 +520,11 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 	if(s_PendingGameObject) then
 		--print("Added pending:")
+		--if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla then
+		--	print('----')
+		--	print(s_Entity.typeInfo.name)
+		--	print(s_Entity:Is('SpatialEntity'))
+		--end
 		--print(s_PendingGameObject.name)
 		if(s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
 			s_Entity = SpatialEntity(s_Entity)
@@ -534,7 +539,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 		-- Set custom objects' entities enabled by default.
 		if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla and
-				(s_Entity:Is('ClientStaticModelEntity') or s_Entity:Is('ServerStaticModelEntity')) then
+				(s_Entity:Is('ClientStaticModelEntity') or s_Entity:Is('ServerStaticModelEntity') or s_Entity:Is('SpatialEntity')) then
 			s_Entity:FireEvent('Enable')
 		end
 
