@@ -519,13 +519,6 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	self.m_Entities[s_Entity.instanceId] = s_GameEntity
 	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 	if(s_PendingGameObject) then
-		--print("Added pending:")
-		--if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla then
-		--	print('----')
-		--	print(s_Entity.typeInfo.name)
-		--	print(s_Entity:Is('SpatialEntity'))
-		--end
-		--print(s_PendingGameObject.name)
 		if(s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity") then
 			s_Entity = SpatialEntity(s_Entity)
 			s_GameEntity.isSpatial = true
