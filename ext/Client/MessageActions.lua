@@ -15,7 +15,6 @@ function MessageActions:RegisterVars()
     self.SetScreenToWorldPositionMessage = self.SetScreenToWorldPosition
     self.PreviewSpawnMessage = self.PreviewSpawn
     self.PreviewDestroyMessage = self.PreviewDestroy
-    self.PreviewMoveMessage = self.PreviewMove
 	self.GetProjectsMessage = self.GetProjects
     self.TeleportMouseMessage = self.TeleportMouse
     self.RequestSaveProjectMessage = self.RequestSaveProject
@@ -144,21 +143,6 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
     end
 end
 
-function MessageActions:PreviewMove(p_Message)
-    local s_gameObjectTransferData = p_Message.gameObjectTransferData
-
-    if (s_gameObjectTransferData == nil) then
-        m_Logger:Error("gameObjectTransferData must be set on PreviewMove")
-    end
-
-    local s_Result = GameObjectManager:SetTransform(gameObjectTransferData.guid, s_gameObjectTransferData.transform, false)
-
-    if s_Result == false then
-        return ActionResultType.Failure
-    else
-        return ActionResultType.Success
-    end
-end
 function MessageActions:TeleportMouse(p_Message)
 	print(p_Message)
 	local newCoords = p_Message.coordinates
