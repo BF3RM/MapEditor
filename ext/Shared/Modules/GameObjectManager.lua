@@ -480,6 +480,7 @@ function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateColli
 
 	return s_GameObject:SetTransform(p_LinearTransform, p_UpdateCollision)
 end
+
 function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
@@ -532,8 +533,12 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 		-- Set custom objects' entities enabled by default.
 		if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla and
-				(s_Entity:Is('ClientStaticModelEntity') or s_Entity:Is('ServerStaticModelEntity')) then
-			s_Entity:FireEvent('Enable')
+				s_Entity:Is('GameEntity') and
+				s_Entity.typeInfo.name ~= "ServerVehicleEntity" then
+			-- Small delay before firing an event, otherwise it may crash
+			Timer:Simple(0.1, function()
+				s_GameEntity:Enable()
+			end)
 		end
 
 		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)

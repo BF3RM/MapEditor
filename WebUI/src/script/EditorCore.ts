@@ -12,6 +12,7 @@ import { Vec2 } from '@/script/types/primitives/Vec2';
 import { InputControls } from '@/script/modules/InputControls';
 import { Dictionary } from 'typescript-collections';
 import SpawnBlueprintCommand from '@/script/commands/SpawnBlueprintCommand';
+import BulkCommand from '@/script/commands/BulkCommand';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -24,6 +25,7 @@ export class EditorCore {
 	private pendingUpdates = new Map<Guid, GameObject>();
 	private updateRequested = false;
 	public highlightedObjects: Dictionary<Guid, GameObject> = new Dictionary<Guid, GameObject>();
+	private pendingSelections: Guid[] = [];
 
 	// @ts-ignore
 	public stats = new Stats();
@@ -35,6 +37,23 @@ export class EditorCore {
 
 		this.lastUpdateTime = 0;
 		this.deltaTime = 1.0 / 30.0;
+	}
+
+	public setPendingSelection(guid: Guid) {
+		this.pendingSelections.push(guid);
+	}
+
+	public selectPendingSelections() {
+		for (let i = this.pendingSelections.length - 1; i >= 0; i--) {
+			const el = this.pendingSelections[i];
+			const go = editor.getGameObjectByGuid(el);
+			if (go) {
+				editor.threeManager.nextFrame(() => {
+					editor.Select(el, true, true);
+				});
+				this.pendingSelections.splice(i, 1);
+			}
+		}
 	}
 
 	public getRaycastTransform() {
@@ -169,6 +188,16 @@ export class EditorCore {
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
 		return commands;
+	}
+
+	public PasteObjects(copy: SpawnBlueprintCommand[]) {
+		const scope = this;
+		if (copy !== null) {
+			copy.forEach((command: SpawnBlueprintCommand) => {
+				scope.setPendingSelection(command.gameObjectTransferData.guid);
+			});
+			editor.execute(new BulkCommand(copy));
+		}
 	}
 
 	public onPreviewDrop() {

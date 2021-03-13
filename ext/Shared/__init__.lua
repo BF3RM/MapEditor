@@ -27,16 +27,23 @@ require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
 Patches = require "__shared/Patches/Patches"
+Timer = require "__shared/Util/Timer"
 
 local m_Logger = Logger("MapEditorShared", true)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
+end
+
+function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)
+	Timer:OnEngineUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorShared:OnLevelDestroy()
 	Patches:OnLevelDestroy()
+	Timer:OnResetData()
 	InstanceParser:OnLevelDestroy()
 end
 

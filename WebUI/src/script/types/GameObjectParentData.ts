@@ -21,4 +21,13 @@ export class GameObjectParentData {
 
 		return new GameObjectParentData(guid, typeName, primaryInstanceGuid, partitionGuid);
 	}
+
+	public toTable() {
+		return {
+			guid: this.guid.toString(),
+			typeName: this.typeName,
+			primaryInstanceGuid: this.primaryInstanceGuid.toString(),
+			partitionGuid: this.partitionGuid.toString()
+		};
+	}
 }
