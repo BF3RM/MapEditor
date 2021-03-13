@@ -176,7 +176,7 @@ export class InputControls {
 			window.location = (window as any).location;
 		}
 		if (event.which === KEYCODE.ESCAPE) {
-			editor.Select(Guid.createEmpty(), false); // Deselects everything.
+			editor.DeselectAll();
 		}
 	}
 
