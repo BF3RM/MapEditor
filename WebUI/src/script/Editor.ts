@@ -288,8 +288,6 @@ export default class Editor {
 
 	*/
 	public Select(guid: Guid, multiSelection: boolean, scrollTo: boolean = false, moveGizmo: boolean = false) {
-		console.log(multiSelection);
-
 		this.editorCore.select(guid, multiSelection, scrollTo, moveGizmo);
 	}
 
