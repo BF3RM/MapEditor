@@ -112,7 +112,7 @@ export class VEXTemulator {
 			sender: commandActionResult.sender,
 
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid,
+				guid: commandActionResult.gameObjectTransferData.guid.toString(),
 				name: commandActionResult.gameObjectTransferData.name
 			}
 		};
@@ -132,7 +132,7 @@ export class VEXTemulator {
 			type: 'SpawnedBlueprint',
 			gameObjectTransferData: {
 				transform: commandActionResult.gameObjectTransferData.transform.toTable(),
-				blueprintCtrRef: commandActionResult.gameObjectTransferData.blueprintCtrRef,
+				blueprintCtrRef: commandActionResult.gameObjectTransferData.blueprintCtrRef.toTable(),
 				gameEntities: [
 					{
 						transform: {
@@ -203,8 +203,8 @@ export class VEXTemulator {
 						typeName: 'WhateverEntity'
 					}
 				],
-				guid: commandActionResult.gameObjectTransferData.guid,
-				parentData: commandActionResult.gameObjectTransferData.parentData,
+				guid: commandActionResult.gameObjectTransferData.guid.toString(),
+				parentData: commandActionResult.gameObjectTransferData.parentData.toTable(),
 				name: commandActionResult.gameObjectTransferData.name,
 				variation: commandActionResult.gameObjectTransferData.variation
 			}
@@ -215,7 +215,7 @@ export class VEXTemulator {
 		return {
 			type: 'SetTransform',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid,
+				guid: commandActionResult.gameObjectTransferData.guid.toString(),
 				transform: commandActionResult.gameObjectTransferData.transform.toTable()
 			}
 		};
@@ -226,7 +226,7 @@ export class VEXTemulator {
 		return {
 			type: 'DeletedBlueprint',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid
+				guid: commandActionResult.gameObjectTransferData.guid.toString()
 			}
 		};
 	}
@@ -235,7 +235,7 @@ export class VEXTemulator {
 		return {
 			type: 'SetObjectName',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid,
+				guid: commandActionResult.gameObjectTransferData.guid.toString(),
 				name: commandActionResult.gameObjectTransferData.name
 			}
 		};
@@ -245,7 +245,7 @@ export class VEXTemulator {
 		return {
 			type: 'SetVariation',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid,
+				guid: commandActionResult.gameObjectTransferData.guid.toString(),
 				variation: commandActionResult.gameObjectTransferData.variation
 			}
 		};
@@ -255,7 +255,7 @@ export class VEXTemulator {
 		return {
 			type: 'EnabledBlueprint',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid
+				guid: commandActionResult.gameObjectTransferData.guid.toString()
 			}
 		};
 	}
@@ -264,7 +264,7 @@ export class VEXTemulator {
 		return {
 			type: 'DisabledBlueprint',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid
+				guid: commandActionResult.gameObjectTransferData.guid.toString()
 			}
 		};
 	}
@@ -273,7 +273,7 @@ export class VEXTemulator {
 		return {
 			type: 'SetField',
 			gameObjectTransferData: {
-				guid: commandActionResult.gameObjectTransferData.guid,
+				guid: commandActionResult.gameObjectTransferData.guid.toString(),
 				overrides: commandActionResult.gameObjectTransferData.overrides
 			}
 		};
