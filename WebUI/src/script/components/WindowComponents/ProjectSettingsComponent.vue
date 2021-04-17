@@ -16,7 +16,7 @@
 		</div>
 		<div v-else-if="showExportWindow">
 			<div class="Container">
-				<input class="projectDataInput" readonly placeholder="Loading..."
+				<textarea class="projectDataInput" readonly placeholder="Loading..."
 					@focus="$event.target.select()" v-model="projectData"
 				/>
 			</div>
@@ -156,7 +156,7 @@ export default class ProjectSettingsComponent extends Vue {
 		});
 		signals.setProjectData.connect((projectData: any) => {
 			this.hint = 'Select all and copy (CTRL+C)';
-			this.projectData = JSON.stringify(projectData);
+			this.projectData = JSON.stringify(projectData, null, '\t');
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
 		});
 	}

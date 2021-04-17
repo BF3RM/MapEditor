@@ -1,7 +1,7 @@
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
 		<div class="container">
-			<input v-model="projectDataJSON"/>
+			<textarea v-model="projectDataJSON"/>
 			<span>{{ displayMessage }}</span>
 		</div>
 		<div class="footer">
@@ -68,10 +68,6 @@ export default class ImportProjectComponent extends Vue {
 	display: grid;
 	min-width: 30vmin;
 	min-height: 20vmin;
-
-	input {
-		height: 100%;
-	}
 }
 .projectList {
 	grid-column: 1;
