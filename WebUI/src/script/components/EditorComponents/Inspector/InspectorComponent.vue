@@ -20,7 +20,7 @@
 				</div>
 				<div id="NameAndVariation">
 					<div id="Name">
-						<input class="name-input" :value="displayName" :disabled="multiSelection" @input="onNameChange" id="name">
+						<input class="name-input" :value="displayName" :disabled="multiSelection" id="name" @blur="onNameChange">
 					</div>
 					<div id="Variation" class="container variation" v-if="!multiSelection">
 						<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
