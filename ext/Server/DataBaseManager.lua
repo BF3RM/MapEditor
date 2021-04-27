@@ -281,7 +281,7 @@ function DataBaseManager:DeleteProject(p_ProjectId)
 	end
 
 	SQL:Query('DELETE FROM ' .. m_DB_Header_Table_Name .. ' WHERE id = ' .. s_ProjectHeader.id) -- this should cascade delete the according data table
-	-- SQL:Query('DELETE FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = "' .. s_ProjectHeader["id"])
+	SQL:Query('DELETE FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. s_ProjectHeader.id)
 	return true
 end
 
