@@ -13,7 +13,7 @@ function ClientTransactionManager:RegisterVars()
 	self.m_Queue = {
 		commands = {},
 		messages = {}
-	};
+	}
 
 	self.m_TransactionId = 0
 	--self.m_GameObjectTransferDatas = {}
@@ -49,15 +49,14 @@ function ClientTransactionManager:OnLevelDestroy()
 	self.m_TransactionId = 0
 end
 
-function ClientTransactionManager:OnSyncClientContext(p_Update)
-	if p_Update == nil then
+function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId)
+	if p_LastTransactionId == nil or p_TransferDatas == nil then
 		goto continue
-	elseif p_Update.lastTransactionId == nil or p_Update.transferDatas == nil then
-		m_Logger:Error('OnSyncClientContext got nil data')
 	end
-	self:UpdateTransactionId(p_Update.lastTransactionId, true)
-	self:SyncClientTransferDatas(p_Update.transferDatas)
-
+	self:UpdateTransactionId(p_LastTransactionId, true)
+	self:SyncClientTransferDatas(p_TransferDatas)
+	-- Request again, in case there are more packaged updates
+	--NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
 	::continue::
 	Events:DispatchLocal('UIManager:LoadingComplete')
 end

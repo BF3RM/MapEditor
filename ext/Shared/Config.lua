@@ -1,5 +1,8 @@
 ME_CONFIG = {
 	LOAD_VANILLA = true,
 	LOGGER_ENABLED = false,
-	LOGGER_PRINT_ALL = false
+	LOGGER_PRINT_ALL = false,
+
+	QUEUE_DELAY_PER_COMMAND = 0.02, -- 1s for 50 commands (1/50)
+	QUEUE_MAX_COMMANDS = 500
 }
