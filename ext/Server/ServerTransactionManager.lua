@@ -90,23 +90,20 @@ function ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 	end
 
 	local s_QueuedCommands = {}
+	local s_NewQueue = {}
 
 	local s_nProcessedCommands = 0
 	for i, l_Command in pairs(self.m_Queue) do
 		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
-			local s_NewQueue = {}
-			for j = i, #self.m_Queue, 1 do
-				table.insert(s_NewQueue, self.m_Queue[j])
-			end
-			self.m_Queue = s_NewQueue
-
-			break
+			table.insert(s_NewQueue, l_Command)
+		else
+			m_Logger:Write("Executing command delayed: " .. l_Command.type)
+			table.insert(s_QueuedCommands, l_Command)
+			s_nProcessedCommands = i
 		end
-		m_Logger:Write("Executing command delayed: " .. l_Command.type)
-		table.insert(s_QueuedCommands, l_Command)
-		s_nProcessedCommands = i
 	end
+	self.m_Queue = s_NewQueue
 	self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
 	m_Logger:Write('Limit of 500 commands reached, queueing the rest')
 	self:_executeCommands(s_QueuedCommands, p_Pass)
