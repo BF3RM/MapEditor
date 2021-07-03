@@ -26,7 +26,9 @@ require "__shared/Types/GameObject"
 require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
-local m_Patches = require "__shared/Patches/Patches"
+
+Patches = require "__shared/Patches/Patches"
+Timer = require "__shared/Util/Timer"
 
 local m_Logger = Logger("MapEditorShared", true)
 
@@ -38,15 +40,21 @@ function MapEditorShared:__init()
 end
 
 function MapEditorShared:OnLevelLoaded(p_MapName, p_GameModeName)
-	m_Patches:OnLevelLoaded(p_MapName, p_GameModeName)
+	Patches:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorShared:OnLevelDestroy()
-	m_Patches:OnLevelDestroy()
+	Patches:OnLevelDestroy()
+	Timer:OnResetData()
+	InstanceParser:OnLevelDestroy()
 end
 
 function MapEditorShared:OnPartitionLoaded(p_Partition)
-	m_Patches:OnPartitionLoaded(p_Partition)
+	Patches:OnPartitionLoaded(p_Partition)
+end
+
+function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)
+	Timer:OnEngineUpdate(p_Delta, p_SimulationDelta)
 end
 
 return MapEditorShared()

@@ -2,9 +2,10 @@
 	<RecycleScroller :class="className"
 					class="scrollable"
 					:items="filteredNodes"
-					:item-height="rowHeight"
 					ref="scroller"
 					:min-item-size="16"
+					:item-size="rowHeight"
+					:buffer="50"
 	>
 		<slot
 			class="text-slot"

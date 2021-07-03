@@ -8,7 +8,6 @@
 	"HasVeniceEXT": true,
 	"Tags": ["mapeditor"],
 	"Dependencies": {
-		"maploader": "^1.0.0",
         "veniceext": "^1.0.0"
     }
 }

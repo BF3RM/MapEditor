@@ -25,7 +25,7 @@ import { FrostbiteDataManager } from './modules/FrostbiteDataManager';
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
-import { EDITOR_MODE, REALM } from '@/script/types/Enums';
+import { EDITOR_MODE, GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
 import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
 
@@ -167,7 +167,8 @@ export default class Editor {
 
 	public Duplicate() {
 		const commands = this.editorCore.CopySelectedObjects();
-		this.execute(new BulkCommand(commands));
+		this.DeselectAll();
+		this.editorCore.PasteObjects(commands);
 	}
 
 	public Copy() {
@@ -175,14 +176,8 @@ export default class Editor {
 	}
 
 	public Paste() {
-		const scope = this;
-		if (scope.copy !== null) {
-			// Generate a new guid for each command
-			scope.copy.forEach((command: SpawnBlueprintCommand) => {
-				command.gameObjectTransferData.guid = Guid.create();
-			});
-			scope.execute(new BulkCommand(scope.copy));
-		}
+		this.DeselectAll();
+		this.editorCore.PasteObjects(this.copy);
 	}
 
 	public Cut() {
@@ -220,6 +215,9 @@ export default class Editor {
 			isEnabled: true
 		});
 
+		this.DeselectAll();
+		this.editorCore.setPendingSelection(gameObjectTransferData.guid);
+
 		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
 	}
 
@@ -229,7 +227,7 @@ export default class Editor {
 		if (go) {
 			go.setRealm(realm);
 		} else {
-			console.error('Tried updatig realm of a gameobject that doesn\'t exist. Guid: ' + guidString);
+			console.error('Tried updating realm of a gameobject that doesn\'t exist. Guid: ' + guidString);
 		}
 	}
 
@@ -295,6 +293,10 @@ export default class Editor {
 
 	public Deselect(guid: Guid) {
 		this.editorCore.deselect(guid);
+	}
+
+	public DeselectAll() {
+		editor.Select(Guid.createEmpty(), false); // Deselects everything.
 	}
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
@@ -411,9 +413,16 @@ export default class Editor {
 					this.missingParent.remove(gameObjectGuid);
 				}
 			}
-			if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && !gameObject.isVanilla) {
+			// if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && gameObject.origin !== GAMEOBJECT_ORIGIN.VANILLA) {
+			// 	// Make selection happen after all signals have been handled
+			// 	this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
+			// }
+			// if (!window.vext.executing && this.editorCore.isPendingSelection(gameObjectGuid)) {
+			if (!window.vext.executing) {
 				// Make selection happen after all signals have been handled
-				this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
+				this.editorCore.selectPendingSelections();
+				// this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, true, true));
+				// this.editorCore.removePendingSelection(gameObjectGuid);
 			}
 			signals.spawnedBlueprint.emit(commandActionResult);
 		});

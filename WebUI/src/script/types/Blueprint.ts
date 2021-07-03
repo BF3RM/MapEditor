@@ -33,7 +33,7 @@ export class Blueprint implements IBlueprint {
 	}
 
 	public hasVariations() {
-		return this.variations.length !== 0;
+		return this.variations.length > 0;
 	}
 
 	public isVariationValid(variation: number) {

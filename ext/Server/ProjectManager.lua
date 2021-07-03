@@ -154,7 +154,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
     -- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
     -- Invoke Restart
 	if(self.m_MapName == s_MapName) then
-		Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
+		--Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
@@ -216,10 +216,13 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
         local s_Command
 
-        --If it's a vanilla object we move it or we delete it. If not we spawn a new object.
-        if l_GameObjectSaveData.isVanilla then
-            --[[if l_GameObjectSaveData.isDeleted then
+        -- Vanilla objects are handled in maploader
+        if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
+				l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild or
+				l_GameObjectSaveData.isVanilla then
+            if l_GameObjectSaveData.isDeleted then
                 s_Command = {
+					guid = l_Guid,
                     sender = "LoadingSaveFile",
                     type = "DeleteBlueprintCommand",
                     gameObjectTransferData = {
@@ -228,6 +231,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
                 }
             else
                 s_Command = {
+					guid = l_Guid,
                     sender = "LoadingSaveFile",
                     type = "SetTransformCommand",
                     gameObjectTransferData = {
@@ -238,7 +242,6 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
             end
 
             table.insert(s_SaveFileCommands, s_Command)
-            --]]
         else
             s_Command = {
                 guid = l_Guid,
@@ -262,7 +265,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
         end
     end
 
-    ServerTransactionManager:ExecuteCommands(s_SaveFileCommands, true)
+    ServerTransactionManager:QueueCommands(s_SaveFileCommands)
 end
 
 return ProjectManager()

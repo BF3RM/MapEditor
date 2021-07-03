@@ -9,6 +9,7 @@
 									:autoOpen="true"
 									:data="data"
 									:selectable="true"
+									:row-height="13"
 									:should-select-node="shouldSelectNode">
 				<expandable-tree-slot slot-scope="{ node, index, tree, active }"
 									:has-visibility-options="true"
@@ -52,7 +53,7 @@ import { GameObject } from '@/script/types/GameObject';
 import { Guid } from '@/script/types/Guid';
 import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
-import { REALM } from '@/script/types/Enums';
+import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent } })
 
@@ -168,7 +169,7 @@ export default class HierarchyComponent extends EditorComponent {
 						this.existingParents.get(parentId)!.push(entry);
 					} else {
 						// Entry does not have a parent.
-						const rootId = gameObject.isVanilla ? 'vanilla_root' : 'custom_root';
+						const rootId = gameObject.origin === GAMEOBJECT_ORIGIN.VANILLA ? 'vanilla_root' : 'custom_root';
 						if (!this.existingParents.has(rootId)) {
 							this.existingParents.set(rootId, []);
 						}

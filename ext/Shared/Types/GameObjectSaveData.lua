@@ -9,7 +9,7 @@ function GameObjectSaveData:__init(p_GameObject)
     self.parentData = p_GameObject.parentData
     self.transform = p_GameObject.transform
     self.variation = p_GameObject.variation
-	self.isVanilla = p_GameObject.isVanilla
+	self.origin = p_GameObject.origin
 	self.original = p_GameObject.original
 	self.localTransform = p_GameObject.localTransform
 
@@ -39,7 +39,7 @@ function GameObjectSaveData:GetAsTable()
         variation = self.variation,
         isDeleted = self.isDeleted,
         isEnabled = self.isEnabled,
-        isVanilla = self.isVanilla,
+		origin = self.origin,
 	}
 	if(self.originalRef) then
 		out.originalRef = self.originalRef:GetTable()

@@ -23,6 +23,15 @@ export class CtrRef {
 		return this;
 	}
 
+	public toTable() {
+		return {
+			typeName: this.typeName,
+			name: this.name,
+			partitionGuid: this.partitionGuid.toString(),
+			instanceGuid: this.instanceGuid.toString()
+		};
+	}
+
 	public clone() {
 		return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
 	}
