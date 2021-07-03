@@ -9,6 +9,7 @@
 									:autoOpen="true"
 									:data="data"
 									:selectable="true"
+									:row-height="13"
 									:should-select-node="shouldSelectNode">
 				<expandable-tree-slot slot-scope="{ node, index, tree, active }"
 									:has-visibility-options="true"
