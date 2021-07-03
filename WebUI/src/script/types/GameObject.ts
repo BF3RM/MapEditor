@@ -52,13 +52,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
 		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
 		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [],
-<<<<<<< HEAD
-		isVanilla: boolean = false, isUserModified: boolean = false,
-		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER, overrides: IEBXFieldData[]) {
-=======
 		origin: GAMEOBJECT_ORIGIN = GAMEOBJECT_ORIGIN.CUSTOM, isUserModified: boolean = false,
-		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER) {
->>>>>>> development
+		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER, overrides: IEBXFieldData[]) {
 		super();
 		this.guid = guid;
 		this.name = name;
