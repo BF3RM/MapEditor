@@ -1,21 +1,21 @@
-class 'DynamicModelPatcher'
-local m_Logger = Logger("DynamicModelPatcher", true)
+class 'MeshProxyPatcher'
+local m_Logger = Logger("MeshProxyPatcher", true)
 
-function DynamicModelPatcher:__init()
+function MeshProxyPatcher:__init()
 	m_Logger:Write("Initializing Vegetation Patches")
 	self:RegisterVars()
 end
 
-function DynamicModelPatcher:RegisterVars()
+function MeshProxyPatcher:RegisterVars()
 	self.m_Replacements = {}
 end
 
-function DynamicModelPatcher:OnLevelDestroy()
+function MeshProxyPatcher:OnLevelDestroy()
 	self.m_Replacements = {}
 end
 
-function DynamicModelPatcher:Patch(p_DynamicModel)
-	local s_Instance = DynamicModelEntityData(p_DynamicModel)
+function MeshProxyPatcher:Patch(p_DynamicModel)
+	local s_Instance = MeshProxyEntityData(p_DynamicModel)
 	local s_ReplacementData = self.m_Replacements[tostring(s_Instance.instanceGuid)]
 
 	if s_ReplacementData then
@@ -27,15 +27,6 @@ function DynamicModelPatcher:Patch(p_DynamicModel)
 	s_ReplacementData.transform = s_Instance.transform
 	s_ReplacementData.enabled = true
 	s_ReplacementData.visible = true
-
-	--[[ Don't think this is necessary
-	for k,v in pairs(s_Instance.components) do
-		print(k)
-		s_ReplacementData.components:add(v)
-	end
-	s_ReplacementData.runtimeComponentCount = s_Instance.runtimeComponentCount
-	s_ReplacementData.physicsData = s_Instance.physicsData
-	]]
 
 	self.m_Replacements[tostring(s_Instance.instanceGuid)] = s_ReplacementData
 
@@ -50,4 +41,4 @@ function DynamicModelPatcher:Patch(p_DynamicModel)
 end
 
 
-return DynamicModelPatcher()
+return MeshProxyPatcher()

@@ -5,6 +5,7 @@ require "__shared/Patches/SequencePatcher"
 require "__shared/Patches/HealthStatePatcher"
 VegetationPatcher = require "__shared/Patches/VegetationPatcher"
 DynamicModelPatcher = require "__shared/Patches/DynamicModelPatcher"
+MeshProxyPatcher = require "__shared/Patches/MeshProxyPatcher"
 
 local m_Logger = Logger("Patches", true)
 
@@ -44,6 +45,8 @@ function Patches:OnPartitionLoaded(p_Partition)
 			SequencePatcher:PatchSequence(l_Instance)
 		elseif l_Instance:Is('HealthStateData') then
 			HealthStatePatcher:PatchHealthStateData(l_Instance)
+		elseif l_Instance:Is('MeshProxyEntityData') then
+			MeshProxyPatcher:Patch(l_Instance)
 		elseif l_Instance:Is('DynamicModelEntityData') then
 			DynamicModelPatcher:Patch(l_Instance)
 		end
@@ -51,4 +54,5 @@ function Patches:OnPartitionLoaded(p_Partition)
 		::continue::
 	end
 end
+
 return Patches()
