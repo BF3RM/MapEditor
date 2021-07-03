@@ -195,7 +195,7 @@ export default class ExpandableTreeSlot extends Vue {
 		.text-container {
 			display: flex;
 			flex-direction: row;
-			width: available;
+			width: max-content;
 			overflow: hidden;
 		}
 		.expand-container img {
@@ -206,8 +206,8 @@ export default class ExpandableTreeSlot extends Vue {
 			}
 		}
 		.icon-container {
-			width: 13px;;
-			height: 100%;
+			width: 13px;
+			max-width: 13px;
 			color: #6d6d6d;
 
 			img {
