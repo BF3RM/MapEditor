@@ -533,10 +533,10 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 		-- Set custom objects' entities enabled by default.
 		if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla and
-				s_Entity:Is('GameEntity') and
+				(s_Entity:Is('GameEntity') or s_Entity:Is('EffectEntity')) and
 				s_Entity.typeInfo.name ~= "ServerVehicleEntity" then
 			-- Small delay before firing an event, otherwise it may crash
-			Timer:Simple(0.1, function()
+			Timer:Simple(0.2, function()
 				s_GameEntity:Enable()
 			end)
 		end
