@@ -291,6 +291,12 @@ export default class Editor {
 		this.editorCore.select(guid, multiSelection, scrollTo, moveGizmo);
 	}
 
+	public SelectMultiple(guids: Guid[]) {
+		guids.forEach((guid: Guid) => {
+			this.editorCore.select(guid, true, false, false);
+		});
+	}
+
 	public Deselect(guid: Guid) {
 		this.editorCore.deselect(guid);
 	}
