@@ -34,6 +34,13 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = p_Command.gameObjectTransferData
 
+	-- Set parentData to root if parentData is vanilla
+	local s_VanillaGameObjectGuids = GameObjectManager:GetVanillaGameObjectsGuids()
+
+	if s_VanillaGameObjectGuids[tostring(s_GameObjectTransferData.parentData.guid)] then
+		s_GameObjectTransferData.parentData = GameObjectParentData:GetRootParentData()
+	end
+
 	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
 																p_Command.sender,
 																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,

@@ -3,6 +3,7 @@ local matrix = require "__shared/Util/matrix"
 local TEMP_GUID_PREFIX = "ED170120"
 local CUSTOMOBJ_GUID_PREFIX = "ED170121"
 local VANILLA_GUID_PREFIX = "ED170122"
+local EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
 
 function MergeTables(p_Old, p_New)
 	if(p_New == nil) then

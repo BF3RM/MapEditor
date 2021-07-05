@@ -184,7 +184,6 @@ export class EditorCore {
 					gameObjectTransferData.variation = bp.getDefaultVariation();
 				}
 			}
-			// TODO: if ParentData is a vanilla object then set it to custom_root. Maybe do it on Lua?
 			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
 		});
 		return commands;
