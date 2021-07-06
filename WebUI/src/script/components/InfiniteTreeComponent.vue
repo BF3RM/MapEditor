@@ -134,12 +134,26 @@ export default class InfiniteTreeComponent extends Vue {
 
 	public scrollTo(node: Node) {
 		const nodeIndex = (this.filteredNodes).findIndex((i) => {
-			// console.log(i.id === node.id);
 			return i.id === node.id;
 		});
 		this.openParentNodes(node);
-		// TODO: dont scroll if the item is in view (item.active) fuck if i know how to access the item tho.
-		this.scroller.scrollToItem(nodeIndex); // TODO: This doesnt work when node's parents were closed
+
+		// Get scroll start and end position of the current view
+		const scrollLimits = this.scroller.getScroll();
+
+		// Get scroll position of the node
+		let nodeScrollPos;
+		if (this.scroller.itemSize === null) {
+			nodeScrollPos = nodeIndex > 0 ? this.scroller.sizes[nodeIndex - 1].accumulator : 0;
+		} else {
+			nodeScrollPos = nodeIndex * this.scroller.itemSize;
+		}
+
+		// Only scroll to node position if the node is not visible
+		if (nodeScrollPos < scrollLimits.start || nodeScrollPos > scrollLimits.end) {
+			// Scroll to position with some offset, so the selected item is not at the top of the hierarchy
+			this.scroller.scrollToPosition(Math.max(nodeScrollPos - 0.25 * (scrollLimits.end - scrollLimits.start), 0));
+		}
 	}
 
 	private openParentNodes(node: Node) {
