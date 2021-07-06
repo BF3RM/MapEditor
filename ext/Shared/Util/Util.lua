@@ -4,13 +4,14 @@ local TEMP_GUID_PREFIX = "ED170120"
 local CUSTOMOBJ_GUID_PREFIX = "ED170121"
 local VANILLA_GUID_PREFIX = "ED170122"
 local EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
+local HAVOK_GUID = Guid('FE9BF899-0000-0000-FF64-00FF64076739')
 
 function MergeTables(p_Old, p_New)
-	if(p_New == nil) then
+	if p_New == nil then
 		return p_Old
 	end
 
-	if(p_Old == nil) then
+	if p_Old == nil then
 		return p_New
 	end
 
@@ -37,7 +38,7 @@ end
 function GetChanges(p_Old, p_New)
 	local s_Changes = {}
 	for k,_ in pairs(p_New) do
-		if(tostring(p_Old[k]) ~= tostring(p_New[k])) then
+		if tostring(p_Old[k]) ~= tostring(p_New[k]) then
 			if type(p_Old[k]) == "table" then
 				for k1,_ in pairs(p_Old[k]) do
 					if(p_Old[k][k1] ~= p_New[k][k1]) then
@@ -54,7 +55,7 @@ end
 
 
 function DecodeParams(p_Table)
-    if(p_Table == nil) then
+    if p_Table == nil then
         print("No table received")
         return false
 	end
@@ -154,7 +155,7 @@ function SanitizeVec3( vec )
 end
 
 function SanitizeFloat( f )
-	if( f < 0.000000001 and f > -0.000000001 ) then
+	if f < 0.000000001 and f > -0.000000001 then
 		return 0
 	end
 	return f
@@ -162,7 +163,7 @@ end
 
 
 function InverseSafe (f)
-    if (f > 0.00000000000001) then
+    if f > 0.00000000000001 then
         return 1.0 / f
     else
         return 0.0
@@ -170,15 +171,15 @@ function InverseSafe (f)
 end
 
 function InverseVec3 (v)
-    return Vec3 (InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z));
+    return Vec3(InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z));
 end
 
 function InverseQuat (v)
-    return Quat (InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z), InverseSafe (v.w));
+    return Quat(InverseSafe (v.x), InverseSafe (v.y), InverseSafe (v.z), InverseSafe (v.w));
 end
 
 function dus_MatrixParent(o)
-	if(o == nil) then
+	if o == nil then
 		print("tried to load jack shit")
 	end
 	if type(o) == 'table' then
@@ -273,7 +274,7 @@ function string:split(sep)
 end
 
 function dump(o)
-	if(o == nil) then
+	if o == nil then
 		print("No table?")
 	end
 	if type(o) == 'table' then
@@ -288,7 +289,7 @@ function dump(o)
 	end
 end
 
-function Set (list)
+function Set(list)
 	local set = {}
 	for _, l in ipairs(list) do set[l] = true end
 	return set
