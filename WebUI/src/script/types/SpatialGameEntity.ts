@@ -5,7 +5,6 @@ import { Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, Mesh, MeshBa
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { CtrRef } from '@/script/types/CtrRef';
-import { Geometry } from 'three/examples/jsm/deprecated/Geometry';
 
 export class SpatialGameEntity extends Mesh implements IGameEntity {
 	private static SELECTED_COLOR: Color = new Color(0xFF0000);
@@ -16,14 +15,6 @@ export class SpatialGameEntity extends Mesh implements IGameEntity {
 	private initiatorRef: CtrRef;
 
 	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox, initiatorRef: CtrRef) {
-		const pointsGeom = new Geometry();
-		pointsGeom.vertices.push(
-			aabb.min,
-			aabb.max
-		);
-
-		const center = new Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5);
-
 		let vmax = aabb.max;
 		if (vmax.x > 100000 || vmax.y > 100000 || vmax.z > 10000) {
 			vmax = new Vec3(1, 1, 1);
@@ -37,6 +28,7 @@ export class SpatialGameEntity extends Mesh implements IGameEntity {
 			vmax.y - vmin.y,
 			vmax.z - vmin.z
 		);
+		const center = new Vector3().copy(aabb.min).add(aabb.max).multiplyScalar(0.5);
 		boxGeom.translate(center.x, center.y, center.z);
 
 		super(boxGeom, new MeshBasicMaterial({
