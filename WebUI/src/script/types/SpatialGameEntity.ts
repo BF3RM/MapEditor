@@ -1,7 +1,7 @@
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, Mesh, MeshBasicMaterial, Vector3 } from 'three';
+import { Box3, BoxGeometry, Color, Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { CtrRef } from '@/script/types/CtrRef';
@@ -37,13 +37,6 @@ export class SpatialGameEntity extends Mesh implements IGameEntity {
 			visible: true
 		}));
 		this.type = 'SpatialGameEntity';
-
-		const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
-		const positions = new Float32Array(8 * 3);
-
-		const geometry = new BufferGeometry();
-		geometry.setIndex(new BufferAttribute(indices, 1));
-		geometry.setAttribute('position', new BufferAttribute(positions, 3));
 
 		this.instanceId = instanceId;
 		this.transform = transform;
