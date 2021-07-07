@@ -26,9 +26,8 @@ export class THREEManager {
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
 	public inputControls = new InputControls(this.renderer.domElement);
-	public instanceManager = new InstanceManager();
+	public worldSpace = WORLD_SPACE.local;
 	public selectionWrapper = new SelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
-	public worldSpace = WORLD_SPACE.world;
 
 	private gridSnap = false;
 	private highlightingEnabled = true;

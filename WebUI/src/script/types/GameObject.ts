@@ -20,7 +20,7 @@ const merge = require('deepmerge');
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
 	their GameEntities to visible = false. GameObjects should always be visible as we want to render their children even
 	when the parent is hidden. Renderer ignores an object if its visible flag is false, so it would ignore their children.
-*/
+ */
 export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
 	public transform: LinearTransform;
@@ -321,14 +321,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.selected = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach(go => (go as GameObject).onSelect());
+		this.children.forEach(go => (go as unknown as IGameEntity).onSelect());
 	}
 
 	onDeselect() {
 		this.selected = false;
 		this.visible = false;
 		this.makeParentsInvisible();
-		this.children.forEach(go => (go as GameObject).onDeselect());
+		this.children.forEach(go => (go as unknown as IGameEntity).onDeselect());
 	}
 
 	onHighlight() {
@@ -336,7 +336,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach(go => (go as GameObject).onHighlight());
+		this.children.forEach(go => (go as unknown as IGameEntity).onHighlight());
 	}
 
 	onUnhighlight() {
@@ -344,7 +344,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = false;
 		this.visible = false;
 		this.makeParentsInvisible();
-		this.children.forEach(go => (go as GameObject).onUnhighlight());
+		this.children.forEach(go => (go as unknown as IGameEntity).onUnhighlight());
 	}
 
 	makeParentsInvisible() {

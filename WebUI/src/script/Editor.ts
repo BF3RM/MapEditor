@@ -380,7 +380,7 @@ export default class Editor {
 				const entityData = gameEntityData;
 
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb, entityData.initiatorRef);
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.initiatorRef, entityData.aabb);
 					gameObject.add(gameEntity);
 				}
 			}

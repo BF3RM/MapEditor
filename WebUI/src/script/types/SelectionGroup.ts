@@ -28,7 +28,7 @@ export class SelectionGroup extends THREE.Object3D {
 		this.updateSelectedGameObjects();
 		for (const go of this.selectedGameObjects) {
 			for (const child of go.children) {
-				child.updateTransform();
+				(child as GameObject).updateTransform();
 			}
 		}
 		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));

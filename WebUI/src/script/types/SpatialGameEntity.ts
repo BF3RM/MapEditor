@@ -1,45 +1,21 @@
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { BoxGeometry, Color, Mesh, MeshBasicMaterial, Object3D, Vector3 } from 'three';
+import { Color, Object3D, Vector3 } from 'three';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { CtrRef } from '@/script/types/CtrRef';
+import InstanceManager from '@/script/modules/InstanceManager';
 
 export class SpatialGameEntity extends Object3D implements IGameEntity {
-	private static SELECTED_COLOR: Color = new Color(0xFF0000);
-	private static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
-	private instanceId: number;
-	public transform: LinearTransform;
-	private initiatorRef: CtrRef;
+	public static SELECTED_COLOR: Color = new Color(0xFF0000);
+	public static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
+	public AABBScale: Vector3;
 
-	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox, initiatorRef: CtrRef) {
+	constructor(public instanceId: number, public transform: LinearTransform, public initiatorRef: CtrRef, aabb: AxisAlignedBoundingBox) {
 		super();
-		// let vmax = aabb.max;
-		// if (vmax.x > 100000 || vmax.y > 100000 || vmax.z > 10000) {
-		// 	vmax = new Vec3(1, 1, 1);
-		// }
-		// let vmin = aabb.min;
-		// if (vmin.x > 100000 || vmin.y > 100000 || vmin.z > 10000) {
-		// 	vmin = new Vec3(0, 0, 0);
-		// }
-		// const boxGeom = new BoxGeometry(
-		// 	vmax.x - vmin.x,
-		// 	vmax.y - vmin.y,
-		// 	vmax.z - vmin.z
-		// );
-		// const center = new Vector3().copy(aabb.min).add(aabb.max).multiplyScalar(0.5);
-		// boxGeom.translate(center.x, center.y, center.z);
-
-		/* super(boxGeom, new THREE.MeshBasicMaterial({
-			color: SpatialGameEntity.SELECTED_COLOR,
-			wireframe: true,
-			visible: true
-		})); */
+		this.AABBScale = aabb.max.clone().sub(aabb.min);
 
 		this.type = 'SpatialGameEntity';
-
-		this.instanceId = instanceId;
-		this.transform = transform;
 		this.matrixAutoUpdate = false;
 
 		this.visible = false;
@@ -48,38 +24,45 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
 		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 		this.updateMatrixWorld();
-		editor.threeManager.instanceManager.AddFromSpatialEntity(this);
-		this.initiatorRef = initiatorRef;
+		console.log(this.position);
+		editor.threeManager.nextFrame(() => {
+			InstanceManager.getInstance().AddFromSpatialEntity(this);
+		});
 	}
 
 	public onHighlight() {
 		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
 		this.visible = true;
+		InstanceManager.getInstance().SetVisibility(true);
 	}
 
 	public onUnhighlight() {
 		this.visible = false;
+		InstanceManager.getInstance().SetVisibility(false);
 	}
 
 	public onDeselect() {
 		this.visible = false;
+		InstanceManager.getInstance().SetVisibility(false);
 	}
 
 	public onSelect() {
 		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
+		InstanceManager.getInstance().SetVisibility(true);
 		this.visible = true;
 	}
 
-	public SetColor(color: THREE.Color) {
+	public SetColor(color: Color) {
 		/* const material = this.material;
 		if (!Array.isArray(material)) {
 			(material as MeshBasicMaterial).color = color;
 		}
 		 */
+		InstanceManager.getInstance().SetColor(this, color);
 		editor.threeManager.setPendingRender();
 	}
 
 	public updateTransform() {
-		editor.threeManager.instanceManager.SetMatrixFromSpatialEntity(this);
+		InstanceManager.getInstance().SetMatrixFromSpatialEntity(this);
 	}
 }
