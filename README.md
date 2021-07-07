@@ -8,7 +8,7 @@ It's not recommended to start any project yet, but if you still want to set up a
 Public releases will have the compiled UI available for download. 
 
 ## Developer set-up
-- Install [nodejs](https://nodejs.org/en/) version 13. Version 14 will give you errors.
+- Install [nodejs](https://nodejs.org/en/).
 - Install [yarn](https://yarnpkg.com/).
 - Place the UI compiler (``vuicc.exe``) in ``.../Server/Admin/`` folder.
 - Download MapEditor files and place them in  ``.../Server/Admin/Mods``. Path should look like ``.../Server/Admin/Mods/MapEditor``.
@@ -30,6 +30,7 @@ Once in freecam, hold right click and:
 - Shift to move camera faster
 - Scrollwheel to change camera speed
 - Page up/down to change rotation speed
+- Arrow up/down to change FOV
 
 In freecam, without holding right click:
 
@@ -56,11 +57,13 @@ In freecam, without holding right click:
 
 ## Mod Dependencies
 MapEditor requires other mods to work fully:
-- [MapLoader](https://github.com/BF3RM/MapLoader). This mod is required to load saves.
 - NoHavok. (Not publicly available yet). This mod transforms Havok objects into Frosbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing.
 
 ## Running saves for playing
-If your project is ready to be used for playing, you only need to run [MapLoader](https://github.com/BF3RM/MapLoader) and load the project save from another mod.
+If your project is ready to be used for playing, export your project's save from MapEditor and load it with
+ [MapLoader](https://github.com/BF3RM/MapLoader). The save can be loaded from an external mod (you can find an 
+ example here: [CustomLevel](https://github.com/BF3RM/CustomLevel)) or MapLoader can be modified to include and load
+ the save.
 
 ## Used libraries and tools
 This project is using:

@@ -2,9 +2,10 @@
 	<RecycleScroller :class="className"
 					class="scrollable"
 					:items="filteredNodes"
-					:item-height="rowHeight"
 					ref="scroller"
 					:min-item-size="16"
+					:item-size="rowHeight"
+					:buffer="50"
 	>
 		<div slot-scope="{ item,index }">
 			<slot
@@ -23,8 +24,8 @@
 <script lang="ts">
 import { RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
-import InfiniteTree, { INode, Node } from 'infinite-tree';
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import InfiniteTree, { Node } from 'infinite-tree';
+import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator';
 
 const lcfirst = (str: string) => {
 	str += '';
@@ -33,7 +34,7 @@ const lcfirst = (str: string) => {
 @Component({ components: { RecycleScroller } })
 export default class InfiniteTreeComponent extends Vue {
 	@Ref('scroller')
-	scroller!: RecycleScroller;
+	scroller: RecycleScroller;
 
 	@Prop()
 	search: string;
@@ -133,12 +134,26 @@ export default class InfiniteTreeComponent extends Vue {
 
 	public scrollTo(node: Node) {
 		const nodeIndex = (this.filteredNodes).findIndex((i) => {
-			// console.log(i.id === node.id);
 			return i.id === node.id;
 		});
 		this.openParentNodes(node);
-		// TODO: dont scroll if the item is in view (item.active) fuck if i know how to access the item tho.
-		this.scroller.scrollToItem(nodeIndex); // TODO: This doesnt work when node's parents were closed
+
+		// Get scroll start and end position of the current view
+		const scrollLimits = this.scroller.getScroll();
+
+		// Get scroll position of the node
+		let nodeScrollPos;
+		if (this.scroller.itemSize === null) {
+			nodeScrollPos = nodeIndex > 0 ? this.scroller.sizes[nodeIndex - 1].accumulator : 0;
+		} else {
+			nodeScrollPos = nodeIndex * this.scroller.itemSize;
+		}
+
+		// Only scroll to node position if the node is not visible
+		if (nodeScrollPos < scrollLimits.start || nodeScrollPos > scrollLimits.end) {
+			// Scroll to position with some offset, so the selected item is not at the top of the hierarchy
+			this.scroller.scrollToPosition(Math.max(nodeScrollPos - 0.25 * (scrollLimits.end - scrollLimits.start), 0));
+		}
 	}
 
 	private openParentNodes(node: Node) {
@@ -156,8 +171,7 @@ export default class InfiniteTreeComponent extends Vue {
 		if (tree === undefined) {
 			return [];
 		}
-		const out = tree.nodes.filter((node) => !(node.state.filtered === false));
-		return out;
+		return tree.nodes.filter((node) => !(node.state.filtered === false));
 	}
 
 	private nodes: Node[] = [];

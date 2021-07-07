@@ -9,6 +9,15 @@ function GameObjectParentData:__init(arg)
     self.partitionGuid = arg.partitionGuid
 end
 
+function GameObjectParentData.static:GetRootParentData()
+    return {
+        guid = EMPTY_GUID,
+        typeName = 'custom_root',
+        primaryInstanceGuid = EMPTY_GUID,
+        partitionGuid = EMPTY_GUID
+    }
+end
+
 function GameObjectParentData:GetTable()
     return {
         guid = self.guid,

@@ -11,10 +11,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class InfoTopBar extends Vue {
 	@Prop()
-	keyName!: string;
+	keyName: string;
 
 	@Prop()
-	description!: string;
+	description: string;
 }
 </script>
 
@@ -34,7 +34,7 @@ export default class InfoTopBar extends Vue {
 		}
 
 		#logo {
-			margin-left: 5vmin;
+			margin-left: 0.5em;
 			color: #fff;
 			font-weight: bolder;
 			font-size: 20px;

@@ -6,13 +6,11 @@ import * as GoldenLayout from 'golden-layout';
 import { SetViewModeMessage } from '@/script/messages/SetViewModeMessage';
 
 export class EditorUI {
-	// private debugWindow = new DebugWindow();
 	private windows = new Collections.Dictionary<string, Window>();
 	private windowZ: number;
 	private debug: boolean;
 	private layout: GoldenLayout | null;
 
-	// private page: JQuery<HTMLElement>;
 	constructor(debug: boolean = false) {
 		this.Initialize();
 
@@ -20,43 +18,13 @@ export class EditorUI {
 		this.debug = debug;
 
 		this.layout = null;
-		// this.page = $('#page');
-		// this.windowContainer = undefined;
-		// this.menubar = {
-		// 	entries: {},
-		// };
 		this.InitializeViews();
 		this.InitializeWindows();
 
 		signals.windowResized.connect(this.onResize.bind(this));
 	}
 
-	// Maybe this isn't the way it's supposed to be done...
 	public Initialize() {
-		/*
-		$('#menubar').menu({
-			position: { my: 'left top', at: 'left bottom' },
-			blur: function() {
-				$(this).menu('option', 'position', { my: 'left top', at: 'left bottom' });
-			},
-			focus: function(e, ui) {
-				if ($('#menubar').get(0) !== $(ui).get(0).item.parent().get(0)) {
-					$(this).menu('option', 'position', { my: 'left top', at: 'right top' });
-				}
-			},
-		});
-		$('#worldView').selectmenu({
-			change: UI.worldViewChanged
-		});
-
-		$('#tools').find('input').checkboxradio({
-			icon: false
-		}).on("change", UI.toolsChanged);
-
-		$('#worldSpace').find('input').checkboxradio({
-			icon: false
-		}).on("change", UI.worldChanged);
-	*/
 	}
 
 	public RegisterWindow(windowId: string, windowTitle: string, windowModule: any, visible: boolean) {

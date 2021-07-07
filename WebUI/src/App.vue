@@ -12,6 +12,7 @@ import '@/style/style.scss';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 import './style/icons.scss';
+
 import Editor from '@/script/Editor';
 import { Log, LogError } from '@/script/modules/Logger';
 import ActiveView from '@/script/components/Views/ActiveView.vue';
@@ -50,7 +51,7 @@ export default class App extends Vue {
 </script>
 
 <style scoped>
-	#viewport-container * {
+	#viewport-component * {
 		background: none !important;
 	}
 </style>
@@ -58,10 +59,22 @@ export default class App extends Vue {
 	.lm_splitter {
 		position: relative;
 		z-index: 0;
+		opacity: 0.5;
+	}
+	.lm_drag_handle:hover {
+		opacity: 0;
+	}
+	.lm_splitter:hover, .lm_splitter.lm_dragging {
+		background: #409EFF;
 	}
 	.lm_header {
 		overflow: visible;
 		position: relative;
 		z-index: 0;
+	}
+	.selectBox {
+		border: 1px solid #55aaff;
+		background-color: rgba(75, 160, 255, 0.3);
+		position: fixed;
 	}
 </style>

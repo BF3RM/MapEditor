@@ -15,6 +15,12 @@ export enum MOUSE_BUTTONS {
 	MIDDLE_CLICK = 4
 }
 
+export enum GAMEOBJECT_ORIGIN {
+	VANILLA = 1,
+	CUSTOM = 2,
+	CUSTOM_CHILD = 3
+}
+
 export enum KEYCODE {
 	BACKSPACE = 8,
 	TAB = 9,
@@ -146,4 +152,12 @@ export enum VIEW {
 export enum RAYCAST_LAYER {
 	GAMEOBJECT = 0,
 	GAMEENTITY= 1
+}
+
+export enum REALM {
+	CLIENT = 0,
+	SERVER = 1,
+	CLIENT_AND_SERVER = 2,
+	NONE = 3,
+	PIPELINE = 4
 }

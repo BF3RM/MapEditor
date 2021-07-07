@@ -8,6 +8,8 @@ UIManager = require "UIManager"
 MessageActions = require "MessageActions"
 ClientTransactionManager = require "ClientTransactionManager"
 ClientGameObjectManager = require "ClientGameObjectManager"
+EBXManager = require "__shared/Modules/EBXManager"
+
 GameObjectManager = GameObjectManager(Realm.Realm_Client)
 
 EditorCommon = EditorCommon(Realm.Realm_Client)
@@ -42,15 +44,12 @@ function MapEditorClient:RegisterEvents()
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectHeaders', self, self.OnReceiveProjectHeaders)
 	NetEvents:Subscribe('MapEditorClient:ReceiveCurrentProjectHeader', self, self.OnReceiveCurrentProjectHeader)
+	NetEvents:Subscribe('MapEditorClient:ProjectImportFinished', self, self.OnProjectImportFinished)
 
 	-- WebUI events
 	Events:Subscribe('MapEditor:UIReloaded', self, self.OnUIReloaded)
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessages)
-	Events:Subscribe('MapEditor:RequestProjectSave', self, self.OnRequestProjectSave)
-	Events:Subscribe('MapEditor:RequestProjectLoad', self, self.OnRequestProjectLoad)
-	Events:Subscribe('MapEditor:RequestProjectDelete', self, self.OnRequestProjectDelete)
-	Events:Subscribe('MapEditor:RequestProjectData', self, self.OnRequestProjectData)
 
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
 	Events:Subscribe('MapEditor:DisableEditorMode', self, self.OnDisableEditorMode)
@@ -64,6 +63,7 @@ function MapEditorClient:RegisterEvents()
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 
 ----------- Game functions----------------
@@ -75,7 +75,6 @@ end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
-	ClientTransactionManager:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnLoaded()
@@ -89,11 +88,11 @@ end
 
 function MapEditorClient:OnPartitionLoaded(p_Partition)
 	InstanceParser:OnPartitionLoaded(p_Partition)
-	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorClient:OnEngineMessage(p_Message)
 	Editor:OnEngineMessage(p_Message)
+	ClientTransactionManager:OnEngineMessage(p_Message)
 end
 
 function MapEditorClient:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
@@ -121,6 +120,7 @@ function MapEditorClient:OnLevelDestroy()
 	GameObjectManager:OnLevelDestroy()
 	FreeCam:OnLevelDestroy()
 	ClientTransactionManager:OnLevelDestroy()
+	ClientGameObjectManager:OnLevelDestroy()
 	UIManager:OnLevelDestroy()
 end
 
@@ -138,6 +138,10 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	end
 	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(loadingInfo)))
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+end
+
+function MapEditorClient:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
+	GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
 end
 
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
@@ -160,11 +164,11 @@ end
 
 function MapEditorClient:OnReceiveProjectData(p_ProjectData)
 	-- TODO: Handle properly in the project admin view
+	WebUpdater:AddUpdate('SetProjectData', p_ProjectData)
 end
 
-function MapEditorClient:OnReceiveCurrentProjectHeader(p_ProjectHeader)
-	-- TODO: set project header
-	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_ProjectHeader)
+function MapEditorClient:OnProjectImportFinished(p_Msg)
+	WebUpdater:AddUpdate('ProjectImportFinished', p_Msg)
 end
 
 ----------- WebUI functions----------------
@@ -178,25 +182,8 @@ function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
 	WebUpdater:AddUpdate('SetProjectHeaders', p_ProjectHeaders)
 end
 
-function MapEditorClient:OnRequestProjectSave(p_ProjectHeaderDataJson)
-	local s_ProjectHeaderData = DecodeParams(json.decode(p_ProjectHeaderDataJson))
-	print(s_ProjectHeaderData)
-	NetEvents:SendLocal("ProjectManager:RequestProjectSave", s_ProjectHeaderData)
-end
-
-function MapEditorClient:OnRequestProjectLoad(p_ProjectId)
-	m_Logger:Write("Load requested: " .. p_ProjectId)
-	NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_ProjectId)
-end
-
-function MapEditorClient:OnRequestProjectDelete(p_ProjectId)
-	m_Logger:Write("Delete requested: " .. p_ProjectId)
-	NetEvents:SendLocal("ProjectManager:RequestProjectDelete", p_ProjectId)
-end
-
-function MapEditorClient:OnRequestProjectData(p_ProjectId)
-	m_Logger:Write("Project Data requested: " .. p_ProjectId)
-	NetEvents:SendLocal("ProjectManager:RequestProjectData", p_ProjectId)
+function MapEditorClient:OnReceiveCurrentProjectHeader(p_CurrentProjectHeader)
+	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_CurrentProjectHeader)
 end
 
 function MapEditorClient:OnEnableFreeCamMovement()

@@ -9,7 +9,7 @@ function GameObjectSaveData:__init(p_GameObject)
     self.parentData = p_GameObject.parentData
     self.transform = p_GameObject.transform
     self.variation = p_GameObject.variation
-	self.isVanilla = p_GameObject.isVanilla
+	self.origin = p_GameObject.origin
 	self.original = p_GameObject.original
 	self.localTransform = p_GameObject.localTransform
 
@@ -20,10 +20,16 @@ function GameObjectSaveData:__init(p_GameObject)
     if not p_GameObject.isEnabled then
         self.isEnabled = false
     end
+	if(p_GameObject.originalRef) then
+		self.originalRef = p_GameObject.originalRef
+	end
+	if(p_GameObject.overrides) then
+		self.overrides = p_GameObject.overrides
+	end
 end
 
 function GameObjectSaveData:GetAsTable()
-    return {
+    local out = {
         guid = self.guid,
         name = self.name,
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
@@ -33,9 +39,15 @@ function GameObjectSaveData:GetAsTable()
         variation = self.variation,
         isDeleted = self.isDeleted,
         isEnabled = self.isEnabled,
-        isVanilla = self.isVanilla,
-        original = self.original:GetTable(),
+		origin = self.origin,
 	}
+	if(self.originalRef) then
+		out.originalRef = self.originalRef:GetTable()
+	end
+	if(self.overrides) then
+		out.overrides = self.overrides
+	end
+	return out
 end
 
 return GameObjectSaveData

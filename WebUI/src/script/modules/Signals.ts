@@ -21,6 +21,8 @@ export const signals = {
 	spawnBlueprintRequested: new Signal(),
 	getProjects: new Signal(),
 	setProjectHeaders: new Signal(),
+	setProjectData: new Signal(),
+	projectImportFinished: new Signal(),
 
 	gizmoModeChanged: new Signal<(mode: GIZMO_MODE) => void>(),
 	worldSpaceChanged: new Signal<(mode: WORLD_SPACE) => void>(),
@@ -32,6 +34,8 @@ export const signals = {
 
 	enabledBlueprint: new Signal(),
 	disabledBlueprint: new Signal(),
+
+	setEBXField: new Signal(),
 
 	createGroupRequested: new Signal(),
 	createdGroup: new Signal(),
@@ -82,5 +86,6 @@ export const signals = {
 	historyChanged: new Signal(),
 	setActiveView: new Signal<(mode: VIEW) => void>(),
 	setLoadingInfo: new Signal<(info: string) => void>(),
-	setCurrentProjectHeader: new Signal<(projectHeader: any) => void>()
+	setCurrentProjectHeader: new Signal<(projectHeader: any) => void>(),
+	saveRequested: new Signal<() => void>()
 };

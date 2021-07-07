@@ -25,17 +25,17 @@ export function GenerateBlueprints(count: number): IBlueprint[] {
 			instanceGuid: Guid.create().toString(),
 			variations: [
 				{
-					hash: Math.random(),
-					name: Math.random()
+					hash: Math.floor(Math.random() * 1000),
+					name: randomName()
 				}, {
-					hash: Math.random(),
-					name: Math.random()
+					hash: Math.floor(Math.random() * 1000),
+					name: randomName()
 				}, {
-					hash: Math.random(),
-					name: Math.random()
+					hash: Math.floor(Math.random() * 1000),
+					name: randomName()
 				}, {
-					hash: Math.random(),
-					name: Math.random()
+					hash: Math.floor(Math.random() * 1000),
+					name: randomName()
 				}
 			]
 		} as IBlueprint);

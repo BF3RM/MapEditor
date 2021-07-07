@@ -12,18 +12,15 @@
 			ref="gl"
 			class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
 			<gl-row>
-				<gl-col :width="80">
-					<gl-row :height="80">
-						<gl-col :width="20">
+				<gl-col>
+					<gl-row>
+						<gl-col width="17">
 							<HierarchyComponent/>
 						</gl-col>
-						<gl-col id="viewport-container" width="80">
-							<ViewportComponent :showHeader="true"/>
-						</gl-col>
+						<ViewportComponent :showHeader="true"/>
 					</gl-row>
 					<gl-row :height="20">
-						<ExplorerComponent :width="70"/>
-						<ConsoleComponent/>
+						<ExplorerComponent/>
 					</gl-row>
 				</gl-col>
 				<gl-col :width="20">
@@ -44,7 +41,7 @@ import ExplorerComponent from '@/script/components/EditorComponents/ExplorerComp
 import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
 import ViewportComponent from '@/script/components/EditorComponents/ViewportComponent.vue';
 import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
-import InspectorComponent from '@/script/components/EditorComponents/InspectorComponent.vue';
+import InspectorComponent from '@/script/components/EditorComponents/Inspector/InspectorComponent.vue';
 import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
 import PerfectScrollbar from 'perfect-scrollbar';
 
@@ -95,7 +92,7 @@ export default class GoldenLayoutHolder extends Vue {
 		height: 100%;
 	}
 	#glHolder {
-		height: calc(100vh - 30px);
+		height: calc(100vh - 32px);
 		width: 100vw;
 		pointer-events: none;
 	}

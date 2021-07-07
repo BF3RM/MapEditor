@@ -20,7 +20,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class KeyTip extends Vue {
 	@Prop()
-	keys!: string | string[];
+	keys: string | string[];
 
 	@Prop()
 	modifierKey?: string;

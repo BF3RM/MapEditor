@@ -1,18 +1,18 @@
 import { LinearTransform } from './types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
-import { PreviewDestroyMessage } from './messages/PreviewDestroyMessage';
 import { Blueprint } from '@/script/types/Blueprint';
 import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
 import { LogError } from '@/script/modules/Logger';
 import { signals } from '@/script/modules/Signals';
-import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
+import { SetScreenToWorldTransformMessage, PreviewDestroyMessage, MoveObjectMessage, PreviewSpawnMessage } from '@/script/messages/MessagesIndex';
 import { Vec3 } from '@/script/types/primitives/Vec3';
-import { MoveObjectMessage } from '@/script/messages/MoveObjectMessage';
-import { PreviewSpawnMessage } from '@/script/messages/PreviewSpawnMessage';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { InputControls } from '@/script/modules/InputControls';
+import { Dictionary } from 'typescript-collections';
+import SpawnBlueprintCommand from '@/script/commands/SpawnBlueprintCommand';
+import BulkCommand from '@/script/commands/BulkCommand';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -24,7 +24,8 @@ export class EditorCore {
 	private deltaTime: number;
 	private pendingUpdates = new Map<Guid, GameObject>();
 	private updateRequested = false;
-	public highlightedObjectGuid: Guid | null = null;
+	public highlightedObjects: Dictionary<Guid, GameObject> = new Dictionary<Guid, GameObject>();
+	private pendingSelections: Guid[] = [];
 
 	// @ts-ignore
 	public stats = new Stats();
@@ -36,6 +37,23 @@ export class EditorCore {
 
 		this.lastUpdateTime = 0;
 		this.deltaTime = 1.0 / 30.0;
+	}
+
+	public setPendingSelection(guid: Guid) {
+		this.pendingSelections.push(guid);
+	}
+
+	public selectPendingSelections() {
+		for (let i = this.pendingSelections.length - 1; i >= 0; i--) {
+			const el = this.pendingSelections[i];
+			const go = editor.getGameObjectByGuid(el);
+			if (go) {
+				editor.threeManager.nextFrame(() => {
+					editor.Select(el, true, true);
+				});
+				this.pendingSelections.splice(i, 1);
+			}
+		}
 	}
 
 	public getRaycastTransform() {
@@ -154,8 +172,35 @@ export class EditorCore {
 		this.isPreviewBlueprintSpawned = false;
 	}
 
+	public CopySelectedObjects(): SpawnBlueprintCommand[] {
+		const commands: SpawnBlueprintCommand[] = [];
+		editor.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
+			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+			gameObjectTransferData.guid = Guid.create();
+			const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
+			// Make sure the variation is valid, otherwise set default one.
+			if (bp) {
+				if (!bp.isVariationValid(gameObjectTransferData.variation)) {
+					gameObjectTransferData.variation = bp.getDefaultVariation();
+				}
+			}
+			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+		});
+		return commands;
+	}
+
+	public PasteObjects(copy: SpawnBlueprintCommand[]) {
+		const scope = this;
+		if (copy !== null) {
+			copy.forEach((command: SpawnBlueprintCommand) => {
+				scope.setPendingSelection(command.gameObjectTransferData.guid);
+			});
+			editor.execute(new BulkCommand(copy));
+		}
+	}
+
 	public onPreviewDrop() {
-		if (this.previewBlueprint === null) {
+		if (this.previewBlueprint === null || !this.isPreviewBlueprintSpawned) {
 			return;
 		}
 		editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
@@ -168,9 +213,10 @@ export class EditorCore {
 
 	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
-		this.unhighlight();
+		// this.unhighlight();
 		// When selecting nothing, deselect all if its not multi selection.
-		if (guid.equals(Guid.createEmpty())) {
+		if (guid.isEmpty()) {
+			console.log('Deselecting');
 			if (!multiSelection) {
 				editor.selectionGroup.deselectAll();
 				editor.threeManager.hideGizmo();
@@ -191,6 +237,7 @@ export class EditorCore {
 	}
 
 	public deselect(guid: Guid) {
+		console.log('Deselecting');
 		const scope = editor;
 		const gameObject = scope.gameObjects.getValue(guid);
 		if (gameObject === undefined) {
@@ -202,9 +249,9 @@ export class EditorCore {
 		}
 	}
 
-	public highlight(guid: Guid) {
+	public highlight(guid: Guid, multiple = false) {
 		// Ignore if already highlighted
-		if (this.highlightedObjectGuid === guid) {
+		if (this.highlightedObjects.containsKey(guid)) {
 			return;
 		}
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
@@ -217,19 +264,29 @@ export class EditorCore {
 			LogError('Failed to highlight gameobject: ' + guid);
 			return false;
 		}
-		this.unhighlight();
+		if (!multiple) {
+			this.unhighlight();
+		}
 		gameObject.onHighlight();
-		this.highlightedObjectGuid = guid;
+		this.highlightedObjects.setValue(guid, gameObject);
 		editor.threeManager.setPendingRender();
 	}
 
-	public unhighlight() {
-		if (this.highlightedObjectGuid == null) return;
-		const gameObject = editor.gameObjects.getValue(this.highlightedObjectGuid) as GameObject;
-		if (gameObject) {
-			gameObject.onUnhighlight();
+	public unhighlight(guid?: Guid) {
+		if (guid !== undefined) {
+			const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+			if (!gameObject.selected) {
+				gameObject.onUnhighlight();
+				this.highlightedObjects.remove(guid);
+			}
+		} else {
+			for (const gameObject of this.highlightedObjects.values()) {
+				if (!gameObject.selected) {
+					gameObject.onUnhighlight();
+					this.highlightedObjects.remove(gameObject.guid);
+				}
+			}
 		}
-		this.highlightedObjectGuid = null;
 		editor.threeManager.setPendingRender();
 	}
 }

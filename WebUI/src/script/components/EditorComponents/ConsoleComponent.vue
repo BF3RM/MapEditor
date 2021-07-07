@@ -1,13 +1,18 @@
 <template>
 	<EditorComponent title="Console">
 		<div class="header">
-			<input type="range" min="0" max="6" step="1" :value="data.filterLevel" @input="onUpdateFilter">
-			<div class="logLevel">{{data.filterLevel}} - {{logLevelDict[data.filterLevel]}}</div>
-			<input id="shouldScrollToBottom" type="checkbox" :checked="data.shouldScrollToBottom" @change="onShouldScrollToBottom"/>
-			<label for="shouldScrollToBottom">
-				Scroll to bottom?
-			</label>
 			<Search @search="onSearch"/>
+			<div>
+				<input type="range" min="0" max="6" step="1" :value="data.filterLevel" @input="onUpdateFilter">
+				<div class="logLevel">{{logLevelDict[data.filterLevel]}}</div>
+			</div>
+			<!--<div>
+				<input id="shouldScrollToBottom" type="checkbox" :checked="data.shouldScrollToBottom" @change="onShouldScrollToBottom"/>
+				<label for="shouldScrollToBottom">
+					Scroll to bottom
+				</label>
+			</div>
+			-->
 		</div>
 		<DynamicScroller
 				ref="scroller"

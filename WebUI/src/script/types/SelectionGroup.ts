@@ -70,13 +70,14 @@ export class SelectionGroup extends THREE.Object3D {
 		const selectionGroupWorld = oldMatrix;
 		const selectionGroupWorldNew = newMatrix;
 
-		const selectionOldMatrixInverse = new THREE.Matrix4().getInverse(selectionGroupWorld);
+		const selectionOldMatrixInverse = new THREE.Matrix4().copy(selectionGroupWorld).invert();
 		const transformMatrix = new THREE.Matrix4().multiplyMatrices(selectionGroupWorldNew, selectionOldMatrixInverse);
 		const childLocal = new THREE.Matrix4();
 		const childLocalNew = new THREE.Matrix4();
 		const childWorldNew = new THREE.Matrix4();
 
 		for (const go of this.selectedGameObjects) {
+			go.updateMatrixWorld();
 			childLocal.multiplyMatrices(go.matrixWorld, selectionOldMatrixInverse); // calculates go's matrix relative to selection group
 			childLocalNew.multiplyMatrices(transformMatrix, childLocal); // calculates go's new matrix with transformation matrix
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
@@ -117,7 +118,8 @@ export class SelectionGroup extends THREE.Object3D {
 			this.deselectAll();
 		}
 
-		if (multiSelection) {
+		// Disabled multiselection deselection for now
+		/* if (multiSelection) {
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
 				// Edge case:
@@ -141,20 +143,21 @@ export class SelectionGroup extends THREE.Object3D {
 				}
 			}
 		}
+		 */
 
 		// If first object move group to its position
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
 			this.setMatrix(gameObject.matrixWorld);
 		}
-		signals.selectedGameObject.emit(gameObject.guid, multiSelection, scrollTo);
 		this.selectedGameObjects.push(gameObject);
 		gameObject.onSelect();
 		this.makeParentsVisible();
+		signals.selectedGameObject.emit(gameObject.guid, multiSelection, scrollTo);
 	}
 
 	public deselectAll() {
 		for (const go of this.selectedGameObjects) {
-			(go as GameObject).onDeselect();
+			(go).onDeselect();
 			signals.deselectedGameObject.emit(go.guid);
 		}
 
@@ -168,9 +171,11 @@ export class SelectionGroup extends THREE.Object3D {
 		if (index === -1) return;
 		signals.deselectedGameObject.emit(gameObject.guid);
 		gameObject.onDeselect();
-		this.makeParentsInvisible();
 		this.selectedGameObjects.splice(index, 1);
-		this.makeParentsVisible();
+		if (!window.vext.executing) {
+			// this.makeParentsInvisible();
+			// this.makeParentsVisible();
+		}
 	}
 
 	public makeParentsInvisible() {
@@ -190,9 +195,9 @@ export class SelectionGroup extends THREE.Object3D {
 			return;
 		}
 
-		const go = this.selectedGameObjects[0] as GameObject;
+		const go = this.selectedGameObjects[0];
 		if (go.parent != null && go.parent.constructor === GameObject) {
-			this.select(go.parent as GameObject, false, true, true);
+			this.select(go.parent, false, true, true);
 		}
 	}
 

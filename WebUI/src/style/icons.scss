@@ -7,6 +7,11 @@ html {
     -webkit-mask-size: contain!important;
     background-color: #9c9898;
 }
+.Large.Icon {
+  height: 30px;
+  width: 30px;
+}
+
 .selectIcon{
     -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
 }
@@ -65,7 +70,12 @@ html {
 .Icon-Light {
     -webkit-mask: url(../icons/types/Light.svg) no-repeat center;
 }
-
+.Icon-folder {
+  -webkit-mask: url(../icons/editor/folder.svg) no-repeat center;
+}
+.Icon-folder-open {
+  -webkit-mask: url(../icons/editor/folder-open.svg) no-repeat center;
+}
 .Icon-GameObject {
     -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
     background-color: #9c9898;

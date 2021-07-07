@@ -18,4 +18,14 @@ function CtrRef:GetTable()
     }
 end
 
+function CtrRef:Get()
+	local s_Instance = ResourceManager:FindInstanceByGuid(Guid(self.partitionGuid), Guid(self.instanceGuid))
+	-- TODO: More resolving for custom objects or whatever? Idk
+	if(s_Instance) then
+		s_Instance = _G[s_Instance.typeInfo.name](s_Instance)
+		return s_Instance
+	end
+	return null
+end
+
 return CtrRef

@@ -63,8 +63,7 @@ function RotationHelper:GetYPRfromLUF(left, up, forward)
         end
     end
 
-    return yaw, pitch, roll
-
+    return self:AdjustRangeRad(yaw), self:AdjustRangeRad(pitch), self:AdjustRangeRad(roll)
 end
 
 function RotationHelper:GetLUFfromYPR(yaw, pitch, roll)
@@ -101,13 +100,22 @@ function RotationHelper:GetYPRfromLT(linearTransform)
             linearTransform.forward
     )
 
-    return yaw, pitch, roll
+    return self:AdjustRangeRad(yaw), self:AdjustRangeRad(pitch), self:AdjustRangeRad(roll)
 end
 
 function RotationHelper:GetLTfromYPR(yaw, pitch, roll)
     local left, up, forward = self:GetLUFfromYPR(yaw, pitch, roll)
 
     return LinearTransform(left, up, forward, Vec3(0,0,0) )
+end
+
+function RotationHelper:AdjustRangeRad(angle)
+    if angle > 2 * math.pi then
+        return angle - 2 * math.pi
+    elseif angle < 0 then
+        return angle + 2 * math.pi
+    end
+    return angle
 end
 
 return RotationHelper

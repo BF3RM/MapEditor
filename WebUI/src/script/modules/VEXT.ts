@@ -5,8 +5,7 @@ import { signals } from '@/script/modules/Signals';
 import { VextCommand } from '@/script/types/VextCommand';
 import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
 import { ILinearTransform } from '@/script/types/primitives/LinearTransform';
-import { IBlueprint } from '@/script/interfaces/IBlueprint';
-import { EDITOR_MODE, LOGLEVEL, VIEW } from '@/script/types/Enums';
+import { EDITOR_MODE, LOGLEVEL, REALM, VIEW } from '@/script/types/Enums';
 import { SetScreenToWorldTransformMessage } from '@/script/messages/SetScreenToWorldTransformMessage';
 
 export default class VEXTInterface {
@@ -22,6 +21,9 @@ export default class VEXTInterface {
 		messages: object[];
 	};
 
+	public receivedCommands: any = [];
+	public receivedBlueprints: any = [];
+
 	constructor(debug: boolean) {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
@@ -34,7 +36,8 @@ export default class VEXTInterface {
 			SetTransform: signals.setTransform.emit,
 			SetVariation: signals.setVariation.emit,
 			EnabledBlueprint: signals.enabledBlueprint.emit,
-			DisabledBlueprint: signals.disabledBlueprint.emit
+			DisabledBlueprint: signals.disabledBlueprint.emit,
+			SetField: signals.setEBXField.emit
 		};
 
 		this.messages = {
@@ -44,9 +47,9 @@ export default class VEXTInterface {
 			SetScreenToWorldPositionMessage: this.SetScreenToWorldPosition,
 			SetUpdateRateMessage: signals.setUpdateRateMessage.emit,
 			GetProjectsMessage: signals.getProjects.emit,
-			SetProjectHeaders: signals.setProjectHeaders.emit
-			// 'SelectedGameObject':	   signals.selectedGameObject.emit,
-			// 'DeselectedGameObject':	signals.deselectedGameObject.emit,
+			SetProjectHeaders: signals.setProjectHeaders.emit,
+			SetProjectData: signals.setProjectData.emit,
+			SetCurrentProjectHeader: signals.setCurrentProjectHeader.emit
 		};
 		this.paused = false;
 		this.executing = false;
@@ -113,7 +116,7 @@ export default class VEXTInterface {
 		}
 		const scope = this;
 		for (const command of commands) {
-			console.log(command.type);
+			console.log(command);
 		}
 		if (editor.debug) {
 			scope.emulator.Receive(commands);
@@ -130,6 +133,7 @@ export default class VEXTInterface {
 		const commandActionResults: CommandActionResult[] = [];
 		CARArray.forEach((obj: object) => {
 			commandActionResults.push(CommandActionResult.FromObject(obj));
+			this.receivedCommands.push(CommandActionResult.FromObject(obj));
 		});
 		let index = 0;
 
@@ -142,7 +146,7 @@ export default class VEXTInterface {
 			if (index === commandActionResults.length - 1) {
 				scope.executing = false;
 			}
-			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type);
+			window.Log(LOGLEVEL.VERBOSE, 'In: ' + commandActionResult.type, commandActionResult.type);
 
 			scope.commands[commandActionResult.type](commandActionResult);
 			index++;
@@ -153,12 +157,13 @@ export default class VEXTInterface {
 		}, 1);
 	}
 
+	public HandleRealmUpdate(payload: any) {
+		editor.UpdateGameObjectRealm(payload.guid, payload.realm);
+	}
+
 	public SendEvent(eventName: string, param?: any) {
 		if (editor.debug) {
-			console.log('Sending event: ' + eventName);
-			if (param != null) {
-				console.log(param);
-			}
+			this.emulator.ReceiveEvent(eventName, param);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:' + eventName, JSON.stringify(param));
 		}
@@ -189,7 +194,6 @@ export default class VEXTInterface {
 		if (editor.debug) {
 			// window.Log(LOGLEVEL.VERBOSE, 'OUT: ');
 			// window.Log(LOGLEVEL.VERBOSE, messages);
-			// We don't handle messages in VEXTEmulator yet
 			scope.emulator.ReceiveMessage(messages);
 		} else {
 			WebUI.Call('DispatchEventLocal', 'MapEditor:ReceiveMessage', JSON.stringify(messages));
@@ -200,7 +204,7 @@ export default class VEXTInterface {
 
 	public WebUpdateBatch(updates: any[]) {
 		// console.log('[VEXT] WebUpdateBatch');
-		console.log(updates);
+		console.log(JSON.stringify(updates));
 		updates.forEach((obj: any) => {
 			(this as any)[obj.path](obj.payload);
 		});
@@ -221,20 +225,11 @@ export default class VEXTInterface {
 			message = JSON.parse(messageRaw);
 			console.log(message.type);
 		}
-
 		if (this.messages[message.type] === undefined) {
 			window.LogError('Failed to call a null message signal: ' + message.type);
 			return;
 		}
-		if (emulator) {
-			const scope = this;
-			// delay to simulate tick increase.
-			setTimeout(() => {
-				scope.messages[message.type](message);
-			}, 1);
-		} else {
-			this.commands[message.type](message);
-		}
+		this.messages[message.type](message.payload);
 		editor.threeManager.setPendingRender();
 	}
 
@@ -260,8 +255,9 @@ export default class VEXTInterface {
 	}
 
 	public RegisterBlueprints(blueprintsRaw: string) {
-		const blueprints = JSON.parse(blueprintsRaw);
-		editor.blueprintManager.registerBlueprints(Object.values(blueprints) as IBlueprint[]);
+		// const blueprints = JSON.parse(blueprintsRaw);
+		// this.receivedBlueprints.push(blueprints);
+		editor.blueprintManager.RegisterBlueprints(blueprintsRaw);
 	}
 
 	public MouseEnabled() {
@@ -272,8 +268,16 @@ export default class VEXTInterface {
 		signals.setProjectHeaders.emit(headers);
 	}
 
-	SetCurrentProjectHeader(header: any) {
+	public SetCurrentProjectHeader(header: any) {
 		signals.setCurrentProjectHeader.emit(header);
+	}
+
+	public ProjectImportFinished(msg: string) {
+		signals.projectImportFinished.emit(msg);
+	}
+
+	SetProjectData(projectData: any) {
+		signals.setProjectData.emit(projectData);
 	}
 
 	public EditorModeChanged(mode: EDITOR_MODE) {

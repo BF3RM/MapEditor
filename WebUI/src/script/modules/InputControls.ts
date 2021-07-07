@@ -4,6 +4,7 @@ import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
+import { signals } from '@/script/modules/Signals';
 
 // TODO Fool: add config keymap
 
@@ -162,6 +163,9 @@ export class InputControls {
 		if (event.which === KEYCODE.KEY_X && event.ctrlKey) { // CTRL + X
 			editor.Cut();
 		}
+		if (event.which === KEYCODE.KEY_S && event.ctrlKey) { // CTRL + S
+			signals.saveRequested.emit();
+		}
 		if (event.which === KEYCODE.DELETE) {
 			editor.DeleteSelected();
 		}
@@ -172,7 +176,7 @@ export class InputControls {
 			window.location = (window as any).location;
 		}
 		if (event.which === KEYCODE.ESCAPE) {
-			editor.Select(Guid.createEmpty(), false); // Deselects everything.
+			editor.DeselectAll();
 		}
 	}
 

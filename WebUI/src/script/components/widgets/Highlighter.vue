@@ -1,6 +1,6 @@
 <template>
-	<span class="highlighter" v-html="highlight()">
-	</span>
+	<div class="highlighter" v-html="highlight()">
+	</div>
 </template>
 
 <script lang="ts">

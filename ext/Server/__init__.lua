@@ -6,6 +6,7 @@ ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"
 DataBaseManager = require "DataBaseManager"
 ServerGameObjectManager = require "ServerGameObjectManager"
+EBXManager = require "__shared/Modules/EBXManager"
 GameObjectManager = GameObjectManager(Realm.Realm_Server)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
@@ -28,10 +29,9 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Player:Chat', self, self.OnChat)
 	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
 
-	Events:Subscribe('GameObjectManager:GameObjectReady', self, self.OnGameObjectReady)
-
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 
 ----------- Debug ----------------
@@ -78,15 +78,19 @@ function MapEditorServer:OnLevelDestroy()
 	m_Logger:Write("Destroy!")
 	GameObjectManager:OnLevelDestroy()
 	ServerTransactionManager:OnLevelDestroy()
+	ServerGameObjectManager:OnLevelDestroy()
 end
 
 function MapEditorServer:OnPartitionLoaded(p_Partition)
 	InstanceParser:OnPartitionLoaded(p_Partition)
-	EditorCommon:OnPartitionLoaded(p_Partition)
 end
 
 function MapEditorServer:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
+end
+
+function MapEditorServer:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
+	GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
 end
 
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
@@ -104,10 +108,6 @@ function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
 	end
 end
 ----------- Editor functions----------------
-
-function MapEditorServer:OnGameObjectReady(p_GameObject)
-	--ServerTransactionManager:OnGameObjectReady(p_GameObject)
-end
 
 function MapEditorServer:OnEnableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, false)

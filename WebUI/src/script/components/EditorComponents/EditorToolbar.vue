@@ -55,7 +55,7 @@ export default class EditorToolbar extends Vue {
 	private worldView = 0;
 	private tool = (window).editor.threeManager.gizmoMode;
 	private worldSpace = (window).editor.threeManager.worldSpace;
-	private worldSpaces = ['local', 'world'];
+	private worldSpaces = ['world', 'local'];
 	private tools = ['select', 'translate', 'rotate', 'scale'];
 
 	private windows = [];
@@ -216,16 +216,16 @@ export default class EditorToolbar extends Vue {
 					callback: entryCallback
 				} as IMenuEntry));
 				if (i === 0) {
-					this.menuBar.children.push(lastEntry!.entries!.get(currentEntry) as IMenuEntry);
+					this.menuBar.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 				} else {
-					lastEntry.children.push(lastEntry!.entries!.get(currentEntry) as IMenuEntry);
+					lastEntry.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 				}
 			}
-			if (i !== path.length - 1 && lastEntry!.entries!.get(currentEntry)!.children === null) {
-				lastEntry!.entries!.get(currentEntry)!.children = [];
-				lastEntry!.entries!.get(currentEntry)!.children.push(lastEntry!.entries!.get(currentEntry) as IMenuEntry);
+			if (i !== path.length - 1 && lastEntry.entries!.get(currentEntry)!.children === null) {
+				lastEntry.entries!.get(currentEntry)!.children = [];
+				lastEntry.entries!.get(currentEntry)!.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 			}
-			lastEntry = lastEntry!.entries!.get(currentEntry) as IMenuEntry;
+			lastEntry = lastEntry.entries!.get(currentEntry) as IMenuEntry;
 		}
 	}
 
@@ -353,7 +353,7 @@ li.el-menu-item.separator {
 	box-sizing: border-box;
 }
 .el-select-dropdown {
-	border: 1px solid #4a4a4a;
+	border: 1px solid #151515 !important;
 	border-radius: 5px;
 	background-color: #262626;
 }
@@ -370,7 +370,6 @@ input#worldView {
 	color: #fff;
 }
 .el-select-dropdown {
-	border: 1px solid #4a4a4a!important;
 	border-radius: 5px!important;
 	background-color: #262626!important;
 }
@@ -397,6 +396,7 @@ input#worldView {
 	justify-content: space-between;
 	border-bottom: 2px solid black;
 	position: relative;
+	opacity: 0.9;
 }
 .el-radio-group {
 	background-color: #2e2e2e;
@@ -454,9 +454,13 @@ label.is-active {
 
 #toolbarRight {
 	margin-left: auto;
-	margin-right: 5vmin;
+	margin-right: 1.5em;
 }
 span {
 	user-select: none;
+}
+
+ul.el-menu.el-menu--horizontal.el-menu {
+	margin-right: 5px;
 }
 </style>

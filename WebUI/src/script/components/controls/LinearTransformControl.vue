@@ -1,62 +1,81 @@
 <template>
-	<div class="transformControls">
+	<div class="transformControls" v-if="value">
 		<div class="pos-control">
-			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="position" label="Position" :step=0.014 @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control
+					label="Position"
+					:hideLabel="hideLabel"
+					:value="value.position"
+					:step=0.014
+					@input="onChangePosition"
+					@blur="$emit('blur')"
+					@dragstart="$emit('dragstart')"
+					@dragend="$emit('dragend')" />
 		</div>
 		<div class="rot-control">
-			<QuatControl @blur="$emit('blur')" :hideLabel="hideLabel" :value="rotation" label="Rotation" :step=0.14 @quatUpdated="quatUpdated" @input="onChangeValue" @startDrag="onStartDrag" @endDrag="onEndDrag" mode="Euler" />
+			<QuatControl
+					label="Rotation"
+					mode="Euler"
+					:hideLabel="hideLabel"
+					:value="value.rotation"
+					:step=0.14
+					@input="onChangeRotation"
+					@blur="$emit('blur')"
+					@dragstart="$emit('dragstart')"
+					@dragend="$emit('dragend')" />
 		</div>
 		<div class="scale-control">
-			<Vec3Control @blur="$emit('blur')" :hideLabel="hideLabel" :value="scale" label="Scale" :min=0.01 @input="onChangeValue" :step=0.014 @startDrag="onStartDrag" @endDrag="onEndDrag"/>
+			<Vec3Control
+					label="Scale"
+					:hideLabel="hideLabel"
+					:value="value.scale"
+					:min=0.01
+					:step=0.014
+					@input="onChangeScale"
+					@blur="$emit('blur')"
+					@dragstart="$emit('dragstart')"
+					@dragend="$emit('dragend')" />
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import QuatControl from '@/script/components/controls/QuatControl.vue';
-import { IVec3, Vec3 } from '@/script/types/primitives/Vec3';
-import { IQuat, Quat } from '@/script/types/primitives/Quat';
+import { Vec3 } from '@/script/types/primitives/Vec3';
+import { Quat } from '@/script/types/primitives/Quat';
+import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
 @Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
 export default class LinearTransformControl extends Vue {
 	@Prop()
-	position: IVec3;
-
-	@Prop()
-	rotation: IQuat;
-
-	@Prop()
-	scale: IVec3;
+	value: LinearTransform;
 
 	@Prop({ default: false })
 	hideLabel: boolean;
 
-	@Emit('update:rotation')
-	quadUpdate(newVal: IQuat) {
-		return newVal;
+	@Prop({ default: null })
+	parentTransform: LinearTransform;
+
+	onChangePosition(newPos: Vec3) {
+		const newVal = this.value.clone();
+		newVal.position = newPos;
+
+		this.$emit('input', newVal);
 	}
 
-	onChangeValue() {
-		this.$emit('input');
+	onChangeScale(newScale: Vec3) {
+		const newVal = this.value.clone();
+		newVal.scale = newScale;
+
+		this.$emit('input', newVal);
 	}
 
-	@Emit('quatUpdated')
-	quatUpdated(newQuat: IQuat) {
-		return newQuat;
-	}
-
-	@Emit('startDrag')
-	onStartDrag(event: Event) {
-		return event;
-	}
-
-	@Emit('endDrag')
-	onEndDrag(event: Event) {
-		this.onChangeValue();
-		return event;
+	onChangeRotation(newRotation: Quat) {
+		const newVal = this.value.clone();
+		newVal.rotation = newRotation;
+		this.$emit('input', newVal);
 	}
 }
 </script>
@@ -64,36 +83,30 @@ export default class LinearTransformControl extends Vue {
 <style lang="scss" scoped>
 	.transformControls {
 		display: grid;
+		padding: 10px;
 	}
 	.transformControls::v-deep .Vec3Control {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(4, 1fr);
 	}
-	.transformControls::v-deep b{
-		grid-row: 1;
+	.transformControls::v-deep .label{
+		grid-column: 1;
 		font-weight: bold;
 	}
 	.transformControls::v-deep .x{
-		grid-column: 1;
-		grid-row: 2;
+		grid-column: 2;
 	}
 	.transformControls::v-deep .y{
-		grid-column: 2;
-		grid-row: 2;
+		grid-column: 3;
 	}
 	.transformControls::v-deep .z {
-		grid-column: 3;
-		grid-row: 2;
+		grid-column: 4;
 	}
 	.transformControls::v-deep .w{
-		grid-column: 4;
-		grid-row: 2;
+		grid-column: 5;
 	}
 	.transformControls::v-deep input {
 		border: 0;
 	}
 
-	.pos-control, .rot-control, .scale-control {
-		margin: 0.5vmin 0;
-	}
 </style>

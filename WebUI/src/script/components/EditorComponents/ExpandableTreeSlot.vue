@@ -1,5 +1,5 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)">
+	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
 				<img :src="enabledIcnSrc"/>
@@ -8,19 +8,25 @@
 				<img :src="raycastEnabledIcnSrc"/>
 			</div>
 		</div>
-		<div class="tree-node" :style="nodeStyle(node)" @click="SelectNode($event, node, tree)">
+		<div class="tree-node" :style="nodeStyle(node)">
 			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
 			</div>
 			<div class="icon-container">
-				<img :class="'Icon Icon-' + node.type"/>
+				<img :class="getNodeIconClass(node)"/>
 			</div>
 			<div class="text-container">
 				<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
 				<span class="slot-text" v-else>
 					{{ nodeText }}
 				</span>
+				<div class="slot-client-server-only" v-if="clientOnly">
+					client-only
+				</div>
+				<div class="slot-client-server-only" v-if="serverOnly">
+					server-only
+				</div>
 			</div>
 		</div>
 	</div>
@@ -29,6 +35,7 @@
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import InfiniteTree, { Node, INode } from 'infinite-tree';
+import { REALM } from '@/script/types/Enums';
 
 @Component({ components: { Highlighter } })
 export default class ExpandableTreeSlot extends Vue {
@@ -59,6 +66,31 @@ export default class ExpandableTreeSlot extends Vue {
 		} else {
 			return true;
 		}
+	}
+
+	get clientOnly() {
+		if (this.content && this.content[0]) {
+			return this.content[0].realm === REALM.CLIENT;
+		} else {
+			return false;
+		}
+	}
+
+	get serverOnly() {
+		if (this.content && this.content[0]) {
+			return this.content[0].realm === REALM.SERVER;
+		} else {
+			return false;
+		}
+	}
+
+	getNodeIconClass(node: Node) {
+		if (node.type === 'folder') {
+			if (node.state.open) {
+				return 'Icon Icon-' + node.type + '-open';
+			}
+		}
+		return 'Icon Icon-' + node.type;
 	}
 
 	get raycastEnabled() {
@@ -95,11 +127,13 @@ export default class ExpandableTreeSlot extends Vue {
 
 	@Emit('node:toggle-enable')
 	public ToggleEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		e.stopPropagation();
 		return node;
 	}
 
 	@Emit('node:toggle-raycast-enable')
 	public ToggleRaycastEnabled(e: MouseEvent, node: Node, tree: InfiniteTree) {
+		e.stopPropagation();
 		return node;
 	}
 
@@ -110,6 +144,7 @@ export default class ExpandableTreeSlot extends Vue {
 		} else if (toggleState === 'opened') {
 			tree.closeNode(node);
 		}
+		e.stopPropagation();
 	}
 
 	@Emit('node:hover')
@@ -150,6 +185,7 @@ export default class ExpandableTreeSlot extends Vue {
 	.tree-node {
 		display: flex;
 		font-family: sans-serif;
+		flex-direction: row;
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
@@ -157,8 +193,10 @@ export default class ExpandableTreeSlot extends Vue {
 		/*white-space: nowrap;*/
 
 		.text-container {
-      width: available;
-      overflow: hidden;
+			display: flex;
+			flex-direction: row;
+			width: max-content;
+			overflow: hidden;
 		}
 		.expand-container img {
 			transition: transform 0.1s;
@@ -168,8 +206,8 @@ export default class ExpandableTreeSlot extends Vue {
 			}
 		}
 		.icon-container {
-			width: 13px;;
-			height: 100%;
+			width: 13px;
+			max-width: 13px;
 			color: #6d6d6d;
 
 			img {
@@ -187,6 +225,12 @@ export default class ExpandableTreeSlot extends Vue {
 
 		.slot-text {
 			margin-left: 5px;
+		}
+		.slot-client-server-only {
+			border: 1px solid gray;
+			padding: 0 2px;
+			border-radius: 3px;
+			margin: 0 5px;
 		}
 	}
 </style>

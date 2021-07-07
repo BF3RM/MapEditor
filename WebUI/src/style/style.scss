@@ -10,6 +10,10 @@ input {
   border: 0;
   background-color: rgba(0, 0, 0, 0.4) !important;
   color: #fff;
+  border: none;
+}
+input[type="text"] {
+  padding-left: 1em;
 }
 #viewport-container {
   background: none !important;
@@ -88,3 +92,8 @@ input {
 input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
 }
+
+.el-input__inner {
+  border: none!important;
+}
+

@@ -1,4 +1,5 @@
 import { Guid } from '@/script/types/Guid';
+import Instance from '@/script/types/ebx/Instance';
 
 export class CtrRef {
 	public typeName: string;
@@ -16,13 +17,26 @@ export class CtrRef {
 	public setFromTable(table: any) {
 		this.typeName = table.typeName;
 		this.name = table.name;
-		this.partitionGuid = table.partitionGuid;
-		this.instanceGuid = table.instanceGuid;
+		this.partitionGuid = new Guid(table.partitionGuid);
+		this.instanceGuid = new Guid(table.instanceGuid);
 
 		return this;
 	}
 
+	public toTable() {
+		return {
+			typeName: this.typeName,
+			name: this.name,
+			partitionGuid: this.partitionGuid.toString(),
+			instanceGuid: this.instanceGuid.toString()
+		};
+	}
+
 	public clone() {
 		return new CtrRef(this.typeName, this.name, this.partitionGuid, this.instanceGuid);
+	}
+
+	public Resolve(): Instance | null {
+		return editor.fbdMan.getInstance(this.partitionGuid, this.instanceGuid);
 	}
 }

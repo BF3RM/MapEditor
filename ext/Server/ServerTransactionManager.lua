@@ -14,6 +14,7 @@ function ServerTransactionManager:RegisterEvents()
 end
 
 function ServerTransactionManager:RegisterVars()
+	self.m_QueueDelay = 0
 	self.m_Queue = {}
 	self.m_Transactions = {}
 end
@@ -25,7 +26,9 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
         return
     end
 
-	ServerGameObjectManager:ClientReady(p_Player)
+	--if p_TransactionId == 0 then -- First request
+		ServerGameObjectManager:ClientReady(p_Player)
+	--end
 
     --- Client up to date
     if p_TransactionId == #self.m_Transactions then
@@ -45,7 +48,10 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
 
     local s_UpdatedGameObjectTransferDatas = {}
 
-    for l_TransactionId = p_TransactionId + 1, #self.m_Transactions do
+	--local l_MaxTransaction = math.min(p_TransactionId + 100, #self.m_Transactions) -- TODO: limit transactions
+	local l_MaxTransaction = #self.m_Transactions
+
+    for l_TransactionId = p_TransactionId + 1, l_MaxTransaction do
         local s_Guid = self.m_Transactions[l_TransactionId]
         if s_Guid ~= nil then
 			local s_GameObject = GameObjectManager.m_GameObjects[s_Guid]
@@ -59,17 +65,18 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
         end
     end
 
-    -- TODO: Change to 2 arguments when this is fixed https://github.com/EmulatorNexus/VeniceUnleashed/issues/451
-    NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, {
-		transferDatas = s_UpdatedGameObjectTransferDatas,
-		lastTransactionId = #self.m_Transactions
-	})
+    NetEvents:SendToLocal(
+			"ServerTransactionManager:SyncClientContext",
+			p_Player,
+			s_UpdatedGameObjectTransferDatas,
+			l_MaxTransaction
+	)
 end
 
-function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson, p_UpdatePass)
+function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson)
 	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
-	self:ExecuteCommands(s_Commands, p_UpdatePass)
+	self:QueueCommands(s_Commands)
 end
 
 function ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
@@ -77,21 +84,38 @@ function ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 		return
 	end
 
-	local s_QueuedCommands = {}
-
-	for _,l_Command in pairs(self.m_Queue) do
-		m_Logger:Write("Executing command delayed: " .. l_Command.type)
-		table.insert(s_QueuedCommands, l_Command)
+	if self.m_QueueDelay > 0 then
+		self.m_QueueDelay = self.m_QueueDelay - p_Delta
+		return
 	end
 
-	self:ExecuteCommands(s_QueuedCommands, p_Pass)
+	local s_QueuedCommands = {}
+	local s_NewQueue = {}
 
-	if (#self.m_Queue > 0) then
-		self.m_Queue = {}
+	local s_nProcessedCommands = 0
+	for i, l_Command in pairs(self.m_Queue) do
+		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
+			-- Limit reached, shift remaining commands in the queue to the beginning of the array
+			table.insert(s_NewQueue, l_Command)
+		else
+			m_Logger:Write("Executing command delayed: " .. l_Command.type)
+			table.insert(s_QueuedCommands, l_Command)
+			s_nProcessedCommands = i
+		end
+	end
+	self.m_Queue = s_NewQueue
+	self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
+	m_Logger:Write('Limit of 500 commands reached, queueing the rest')
+	self:_executeCommands(s_QueuedCommands, p_Pass)
+end
+
+function ServerTransactionManager:QueueCommands(p_Commands)
+	for _, l_Command in pairs(p_Commands) do
+		table.insert(self.m_Queue, l_Command)
 	end
 end
 
-function ServerTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
+function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
 	for _, l_Command in pairs(p_Commands) do
 

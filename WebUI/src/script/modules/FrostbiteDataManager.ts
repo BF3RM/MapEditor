@@ -1,48 +1,52 @@
 import { signals } from '@/script/modules/Signals';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { JSZipUtils } from '@/script/libs/jszip-utils';
 import { FBBundle } from '@/script/types/gameData/FBBundle';
 import { FBSuperBundle } from '@/script/types/gameData/FBSuperBundle';
+import { Dictionary } from 'typescript-collections';
+import { FBPartition } from '@/script/types/gameData/FBPartition';
+import { Guid } from '@/script/types/Guid';
+import Instance from '@/script/types/ebx/Instance';
+import { CommandActionResult } from '@/script/types/CommandActionResult';
 
 export class FrostbiteDataManager {
-	private superBundles: { all: FBSuperBundle };
-	private bundles: { all: FBBundle };
-	private partitions: object;
-	private files: object;
-	private data: object;
+	public superBundles = new Dictionary<string, FBSuperBundle>();
+	public bundles = new Dictionary<string, FBBundle>();
+	public partitions = new Dictionary<string, FBPartition>();
+
+	public assetHashes = new Dictionary<string, string>();
+	public eventHashes = new Dictionary<string, string>();
+	public InterfaceIDs = new Dictionary<string, string>();
+	public partitionGuids = new Dictionary<string, FBPartition>();
+
+	private files = new Dictionary<string, any>();
+	private data: JSZip;
 
 	constructor() {
-		// this.window = new ImportWindow();
+		this.superBundles.setValue('all', new FBSuperBundle({
+			name: 'all',
+			chunkCount: 0,
+			bundleCount: 0
+		}));
+		this.bundles.setValue('all', new FBBundle({
+			name: 'all',
+			partitionCount: 0,
+			size: 0
+		}));
 
-		this.superBundles = {
-			all: new FBSuperBundle({
-				name: 'all',
-				chunkCount: 0,
-				bundleCount: 0
-			})
-		};
-		this.bundles = {
-			all: new FBBundle({
-				name: 'all',
-				partitionCount: 0,
-				size: 0
-			})
-		};
-		this.partitions = {};
-
-		this.files = {};
-		this.data = {};
+		this.data = new JSZip();
 
 		signals.editor.Initializing.connect(this._onEditorInitializing.bind(this));
 		signals.editor.Ready.connect(this._onEditorReady.bind(this));
+		signals.setEBXField.connect(this.onSetEBXField.bind(this));
 
-		// this._Init();
+		this._Init();
 	}
 
 	public _Init() {
 		const scope = this;
 		const jszu = new JSZipUtils();
-		jszu.getBinaryContent('data/data.zip', (err: any, data: any) => {
+		jszu.getBinaryContent('/data.zip', (err: any, data: any) => {
 			if (err) {
 				throw err; // or handle err
 			}
@@ -70,46 +74,45 @@ export class FrostbiteDataManager {
 	}
 
 	public _ExtractFiles() {
-		/*
-		const scope = this;
-		if (scope._data === null) {
+		if (this.data === null) {
 			return false;
 		}
-		Object.keys(scope._data.files).forEach(function(fileNameJson) {
+		Object.keys(this.data.files).forEach((fileNameJson) => {
 			// Add filetype check here maybe?
 			const fileName = fileNameJson.replace('.json', '');
-			scope._data.file(fileNameJson).async('string').then(function(text) {
-				scope._files[fileName.toLowerCase()] = JSON.parse(text);
-				console.log('Loading ' + fileName);
-				scope._HandleFile(fileName.toLowerCase());
+			// @ts-ignore
+			this.data.file(fileNameJson).async('string').then((text) => {
+				this.files.setValue(fileName.toLowerCase(), JSON.parse(text));
+				window.vext.SetLoadingInfo('Loading ' + fileName);
+				this._HandleFile(fileName.toLowerCase());
 			});
 		});
-		 */
 	}
 
 	public async _HandleFile(fileName: string) {
-		/*
-		p_FileName = p_FileName.toLowerCase();
+		fileName = fileName.toLowerCase();
 		const scope = this;
-		const file = scope._files[p_FileName];
+		const file = this.files.getValue(fileName);
 		Object.keys(file).forEach(function(entryName) {
 			const entry = file[entryName];
-			switch (p_FileName) {
-				case 'superbundles':
-					scope.superBundles[entryName] = new FBSuperBundle(entry);
-					break;
-				case 'bundles':
-					scope.bundles[entryName] = new FBBundle(entry);
-					break;
-				case 'partitions':
-					scope.partitions[entryName] = new FBPartition(entry);
-					break;
-				default:
+			switch (fileName) {
+			case 'superbundles':
+				scope.superBundles.setValue(entryName, new FBSuperBundle(entry));
+				break;
+			case 'bundles':
+				scope.bundles.setValue(entryName, new FBBundle(entry));
+				break;
+			case 'partitions':
+				// eslint-disable-next-line no-case-declarations
+				const partition = new FBPartition(entry.name, entry.guid, entry.primaryInstance, entry.instances);
+				scope.partitionGuids.setValue(partition.guid.toString().toLowerCase(), partition);
+				scope.partitions.setValue(entryName, partition);
+				break;
+			default:
 				// code block
 			}
 		});
-		console.log('Loaded ' + p_FileName);
-		 */
+		console.log('Loaded ' + fileName);
 	}
 
 	public getBundle(path: string) {
@@ -156,12 +159,13 @@ export class FrostbiteDataManager {
 		 */
 	}
 
-	public getPartition(partitionName: string) {
-		// return this.partitions[p_PartitionName.toLowerCase()];
+	public getPartitionByName(partitionName: string = ''): FBPartition | null {
+		const partition = this.partitions.getValue(partitionName.toString().toLowerCase());
+		return partition || null;
 	}
 
 	public getSuperBundle(superBundleName: string) {
-		// return this.superBundles[p_SuperBundleName.toLowerCase()];
+		// return this.superBundles[superBundleName.toLowerCase()];
 	}
 
 	public getPartitions(bundleName?: string) {
@@ -170,29 +174,29 @@ export class FrostbiteDataManager {
 		const partitions = {};
 
 		if (p_BundleName === undefined || p_BundleName.toLowerCase() === 'all') {
-			Object.keys(scope._files.bundles).forEach(function(bundleName) {
-				const bundle = scope._files.bundles[bundleName.toLowerCase()];
+			Object.keys(scope.files.bundles).forEach(function(bundleName) {
+				const bundle = scope.files.bundles[bundleName.toLowerCase()];
 				Object.values(bundle.partitions).forEach(function(partitionName) {
-					const partition = scope.getPartition(partitionName);
+					const partition = scope.getPartitionByName(partitionName);
 					if (partition !== undefined) {
 						partitions[partitionName] = scope.partitions[partitionName];
 					}
 				});
 			});
-		} else if (scope._files.bundles[p_BundleName.toLowerCase()] !== undefined) {
-			const bundle = scope._files.bundles[p_BundleName.toLowerCase()];
+		} else if (scope.files.bundles[p_BundleName.toLowerCase()] !== undefined) {
+			const bundle = scope.files.bundles[p_BundleName.toLowerCase()];
 			Object.values(bundle.partitions).forEach(function(partitionName) {
-				const partition = scope.getPartition(partitionName);
+				const partition = scope.getPartitionByName(partitionName);
 				if (partition !== undefined) {
 					partitions[partitionName] = scope.partitions[partitionName];
 				}
 			});
 		} else {
-			for (const key of Object.keys(scope._files.bundles)) {
+			for (const key of Object.keys(scope.files.bundles)) {
 				if (key.startsWith(p_BundleName)) {
-					const bundle = scope._files.bundles[key];
+					const bundle = scope.files.bundles[key];
 					Object.values(bundle.partitions).forEach( (partitionName) => {
-						const partition = scope.getPartition(partitionName);
+						const partition = scope.getPartitionByName(partitionName);
 						if (partition !== undefined) {
 							partitions[partition.name] = partition;
 						}
@@ -206,9 +210,48 @@ export class FrostbiteDataManager {
 
 	public getBundlesReferencedIn(partitionName: string) {
 		/*
-		const superBundle = this._files.partitions[p_PartitionName.toLowerCase()];
+		const superBundle = this.files.partitions[p_PartitionName.toLowerCase()];
 		return superBundle.bundlesReferencedIn;
 
 		 */
+	}
+
+	public getInstance(partitionGuid: Guid, instanceGuid: Guid): Instance | null {
+		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
+		if (partition) {
+			return partition.getInstance(instanceGuid);
+		}
+		return null;
+	}
+
+	public getPartition(partitionGuid: Guid): FBPartition | null {
+		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
+		if (partition) {
+			return partition;
+		}
+		return null;
+	}
+
+	public getPartitionName(partitionGuid: Guid): string {
+		const partition = this.partitionGuids.getValue(partitionGuid.toString().toLowerCase());
+		return partition ? partition.name : '';
+	}
+
+	private onSetEBXField(commandActionResult: CommandActionResult) {
+		// IEBXFieldData
+		for (const override of commandActionResult.gameObjectTransferData.overrides) {
+			const gameObject = editor.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
+			if (gameObject) {
+				gameObject.setOverride(override);
+			} else if (override.reference) {
+				const partition = this.getPartition(override.reference.partitionGuid);
+				if (partition && partition.isLoaded) {
+					const reference = partition.getInstance(override.reference.instanceGuid);
+					if (reference) {
+						reference.fields[override.field].value = override.value; // TODO: Parse values
+					}
+				}
+			}
+		}
 	}
 }

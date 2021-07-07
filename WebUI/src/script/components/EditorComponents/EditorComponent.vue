@@ -1,17 +1,29 @@
 <template>
-	<gl-component :title="title">
-		<slot>
-		</slot>
+	<gl-component
+			ref="glChild"
+			class="EditorComponent"
+			:title="title"
+			:closable="closable"
+			:hidden="hidden">
+		<slot />
 	</gl-component>
 </template>
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { glCustomContainer } from 'vue-golden-layout';
 
 @Component
 export default class EditorComponent extends glCustomContainer {
-	@Prop({ default: true }) showHeader: boolean;
-	@Prop({ default: false }) isDestructible: boolean;
-	@Prop({ default: 'EditorComponent' }) title: string;
 }
 </script>
+<style lang="scss">
+.EditorComponent {
+	.header {
+		display: flex;
+
+		input[type="range"] {
+			width: 10em;
+		}
+	}
+}
+</style>

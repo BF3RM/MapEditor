@@ -25,29 +25,16 @@ export class BlueprintManager {
 		}
 
 		for (const bp of blueprintArray) {
-			if (bp !== undefined) {
-				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp as IBlueprint);
-			}
-		}
-		signals.blueprintsRegistered.emit(this.GetBLueprintsSorted());
-	}
-
-	public registerBlueprints(blueprints: IBlueprint[]) {
-		const scope = this;
-
-		if (blueprints.length === 0) {
-			return;
-		}
-
-		for (const bp of blueprints) {
-			if (bp !== undefined) {
+			if (bp !== undefined && bp.name !== undefined) {
 				scope.RegisterBlueprint(Guid.parse(bp.instanceGuid as string), bp);
+			} else {
+				console.error('Empty blueprint??');
 			}
 		}
-		signals.blueprintsRegistered.emit(this.GetBLueprintsSorted());
+		signals.blueprintsRegistered.emit(this.GetBlueprintsSorted());
 	}
 
-	private GetBLueprintsSorted():Blueprint[] {
+	private GetBlueprintsSorted():Blueprint[] {
 		return this.blueprints.values().sort((a, b) => {
 			if (a.name < b.name) {
 				return -1;

@@ -1,23 +1,39 @@
 <template>
-	<gl-row>
-		<gl-col>
+	<gl-col>
+		<gl-row>
 			<EditorComponent id="explorer-component" title="Project">
 				<div class="header">
 					<Search v-model="search"/>
 				</div>
-				<infinite-tree-component class="scrollable datafont" ref="it" :search="search" :autoOpen="true" :data="treeData" :selectable="true" :should-select-node="shouldSelectNode" :on-select-node="onSelectNode">
+				<infinite-tree-component
+						class="scrollable datafont"
+						ref="it"
+						:search="search"
+						:autoOpen="false"
+						:data="treeData"
+						:selectable="true"
+						:should-select-node="shouldSelectNode"
+						:row-height="13"
+						:on-select-node="onSelectNode">
 					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
 			</EditorComponent>
-		</gl-col>
-		<gl-col>
-			<ListComponent class="datafont" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
-				<template slot-scope="{ item, data }" >
-					<Highlighter class="td" :text="cleanPath(item.name)" :search="search"/><div class="td">{{item.typeName}}</div>
-				</template>
-			</ListComponent>
-		</gl-col>
-	</gl-row>
+			<gl-stack :width="90">
+				<GridComponent class="datafont" :right-align="true" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
+					<template v-slot:grid="{ item, data }" >
+						<img :class="'Icon Icon-' + item.typeName"/>
+						<div><Highlighter class="name" :text="item.fileName" :search="data.search"/></div>
+					</template>
+					<template v-slot:list="{ item, data }" >
+						<img :class="'Icon Icon-' + item.typeName"/>
+						<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search"/></div>
+						<div class="td type">{{item.typeName}}</div>
+					</template>
+				</GridComponent>
+				<ConsoleComponent/>
+			</gl-stack>
+		</gl-row>
+	</gl-col>
 </template>
 
 <script lang="ts">
@@ -33,8 +49,10 @@ import ListComponent from '@/script/components/EditorComponents/ListComponent.vu
 import InfiniteTree, { Node, INode } from 'infinite-tree';
 import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
+import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
+import GridComponent from '@/script/components/EditorComponents/GridComponent.vue';
 
-@Component({ components: { ExpandableTreeSlot, EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
+@Component({ components: { GridComponent, ConsoleComponent, ExpandableTreeSlot, EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class ExplorerComponent extends EditorComponent {
 	private treeData: INode = {
@@ -170,5 +188,11 @@ export default class ExplorerComponent extends EditorComponent {
 		&:hover {
 			background-color: #343434;
 		}
+	}
+	.datafont img.Icon {
+		padding-top: 6px;
+	}
+	.type {
+		text-align: right;
 	}
 </style>

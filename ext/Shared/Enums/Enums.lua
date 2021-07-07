@@ -10,10 +10,10 @@ RaycastType = {
 	Mouse = 2
 }
 
-GameObjectType = {
-	ClientOnly = 1,
-	ServerOnly = 2,
-	ClientAndSerer = 3
+GameObjectOriginType = {
+	Vanilla = 1,
+	Custom = 2,
+	CustomChild = 3
 }
 
 EditorMode = {
@@ -29,9 +29,10 @@ ActionResultType = {
 	Queue = 3
 }
 
-AsyncState = {
+CoroutineState = {
 	Scheduled = "scheduled",
 	Suspended = "suspended",
 	Running = "running",
 	Dead = "dead"
 }
+

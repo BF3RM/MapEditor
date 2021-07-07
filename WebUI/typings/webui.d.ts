@@ -45,6 +45,16 @@ declare namespace WebUI {
 	function Call(type: 'ResetMouse'): boolean;
 
 	/**
+	 * Brings WebUI to the front of the WebUI stack
+	 */
+	function Call(type: 'BringToFront'): boolean;
+
+	/**
+	 * Brings WebUI to the bacmk of the WebUI stack
+	 */
+	function Call(type: 'BringToBack'): boolean;
+
+	/**
 	 * Dispatches an event
 	 * @param event Event to dispatch
 	 */

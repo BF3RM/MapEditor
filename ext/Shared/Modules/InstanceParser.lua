@@ -18,6 +18,7 @@ function InstanceParser:RegisterVars()
 	self.m_MeshVariationDatabases = {}
 	self.m_StaticModelGroupDatabase = {}
 	self.m_StaticModelGroupEntityDataGuids = {}
+	self.m_ObjectVariations = {}
 
 	self.m_IllegalTypes = Set {
 		"DebrisClusterData",
@@ -30,6 +31,10 @@ function InstanceParser:RegisterVars()
 	self.m_LevelDatas = {}
 end
 
+
+function InstanceParser:OnLevelDestroy()
+	self.m_MeshVariationDatabases = {}
+end
 
 function InstanceParser:Clear()
     --self:RegisterVars()
@@ -58,35 +63,37 @@ end
 
 function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	--m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
-	local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGuid(
-		Guid(self.m_StaticModelGroupEntityDataGuids.partitionGuid),
-		Guid(self.m_StaticModelGroupEntityDataGuids.instanceGuid)))
+	for k, v in pairs(self.m_StaticModelGroupEntityDataGuids) do
+		local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGuid(
+				Guid(v.partitionGuid),
+				Guid(v.instanceGuid)))
 
-	for _,l_Member in ipairs(s_Instance.memberDatas) do
-		local s_Member = StaticModelGroupMemberData(l_Member)
+		for _,l_Member in ipairs(s_Instance.memberDatas) do
+			local s_Member = StaticModelGroupMemberData(l_Member)
 
-		if(#s_Member.instanceObjectVariation > 0) then
-			local s_MemberType = StaticModelEntityData(s_Member.memberType)
+			if (#s_Member.instanceObjectVariation > 0) then
+				local s_MemberType = StaticModelEntityData(s_Member.memberType)
 
-			if(s_MemberType ~= nil) then
-				local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
+				if (s_MemberType ~= nil) then
+					local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
 
-				local s_Variations = {}
-				for _, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
-					-- Eww
-					s_Variations[l_Variation] = l_Variation
-				end
+					local s_Variations = {}
+					for _, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+						-- Eww
+						s_Variations[l_Variation] = l_Variation
+					end
 
-				if(self.m_Variations[s_Mesh] == nil) then
-					self.m_Variations[s_Mesh] = {}
-				end
+					if(self.m_Variations[s_Mesh] == nil) then
+						self.m_Variations[s_Mesh] = {}
+					end
 
-				for _, l_Variation in pairs(s_Variations) do
-					local s_Variation = {
-						hash =l_Variation,
-						name ="fuck"
-					}
-					table.insert(self.m_Variations[s_Mesh], s_Variation)
+					for _, l_Variation in pairs(s_Variations) do
+						local s_Variation = {
+							hash =l_Variation,
+							name = self.m_ObjectVariations[l_Variation]
+						}
+						table.insert(self.m_Variations[s_Mesh], s_Variation)
+					end
 				end
 			end
 		end
@@ -124,14 +131,14 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			end
 
 			-- If the map uses both the autogen and the original prefab, use the original prefab instead.
-			if(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] ~= nil) then
-				if(s_Autogen == false) then
-					-- print("Replacing Autogen: " .. s_PrimaryInstance.name)
-					-- print(l_Instance.instanceGuid)
-				end
-			else
-				self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
-			end
+			--if(self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] ~= nil) then
+			--	if(s_Autogen == false) then
+			--		m_Logger:Write("Replacing Autogen: " .. s_PrimaryInstance.name .. " - " .. tostring(l_Instance.instanceGuid))
+			--		self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
+			--	end
+			--else
+			self.m_BlueprintInstances[tostring(l_Instance.instanceGuid)] = tostring(p_Partition.guid)
+			--end
 		end
 
 		-- Catch all blueprints
@@ -162,10 +169,16 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 			table.insert(self.m_MeshVariationDatabases, s_Instance)
 		end
 
-		if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
-			self.m_StaticModelGroupEntityDataGuids.instanceGuid = l_Instance.instanceGuid
-			self.m_StaticModelGroupEntityDataGuids.partitionGuid = p_Partition.guid
+		if(l_Instance.typeInfo.name == "ObjectVariation") then
+			local s_Instance = ObjectVariation(l_Instance)
+			self.m_ObjectVariations[s_Instance.nameHash] = s_Instance.name
+		end
 
+		if(l_Instance.typeInfo.name == "StaticModelGroupEntityData") then
+			table.insert(self.m_StaticModelGroupEntityDataGuids, {
+				instanceGuid = l_Instance.instanceGuid,
+				partitionGuid = p_Partition.guid
+			})
 		end
 
 		if(l_Instance.typeInfo.name == "LevelData") then
@@ -177,40 +190,34 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 				name = s_Instance.name
 			}
 		end
-		--[[
-		if(l_Instance.typeInfo.name == "DynamicModelEntityData") then
-			local s_Instance = DynamicModelEntityData(l_Instance)
-			local s_StaticModel = StaticModelEntityData(s_Instance.instanceGuid)
-			s_StaticModel.indexInBlueprint = s_Instance.indexInBlueprint
-			s_StaticModel.transform = s_Instance.transform
-			s_StaticModel.enabled = true
-			s_StaticModel.visible = true
-			if(s_Instance.mesh.isLazyLoaded) then
-				s_Instance.mesh:RegisterLoadHandlerOnce(function(ctr)
-					s_StaticModel.mesh = _G[ctr.typeInfo.name](ctr)
-				end)
-			else
-				s_StaticModel.mesh = s_Instance.mesh
-			end
-			for k,v in pairs(s_Instance.components) do
-				print(k)
-				s_StaticModel.components:add(v)
-			end
-			s_StaticModel.runtimeComponentCount = s_Instance.runtimeComponentCount
-			s_StaticModel.physicsData = s_Instance.physicsData
-
-			p_Partition:ReplaceInstance(l_Instance, s_StaticModel, true)
-			if(p_Partition.primaryInstance.typeInfo.name == "ObjectBlueprint") then
-				local s_PrimaryInstance = ObjectBlueprint(p_Partition.primaryInstance)
-				s_PrimaryInstance:MakeWritable()
-				s_PrimaryInstance.object = s_StaticModel
-			else
-				print(s_PrimaryInstance.typeInfo.name)
-			end
-		end
-		-]]
-
 		::continue::
+	end
+end
+
+function InstanceParser:IsValidVariation(p_InstanceGuid, p_VariationHash)
+	local s_Blueprint = self.m_Blueprints[tostring(p_InstanceGuid)]
+	if not s_Blueprint then
+		m_Logger:Error('Could not find blueprint with instanceGuid: '.. tostring(p_InstanceGuid))
+		return false
+	end
+
+	for _, l_Variation in pairs(s_Blueprint.variations) do
+		if p_VariationHash == l_Variation.hash then
+			return true
+		end
+	end
+	return false
+end
+
+function InstanceParser:GetDefaultVariation(p_InstanceGuid)
+	local s_Blueprint = self.m_Blueprints[tostring(p_InstanceGuid)]
+	if not s_Blueprint then
+		m_Logger:Error('Could not find blueprint with instanceGuid: '.. tostring(p_InstanceGuid))
+		return nil
+	end
+
+	if s_Blueprint.variations[1] then
+		return s_Blueprint.variations[1].hash
 	end
 end
 
@@ -227,36 +234,37 @@ function InstanceParser:FillVariations()
 			if(l_mvdEntry.mesh == nil) then
 				return
 			end
-			local l_MeshGuid = tostring(l_mvdEntry.mesh.instanceGuid)
+			local l_MeshGuid = tostring(Asset(l_mvdEntry.mesh).instanceGuid)
 			--local mesh = Asset(l_mvdEntry.mesh)
 			if(self.m_Variations[l_MeshGuid] == nil) then
 				self.m_Variations[l_MeshGuid] = {}
 			end
 			local s_Hash = l_mvdEntry.variationAssetNameHash
 			local s_Variation = {
-				hash =s_Hash,
-				name ="fuck"
+				hash = s_Hash,
+				name = self.m_ObjectVariations[s_Hash]
 			}
 
 			table.insert(self.m_Variations[l_MeshGuid], s_Variation)
 		end
 	end
-	for k, v in pairs(self.m_Blueprints) do
-		if(self.m_Meshes[v.name:lower() .. "_mesh"] == nil) then
+	for _, l_Blueprint in pairs(self.m_Blueprints) do
+		local l_MeshGuid = self.m_Meshes[l_Blueprint.name:lower() .. "_mesh"]
+		if l_MeshGuid == nil then
 			--m_Logger:Write("Missing: " .. v.name .. "_mesh")
 		else
-			local l_MeshGuid = self.m_Meshes[v.name:lower() .. "_mesh"]
+			if self.m_Variations[l_MeshGuid] ~= nil then
+				l_Blueprint.variations = self.m_Variations[l_MeshGuid]
 
-			if(self.m_Variations[l_MeshGuid] ~= nil ) then
-				self.m_Blueprints[k].variations = self.m_Variations[l_MeshGuid]
-				local jsonTest = (json.encode(self.m_Variations[l_MeshGuid]))
-				if(jsonTest == nil) then
-					m_Logger:Write("------------------")
-					m_Logger:Write(self.m_Variations[l_MeshGuid])
-					m_Logger:Write("------------------")
-				end
+				--- NOTE: json.encode causes a crash when the round restarts for some reason
+				--local jsonTest = (json.encode(self.m_Variations[l_MeshGuid]))
+				--if(jsonTest == nil) then
+				--	m_Logger:Write("------------------")
+				--	m_Logger:Write(self.m_Variations[l_MeshGuid])
+				--	m_Logger:Write("------------------")
+				--end
 			else
-				m_Logger:Write("No variation for " .. v.name)
+				m_Logger:Write("No variation for " .. l_Blueprint.name)
 			end
 		end
 	end
