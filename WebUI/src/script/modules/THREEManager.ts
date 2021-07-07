@@ -429,7 +429,6 @@ export class THREEManager {
 		let hitSelf: GameObject | null = null;
 
 		// Only check raycast collisions with GameEntities
-
 		const intersects = this.raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
 		if (intersects.length > 0) {
 			// console.log('hit ' + (intersects.length) + ' objects');
@@ -461,10 +460,11 @@ export class THREEManager {
 							hitSelf = parent;
 							continue;
 						}
+
 						if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
 								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
 								!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
-								!parent.raycastEnabled) {
+								parent.raycastEnabled) {
 							return parent.guid;
 						}
 					}
