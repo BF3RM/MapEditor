@@ -1,6 +1,6 @@
 import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { signals } from '@/script/modules/Signals';
-import { BoxGeometry, Color, DynamicDrawUsage, InstancedMesh, MeshBasicMaterial } from 'three';
+import { BoxGeometry, Color, DynamicDrawUsage, InstancedMesh, Matrix4, MeshBasicMaterial } from 'three';
 
 export default class InstanceManager {
 	private static instance: InstanceManager;
@@ -41,16 +41,27 @@ export default class InstanceManager {
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {
+		if (!entity.visible) return;
 		this.instancedMesh.setMatrixAt(entity.instanceId, entity.matrixWorld.clone().scale(entity.AABBScale));
 		this.instancedMesh.instanceMatrix.needsUpdate = true;
+		editor.threeManager.setPendingRender();
 	}
 
 	SetColor(entity: SpatialGameEntity, color: Color) {
+		console.log('SET COLOR');
 		this.instancedMesh.setColorAt(entity.instanceId, color);
 		this.instancedMesh.instanceMatrix.needsUpdate = true;
+		editor.threeManager.setPendingRender();
 	}
 
-	SetVisibility(visible: boolean) {
-		//
+	SetVisibility(entity: SpatialGameEntity, visible: boolean) {
+		if (visible) {
+			this.SetMatrixFromSpatialEntity(entity);
+			return;
+		}
+
+		this.instancedMesh.setMatrixAt(entity.instanceId, new Matrix4());
+		this.instancedMesh.instanceMatrix.needsUpdate = true;
+		editor.threeManager.setPendingRender();
 	}
 }

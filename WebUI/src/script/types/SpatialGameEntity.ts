@@ -33,22 +33,22 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 	public onHighlight() {
 		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
 		this.visible = true;
-		InstanceManager.getInstance().SetVisibility(true);
+		InstanceManager.getInstance().SetVisibility(this, true);
 	}
 
 	public onUnhighlight() {
 		this.visible = false;
-		InstanceManager.getInstance().SetVisibility(false);
+		InstanceManager.getInstance().SetVisibility(this, false);
 	}
 
 	public onDeselect() {
 		this.visible = false;
-		InstanceManager.getInstance().SetVisibility(false);
+		InstanceManager.getInstance().SetVisibility(this, false);
 	}
 
 	public onSelect() {
 		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
-		InstanceManager.getInstance().SetVisibility(true);
+		InstanceManager.getInstance().SetVisibility(this, true);
 		this.visible = true;
 	}
 
@@ -59,7 +59,6 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 		}
 		 */
 		InstanceManager.getInstance().SetColor(this, color);
-		editor.threeManager.setPendingRender();
 	}
 
 	public updateTransform() {
