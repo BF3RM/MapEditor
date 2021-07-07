@@ -57,11 +57,13 @@ In freecam, without holding right click:
 
 ## Mod Dependencies
 MapEditor requires other mods to work fully:
-- [MapLoader](https://github.com/BF3RM/MapLoader). This mod is required to load saves.
 - NoHavok. (Not publicly available yet). This mod transforms Havok objects into Frosbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing.
 
 ## Running saves for playing
-If your project is ready to be used for playing, you only need to run [MapLoader](https://github.com/BF3RM/MapLoader) and load the project save from another mod.
+If your project is ready to be used for playing, export your project's save from MapEditor and load it with
+ [MapLoader](https://github.com/BF3RM/MapLoader). The save can be loaded from an external mod (you can find an 
+ example here: [CustomLevel](https://github.com/BF3RM/CustomLevel)) or MapLoader can be modified to include and load
+ the save.
 
 ## Used libraries and tools
 This project is using:
