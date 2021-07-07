@@ -1,7 +1,7 @@
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { Box3, BoxGeometry, Color, Mesh, MeshBasicMaterial, Vector3 } from 'three';
+import { BoxGeometry, Color, Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { CtrRef } from '@/script/types/CtrRef';
@@ -11,7 +11,6 @@ export class SpatialGameEntity extends Mesh implements IGameEntity {
 	private static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
 	private instanceId: number;
 	public transform: LinearTransform;
-	private box: Box3;
 	private initiatorRef: CtrRef;
 
 	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox, initiatorRef: CtrRef) {
@@ -43,9 +42,6 @@ export class SpatialGameEntity extends Mesh implements IGameEntity {
 		this.matrixAutoUpdate = false;
 
 		this.visible = false;
-		this.box = new Box3(
-			aabb.min,
-			aabb.max);
 		this.updateMatrix();
 
 		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
