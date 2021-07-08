@@ -48,16 +48,16 @@ export default class InstanceManager {
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {
-		if (!entity.visible) return;
+		// if (!entity.visible) return;
 		this.instancedMesh.setMatrixAt(entity.instanceId, entity.matrixWorld.clone().scale(entity.AABBScale));
 		this.instancedMesh.instanceMatrix.needsUpdate = true;
 		editor.threeManager.setPendingRender();
 	}
 
 	SetColor(entity: SpatialGameEntity, color: Color) {
-		console.log('SET COLOR');
 		this.instancedMesh.setColorAt(entity.instanceId, color);
-		this.instancedMesh.instanceMatrix.needsUpdate = true;
+		// @ts-ignore
+		this.instancedMesh.instanceColor.needsUpdate = true;
 		editor.threeManager.setPendingRender();
 	}
 
@@ -65,11 +65,11 @@ export default class InstanceManager {
 	SetVisibility(entity: SpatialGameEntity, visible: boolean) {
 		if (visible) {
 			this.SetMatrixFromSpatialEntity(entity);
-			return;
+			// return;
 		}
 
-		this.instancedMesh.setMatrixAt(entity.instanceId, this.scale0Matrix);
-		this.instancedMesh.instanceMatrix.needsUpdate = true;
-		editor.threeManager.setPendingRender();
+		// this.instancedMesh.setMatrixAt(entity.instanceId, this.scale0Matrix);
+		// this.instancedMesh.instanceMatrix.needsUpdate = true;
+		// editor.threeManager.setPendingRender();
 	}
 }
