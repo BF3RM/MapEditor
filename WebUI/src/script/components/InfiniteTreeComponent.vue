@@ -143,9 +143,12 @@ export default class InfiniteTreeComponent extends Vue {
 
 		// Get scroll position of the node
 		let nodeScrollPos;
+		// @ts-ignore
 		if (this.scroller.itemSize === null) {
+			// @ts-ignore
 			nodeScrollPos = nodeIndex > 0 ? this.scroller.sizes[nodeIndex - 1].accumulator : 0;
 		} else {
+			// @ts-ignore
 			nodeScrollPos = nodeIndex * this.scroller.itemSize;
 		}
 
