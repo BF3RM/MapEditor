@@ -56,15 +56,15 @@ export default class InstanceManager {
 		this.entityIds[index2] = cachedInstanceId;
 	}
 
-	private setMatrixFromSpatialEntity(entity: SpatialGameEntity, n: number) {
-		this.instancedMesh.setMatrixAt(n, entity.matrixWorld.clone().scale(entity.AABBScale));
+	private setMatrixFromSpatialEntity(entity: SpatialGameEntity, index: number) {
+		this.instancedMesh.setMatrixAt(index, entity.matrixWorld.clone().multiply(entity.AABBTransformMatrix).scale(entity.AABBScale));
 		this.instancedMesh.instanceMatrix.needsUpdate = true;
 	}
 
 	AddFromSpatialEntity(entity: SpatialGameEntity) {
 		this.entityIds.push(entity.instanceId);
 		this.setMatrixFromSpatialEntity(entity, this.entityIds.length - 1);
-		// we dont increase count, cause we assume is not visible yet.
+		// Don't increase count because we assume is not visible yet.
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {
