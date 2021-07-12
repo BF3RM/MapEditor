@@ -1,36 +1,34 @@
 import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { BoxGeometry, Color, DynamicDrawUsage, InstancedMesh, Matrix4, MeshBasicMaterial, Vector3 } from 'three';
 
+/***
+ * Singleton that handles an InstancedMesh with all the SpatialEntities. The material and mesh is shared for all
+ * instances and are scaled by the AABB matrix. The array of instances is rearranged so visible entities are first
+ * and the count property is the amount of visible instances, so invisible instances aren't rendered.
+ * */
+
 export default class InstanceManager {
 	private static instance: InstanceManager;
-	private readonly count = 1000;
-	private instanceId = 0;
+	private readonly maxCount = 10000;
+	private entityIds: number[] = [];
 	private boxGeom = new BoxGeometry(
 		1,
 		1,
 		1
 	);
 
-	private scale0Matrix = new Matrix4().scale(new Vector3(0, 0, 0));
-
 	private material = new MeshBasicMaterial({
-		color: new Color(SpatialGameEntity.HIGHLIGHTED_COLOR),
+		color: SpatialGameEntity.HIGHLIGHTED_COLOR,
 		wireframe: true,
 		visible: true
 	});
 
-	private instancedMesh = new InstancedMesh(this.boxGeom, this.material, this.count);
+	private instancedMesh = new InstancedMesh(this.boxGeom, this.material, this.maxCount);
 
 	private constructor() {
-		this.boxGeom.translate(0, 0.5, 0);
 		this.instancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
 		editor.threeManager.scene.add(this.instancedMesh);
-
-		// Set all objects as invisible (scaled by 0) to start with
-		for (let i = 0; i < this.count; i++) {
-			this.instancedMesh.setMatrixAt(i, this.scale0Matrix);
-		}
-		this.instancedMesh.instanceMatrix.needsUpdate = true;
+		this.instancedMesh.count = 0;
 	}
 
 	public static getInstance(): InstanceManager {
@@ -41,35 +39,83 @@ export default class InstanceManager {
 		return InstanceManager.instance;
 	}
 
+	private swapInstances(index1: number, index2: number) {
+		// Cache stuff in entityIds[index1]
+		const cachedMatrix = new Matrix4();
+		this.instancedMesh.getMatrixAt(index1, cachedMatrix);
+		const cachedInstanceId = this.entityIds[index1];
+
+		// Put entityIds[index2] info in entityIds[index1]
+		const matrix = new Matrix4();
+		this.instancedMesh.getMatrixAt(index2, matrix);
+		this.instancedMesh.setMatrixAt(index1, matrix);
+		this.entityIds[index1] = this.entityIds[index2];
+
+		// Put cached info in entityIds[index2]
+		this.instancedMesh.setMatrixAt(index2, cachedMatrix);
+		this.entityIds[index2] = cachedInstanceId;
+	}
+
+	private setMatrixFromSpatialEntity(entity: SpatialGameEntity, n: number) {
+		this.instancedMesh.setMatrixAt(n, entity.matrixWorld.clone().scale(entity.AABBScale));
+		this.instancedMesh.instanceMatrix.needsUpdate = true;
+	}
+
 	AddFromSpatialEntity(entity: SpatialGameEntity) {
-		entity.instanceId = this.instanceId;
-		this.instanceId++;
-		this.SetMatrixFromSpatialEntity(entity);
+		this.entityIds.push(entity.instanceId);
+		this.setMatrixFromSpatialEntity(entity, this.entityIds.length - 1);
+		// we dont increase count, cause we assume is not visible yet.
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {
-		// if (!entity.visible) return;
-		this.instancedMesh.setMatrixAt(entity.instanceId, entity.matrixWorld.clone().scale(entity.AABBScale));
-		this.instancedMesh.instanceMatrix.needsUpdate = true;
-		editor.threeManager.setPendingRender();
+		const n = this.entityIds.findIndex((el) =>
+			el === entity.instanceId
+		);
+		this.setMatrixFromSpatialEntity(entity, n);
 	}
 
 	SetColor(entity: SpatialGameEntity, color: Color) {
-		this.instancedMesh.setColorAt(entity.instanceId, color);
-		// @ts-ignore
-		this.instancedMesh.instanceColor.needsUpdate = true;
-		editor.threeManager.setPendingRender();
+		const n = this.entityIds.findIndex((el) =>
+			el === entity.instanceId
+		);
+		this.instancedMesh.setColorAt(n, color);
+		if (this.instancedMesh.instanceColor) {
+			this.instancedMesh.instanceColor.needsUpdate = true;
+		}
 	}
 
-	// All objects in the instancedMesh group are always visible, so in order to hide them we need to scale them to 0
 	SetVisibility(entity: SpatialGameEntity, visible: boolean) {
-		if (visible) {
-			this.SetMatrixFromSpatialEntity(entity);
-			// return;
+		const n = this.entityIds.findIndex((el) =>
+			el === entity.instanceId
+		);
+		if (n === -1) {
+			console.error('Tried to set visibility of an entity that hasn\'t been registered in InstanceManager');
+			return;
 		}
+		if (visible) {
+			if (n < this.instancedMesh.count) {
+				// Already visible
+			} else {
+				// Swap [n] and [count] instances and increase count by 1, so the new visible entity is the last visible
+				// instance
+				this.swapInstances(this.instancedMesh.count, n);
 
-		// this.instancedMesh.setMatrixAt(entity.instanceId, this.scale0Matrix);
-		// this.instancedMesh.instanceMatrix.needsUpdate = true;
-		// editor.threeManager.setPendingRender();
+				// Increase count
+				this.instancedMesh.count++;
+				this.instancedMesh.instanceMatrix.needsUpdate = true;
+			}
+		} else {
+			if (n < this.instancedMesh.count) {
+				// Swap [n] with [count-1] instances and decrease count by 1, so the new invisible instance is after the
+				// last visible instance
+				this.swapInstances(this.instancedMesh.count - 1, n);
+
+				// Decrease count
+				this.instancedMesh.count--;
+				this.instancedMesh.instanceMatrix.needsUpdate = true;
+			} else {
+				// Already invisible
+			}
+		}
 	}
 }

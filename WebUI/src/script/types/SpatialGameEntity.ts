@@ -24,32 +24,36 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
 		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 		this.updateMatrixWorld();
-		console.log(this.position);
+
 		editor.threeManager.nextFrame(() => {
 			InstanceManager.getInstance().AddFromSpatialEntity(this);
 		});
 	}
 
 	public onHighlight() {
-		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
 		this.visible = true;
 		InstanceManager.getInstance().SetVisibility(this, true);
+		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
+		editor.threeManager.setPendingRender();
 	}
 
 	public onUnhighlight() {
 		this.visible = false;
 		InstanceManager.getInstance().SetVisibility(this, false);
+		editor.threeManager.setPendingRender();
 	}
 
 	public onDeselect() {
 		this.visible = false;
 		InstanceManager.getInstance().SetVisibility(this, false);
+		editor.threeManager.setPendingRender();
 	}
 
 	public onSelect() {
-		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
 		InstanceManager.getInstance().SetVisibility(this, true);
 		this.visible = true;
+		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
+		editor.threeManager.setPendingRender();
 	}
 
 	public SetColor(color: Color) {
