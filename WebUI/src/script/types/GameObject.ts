@@ -9,7 +9,7 @@ import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
-import { GAMEOBJECT_ORIGIN, RAYCAST_LAYER, REALM } from '@/script/types/Enums';
+import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
@@ -72,9 +72,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.realm = realm;
 		// Update the matrix after initialization.
 		this.updateMatrix();
-
-		this.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
-		this.layers.disable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public get partition(): Promise<FBPartition> | null {

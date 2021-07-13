@@ -9,11 +9,10 @@ import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
 import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
-import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 import InstanceManager from '@/script/modules/InstanceManager';
 import SelectionWrapper from '@/script/modules/three/SelectionWrapper';
-import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { Intersection } from 'three';
 
 export class THREEManager {
@@ -58,8 +57,6 @@ export class THREEManager {
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;
-		// this.camera.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
-		// this.camera.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public initialize() {
@@ -77,8 +74,6 @@ export class THREEManager {
 		} else {
 			console.error('Unable to find ViewPort');
 		}
-		// this.raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
-		// this.raycaster.layers.disable(RAYCAST_LAYER.GAMEENTITY);
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
 			const planeSize = 100;

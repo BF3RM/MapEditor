@@ -2,7 +2,6 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { Color, Matrix4, Object3D, Vector3 } from 'three';
-import { RAYCAST_LAYER } from '@/script/types/Enums';
 import { CtrRef } from '@/script/types/CtrRef';
 import InstanceManager from '@/script/modules/InstanceManager';
 
@@ -28,9 +27,6 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 
 		this.visible = false;
 		this.updateMatrix();
-
-		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
-		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 		this.updateMatrixWorld();
 
 		editor.threeManager.nextFrame(() => {
