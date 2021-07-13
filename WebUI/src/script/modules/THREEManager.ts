@@ -13,6 +13,8 @@ import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 import InstanceManager from '@/script/modules/InstanceManager';
 import SelectionWrapper from '@/script/modules/three/SelectionWrapper';
+import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
+import { Intersection } from 'three';
 
 export class THREEManager {
 	public scene = new THREE.Scene();
@@ -56,8 +58,8 @@ export class THREEManager {
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;
-		this.camera.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
-		this.camera.layers.enable(RAYCAST_LAYER.GAMEENTITY);
+		// this.camera.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
+		// this.camera.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public initialize() {
@@ -75,8 +77,8 @@ export class THREEManager {
 		} else {
 			console.error('Unable to find ViewPort');
 		}
-		this.raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
-		this.raycaster.layers.enable(RAYCAST_LAYER.GAMEENTITY);
+		// this.raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
+		// this.raycaster.layers.disable(RAYCAST_LAYER.GAMEENTITY);
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
 			const planeSize = 100;
@@ -425,66 +427,92 @@ export class THREEManager {
 	}
 
 	// TODO: Clean up
-	public async raycastSelection(mousePos: Vec2) {
-		this.raycaster.setFromCamera(mousePos, this.camera);
+	private async getHitTarget(intersection: Intersection[]) {
 		let hitSelf: GameObject | null = null;
 
-		// Only check raycast collisions with GameEntities
-		const intersects = this.raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
-		if (intersects.length > 0) {
-			// console.log('hit ' + (intersects.length) + ' objects');
-			for (const element of intersects.sort((a, b) => {
-				return a.distance - b.distance;
-			})) {
-				if (element.object == null || element.object.parent == null) {
-					continue;
-				}
-				if (element.object.parent.constructor === GameObject && (element.object.parent as any).name !== 'Gameplay/Logic/ShowRoom') {
-					const gameObject = element.object.parent as GameObject;
-					if (editor.selectionGroup.isSelected(gameObject)) {
-						hitSelf = gameObject;
-						continue;
-					}
-
-					if (!gameObject.raycastEnabled) {
-						continue;
-					}
-
-					// Select its parent if possible.
-					if (gameObject.parent != null) {
-						const parent = gameObject.parent;
-						// if (!parent.raycastEnabled) {
-						// 	continue;
-						// }
-						if (editor.selectionGroup.isSelected(parent)) {
-							console.log('Hit self ' + parent.guid);
-							hitSelf = parent;
-							continue;
-						}
-
-						if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
-								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
-								!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
-								parent.raycastEnabled) {
-							return parent.guid;
-						}
-					}
-					// Else we select the GameObject.
-					if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
-						return gameObject.guid;
-					}
-				}
-			}
-			// A selected GameObject was hit.
-			if (hitSelf !== null) {
-				return hitSelf.guid;
-			} else { // Didn't hit any GameObjects
-				return null;
-			}
-		} else {
-			// console.log("no hit")
+		if (intersection.length === 0) {
 			return null;
 		}
+
+		for (const element of intersection.sort((a, b) => {
+			return a.distance - b.distance;
+		})) {
+			if (!element.instanceId) {
+				console.error('Something went wrong, instanceId of intersection is null');
+				return null;
+			}
+			const entityId = InstanceManager.getInstance().getEntityId(element.instanceId);
+			if (!entityId) {
+				console.error('Couldn\'t find entityId of instance. Index: ' + element.instanceId);
+				return null;
+			}
+			const spatialGE = editor.spatialGameEntities.get(entityId);
+			if (!spatialGE) {
+				console.error('Couldn\'t find entity with entityId: ' + entityId);
+				return null;
+			}
+			if (!spatialGE.parent) {
+				console.error('Found spatial entity without a parent, this should never happen');
+				return null;
+			}
+			const gameObject = spatialGE.parent as GameObject;
+
+			if (gameObject.name === 'Gameplay/Logic/ShowRoom' || !gameObject.raycastEnabled) {
+				continue;
+			}
+
+			if (editor.selectionGroup.isSelected(gameObject)) {
+				hitSelf = gameObject;
+				continue;
+			}
+
+			// Select its parent if possible.
+			if (gameObject.parent != null) {
+				const parent = gameObject.parent;
+				// if (!parent.raycastEnabled) {
+				// 	continue;
+				// }
+				if (editor.selectionGroup.isSelected(parent)) {
+					console.log('Hit self ' + parent.guid);
+					hitSelf = parent;
+					continue;
+				}
+
+				if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
+					(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
+					!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
+					parent.raycastEnabled) {
+					return parent.guid;
+				}
+			}
+			// Else we select the GameObject.
+			if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
+				return gameObject.guid;
+			}
+		}
+		// A selected GameObject was hit.
+		if (hitSelf) {
+			return hitSelf.guid;
+		} else { // Didn't hit any GameObjects
+			return null;
+		}
+	}
+
+	public async raycastSelection(mousePos: Vec2) {
+		this.raycaster.setFromCamera(mousePos, this.camera);
+		const instanceManager = InstanceManager.getInstance();
+		const instancedMesh = instanceManager.instancedMesh;
+
+		// Increase count to cover all SpatialEntities, so it can hit any of them.
+		const cachedCount = instancedMesh.count;
+		instancedMesh.count = instanceManager.getNumberOfEntities();
+		const intersection = this.raycaster.intersectObject(instancedMesh);
+
+		const result = await this.getHitTarget(intersection);
+
+		// Reset count to original value
+		instancedMesh.count = cachedCount;
+		return result;
 	}
 
 	public getMouse3D(e: MouseEvent) {

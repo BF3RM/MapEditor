@@ -40,6 +40,14 @@ export default class InstanceManager {
 		return InstanceManager.instance;
 	}
 
+	public getNumberOfEntities(): number {
+		return this.entityIds.length;
+	}
+
+	public getEntityId(index: number): number {
+		return this.entityIds[index];
+	}
+
 	private swapInstances(index1: number, index2: number) {
 		// Cache stuff in entityIds[index1]
 		const cachedMatrix = new Matrix4();
