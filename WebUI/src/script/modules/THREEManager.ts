@@ -380,6 +380,7 @@ export class THREEManager {
 		this.highlightingEnabled = true;
 		// focus on canvas again
 		this.renderer.domElement.focus();
+		window.vext.SendEvent('controlStart');
 		this.OnCameraMoveDisable();
 	}
 
