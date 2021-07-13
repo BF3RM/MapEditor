@@ -3,8 +3,9 @@ import { BoxGeometry, Color, DynamicDrawUsage, InstancedMesh, Matrix4, MeshBasic
 
 /***
  * Singleton that handles an InstancedMesh with all the SpatialEntities. The material and mesh is shared for all
- * instances and are scaled by the AABB matrix. The array of instances is rearranged so visible entities are first
- * and the count property is the amount of visible instances, so invisible instances aren't rendered.
+ * instances and are scaled and positioned correctly with the AABB matrix. The array of instances is rearranged so
+ * visible entities are first and the count property is the amount of visible instances, so invisible instances
+ * aren't rendered.
  * */
 
 export default class InstanceManager {
@@ -23,10 +24,10 @@ export default class InstanceManager {
 		visible: true
 	});
 
-	private instancedMesh = new InstancedMesh(this.boxGeom, this.material, this.maxCount);
+	public instancedMesh = new InstancedMesh(this.boxGeom, this.material, this.maxCount);
 
 	private constructor() {
-		this.instancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+		// this.instancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
 		editor.threeManager.scene.add(this.instancedMesh);
 		this.instancedMesh.count = 0;
 	}
@@ -65,6 +66,27 @@ export default class InstanceManager {
 		this.entityIds.push(entity.instanceId);
 		this.setMatrixFromSpatialEntity(entity, this.entityIds.length - 1);
 		// Don't increase count because we assume is not visible yet.
+	}
+
+	DeleteSpatialEntity(entity: SpatialGameEntity) {
+		const index = this.entityIds.findIndex((el) =>
+			el === entity.instanceId
+		);
+
+		if (index === -1) {
+			console.error('Tried to delete an entity that hasn\'t been registered in InstanceManager');
+			return;
+		}
+
+		// Swap [index] and [length-1] instances and pop
+		// instance
+		this.swapInstances(this.entityIds.length - 1, index);
+		this.entityIds.pop();
+
+		if (index < this.instancedMesh.count) {
+			// If it was visible decrease count by 1 as it got removed
+			this.instancedMesh.count--;
+		}
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {

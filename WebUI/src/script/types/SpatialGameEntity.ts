@@ -35,6 +35,10 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 		});
 	}
 
+	public Delete() {
+		InstanceManager.getInstance().DeleteSpatialEntity(this);
+	}
+
 	public onHighlight() {
 		this.visible = true;
 		InstanceManager.getInstance().SetVisibility(this, true);
@@ -62,11 +66,6 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 	}
 
 	public SetColor(color: Color) {
-		/* const material = this.material;
-		if (!Array.isArray(material)) {
-			(material as MeshBasicMaterial).color = color;
-		}
-		 */
 		InstanceManager.getInstance().SetColor(this, color);
 	}
 

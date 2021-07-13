@@ -43,6 +43,7 @@ export default class Editor {
 	public playerName: string;
 	public gameObjects = new Collections.Dictionary<Guid, GameObject>();
 	public favorites = new Collections.Dictionary<Guid, Blueprint>();
+	public spatialGameEntities = new Map();
 	public copy: SpawnBlueprintCommand[];
 
 	public selectionGroup: SelectionGroup;
@@ -348,6 +349,12 @@ export default class Editor {
 		this.gameObjects.remove(gameObjectGuid);
 
 		gameObject.getAllChildren().forEach((go) => {
+			go.children.forEach((child) => {
+				if (child instanceof SpatialGameEntity) {
+					this.spatialGameEntities.delete(child.instanceId);
+					child.Delete();
+				}
+			});
 			this.threeManager.deleteObject(go);
 			this.gameObjects.remove(go.guid);
 		});
@@ -381,6 +388,7 @@ export default class Editor {
 
 				if (entityData.isSpatial) {
 					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.initiatorRef, entityData.aabb);
+					this.spatialGameEntities.set(entityData.instanceId, gameEntity);
 					gameObject.add(gameEntity);
 				}
 			}
