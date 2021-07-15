@@ -20,10 +20,10 @@ end
 
 function GameObjectParentData:GetTable()
     return {
-        guid = self.guid,
+        guid = tostring(self.guid),
         typeName = self.typeName,
-        primaryInstanceGuid = self.primaryInstanceGuid,
-        partitionGuid = self.partitionGuid
+        primaryInstanceGuid = tostring(self.primaryInstanceGuid),
+        partitionGuid = tostring(self.partitionGuid)
     }
 end
 

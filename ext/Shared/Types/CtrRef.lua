@@ -13,8 +13,8 @@ function CtrRef:GetTable()
     return {
         typeName = self.typeName,
         name = self.name,
-        partitionGuid = self.partitionGuid,
-        instanceGuid = self.instanceGuid
+        partitionGuid = tostring(self.partitionGuid),
+        instanceGuid = tostring(self.instanceGuid)
     }
 end
 
