@@ -63,10 +63,15 @@ end
 
 function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	--m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
-	for k, v in pairs(self.m_StaticModelGroupEntityDataGuids) do
-		local s_Instance = StaticModelGroupEntityData(ResourceManager:FindInstanceByGuid(
-				Guid(v.partitionGuid),
-				Guid(v.instanceGuid)))
+	for _, l_Data in pairs(self.m_StaticModelGroupEntityDataGuids) do
+		local s_Instance = ResourceManager:FindInstanceByGuid(
+				Guid(l_Data.partitionGuid),
+				Guid(l_Data.instanceGuid))
+		if s_Instance == nil then
+			print('Couldn\'t find DataContainer. PartitionGuid: '.. tostring(l_Data.partitionGuid)..', instanceGuid'..tostring(l_Data.instanceGuid))
+			goto continue
+		end
+		s_Instance = StaticModelGroupEntityData(s_Instance)
 
 		for _,l_Member in ipairs(s_Instance.memberDatas) do
 			local s_Member = StaticModelGroupMemberData(l_Member)
@@ -97,6 +102,8 @@ function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 				end
 			end
 		end
+
+		::continue::
 	end
 end
 
