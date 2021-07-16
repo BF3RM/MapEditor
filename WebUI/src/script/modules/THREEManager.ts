@@ -7,7 +7,6 @@ import { signals } from '@/script/modules/Signals';
 import CameraControlWrapper from '@/script/modules/three/CameraControlWrapper';
 import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
-import { MathUtils } from 'three/src/math/MathUtils';
 import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
@@ -333,7 +332,7 @@ export class THREEManager {
 	public enableGridSnap() {
 		this.gridSnap = true;
 		this.gizmoControls.setTranslationSnap(0.5);
-		this.gizmoControls.setRotationSnap(MathUtils.degToRad(15));
+		this.gizmoControls.setRotationSnap(THREE.MathUtils.degToRad(15));
 	}
 
 	public disableGridSnap() {
@@ -378,6 +377,7 @@ export class THREEManager {
 		this.highlightingEnabled = true;
 		// focus on canvas again
 		this.renderer.domElement.focus();
+		window.vext.SendEvent('controlStart');
 		this.OnCameraMoveDisable();
 	}
 

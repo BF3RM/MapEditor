@@ -30,7 +30,7 @@ end
 
 function GameObjectSaveData:GetAsTable()
     local out = {
-        guid = self.guid,
+        guid = tostring(self.guid),
         name = self.name,
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),

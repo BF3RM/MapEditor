@@ -28,9 +28,8 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import { Quat } from '@/script/types/primitives/Quat';
 import { Vec3 } from '@/script/types/primitives/Vec3';
-import { Euler } from 'three';
+import { Euler, MathUtils } from 'three';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
-import { MathUtils } from 'three/src/math/MathUtils';
 import RAD2DEG = MathUtils.RAD2DEG;
 import DEG2RAD = MathUtils.DEG2RAD;
 

@@ -211,7 +211,7 @@ end
 
 function GameObject:GetGameObjectTransferData()
     local s_GameObjectTransferData = {
-        guid = self.guid,
+        guid = tostring(self.guid),
         name = self.name,
         blueprintCtrRef = self.blueprintCtrRef:GetTable(),
         parentData = self.parentData:GetTable(),
