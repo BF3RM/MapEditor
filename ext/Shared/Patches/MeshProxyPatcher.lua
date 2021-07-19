@@ -1,4 +1,5 @@
 class 'MeshProxyPatcher'
+
 local m_Logger = Logger("MeshProxyPatcher", true)
 
 function MeshProxyPatcher:__init()
@@ -39,6 +40,5 @@ function MeshProxyPatcher:Patch(p_DynamicModel)
 	end
 	s_Instance:ReplaceReferences(s_ReplacementData)
 end
-
 
 return MeshProxyPatcher()
