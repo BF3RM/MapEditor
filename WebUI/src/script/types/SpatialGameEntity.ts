@@ -14,13 +14,15 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 	constructor(public instanceId: number, public transform: LinearTransform, public initiatorRef: CtrRef, aabb: AxisAlignedBoundingBox) {
 		super();
 		this.AABBScale = aabb.max.clone().sub(aabb.min);
-		if (this.AABBScale.x > 10000 || this.AABBScale.y > 10000 || this.AABBScale.z > 10000) {
-			this.AABBScale = new Vector3(1, 1, 1);
-		}
-
 		// Calculate transformation matrix to offset AABB position to correct place
 		const AABBCenter = new Vector3().copy(aabb.min).add(aabb.max).multiplyScalar(0.5);
 		this.AABBTransformMatrix = new Matrix4().makeTranslation(AABBCenter.x, AABBCenter.y, AABBCenter.z);
+
+		if (Math.max(...[aabb.max.x, aabb.max.y, aabb.max.z, aabb.min.x, aabb.min.y, aabb.min.z]) > 1000) {
+			// Fix for wrong aabbs with sizes or offsets too large.
+			this.AABBScale = new Vector3(1, 1, 1);
+			this.AABBTransformMatrix = new Matrix4().identity();
+		}
 
 		this.type = 'SpatialGameEntity';
 		this.matrixAutoUpdate = false;
