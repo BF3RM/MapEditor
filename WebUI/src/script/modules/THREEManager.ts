@@ -432,7 +432,7 @@ export class THREEManager {
 		for (const element of intersection.sort((a, b) => {
 			return a.distance - b.distance;
 		})) {
-			if (!element.instanceId) {
+			if (element.instanceId === undefined) {
 				console.error('Something went wrong, instanceId of intersection is null');
 				return null;
 			}
