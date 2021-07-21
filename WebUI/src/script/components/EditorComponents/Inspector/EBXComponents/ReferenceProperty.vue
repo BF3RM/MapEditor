@@ -149,6 +149,6 @@ export default class ReferenceComponent extends Vue {
 	border: 0;
 	background-color: rgba(0, 0, 0, 0.4) !important;
 	color: #fff;
-	border-top: 1px solid rgb(0 0 0 / 40%) !important;
+	border-top: 1px solid rgba(0, 0, 0, 0.4) !important;
 }
 </style>
