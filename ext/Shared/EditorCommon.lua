@@ -12,11 +12,6 @@ function EditorCommon:RegisterVars()
 
 end
 
-
-function EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
-
-end
-
 function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectHeader)
     if p_ProjectHeader == nil then
         return
