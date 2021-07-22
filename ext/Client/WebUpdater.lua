@@ -43,14 +43,16 @@ function WebUpdater:AddUpdate(p_Path, p_Payload, p_RemoveDuplicates)
 	})
 end
 
-function WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
+function WebUpdater:OnUpdate(p_DeltaTime, p_SimulationDelta)
 	if not self.m_IsUIReady then
 		return
 	end
 
-	self.m_ElapsedTime = self.m_ElapsedTime + p_Delta
+	self.m_ElapsedTime = self.m_ElapsedTime + p_DeltaTime
+
 	if self.m_ElapsedTime > UI_UPDATE_TIME then
 		self.m_ElapsedTime = 0
+
 		if self.m_WebUpdateStack ~= nil and #self.m_WebUpdateStack > 0 then
 			WebUI:ExecuteJS(string.format("window.vext.WebUpdateBatch(%s)", json.encode(self.m_WebUpdateStack)))
 			self.m_WebUpdateStack = {}

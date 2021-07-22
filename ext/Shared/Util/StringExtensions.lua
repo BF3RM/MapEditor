@@ -4,43 +4,46 @@ function string:normalizePath()
 	if self == nil then
 		return ""
 	end
-	local normalizedString = self
 
-	normalizedString = string.gsub(normalizedString, "/", "_")
-	normalizedString = string.gsub(normalizedString, "-", "_")
-	return normalizedString
+	local s_NormalizedString = self
+
+	s_NormalizedString = string.gsub(s_NormalizedString, "/", "_")
+	s_NormalizedString = string.gsub(s_NormalizedString, "-", "_")
+
+	return s_NormalizedString
 end
 
 function string:getNormalizedNameFromPath()
 	if self == nil then
 		return ""
 	end
-	local normalizedString = self
-	normalizedString = string.gsub(normalizedString, "-", "_")
-	normalizedString = string.gsub(normalizedString, " ", "_")
 
-	local parts = normalizedString:split("/") -- e.g. Levels/XP3_Shield/XP3_Shield
-	return parts[#parts] -- last part
+	local s_NormalizedString = self
+	s_NormalizedString = string.gsub(s_NormalizedString, "-", "_")
+	s_NormalizedString = string.gsub(s_NormalizedString, " ", "_")
+
+	local s_Parts = s_NormalizedString:split("/") -- e.g. Levels/XP3_Shield/XP3_Shield
+	return s_Parts[#s_Parts] -- last part
 end
 
 
-function string:split(sep)
-	local sep, fields = sep or ":", {}
-	local pattern = string.format("([^%s]+)", sep)
-	self:gsub(pattern, function(c) fields[#fields+1] = c end)
-	return fields
+function string:split(p_Sep)
+	local s_Sep, s_Fields = p_Sep or ":", {}
+	local s_Pattern = string.format("([^%s]+)", s_Sep)
+	self:gsub(s_Pattern, function(c) s_Fields[#s_Fields+1] = c end)
+	return s_Fields
 end
 
-function string:startsWith(startOfString)
-	return string.sub(self, 1, string.len(startOfString)) == startOfString
+function string:startsWith(p_StartOfString)
+	return string.sub(self, 1, string.len(p_StartOfString)) == p_StartOfString
 end
 
-function string:endsWith(endOfString)
-	return endOfString == '' or string.sub(String, -string.len(endOfString)) == endOfString
+function string:endsWith(p_EndOfString)
+	return p_EndOfString == '' or string.sub(String, -string.len(p_EndOfString)) == p_EndOfString
 end
 
-function string:firstToLower(str)
-	return (str:gsub("^%L", string.lower))
+function string:firstToLower(p_String)
+	return (p_String:gsub("^%L", string.lower))
 end
 
 function string:quote()
@@ -48,6 +51,5 @@ function string:quote()
 	self = self:gsub("'", "\\'")
 	return self
 end
-
 
 return StringExtensions

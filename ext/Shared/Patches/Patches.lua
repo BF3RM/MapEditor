@@ -1,8 +1,10 @@
 class 'Patches'
+
 require "__shared/Patches/CommonRosePatcher"
 require "__shared/Patches/LevelPatcher"
 require "__shared/Patches/SequencePatcher"
 require "__shared/Patches/HealthStatePatcher"
+
 VegetationPatcher = require "__shared/Patches/VegetationPatcher"
 DynamicModelPatcher = require "__shared/Patches/DynamicModelPatcher"
 MeshProxyPatcher = require "__shared/Patches/MeshProxyPatcher"
@@ -16,7 +18,7 @@ function Patches:__init()
 end
 
 function Patches:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	if(p_Data.typeInfo == VegetationTreeEntityData.typeInfo) then
+	if p_Data.typeInfo == VegetationTreeEntityData.typeInfo then
 		p_Hook:Pass(VegetationPatcher:PatchVegetationTree(p_Data), p_Transform)
 	end
 end
@@ -31,6 +33,7 @@ function Patches:OnPartitionLoaded(p_Partition)
 	end
 
 	local s_Instances = p_Partition.instances
+
 	for _, l_Instance in ipairs(s_Instances) do
 		if l_Instance == nil then
 			m_Logger:Write('Instance is null?')

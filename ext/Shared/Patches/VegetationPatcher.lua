@@ -1,4 +1,5 @@
 class 'VegetationPatcher'
+
 local m_Logger = Logger("VegetationPatcher", true)
 
 function VegetationPatcher:__init()
@@ -23,9 +24,11 @@ function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 	else
 		s_ReplacementData = StaticModelEntityData(p_VegetationTree.instanceGuid)
 	end
+
 	local s_BoneCount = 0
-	for k,v in pairs(s_Instance.basePoseTransforms) do
-		--s_ReplacementData.basePoseTransforms:add(v)
+
+	for _, l_Transform in pairs(s_Instance.basePoseTransforms) do
+		-- s_ReplacementData.basePoseTransforms:add(l_Transform)
 		s_BoneCount = s_BoneCount + 1
 	end
 
@@ -35,15 +38,16 @@ function VegetationPatcher:PatchVegetationTree(p_VegetationTree)
 	s_ReplacementData.visible = true
 
 	self.m_Replacements[tostring(s_Instance.instanceGuid)] = s_ReplacementData
-	if (s_Instance.mesh.isLazyLoaded) then
+
+	if s_Instance.mesh.isLazyLoaded then
 		s_Instance.mesh:RegisterLoadHandlerOnce(function(p_Mesh)
 			s_ReplacementData.mesh = MeshAsset(p_Mesh)
 		end)
 	else
 		s_ReplacementData.mesh = MeshAsset(s_Instance.mesh)
 	end
+
 	return s_ReplacementData
 end
-
 
 return VegetationPatcher()

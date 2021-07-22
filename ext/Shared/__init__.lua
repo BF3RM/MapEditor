@@ -1,8 +1,8 @@
 class 'MapEditorShared'
 
 require "__shared/Config"
-Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Logger"
+Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Util"
 DataContainerExt = require "__shared/Util/DataContainerExt"
 --require "__shared/Modules/ObjectManager"
