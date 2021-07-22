@@ -155,7 +155,7 @@ function SanitizeVec3( vec )
 end
 
 function SanitizeFloat( f )
-	if f < 0.000000001 and f > -0.000000001 then
+	if math.abs(f) < 0.00001 or math.abs(f) > 1000000 then
 		return 0
 	end
 	return f
