@@ -1,4 +1,5 @@
 class 'HealthStatePatcher'
+
 local m_Logger = Logger("HealthStatePatcher", true)
 
 function HealthStatePatcher:__init()

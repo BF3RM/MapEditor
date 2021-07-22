@@ -24,18 +24,16 @@ function MapEditorServer:RegisterEvents()
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
-    Events:Subscribe('Level:Loaded', self, self.OnLevelLoaded)
-    Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+	Events:Subscribe('Level:Loaded', self, self.OnLevelLoaded)
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Events:Subscribe('Player:Chat', self, self.OnChat)
 	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
-    Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 end
 
 ----------- Debug ----------------
-
-
 function MapEditorServer:OnChat(p_Player, p_RecipientMask, p_Message)
 	if p_Message == '' then
 		return
@@ -50,9 +48,9 @@ function MapEditorServer:OnChat(p_Player, p_RecipientMask, p_Message)
 	p_Message = p_Message:lower()
 
 	local s_Parts = p_Message:split(' ')
-	local firstPart = s_Parts[1]
+	local s_FirstPart = s_Parts[1]
 
-	if firstPart == 'save' then
+	if s_FirstPart == 'save' then
 		ProjectManager:OnRequestProjectSave(p_Player, {
 			projectName = "DebugProject",
 			mapName = "XP2_Skybar",
@@ -63,9 +61,9 @@ function MapEditorServer:OnChat(p_Player, p_RecipientMask, p_Message)
 end
 
 ----------- Game functions----------------
-function MapEditorServer:OnUpdatePass(p_Delta, p_Pass)
-	ServerTransactionManager:OnUpdatePass(p_Delta, p_Pass)
-	ProjectManager:OnUpdatePass(p_Delta, p_Pass)
+function MapEditorServer:OnUpdatePass(p_DeltaTime, p_UpdatePass)
+	ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
+	ProjectManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 end
 
 function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
@@ -98,7 +96,7 @@ function MapEditorServer:OnPlayerAuthenticated(p_Player)
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)
-	for i=0, 125 do
+	for i = 0, 125 do
 		p_Player:EnableInput(i, p_Enabled)
 	end
 end

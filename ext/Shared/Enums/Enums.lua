@@ -35,4 +35,3 @@ CoroutineState = {
 	Running = "running",
 	Dead = "dead"
 }
-

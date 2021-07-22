@@ -2,18 +2,18 @@ class "Timer"
 
 local m_Logger = Logger("Timer", false)
 
-local currentTime = 0
-local lastDelta = 0
-local timers = {}
+local m_CurrentTime = 0
+local m_LastDelta = 0
+local m_Timers = {}
 
 function Timer:__init()
 	m_Logger:Write("Timer init.")
 end
 
 function Timer:OnResetData()
-	currentTime = 0
-	lastDelta = 0
-	timers = {}
+	m_CurrentTime = 0
+	m_LastDelta = 0
+	m_Timers = {}
 end
 
 -- this local function has to be above in the code of where its getting called. Don't move it down.
@@ -22,122 +22,122 @@ local function xpcall_callback(err)
 end
 
 function Timer:GetTimers()
-	return timerstimers
+	return m_Timers
 end
 
-function Timer:GetTimer(timerName)
-	if not timerName then
+function Timer:GetTimer(p_TimerName)
+	if not p_TimerName then
 		m_Logger:Error('Timer:GetTimer() - argument timerName was nil')
 		return
 	end
 
-	return timers[timerName]
+	return m_Timers[p_TimerName]
 end
 
-function Timer:OnEngineUpdate(p_Delta, p_SimDelta)
-	lastDelta = lastDelta + p_Delta
+function Timer:OnEngineUpdate(p_DeltaTime, p_SimDelta)
+	m_LastDelta = m_LastDelta + p_DeltaTime
 
-	if lastDelta < 0.01 then -- add check: or round hasnt started yet
+	if m_LastDelta < 0.01 then -- add check: or round hasnt started yet
 		return
 	end
 
-	currentTime = currentTime + lastDelta
+	m_CurrentTime = m_CurrentTime + m_LastDelta
 
-	lastDelta = 0
+	m_LastDelta = 0
 
 	Timer:Check()
 end
 
-local isRandomseedSet = false
-
-function Timer:GetTimeLeft(timerName)
-	local timer = timers[timerName]
-	return timer.lastExec + timer.delay - currentTime
+function Timer:GetTimeLeft(p_TimerName)
+	local s_Timer = m_Timers[p_TimerName]
+	return s_Timer.lastExec + s_Timer.delay - m_CurrentTime
 end
 
 function Timer:GetNewRandomString()
-	if currentTime == 0 then
+	if m_CurrentTime == 0 then
 		m_Logger:Error('CurrentTime was 0, that means the OnEngineUpdate didnt start yet. No way you should be spawning stuff already.')
 		return
 	end
 
-	local pseudorandom = nil
+	local s_Pseudorandom = nil
 
 	while(true) do
-		pseudorandom = MathUtils:GetRandomInt(10000000, 99999999)
+		s_Pseudorandom = MathUtils:GetRandomInt(10000000, 99999999)
 
-		if timers[pseudorandom] == nil then
+		if m_Timers[s_Pseudorandom] == nil then
 			break
 		end
 	end
 
-	m_Logger:Write("Timer:GetNewRandomString() - got a new random timer name: " .. tostring(pseudorandom))
-	return tostring(pseudorandom)
+	m_Logger:Write("Timer:GetNewRandomString() - got a new random timer name: " .. tostring(s_Pseudorandom))
+	return tostring(s_Pseudorandom)
 end
 
-function Timer:Simple(delay, func)
-	Timer:CreateInternal(Timer:GetNewRandomString(), delay, 1, func, false)
+function Timer:Simple(p_Delay, p_Func)
+	Timer:CreateInternal(Timer:GetNewRandomString(), p_Delay, 1, p_Func, false)
 end
 
-function Timer:Create(name, delay, reps, func)
-	Timer:CreateInternal(name, delay, reps, func, false)
+function Timer:Create(p_Name, p_Delay, p_Reps, p_Func)
+	Timer:CreateInternal(p_Name, p_Delay, p_Reps, p_Func, false)
 end
 
-function Timer:CreateRepetitive(name, delay, func)
-	Timer:CreateInternal(name, delay, 0, func, true)
+function Timer:CreateRepetitive(p_Name, p_Delay, p_Func)
+	Timer:CreateInternal(p_Name, p_Delay, 0, p_Func, true)
 end
 
-function Timer:CreateInternal(name, delay, reps, func, isRepetitive) -- call one of the above not this one
-	if name ~= nil and type(name) ~= "string" then
-		m_Logger:Error("Invalid timer name: "..tostring(name))
+function Timer:CreateInternal(p_Name, p_Delay, p_Reps, p_Func, p_IsRepetitive) -- call one of the above not this one
+	if p_Name ~= nil and type(p_Name) ~= "string" then
+		m_Logger:Error("Invalid timer name: "..tostring(p_Name))
 		return
 	end
 
-	if type(delay) ~= "number" or delay < 0 then
-		m_Logger:Error("Invalid timer delay: "..tostring(delay))
+	if type(p_Delay) ~= "number" or p_Delay < 0 then
+		m_Logger:Error("Invalid timer delay: "..tostring(p_Delay))
 		return
 	end
 
-	if type(reps) ~= "number" or reps < 0 or math.floor(reps) ~= reps then
-		m_Logger:Error("Invalid timer reps: "..tostring(reps))
+	if type(p_Reps) ~= "number" or p_Reps < 0 or math.floor(p_Reps) ~= p_Reps then
+		m_Logger:Error("Invalid timer reps: "..tostring(p_Reps))
 		return
 	end
 
-	if func ~= nil and type(func) ~= "function" and not (getmetatable(func) and getmetatable(func).__call) then
-		m_Logger:Error("Invalid timer function: "..tostring(func))
+	if p_Func ~= nil and type(p_Func) ~= "function" and not (getmetatable(p_Func) and getmetatable(p_Func).__call) then
+		m_Logger:Error("Invalid timer function: "..tostring(p_Func))
 		return
 	end
 
-	name = name or Timer:GetNewRandomString()
+	p_Name = p_Name or Timer:GetNewRandomString()
 
-	timers[name] = {
-		name = name,
-		delay = delay,
-		reps = reps == 0 and -1 or reps,
-		func = func,
+	m_Timers[p_Name] = {
+		name = p_Name,
+		delay = p_Delay,
+		reps = p_Reps == 0 and -1 or p_Reps,
+		func = p_Func,
 		on = false,
 		lastExec = 0,
-		isRepetitive = false or isRepetitive,
+		isRepetitive = false or p_IsRepetitive,
 	}
 
-	m_Logger:Write("Timer:CreateInternal() - timer name: " .. name .. ' delay: ' .. delay)
-	Timer:Start(name)
+	m_Logger:Write("Timer:CreateInternal() - timer name: " .. p_Name .. ' delay: ' .. p_Delay)
+	Timer:Start(p_Name)
 end
 
 function Timer:Check()
-	local t = currentTime
-	for name,tmr in pairs(timers) do
-		if tmr.lastExec + tmr.delay <= t and tmr.on then
-			if tmr.func ~= nil then
-				tmr.func()
+	local t = m_CurrentTime
+
+	for l_Name, l_Timer in pairs(m_Timers) do
+		if l_Timer.lastExec + l_Timer.delay <= t and l_Timer.on then
+			if l_Timer.func ~= nil then
+				l_Timer.func()
 			end
 
-			tmr.lastExec = t
+			l_Timer.lastExec = t
 
-			if not tmr.isRepetitive then
-				tmr.reps = tmr.reps - 1
-				if tmr.reps == 0 then
-					timers[name] = nil
+			if not l_Timer.isRepetitive then
+				l_Timer.reps = l_Timer.reps - 1
+
+				if l_Timer.reps == 0 then
+					m_Timers[l_Name] = nil
 				end
 			end
 		end
@@ -146,24 +146,28 @@ end
 
 function Timer:Start(name)
 	m_Logger:Write('Timer:Start() - Starting timer: ' .. name)
-	local t = timers[name]
+	local t = m_Timers[name]
+
 	if not t then
 		m_Logger:Error("Tried to start nonexistant timer: "..tostring(name))
 		return
 	end
+
 	t.on = true
 	t.timeDiff = nil
-	t.lastExec = currentTime
+	t.lastExec = m_CurrentTime
 	return true
 end
 
 function Timer:Stop(name)
 	m_Logger:Write('Timer:Stop() - Stopping timer: ' .. name)
-	local t = timers[name]
+	local t = m_Timers[name]
+
 	if not t then
 		m_Logger:Error("Tried to stop nonexistant timer: "..tostring(name))
 		return
 	end
+
 	t.on = false
 	t.timeDiff = nil
 	--timers[name] = nil
@@ -172,46 +176,53 @@ end
 
 function Timer:Pause(name)
 	m_Logger:Write('Timer:Pause() - Pausing timer: ' .. name)
-	local t = timers[name]
+	local t = m_Timers[name]
+
 	if not t then
 		m_Logger:Error("Tried to pause nonexistant timer: "..tostring(name))
 		return
 	end
+
 	t.on = false
-	t.timeDiff = currentTime - t.lastExec
+	t.timeDiff = m_CurrentTime - t.lastExec
 	return true
 end
 
 function Timer:UnPause(name)
 	m_Logger:Write('Timer:UnPause() - Unpausing timer: ' .. name)
-	local t = timers[name]
+	local t = m_Timers[name]
+
 	if not t or not t.timeDiff then
 		m_Logger:Error("Tried to unpause nonexistant timer: "..tostring(name))
 		return
 	end
+
 	if not t.timeDiff then
 		m_Logger:Error("Tried to unpause nonpaused timer: "..tostring(name))
 		return
 	end
 
 	t.on = true
-	t.lastExec = currentTime - t.timeDiff
+	t.lastExec = m_CurrentTime - t.timeDiff
 	t.timeDiff = nil
 	return true
 end
 
 function Timer:Adjust(name, delay, reps, func, isRepetitive)
 	m_Logger:Write('Timer:Adjust() - Adjusting timer: ' .. name)
-	local t = timers[name]
+	local t = m_Timers[name]
+
 	-- if not t or not t.timeDiff then
 	if not t then
 		m_Logger:Error("Tried to adjust nonexistant timer: "..tostring(name))
 		return
 	end
+
 	if type(delay) ~= "number" or delay < 0 then
 		m_Logger:Error("Invalid timer delay: "..tostring(delay))
 		return
 	end
+
 	if type(reps) ~= "number" or reps < 0 or math.floor(reps) ~= reps then
 		m_Logger:Error("Invalid timer reps: "..tostring(reps))
 		return
@@ -226,6 +237,7 @@ function Timer:Adjust(name, delay, reps, func, isRepetitive)
 		m_Logger:Error("Invalid timer function: "..tostring(func))
 		return
 	end
+
 	t.func = func
 	return true
 end
@@ -237,16 +249,15 @@ function Timer:Delete(name)
 
 	m_Logger:Write('Timer:Delete() - Delete timer: ' .. name)
 
-	if timers[name] ~= nil then
-		timers[name] = nil
+	if m_Timers[name] ~= nil then
+		m_Timers[name] = nil
 	end
-
 end
 -- Timer.Remove = Timer.Delete -- whats this for?
 
 -- Singleton.
 if g_Timer == nil then
-    g_Timer = Timer()
+	g_Timer = Timer()
 end
 
 return g_Timer

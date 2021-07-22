@@ -22,7 +22,6 @@ function Logger:Write(p_Message)
 
 	if ME_CONFIG.LOGGER_PRINT_ALL == true and self.className ~= nil then
 		goto continue
-
 	elseif self.debug == false or
 		 self.debug == nil or
 		 self.className == nil then
@@ -30,7 +29,8 @@ function Logger:Write(p_Message)
 	end
 
 	::continue::
-	if(type(p_Message) == 'table') then
+
+	if type(p_Message) == 'table' then
 		print("["..self.className.."]")
 		print(p_Message)
 	else
@@ -39,8 +39,8 @@ function Logger:Write(p_Message)
 end
 
 function Logger:WriteTable(p_Table)
-	for key, value in pairs(p_Table) do
-		self:Write(tostring(key) .. " - " .. tostring(value))
+	for l_Key, l_Value in pairs(p_Table) do
+		self:Write(tostring(l_Key) .. " - " .. tostring(l_Value))
 	end
 end
 

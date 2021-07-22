@@ -1,4 +1,5 @@
 class 'LevelPatcher'
+
 local m_Logger = Logger("LevelPatcher", true)
 
 function LevelPatcher:__init()
@@ -20,12 +21,14 @@ function LevelPatcher:PatchLevelDescription(p_LevelDescription)
 	s_Instance.description.isMultiplayer = true
 	s_Instance.description.isMenu = false
 
-	local cat = LevelDescriptionInclusionCategory()
-	cat.category = "GameMode"
-	for k,v in pairs(GameModes) do
-		cat.mode:add(v.GameModeName)
+	local s_Category = LevelDescriptionInclusionCategory()
+	s_Category.category = "GameMode"
+
+	for _, l_GameMode in pairs(GameModes) do
+		s_Category.mode:add(l_GameMode.GameModeName)
 	end
-	s_Instance.categories:add(cat)
+
+	s_Instance.categories:add(s_Category)
 	s_Instance.startPoints:clear()
 end
 

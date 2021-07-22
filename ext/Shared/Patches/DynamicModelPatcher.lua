@@ -1,4 +1,5 @@
 class 'DynamicModelPatcher'
+
 local m_Logger = Logger("DynamicModelPatcher", true)
 
 function DynamicModelPatcher:__init()
@@ -29,9 +30,9 @@ function DynamicModelPatcher:Patch(p_DynamicModel)
 	s_ReplacementData.visible = true
 
 	--[[ Don't think this is necessary
-	for k,v in pairs(s_Instance.components) do
-		print(k)
-		s_ReplacementData.components:add(v)
+	for l_Index, l_Component in pairs(s_Instance.components) do
+		print(l_Index)
+		s_ReplacementData.components:add(l_Component)
 	end
 	s_ReplacementData.runtimeComponentCount = s_Instance.runtimeComponentCount
 	s_ReplacementData.physicsData = s_Instance.physicsData
@@ -48,6 +49,5 @@ function DynamicModelPatcher:Patch(p_DynamicModel)
 	end
 	s_Instance:ReplaceReferences(s_ReplacementData)
 end
-
 
 return DynamicModelPatcher()

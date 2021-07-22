@@ -27,27 +27,31 @@ function FreeCam:RegisterVars()
 
 	self.m_LastSpectatedPlayer = 0
 end
+
 function FreeCam:OnLevelDestroy()
 	self:RegisterVars()
 end
 
 function FreeCam:Create()
-    local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
-    if s_Entity == nil then
-        m_Logger:Error("Could not spawn camera")
-        return
-    end
-    self.cameraData.transform = ClientUtils:GetCameraTransform()
-    self.cameraData.fov = 90
-    self.camera = s_Entity
+	local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
+
+	if s_Entity == nil then
+		m_Logger:Error("Could not spawn camera")
+		return
+	end
+
+	self.cameraData.transform = ClientUtils:GetCameraTransform()
+	self.cameraData.fov = 90
+	self.camera = s_Entity
 end
 
 function FreeCam:SetCameraMode(p_Mode)
-    if self.m_Mode == CameraMode.Editor and p_Mode == CameraMode.FreeCam then
-        self:UpdateFreeCamVars()
-    end
+	if self.m_Mode == CameraMode.Editor and p_Mode == CameraMode.FreeCam then
+		self:UpdateFreeCamVars()
+	end
+
 	--m_Logger:Write("Setting FreeCam mode to "..p_Mode)
-    self.m_Mode = p_Mode
+	self.m_Mode = p_Mode
 end
 
 function FreeCam:SetCameraFOV(p_FOV)
@@ -67,15 +71,15 @@ function FreeCam:GetCameraFOV()
 end
 
 function FreeCam:GetCameraMode()
-    return self.m_Mode
+	return self.m_Mode
 end
 
 function FreeCam:OnControlStart()
-    self:SetCameraMode(CameraMode.Editor)
+	self:SetCameraMode(CameraMode.Editor)
 end
 
 function FreeCam:OnControlEnd()
-    self:SetCameraMode(CameraMode.FreeCam)
+	self:SetCameraMode(CameraMode.FreeCam)
 end
 
 function FreeCam:OnControlUpdate(p_Transform)
@@ -83,12 +87,12 @@ function FreeCam:OnControlUpdate(p_Transform)
 end
 
 function FreeCam:OnEnableFreeCamMovement()
-    self:SetCameraMode(CameraMode.FreeCam)
+	self:SetCameraMode(CameraMode.FreeCam)
 end
 
 -- Update rotation angles with the new transform
 function FreeCam:UpdateFreeCamVars()
-    local s_Yaw, s_Pitch, s_Roll = m_RotationHelper:GetYPRfromLUF(
+	local s_Yaw, s_Pitch, s_Roll = m_RotationHelper:GetYPRfromLUF(
 			self.m_CameraData.transform.left,
 			self.m_CameraData.transform.up,
 			self.m_CameraData.transform.forward)
@@ -96,18 +100,17 @@ function FreeCam:UpdateFreeCamVars()
 	self.m_CameraPitch = -(s_Pitch - math.pi)
 	self.m_CameraRoll = s_Roll - math.pi
 
-    self.m_LastTransform = self.m_CameraData.transform.trans
+	self.m_LastTransform = self.m_CameraData.transform.trans
 end
 
 function FreeCam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
-
 	if self.m_Camera ~= nil and self.m_Mode == CameraMode.FreeCam then
-
-		local s_NewYaw   = self.m_CameraYaw   - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
+		local s_NewYaw = self.m_CameraYaw - p_Cache:GetLevel(InputConceptIdentifiers.ConceptYaw) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 		local s_NewPitch = self.m_CameraPitch - p_Cache:GetLevel(InputConceptIdentifiers.ConceptPitch) * (p_DeltaTime * self.m_RotationSpeedMultiplier)
 
 		self.m_CameraYaw = s_NewYaw
-		if (math.abs(s_NewPitch)* 2 < math.pi) then
+
+		if math.abs(s_NewPitch)* 2 < math.pi then
 			self.m_CameraPitch = s_NewPitch
 		end
 	end
@@ -115,11 +118,13 @@ end
 
 function FreeCam:Create()
 	local s_Entity = EntityManager:CreateEntity(self.m_CameraData, LinearTransform())
+
 	if s_Entity == nil then
 		m_Logger:Error("Could not spawn camera")
 		return
 	end
-	s_Entity:Init(Realm.Realm_Client, true);
+
+	s_Entity:Init(Realm.Realm_Client, true)
 
 	-- local s_Spatial = SpatialEntity(s_Entity)
 	self.m_CameraData.transform = ClientUtils:GetCameraTransform()
@@ -128,33 +133,33 @@ function FreeCam:Create()
 end
 
 function FreeCam:TakeControl()
-	if(self.m_Camera ~= nil) then
+	if self.m_Camera ~= nil then
 		self.m_Camera:FireEvent("TakeControl")
 	end
 end
 
 function FreeCam:ReleaseControl()
-	if(self.m_Camera ~= nil) then
+	if self.m_Camera ~= nil then
 		self.m_Camera:FireEvent("ReleaseControl")
 	end
 end
 
 function FreeCam:Enable()
-	if(self.m_Camera == nil) then
+	if self.m_Camera == nil then
 		self:Create()
 	end
 
-	if(self.m_lastTransform ~= nil) then
+	if self.m_lastTransform ~= nil then
 		self.m_CameraData.transform = self.m_LastTransform
 	end
 
-    self:SetCameraMode(CameraMode.FreeCam)
+	self:SetCameraMode(CameraMode.FreeCam)
 	self:TakeControl()
 end
 
 function FreeCam:Disable()
 	self.m_LastTransform = self.m_CameraData.transform
-    self:SetCameraMode(CameraMode.FirstPerson)
+	self:SetCameraMode(CameraMode.FirstPerson)
 	self:ReleaseControl()
 end
 
@@ -199,8 +204,8 @@ function FreeCam:OnUpdateInput(p_Delta)
 		self.m_CameraDistance = 1.0
 		self.m_ThirdPersonRotX = 0.0
 		self.m_ThirdPersonRotY = 0.0
-
 	end
+
 	-- Reset movement.
 	self.m_RotateX = 0.0
 	self.m_RotateY = 0.0
@@ -225,7 +230,7 @@ function FreeCam:UpdateCameraControls(p_Delta)
 	end
 
 	--- When moving diagonally lower axis direction speeds.
-	if s_MoveX ~= 0.0 and s_MoveZ ~= 0.0  then
+	if s_MoveX ~= 0.0 and s_MoveZ ~= 0.0 then
 		s_MoveX = s_MoveX * 0.7071 -- cos(45º)
 		s_MoveZ = s_MoveZ * 0.7071 -- cos(45º)
 	end
@@ -256,7 +261,7 @@ function FreeCam:UpdateCameraControls(p_Delta)
 	local s_MouseWheel = InputManager:GetLevel(InputConceptIdentifiers.ConceptFreeCameraSwitchSpeed)
 
 	if self.m_Mode == CameraMode.FreeCam then
-		local s_Step = s_MouseWheel * self.m_SpeedMultiplier / 20
+		s_Step = s_MouseWheel * self.m_SpeedMultiplier / 20
 		self.m_SpeedMultiplier = self.m_SpeedMultiplier + s_Step
 
 		if self.m_SpeedMultiplier < 0.000005 then
@@ -279,10 +284,10 @@ function FreeCam:UpdateEditor(p_Transform)
 end
 
 function FreeCam:UpdateFreeCamera(p_Delta)
-	local left, up, forward = m_RotationHelper:GetLUFfromYPR(self.m_CameraYaw, self.m_CameraPitch, self.m_CameraRoll)
-	self.m_CameraData.transform.left = left
-	self.m_CameraData.transform.up = up
-	self.m_CameraData.transform.forward = forward
+	local s_Left, s_Up, s_Forward = m_RotationHelper:GetLUFfromYPR(self.m_CameraYaw, self.m_CameraPitch, self.m_CameraRoll)
+	self.m_CameraData.transform.left = s_Left
+	self.m_CameraData.transform.up = s_Up
+	self.m_CameraData.transform.forward = s_Forward
 
 	local s_Transform = self.m_CameraData.transform
 

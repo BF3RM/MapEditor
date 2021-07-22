@@ -33,7 +33,7 @@ function GameObjectManager:GetGameEntities(p_EntityIds)
 	for _, l_EntityId in pairs(p_EntityIds) do
 		local s_Entity = self.m_Entities[l_EntityId]
 
-		if (s_Entity == nil) then
+		if s_Entity == nil then
 			m_Logger:Error("Entity not found: " .. tostring(l_EntityId))
 		end
 
@@ -45,9 +45,8 @@ end
 
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
-			p_BlueprintInstanceGuid == nil or
-			p_LinearTransform == nil then
-
+	p_BlueprintInstanceGuid == nil or
+	p_LinearTransform == nil then
 		m_Logger:Error('InvokeBlueprintSpawn: One or more parameters are nil.')
 		return false
 	end
@@ -96,9 +95,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 		return
 	end
+
 	if p_Parent ~= nil and p_Parent.instanceGuid == HAVOK_GUID then
 		m_Logger:Write("Loading havok WorldPartData")
 	end
+
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
 	local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
 	--local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
@@ -112,18 +113,22 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
 		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
 	end
+
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
 	if s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData" then
 		return
 	end
-	local originalRef = CtrRef({})
+
+	local s_OriginalRef = CtrRef({})
+
 	if p_Parent ~= nil then
-		originalRef = CtrRef {
+		s_OriginalRef = CtrRef {
 			typeName = p_Parent.typeInfo.name,
 			instanceGuid = s_ParentInstanceGuid,
 			partitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
 		}
 	end
+
 	local s_GameObject = GameObject{
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
@@ -136,8 +141,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		gameEntities = {},
 		children = {},
 		realm = Realm.Realm_ClientAndServer,
-		originalRef = originalRef,
+		originalRef = s_OriginalRef,
 	}
+
 	if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil then
 		s_GameObject.creatorName = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].creatorName
 		s_GameObject.overrides = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].overrides
@@ -205,8 +211,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 	-- Custom object have to be manually initialized.
 	if not s_GameObject.origin == GameObjectOriginType.Vanilla then
-		--print("Amount of entities in entity bus: "  .. #s_EntityBus.entities)
-		for _,l_Entity in pairs(s_EntityBus.entities) do
+		for _, l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
 			l_Entity:Init(self.m_Realm, true)
 		end
@@ -214,6 +219,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
+
 		if s_GameEntity == nil then
 			s_GameEntity = GameEntity{
 				entity = l_Entity,
@@ -225,6 +231,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 		if s_GameEntity.indexInBlueprint == nil then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
+
 			if l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
 				local s_Entity = SpatialEntity(l_Entity)
 
@@ -236,6 +243,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
 				}
 			end
+
 			if s_GameEntity.initiatorRef == nil and s_GameEntity.data then
 				s_GameEntity.initiatorRef = CtrRef {
 					typeName = s_GameEntity.data.typeInfo.name,
@@ -251,8 +259,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			if s_GameObject.origin ~= GameObjectOriginType.Vanilla and
 					(l_Entity:Is('GameEntity') or l_Entity:Is('EffectEntity')) and
 					l_Entity.typeInfo.name ~= "ServerVehicleEntity" then
-				-- Small delay before firing an event, otherwise it may crash
-				Timer:Simple(0.2, function()
+
+				Timer:Simple(0.2, function() -- Small delay before firing an event, otherwise it may crash
 					s_GameEntity:Enable()
 				end)
 			end
@@ -262,6 +270,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	--- If its a root object all children are now resolved so we update WebUI.
 	if s_GameObject.parentData.guid == nil then
 		local s_UnresolvedRODCount = GetLength(self.m_ReferenceObjectDatas)
+
 		if s_UnresolvedRODCount ~= 0 then
 			-- TODO: update blueprint data with the correct realm if its client or server only
 			if self.m_Realm == Realm.Realm_Server then
@@ -278,6 +287,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
 			self.m_ReferenceObjectDatas = {}
 		end
+
 		if s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000' then
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
@@ -286,17 +296,20 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	--- If its a root custom object we remove it from pending and call ready event.
 	if self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
+
 		if s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000' then
-			--print("Spawning: " .. s_GameObject.guid)
+			--m_Logger:Write("Spawning: " .. s_GameObject.guid)
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
+
 	if s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000' then -- Set collision to 0,0,0 so we don't hit the same object over and over
 		s_GameObject:SetTransform(LinearTransform(), true)
 		s_GameObject:SetTransform(p_Transform, false)
 	end
+
 	if s_GameObject:HasOverrides() then
-		print("Patching GameObject: " .. tostring(s_GameObject.guid))
+		m_Logger:Write("Patching GameObject: " .. tostring(s_GameObject.guid))
 		s_GameObject:SetOverrides(s_GameObject.overrides)
 	end
 end
@@ -322,6 +335,7 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
 
 	end
+
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 end
 
@@ -333,11 +347,14 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		primaryInstanceGuid = p_ParentGameObject.blueprintCtrRef.instanceGuid,
 		partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid
 	}
+
 	if p_GameObject.originalRef.partitionGuid == nil then
 		p_GameObject.originalRef.partitionGuid = p_ParentGameObject.blueprintCtrRef.partitionGuid -- TODO: Confirm that this is correct
 	end
+
 	p_GameObject.origin = p_ParentGameObject.origin
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
+
 	if p_GameObject.origin == GameObjectOriginType.Vanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
@@ -345,19 +362,23 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	else
 		local i = 1
 		local s_CustomGuid
+
 		repeat
 			s_CustomGuid = GenerateChildGuid(p_GameObject.parentData.guid, i)
 			i = i + 1
 		until self.m_GameObjects[tostring(s_CustomGuid)] == nil
+
 		p_GameObject.guid = s_CustomGuid
 		p_GameObject.origin = GameObjectOriginType.CustomChild
 	end
+
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
 	table.insert(p_ParentGameObject.children, p_GameObject)
 end
 
 function GameObjectManager:UpdateGameObjectRealm(p_Guid, p_Realm)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+
 	if s_GameObject == nil then
 		m_Logger:Error('Tried to update realm of a gameobject that doesn\'t exist')
 		return
@@ -371,24 +392,26 @@ function GameObjectManager:GetVanillaGameObjectsGuids()
 end
 
 function GameObjectManager:AddGameObjectToTable(p_GameObject)
-	local guidAsString = tostring(p_GameObject.guid)
+	local s_GuidAsString = tostring(p_GameObject.guid)
 
-	if self.m_GameObjects[guidAsString] ~= nil then
-		m_Logger:Warning("GameObject with the same guid already exists: " ..  guidAsString)
+	if self.m_GameObjects[s_GuidAsString] ~= nil then
+		m_Logger:Warning("GameObject with the same guid already exists: " .. s_GuidAsString)
 	end
 
 	--m_Logger:Write(tostring(p_GameObject.guid) .. " | " .. p_GameObject.name .. " | " .. tostring(p_GameObject.transform.trans))
 
-	self.m_GameObjects[guidAsString] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
+	self.m_GameObjects[s_GuidAsString] = p_GameObject -- add gameObject to our array of gameObjects now that it is finalized
 end
 
 function GameObjectManager:GetVanillaGuid(p_Name, p_Transform)
 	local s_VanillaGuid = GenerateVanillaGuid(p_Name, p_Transform, 0)
 	local s_Increment = 1
+
 	while self.m_GameObjects[tostring(s_VanillaGuid)] ~= nil do
 		s_VanillaGuid = GenerateVanillaGuid(p_Name, p_Transform, s_Increment)
 		s_Increment = s_Increment + 1
 	end
+
 	return s_VanillaGuid
 end
 
@@ -439,18 +462,18 @@ function GameObjectManager:UndeleteBlueprint(p_Guid)
 end
 
 --function GameObjectManager:DestroyGameObject(p_Guid)
---    local s_GameObject = self.m_GameObjects[p_Guid]
+--	local s_GameObject = self.m_GameObjects[p_Guid]
 --
---    if (s_GameObject == nil) then
---        m_Logger:Error("GameObject not found: " .. p_Guid)
---        return false
---    end
+--	if s_GameObject == nil then
+--		m_Logger:Error("GameObject not found: " .. p_Guid)
+--		return false
+--	end
 --
---    s_GameObject:Destroy()
+--	s_GameObject:Destroy()
 --
---    self.m_GameObjects[self.guid] = nil
+--	self.m_GameObjects[self.guid] = nil
 --
---    return true
+--	return true
 --end
 
 function GameObjectManager:EnableGameObject(p_Guid)
@@ -497,6 +520,7 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 		m_Logger:Error('Object with id ' .. tostring(p_Guid) .. ' does not exist')
 		return false
 	end
+
 	local s_TransferData = s_GameObject:GetGameObjectTransferData()
 	s_TransferData.variation = p_Variation
 
