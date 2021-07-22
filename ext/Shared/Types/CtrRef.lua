@@ -27,7 +27,7 @@ function CtrRef:Get()
 		return s_Instance
 	end
 
-	return null
+	return nil
 end
 
 return CtrRef
