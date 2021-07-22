@@ -165,18 +165,18 @@ function SanitizeVec3(p_Vec3)
 	return p_Vec3
 end
 
-function SanitizeFloat(f)
-	if f < 0.000000001 and f > -0.000000001 then
+function SanitizeFloat(p_Float)
+	if math.abs(p_Float) < 0.00001 or math.abs(p_Float) > 1000000 then
 		return 0
 	end
 
-	return f
+	return p_Float
 end
 
 
-function InverseSafe(f)
-	if f > 0.00000000000001 then
-		return 1.0 / f
+function InverseSafe(p_Float)
+	if p_Float > 0.00000000000001 then
+		return 1.0 / p_Float
 	else
 		return 0.0
 	end

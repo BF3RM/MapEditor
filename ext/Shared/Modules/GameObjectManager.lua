@@ -11,8 +11,6 @@ end
 function GameObjectManager:RegisterVars()
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
-	self.m_PendingBlueprint = {}
-
 
 	self.m_Entities = {}
 	self.m_VanillaGameObjectGuids = {}
@@ -135,7 +133,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
 		parentData = GameObjectParentData{},
-		transform = p_Transform,
+		transform = SanitizeLT(p_Transform),
 		variation = p_Variation,
 		origin = GameObjectOriginType.Vanilla,
 		isDeleted = false,
@@ -207,23 +205,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 	end
 
-	if s_BlueprintPartitionGuid then
-		self.m_PendingBlueprint[s_BlueprintPartitionGuid] = s_GameObject
-	end
-
 	---^^^^ This is parent to children / top to bottom ^^^^
 	local s_EntityBus = p_Hook:Call()
 	---vvvv This is children to parent / bottom to top vvvv
 
 	-- Custom object have to be manually initialized.
 	if not s_GameObject.origin == GameObjectOriginType.Vanilla then
-		--print("Amount of entities in entity bus: " .. #s_EntityBus.entities)
 		for _, l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
 			l_Entity:Init(self.m_Realm, true)
 		end
 	end
-
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
@@ -237,17 +229,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
 		end
 
-		--m_Logger:Write(l_Entity.typeInfo.name)
 		if s_GameEntity.indexInBlueprint == nil then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
 
 			if l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
 				local s_Entity = SpatialEntity(l_Entity)
+
 				s_GameEntity.isSpatial = true
 				s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
 				s_GameEntity.aabb = AABB {
-					min = s_Entity.aabb.min,
-					max = s_Entity.aabb.max,
+					min = SanitizeVec3(s_Entity.aabb.min),
+					max = SanitizeVec3(s_Entity.aabb.max),
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
 				}
 			end
@@ -261,6 +253,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			end
 
 			self.m_Entities[l_Entity.instanceId] = s_GameEntity
+			table.insert(s_GameObject.gameEntities, s_GameEntity)
+
+			-- Set custom objects' entities enabled by default.
+			if s_GameObject.origin ~= GameObjectOriginType.Vanilla and
+					(l_Entity:Is('GameEntity') or l_Entity:Is('EffectEntity')) and
+					l_Entity.typeInfo.name ~= "ServerVehicleEntity" then
+
+				Timer:Simple(0.2, function() -- Small delay before firing an event, otherwise it may crash
+					s_GameEntity:Enable()
+				end)
+			end
 		end
 	end
 
@@ -525,59 +528,6 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
 	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false, s_TransferData.overrides)
 	return true
-end
-
-function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
-	local s_Entity = p_Hook:Call()
-
-	if not s_Entity then
-		return
-	end
-
-	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
-
-	if s_GameEntity == nil then
-		s_GameEntity = GameEntity{
-			entity = s_Entity,
-			instanceId = s_Entity.instanceId,
-			typeName = s_Entity.typeInfo.name,
-		}
-	end
-
-	--m_Logger:Write("Entity instance id: " .. s_Entity.instanceId)
-	local s_PartitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid);
-	s_GameEntity.initiatorRef = CtrRef {
-		typeName = p_EntityData.typeInfo.name,
-		instanceGuid = tostring(p_EntityData.instanceGuid),
-		partitionGuid = s_PartitionGuid
-	}
-	self.m_Entities[s_Entity.instanceId] = s_GameEntity
-	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
-
-	if s_PendingGameObject then
-		if s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
-			s_Entity = SpatialEntity(s_Entity)
-			s_GameEntity.isSpatial = true
-			s_GameEntity.transform = ToLocal(s_Entity.transform, s_PendingGameObject.transform)
-			s_GameEntity.aabb = AABB {
-				min = s_Entity.aabb.min,
-				max = s_Entity.aabb.max,
-				transform = ToLocal(s_Entity.aabbTransform, s_PendingGameObject.transform)
-			}
-		end
-
-		-- Set custom objects' entities enabled by default.
-		if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla and
-		(s_Entity:Is('GameEntity') or s_Entity:Is('EffectEntity')) and
-		s_Entity.typeInfo.name ~= "ServerVehicleEntity" then
-			-- Small delay before firing an event, otherwise it may crash
-			Timer:Simple(0.2, function()
-				s_GameEntity:Enable()
-			end)
-		end
-
-		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
-	end
 end
 
 return GameObjectManager

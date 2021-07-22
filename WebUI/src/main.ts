@@ -15,10 +15,8 @@ import Reference from '@/script/components/EditorComponents/Inspector/EBXCompone
 import Partition from '@/script/components/EditorComponents/Inspector/EBXComponents/Partition.vue';
 import Instance from '@/script/components/EditorComponents/Inspector/EBXComponents/InstanceProperty.vue';
 import { capitalize, removeExtension } from './filters';
-import VueCompositionAPI from '@vue/composition-api';
 
 const locale = require('element-ui/lib/locale/lang/en');
-
 let debugMode: boolean = false;
 if (!navigator.userAgent.includes('VeniceUnleashed')) {
 	if (window.location.ancestorOrigins === undefined || window.location.ancestorOrigins[0] !== 'webui://main') {
@@ -33,10 +31,7 @@ window.vext = new VEXTInterface(debugMode);
 (window).LogError = LogError;
 
 Vue.use(vgl);
-Vue.use(VueCompositionAPI);
-
 Vue.use(ElementUI, { locale });
-
 Vue.component('TypeDocumentationLink', TypeDocumentationLink);
 Vue.component('Property', Property);
 Vue.component('Reference', Reference);
