@@ -332,7 +332,7 @@ export default class Editor {
 	public onSetVariation(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
-		if (gameObject !== undefined) {
+		if (gameObject) {
 			(gameObject).setVariation(gameObjectTransferData.variation);
 		}
 	}

@@ -212,19 +212,19 @@ export class EditorCore {
 	}
 
 	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
-		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
-		// this.unhighlight();
 		// When selecting nothing, deselect all if its not multi selection.
 		if (guid.isEmpty()) {
-			console.log('Deselecting');
 			if (!multiSelection) {
 				editor.selectionGroup.deselectAll();
 				editor.threeManager.hideGizmo();
 			}
 			return;
 		}
-		if (gameObject === undefined) {
-			LogError('Failed to select gameobject: ' + guid);
+
+		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+
+		if (!gameObject) {
+			LogError('Couldn\'t find gameobject with guid ' + guid.toString());
 			return false;
 		}
 
@@ -237,7 +237,6 @@ export class EditorCore {
 	}
 
 	public deselect(guid: Guid) {
-		console.log('Deselecting');
 		const scope = editor;
 		const gameObject = scope.gameObjects.getValue(guid);
 		if (gameObject === undefined) {
@@ -255,15 +254,17 @@ export class EditorCore {
 			return;
 		}
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+
+		if (!gameObject) {
+			LogError('Couldn\'t find gameobject with guid ' + guid.toString());
+			return false;
+		}
+
 		// Ignore if selected
 		if (gameObject.selected) {
 			return;
 		}
 
-		if (!gameObject) {
-			LogError('Failed to highlight gameobject: ' + guid);
-			return false;
-		}
 		if (!multiple) {
 			this.unhighlight();
 		}
@@ -275,6 +276,12 @@ export class EditorCore {
 	public unhighlight(guid?: Guid) {
 		if (guid !== undefined) {
 			const gameObject = editor.gameObjects.getValue(guid) as GameObject;
+
+			if (!gameObject) {
+				LogError('Couldn\'t find gameobject with guid ' + guid.toString());
+				return false;
+			}
+
 			if (!gameObject.selected) {
 				gameObject.onUnhighlight();
 				this.highlightedObjects.remove(guid);
