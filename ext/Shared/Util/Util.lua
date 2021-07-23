@@ -166,7 +166,7 @@ function SanitizeVec3(p_Vec3)
 end
 
 function SanitizeFloat(p_Float)
-	if math.abs(p_Float) < 0.00001 or math.abs(p_Float) > 1000000 then
+	if math.abs(p_Float) < 0.0001 or math.abs(p_Float) > 1000000 then
 		return 0
 	end
 
@@ -209,7 +209,9 @@ function dus_MatrixParent(o)
 	end
 end
 
+-- Don't use, use GameObject.origin == GameObjectOriginType.Vanilla instead
 function IsVanilla(p_Guid)
+	m_Logger:Warning('Don\'t use IsVanilla(), use GameObject.origin instead')
 	if p_Guid == nil then
 		return false
 	end

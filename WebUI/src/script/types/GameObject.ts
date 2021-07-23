@@ -135,6 +135,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			name: this.name,
 			blueprintCtrRef: this.blueprintCtrRef,
 			parentData: this.parentData,
+			origin: this.origin,
 			transform: this.transform,
 			variation: this.variation,
 			overrides: this.overrides,

@@ -115,7 +115,7 @@ function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
 
 	m_Logger:Write("UndeleteBlueprint with guid " .. p_Command.gameObjectTransferData.guid)
 
-	if not IsVanilla(p_Command.gameObjectTransferData.guid) then
+	if p_Command.gameObjectTransferData.origin == GameObjectOriginType.Vanilla then
 		return CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end
 

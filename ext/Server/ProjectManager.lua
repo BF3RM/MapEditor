@@ -222,7 +222,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 		-- Vanilla objects are handled in maploader
 		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
 		l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild or
-		l_GameObjectSaveData.isVanilla then
+		l_GameObjectSaveData.isVanilla then -- Supports old savefiles
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
 					guid = s_Guid,
