@@ -122,7 +122,7 @@ function ServerTransactionManager:QueueCommands(p_Commands)
 end
 
 function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
-	local s_CommandActionResults = {}
+	local s_ExecutedCommands = {}
 
 	for _, l_Command in pairs(p_Commands) do
 		local s_CommandAction = CommandActions[l_Command.type]
@@ -140,11 +140,7 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 			end
 
 			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
-			table.insert(s_CommandActionResults, s_CommandActionResult)
-
-			--local s_Guid = s_GameObjectTransferData.guid
-			--self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
-
+			table.insert(s_ExecutedCommands, l_Command)
 			table.insert(self.m_Transactions, s_GameObjectTransferData.guid) -- Store that this transaction has happened.
 		elseif s_ActionResultType == ActionResultType.Queue then
 			m_Logger:Write("Queued command: " .. l_Command.type)
@@ -159,8 +155,8 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
 
-	if #s_CommandActionResults > 0 then
-		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(p_Commands), #self.m_Transactions)
+	if #s_ExecutedCommands > 0 then
+		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(s_ExecutedCommands), #self.m_Transactions)
 	end
 end
 
