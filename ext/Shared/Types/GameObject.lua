@@ -205,7 +205,7 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoMod
 
 	self:SetField("transform", LinearTransform(p_LinearTransform), p_AutoModified)
 
-	if tostring(self.parentData.guid) ~= "00000000-0000-0000-0000-000000000000" then
+	if self.parentData.guid ~= EMPTY_GUID then
 		local s_Parent = GameObjectManager:GetGameObject(self.parentData.guid)
 
 		if s_Parent ~= nil then

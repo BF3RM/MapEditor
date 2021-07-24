@@ -67,7 +67,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
 	else
 		local s_PreviewSpawnParentData = GameObjectParentData{
-			guid = Guid('00000000-0000-0000-0000-000000000000'), -- Root
+			guid = EMPTY_GUID, -- Root
 			typeName = "previewSpawn",
 		}
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
@@ -288,7 +288,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 			self.m_ReferenceObjectDatas = {}
 		end
 
-		if s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000' then
+		if s_GameObject.guid ~= PREVIEW_GUID then
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
@@ -297,13 +297,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	if self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
 
-		if s_GameObject.guid ~= 'ED170120-0000-0000-0000-000000000000' then
+		if s_GameObject.guid ~= PREVIEW_GUID then
 			--m_Logger:Write("Spawning: " .. s_GameObject.guid)
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
 
-	if s_GameObject.guid == 'ED170120-0000-0000-0000-000000000000' then -- Set collision to 0,0,0 so we don't hit the same object over and over
+	if s_GameObject.guid == PREVIEW_GUID then -- Set collision to 0,0,0 so we don't hit the same object over and over
 		s_GameObject:SetTransform(LinearTransform(), true)
 		s_GameObject:SetTransform(p_Transform, false)
 	end
