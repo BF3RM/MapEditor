@@ -238,8 +238,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 				s_GameEntity.isSpatial = true
 				s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
 				s_GameEntity.aabb = AABB {
-					min = SanitizeVec3(s_Entity.aabb.min),
-					max = SanitizeVec3(s_Entity.aabb.max),
+					min = SanitizeVec3(s_Entity.aabb.min:Clone()),
+					max = SanitizeVec3(s_Entity.aabb.max:Clone()),
 					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
 				}
 			end
