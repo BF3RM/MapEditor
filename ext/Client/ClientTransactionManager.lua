@@ -222,17 +222,15 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
-			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
-
-			-- Spawned objects are sent when they are ready on OnGameObjectReady
-			if l_Command.type ~= "SpawnBlueprintCommand" then
+			if s_CommandActionResult.type == "UndeletedBlueprint" then
+				-- Vanilla undeleted objects are already spawned and in lua, we set the parent ready so it's sent alongside
+				-- its children plus all their entities to WebUI
+				local s_GameObject = GameObjectManager.m_GameObjects[s_CommandActionResult.gameObjectTransferData.guid]
+				self:OnGameObjectReady(s_GameObject)
+			elseif s_CommandActionResult.type ~= "SpawnedBlueprint" then
+				-- Spawned objects are sent when they are ready on OnGameObjectReady
 				table.insert(s_CommandActionResults, s_CommandActionResult)
 			end
-
-			local s_Guid = s_GameObjectTransferData.guid
-			-- TODO: Dont store all gameobjecttransferdatas, we have the gameobjectmanager.gameobjects for that.
-			--self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
-
 		elseif s_ActionResultType == ActionResultType.Queue then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue.commands, l_Command)

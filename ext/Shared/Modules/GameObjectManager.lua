@@ -438,7 +438,7 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 	return true
 end
 
-function GameObjectManager:UndeleteBlueprint(p_Guid)
+function GameObjectManager:UndeleteGameObject(p_Guid)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
 	if s_GameObject == nil then
@@ -459,21 +459,6 @@ function GameObjectManager:UndeleteBlueprint(p_Guid)
 
 	return true
 end
-
---function GameObjectManager:DestroyGameObject(p_Guid)
---	local s_GameObject = self.m_GameObjects[p_Guid]
---
---	if s_GameObject == nil then
---		m_Logger:Error("GameObject not found: " .. p_Guid)
---		return false
---	end
---
---	s_GameObject:Destroy()
---
---	self.m_GameObjects[self.guid] = nil
---
---	return true
---end
 
 function GameObjectManager:EnableGameObject(p_Guid)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]

@@ -13,8 +13,6 @@ import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
 
-const merge = require('deepmerge');
-
 /**
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
 	their GameEntities to visible = false. GameObjects should always be visible as we want to render their children even

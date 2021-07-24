@@ -174,6 +174,9 @@ function SanitizeFloat(p_Float)
 	return p_Float
 end
 
+function SanitizeEnum(p_Enum)
+	return math.floor(0.01 + p_Enum)
+end
 
 function InverseSafe(p_Float)
 	if p_Float > 0.00000000000001 then

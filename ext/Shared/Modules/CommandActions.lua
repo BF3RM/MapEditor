@@ -115,24 +115,24 @@ function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
 
 	m_Logger:Write("UndeleteBlueprint with guid " .. p_Command.gameObjectTransferData.guid)
 
-	if p_Command.gameObjectTransferData.origin == GameObjectOriginType.Vanilla then
+	if SanitizeEnum(p_Command.gameObjectTransferData.origin) ~= GameObjectOriginType.Vanilla then
 		return CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end
 
-	local s_Result = GameObjectManager:UndeleteBlueprint(p_Command.gameObjectTransferData.guid)
-
-	if s_Result == false then
-		m_Logger:Write("Failed to undelete blueprint: " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
-	end
+	local s_Result = GameObjectManager:UndeleteGameObject(p_Command.gameObjectTransferData.guid)
 
 	local s_GameObjectTransferData = GameObjectManager.m_GameObjects[p_Command.gameObjectTransferData.guid]:GetGameObjectTransferData()
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "SpawnedBlueprint",
+		type = "UndeletedBlueprint",
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
+
+	if s_Result == false then
+		m_Logger:Write("Failed to undelete blueprint: " .. p_Command.gameObjectTransferData.guid)
+		return nil, ActionResultType.Failure
+	end
 
 	return s_CommandActionResult, ActionResultType.Success
 end
