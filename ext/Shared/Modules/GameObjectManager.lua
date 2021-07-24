@@ -450,8 +450,7 @@ function GameObjectManager:UndeleteBlueprint(p_Guid)
 		m_Logger:Error("GameObject was not marked as deleted before undeleting: " .. p_Guid)
 		return false
 	end
-
-	if s_GameObject.origin == GameObjectOriginType.Vanilla then
+	if s_GameObject.origin ~= GameObjectOriginType.Vanilla then
 		m_Logger:Error("GameObject was not a vanilla object " .. p_Guid)
 		return false
 	end
