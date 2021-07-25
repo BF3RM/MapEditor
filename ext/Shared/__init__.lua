@@ -42,7 +42,6 @@ function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorShared:OnLevelDestroy()
-	Patches:OnLevelDestroy()
 	Timer:OnResetData()
 	InstanceParser:OnLevelDestroy()
 end

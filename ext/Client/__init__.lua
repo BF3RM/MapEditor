@@ -57,7 +57,8 @@ function MapEditorClient:RegisterEvents()
 	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
-	Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+    Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 
 ----------- Game functions----------------
@@ -131,6 +132,10 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 
 	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(s_LoadingInfo)))
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+end
+
+function MapEditorClient:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
+	GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
 end
 
 function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
