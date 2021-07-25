@@ -2,10 +2,10 @@ import Command from '../libs/three/Command';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { VextCommand } from '@/script/types/VextCommand';
 
-export default class UndeleteBlueprintCommand extends Command {
+export default class UndeleteGameObjectCommand extends Command {
 	constructor(private gameObjectTransferData: GameObjectTransferData) {
-		super('UndeleteBlueprintCommand');
-		this.name = 'Undelete Blueprint';
+		super('UndeleteGameObjectCommand');
+		this.name = 'Undelete GameObject';
 		this.gameObjectTransferData = gameObjectTransferData;
 	}
 
@@ -18,6 +18,6 @@ export default class UndeleteBlueprintCommand extends Command {
 	}
 
 	public undo() {
-		window.vext.SendCommand(new VextCommand('DeleteBlueprintCommand', this.gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand('DeleteGameObjectCommand', this.gameObjectTransferData));
 	}
 }

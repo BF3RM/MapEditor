@@ -215,30 +215,30 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 			return false
 		end
 
-		local s_CommandActionResult, s_ActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
+		local s_CommandActionResult, s_CARResponseType = s_CommandAction(self, l_Command, p_UpdatePass)
 
-		if s_ActionResultType == ActionResultType.Success then
+		if s_CARResponseType == CARResponseType.Success then
 			if s_CommandActionResult.gameObjectTransferData == nil then
 				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
-			if s_CommandActionResult.type == "UndeletedBlueprint" then
+			if s_CommandActionResult.type == CARType.UndeletedGameObject then
 				-- Vanilla undeleted objects are already spawned and in lua, we set the parent ready so it's sent alongside
 				-- its children plus all their entities to WebUI
 				local s_GameObject = GameObjectManager.m_GameObjects[s_CommandActionResult.gameObjectTransferData.guid]
 				self:OnGameObjectReady(s_GameObject)
-			elseif s_CommandActionResult.type ~= "SpawnedBlueprint" then
+			elseif s_CommandActionResult.type ~= CARType.SpawnedGameObject then
 				-- Spawned objects are sent when they are ready on OnGameObjectReady
 				table.insert(s_CommandActionResults, s_CommandActionResult)
 			end
-		elseif s_ActionResultType == ActionResultType.Queue then
+		elseif s_CARResponseType == CARResponseType.Queue then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue.commands, l_Command)
-		elseif s_ActionResultType == ActionResultType.Failure then
+		elseif s_CARResponseType == CARResponseType.Failure then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
 		else
-			m_Logger:Error("Unknown ActionResultType for command: " .. l_Command.type)
+			m_Logger:Error("Unknown CARResponseType for command: " .. l_Command.type)
 		end
 	end
 
@@ -271,16 +271,16 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
 			return false
 		end
 
-		local s_ActionResultType = s_MessageAction(self, l_Message, p_UpdatePass)
+		local s_CARResponseType = s_MessageAction(self, l_Message, p_UpdatePass)
 
-		if s_ActionResultType == ActionResultType.Success then
+		if s_CARResponseType == CARResponseType.Success then
 			return
-		elseif s_ActionResultType == ActionResultType.Queue then
+		elseif s_CARResponseType == CARResponseType.Queue then
 			table.insert(self.m_Queue.messages, l_Message)
-		elseif s_ActionResultType == ActionResultType.Failure then
+		elseif s_CARResponseType == CARResponseType.Failure then
 			m_Logger:Error("Failed to get a valid return for executing message: " .. tostring(l_Message.type))
 		else
-			m_Logger:Error("Unknown ActionResultType for message: " .. l_Message.type)
+			m_Logger:Error("Unknown CARResponseType for message: " .. l_Message.type)
 		end
 	end
 end
@@ -304,7 +304,7 @@ function ClientTransactionManager:CreateCommandActionResultsRecursively(p_GameOb
 
 	local s_CommandActionResult = {
 		sender = p_GameObject.creatorName,
-		type = 'SpawnedBlueprint',
+		type = CARType.SpawnedGameObject,
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
 

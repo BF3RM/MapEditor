@@ -96,10 +96,10 @@ export default class HierarchyComponent extends EditorComponent {
 	constructor() {
 		super();
 		console.log('Mounted');
-		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
-		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
-		// signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
-		// signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
+		signals.spawnedGameObject.connect(this.onSpawnedGameObject.bind(this));
+		signals.deletedGameObject.connect(this.onDeletedGameObject.bind(this));
+		// signals.enabledGameObject.connect(this.onEnabledBlueprint.bind(this));
+		// signals.disabledGameObject.connect(this.onDisabledBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
@@ -130,12 +130,12 @@ export default class HierarchyComponent extends EditorComponent {
 		return (node.children.length === 0) ? node.name : node.name + ' (' + node.children.length + ')';
 	}
 
-	onDeletedBlueprint(commandActionResult: CommandActionResult) {
+	onDeletedGameObject(commandActionResult: CommandActionResult) {
 		const node = this.tree.getNodeById(commandActionResult.gameObjectTransferData.guid.toString());
 		this.tree.removeNode(node, {});
 	}
 
-	onSpawnedBlueprint(commandActionResult: CommandActionResult) {
+	onSpawnedGameObject(commandActionResult: CommandActionResult) {
 		return new Promise((resolve, reject) => {
 			const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
 			const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);

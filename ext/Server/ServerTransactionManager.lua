@@ -132,9 +132,9 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 			return false
 		end
 
-		local s_CommandActionResult, s_ActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
+		local s_CommandActionResult, s_CARResponseType = s_CommandAction(self, l_Command, p_UpdatePass)
 
-		if s_ActionResultType == ActionResultType.Success then
+		if s_CARResponseType == CARResponseType.Success then
 			if s_CommandActionResult.gameObjectTransferData == nil then
 				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
@@ -142,14 +142,14 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
 			table.insert(s_ExecutedCommands, l_Command)
 			table.insert(self.m_Transactions, s_GameObjectTransferData.guid) -- Store that this transaction has happened.
-		elseif s_ActionResultType == ActionResultType.Queue then
+		elseif s_CARResponseType == CARResponseType.Queue then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue, l_Command)
-		elseif s_ActionResultType == ActionResultType.Failure then
+		elseif s_CARResponseType == CARResponseType.Failure then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
 		else
-			m_Logger:Error("Unknown CommandActionResultType for command: " .. l_Command.type)
+			m_Logger:Error("Unknown CommandCARResponseType for command: " .. l_Command.type)
 		end
 	end
 

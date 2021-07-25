@@ -11,7 +11,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { Vec2 } from '@/script/types/primitives/Vec2';
 import { InputControls } from '@/script/modules/InputControls';
 import { Dictionary } from 'typescript-collections';
-import SpawnBlueprintCommand from '@/script/commands/SpawnBlueprintCommand';
+import SpawnGameObjectCommand from '@/script/commands/SpawnGameObjectCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
 
 export class EditorCore {
@@ -172,8 +172,8 @@ export class EditorCore {
 		this.isPreviewBlueprintSpawned = false;
 	}
 
-	public CopySelectedObjects(): SpawnBlueprintCommand[] {
-		const commands: SpawnBlueprintCommand[] = [];
+	public CopySelectedObjects(): SpawnGameObjectCommand[] {
+		const commands: SpawnGameObjectCommand[] = [];
 		editor.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
 			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = Guid.create();
@@ -184,15 +184,15 @@ export class EditorCore {
 					gameObjectTransferData.variation = bp.getDefaultVariation();
 				}
 			}
-			commands.push(new SpawnBlueprintCommand(gameObjectTransferData));
+			commands.push(new SpawnGameObjectCommand(gameObjectTransferData));
 		});
 		return commands;
 	}
 
-	public PasteObjects(copy: SpawnBlueprintCommand[]) {
+	public PasteObjects(copy: SpawnGameObjectCommand[]) {
 		const scope = this;
 		if (copy !== null) {
-			copy.forEach((command: SpawnBlueprintCommand) => {
+			copy.forEach((command: SpawnGameObjectCommand) => {
 				scope.setPendingSelection(command.gameObjectTransferData.guid);
 			});
 			editor.execute(new BulkCommand(copy));

@@ -5,8 +5,8 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
-import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
-import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
+import EnableGameObjectCommand from '@/script/commands/EnableGameObjectCommand';
+import DisableGameObjectCommand from '@/script/commands/DisableGameObjectCommand';
 import { Vector3 } from 'three';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
@@ -203,7 +203,7 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
-			const command = new EnableBlueprintCommand(new GameObjectTransferData({
+			const command = new EnableGameObjectCommand(new GameObjectTransferData({
 				guid: gameObject.guid
 			}));
 			commands.push(command);
@@ -224,7 +224,7 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
-			const command = new DisableBlueprintCommand(new GameObjectTransferData({
+			const command = new DisableGameObjectCommand(new GameObjectTransferData({
 				guid: gameObject.guid
 			}));
 			commands.push(command);

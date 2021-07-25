@@ -23,10 +23,23 @@ EditorMode = {
 	FreeCam = 4
 }
 
-ActionResultType = {
+CARResponseType = {
 	Success = 1,
 	Failure = 2,
 	Queue = 3
+}
+
+CARType = {
+	SpawnedGameObject = "SpawnedGameObject",
+	DeletedGameObject = "DeletedGameObject",
+	UndeletedGameObject = "UndeletedGameObject",
+	UndeletedGameObject = "UndeletedGameObject",
+	EnabledGameObject = "EnabledGameObject",
+	DisabledGameObject = "DisabledGameObject",
+	SelectedGameObject = "SelectedGameObject",
+	SetTransform = "SetTransform",
+	SetVariation = "SetVariation",
+	SetField = "SetField"
 }
 
 CoroutineState = {
