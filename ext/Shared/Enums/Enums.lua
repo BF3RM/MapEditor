@@ -29,10 +29,22 @@ CARResponseType = {
 	Queue = 3
 }
 
+CommandActionType = {
+	SpawnGameObjectCommand = "SpawnGameObjectCommand",
+	DeleteGameObjectCommand = "DeleteGameObjectCommand",
+	UndeleteGameObjectCommand = "UndeleteGameObjectCommand",
+	SetTransformCommand = "SetTransformCommand",
+	SelectGameObjectCommand = "SelectGameObjectCommand",
+	EnableGameObjectCommand = "EnableGameObjectCommand",
+	DisableGameObjectCommand = "DisableGameObjectCommand",
+	SetVariationCommand = "SetVariationCommand",
+	SetEBXFieldCommand = "SetEBXFieldCommand",
+	SetObjectNameCommand = "SetObjectNameCommand",
+}
+
 CARType = {
 	SpawnedGameObject = "SpawnedGameObject",
 	DeletedGameObject = "DeletedGameObject",
-	UndeletedGameObject = "UndeletedGameObject",
 	UndeletedGameObject = "UndeletedGameObject",
 	EnabledGameObject = "EnabledGameObject",
 	DisabledGameObject = "DisabledGameObject",

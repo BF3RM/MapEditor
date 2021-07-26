@@ -227,7 +227,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 				s_Command = {
 					guid = s_Guid,
 					sender = "LoadingSaveFile",
-					type = "DeleteBlueprintCommand",
+					type = CommandActionType.DeleteGameObjectCommand,
 					gameObjectTransferData = {
 						guid = s_Guid
 					}
@@ -236,7 +236,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 				s_Command = {
 					guid = s_Guid,
 					sender = "LoadingSaveFile",
-					type = "SetTransformCommand",
+					type = CommandActionType.SetTransformCommand,
 					gameObjectTransferData = {
 						guid = s_Guid,
 						transform = l_GameObjectSaveData.transform
@@ -249,7 +249,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 			s_Command = {
 				guid = s_Guid,
 				sender = "LoadingSaveFile",
-				type = "SpawnBlueprintCommand",
+				type = CommandActionType.SpawnGameObjectCommand,
 				gameObjectTransferData = { -- We're not using the actual type, i think its because of json serialization fuckups
 					guid = s_Guid,
 					name = l_GameObjectSaveData.name,

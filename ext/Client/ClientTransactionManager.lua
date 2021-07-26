@@ -72,7 +72,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 		if s_GameObject == nil then
 			if l_GameObjectTransferData ~= nil and l_GameObjectTransferData.isDeleted == false then
 				s_Command = {
-					type = "SpawnBlueprintCommand",
+					type = CommandActionType.SpawnGameObjectCommand,
 					gameObjectTransferData = l_GameObjectTransferData
 				}
 
@@ -83,7 +83,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 		else
 			if l_GameObjectTransferData == nil or l_GameObjectTransferData.isDeleted == true then
 				s_Command = {
-					type = "DeleteBlueprintCommand",
+					type = CommandActionType.DeleteGameObjectCommand,
 					gameObjectTransferData = {
 						guid = l_Guid
 					}
@@ -92,7 +92,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 				table.insert(s_Commands, s_Command)
 			elseif s_GameObject.isDeleted == true and l_GameObjectTransferData.isDeleted == false then
 				s_Command = {
-					type = "UndeleteBlueprintCommand",
+					type = CommandActionType.UndeleteGameObjectCommand,
 					gameObjectTransferData = l_GameObjectTransferData
 				}
 
@@ -104,20 +104,20 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 				for _, l_Change in pairs(s_Changes) do
 					if l_Change == "transform" then
 						s_Command = {
-							type = "SetTransformCommand",
+							type = CommandActionType.SetTransformCommand,
 							gameObjectTransferData = l_GameObjectTransferData
 						}
 					elseif l_Change == "isEnabled" then
 						if l_GameObjectTransferData.isEnabled then
 							s_Command = {
-								type = "EnableBlueprintCommand",
+								type = CommandActionType.EnableGameObjectCommand,
 								gameObjectTransferData = {
 									guid = l_Guid
 								}
 							}
 						else
 							s_Command = {
-								type = "DisableBlueprintCommand",
+								type = CommandActionType.DisableGameObjectCommand,
 								gameObjectTransferData = {
 									guid = l_Guid
 								}
@@ -125,7 +125,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 						end
 					elseif l_Change == "variation" then
 						s_Command = {
-							type = "SetVariationCommand",
+							type = CommandActionType.SetVariationCommand,
 							gameObjectTransferData = {
 								guid = l_Guid,
 								variation = l_GameObjectTransferData.variation
@@ -133,7 +133,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 						}
 					elseif l_Change == "name" then
 						s_Command = {
-							type = "SetObjectNameCommand",
+							type = CommandActionType.SetObjectNameCommand,
 							gameObjectTransferData = {
 								guid = l_Guid,
 								name = l_GameObjectTransferData.name
