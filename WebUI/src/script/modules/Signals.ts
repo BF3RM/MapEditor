@@ -28,12 +28,12 @@ export const signals = {
 	worldSpaceChanged: new Signal<(mode: WORLD_SPACE) => void>(),
 	objectChanged: new Signal<(gameObject: GameObject, field: string, value: any) => void>(),
 
-	spawnedBlueprint: new Signal<(result: CommandActionResult) => void>(),
+	spawnedGameObject: new Signal<(result: CommandActionResult) => void>(),
 	blueprintSpawnInvoked: new Signal(),
-	deletedBlueprint: new Signal(),
+	deletedGameObject: new Signal(),
 
-	enabledBlueprint: new Signal(),
-	disabledBlueprint: new Signal(),
+	enabledGameObject: new Signal(),
+	disabledGameObject: new Signal(),
 
 	setEBXField: new Signal(),
 

@@ -222,12 +222,12 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 		-- Vanilla objects are handled in maploader
 		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
 		l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild or
-		l_GameObjectSaveData.isVanilla then
+		l_GameObjectSaveData.isVanilla then -- Supports old savefiles
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
 					guid = s_Guid,
 					sender = "LoadingSaveFile",
-					type = "DeleteBlueprintCommand",
+					type = CommandActionType.DeleteGameObjectCommand,
 					gameObjectTransferData = {
 						guid = s_Guid
 					}
@@ -236,7 +236,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 				s_Command = {
 					guid = s_Guid,
 					sender = "LoadingSaveFile",
-					type = "SetTransformCommand",
+					type = CommandActionType.SetTransformCommand,
 					gameObjectTransferData = {
 						guid = s_Guid,
 						transform = l_GameObjectSaveData.transform
@@ -249,7 +249,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 			s_Command = {
 				guid = s_Guid,
 				sender = "LoadingSaveFile",
-				type = "SpawnBlueprintCommand",
+				type = CommandActionType.SpawnGameObjectCommand,
 				gameObjectTransferData = { -- We're not using the actual type, i think its because of json serialization fuckups
 					guid = s_Guid,
 					name = l_GameObjectSaveData.name,

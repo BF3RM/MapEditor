@@ -7,6 +7,7 @@ local CUSTOMOBJ_GUID_PREFIX = "ED170121"
 local VANILLA_GUID_PREFIX = "ED170122"
 local EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
 local HAVOK_GUID = Guid('FE9BF899-0000-0000-FF64-00FF64076739')
+local PREVIEW_GUID = Guid('ED170120-0000-0000-0000-000000000000')
 
 function MergeTables(p_Old, p_New)
 	if p_New == nil then
@@ -166,13 +167,16 @@ function SanitizeVec3(p_Vec3)
 end
 
 function SanitizeFloat(p_Float)
-	if math.abs(p_Float) < 0.00001 or math.abs(p_Float) > 1000000 then
+	if math.abs(p_Float) < 0.0001 or math.abs(p_Float) > 1000000 then
 		return 0
 	end
 
 	return p_Float
 end
 
+function SanitizeEnum(p_Enum)
+	return math.floor(0.01 + p_Enum)
+end
 
 function InverseSafe(p_Float)
 	if p_Float > 0.00000000000001 then
@@ -209,7 +213,9 @@ function dus_MatrixParent(o)
 	end
 end
 
+-- Don't use, use GameObject.origin == GameObjectOriginType.Vanilla instead
 function IsVanilla(p_Guid)
+	m_Logger:Warning('Don\'t use IsVanilla(), use GameObject.origin instead')
 	if p_Guid == nil then
 		return false
 	end
@@ -241,9 +247,10 @@ end
 
 function GenerateChildGuid(p_ParentGuid, p_Offset)
 	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
-	local a = s_ParentGuidParts[5]
-	local b = tonumber(a, 16)
-	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. string.format("%x", b+1):upper())
+	local s_GuidEnd = s_ParentGuidParts[5]
+	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
+	local s_NewGuidEnd = string.format("%x", s_GuidEndNumber + p_Offset):upper()
+	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEnd)
 end
 
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)

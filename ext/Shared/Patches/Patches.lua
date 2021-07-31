@@ -14,17 +14,6 @@ local m_Logger = Logger("Patches", true)
 function Patches:__init()
 	m_Logger:Write("Initializing Patches")
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
-	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
-end
-
-function Patches:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	if p_Data.typeInfo == VegetationTreeEntityData.typeInfo then
-		p_Hook:Pass(VegetationPatcher:PatchVegetationTree(p_Data), p_Transform)
-	end
-end
-
-function Patches:OnLevelDestroy()
-	VegetationPatcher:OnLevelDestroy()
 end
 
 function Patches:OnPartitionLoaded(p_Partition)
@@ -52,6 +41,8 @@ function Patches:OnPartitionLoaded(p_Partition)
 			MeshProxyPatcher:Patch(l_Instance)
 		elseif l_Instance:Is('DynamicModelEntityData') then
 			DynamicModelPatcher:Patch(l_Instance)
+		elseif l_Instance:Is('VegetationTreeEntityData') then
+			VegetationPatcher:Patch(l_Instance)
 		end
 
 		::continue::

@@ -87,7 +87,10 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
 			s_Entity.transform = ToWorld(self.transform, LinearTransform(p_LinearTransform))
 			if p_UpdateCollision and p_Enabled then
 				s_Entity:FireEvent("Disable")
+				s_Entity:FireEvent("Stop")
 				s_Entity:FireEvent("Enable")
+				s_Entity:FireEvent("Start")
+
 				--self:UpdateOffsets(p_Guid, s_Entity.instanceId, LinearTransform(p_LinearTransform))
 			end
 		end

@@ -23,10 +23,35 @@ EditorMode = {
 	FreeCam = 4
 }
 
-ActionResultType = {
+CARResponseType = {
 	Success = 1,
 	Failure = 2,
 	Queue = 3
+}
+
+CommandActionType = {
+	SpawnGameObjectCommand = "SpawnGameObjectCommand",
+	DeleteGameObjectCommand = "DeleteGameObjectCommand",
+	UndeleteGameObjectCommand = "UndeleteGameObjectCommand",
+	SetTransformCommand = "SetTransformCommand",
+	SelectGameObjectCommand = "SelectGameObjectCommand",
+	EnableGameObjectCommand = "EnableGameObjectCommand",
+	DisableGameObjectCommand = "DisableGameObjectCommand",
+	SetVariationCommand = "SetVariationCommand",
+	SetEBXFieldCommand = "SetEBXFieldCommand",
+	SetObjectNameCommand = "SetObjectNameCommand",
+}
+
+CARType = {
+	SpawnedGameObject = "SpawnedGameObject",
+	DeletedGameObject = "DeletedGameObject",
+	UndeletedGameObject = "UndeletedGameObject",
+	EnabledGameObject = "EnabledGameObject",
+	DisabledGameObject = "DisabledGameObject",
+	SelectedGameObject = "SelectedGameObject",
+	SetTransform = "SetTransform",
+	SetVariation = "SetVariation",
+	SetField = "SetField"
 }
 
 CoroutineState = {

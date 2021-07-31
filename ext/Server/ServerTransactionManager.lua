@@ -93,26 +93,29 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		return
 	end
 
-	local s_QueuedCommands = {}
+	local s_CommandsToExecute = {}
 	local s_NewQueue = {}
 
 	local s_nProcessedCommands = 0
 
 	for i, l_Command in pairs(self.m_Queue) do
 		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
+			if #s_NewQueue == 0 then
+				m_Logger:Write('Limit of 500 commands reached, queueing the rest')
+			end
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
 			table.insert(s_NewQueue, l_Command)
 		else
 			m_Logger:Write("Executing command delayed: " .. l_Command.type)
-			table.insert(s_QueuedCommands, l_Command)
+			table.insert(s_CommandsToExecute, l_Command)
 			s_nProcessedCommands = i
 		end
 	end
 
 	self.m_Queue = s_NewQueue
+
 	self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
-	m_Logger:Write('Limit of 500 commands reached, queueing the rest')
-	self:_executeCommands(s_QueuedCommands, p_UpdatePass)
+	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
 end
 
 function ServerTransactionManager:QueueCommands(p_Commands)
@@ -122,7 +125,7 @@ function ServerTransactionManager:QueueCommands(p_Commands)
 end
 
 function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
-	local s_CommandActionResults = {}
+	local s_ExecutedCommands = {}
 
 	for _, l_Command in pairs(p_Commands) do
 		local s_CommandAction = CommandActions[l_Command.type]
@@ -132,35 +135,31 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 			return false
 		end
 
-		local s_CommandActionResult, s_ActionResultType = s_CommandAction(self, l_Command, p_UpdatePass)
+		local s_CommandActionResult, s_CARResponseType = s_CommandAction(self, l_Command, p_UpdatePass)
 
-		if s_ActionResultType == ActionResultType.Success then
+		if s_CARResponseType == CARResponseType.Success then
 			if s_CommandActionResult.gameObjectTransferData == nil then
 				m_Logger:Error("There must be a gameObjectTransferData defined for sending back the CommandActionResult.")
 			end
 
 			local s_GameObjectTransferData = s_CommandActionResult.gameObjectTransferData
-			table.insert(s_CommandActionResults, s_CommandActionResult)
-
-			--local s_Guid = s_GameObjectTransferData.guid
-			--self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
-
+			table.insert(s_ExecutedCommands, l_Command)
 			table.insert(self.m_Transactions, s_GameObjectTransferData.guid) -- Store that this transaction has happened.
-		elseif s_ActionResultType == ActionResultType.Queue then
+		elseif s_CARResponseType == CARResponseType.Queue then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue, l_Command)
-		elseif s_ActionResultType == ActionResultType.Failure then
+		elseif s_CARResponseType == CARResponseType.Failure then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
 		else
-			m_Logger:Error("Unknown CommandActionResultType for command: " .. l_Command.type)
+			m_Logger:Error("Unknown CommandCARResponseType for command: " .. l_Command.type)
 		end
 	end
 
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
 
-	if #s_CommandActionResults > 0 then
-		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(p_Commands), #self.m_Transactions)
+	if #s_ExecutedCommands > 0 then
+		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(s_ExecutedCommands), #self.m_Transactions)
 	end
 end
 

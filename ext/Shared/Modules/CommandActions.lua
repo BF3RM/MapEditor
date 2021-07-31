@@ -11,25 +11,25 @@ end
 function CommandActions:RegisterVars()
 	m_Logger:Write("Initialized vars")
 
-	self.SpawnBlueprintCommand = self.SpawnBlueprint
-	self.DeleteBlueprintCommand = self.DeleteBlueprint
-	self.UndeleteBlueprintCommand = self.UndeleteBlueprint
+	self.SpawnGameObjectCommand = self.SpawnGameObject
+	self.DeleteGameObjectCommand = self.DeleteGameObject
+	self.UndeleteGameObjectCommand = self.UndeleteGameObject
 	self.SetTransformCommand = self.SetTransform
 	self.SelectGameObjectCommand = self.SelectGameObject
-	self.EnableBlueprintCommand = self.EnableBlueprint
-	self.DisableBlueprintCommand = self.DisableBlueprint
+	self.EnableGameObjectCommand = self.EnableGameObject
+	self.DisableGameObjectCommand = self.DisableGameObject
 	self.SetVariationCommand = self.SetVariation
 	self.SetEBXFieldCommand = self.SetEBXField
 end
 
-function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
+function CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
-		m_Logger:Error("The SpawnBlueprintCommand needs to have a valid gameObjectTransferData set.")
-		return nil, ActionResultType.Failure
+		m_Logger:Error("The SpawnGameObjectCommand needs to have a valid gameObjectTransferData set.")
+		return nil, CARResponseType.Failure
 	end
 
 	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
-		return nil, ActionResultType.Queue
+		return nil, CARResponseType.Queue
 	end
 
 	local s_GameObjectTransferData = p_Command.gameObjectTransferData
@@ -55,7 +55,7 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	if s_SpawnResult == false then
 		-- Send error to webui
 		m_Logger:Write("Failed to spawn blueprint.")
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_ResultGameObjectTransferData = {
@@ -65,28 +65,28 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = 'SpawnedBlueprint',
+		type = CARType.SpawnedGameObject,
 		gameObjectTransferData = s_ResultGameObjectTransferData,
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
-function CommandActions:DeleteBlueprint(p_Command, p_UpdatePass)
+function CommandActions:DeleteGameObject(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
 		m_Logger:Error("The DestroyBlueprint needs to have a valid gameObjectTransferData set.")
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
-		return nil, ActionResultType.Queue
+		return nil, CARResponseType.Queue
 	end
 
 	local s_Result = GameObjectManager:DeleteGameObject(p_Command.gameObjectTransferData.guid)
 
 	if s_Result == false then
 		m_Logger:Write("Failed to destroy entity: " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -96,50 +96,50 @@ function CommandActions:DeleteBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "DeletedBlueprint", -- TODO: powback rename DestroyBlueprint -> DeletedBlueprint / DeletedBlueprint -> DeletedBlueprint
+		type = CARType.DeletedGameObject,
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
-function CommandActions:UndeleteBlueprint(p_Command, p_UpdatePass)
+function CommandActions:UndeleteGameObject(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
-		m_Logger:Error("The UndeleteBlueprint needs to have a valid gameObjectTransferData set.")
+		m_Logger:Error("The UndeleteGameObject needs to have a valid gameObjectTransferData set.")
 		return
 	end
 
 	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
-		return nil, ActionResultType.Queue
+		return nil, CARResponseType.Queue
 	end
 
-	m_Logger:Write("UndeleteBlueprint with guid " .. p_Command.gameObjectTransferData.guid)
+	m_Logger:Write("UndeleteGameObject with guid " .. p_Command.gameObjectTransferData.guid)
 
-	if not IsVanilla(p_Command.gameObjectTransferData.guid) then
-		return CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
+	if SanitizeEnum(p_Command.gameObjectTransferData.origin) ~= GameObjectOriginType.Vanilla then
+		return CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 	end
 
-	local s_Result = GameObjectManager:UndeleteBlueprint(p_Command.gameObjectTransferData.guid)
-
-	if s_Result == false then
-		m_Logger:Write("Failed to undelete blueprint: " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
-	end
+	local s_Result = GameObjectManager:UndeleteGameObject(p_Command.gameObjectTransferData.guid)
 
 	local s_GameObjectTransferData = GameObjectManager.m_GameObjects[p_Command.gameObjectTransferData.guid]:GetGameObjectTransferData()
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "SpawnedBlueprint",
+		type = CARType.UndeletedGameObject,
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	if s_Result == false then
+		m_Logger:Write("Failed to undelete blueprint: " .. p_Command.gameObjectTransferData.guid)
+		return nil, CARResponseType.Failure
+	end
+
+	return s_CommandActionResult, CARResponseType.Success
 end
 
-function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
+function CommandActions:EnableGameObject(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
-		m_Logger:Error("The EnableBlueprint needs to have a valid gameObjectTransferData set.")
+		m_Logger:Error("The EnableGameObject needs to have a valid gameObjectTransferData set.")
 		return
 	end
 
@@ -147,7 +147,7 @@ function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
 
 	if s_Result == false then
 		m_Logger:Write("Failed to enable blueprint: " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -157,16 +157,16 @@ function CommandActions:EnableBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "EnabledBlueprint",
+		type = CARType.EnabledGameObject,
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
-function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
+function CommandActions:DisableGameObject(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
-		m_Logger:Error("The DisableBlueprint needs to have a valid gameObjectTransferData set.")
+		m_Logger:Error("The DisableGameObject needs to have a valid gameObjectTransferData set.")
 		return
 	end
 
@@ -174,7 +174,7 @@ function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 
 	if s_Result == false then
 		m_Logger:Error("Failed to disable blueprint: " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -184,11 +184,11 @@ function CommandActions:DisableBlueprint(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "DisabledBlueprint",
+		type = CARType.DisabledGameObject,
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
 function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
@@ -199,7 +199,7 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 
 	if GameObjectManager:GetEntityByGuid(p_Command.gameObjectTransferData.guid) == nil then
 		m_Logger:Write("Failed to select that gameobject")
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -208,11 +208,11 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = 'SelectedGameObject',
+		type = CARType.SelectedGameObject,
 		gameObjectTransferData = s_GameObjectTransferData,
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
 function CommandActions:SetTransform(p_Command, p_UpdatePass)
@@ -225,7 +225,7 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	if s_Result == false then
 		m_Logger:Write("Failed to set transform for object " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -235,11 +235,11 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "SetTransform",
+		type = CARType.SetTransform,
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
 
@@ -253,7 +253,7 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 
 	if s_Result == false then
 		m_Logger:Error("Failed to set variation for object " .. p_Command.gameObjectTransferData.guid)
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	local s_GameObjectTransferData = {
@@ -263,11 +263,11 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "SetVariation",
+		type = CARType.SetVariation,
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
 function CommandActions:SetEBXField(p_Command)
@@ -283,7 +283,7 @@ function CommandActions:SetEBXField(p_Command)
 
 		if not s_GameObject then
 			m_Logger:Warning('Could not find GameObject: ' .. p_Command.gameObjectTransferData.guid)
-			return nil, ActionResultType.Failure
+			return nil, CARResponseType.Failure
 		end
 
 		s_Result, s_Path = s_GameObject:SetOverrides(p_Command.gameObjectTransferData.overrides)
@@ -293,7 +293,7 @@ function CommandActions:SetEBXField(p_Command)
 
 	if s_Result == false then
 		m_Logger:Error("Failed to set field: " .. p_Command.gameObjectTransferData.overrides.type .. p_Command.gameObjectTransferData.overrides.field)
-		return nil, ActionResultType.Failure
+		return nil, CARResponseType.Failure
 	end
 
 	p_Command.gameObjectTransferData.overrides.path = s_Path
@@ -304,11 +304,11 @@ function CommandActions:SetEBXField(p_Command)
 
 	local s_CommandActionResult = {
 		sender = p_Command.sender,
-		type = "SetField",
+		type = CARType.SetField,
 		gameObjectTransferData = s_GameObjectTransferData
 	}
 
-	return s_CommandActionResult, ActionResultType.Success
+	return s_CommandActionResult, CARResponseType.Success
 end
 
 return CommandActions

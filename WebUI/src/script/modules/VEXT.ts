@@ -28,15 +28,15 @@ export default class VEXTInterface {
 		this.emulator = new VEXTemulator();
 		this.commandQueue = [];
 		this.commands = {
-			SpawnedBlueprint: editor.onSpawnedBlueprint.bind(editor),
+			SpawnedGameObject: editor.onSpawnedGameObject.bind(editor),
 			BlueprintSpawnInvoked: signals.blueprintSpawnInvoked.emit,
-			DeletedBlueprint: signals.deletedBlueprint.emit,
+			DeletedGameObject: signals.deletedGameObject.emit,
 			CreatedGroup: signals.createdGroup.emit,
 			SetObjectName: signals.setObjectName.emit,
 			SetTransform: signals.setTransform.emit,
 			SetVariation: signals.setVariation.emit,
-			EnabledBlueprint: signals.enabledBlueprint.emit,
-			DisabledBlueprint: signals.disabledBlueprint.emit,
+			EnabledGameObject: signals.enabledGameObject.emit,
+			DisabledGameObject: signals.disabledGameObject.emit,
 			SetField: signals.setEBXField.emit
 		};
 

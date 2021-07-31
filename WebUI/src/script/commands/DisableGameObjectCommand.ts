@@ -2,10 +2,10 @@ import { VextCommand } from '@/script/types/VextCommand';
 import Command from '@/script/libs/three/Command';
 import { GameObjectTransferData } from '@/script/types/GameObjectTransferData';
 
-export default class DisableBlueprintCommand extends Command {
+export default class DisableGameObjectCommand extends Command {
 	constructor(private gameObjectTransferData: GameObjectTransferData) {
-		super('DisableBlueprintCommand');
-		this.name = 'Disable Blueprint';
+		super('DisableGameObjectCommand');
+		this.name = 'Disable GameObject';
 	}
 
 	public execute() {
@@ -19,6 +19,6 @@ export default class DisableBlueprintCommand extends Command {
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.gameObjectTransferData.guid
 		});
-		window.vext.SendCommand(new VextCommand('EnableBlueprintCommand', gameObjectTransferData));
+		window.vext.SendCommand(new VextCommand('EnableGameObjectCommand', gameObjectTransferData));
 	}
 }

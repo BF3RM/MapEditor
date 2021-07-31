@@ -16,15 +16,15 @@ export class VEXTemulator {
 
 	constructor() {
 		this.commands = {};
-		this.commands.SpawnBlueprintCommand = this.SpawnBlueprint;
-		this.commands.DeleteBlueprintCommand = this.DestroyBlueprint;
+		this.commands.SpawnGameObjectCommand = this.SpawnGameObject;
+		this.commands.DeleteGameObjectCommand = this.DestroyGameObject;
 		this.commands.CreateGroupCommand = this.CreateGroup;
 		this.commands.DestroyGroupCommand = this.DestroyGroup;
 		this.commands.SetObjectNameCommand = this.SetObjectName;
 		this.commands.SetTransformCommand = this.SetTransform;
 		this.commands.SetVariationCommand = this.SetVariation;
-		this.commands.EnableBlueprintCommand = this.EnableBlueprint;
-		this.commands.DisableBlueprintCommand = this.DisableBlueprint;
+		this.commands.EnableGameObjectCommand = this.EnableGameObject;
+		this.commands.DisableGameObjectCommand = this.DisableGameObject;
 		this.commands.SetEBXFieldCommand = this.SetEBXField;
 
 		this.messages = {};
@@ -122,7 +122,7 @@ export class VEXTemulator {
 		LogError('NotImplemented');
 	}
 
-	private SpawnBlueprint(commandActionResult: CommandActionResult) {
+	private SpawnGameObject(commandActionResult: CommandActionResult) {
 		// Spawn blueprint at coordinate
 		// Blueprint spawns, we get a list of entities
 		// We send the whole thing to web again.
@@ -221,7 +221,7 @@ export class VEXTemulator {
 		};
 	}
 
-	private DestroyBlueprint(commandActionResult: CommandActionResult) {
+	private DestroyGameObject(commandActionResult: CommandActionResult) {
 		// Delete all children of blueprint
 		return {
 			type: 'DeletedBlueprint',
@@ -251,7 +251,7 @@ export class VEXTemulator {
 		};
 	}
 
-	private EnableBlueprint(commandActionResult: CommandActionResult) {
+	private EnableGameObject(commandActionResult: CommandActionResult) {
 		return {
 			type: 'EnabledBlueprint',
 			gameObjectTransferData: {
@@ -260,7 +260,7 @@ export class VEXTemulator {
 		};
 	}
 
-	private DisableBlueprint(commandActionResult: CommandActionResult) {
+	private DisableGameObject(commandActionResult: CommandActionResult) {
 		return {
 			type: 'DisabledBlueprint',
 			gameObjectTransferData: {
