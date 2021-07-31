@@ -197,7 +197,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		} else if (this.parent.type !== 'Scene') {
 			// Calculate local transform.
 			const parentWorldInverse = new THREE.Matrix4();
-			parentWorldInverse.getInverse(this.parent.matrixWorld);
+			parentWorldInverse.copy(this.parent.matrixWorld).invert();
 			matrix.multiplyMatrices(parentWorldInverse, matrix);
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
