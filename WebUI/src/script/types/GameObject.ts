@@ -181,9 +181,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	public updateTransform() {
 		this.setWorldMatrix(this.transform.toMatrix());
-		for (const child of this.children) {
-			(child as SpatialGameEntity).updateTransform();
-		}
 	}
 
 	/**
@@ -201,6 +198,13 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix(); // Matrix will update in next render call.
+
+		// Update transform of spatial entities after matrix is updated
+		editor.threeManager.nextFrame(() => {
+			for (const child of this.children) {
+				(child as SpatialGameEntity).updateTransform();
+			}
+		});
 	}
 
 	public setTransform(linearTransform: LinearTransform) {
