@@ -245,7 +245,7 @@ export default class InspectorComponent extends EditorComponent {
 		// }
 		// this.selectedVariation = selectedGameObject.variation;
 		// this.objectType = selectedGameObject.blueprintCtrRef.typeName;
-		//
+
 		// this.selectedGameObject = selectedGameObject;
 		// this.$data.partition = this.selectedGameObject.partition;
 	}
