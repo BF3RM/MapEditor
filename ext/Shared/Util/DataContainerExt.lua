@@ -1,6 +1,6 @@
 class "DataContainerExt"
 
- local m_Logger = Logger("DataContainerExt", false)
+local m_Logger = Logger("DataContainerExt", false)
 require "__shared/Util/StringExtensions"
 
 local m_PrintedObjects = nil
@@ -47,6 +47,7 @@ end
 
 function DataContainerExt:ShallowCopy(p_Instance, p_Guid)
 	p_Guid = p_Guid or GenerateGuid()
+
 	if p_Instance == nil then
 		m_Logger:Error('Parameter p_Instance was nil.')
 		return
@@ -65,7 +66,6 @@ function DataContainerExt:ShallowCopy(p_Instance, p_Guid)
 
 	if p_Instance.instanceGuid == nil then
 		m_Logger:Error('Instance.instanceGuid is nil. Instance type: ' .. p_Instance.typeInfo.name)
-
 		return nil
 	end
 
@@ -93,16 +93,13 @@ function DataContainerExt:FindLazyLoadedFields(p_Instance)
 
 	-- We copy all fields
 	local s_Fields = getFields(s_TypeInfo)
-	for _, field in pairs(s_Fields) do
 
-		if field.typeInfo ~= nil then
+	for _, l_Field in pairs(s_Fields) do
+		if l_Field.typeInfo ~= nil then
+			local s_Name = firstToLower(l_Field.name)
 
-			local s_Name = firstToLower(field.name)
-
-			if field.typeInfo.array then
-
-			elseif isPrintable(field.typeInfo.name) or field.typeInfo.enum then
-
+			if l_Field.typeInfo.array then
+			elseif isPrintable(l_Field.typeInfo.name) or l_Field.typeInfo.enum then
 			else
 				if p_Instance[s_Name] ~= nil then
 					if p_Instance[s_Name].instanceGuid ~= nil then
@@ -115,8 +112,6 @@ function DataContainerExt:FindLazyLoadedFields(p_Instance)
 		else
 			m_Logger:Write("typeInfo nil ?")
 		end
-
-		::continue::
 	end
 
 	m_Logger:Write('Finished looking for lazy loaded fields.')
@@ -124,6 +119,7 @@ end
 
 function DataContainerExt:GetInstanceFromPath(p_Instance, p_Path)
 	local s_PathArray = p_Path:split(".")
+
 	if s_PathArray[1] == "" then
 		table.remove(s_PathArray, 1)
 	end
@@ -132,17 +128,20 @@ function DataContainerExt:GetInstanceFromPath(p_Instance, p_Path)
 
 	for i, l_FieldName in pairs(s_PathArray) do
 		-- m_Logger:Write(i .. " - "..l_FieldName)
+
 		if s_Instance.typeInfo == nil then
 			--array
 		else
 			s_Instance = _G[s_Instance.typeInfo.name](s_Instance)
 		end
 
-		s_Child = s_Instance[l_FieldName]
+		local s_Child = s_Instance[l_FieldName]
+
 		if s_Child == nil then
 			m_Logger:Write('error in field '.. l_FieldName)
 			return
 		end
+
 		s_Instance = s_Child
 	end
 
@@ -185,9 +184,11 @@ function DataContainerExt:DeepCopy(p_Instance, p_DeepCopiedChildrenGuids, p_Curr
 			m_Logger:Write('Found custom guid: '..tostring(p_DeepCopiedChildrenGuids[tostring(p_Instance.instanceGuid)])..", original instanceGuid "..tostring(p_Instance.instanceGuid))
 
 			s_Clone = self:ShallowCopy(p_Instance, p_DeepCopiedChildrenGuids[tostring(p_Instance.instanceGuid)])
+
 			if s_Clone == nil then
 				m_Logger:Write('Cloning returned nil')
 			end
+
 			m_CopiedObjects[tostring(p_Instance.instanceGuid)] = s_Clone
 		end
 	end
@@ -208,23 +209,25 @@ function DataContainerExt:_deepCopyFields(p_Clone, p_DeepCopiedChildrenGuids, p_
 
 	-- We look for fields that are DCs to clone them
 	local s_Fields = getFields(s_TypeInfo)
-	for _, field in pairs(s_Fields) do
-		if field.typeInfo ~= nil then
-			local s_Name = firstToLower(field.name)
 
-			if field.typeInfo.array then
+	for _, l_Field in pairs(s_Fields) do
+		if l_Field.typeInfo ~= nil then
+			local s_Name = firstToLower(l_Field.name)
 
+			if l_Field.typeInfo.array then
 				local s_Array = p_Clone[s_Name]
+
 				if s_Array ~= nil then
 					for i = #s_Array, 1, -1 do
 						local s_Member = s_Array[i]
-						if s_Member ~= nil and not isPrintable(field.typeInfo.elementType.name) and not field.typeInfo.elementType.enum then
+
+						if s_Member ~= nil and not isPrintable(l_Field.typeInfo.elementType.name) and not l_Field.typeInfo.elementType.enum then
 							self:_deepCopyStructOrDC(p_Clone, s_Name, i, p_DeepCopiedChildrenGuids, p_CurrentDepth)
 						end
 					end
 				end
 				-- It's an object or structure
-			elseif not isPrintable(field.typeInfo.name) and not field.typeInfo.enum then
+			elseif not isPrintable(l_Field.typeInfo.name) and not l_Field.typeInfo.enum then
 				self:_deepCopyStructOrDC(p_Clone, s_Name, nil, p_DeepCopiedChildrenGuids, p_CurrentDepth)
 			end
 		else
@@ -244,6 +247,7 @@ function DataContainerExt:_deepCopyStructOrDC(p_Clone, p_FieldName, p_FieldIndex
 	if s_FieldInstance == nil then
 		return
 	end
+
 	if s_FieldInstance.instanceGuid == nil then -- Structure
 		self:_deepCopyFields(s_FieldInstance, p_DeepCopiedChildrenGuids, p_CurrentDepth)
 	else -- DataContainer
@@ -258,7 +262,8 @@ function DataContainerExt:_deepCopyDC(p_Clone, p_FieldName, p_FieldIndex, p_Deep
 	if p_FieldIndex then
 		s_FieldInstance = s_FieldInstance[p_FieldIndex]
 	end
-	-- Filter  DataContainer
+
+	-- Filter DataContainer
 	if s_FieldInstance.typeInfo.name ~= "DataContainer" then
 		-- Only clone field if it was specified in the path array.
 		if p_DeepCopiedChildrenGuids[tostring(s_FieldInstance.instanceGuid)] then
@@ -292,18 +297,19 @@ function DataContainerExt:DeepClone(p_Instance, p_Guid, p_CurrentDepth)
 	if p_Instance.instanceGuid ~= nil then
 		if p_Instance.isLazyLoaded then
 			m_Logger:Write("DC with guid "..tostring(p_Instance.instanceGuid).." is lazy loaded, please deepclone after everything is loaded. Type "..p_Instance.typeInfo.name)
-			return s_Instance
+			return p_Instance
 		end
 
 		if m_CopiedObjects[tostring(p_Instance.instanceGuid)] ~= nil then
 			return m_CopiedObjects[tostring(p_Instance.instanceGuid)]
 		end
 
-
 		s_Clone = self:ShallowCopy(p_Instance, p_Guid)
+
 		if s_Clone == nil then
 			m_Logger:Write('Cloning returned nil')
 		end
+
 		m_CopiedObjects[tostring(p_Instance.instanceGuid)] = s_Clone
 	end
 
@@ -322,23 +328,24 @@ function DataContainerExt:_deepCloneFields(p_Clone, p_CurrentDepth)
 
 	-- We look for fields that are DCs to clone them
 	local s_Fields = getFields(s_TypeInfo)
-	for _, field in pairs(s_Fields) do
-		if field.typeInfo ~= nil then
-			local s_Name = firstToLower(field.name)
 
-			if field.typeInfo.array then
+	for _, l_Field in pairs(s_Fields) do
+		if l_Field.typeInfo ~= nil then
+			local s_Name = firstToLower(l_Field.name)
 
+			if l_Field.typeInfo.array then
 				local s_Array = p_Clone[s_Name]
+
 				if s_Array ~= nil then
 					for i = #s_Array, 1, -1 do
 						local s_Member = s_Array[i]
-						if s_Member ~= nil and not isPrintable(field.typeInfo.elementType.name) and not field.typeInfo.elementType.enum then
+						if s_Member ~= nil and not isPrintable(l_Field.typeInfo.elementType.name) and not l_Field.typeInfo.elementType.enum then
 							self:_deepCloneStructOrDC(p_Clone, s_Name, i, p_CurrentDepth)
 						end
 					end
 				end
 				-- It's an object or structure
-			elseif not isPrintable(field.typeInfo.name) and not field.typeInfo.enum then
+			elseif not isPrintable(l_Field.typeInfo.name) and not l_Field.typeInfo.enum then
 				self:_deepCloneStructOrDC(p_Clone, s_Name, nil, p_CurrentDepth)
 			end
 		else
@@ -358,6 +365,7 @@ function DataContainerExt:_deepCloneStructOrDC(p_Clone, p_FieldName, p_FieldInde
 	if s_FieldInstance == nil then
 		return
 	end
+
 	if s_FieldInstance.instanceGuid == nil then -- Structure
 		self:_deepCloneFields(s_FieldInstance, p_CurrentDepth)
 	else -- DataContainer
@@ -372,7 +380,8 @@ function DataContainerExt:_deepCloneDC(p_Clone, p_FieldName, p_FieldIndex, p_Cur
 	if p_FieldIndex then
 		s_FieldInstance = s_FieldInstance[p_FieldIndex]
 	end
-	-- Filter  DataContainer
+
+	-- Filter DataContainer
 	if s_FieldInstance.typeInfo.name ~= "DataContainer" then
 		if p_FieldIndex then
 			p_Clone[p_FieldName][p_FieldIndex] = self:DeepClone(s_FieldInstance, nil, p_CurrentDepth + 1)
@@ -430,14 +439,14 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 		p_MaxDepth = -1
 	end
 
-	if(p_Padding == nil) then
+	if p_Padding == nil then
 		p_Padding = ""
 	end
 
 	if string.match(p_TypeInfo.name:lower(), "voice") or
-		string.match(p_TypeInfo.name:lower(), "sound") or
-		p_TypeInfo == MaterialContainerPair.typeInfo or
-		p_TypeInfo == MaterialContainerAsset.typeInfo then
+	string.match(p_TypeInfo.name:lower(), "sound") or
+	p_TypeInfo == MaterialContainerPair.typeInfo or
+	p_TypeInfo == MaterialContainerAsset.typeInfo then
 		return
 	end
 
@@ -448,7 +457,7 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 		m_Logger:Write(p_Padding ..p_FieldName..'(Structure - '..p_TypeInfo.name..') {')
 	else
 		-- Not print it if we already printed this object
-		if(m_PrintedObjects[tostring(s_Instance.instanceGuid)] ~= nil) then
+		if m_PrintedObjects[tostring(s_Instance.instanceGuid)] ~= nil then
 			m_Logger:Write(p_Padding ..p_FieldName..'(Object - '..p_TypeInfo.name..') instanceGuid: '.. tostring(s_Instance.instanceGuid).. ' (Printed above) {')
 			return
 		else
@@ -469,33 +478,32 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 		return
 	end
 
-	p_Padding = p_Padding .. "  "
+	p_Padding = p_Padding .. " "
 
 	local s_Fields = getFields(p_TypeInfo)
-	for _, field in ipairs(s_Fields) do
 
-		if field.typeInfo == nil then
+	for _, l_Field in ipairs(s_Fields) do
+		if l_Field.typeInfo == nil then
 			m_Logger:Write("field.typeInfo == nil")
 			goto continue
-		elseif field.name == "MaterialPairs" then
+		elseif l_Field.name == "MaterialPairs" then
 			m_Logger:Write("MaterialPairs isn't supported, ignoring.")
 			goto continue
 		end
 
-		local s_Name = firstToLower(field.name)
+		local s_Name = firstToLower(l_Field.name)
 
-		if isPrintable(field.typeInfo.name) then
+		if isPrintable(l_Field.typeInfo.name) then
 			local s_Value = s_Instance[s_Name]
-			m_Logger:Write(p_Padding ..field.name..' ('..field.typeInfo.name..') : '.. tostring(s_Value))
-
-			--Array
-		elseif field.typeInfo.array then
+			m_Logger:Write(p_Padding ..l_Field.name..' ('..l_Field.typeInfo.name..') : '.. tostring(s_Value))
+		--Array
+		elseif l_Field.typeInfo.array then
 			local s_Array = s_Instance[s_Name]
 
 			if s_Array == nil then
-				m_Logger:Write(p_Padding ..field.name..' (Array), nil')
+				m_Logger:Write(p_Padding ..l_Field.name..' (Array), nil')
 			else
-				m_Logger:Write(p_Padding ..field.name..' (Array), '..tostring(#s_Array)..' Members {')
+				m_Logger:Write(p_Padding ..l_Field.name..' (Array), '..tostring(#s_Array)..' Members {')
 				for i = 1, #s_Array, 1 do
 					local s_Member = s_Array[i]
 
@@ -503,9 +511,9 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 						goto continue1
 					end
 
-					if isPrintable(field.typeInfo.elementType.name) then
-						m_Logger:Write(p_Padding .."[" .. i .. "] "..' ('..field.typeInfo.elementType.name..') : '.. tostring(s_Member))
-					elseif field.typeInfo.elementType.enum then
+					if isPrintable(l_Field.typeInfo.elementType.name) then
+						m_Logger:Write(p_Padding .."[" .. i .. "] "..' ('..l_Field.typeInfo.elementType.name..') : '.. tostring(s_Member))
+					elseif l_Field.typeInfo.elementType.enum then
 						m_Logger:Write(p_Padding .."[" .. i .. "] "..' (Enum) : '.. tostring(s_Member))
 					else
 						self:_printFieldsInternal(s_Member, s_Member.typeInfo, p_Padding, p_CurrentDepth + 1, p_MaxDepth)
@@ -516,30 +524,28 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 
 				m_Logger:Write(p_Padding .. "}")
 			end
-
-			--Enum
-		elseif field.typeInfo.enum then
+		--Enum
+		elseif l_Field.typeInfo.enum then
 			local s_Value = s_Instance[s_Name]
-			m_Logger:Write(p_Padding..field.name..' (Enum) : ' .. tostring(s_Value))
-
-			--Object or Structure
+			m_Logger:Write(p_Padding..l_Field.name..' (Enum) : ' .. tostring(s_Value))
+		--Object or Structure
 		else
 			if s_Instance[s_Name] ~= nil then
 				-- local s_Value = s_Instance[s_Name]
-				local i = _G[field.typeInfo.name](s_Instance[s_Name])
+				local i = _G[l_Field.typeInfo.name](s_Instance[s_Name])
 				if i ~= nil then
 					-- p_Padding = p_Padding .. "	"
-					self:_printFieldsInternal( i, i.typeInfo, p_Padding, p_CurrentDepth + 1, p_MaxDepth, field.name)
+					self:_printFieldsInternal( i, i.typeInfo, p_Padding, p_CurrentDepth + 1, p_MaxDepth, l_Field.name)
 				end
 			else
-				m_Logger:Write(p_Padding ..field.name..' (Object - '..field.typeInfo.name..') nil')
+				m_Logger:Write(p_Padding ..l_Field.name..' (Object - '..l_Field.typeInfo.name..') nil')
 			end
 		end
 
 		::continue::
 	end
 
-	print (p_Padding:sub(1, -3) .. "}")
+	m_Logger:Write(p_Padding:sub(1, -3) .. "}")
 
 	-- Clear printed objects
 	if p_CurrentDepth == 0 then
@@ -547,50 +553,54 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 	end
 end
 
-function getFields( typeInfo )
+function getFields(p_TypeInfo)
 	local s_Super = {}
-	if typeInfo.super ~= nil then
-		if typeInfo.super.name ~= "DataContainer" then
-			for k,superv in pairs(getFields(typeInfo.super)) do
-				table.insert(s_Super, superv)
+
+	if p_TypeInfo.super ~= nil then
+		if p_TypeInfo.super.name ~= "DataContainer" then
+			for _, l_SuperType in pairs(getFields(p_TypeInfo.super)) do
+				table.insert(s_Super, l_SuperType)
 			end
 		end
 	end
-	for k,v in pairs(typeInfo.fields) do
-		table.insert(s_Super, v)
+
+	for _, l_Field in pairs(p_TypeInfo.fields) do
+		table.insert(s_Super, l_Field)
 	end
+
 	return s_Super
 end
 
-function isPrintable( typ )
-	if typ == "CString" or
-		typ == "Single" or
-		typ == "Float8" or
-		typ == "Float16" or
-		typ == "Float32" or
-		typ == "Float64" or
-		typ == "Int8" or
-		typ == "Int16" or
-		typ == "Int32" or
-		typ == "Int64" or
-		typ == "Uint8" or
-		typ == "Uint16" or
-		typ == "Uint32" or
-		typ == "Uint64" or
-		typ == "LinearTransform" or
-		typ == "Vec2" or
-		typ == "Vec3" or
-		typ == "Vec4" or
-		typ == "Boolean" or
-		typ == "Guid" or
-		typ == "SByte" then
+function isPrintable(p_Type)
+	if p_Type == "CString" or
+	p_Type == "Single" or
+	p_Type == "Float8" or
+	p_Type == "Float16" or
+	p_Type == "Float32" or
+	p_Type == "Float64" or
+	p_Type == "Int8" or
+	p_Type == "Int16" or
+	p_Type == "Int32" or
+	p_Type == "Int64" or
+	p_Type == "Uint8" or
+	p_Type == "Uint16" or
+	p_Type == "Uint32" or
+	p_Type == "Uint64" or
+	p_Type == "LinearTransform" or
+	p_Type == "Vec2" or
+	p_Type == "Vec3" or
+	p_Type == "Vec4" or
+	p_Type == "Boolean" or
+	p_Type == "Guid" or
+	p_Type == "SByte" then
 		return true
 	end
+
 	return false
 end
 
-function firstToLower(str)
-	return str:gsub("^%L", string.lower)
+function firstToLower(p_String)
+	return p_String:gsub("^%L", string.lower)
 end
 
 function GenerateGuid()
@@ -598,8 +608,8 @@ function GenerateGuid()
 end
 
 function h()
-	local vars = {"A","B","C","D","E","F","0","1","2","3","4","5","6","7","8","9"}
-	return vars[math.floor(MathUtils:GetRandomInt(1,16))]..vars[math.floor(MathUtils:GetRandomInt(1,16))]
+	local s_Vars = {"A","B","C","D","E","F","0","1","2","3","4","5","6","7","8","9"}
+	return s_Vars[math.floor(MathUtils:GetRandomInt(1,16))]..s_Vars[math.floor(MathUtils:GetRandomInt(1,16))]
 end
 
 -- Singleton.

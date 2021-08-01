@@ -13,6 +13,15 @@ export class GameObjectParentData {
 		this.partitionGuid = partitionGuid;
 	}
 
+	public static GetRootParentData() {
+		return new GameObjectParentData(
+			Guid.createEmpty(),
+			'custom_root',
+			Guid.createEmpty(),
+			Guid.createEmpty()
+		);
+	}
+
 	public static FromTable(table: any) {
 		const guid = Guid.parse(table.guid);
 		const typeName = table.typeName;

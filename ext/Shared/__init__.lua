@@ -1,8 +1,8 @@
 class 'MapEditorShared'
 
 require "__shared/Config"
-Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Logger"
+Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Util"
 DataContainerExt = require "__shared/Util/DataContainerExt"
 --require "__shared/Modules/ObjectManager"
@@ -42,7 +42,6 @@ function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorShared:OnLevelDestroy()
-	Patches:OnLevelDestroy()
 	Timer:OnResetData()
 	InstanceParser:OnLevelDestroy()
 end

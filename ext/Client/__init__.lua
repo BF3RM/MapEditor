@@ -18,19 +18,14 @@ CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
 
 function MapEditorClient:__init()
-	print("Initializing MapEditorClient")
-	self:RegisterVars()
+	m_Logger:Write("Initializing MapEditorClient")
 	self:RegisterEvents()
-end
-
-function MapEditorClient:RegisterVars()
-
 end
 
 function MapEditorClient:RegisterEvents()
 	--Game events
 	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
-	Events:Subscribe('Extension:Loaded', self, self.OnLoaded)
+	Events:Subscribe('Extension:Loaded', self, self.OnExtensionLoaded)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
 	Events:Subscribe('Engine:Update', self, self.OnUpdate)
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
@@ -57,9 +52,9 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:controlEnd', self, self.OnCameraControlEnd)
 	Events:Subscribe('MapEditor:controlUpdate', self, self.OnCameraControlUpdate)
 
-    Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
-    Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
-    Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
+	-- Hooks
+	Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
+	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
@@ -77,7 +72,7 @@ function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
-function MapEditorClient:OnLoaded()
+function MapEditorClient:OnExtensionLoaded()
 	WebUI:Init()
 	WebUI:Show()
 end
@@ -124,19 +119,18 @@ function MapEditorClient:OnLevelDestroy()
 	UIManager:OnLevelDestroy()
 end
 
-function MapEditorClient:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	EditorCommon:OnEntityCreate(p_Hook, p_Data, p_Transform)
-end
-
 function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	local loadingInfo = ''
-	for k,v in pairs(p_Bundles) do
-		loadingInfo = loadingInfo .. v
-		if(k ~= #p_Bundles) then
-			loadingInfo = loadingInfo .. ", "
+	local s_LoadingInfo = ''
+
+	for l_Index, l_Bundle in pairs(p_Bundles) do
+		s_LoadingInfo = s_LoadingInfo .. l_Bundle
+
+		if l_Index ~= #p_Bundles then
+			s_LoadingInfo = s_LoadingInfo .. ", "
 		end
 	end
-	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(loadingInfo)))
+
+	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(s_LoadingInfo)))
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
 end
 

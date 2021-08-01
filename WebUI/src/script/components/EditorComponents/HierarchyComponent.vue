@@ -9,6 +9,7 @@
 									:autoOpen="true"
 									:data="data"
 									:selectable="true"
+									:row-height="13"
 									:should-select-node="shouldSelectNode">
 				<expandable-tree-slot slot-scope="{ node, index, tree, active }"
 									:has-visibility-options="true"
@@ -95,10 +96,10 @@ export default class HierarchyComponent extends EditorComponent {
 	constructor() {
 		super();
 		console.log('Mounted');
-		signals.spawnedBlueprint.connect(this.onSpawnedBlueprint.bind(this));
-		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
-		// signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
-		// signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
+		signals.spawnedGameObject.connect(this.onSpawnedGameObject.bind(this));
+		signals.deletedGameObject.connect(this.onDeletedGameObject.bind(this));
+		// signals.enabledGameObject.connect(this.onEnabledBlueprint.bind(this));
+		// signals.disabledGameObject.connect(this.onDisabledBlueprint.bind(this));
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
@@ -129,14 +130,13 @@ export default class HierarchyComponent extends EditorComponent {
 		return (node.children.length === 0) ? node.name : node.name + ' (' + node.children.length + ')';
 	}
 
-	onDeletedBlueprint(commandActionResult: CommandActionResult) {
+	onDeletedGameObject(commandActionResult: CommandActionResult) {
 		const node = this.tree.getNodeById(commandActionResult.gameObjectTransferData.guid.toString());
 		this.tree.removeNode(node, {});
 	}
 
-	onSpawnedBlueprint(commandActionResult: CommandActionResult) {
+	onSpawnedGameObject(commandActionResult: CommandActionResult) {
 		return new Promise((resolve, reject) => {
-			// console.log('Spawning:' + commandActionResult.gameObjectTransferData.guid.value);
 			const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
 			const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
 
@@ -264,14 +264,62 @@ export default class HierarchyComponent extends EditorComponent {
 
 	private onNodeClick(o: any) {
 		const guid = Guid.parse(o.nodeId.toString());
+
 		if (guid.isEmpty()) return;
+
 		if (o.event.detail === 1) {
 			// Click
-			window.editor.Select(guid, o.event.ctrlKey, false, true);
+			if (o.event.shiftKey) {
+				const selectedNode = this.tree.getNodeById(o.nodeId);
+				window.editor.SelectMultiple(this.getConsecutiveNodesGuids(selectedNode));
+			} else {
+				window.editor.Select(guid, o.event.ctrlKey, false, true);
+			}
 		} else if (o.event.detail === 2) {
 			// Double Click
 			window.editor.Focus(guid);
 		}
+	}
+
+	private getConsecutiveNodesGuids(newSelectedNode: Node): Guid[] {
+		const guids = [];
+
+		// Search for the first selected node that share parent with the newly selected node
+		let firstNodeId: string | null = null;
+		for (let i = 0; i < this.selected.length; i++) {
+			const node = this.selected[i];
+			if (node.parent.id === newSelectedNode.parent.id) {
+				firstNodeId = node.id;
+				break;
+			}
+		}
+		let found = false;
+
+		if (firstNodeId) {
+			for (let j = 0; j < newSelectedNode.parent.children.length - 1; j++) {
+				const node = newSelectedNode.parent.children[j];
+
+				if (node.id === firstNodeId) {
+					found = true;
+					continue;
+				}
+
+				if (node.id === newSelectedNode.id) {
+					break;
+				}
+
+				if (found) {
+					guids.push(this.getNodeGuid(node));
+				}
+			}
+		}
+		// Add selected node
+		guids.push(this.getNodeGuid(newSelectedNode));
+		return guids;
+	}
+
+	private getNodeGuid(node: Node) {
+		return Guid.parse(node.id.toString());
 	}
 
 	private shouldSelectNode(node: Node) {

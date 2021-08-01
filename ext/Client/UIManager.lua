@@ -33,6 +33,7 @@ end
 function UIManager:OnLevelDestroy()
 	WebUI:ExecuteJS("window.location = window.location")
 end
+
 ----------- Game functions----------------
 function UIManager:OnPushScreen(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
 	self:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGraph)
@@ -42,10 +43,9 @@ function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGrap
 	local s_Screen = UIGraphAsset(p_Screen)
 
 	if s_Screen.name == 'UI/Flow/Screen/PreRoundWaitingScreen' or
-		s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
-		s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
-		s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
-
+	s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
+	s_Screen.name == 'UI/Flow/Screen/HudMatchPreroundScreen' or
+	s_Screen.name == 'UI/Flow/Screen/CommRoseScreen' then
 		p_Hook:Return(nil)
 	end
 end
@@ -94,6 +94,7 @@ function UIManager:EnableFreeCam()
 	end
 
 	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+
 	-- Don't change to freecam if the player isnt alive, maybe add message saying so?
 	if s_LocalPlayer == nil or s_LocalPlayer.soldier == nil then
 		return
@@ -114,6 +115,7 @@ function UIManager:DisableFreeCam()
 	if self.m_ActiveMode ~= EditorMode.Editor then
 		return
 	end
+
 	NetEvents:SendLocal('DisableInputRestriction')
 	FreeCam:Disable()
 	self:SetEditorMode(EditorMode.Playing)

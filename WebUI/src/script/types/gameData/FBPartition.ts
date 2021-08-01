@@ -63,6 +63,8 @@ export class FBPartition {
 				Vue.set(this.instances, instance.$guid, Instance.fromJSON(this._data, instance));
 			}
 			return data;
+		}).catch((e: any) => {
+			console.error(e);
 		});
 		return this.promise;
 	}

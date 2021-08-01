@@ -2,9 +2,9 @@ import * as Collections from 'typescript-collections';
 
 import { Guid } from '@/script/types/Guid';
 import Command from './libs/three/Command';
-import SpawnBlueprintCommand from './commands/SpawnBlueprintCommand';
+import SpawnGameObjectCommand from './commands/SpawnGameObjectCommand';
 import BulkCommand from './commands/BulkCommand';
-import DeleteBlueprintCommand from './commands/DeleteBlueprintCommand';
+import DeleteGameObjectCommand from './commands/DeleteGameObjectCommand';
 import History from './libs/three/History';
 import GameContext from './modules/GameContext';
 import VEXTInterface from './modules/VEXT';
@@ -26,8 +26,8 @@ import { LinearTransform } from './types/primitives/LinearTransform';
 import { Vec3 } from './types/primitives/Vec3';
 import { signals } from '@/script/modules/Signals';
 import { EDITOR_MODE, GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
-import DisableBlueprintCommand from '@/script/commands/DisableBlueprintCommand';
-import EnableBlueprintCommand from '@/script/commands/EnableBlueprintCommand';
+import DisableGameObjectCommand from '@/script/commands/DisableGameObjectCommand';
+import EnableGameObjectCommand from '@/script/commands/EnableGameObjectCommand';
 
 export default class Editor {
 	public config = new Config();
@@ -43,7 +43,7 @@ export default class Editor {
 	public playerName: string;
 	public gameObjects = new Collections.Dictionary<Guid, GameObject>();
 	public favorites = new Collections.Dictionary<Guid, Blueprint>();
-	public copy: SpawnBlueprintCommand[];
+	public copy: SpawnGameObjectCommand[];
 
 	public selectionGroup: SelectionGroup;
 	public missingParent: Collections.Dictionary<Guid, GameObject[]>;
@@ -57,10 +57,10 @@ export default class Editor {
 		// Commands
 		signals.editor.Ready.connect(this.onEditorReady.bind(this));
 		signals.blueprintSpawnInvoked.connect(this.onBlueprintSpawnInvoked.bind(this));
-		signals.enabledBlueprint.connect(this.onEnabledBlueprint.bind(this));
-		signals.disabledBlueprint.connect(this.onDisabledBlueprint.bind(this));
+		signals.enabledGameObject.connect(this.onEnabledBlueprint.bind(this));
+		signals.disabledGameObject.connect(this.onDisabledBlueprint.bind(this));
 
-		signals.deletedBlueprint.connect(this.onDeletedBlueprint.bind(this));
+		signals.deletedGameObject.connect(this.onDeletedGameObject.bind(this));
 		signals.setObjectName.connect(this.onSetObjectName.bind(this));
 		signals.setTransform.connect(this.onSetTransform.bind(this));
 		signals.setVariation.connect(this.onSetVariation.bind(this));
@@ -199,7 +199,7 @@ export default class Editor {
 			variation = blueprint.getDefaultVariation();
 		}
 		if (parentData === undefined) {
-			parentData = new GameObjectParentData(Guid.createEmpty(), 'custom_root', Guid.createEmpty(), Guid.createEmpty());
+			parentData = GameObjectParentData.GetRootParentData();
 		}
 
 		// Spawn blueprint
@@ -218,7 +218,7 @@ export default class Editor {
 		this.DeselectAll();
 		this.editorCore.setPendingSelection(gameObjectTransferData.guid);
 
-		this.execute(new SpawnBlueprintCommand(gameObjectTransferData));
+		this.execute(new SpawnGameObjectCommand(gameObjectTransferData));
 	}
 
 	public UpdateGameObjectRealm(guidString: string, realm: REALM) {
@@ -236,7 +236,7 @@ export default class Editor {
 		const commands: Command[] = [];
 		this.selectionGroup.selectedGameObjects.forEach((selectedGameObject) => {
 			if (selectedGameObject) {
-				commands.push(new DeleteBlueprintCommand(selectedGameObject.getGameObjectTransferData()));
+				commands.push(new DeleteGameObjectCommand(selectedGameObject.getGameObjectTransferData()));
 			}
 		});
 
@@ -246,14 +246,14 @@ export default class Editor {
 	}
 
 	public Enable(guid: Guid) {
-		const command = new EnableBlueprintCommand(new GameObjectTransferData({
+		const command = new EnableGameObjectCommand(new GameObjectTransferData({
 			guid: guid
 		}));
 		this.execute(command);
 	}
 
 	public Disable(guid: Guid) {
-		const command = new DisableBlueprintCommand(new GameObjectTransferData({
+		const command = new DisableGameObjectCommand(new GameObjectTransferData({
 			guid: guid
 		}));
 		this.execute(command);
@@ -291,6 +291,12 @@ export default class Editor {
 		this.editorCore.select(guid, multiSelection, scrollTo, moveGizmo);
 	}
 
+	public SelectMultiple(guids: Guid[]) {
+		guids.forEach((guid: Guid) => {
+			this.editorCore.select(guid, true, false, false);
+		});
+	}
+
 	public Deselect(guid: Guid) {
 		this.editorCore.deselect(guid);
 	}
@@ -326,12 +332,12 @@ export default class Editor {
 	public onSetVariation(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
-		if (gameObject !== undefined) {
+		if (gameObject) {
 			(gameObject).setVariation(gameObjectTransferData.variation);
 		}
 	}
 
-	public onDeletedBlueprint(commandActionResult: CommandActionResult) {
+	public onDeletedGameObject(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const gameObject = this.gameObjects.getValue(gameObjectGuid);
@@ -355,7 +361,7 @@ export default class Editor {
 	}
 
 	// TODO: Move logic to GameContext
-	public onSpawnedBlueprint(commandActionResult: CommandActionResult) {
+	public onSpawnedGameObject(commandActionResult: CommandActionResult) {
 		return new Promise((resolve, reject) => {
 			const scope = this;
 			const gameObjectTransferData = commandActionResult.gameObjectTransferData;
@@ -424,7 +430,7 @@ export default class Editor {
 				// this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, true, true));
 				// this.editorCore.removePendingSelection(gameObjectGuid);
 			}
-			signals.spawnedBlueprint.emit(commandActionResult);
+			signals.spawnedGameObject.emit(commandActionResult);
 		});
 	}
 

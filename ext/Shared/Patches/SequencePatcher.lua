@@ -1,4 +1,5 @@
 class 'SequencePatcher'
+
 local m_Logger = Logger("SequencePatcher", true)
 
 function SequencePatcher:__init()
