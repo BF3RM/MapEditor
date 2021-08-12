@@ -45,6 +45,10 @@ function ProjectManager:OnRequestProjectHeaders(p_Player)
 	end
 end
 
+function ProjectManager:OnLevelDestroy()
+	m_IsLevelLoaded = false
+end
+
 function ProjectManager:UpdateClientProjectHeader(p_Player)
 	if self.m_CurrentProjectHeader == nil then
 		self.m_CurrentProjectHeader = {
