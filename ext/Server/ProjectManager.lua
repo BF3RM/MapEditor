@@ -115,7 +115,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil then
 		m_LoadDelay = m_LoadDelay + p_Delta
 
-		if m_LoadDelay > 10 and self.m_CurrentProjectHeader.projectName ~= nil then
+		if m_LoadDelay > ME_CONFIG.SAVE_LOAD_DELAY and self.m_CurrentProjectHeader.projectName ~= nil then
 			m_IsLevelLoaded = false
 			m_LoadDelay = 0
 
