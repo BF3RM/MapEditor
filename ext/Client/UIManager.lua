@@ -1,6 +1,6 @@
 class 'UIManager'
 
-local m_Logger = Logger("UIManager", true)
+local m_Logger = Logger("UIManager", false)
 
 function UIManager:__init()
 	m_Logger:Write("Initializing UIManager")

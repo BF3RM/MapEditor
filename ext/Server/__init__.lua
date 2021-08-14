@@ -1,6 +1,6 @@
 class 'MapEditorServer'
 
-local m_Logger = Logger("MapEditorServer", true)
+local m_Logger = Logger("MapEditorServer", false)
 
 ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"

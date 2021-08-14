@@ -1,6 +1,6 @@
 class 'VegetationPatcher'
 
-local m_Logger = Logger("VegetationPatcher", true)
+local m_Logger = Logger("VegetationPatcher", false)
 
 function VegetationPatcher:__init()
 	m_Logger:Write("Initializing Vegetation Patches")

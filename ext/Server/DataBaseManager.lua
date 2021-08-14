@@ -1,6 +1,6 @@
 class 'DataBaseManager'
 
-local m_Logger = Logger("DataBaseManager", true)
+local m_Logger = Logger("DataBaseManager", false)
 
 local m_DB_Header_Table_Name = "project_header"
 local m_ProjectName_Unique_Index = "idx_project_name"

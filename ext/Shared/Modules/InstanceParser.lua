@@ -1,6 +1,6 @@
 class 'InstanceParser'
 
-local m_Logger = Logger("InstanceParser", true)
+local m_Logger = Logger("InstanceParser", false)
 
 function InstanceParser:__init(p_Realm)
 	m_Logger:Write("Initializing InstanceParser")

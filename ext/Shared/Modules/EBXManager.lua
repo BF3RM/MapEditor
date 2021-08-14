@@ -1,6 +1,6 @@
 class 'EBXManager'
 
-local m_Logger = Logger("EBXManager", true)
+local m_Logger = Logger("EBXManager", false)
 
 function EBXManager:__init(p_Realm)
 	m_Logger:Write("Initializing EBXManager: " .. tostring(p_Realm))

@@ -1,6 +1,6 @@
 class 'ServerTransactionManager'
 
-local m_Logger = Logger("ServerTransactionManager", true)
+local m_Logger = Logger("ServerTransactionManager", false)
 
 function ServerTransactionManager:__init()
 	m_Logger:Write("Initializing ServerTransactionManager")

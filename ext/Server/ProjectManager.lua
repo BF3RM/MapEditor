@@ -1,6 +1,6 @@
 class 'ProjectManager'
 
-local m_Logger = Logger("ProjectManager", true)
+local m_Logger = Logger("ProjectManager", false)
 
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0

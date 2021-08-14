@@ -1,6 +1,6 @@
 class 'CommandActionResult'
 
-local m_Logger = Logger("CommandActionResult", true)
+local m_Logger = Logger("CommandActionResult", false)
 
 function CommandActionResult:__init(p_Arg)
 	if p_Arg.type == nil then
