@@ -265,7 +265,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		RCON:SendCommand('mapList.restartRound')
 	else
 		RCON:SendCommand('mapList.clear')
-		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
+		local out = RCON:SendCommand('mapList.add', {s_MapName, s_GameModeName, '1'}) -- TODO: add proper map / gameplay support
 		RCON:SendCommand('mapList.runNextRound')
 	end
 end
