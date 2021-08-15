@@ -34,6 +34,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('UI:DrawHud', self, self.OnDrawHud)
 	Events:Subscribe('Level:LoadingInfo', self, self.OnLoadingInfo)
+	Events:Subscribe('Level:LoadResources', self, self.OnLevelLoadResources)
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
@@ -57,6 +58,8 @@ function MapEditorClient:RegisterEvents()
 	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
+	Hooks:Install('Terrain:Load', 1, self, self.OnTerrainLoad)
+	Hooks:Install('VisualTerrain:Load', 1, self, self.OnTerrainLoad)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
@@ -119,6 +122,10 @@ function MapEditorClient:OnLevelDestroy()
 	UIManager:OnLevelDestroy()
 end
 
+function MapEditorClient:OnTerrainLoad(p_HookCtx, p_AssetName)
+	EditorCommon:OnTerrainLoad(p_HookCtx, p_AssetName, Editor.m_CurrentProjectHeader)
+end
+
 function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	local s_LoadingInfo = ''
 
@@ -142,8 +149,12 @@ function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
 
-function MapEditorClient:OnLoadingInfo( p_Info )
+function MapEditorClient:OnLoadingInfo(p_Info)
 	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('%s')", p_Info))
+end
+
+function MapEditorClient:OnLevelLoadResources(p_LevelName, p_GameMode, p_IsDedicatedServer)
+	EditorCommon:OnLevelLoadResources(Editor.m_CurrentProjectHeader)
 end
 
 ----------- Editor functions----------------

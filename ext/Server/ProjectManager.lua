@@ -4,6 +4,55 @@ local m_Logger = Logger("ProjectManager", true)
 
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
+local m_SuperBundles = {
+	["levels/coop_002/coop_002"] = true,
+	["levels/coop_003/coop_003"] = true,
+	["levels/coop_006/coop_006"] = true,
+	["levels/coop_007/coop_007"] = true,
+	["levels/coop_009/coop_009 "] = true,
+	["levels/coop_010/coop_010"] = true,
+	["levels/mp_001/mp_001"] = true,
+	["levels/mp_003/mp_003"] = true,
+	["levels/mp_007/mp_007"] = true,
+	["levels/mp_011/mp_011"] = true,
+	["levels/mp_012/mp_012"] = true,
+	["levels/mp_013/mp_013"] = true,
+	["levels/mp_017/mp_017"] = true,
+	["levels/mp_018/mp_018"] = true,
+	["levels/mp_subway/mp_subway"] = true,
+	["levels/sp_bank/sp_bank"] = true,
+	["levels/sp_earthquake/sp_earthquake"] = true,
+	["levels/sp_earthquake2/sp_earthquake2"] = true,
+	["levels/sp_finale/sp_finale"] = true,
+	["levels/sp_jet/sp_jet"] = true,
+	["levels/sp_new_york/sp_new_york"] = true,
+	["levels/sp_paris/sp_paris"] = true,
+	["levels/sp_sniper/sp_sniper"] = true,
+	["levels/sp_tank/sp_tank"] = true,
+	["levels/sp_tank_b/sp_tank_b"] = true,
+	["levels/sp_valley/sp_valley"] = true,
+	["levels/sp_villa/sp_villa"] = true,
+	["levels/xp1_001/xp1_001"] = true,
+	["levels/xp1_002/xp1_002"] = true,
+	["levels/xp1_003/xp1_003"] = true,
+	["levels/xp1_004/xp1_004"] = true,
+	["levels/xp2_factory/xp2_factory"] = true,
+	["levels/xp2_office/xp2_office"] = true,
+	["levels/xp2_palace/xp2_palace"] = true,
+	["levels/xp2_skybar/xp2_skybar"] = true,
+	["levels/xp3_alborz/xp3_alborz"] = true,
+	["levels/xp3_desert/xp3_desert"] = true,
+	["levels/xp3_shield/xp3_shield"] = true,
+	["levels/xp3_valley/xp3_valley"] = true,
+	["levels/xp4_fd/xp4_fd"] = true,
+	["levels/xp4_parl/xp4_parl"] = true,
+	["levels/xp4_quake/xp4_quake"] = true,
+	["levels/xp4_rubble/xp4_rubble"] = true,
+	["levels/xp5_001/xp5_001"] = true,
+	["levels/xp5_002/xp5_002"] = true,
+	["levels/xp5_003/xp5_003"] = true,
+	["levels/xp5_004/xp5_004"] = true
+}
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -17,6 +66,7 @@ function ProjectManager:RegisterVars()
 	self.m_MapName = nil
 	self.m_GameMode = nil
 	self.m_LoadedBundles = {}
+	self.m_LoadedSuperBundles = {}
 end
 
 function ProjectManager:RegisterEvents()
@@ -30,9 +80,61 @@ function ProjectManager:RegisterEvents()
 end
 
 function ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
-	for _, l_Bundle in pairs(p_Bundles) do
-		self.m_LoadedBundles[l_Bundle] = true
+	if not self:IsLevelBundle(p_Bundles) then
+		return
 	end
+
+	for _, l_Bundle in pairs(p_Bundles) do
+		if l_Bundle ~= SharedUtils:GetLevelName() then
+			if l_Bundle:match("xp1_") then
+				self.m_LoadedSuperBundles["xp1chunks"] = true
+			elseif l_Bundle:match("xp2_") then
+				self.m_LoadedSuperBundles["xp2chunks"] = true
+			elseif l_Bundle:match("xp3_") then
+				self.m_LoadedSuperBundles["xp3chunks"] = true
+			elseif l_Bundle:match("xp4_") then
+				self.m_LoadedSuperBundles["xp4chunks"] = true
+			elseif l_Bundle:match("xp5_") then
+				self.m_LoadedSuperBundles["xp5chunks"] = true
+			elseif l_Bundle:match("coop_") or l_Bundle:match("sp_") then
+				self.m_LoadedSuperBundles["spchunks"] = true
+			end
+
+			if m_SuperBundles[l_Bundle] ~= nil then
+				self.m_LoadedSuperBundles[l_Bundle] = true
+			end
+
+			self.m_LoadedBundles[l_Bundle] = true
+		end
+	end
+
+	local s_Bundle = SharedUtils:GetLevelName()
+
+	if s_Bundle:match("xp1_") then
+		self.m_LoadedSuperBundles["xp1chunks"] = nil
+	elseif s_Bundle:match("xp2_") then
+		self.m_LoadedSuperBundles["xp2chunks"] = nil
+	elseif s_Bundle:match("xp3_") then
+		self.m_LoadedSuperBundles["xp3chunks"] = nil
+	elseif s_Bundle:match("xp4_") then
+		self.m_LoadedSuperBundles["xp4chunks"] = nil
+	elseif s_Bundle:match("xp5_") then
+		self.m_LoadedSuperBundles["xp5chunks"] = nil
+	elseif s_Bundle:match("coop_") or s_Bundle:match("sp_") then
+		self.m_LoadedSuperBundles["spchunks"] = nil
+		self.m_LoadedSuperBundles["mpchunks"] = true
+	end
+end
+
+
+function ProjectManager:IsLevelBundle(p_Bundles)
+	for _, l_Bundle in pairs(p_Bundles) do
+		if l_Bundle == SharedUtils:GetLevelName() then
+			return true
+		end
+	end
+
+	return false
 end
 
 function ProjectManager:OnRequestProjectHeaders(p_Player)
@@ -200,7 +302,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		gameModeName = self.m_GameMode,
 		requiredBundles = self.m_RequiredBundles
 	}
-	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
+	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedSuperBundles, self.m_LoadedBundles, self.m_CurrentProjectHeader.mapName, s_GameObjectSaveDatas)
 
 	if s_Success then
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
