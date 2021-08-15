@@ -15,6 +15,11 @@ function Editor:RegisterVars()
 
 	self.m_CameraTransform = nil
 	--self.m_LevelLoaded = false
+	self.m_CurrentProjectHeader = nil
+end
+
+function Editor:SetProjectHeaders(p_CurrentProjectHeader)
+	self.m_CurrentProjectHeader = p_CurrentProjectHeader
 end
 
 function Editor:OnEngineMessage(p_Message)

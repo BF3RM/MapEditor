@@ -104,8 +104,10 @@ function MapEditorServer:OnTerrainLoad(p_HookCtx, p_AssetName)
 end
 
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
-	ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
+	local s_Bundles = EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
+	ProjectManager:OnLoadBundles(s_Bundles, p_Compartment)
+
+	p_Hook:Pass(s_Bundles, p_Compartment)
 end
 
 function MapEditorServer:OnPlayerAuthenticated(p_Player)

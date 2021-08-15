@@ -138,7 +138,9 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	end
 
 	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(s_LoadingInfo)))
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+	local s_Bundles = EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+
+	p_Hook:Pass(s_Bundles, p_Compartment)
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
@@ -184,10 +186,12 @@ function MapEditorClient:OnUIReloaded()
 end
 
 function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
+	Editor:SetProjectHeaders(p_ProjectHeaders)
 	WebUpdater:AddUpdate('SetProjectHeaders', p_ProjectHeaders)
 end
 
 function MapEditorClient:OnReceiveCurrentProjectHeader(p_CurrentProjectHeader)
+	Editor:SetProjectHeaders(p_CurrentProjectHeader)
 	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_CurrentProjectHeader)
 end
 

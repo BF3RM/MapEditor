@@ -15,11 +15,21 @@ function EditorCommon:OnLevelLoadResources(p_ProjectHeader)
 		return
 	end
 
+	local s_SortedSuperBundles = {}
+
 	for l_SuperBundle, l_IsRequired in pairs(p_ProjectHeader.requiredSuperBundles) do
 		if l_IsRequired then
-			print("MountSuperBundle: " .. l_SuperBundle)
-			ResourceManager:MountSuperBundle(l_SuperBundle)
+			if l_SuperBundle:match("chunks") then
+				table.insert(s_SortedSuperBundles, 1, l_SuperBundle)
+			else
+				table.insert(s_SortedSuperBundles, l_SuperBundle)
+			end
 		end
+	end
+
+	for _, l_SuperBundle in pairs(s_SortedSuperBundles) do
+		print("MountSuperBundle: " .. l_SuperBundle)
+		ResourceManager:MountSuperBundle(l_SuperBundle)
 	end
 end
 
@@ -38,29 +48,36 @@ function EditorCommon:OnTerrainLoad(p_HookCtx, p_AssetName, p_ProjectHeader)
 end
 
 function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectHeader)
+	local s_Bundles = {}
+
 	if p_ProjectHeader == nil then
-		return
+		return s_Bundles
 	end
 
 	if p_ProjectHeader.requiredBundles == nil then
-		return
+		return s_Bundles
 	end
 
 	if not self:IsLevelBundle(p_Bundles) then
-		return
+		return s_Bundles
+	end
+
+
+	for _, p_Bundle in pairs(p_Bundles) do
+		table.insert(s_Bundles, p_Bundle)
 	end
 
 	for l_Bundle, l_IsRequired in pairs(p_ProjectHeader.requiredBundles) do
 		if l_IsRequired then
-			if not self:IsBundleInList(p_Bundles, l_Bundle) then
+			if not self:IsBundleInList(s_Bundles, l_Bundle) then
 				print("Add to bundle: " .. l_Bundle)
-				table.insert(p_Bundles, l_Bundle)
+				table.insert(s_Bundles, 1, l_Bundle)
 			end
 		end
 	end
 
 	print("Pass bundles")
-	p_Hook:Pass(p_Hook, p_Bundles, p_Compartment)
+	return s_Bundles
 end
 
 function EditorCommon:IsLevelBundle(p_Bundles)
