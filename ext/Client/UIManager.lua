@@ -1,6 +1,6 @@
 class 'UIManager'
 
-local m_Logger = Logger("UIManager", true)
+local m_Logger = Logger("UIManager", false)
 
 function UIManager:__init()
 	m_Logger:Write("Initializing UIManager")
@@ -21,17 +21,14 @@ function UIManager:OnLoadingComplete()
 end
 
 function UIManager:OnLevelDestroy()
-	self.m_ActiveMode = EditorMode.Loading
+	WebUI:ExecuteJS("window.location = window.location")
+	self:SetEditorMode(EditorMode.Loading)
 end
 
 function UIManager:SetEditorMode(p_Mode)
 	m_Logger:Write('Setting editor mode to '.. p_Mode)
 	self.m_ActiveMode = p_Mode
 	WebUpdater:AddUpdate('EditorModeChanged', p_Mode)
-end
-
-function UIManager:OnLevelDestroy()
-	WebUI:ExecuteJS("window.location = window.location")
 end
 
 ----------- Game functions----------------

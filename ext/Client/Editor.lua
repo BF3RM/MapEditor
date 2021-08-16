@@ -1,6 +1,6 @@
 class 'Editor'
 
-local m_Logger = Logger("Editor", true)
+local m_Logger = Logger("Editor", false)
 
 local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10

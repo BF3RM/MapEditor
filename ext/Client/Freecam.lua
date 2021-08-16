@@ -1,6 +1,6 @@
 class 'FreeCam'
 
-local m_Logger = Logger("FreeCam", true)
+local m_Logger = Logger("FreeCam", false)
 local m_RotationHelper = require "__shared/Util/RotationHelper"
 
 function FreeCam:__init()

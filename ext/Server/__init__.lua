@@ -1,6 +1,6 @@
 class 'MapEditorServer'
 
-local m_Logger = Logger("MapEditorServer", true)
+local m_Logger = Logger("MapEditorServer", false)
 
 ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"
@@ -77,6 +77,7 @@ function MapEditorServer:OnLevelDestroy()
 	GameObjectManager:OnLevelDestroy()
 	ServerTransactionManager:OnLevelDestroy()
 	ServerGameObjectManager:OnLevelDestroy()
+	ProjectManager:OnLevelDestroy()
 end
 
 function MapEditorServer:OnPartitionLoaded(p_Partition)
