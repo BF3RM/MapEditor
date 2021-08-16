@@ -31,28 +31,35 @@ Timer = require "__shared/Util/Timer"
 
 local m_Logger = Logger("MapEditorShared", false)
 
+local m_SettingsGuids = {
+	partitionGuid = Guid('C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4'),
+	instanceGuid = Guid('818334B3-CEA6-FC3F-B524-4A0FED28CA35'),
+}
+
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
 
-	ResourceManager:RegisterInstanceLoadHandler(Guid('C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4'), Guid('818334B3-CEA6-FC3F-B524-4A0FED28CA35'), function(p_Instance)
-		if SharedUtils:IsClientModule()	then
-			p_Instance = ClientSettings(p_Instance)
-			p_Instance:MakeWritable()
-			p_Instance.loadedTimeout = 25
-			p_Instance.loadingTimeout = 25
-			p_Instance.ingameTimeout = 25
-			print("Changed ClientSettings")
-		else
-			p_Instance = ServerSettings(p_Instance)
-			p_Instance:MakeWritable()
-			p_Instance.loadingTimeout = 25
-			p_Instance.ingameTimeout = 25
-			p_Instance.timeoutTime = 25
-			print("Changed ServerSettings")
-		end
-	end)
+	ResourceManager:RegisterInstanceLoadHandler(m_SettingsGuids.partitionGuid, m_SettingsGuids.instanceGuid, self, self._updateTimeoutSettings)
+end
+
+function MapEditorShared:_updateTimeoutSettings(p_Instance)
+	if SharedUtils:IsClientModule()	then
+		p_Instance = ClientSettings(p_Instance)
+		p_Instance:MakeWritable()
+		p_Instance.loadedTimeout = 25
+		p_Instance.loadingTimeout = 25
+		p_Instance.ingameTimeout = 25
+		m_Logger:Write("Changed ClientSettings")
+	else
+		p_Instance = ServerSettings(p_Instance)
+		p_Instance:MakeWritable()
+		p_Instance.loadingTimeout = 25
+		p_Instance.ingameTimeout = 25
+		p_Instance.timeoutTime = 25
+		m_Logger:Write("Changed ServerSettings")
+	end
 end
 
 function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)
