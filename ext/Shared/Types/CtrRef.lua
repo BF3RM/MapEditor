@@ -1,6 +1,6 @@
 class 'CtrRef'
 
-local m_Logger = Logger("CtrRef", true)
+local m_Logger = Logger("CtrRef", false)
 
 function CtrRef:__init(arg)
 	self.typeName = arg.typeName

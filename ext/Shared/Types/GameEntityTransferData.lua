@@ -1,6 +1,6 @@
 class 'GameEntityTransferData'
 
-local m_Logger = Logger("GameEntityTransferData", true)
+local m_Logger = Logger("GameEntityTransferData", false)
 
 function GameEntityTransferData:__init(arg)
 	self.indexInBlueprint = arg.indexInBlueprint

@@ -1,6 +1,6 @@
 class 'MeshProxyPatcher'
 
-local m_Logger = Logger("MeshProxyPatcher", true)
+local m_Logger = Logger("MeshProxyPatcher", false)
 
 function MeshProxyPatcher:__init()
 	m_Logger:Write("Initializing Vegetation Patches")

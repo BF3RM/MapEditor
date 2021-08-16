@@ -1,4 +1,4 @@
-local m_Logger = Logger("Util", true)
+local m_Logger = Logger("Util", false)
 
 local matrix = require "__shared/Util/matrix"
 

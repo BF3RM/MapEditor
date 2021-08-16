@@ -1,6 +1,6 @@
 class 'MapEditorShared'
 
-local m_Logger = Logger("MapEditorShared", true)
+local m_Logger = Logger("MapEditorShared", false)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")

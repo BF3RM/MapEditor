@@ -1,6 +1,6 @@
 class 'MapEditorClient'
 
-local m_Logger = Logger("MapEditorClient", true)
+local m_Logger = Logger("MapEditorClient", false)
 WebUpdater = require "WebUpdater"
 FreeCam = require "Freecam"
 Editor = require "Editor"

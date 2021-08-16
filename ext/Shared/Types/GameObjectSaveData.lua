@@ -1,6 +1,6 @@
 class 'GameObjectSaveData'
 
-local m_Logger = Logger("GameObjectSaveData", true)
+local m_Logger = Logger("GameObjectSaveData", false)
 
 function GameObjectSaveData:__init(p_GameObject)
 	self.guid = p_GameObject.guid

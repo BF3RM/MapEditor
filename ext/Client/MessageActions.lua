@@ -1,6 +1,6 @@
 class 'MessageActions'
 
-local m_Logger = Logger("MessageActions", true)
+local m_Logger = Logger("MessageActions", false)
 
 function MessageActions:__init()
 	m_Logger:Write("Initializing MessageActions")

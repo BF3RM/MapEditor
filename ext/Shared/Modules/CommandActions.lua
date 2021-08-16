@@ -1,6 +1,6 @@
 class 'CommandActions'
 
-local m_Logger = Logger("CommandActions", true)
+local m_Logger = Logger("CommandActions", false)
 
 function CommandActions:__init(p_Realm)
 	m_Logger:Write("Initializing CommandActions: " .. tostring(p_Realm))

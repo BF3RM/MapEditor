@@ -1,6 +1,6 @@
 class 'DynamicModelPatcher'
 
-local m_Logger = Logger("DynamicModelPatcher", true)
+local m_Logger = Logger("DynamicModelPatcher", false)
 
 function DynamicModelPatcher:__init()
 	m_Logger:Write("Initializing Vegetation Patches")

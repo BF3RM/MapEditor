@@ -1,6 +1,6 @@
 class 'GameObject'
 
-local m_Logger = Logger("GameObject", true)
+local m_Logger = Logger("GameObject", false)
 local m_TraceableField_Suffix = "_original_value"
 
 function GameObject:__init(arg)
