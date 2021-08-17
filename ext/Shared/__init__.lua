@@ -48,16 +48,16 @@ function MapEditorShared:_updateTimeoutSettings(p_Instance)
 	if SharedUtils:IsClientModule()	then
 		p_Instance = ClientSettings(p_Instance)
 		p_Instance:MakeWritable()
-		p_Instance.loadedTimeout = 25
-		p_Instance.loadingTimeout = 25
-		p_Instance.ingameTimeout = 25
+		p_Instance.loadedTimeout = ME_CONFIG.LOADING_TIMEOUT
+		p_Instance.loadingTimeout = ME_CONFIG.LOADING_TIMEOUT
+		p_Instance.ingameTimeout = ME_CONFIG.LOADING_TIMEOUT
 		m_Logger:Write("Changed ClientSettings")
 	else
 		p_Instance = ServerSettings(p_Instance)
 		p_Instance:MakeWritable()
-		p_Instance.loadingTimeout = 25
-		p_Instance.ingameTimeout = 25
-		p_Instance.timeoutTime = 25
+		p_Instance.loadingTimeout = ME_CONFIG.LOADING_TIMEOUT
+		p_Instance.ingameTimeout = ME_CONFIG.LOADING_TIMEOUT
+		p_Instance.timeoutTime = ME_CONFIG.LOADING_TIMEOUT
 		m_Logger:Write("Changed ServerSettings")
 	end
 end
