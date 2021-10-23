@@ -73,14 +73,6 @@ export default class InstanceManager {
 	AddFromSpatialEntity(entity: SpatialGameEntity) {
 		this.entityIds.push(entity.instanceId);
 
-		// Temporary until this fix is released https://github.com/mrdoob/three.js/pull/22171
-		if (this.instancedMesh.count === 0) {
-			// Instantiate color arraybuffer stuff,
-			this.instancedMesh.count = this.maxCount;
-			this.instancedMesh.setColorAt(0, SpatialGameEntity.HIGHLIGHTED_COLOR);
-			this.instancedMesh.count = 0;
-		}
-
 		this.setMatrixFromSpatialEntity(entity, this.entityIds.length - 1);
 		// Don't increase count because we assume is not visible yet.
 	}
