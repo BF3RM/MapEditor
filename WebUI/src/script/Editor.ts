@@ -383,7 +383,7 @@ export default class Editor {
 			const parentGuid = gameObjectTransferData.parentData.guid;
 			const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
 			editor.threeManager.attachToScene(gameObject);
-			gameObject.updateTransform();
+			gameObject.updateMatrixFromTransform();
 			for (const gameEntityData of gameObjectTransferData.gameEntities) {
 				const entityData = gameEntityData;
 

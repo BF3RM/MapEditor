@@ -7,9 +7,6 @@ import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
 import EnableGameObjectCommand from '@/script/commands/EnableGameObjectCommand';
 import DisableGameObjectCommand from '@/script/commands/DisableGameObjectCommand';
-import { Vector3 } from 'three';
-import { Vec3 } from '@/script/types/primitives/Vec3';
-import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -26,12 +23,10 @@ export class SelectionGroup extends THREE.Object3D {
 	public onClientOnlyMove() {
 		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
-		for (const go of this.selectedGameObjects) {
-			for (const child of go.children) {
-				(child as GameObject).updateTransform();
-			}
-		}
-		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+
+		editor.threeManager.nextFrame(() => {
+			signals.selectionGroupChanged.emit(this, 'transform', this.transform);
+		});
 	}
 
 	public onClientOnlyMoveEnd() {
@@ -83,7 +78,9 @@ export class SelectionGroup extends THREE.Object3D {
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
 			go.setWorldMatrix(childWorldNew);
 			// Matrix is recalculated on render, we call the signal in the next frame.
-			editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
+			editor.threeManager.nextFrame(() => {
+				signals.objectChanged.emit(go, 'transform', go.transform);
+			});
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);

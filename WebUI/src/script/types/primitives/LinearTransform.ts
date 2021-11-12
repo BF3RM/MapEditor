@@ -70,6 +70,7 @@ export class LinearTransform {
 		return this;
 	}
 
+	// TODO: change to static
 	public setFromMatrix(matrix: Matrix4) {
 		this.left.set(
 			matrix.elements[0],

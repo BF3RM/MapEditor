@@ -98,13 +98,13 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		);
 	}
 
-	public OnMoving() {
-		for (const child of this.children) {
-			if (child.type === 'SpatialGameEntity') {
-				(child as SpatialGameEntity).updateTransform();
-			}
-		}
-	}
+	// public OnMoving() {
+	// 	for (const child of this.children) {
+	// 		if (child.type === 'SpatialGameEntity') {
+	// 			(child as SpatialGameEntity).updateTransform();
+	// 		}
+	// 	}
+	// }
 
 	public descendantOf(parentGameObject: GameObject): boolean {
 		if (!this.parent || this.parent.type === 'Scene') {
@@ -180,6 +180,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	public updateTransform() {
+		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+
+		for (const child of this.children) {
+			(child as any).updateTransform();
+		}
+	}
+
+	public updateMatrixFromTransform() {
 		this.setWorldMatrix(this.transform.toMatrix());
 	}
 
@@ -202,7 +210,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		// Update transform of spatial entities after matrix is updated
 		editor.threeManager.nextFrame(() => {
 			for (const child of this.children) {
-				(child as SpatialGameEntity).updateTransform();
+				(child as any).updateTransform();
 			}
 		});
 	}
@@ -210,7 +218,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public setTransform(linearTransform: LinearTransform) {
 		const oldTransform = this.transform.clone();
 		this.transform = linearTransform;
-		this.updateTransform();
+		this.updateMatrixFromTransform();
 		if (this.originalRef !== undefined && this.parent.partition) {
 			this.parent.partition.then((res) => {
 				// @ts-ignore
