@@ -8,7 +8,6 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
@@ -97,14 +96,6 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.realm
 		);
 	}
-
-	// public OnMoving() {
-	// 	for (const child of this.children) {
-	// 		if (child.type === 'SpatialGameEntity') {
-	// 			(child as SpatialGameEntity).updateTransform();
-	// 		}
-	// 	}
-	// }
 
 	public descendantOf(parentGameObject: GameObject): boolean {
 		if (!this.parent || this.parent.type === 'Scene') {
@@ -205,9 +196,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			matrix.multiplyMatrices(parentWorldInverse, matrix);
 		}
 		matrix.decompose(this.position, this.quaternion, this.scale);
-		this.updateMatrix(); // Matrix will update in next render call.
+		this.updateMatrix(); // Matrix will be updated in next render call.
 
-		// Update transform of spatial entities after matrix is updated
+		// Update transform of spatial entities and children gameobjects after matrix is recalculated
 		editor.threeManager.nextFrame(() => {
 			for (const child of this.children) {
 				(child as any).updateTransform();
