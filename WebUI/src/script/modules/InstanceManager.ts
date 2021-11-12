@@ -72,6 +72,7 @@ export default class InstanceManager {
 
 	AddFromSpatialEntity(entity: SpatialGameEntity) {
 		this.entityIds.push(entity.instanceId);
+		this.instancedMesh.setColorAt(this.entityIds.length - 1, SpatialGameEntity.HIGHLIGHTED_COLOR);
 
 		this.setMatrixFromSpatialEntity(entity, this.entityIds.length - 1);
 		// Don't increase count because we assume is not visible yet.
