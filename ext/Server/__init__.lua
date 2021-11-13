@@ -1,6 +1,6 @@
 class 'MapEditorServer'
 
-local m_Logger = Logger("MapEditorServer", true)
+local m_Logger = Logger("MapEditorServer", false)
 
 ServerTransactionManager = require "ServerTransactionManager"
 ProjectManager = require "ProjectManager"
@@ -13,14 +13,28 @@ InstanceParser = InstanceParser(Realm.Realm_Server)
 CommandActions = CommandActions(Realm.Realm_ClientAndServer)
 EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
 
+local m_ClientSettingsGuids = {
+	partitionGuid = Guid('C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4'),
+	instanceGuid = Guid('B479A8FA-67FF-8825-9421-B31DE95B551A'),
+}
+
+local m_ServerSettingsGuids = {
+	partitionGuid = Guid('C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4'),
+	instanceGuid = Guid('818334B3-CEA6-FC3F-B524-4A0FED28CA35'),
+}
+
 function MapEditorServer:__init()
 	m_Logger:Write("Initializing MapEditorServer")
 	self:RegisterEvents()
+
+	ResourceManager:RegisterInstanceLoadHandler(m_ClientSettingsGuids.partitionGuid, m_ClientSettingsGuids.instanceGuid, self, self._modifyClientTimeoutSettings)
+	ResourceManager:RegisterInstanceLoadHandler(m_ServerSettingsGuids.partitionGuid, m_ServerSettingsGuids.instanceGuid, self, self._modifyServerTimeoutSettings)
 end
 
 function MapEditorServer:RegisterEvents()
 	NetEvents:Subscribe('EnableInputRestriction', self, self.OnEnableInputRestriction)
 	NetEvents:Subscribe('DisableInputRestriction', self, self.OnDisableInputRestriction)
+	NetEvents:Subscribe('TeleportSoldierToPosition', self, self.OnTeleportSoldierToPosition)
 
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
@@ -32,6 +46,24 @@ function MapEditorServer:RegisterEvents()
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
+end
+
+function MapEditorServer:_modifyClientTimeoutSettings(p_Instance)
+	p_Instance = ClientSettings(p_Instance)
+	p_Instance:MakeWritable()
+	p_Instance.loadedTimeout = ME_CONFIG.LOADING_TIMEOUT
+	p_Instance.loadingTimeout = ME_CONFIG.LOADING_TIMEOUT
+	p_Instance.ingameTimeout = ME_CONFIG.LOADING_TIMEOUT
+	m_Logger:Write("Changed ClientSettings")
+end
+
+function MapEditorServer:_modifyServerTimeoutSettings(p_Instance)
+	p_Instance = ServerSettings(p_Instance)
+	p_Instance:MakeWritable()
+	p_Instance.loadingTimeout = ME_CONFIG.LOADING_TIMEOUT
+	p_Instance.ingameTimeout = ME_CONFIG.LOADING_TIMEOUT
+	p_Instance.timeoutTime = ME_CONFIG.LOADING_TIMEOUT
+	m_Logger:Write("Changed ServerSettings")
 end
 
 ----------- Debug ----------------
@@ -77,6 +109,7 @@ function MapEditorServer:OnLevelDestroy()
 	GameObjectManager:OnLevelDestroy()
 	ServerTransactionManager:OnLevelDestroy()
 	ServerGameObjectManager:OnLevelDestroy()
+	ProjectManager:OnLevelDestroy()
 end
 
 function MapEditorServer:OnPartitionLoaded(p_Partition)
@@ -113,6 +146,14 @@ end
 
 function MapEditorServer:OnDisableInputRestriction(p_Player)
 	self:SetInputRestriction(p_Player, true)
+end
+
+function MapEditorServer:OnTeleportSoldierToPosition(p_Player, p_NewTransform)
+	if p_Player.soldier == nil then
+		return
+	end
+
+	p_Player.soldier:SetTransform(p_NewTransform)
 end
 
 return MapEditorServer()

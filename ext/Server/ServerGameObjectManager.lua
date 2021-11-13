@@ -1,6 +1,6 @@
 class ('ServerGameObjectManager')
 
-local m_Logger = Logger("ServerGameObjectManager", true)
+local m_Logger = Logger("ServerGameObjectManager", false)
 
 function ServerGameObjectManager:__init()
 	m_Logger:Write("Initializing ServerGameObjectManager")

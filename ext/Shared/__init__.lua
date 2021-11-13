@@ -29,7 +29,7 @@ require "__shared/Types/GameObjectSaveData"
 Patches = require "__shared/Patches/Patches"
 Timer = require "__shared/Util/Timer"
 
-local m_Logger = Logger("MapEditorShared", true)
+local m_Logger = Logger("MapEditorShared", false)
 
 function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")

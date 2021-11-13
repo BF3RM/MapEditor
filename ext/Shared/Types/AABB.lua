@@ -1,6 +1,6 @@
 class 'AABB'
 
-local m_Logger = Logger("AABB", true)
+local m_Logger = Logger("AABB", false)
 
 function AABB:__init(p_Arg)
 	self.min = p_Arg.min

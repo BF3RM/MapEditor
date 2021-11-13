@@ -9,7 +9,7 @@ VegetationPatcher = require "__shared/Patches/VegetationPatcher"
 DynamicModelPatcher = require "__shared/Patches/DynamicModelPatcher"
 MeshProxyPatcher = require "__shared/Patches/MeshProxyPatcher"
 
-local m_Logger = Logger("Patches", true)
+local m_Logger = Logger("Patches", false)
 
 function Patches:__init()
 	m_Logger:Write("Initializing Patches")

@@ -1,6 +1,6 @@
 class 'GameEntity'
 
-local m_Logger = Logger("GameEntity", true)
+local m_Logger = Logger("GameEntity", false)
 
 function GameEntity:__init(arg)
 	self.entity = arg.entity

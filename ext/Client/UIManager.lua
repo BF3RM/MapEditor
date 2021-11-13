@@ -1,6 +1,6 @@
 class 'UIManager'
 
-local m_Logger = Logger("UIManager", true)
+local m_Logger = Logger("UIManager", false)
 
 function UIManager:__init()
 	m_Logger:Write("Initializing UIManager")
@@ -21,17 +21,14 @@ function UIManager:OnLoadingComplete()
 end
 
 function UIManager:OnLevelDestroy()
-	self.m_ActiveMode = EditorMode.Loading
+	WebUI:ExecuteJS("window.location = window.location")
+	self:SetEditorMode(EditorMode.Loading)
 end
 
 function UIManager:SetEditorMode(p_Mode)
 	m_Logger:Write('Setting editor mode to '.. p_Mode)
 	self.m_ActiveMode = p_Mode
 	WebUpdater:AddUpdate('EditorModeChanged', p_Mode)
-end
-
-function UIManager:OnLevelDestroy()
-	WebUI:ExecuteJS("window.location = window.location")
 end
 
 ----------- Game functions----------------
@@ -56,6 +53,17 @@ function UIManager:OnUpdateInput(p_Delta)
 			self:DisableFreeCam()
 		elseif self.m_ActiveMode == EditorMode.Playing then
 			self:EnableFreeCam()
+		end
+	end
+
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
+		if self.m_ActiveMode == EditorMode.Editor then
+			local s_NewSoldierTransform = ClientUtils:GetCameraTransform()
+			s_NewSoldierTransform.trans.y = s_NewSoldierTransform.trans.y - 1.8
+			s_NewSoldierTransform.forward = Vec3(s_NewSoldierTransform.forward.x * -1, s_NewSoldierTransform.forward.y * -1, s_NewSoldierTransform.forward.z * -1)
+
+			NetEvents:SendLocal("TeleportSoldierToPosition", s_NewSoldierTransform)
+			self:DisableFreeCam()
 		end
 	end
 

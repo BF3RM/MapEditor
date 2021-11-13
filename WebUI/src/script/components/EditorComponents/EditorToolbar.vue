@@ -30,6 +30,9 @@
 				<key-tip
 					:keys="'F1'"
 					:description="'Enable play mode'"/>
+				<key-tip
+					:keys="'F2'"
+					:description="'Teleport soldier here'"/>
 			</div>
 			<div id="toolbarRight">
 				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
