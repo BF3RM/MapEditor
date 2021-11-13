@@ -67,6 +67,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.isUserModified = isUserModified;
 		this.originalRef = originalRef;
 		this.realm = realm;
+
+		this.updateMatrixFromTransform();
 		// Update the matrix after initialization.
 		this.updateMatrix();
 	}
@@ -178,7 +180,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 	}
 
-	public updateMatrixFromTransform() {
+	private updateMatrixFromTransform() {
 		this.setWorldMatrix(this.transform.toMatrix());
 	}
 
@@ -210,6 +212,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const oldTransform = this.transform.clone();
 		this.transform = linearTransform;
 		this.updateMatrixFromTransform();
+
 		if (this.originalRef !== undefined && this.parent.partition) {
 			this.parent.partition.then((res) => {
 				// @ts-ignore
