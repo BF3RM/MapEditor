@@ -1,77 +1,70 @@
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { BoxGeometry, Color, Mesh, MeshBasicMaterial, Vector3 } from 'three';
-import { Vec3 } from '@/script/types/primitives/Vec3';
-import { RAYCAST_LAYER } from '@/script/types/Enums';
+import { Color, Matrix4, Object3D, Vector3 } from 'three';
 import { CtrRef } from '@/script/types/CtrRef';
+import InstanceManager from '@/script/modules/InstanceManager';
 
-export class SpatialGameEntity extends Mesh implements IGameEntity {
-	private static SELECTED_COLOR: Color = new Color(0xFF0000);
-	private static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
-	private instanceId: number;
-	public transform: LinearTransform;
-	private initiatorRef: CtrRef;
+export class SpatialGameEntity extends Object3D implements IGameEntity {
+	public static SELECTED_COLOR: Color = new Color(0xFF0000);
+	public static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
+	public AABBScale: Vector3;
+	public AABBTransformMatrix: Matrix4;
 
-	constructor(instanceId: number, transform: LinearTransform, aabb: AxisAlignedBoundingBox, initiatorRef: CtrRef) {
-		let vmax = aabb.max;
-		if (vmax.x > 100000 || vmax.y > 100000 || vmax.z > 10000) {
-			vmax = new Vec3(1, 1, 1);
-		}
-		let vmin = aabb.min;
-		if (vmin.x > 100000 || vmin.y > 100000 || vmin.z > 10000) {
-			vmin = new Vec3(0, 0, 0);
-		}
-		const boxGeom = new BoxGeometry(
-			vmax.x - vmin.x,
-			vmax.y - vmin.y,
-			vmax.z - vmin.z
-		);
-		const center = new Vector3().copy(aabb.min).add(aabb.max).multiplyScalar(0.5);
-		boxGeom.translate(center.x, center.y, center.z);
+	constructor(public instanceId: number, public transform: LinearTransform, public initiatorRef: CtrRef, aabb: AxisAlignedBoundingBox) {
+		super();
+		this.AABBScale = aabb.max.clone().sub(aabb.min);
+		// Calculate transformation matrix to offset AABB position to correct place
+		const AABBCenter = new Vector3().copy(aabb.min).add(aabb.max).multiplyScalar(0.5);
+		this.AABBTransformMatrix = new Matrix4().makeTranslation(AABBCenter.x, AABBCenter.y, AABBCenter.z);
 
-		super(boxGeom, new MeshBasicMaterial({
-			color: SpatialGameEntity.SELECTED_COLOR,
-			wireframe: true,
-			visible: true
-		}));
 		this.type = 'SpatialGameEntity';
-
-		this.instanceId = instanceId;
-		this.transform = transform;
 		this.matrixAutoUpdate = false;
 
 		this.visible = false;
 		this.updateMatrix();
+		this.updateMatrixWorld();
 
-		this.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
-		this.layers.enable(RAYCAST_LAYER.GAMEENTITY);
-		this.initiatorRef = initiatorRef;
+		editor.threeManager.nextFrame(() => {
+			InstanceManager.getInstance().AddFromSpatialEntity(this);
+		});
+	}
+
+	public Delete() {
+		InstanceManager.getInstance().DeleteSpatialEntity(this);
 	}
 
 	public onHighlight() {
-		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
 		this.visible = true;
+		InstanceManager.getInstance().SetVisibility(this, true);
+		this.SetColor(SpatialGameEntity.HIGHLIGHTED_COLOR);
+		editor.threeManager.setPendingRender();
 	}
 
 	public onUnhighlight() {
 		this.visible = false;
+		InstanceManager.getInstance().SetVisibility(this, false);
+		editor.threeManager.setPendingRender();
 	}
 
 	public onDeselect() {
 		this.visible = false;
+		InstanceManager.getInstance().SetVisibility(this, false);
+		editor.threeManager.setPendingRender();
 	}
 
 	public onSelect() {
-		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
+		InstanceManager.getInstance().SetVisibility(this, true);
 		this.visible = true;
+		this.SetColor(SpatialGameEntity.SELECTED_COLOR);
+		editor.threeManager.setPendingRender();
 	}
 
-	public SetColor(color: THREE.Color) {
-		const material = this.material;
-		if (!Array.isArray(material)) {
-			(material as MeshBasicMaterial).color = color;
-		}
-		editor.threeManager.setPendingRender();
+	public SetColor(color: Color) {
+		InstanceManager.getInstance().SetColor(this, color);
+	}
+
+	public updateTransform() {
+		InstanceManager.getInstance().SetMatrixFromSpatialEntity(this);
 	}
 }
