@@ -382,7 +382,7 @@ export default class Editor {
 
 			const parentGuid = gameObjectTransferData.parentData.guid;
 			const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
-			editor.threeManager.attachToScene(gameObject);
+
 			for (const gameEntityData of gameObjectTransferData.gameEntities) {
 				const entityData = gameEntityData;
 
@@ -427,18 +427,13 @@ export default class Editor {
 					this.missingParent.remove(gameObjectGuid);
 				}
 			}
-			// if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && gameObject.origin !== GAMEOBJECT_ORIGIN.VANILLA) {
-			// 	// Make selection happen after all signals have been handled
-			// 	this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
-			// }
-			// if (!window.vext.executing && this.editorCore.isPendingSelection(gameObjectGuid)) {
-			if (!window.vext.executing) {
-				// Make selection happen after all signals have been handled
-				this.editorCore.selectPendingSelections();
-				// this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, true, true));
-				// this.editorCore.removePendingSelection(gameObjectGuid);
-			}
+
 			signals.spawnedGameObject.emit(commandActionResult);
+
+			// Make selection happen after all signals have been handled
+			if (!window.vext.executing) {
+				this.editorCore.selectPendingSelections();
+			}
 		});
 	}
 
