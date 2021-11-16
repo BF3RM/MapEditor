@@ -189,14 +189,15 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	 */
 	public setWorldMatrix(worldMatrix: THREE.Matrix4) {
 		const matrix = worldMatrix;
-		if (!this.parent) {
-			console.warn('Found GameObject without parent, this should never happen. Guid: ' + this.guid.toString());
-		} else if (this.parent.type !== 'Scene') {
+
+		// Move respective to the parent if it has one
+		if (this.parent.type) {
 			// Calculate local transform.
 			const parentWorldInverse = new THREE.Matrix4();
 			parentWorldInverse.copy(this.parent.matrixWorld).invert();
 			matrix.multiplyMatrices(parentWorldInverse, matrix);
 		}
+
 		matrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix(); // Matrix will be updated in next render call.
 
