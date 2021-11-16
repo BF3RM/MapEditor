@@ -10,7 +10,7 @@ import { BoxGeometry, Color, DynamicDrawUsage, InstancedMesh, Matrix4, MeshBasic
 
 export default class InstanceManager {
 	private static instance: InstanceManager;
-	private readonly maxCount = 10000;
+	private readonly maxCount = 100000;
 	private entityIds: number[] = [];
 	private boxGeom = new BoxGeometry(
 		1,
