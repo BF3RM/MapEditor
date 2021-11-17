@@ -191,7 +191,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const matrix = worldMatrix;
 
 		// Move respective to the parent if it has one
-		if (this.parent.type) {
+		if (this.parent) {
 			// Calculate local transform.
 			const parentWorldInverse = new THREE.Matrix4();
 			parentWorldInverse.copy(this.parent.matrixWorld).invert();
