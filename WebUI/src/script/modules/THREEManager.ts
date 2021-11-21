@@ -255,10 +255,10 @@ export class THREEManager {
 
 	public deleteObject(gameObject: GameObject) {
 		if (gameObject.parent !== null) {
-			this.scene.attach(gameObject);
+			gameObject.parent.remove(gameObject);
+		} else {
+			this.scene.remove(gameObject);
 		}
-		this.scene.remove(gameObject);
-		// this.setPendingRender();
 	}
 
 	public hideGizmo() {

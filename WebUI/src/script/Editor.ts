@@ -349,6 +349,10 @@ export default class Editor {
 		this.threeManager.deleteObject(gameObject);
 		this.gameObjects.remove(gameObjectGuid);
 
+		if (gameObject.selected) {
+			this.selectionGroup.deselect(gameObject);
+		}
+
 		gameObject.getAllChildren().forEach((go) => {
 			go.children.forEach((child) => {
 				if (child instanceof SpatialGameEntity) {
@@ -356,8 +360,8 @@ export default class Editor {
 					child.Delete();
 				}
 			});
-			this.threeManager.deleteObject(go);
 			this.gameObjects.remove(go.guid);
+			this.threeManager.deleteObject(go);
 		});
 
 		if (this.selectionGroup.selectedGameObjects.length === 0) {
