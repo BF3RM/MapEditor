@@ -387,7 +387,7 @@ export default class Editor {
 				const entityData = gameEntityData;
 
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.initiatorRef, entityData.aabb);
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.initiatorRef, entityData.aabb);
 					gameObject.add(gameEntity);
 					gameObject.updateMatrixWorld(); // update matrix and their children's
 					this.spatialGameEntities.set(entityData.instanceId, gameEntity);

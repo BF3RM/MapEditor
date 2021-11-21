@@ -1,4 +1,3 @@
-import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { AxisAlignedBoundingBox } from '@/script/types/AxisAlignedBoundingBox';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
 import { Color, Matrix4, Object3D, Vector3 } from 'three';
@@ -11,7 +10,7 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 	public AABBScale: Vector3;
 	public AABBTransformMatrix: Matrix4;
 
-	constructor(public instanceId: number, public transform: LinearTransform, public initiatorRef: CtrRef, aabb: AxisAlignedBoundingBox) {
+	constructor(public instanceId: number, public initiatorRef: CtrRef, aabb: AxisAlignedBoundingBox) {
 		super();
 		this.AABBScale = aabb.max.clone().sub(aabb.min);
 		// Calculate transformation matrix to offset AABB position to correct place
