@@ -3551,10 +3551,10 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.1.0.tgz#a5d06b4a8b01e3a63771daa5cb7a1903e2e57067"
   integrity sha512-tW+UkmtNg/jv9CSofAKvgVcO7c2URjhTdW1ZTkcAritblu8tajiYy7YisnIflEwtKssCtOxpnBRoCB7iap0/TA==
 
-flattree@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/flattree/-/flattree-0.10.0.tgz#b4e8528e3bc82716384e78c78a79cea71d1ac744"
-  integrity sha1-tOhSjjvIJxY4TnjHinnOpx0ax0Q=
+flattree@0.11.1, flattree@^0.10.0:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/flattree/-/flattree-0.11.1.tgz#5fd0be125e74eb28d3885e3f6dcfa784844cac56"
+  integrity sha512-3+Rup2VS406JqWsf+eGKVvwfs7aCmquu+GIFb3KyB8/8vnlj3KCfoDUx7xjMSmolyoebEjjvXIthj1s0uC2CvA==
 
 flush-write-stream@^1.0.0:
   version "1.1.1"

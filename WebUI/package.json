@@ -58,5 +58,8 @@
     "plugins": {
       "autoprefixer": {}
     }
+  },
+  "resolutions": {
+    "flattree": "0.11.1"
   }
 }
