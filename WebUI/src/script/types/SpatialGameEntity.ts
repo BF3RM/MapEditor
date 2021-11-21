@@ -23,9 +23,8 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 
 		this.visible = false;
 		this.updateMatrix();
-		this.updateMatrixWorld();
-
 		editor.threeManager.nextFrame(() => {
+			// Add in next frame, so the world matrix is updated
 			InstanceManager.getInstance().AddFromSpatialEntity(this);
 		});
 	}
