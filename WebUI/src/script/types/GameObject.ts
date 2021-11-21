@@ -38,8 +38,12 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public realm: REALM;
 
 	public get localTransform(): LinearTransform {
-		const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
-		return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+		if (this.parent) {
+			const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
+			return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+		} else {
+			return this.transform;
+		}
 	}
 
 	public set localTransform(newValue: LinearTransform) {
