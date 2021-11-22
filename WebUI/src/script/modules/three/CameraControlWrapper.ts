@@ -6,8 +6,7 @@ import { Vec3 } from '@/script/types/primitives/Vec3';
 CameraControls.install({ THREE });
 
 export default class CameraControlWrapper extends CameraControls {
-	private waitingForControlEnd = false;
-	private updatingCamera = false;
+	private cameraControlledByVext = false;
 
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
 		super(camera, element);
@@ -17,13 +16,15 @@ export default class CameraControlWrapper extends CameraControls {
 		this.mouseButtons.middle = CameraControls.ACTION.TRUCK;
 
 		this.addEventListener('controlstart', (event: any) => {
+			this.cameraControlledByVext = true;
 			window.vext.SendEvent('controlStart');
 		});
 		this.addEventListener('controlend', (event: any) => {
-			this.waitingForControlEnd = true;
+			this.cameraControlledByVext = false;
 		});
 		this.addEventListener('update', (event: any) => {
-			if (!this.updatingCamera) {
+			// If the camera is being controlled by webui, we update lua with its new position
+			if (this.cameraControlledByVext) {
 				// lx, ly, lz, ux, uy, uz, fx, fy, fz, x, y, z) {
 				const transform = new LinearTransform().setFromMatrix(event.target._camera.matrixWorld);
 				window.vext.SendEvent('controlUpdate', {

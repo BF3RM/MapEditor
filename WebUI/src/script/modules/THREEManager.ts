@@ -159,11 +159,12 @@ export class THREEManager {
 	}
 
 	public onMouseOver(event: any) {
-		editor.editorCore.GetMouseToScreenPosition(event);
 		if (this.isDragSpawning) {
+			editor.editorCore.GetMouseToScreenPosition(event);
 			editor.editorCore.onPreviewDrag(event);
 		}
 		if (this.gizmoControls.raycastPlacing) {
+			editor.editorCore.GetMouseToScreenPosition(event);
 			this.gizmoControls.OnMouseMove(event);
 		}
 	}
