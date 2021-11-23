@@ -1,8 +1,6 @@
 import CameraControls from 'camera-controls';
 import { Vec2 } from '@/script/types/primitives/Vec2';
-import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
-import { Vec3 } from '@/script/types/primitives/Vec3';
 import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
 import { signals } from '@/script/modules/Signals';
 

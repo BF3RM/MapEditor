@@ -1,12 +1,11 @@
 import { Camera, Scene, WebGLRenderer } from 'three';
-import { SpatialGameEntity } from '@/script/types/SpatialGameEntity';
 import { GameObject } from '@/script/types/GameObject';
-import { InputControls } from '@/script/modules/InputControls';
 import { KEYCODE } from '@/script/types/Enums';
-import SelectionHelper from './SelectionHelper';
-import SelectionBox from './SelectionBox';
+import { SelectionBox } from 'three/examples/jsm/interactive/SelectionBox';
+import { SelectionHelper } from 'three/examples/jsm/interactive/SelectionHelper';
+import InstanceManager from '@/script/modules/InstanceManager';
 
-export default class SelectionWrapper {
+export default class BoxSelectionWrapper {
 	constructor(canvas: HTMLCanvasElement, scene: Scene, camera: Camera, renderer: WebGLRenderer) {
 		const selectionBox = new SelectionBox(camera, scene);
 		const helper = new SelectionHelper(selectionBox, renderer, 'selectBox');
@@ -20,9 +19,7 @@ export default class SelectionWrapper {
 				helper.element.style.display = 'none';
 				return;
 			}
-			for (const item of selectionBox.collection) {
-				// item.material.emissive.set(0x000000);
-			}
+
 			helper.element.style.display = 'inherit';
 
 			selectionBox.startPoint.set(
@@ -38,31 +35,29 @@ export default class SelectionWrapper {
 				return;
 			}
 			if (helper.isDown) {
-				for (let i = 0; i < selectionBox.collection.length; i++) {
-					if (selectionBox.collection[i].type === 'SpatialGameEntity') {
-						const guid = ((selectionBox.collection[i] as SpatialGameEntity).parent as GameObject).guid;
-						if (guid) {
-							editor.editorCore.unhighlight(guid);
-						}
-					}
-					// selectionBox.collection[i].material.emissive.set(0x000000);
-				}
+				editor.editorCore.unhighlight();
 
 				selectionBox.endPoint.set(
 					(event.clientX / window.innerWidth) * 2 - 1,
 					-(event.clientY / window.innerHeight) * 2 + 1,
 					0.5);
+				const instanceManager = InstanceManager.getInstance();
+				const oldCount = instanceManager.instancedMesh.count;
+				instanceManager.instancedMesh.count = instanceManager.getNumberOfEntities() - 1;
+				selectionBox.select();
+				instanceManager.instancedMesh.count = oldCount;
 
-				const allSelected = selectionBox.select();
-
-				for (let i = 0; i < allSelected.length; i++) {
-					if (selectionBox.collection[i].type === 'SpatialGameEntity') {
-						const guid = ((selectionBox.collection[i] as SpatialGameEntity).parent as GameObject).guid;
+				// @ts-ignore
+				const ids = selectionBox.instances[instanceManager.instancedMesh.uuid];
+				ids.forEach((entityIndex: number) => {
+					const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
+					if (entity) {
+						const guid = (entity.parent as GameObject).guid;
 						if (guid) {
 							editor.editorCore.highlight(guid, true);
 						}
 					}
-				}
+				});
 			}
 		});
 
@@ -77,16 +72,19 @@ export default class SelectionWrapper {
 				-(event.clientY / window.innerHeight) * 2 + 1,
 				0.5);
 
-			const allSelected = selectionBox.select();
+			const instanceManager = InstanceManager.getInstance();
 
-			for (let i = 0; i < allSelected.length; i++) {
-				if (selectionBox.collection[i].type === 'SpatialGameEntity') {
-					const guid = ((selectionBox.collection[i] as SpatialGameEntity).parent as GameObject).guid;
+			// @ts-ignore
+			const ids = selectionBox.instances[instanceManager.instancedMesh.uuid];
+			ids.forEach((entityIndex: number) => {
+				const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
+				if (entity) {
+					const guid = (entity.parent as GameObject).guid;
 					if (guid) {
 						editor.Select(guid, true);
 					}
 				}
-			}
+			});
 		});
 	}
 }

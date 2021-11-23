@@ -11,7 +11,7 @@ import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 import InstanceManager from '@/script/modules/InstanceManager';
-import SelectionWrapper from '@/script/modules/three/SelectionWrapper';
+import BoxSelectionWrapper from '@/script/modules/three/BoxSelectionWrapper';
 import { Intersection } from 'three';
 
 export class THREEManager {
@@ -27,7 +27,7 @@ export class THREEManager {
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
 	public inputControls = new InputControls(this.renderer.domElement);
 	public worldSpace = WORLD_SPACE.local;
-	public selectionWrapper = new SelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
+	public selectionWrapper = new BoxSelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
 
 	private gridSnap = false;
 	private highlightingEnabled = true;
