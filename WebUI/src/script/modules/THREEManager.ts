@@ -181,6 +181,7 @@ export class THREEManager {
 	public enableFreecamMovement() {
 		this.highlightingEnabled = false;
 		window.vext.SendEvent('EnableFreeCamMovement');
+		this.cameraControls.enableVextCameraUpdates(false);
 		this.OnCameraMoveEnable();
 
 		// Hack to make sure we don't navigate the windows while in freecam.
@@ -379,6 +380,7 @@ export class THREEManager {
 		// focus on canvas again
 		this.renderer.domElement.focus();
 		window.vext.SendEvent('controlStart');
+		this.cameraControls.enableVextCameraUpdates(true);
 		this.OnCameraMoveDisable();
 	}
 
