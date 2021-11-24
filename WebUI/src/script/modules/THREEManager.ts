@@ -439,23 +439,9 @@ export class THREEManager {
 				console.error('Something went wrong, instanceId of intersection is null');
 				return null;
 			}
-			const entityId = InstanceManager.getInstance().getEntityId(element.instanceId);
-			if (!entityId) {
-				console.error('Couldn\'t find entityId of instance. Index: ' + element.instanceId);
-				return null;
-			}
-			const spatialGE = editor.spatialGameEntities.get(entityId);
-			if (!spatialGE) {
-				console.error('Couldn\'t find entity with entityId: ' + entityId);
-				return null;
-			}
-			if (!spatialGE.parent) {
-				console.error('Found spatial entity without a parent, this should never happen');
-				return null;
-			}
-			const gameObject = spatialGE.parent as GameObject;
+			const gameObject = editor.editorCore.getGameObjectFromInstanceId(element.instanceId);
 
-			if (gameObject.name === 'Gameplay/Logic/ShowRoom' || !gameObject.raycastEnabled) {
+			if (!gameObject.isSelectableWithRaycast()) {
 				continue;
 			}
 

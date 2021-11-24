@@ -399,4 +399,12 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 		return out.object;
 	}
+
+	public isSelectableWithRaycast(): boolean {
+		if (this.name === 'Gameplay/Logic/ShowRoom' || !this.raycastEnabled) {
+			return false;
+		}
+
+		return true;
+	}
 }

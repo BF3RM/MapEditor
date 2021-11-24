@@ -66,14 +66,13 @@ export default class BoxSelectionWrapper {
 
 		// @ts-ignore
 		const ids = this.selectionBox.instances[instanceManager.instancedMesh.uuid];
-		ids.forEach((entityIndex: number) => {
-			const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
-			if (entity) {
-				const guid = (entity.parent as GameObject).guid;
-				if (guid) {
-					editor.editorCore.highlight(guid, true);
-				}
+		ids.forEach((instanceId: number) => {
+			const gameObject = editor.editorCore.getGameObjectFromInstanceId(instanceId);
+
+			if (!gameObject.isSelectableWithRaycast()) {
+				return;
 			}
+			editor.editorCore.highlight(gameObject.guid, true);
 		});
 	}
 
@@ -85,7 +84,6 @@ export default class BoxSelectionWrapper {
 			return;
 		}
 
-		console.log('BOI');
 		this.selectionBox.endPoint.set(
 			(event.clientX / window.innerWidth) * 2 - 1,
 			-(event.clientY / window.innerHeight) * 2 + 1,
