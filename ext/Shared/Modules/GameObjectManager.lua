@@ -14,7 +14,7 @@ function GameObjectManager:RegisterVars()
 	self.m_PendingBlueprint = {}
 
 
-	self.m_PendingEntities = {}
+	self.m_Entities = {}
 	self.m_VanillaGameObjectGuids = {}
 
 	--- key: child (ReferenceObjectData) guid, value: parent GameObject guid
@@ -29,6 +29,21 @@ function GameObjectManager:GetGameObject(p_GameObjectGuid)
 	return self.m_GameObjects[tostring(p_GameObjectGuid)]
 end
 
+function GameObjectManager:GetGameEntities(p_EntityIds)
+	local s_GameEntities = {}
+
+	for _, l_EntityId in pairs(p_EntityIds) do
+		local s_Entity = self.m_Entities[l_EntityId]
+
+		if s_Entity == nil then
+			m_Logger:Error("Entity not found: " .. tostring(l_EntityId))
+		end
+
+		table.insert(s_GameEntities, s_Entity)
+	end
+
+	return s_GameEntities
+end
 
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
@@ -209,11 +224,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
-		local s_GameEntity = s_GameObject.gameEntities[l_Entity.instanceId]
-
-		if s_GameObject == nil then
-			s_GameEntity = self.m_PendingEntities[l_Entity.instanceId]
-		end
+		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
 
 		if s_GameEntity == nil then
 			s_GameEntity = GameEntity{
@@ -226,7 +237,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		if s_GameEntity.indexInBlueprint == nil then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
 
-			if (s_GameEntity.aabb == nil or s_GameEntity.transform == nil) and l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
+			if l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
 				local s_Entity = SpatialEntity(l_Entity)
 
 				s_GameEntity.isSpatial = true
@@ -245,8 +256,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
 				}
 			end
-			s_GameObject.gameEntities[l_Entity.instanceId] = s_GameEntity
-			self.m_PendingEntities[l_Entity.instanceId] = nil
+
+			self.m_Entities[l_Entity.instanceId] = s_GameEntity
+			table.insert(s_GameObject.gameEntities, s_GameEntity)
 		end
 	end
 
@@ -504,7 +516,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		return
 	end
 
-	local s_GameEntity = self.m_PendingEntities[s_Entity.instanceId]
+	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
 
 	if s_GameEntity == nil then
 		s_GameEntity = GameEntity{
@@ -520,8 +532,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		instanceGuid = tostring(p_EntityData.instanceGuid),
 		partitionGuid = s_PartitionGuid
 	}
-
-	self.m_PendingEntities[s_Entity.instanceId] = s_GameEntity
+	self.m_Entities[s_Entity.instanceId] = s_GameEntity
 	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 
 	if s_PendingGameObject then
@@ -547,8 +558,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 			end)
 		end
 
-		s_PendingGameObject.gameEntities[s_Entity.instanceId] = s_GameEntity
-		self.m_PendingEntities[s_Entity.instanceId] = nil
+		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
 	end
 end
 

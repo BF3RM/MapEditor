@@ -149,6 +149,11 @@ export enum VIEW {
 	FREECAM = 'FreeCam'
 }
 
+export enum RAYCAST_LAYER {
+	GAMEOBJECT = 0,
+	GAMEENTITY= 1
+}
+
 export enum REALM {
 	CLIENT = 0,
 	SERVER = 1,

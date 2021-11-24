@@ -70,6 +70,7 @@ function UIManager:OnUpdateInput(p_Delta)
 	-- We let go of right mouse button. Activate the UI again.
 	if InputManager:WentMouseButtonUp(InputDeviceMouseButtons.IDB_Button_1) then
 		self:DisableFreeCamMovement()
+		Editor:SetPendingRaycast(RaycastType.Camera)
 	end
 end
 
@@ -84,7 +85,6 @@ end
 
 function UIManager:DisableFreeCamMovement()
 	if FreeCam:GetCameraMode() == CameraMode.FreeCam then
-		Editor:SetPendingRaycast(RaycastType.Camera) -- Recalculate camera raycast when the camera finishes freecam
 		WebUI:EnableMouse()
 		WebUI:EnableKeyboard()
 		WebUpdater:AddUpdate('MouseEnabled')

@@ -8,11 +8,9 @@ import CameraControlWrapper from '@/script/modules/three/CameraControlWrapper';
 import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
 import { Guid } from '@/script/types/Guid';
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, RAYCAST_LAYER, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
-import InstanceManager from '@/script/modules/InstanceManager';
-import BoxSelectionWrapper from '@/script/modules/three/BoxSelectionWrapper';
-import { Intersection } from 'three';
+import SelectionWrapper from '@/script/modules/three/SelectionWrapper';
 
 export class THREEManager {
 	public scene = new THREE.Scene();
@@ -26,8 +24,8 @@ export class THREEManager {
 	public cameraControls = new CameraControlWrapper(this.camera, this.renderer.domElement);
 	public gizmoControls: GizmoWrapper = new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select);
 	public inputControls = new InputControls(this.renderer.domElement);
-	public worldSpace = WORLD_SPACE.local;
-	public selectionWrapper = new BoxSelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
+	public selectionWrapper = new SelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer);
+	public worldSpace = WORLD_SPACE.world;
 
 	private gridSnap = false;
 	private highlightingEnabled = true;
@@ -48,6 +46,7 @@ export class THREEManager {
 	public isCameraMoving = false;
 	private clock = new THREE.Clock();
 	private cameraHasMoved: boolean;
+	private miniBrushEnabled: boolean;
 
 	private raycaster = new THREE.Raycaster();
 
@@ -56,6 +55,8 @@ export class THREEManager {
 		signals.editor.Ready.connect(this.initialize.bind(this));
 		this.registerEvents();
 		this.debugMode = debugMode;
+		this.camera.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
+		this.camera.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public initialize() {
@@ -73,6 +74,8 @@ export class THREEManager {
 		} else {
 			console.error('Unable to find ViewPort');
 		}
+		this.raycaster.layers.disable(RAYCAST_LAYER.GAMEOBJECT);
+		this.raycaster.layers.enable(RAYCAST_LAYER.GAMEENTITY);
 		if (this.debugMode) {
 			scope.scene.background = new THREE.Color(0x373737);
 			const planeSize = 100;
@@ -159,17 +162,16 @@ export class THREEManager {
 	}
 
 	public onMouseOver(event: any) {
+		editor.editorCore.GetMouseToScreenPosition(event);
 		if (this.isDragSpawning) {
-			editor.editorCore.GetMouseToScreenPosition(event);
 			editor.editorCore.onPreviewDrag(event);
 		}
 		if (this.gizmoControls.raycastPlacing) {
-			editor.editorCore.GetMouseToScreenPosition(event);
 			this.gizmoControls.OnMouseMove(event);
 		}
 	}
 
-	public onMouseUp(event: any) {
+	public onMouseUp(event: MouseEvent) {
 		if (this.isDragSpawning) {
 			this.isDragSpawning = false;
 			editor.editorCore.onPreviewDrop();
@@ -178,10 +180,17 @@ export class THREEManager {
 		this.gizmoControls.OnMouseUp(event);
 	}
 
+	public EnableMiniBrushMode() {
+		this.miniBrushEnabled = true;
+	}
+
+	public DisableMiniBrushMode() {
+		this.miniBrushEnabled = false;
+	}
+
 	public enableFreecamMovement() {
 		this.highlightingEnabled = false;
 		window.vext.SendEvent('EnableFreeCamMovement');
-		this.cameraControls.enableVextCameraUpdates(false);
 		this.OnCameraMoveEnable();
 
 		// Hack to make sure we don't navigate the windows while in freecam.
@@ -257,10 +266,10 @@ export class THREEManager {
 
 	public deleteObject(gameObject: GameObject) {
 		if (gameObject.parent !== null) {
-			gameObject.parent.remove(gameObject);
-		} else {
-			this.scene.remove(gameObject);
+			this.scene.attach(gameObject);
 		}
+		this.scene.remove(gameObject);
+		// this.setPendingRender();
 	}
 
 	public hideGizmo() {
@@ -291,7 +300,7 @@ export class THREEManager {
 	}
 
 	public setGizmoMode(mode: GIZMO_MODE) {
-		console.log('Changing gizmo mode to ' + mode);
+		// console.log('Changing gizmo mode to ' + mode);
 
 		if (mode === GIZMO_MODE.select) {
 			this.hideGizmo();
@@ -315,7 +324,7 @@ export class THREEManager {
 	public setWorldSpace(space: WORLD_SPACE) {
 		if (space === WORLD_SPACE.local || space === WORLD_SPACE.world) {
 			this.gizmoControls.setSpace(space);
-			console.log('Changed worldspace to ' + space);
+			// console.log('Changed worldspace to ' + space);
 			this.worldSpace = space;
 			signals.worldSpaceChanged.emit(space);
 		} else {
@@ -368,9 +377,13 @@ export class THREEManager {
 		if (scope.raycastPlacing) {
 			scope.cameraControls.enabled = false;
 		} else if (this.gizmoControls.selected) {
-			console.log('Control selected');
-		} else if (selectionEnabled) {
+			// console.log('Control selected');
+		} else if (selectionEnabled && !this.miniBrushEnabled) {
 			this.selectWithRaycast(mousePos, multiSelection);
+		}
+
+		if (!this.isDragSpawning && this.miniBrushEnabled && selectionEnabled) {
+			editor.MiniBrushRandomizedDuplicate();
 		}
 	}
 
@@ -380,7 +393,6 @@ export class THREEManager {
 		// focus on canvas again
 		this.renderer.domElement.focus();
 		window.vext.SendEvent('controlStart');
-		this.cameraControls.enableVextCameraUpdates(true);
 		this.OnCameraMoveDisable();
 	}
 
@@ -392,7 +404,7 @@ export class THREEManager {
 	}
 
 	public highlight(mousePos: Vec2) {
-		if (this.highlightingEnabled) {
+		if (this.highlightingEnabled && !this.miniBrushEnabled) {
 			this.highlightWithRaycast(mousePos);
 		}
 	}
@@ -425,78 +437,66 @@ export class THREEManager {
 	}
 
 	// TODO: Clean up
-	private async getHitTarget(intersection: Intersection[]) {
-		let hitSelf: GameObject | null = null;
-
-		if (intersection.length === 0) {
-			return null;
-		}
-
-		for (const element of intersection.sort((a, b) => {
-			return a.distance - b.distance;
-		})) {
-			if (element.instanceId === undefined) {
-				console.error('Something went wrong, instanceId of intersection is null');
-				return null;
-			}
-			const gameObject = editor.editorCore.getGameObjectFromInstanceId(element.instanceId);
-
-			if (!gameObject.isSelectableWithRaycast()) {
-				continue;
-			}
-
-			if (editor.selectionGroup.isSelected(gameObject)) {
-				hitSelf = gameObject;
-				continue;
-			}
-
-			// Select its parent if possible.
-			if (gameObject.parent != null) {
-				const parent = gameObject.parent;
-				// if (!parent.raycastEnabled) {
-				// 	continue;
-				// }
-				if (editor.selectionGroup.isSelected(parent)) {
-					// console.log('Hit self ' + parent.guid);
-					hitSelf = parent;
-					continue;
-				}
-
-				if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
-					(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
-					!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
-					parent.raycastEnabled) {
-					return parent.guid;
-				}
-			}
-			// Else we select the GameObject.
-			if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
-				return gameObject.guid;
-			}
-		}
-		// A selected GameObject was hit.
-		if (hitSelf) {
-			return hitSelf.guid;
-		} else { // Didn't hit any GameObjects
-			return null;
-		}
-	}
-
 	public async raycastSelection(mousePos: Vec2) {
 		this.raycaster.setFromCamera(mousePos, this.camera);
-		const instanceManager = InstanceManager.getInstance();
-		const instancedMesh = instanceManager.instancedMesh;
+		let hitSelf: GameObject | null = null;
 
-		// Increase count to cover all SpatialEntities, so it can hit any of them.
-		const cachedCount = instancedMesh.count;
-		instancedMesh.count = instanceManager.getNumberOfEntities();
-		const intersection = this.raycaster.intersectObject(instancedMesh);
+		// Only check raycast collisions with GameEntities
+		const intersects = this.raycaster.intersectObjects(Object.values(editor.gameObjects.values()), true);
+		if (intersects.length > 0) {
+			// console.log('hit ' + (intersects.length) + ' objects');
+			for (const element of intersects.sort((a, b) => {
+				return a.distance - b.distance;
+			})) {
+				if (element.object == null || element.object.parent == null) {
+					continue;
+				}
+				if (element.object.parent.constructor === GameObject && (element.object.parent as any).name !== 'Gameplay/Logic/ShowRoom') {
+					const gameObject = element.object.parent as GameObject;
+					if (editor.selectionGroup.isSelected(gameObject)) {
+						hitSelf = gameObject;
+						continue;
+					}
 
-		const result = await this.getHitTarget(intersection);
+					if (!gameObject.raycastEnabled) {
+						continue;
+					}
 
-		// Reset count to original value
-		instancedMesh.count = cachedCount;
-		return result;
+					// Select its parent if possible.
+					if (gameObject.parent != null) {
+						const parent = gameObject.parent;
+						// if (!parent.raycastEnabled) {
+						// 	continue;
+						// }
+						if (editor.selectionGroup.isSelected(parent)) {
+							// console.log('Hit self ' + parent.guid);
+							hitSelf = parent;
+							continue;
+						}
+
+						if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
+								(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
+								!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
+								parent.raycastEnabled) {
+							return parent.guid;
+						}
+					}
+					// Else we select the GameObject.
+					if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
+						return gameObject.guid;
+					}
+				}
+			}
+			// A selected GameObject was hit.
+			if (hitSelf !== null) {
+				return hitSelf.guid;
+			} else { // Didn't hit any GameObjects
+				return null;
+			}
+		} else {
+			// console.log("no hit")
+			return null;
+		}
 	}
 
 	public getMouse3D(e: MouseEvent) {

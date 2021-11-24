@@ -46,8 +46,6 @@ export default class Editor {
 	public playerName: string;
 	public gameObjects = new Collections.Dictionary<Guid, GameObject>();
 	public favorites = new Collections.Dictionary<Guid, Blueprint>();
-
-	public spatialGameEntities = new Map();
 	public copy: SpawnGameObjectCommand[];
 
 	public selectionGroup: SelectionGroup;
@@ -371,19 +369,9 @@ export default class Editor {
 		this.threeManager.deleteObject(gameObject);
 		this.gameObjects.remove(gameObjectGuid);
 
-		if (gameObject.selected) {
-			this.selectionGroup.deselect(gameObject);
-		}
-
 		gameObject.getAllChildren().forEach((go) => {
-			go.children.forEach((child) => {
-				if (child instanceof SpatialGameEntity) {
-					this.spatialGameEntities.delete(child.instanceId);
-					child.Delete();
-				}
-			});
-			this.gameObjects.remove(go.guid);
 			this.threeManager.deleteObject(go);
+			this.gameObjects.remove(go.guid);
 		});
 
 		if (this.selectionGroup.selectedGameObjects.length === 0) {
@@ -408,15 +396,14 @@ export default class Editor {
 
 			const parentGuid = gameObjectTransferData.parentData.guid;
 			const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
-
+			editor.threeManager.attachToScene(gameObject);
+			gameObject.updateTransform();
 			for (const gameEntityData of gameObjectTransferData.gameEntities) {
 				const entityData = gameEntityData;
 
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.initiatorRef, entityData.aabb);
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb, entityData.initiatorRef);
 					gameObject.add(gameEntity);
-					gameObject.updateMatrixWorld(); // update matrix and their children's
-					this.spatialGameEntities.set(entityData.instanceId, gameEntity);
 				}
 			}
 
@@ -454,13 +441,18 @@ export default class Editor {
 					this.missingParent.remove(gameObjectGuid);
 				}
 			}
-
-			signals.spawnedGameObject.emit(commandActionResult);
-
-			// Make selection happen after all signals have been handled
+			// if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && gameObject.origin !== GAMEOBJECT_ORIGIN.VANILLA) {
+			// 	// Make selection happen after all signals have been handled
+			// 	this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
+			// }
+			// if (!window.vext.executing && this.editorCore.isPendingSelection(gameObjectGuid)) {
 			if (!window.vext.executing) {
+				// Make selection happen after all signals have been handled
 				this.editorCore.selectPendingSelections();
+				// this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, true, true));
+				// this.editorCore.removePendingSelection(gameObjectGuid);
 			}
+			signals.spawnedGameObject.emit(commandActionResult);
 		});
 	}
 

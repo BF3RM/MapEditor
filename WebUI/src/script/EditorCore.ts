@@ -13,7 +13,6 @@ import { InputControls } from '@/script/modules/InputControls';
 import { Dictionary } from 'typescript-collections';
 import SpawnGameObjectCommand from '@/script/commands/SpawnGameObjectCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
-import InstanceManager from '@/script/modules/InstanceManager';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -319,23 +318,5 @@ export class EditorCore {
 			}
 		}
 		editor.threeManager.setPendingRender();
-	}
-
-	public getGameObjectFromInstanceId(instanceId: number): GameObject {
-		const entityId = InstanceManager.getInstance().getEntityId(instanceId);
-		if (!entityId) {
-			console.error('Couldn\'t find entityId of instance. Index: ' + instanceId);
-		}
-		const spatialGE = editor.spatialGameEntities.get(entityId);
-
-		if (!spatialGE) {
-			console.error('Couldn\'t find entity with entityId: ' + entityId);
-		}
-
-		if (!spatialGE.parent) {
-			console.error('Found spatial entity without a parent, this should never happen');
-		}
-
-		return spatialGE.parent as GameObject;
 	}
 }
