@@ -41,3 +41,9 @@ Three.js Group subclass that can hold multiple GameEntities or other Groups to m
 
 # SelectionGroup
 Group subclass, where only one instance exists with the purpose of adding selected objects to it allowing multiselection. The Gizmo is only attached to this intance.
+
+#InstanceManager
+Class that handles the rendering of GameEntities, as they GameEntities themselves don't have 
+meshes. This is because all entities are rendered as one instancedMesh, as they are all
+bounding boxes with the same exact mesh. The class sets and updates the position, scale, color and visibility of each 
+entity.

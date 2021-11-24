@@ -28,12 +28,10 @@ export class Guid {
 	}
 
 	private value: string = Guid.EMPTY;
-	private key: string = Guid.EMPTY;
 
 	public constructor(guid?: string) {
 		if (guid && Guid.validator.test(guid)) {
 			this.value = guid;
-			this.key = guid;
 		}
 	}
 

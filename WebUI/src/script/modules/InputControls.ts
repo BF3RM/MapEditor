@@ -1,8 +1,6 @@
 import CameraControls from 'camera-controls';
 import { Vec2 } from '@/script/types/primitives/Vec2';
-import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
-import { Vec3 } from '@/script/types/primitives/Vec3';
 import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
 import { signals } from '@/script/modules/Signals';
 
@@ -35,6 +33,11 @@ export class InputControls {
 
 		switch (event.buttons) {
 		case MOUSE_BUTTONS.LEFT_CLICK:
+			if (event.shiftKey) {
+				// Box selection
+				editor.threeManager.selectionWrapper.initBoxSelection(event);
+				return;
+			}
 			selectionEnabled = !event.altKey; // Alt key is used for rotating camera
 			multiSelection = event.ctrlKey;
 			break;

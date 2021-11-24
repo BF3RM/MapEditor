@@ -311,10 +311,10 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.6.tgz#a9ca4b70a18b270ccb2bc0aaafefd1d486b7ea74"
   integrity sha512-W+bw9ds02rAQaMvaLYxAbJ6cvguW/iJXNT6lTssS1ps6QdrMKttqEAMEG/b5CR8TZl3/L7/lH0ZV5nNR1LXikA==
 
-"@types/three@0.130.1":
-  version "0.130.1"
-  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.130.1.tgz#e5c9aadca684ca3da8daf64e8284bd1a9df2fcc8"
-  integrity sha512-FlCR3CxQHxCmjI0ZCG59O/E15bV+bx7XRO+nJ7RY8KBg2pEF/52frmV/uh9SrLd+ORx+7Zc7NxnJm5Kj4xS9Sg==
+"@types/three@0.134.0":
+  version "0.134.0"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.134.0.tgz#22ae9892f4490faaf35f0ccea127df18407b8ab3"
+  integrity sha512-4YB+99Rgqq27EjiYTItEoZtdjLnTh8W9LxowgpC9eWsjaQJIL4Kn/ZcUKAnW3gB/jS4hqGN8iqmid+RcUZDzpA==
 
 "@types/uglify-js@*":
   version "3.11.1"
@@ -3551,10 +3551,10 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.1.0.tgz#a5d06b4a8b01e3a63771daa5cb7a1903e2e57067"
   integrity sha512-tW+UkmtNg/jv9CSofAKvgVcO7c2URjhTdW1ZTkcAritblu8tajiYy7YisnIflEwtKssCtOxpnBRoCB7iap0/TA==
 
-flattree@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/flattree/-/flattree-0.10.0.tgz#b4e8528e3bc82716384e78c78a79cea71d1ac744"
-  integrity sha1-tOhSjjvIJxY4TnjHinnOpx0ax0Q=
+flattree@0.11.1, flattree@^0.10.0:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/flattree/-/flattree-0.11.1.tgz#5fd0be125e74eb28d3885e3f6dcfa784844cac56"
+  integrity sha512-3+Rup2VS406JqWsf+eGKVvwfs7aCmquu+GIFb3KyB8/8vnlj3KCfoDUx7xjMSmolyoebEjjvXIthj1s0uC2CvA==
 
 flush-write-stream@^1.0.0:
   version "1.1.1"
@@ -7993,10 +7993,10 @@ thread-loader@^2.1.3:
     loader-utils "^1.1.0"
     neo-async "^2.6.0"
 
-three@0.130.1:
-  version "0.130.1"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.130.1.tgz#797588b2877ace31603bbbc864eb2e3022f0b3b4"
-  integrity sha512-OSPPKcGvFSiGkG3jFrwwC76PBV/ZSrGxpBbg28bW8s9GU8r/y2spNGtEXHEb/CVqo0Ctf5Lx2rVaxQZB6OasaA==
+three@0.134.0:
+  version "0.134.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.134.0.tgz#d7ad4d85d050da0861bf39749b06ddfb5f17157f"
+  integrity sha512-LbBerg7GaSPjYtTOnu41AMp7tV6efUNR3p4Wk5NzkSsNTBuA5mDGOfwwZL1jhhVMLx9V20HolIUo0+U3AXehbg==
 
 throttle-debounce@^1.0.1:
   version "1.1.0"

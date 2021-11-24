@@ -8,7 +8,7 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { signals } from '@/script/modules/Signals';
 import * as THREE from 'three';
 import { IGameEntity } from '@/script/interfaces/IGameEntity';
-import { GAMEOBJECT_ORIGIN, RAYCAST_LAYER, REALM } from '@/script/types/Enums';
+import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
@@ -17,7 +17,7 @@ import { isPrintable } from '@/script/modules/Utils';
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
 	their GameEntities to visible = false. GameObjects should always be visible as we want to render their children even
 	when the parent is hidden. Renderer ignores an object if its visible flag is false, so it would ignore their children.
-*/
+ */
 export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
 	public transform: LinearTransform;
@@ -38,8 +38,12 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public realm: REALM;
 
 	public get localTransform(): LinearTransform {
-		const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
-		return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+		if (this.parent) {
+			const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
+			return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+		} else {
+			return this.transform;
+		}
 	}
 
 	public set localTransform(newValue: LinearTransform) {
@@ -67,11 +71,10 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.isUserModified = isUserModified;
 		this.originalRef = originalRef;
 		this.realm = realm;
+
+		this.updateMatrixFromTransform();
 		// Update the matrix after initialization.
 		this.updateMatrix();
-
-		this.layers.enable(RAYCAST_LAYER.GAMEOBJECT);
-		this.layers.disable(RAYCAST_LAYER.GAMEENTITY);
 	}
 
 	public get partition(): Promise<FBPartition> | null {
@@ -145,7 +148,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const out = [] as GameObject[];
 		this.children.forEach((go) => {
 			if (go instanceof GameObject) {
-				console.log(go);
+				// console.log(go);
 				out.push(go);
 				out.concat(go.getAllChildren());
 			}
@@ -174,6 +177,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	public updateTransform() {
+		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+
+		for (const child of this.children) {
+			(child as any).updateTransform();
+		}
+	}
+
+	private updateMatrixFromTransform() {
 		this.setWorldMatrix(this.transform.toMatrix());
 	}
 
@@ -182,22 +193,31 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	 */
 	public setWorldMatrix(worldMatrix: THREE.Matrix4) {
 		const matrix = worldMatrix;
-		if (!this.parent) {
-			console.warn('Found GameObject without parent, this should never happen. Guid: ' + this.guid.toString());
-		} else if (this.parent.type !== 'Scene') {
+
+		// Move respective to the parent if it has one
+		if (this.parent) {
 			// Calculate local transform.
 			const parentWorldInverse = new THREE.Matrix4();
-			parentWorldInverse.getInverse(this.parent.matrixWorld);
+			parentWorldInverse.copy(this.parent.matrixWorld).invert();
 			matrix.multiplyMatrices(parentWorldInverse, matrix);
 		}
+
 		matrix.decompose(this.position, this.quaternion, this.scale);
-		this.updateMatrix(); // Matrix will update in next render call.
+		this.updateMatrix(); // Matrix will be updated in next render call.
+
+		// Update transform of spatial entities and children gameobjects after matrix is recalculated
+		editor.threeManager.nextFrame(() => {
+			for (const child of this.children) {
+				(child as any).updateTransform();
+			}
+		});
 	}
 
 	public setTransform(linearTransform: LinearTransform) {
 		const oldTransform = this.transform.clone();
 		this.transform = linearTransform;
-		this.updateTransform();
+		this.updateMatrixFromTransform();
+
 		if (this.originalRef !== undefined && this.parent.partition) {
 			this.parent.partition.then((res) => {
 				// @ts-ignore
@@ -308,14 +328,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.selected = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach(go => (go as GameObject).onSelect());
+		this.children.forEach(go => (go as unknown as IGameEntity).onSelect());
 	}
 
 	onDeselect() {
 		this.selected = false;
 		this.visible = false;
 		this.makeParentsInvisible();
-		this.children.forEach(go => (go as GameObject).onDeselect());
+		this.children.forEach(go => (go as unknown as IGameEntity).onDeselect());
 	}
 
 	onHighlight() {
@@ -323,7 +343,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach(go => (go as GameObject).onHighlight());
+		this.children.forEach(go => (go as unknown as IGameEntity).onHighlight());
 	}
 
 	onUnhighlight() {
@@ -331,7 +351,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = false;
 		this.visible = false;
 		this.makeParentsInvisible();
-		this.children.forEach(go => (go as GameObject).onUnhighlight());
+		this.children.forEach(go => (go as unknown as IGameEntity).onUnhighlight());
 	}
 
 	makeParentsInvisible() {
@@ -378,5 +398,13 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			return out.objects;
 		}
 		return out.object;
+	}
+
+	public isSelectableWithRaycast(): boolean {
+		if (this.name === 'Gameplay/Logic/ShowRoom' || !this.raycastEnabled) {
+			return false;
+		}
+
+		return true;
 	}
 }
