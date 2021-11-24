@@ -129,7 +129,7 @@ export class VEXTemulator {
 		// command.gameObjectTransferData.transform = command.gameObjectTransferData.transform.toTable();
 		return {
 			sender: commandActionResult.sender,
-			type: 'SpawnedBlueprint',
+			type: 'SpawnedGameObject',
 			gameObjectTransferData: {
 				transform: commandActionResult.gameObjectTransferData.transform.toTable(),
 				blueprintCtrRef: commandActionResult.gameObjectTransferData.blueprintCtrRef.toTable(),
