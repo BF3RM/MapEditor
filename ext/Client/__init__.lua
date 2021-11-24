@@ -200,6 +200,7 @@ end
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
 	FreeCam:OnControlUpdate(s_Transform.transform)
+	Editor:OnControlUpdate(s_Transform.transform)
 end
 
 return MapEditorClient()

@@ -97,6 +97,11 @@ function Editor:Raycast()
 	self.m_PendingRaycast = false
 end
 
+function Editor:OnControlUpdate()
+	-- Recalculate camera raycast when the camera moves
+	Editor:SetPendingRaycast(RaycastType.Camera)
+end
+
 function Editor:CameraHasMoved()
 	return self.m_CameraTransform ~= ClientUtils:GetCameraTransform()
 end
