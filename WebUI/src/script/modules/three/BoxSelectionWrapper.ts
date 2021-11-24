@@ -6,85 +6,105 @@ import { SelectionHelper } from 'three/examples/jsm/interactive/SelectionHelper'
 import InstanceManager from '@/script/modules/InstanceManager';
 
 export default class BoxSelectionWrapper {
+	private readonly selectionBox: SelectionBox;
+	private readonly helper: SelectionHelper;
+	private gizmoWasSelected = false;
+	private boxSelectinInProgress = false;
+
 	constructor(canvas: HTMLCanvasElement, scene: Scene, camera: Camera, renderer: WebGLRenderer) {
-		const selectionBox = new SelectionBox(camera, scene);
-		const helper = new SelectionHelper(selectionBox, renderer, 'selectBox');
+		this.selectionBox = new SelectionBox(camera, scene);
+		this.helper = new SelectionHelper(this.selectionBox, renderer, 'selectBox');
+		this.gizmoWasSelected = false;
 
-		let gizmoWasSelected = false;
+		document.addEventListener('mousemove', this.onMouseMove.bind(this));
+		document.addEventListener('mouseup', this.onMouseUp.bind(this));
+	}
 
-		document.addEventListener('mousedown', function (event) {
-			if (event.which !== 1 || !event.shiftKey || editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
-				helper.isDown = false;
-				gizmoWasSelected = true;
-				helper.element.style.display = 'none';
-				return;
-			}
+	public initBoxSelection(event: MouseEvent) {
+		if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+			this.helper.isDown = false;
+			this.gizmoWasSelected = true;
+			this.helper.element.style.display = 'none';
+			return;
+		}
+		this.boxSelectinInProgress = true;
+		this.helper.element.style.display = 'inherit';
 
-			helper.element.style.display = 'inherit';
+		this.selectionBox.startPoint.set(
+			(event.clientX / window.innerWidth) * 2 - 1,
+			-(event.clientY / window.innerHeight) * 2 + 1,
+			0.5);
+	}
 
-			selectionBox.startPoint.set(
-				(event.clientX / window.innerWidth) * 2 - 1,
-				-(event.clientY / window.innerHeight) * 2 + 1,
-				0.5);
-		});
+	public onMouseMove(event: MouseEvent) {
+		if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+			this.helper.isDown = false;
+			this.gizmoWasSelected = true;
+			this.boxSelectinInProgress = false;
+			return;
+		}
 
-		document.addEventListener('mousemove', function (event) {
-			if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
-				helper.isDown = false;
-				gizmoWasSelected = true;
-				return;
-			}
-			if (helper.isDown) {
-				editor.editorCore.unhighlight();
+		if (!this.boxSelectinInProgress) return;
 
-				selectionBox.endPoint.set(
-					(event.clientX / window.innerWidth) * 2 - 1,
-					-(event.clientY / window.innerHeight) * 2 + 1,
-					0.5);
-				const instanceManager = InstanceManager.getInstance();
-				const oldCount = instanceManager.instancedMesh.count;
-				instanceManager.instancedMesh.count = instanceManager.getNumberOfEntities() - 1;
-				selectionBox.select();
-				instanceManager.instancedMesh.count = oldCount;
+		if (!this.helper.isDown) return;
 
-				// @ts-ignore
-				const ids = selectionBox.instances[instanceManager.instancedMesh.uuid];
-				ids.forEach((entityIndex: number) => {
-					const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
-					if (entity) {
-						const guid = (entity.parent as GameObject).guid;
-						if (guid) {
-							editor.editorCore.highlight(guid, true);
-						}
-					}
-				});
-			}
-		});
+		editor.editorCore.unhighlight();
 
-		document.addEventListener('mouseup', function (event) {
-			if (event.which !== 1 || editor.threeManager.gizmoControls.selected || gizmoWasSelected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
-				helper.isDown = false;
-				gizmoWasSelected = false;
-				return;
-			}
-			selectionBox.endPoint.set(
-				(event.clientX / window.innerWidth) * 2 - 1,
-				-(event.clientY / window.innerHeight) * 2 + 1,
-				0.5);
+		this.selectionBox.endPoint.set(
+			(event.clientX / window.innerWidth) * 2 - 1,
+			-(event.clientY / window.innerHeight) * 2 + 1,
+			0.5);
 
-			const instanceManager = InstanceManager.getInstance();
+		// Temporarily set instanceMesh count to number of entities, so all can be selected
+		const instanceManager = InstanceManager.getInstance();
+		const oldCount = instanceManager.instancedMesh.count;
+		instanceManager.instancedMesh.count = instanceManager.getNumberOfEntities() - 1;
 
-			// @ts-ignore
-			const ids = selectionBox.instances[instanceManager.instancedMesh.uuid];
-			ids.forEach((entityIndex: number) => {
-				const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
-				if (entity) {
-					const guid = (entity.parent as GameObject).guid;
-					if (guid) {
-						editor.Select(guid, true);
-					}
+		this.selectionBox.select();
+		// Set count back to original value
+		instanceManager.instancedMesh.count = oldCount;
+
+		// @ts-ignore
+		const ids = this.selectionBox.instances[instanceManager.instancedMesh.uuid];
+		ids.forEach((entityIndex: number) => {
+			const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
+			if (entity) {
+				const guid = (entity.parent as GameObject).guid;
+				if (guid) {
+					editor.editorCore.highlight(guid, true);
 				}
-			});
+			}
 		});
+	}
+
+	public onMouseUp(event: MouseEvent) {
+		if (event.which !== 1 || !this.boxSelectinInProgress || editor.threeManager.gizmoControls.selected || this.gizmoWasSelected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+			this.helper.isDown = false;
+			this.gizmoWasSelected = false;
+			this.boxSelectinInProgress = false;
+			return;
+		}
+
+		console.log('BOI');
+		this.selectionBox.endPoint.set(
+			(event.clientX / window.innerWidth) * 2 - 1,
+			-(event.clientY / window.innerHeight) * 2 + 1,
+			0.5);
+
+		const instanceManager = InstanceManager.getInstance();
+
+		// @ts-ignore
+		const ids = this.selectionBox.instances[instanceManager.instancedMesh.uuid];
+		ids.forEach((entityIndex: number) => {
+			const entity = editor.spatialGameEntities.get(instanceManager.getEntityId(entityIndex));
+			if (entity) {
+				const guid = (entity.parent as GameObject).guid;
+				if (guid) {
+					editor.Select(guid, true);
+				}
+			}
+		});
+
+		this.boxSelectinInProgress = false;
 	}
 }

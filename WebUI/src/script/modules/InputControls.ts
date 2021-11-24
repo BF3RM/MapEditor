@@ -31,6 +31,11 @@ export class InputControls {
 
 		switch (event.buttons) {
 		case MOUSE_BUTTONS.LEFT_CLICK:
+			if (event.shiftKey) {
+				// Box selection
+				editor.threeManager.selectionWrapper.initBoxSelection(event);
+				return;
+			}
 			selectionEnabled = !event.altKey; // Alt key is used for rotating camera
 			multiSelection = event.ctrlKey;
 			break;
