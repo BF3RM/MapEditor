@@ -168,6 +168,9 @@ export class THREEManager {
 			editor.editorCore.GetMouseToScreenPosition(event);
 			this.gizmoControls.OnMouseMove(event);
 		}
+		if (this.miniBrushEnabled) {
+			editor.editorCore.GetMouseToScreenPosition(event);
+		}
 	}
 
 	public onMouseUp(event: MouseEvent) {
