@@ -93,10 +93,10 @@ function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 
 					for _, l_Variation in pairs(s_Variations) do
 						local s_Variation = {
-							hash =l_Variation,
+							hash = l_Variation,
 							name = self.m_ObjectVariations[l_Variation]
 						}
-						table.insert(self.m_Variations[s_Mesh], s_Variation)
+						self.m_Variations[s_Mesh][l_Variation] = s_Variation
 					end
 				end
 			end
@@ -262,7 +262,7 @@ function InstanceParser:FillVariations()
 				name = self.m_ObjectVariations[s_Hash]
 			}
 
-			table.insert(self.m_Variations[s_MeshGuid], s_Variation)
+			self.m_Variations[s_MeshGuid][s_Hash] = s_Variation
 		end
 	end
 
@@ -273,7 +273,11 @@ function InstanceParser:FillVariations()
 			--m_Logger:Write("Missing: " .. v.name .. "_mesh")
 		else
 			if self.m_Variations[s_MeshGuid] ~= nil then
-				l_Blueprint.variations = self.m_Variations[s_MeshGuid]
+				l_Blueprint.variations = {}
+
+				for _, l_Variation in pairs(self.m_Variations[s_MeshGuid]) do
+					table.insert(l_Blueprint.variations, l_Variation)
+				end
 
 				--- NOTE: json.encode causes a crash when the round restarts for some reason
 				--local jsonTest = (json.encode(self.m_Variations[l_MeshGuid]))
