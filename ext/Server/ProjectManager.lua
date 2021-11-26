@@ -1,9 +1,9 @@
 class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
-
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
+
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -121,6 +121,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 
 			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
 				m_Logger:Error("Cant load project that is not built for the same map as current one.")
+				return
 			end
 
 			-- Load User Data from Database
@@ -139,6 +140,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
 	if s_Project == nil then
 		m_Logger:Error('Failed to get project with id '..tostring(p_ProjectId))
+		return
 	end
 
 	self.m_CurrentProjectHeader = s_Project.header
@@ -152,6 +154,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 			GameModes[s_GameModeName] == nil then
 
 		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
+		return
 	end
 
 	self:UpdateClientProjectHeader(nil)
@@ -162,9 +165,21 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		--Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
-		RCON:SendCommand('mapList.clear')
-		local out = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 1') -- TODO: add proper map / gameplay support
-		RCON:SendCommand('mapList.runNextRound')
+		local s_Response = RCON:SendCommand('mapList.list')
+		if s_Response[1] ~= 'OK' then
+			m_Logger:Error('Couldn\'t clear maplist')
+			return
+		end
+
+		s_Response = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 2') -- TODO: add proper map / gameplay support
+		if s_Response[1] ~= 'OK' then
+			m_Logger:Error('Couldn\'t add map to maplist. ' .. s_Response[1])
+		end
+
+		s_Response = RCON:SendCommand('mapList.runNextRound')
+		if s_Response[1] ~= 'OK' then
+			m_Logger:Error('Couldn\'t run next round')
+		end
 	end
 end
 
