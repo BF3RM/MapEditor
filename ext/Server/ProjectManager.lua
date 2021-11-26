@@ -165,7 +165,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		--Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
-		local s_Response = RCON:SendCommand('mapList.list')
+		local s_Response = RCON:SendCommand('mapList.clear')
 		if s_Response[1] ~= 'OK' then
 			m_Logger:Error('Couldn\'t clear maplist. ' .. s_Response[1])
 			return
