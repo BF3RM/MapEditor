@@ -167,18 +167,18 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	else
 		local s_Response = RCON:SendCommand('mapList.list')
 		if s_Response[1] ~= 'OK' then
-			m_Logger:Error('Couldn\'t clear maplist')
+			m_Logger:Error('Couldn\'t clear maplist. ' .. s_Response[1])
 			return
 		end
 
-		s_Response = RCON:SendCommand('mapList.add ' .. s_MapName .. ' ' .. s_GameModeName .. ' 2') -- TODO: add proper map / gameplay support
+		s_Response = RCON:SendCommand('mapList.add', {s_MapName, s_GameModeName, '1'}) -- TODO: add proper map / gameplay support
 		if s_Response[1] ~= 'OK' then
 			m_Logger:Error('Couldn\'t add map to maplist. ' .. s_Response[1])
 		end
 
 		s_Response = RCON:SendCommand('mapList.runNextRound')
 		if s_Response[1] ~= 'OK' then
-			m_Logger:Error('Couldn\'t run next round')
+			m_Logger:Error('Couldn\'t run next round. ' .. s_Response[1])
 		end
 	end
 end
