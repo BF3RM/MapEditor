@@ -92,8 +92,7 @@ export default class HierarchyComponent extends EditorComponent {
 	@Ref('infiniteTreeComponent')
 	infiniteTreeComponent: any;
 
-	constructor() {
-		super();
+	public mounted() {
 		console.log('Mounted');
 		signals.spawnedGameObject.connect(this.onSpawnedGameObject.bind(this));
 		signals.deletedGameObject.connect(this.onDeletedGameObject.bind(this));
@@ -102,9 +101,7 @@ export default class HierarchyComponent extends EditorComponent {
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
-	}
 
-	public mounted() {
 		if (this.infiniteTreeComponent !== undefined) {
 			this.tree = (this.infiniteTreeComponent).tree as InfiniteTree;
 		}

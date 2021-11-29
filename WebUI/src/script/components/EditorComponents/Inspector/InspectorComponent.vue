@@ -137,8 +137,7 @@ export default class InspectorComponent extends EditorComponent {
 	@Ref('enableInput')
 	enableInput: HTMLInputElement;
 
-	constructor() {
-		super();
+	mounted() {
 		signals.selectionGroupChanged.connect(this.onSelectionGroupChanged.bind(this));
 		signals.selectedGameObject.connect(this.onSelection.bind(this));
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));

@@ -25,8 +25,7 @@ import VEXTInterface from '@/script/modules/VEXT';
 	}
 })
 export default class App extends Vue {
-	constructor() {
-		super();
+	mounted() {
 		console.log('UI RELOADED');
 		this.$nextTick(() => {
 			window.vext.SendEvent('UIReloaded');

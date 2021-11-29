@@ -25,8 +25,7 @@ import { Computed } from 'vuex/types/helpers';
 	}
 })
 export default class HistoryComponent extends EditorComponent {
-	constructor() {
-		super();
+	mounted() {
 		signals.historyChanged.connect(this.onHistoryChanged.bind(this));
 	}
 
