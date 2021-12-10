@@ -19,7 +19,7 @@
 					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 				</div>
 				<div id="NameAndVariation">
-					<div id="Name">
+					<div>
 						<input class="name-input" :value="displayName" :disabled="multiSelection" id="name" @blur="onNameChange">
 					</div>
 					<div id="Variation" class="container variation" v-if="!multiSelection">
@@ -198,10 +198,8 @@ export default class InspectorComponent extends EditorComponent {
 			group.scale.set(newTrans.scale.x, newTrans.scale.y, newTrans.scale.z);
 			group.rotation.setFromQuaternion(newTrans.rotation);
 
-			group.updateMatrix();
 			group.onClientOnlyMove();
-
-			window.editor.threeManager.setPendingRender();
+			window.editor.editorCore.RequestUpdate();
 		}
 	}
 
@@ -214,10 +212,8 @@ export default class InspectorComponent extends EditorComponent {
 			group.scale.set(newTrans.scale.x, newTrans.scale.y, newTrans.scale.z);
 			group.rotation.setFromQuaternion(newTrans.rotation);
 
-			group.updateMatrix();
 			group.onClientOnlyMove();
-
-			window.editor.threeManager.setPendingRender();
+			window.editor.editorCore.RequestUpdate();
 		}
 	}
 
@@ -266,7 +262,7 @@ export default class InspectorComponent extends EditorComponent {
 
 	onEndDrag() {
 		const group = window.editor.selectionGroup;
-
+		window.editor.setUpdating(false);
 		if (group) {
 			group.onClientOnlyMoveEnd();
 		}
@@ -274,6 +270,7 @@ export default class InspectorComponent extends EditorComponent {
 
 	private onSelectionGroupChanged() {
 		const group = window.editor.selectionGroup;
+
 		// Update inspector transform.
 		this.transform = group.transform;
 
@@ -283,6 +280,8 @@ export default class InspectorComponent extends EditorComponent {
 			this.localTransform = group.selectedGameObjects[0].localTransform;
 			console.log('localTransform updated');
 		}
+
+		window.editor.editorCore.RequestUpdate();
 	}
 
 	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
