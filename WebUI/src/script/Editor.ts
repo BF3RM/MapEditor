@@ -402,7 +402,7 @@ export default class Editor {
 			const gameObjectGuid = gameObjectTransferData.guid;
 
 			if (this.gameObjects.getValue(gameObjectGuid)) {
-				console.error('Tried to create a GameObject that already exists');
+				console.error('Tried to create a GameObject that already exists. Guid: ' + gameObjectGuid.toString() + ', name: ' + gameObjectTransferData.name);
 				return;
 			}
 

@@ -22,8 +22,8 @@ function DataBaseManager:__init()
 	self:CreateOrUpdateDatabase()
 end
 
-function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas)
-	local s_TimeStamp = SharedUtils:GetTimeMS()
+function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas, p_TimeStamp)
+	local s_TimeStamp = p_TimeStamp or SharedUtils:GetTimeMS()
 
 	local s_GameObjectSaveDatasJson = p_GameObjectSaveDatas
 	local s_RequiredBundlesJson = p_RequiredBundles
@@ -263,7 +263,7 @@ function DataBaseManager:ImportProject(p_ProjectDataJSON)
 		return false, 'Save header missing necessary field(s)'
 	end
 
-	return self:SaveProject(s_Header.projectName, s_Header.mapName, s_Header.gameModeName, s_Header.requiredBundles, s_Data)
+	return self:SaveProject(s_Header.projectName, s_Header.mapName, s_Header.gameModeName, s_Header.requiredBundles, s_Data, s_Header.timeStamp)
 end
 
 function DataBaseManager:DeleteProject(p_ProjectId)

@@ -90,12 +90,8 @@ export default class ConsoleComponent extends EditorComponent {
 		search: ''
 	};
 
-	constructor() {
-		super();
-		signals.onLog.connect(this.onLog.bind(this));
-	}
-
 	public mounted() {
+		signals.onLog.connect(this.onLog.bind(this));
 		window.onLog = this.onLog.bind(this);
 		/*
 		console.log = this.consoleLog.bind(this);

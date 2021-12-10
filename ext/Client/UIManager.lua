@@ -14,6 +14,15 @@ end
 
 function UIManager:RegisterEvents()
 	Events:Subscribe('UIManager:LoadingComplete', self, self.OnLoadingComplete)
+	Events:Subscribe('UIManager:SyncingStart', self, self.OnSyncingStart)
+end
+
+function UIManager:OnSyncingStart()
+	self:SetLoadingInfo('Syncing with server changes...')
+end
+
+function UIManager:SetLoadingInfo(p_Info)
+	WebUpdater:AddUpdate('SetLoadingInfo', p_Info)
 end
 
 function UIManager:OnLoadingComplete()

@@ -38,7 +38,7 @@ export class THREEManager {
 	private pendingRender = true;
 
 	private delta = new THREE.Vector3();
-	private box = new THREE.Box3();
+	// private box = new THREE.Box3();
 	private center = new THREE.Vector3();
 
 	private waitingForControlEnd = false;
@@ -228,41 +228,27 @@ export class THREEManager {
 
 		if (target === undefined) {
 			if (editor.selectionGroup.selectedGameObjects.length !== 1) {
-				return;
+				target = editor.selectionGroup;
 			}
 			target = editor.selectionGroup.selectedGameObjects[0];
 		}
 
-		let distance;
-
-		scope.box.setFromObject(target);
+		// TODO: calculate distance from the bounding box of all SpatialEntities' AABBs in target
+		const distance = 10;
 
 		scope.center.setFromMatrixPosition(target.matrixWorld);
-		distance = 0.1;
 
 		scope.delta.set(0, 0, 1);
 		scope.delta.applyQuaternion(scope.camera.quaternion);
-		scope.delta.multiplyScalar(distance * 4);
+		scope.delta.multiplyScalar(distance);
 
 		const newPos = scope.center.add(scope.delta);
 		scope.cameraControls.moveTo(newPos.x, newPos.y, newPos.z, true);
 
-		const paddingLeft = 0;
-		const paddingRight = 0;
-		const paddingBottom = 0;
-		const paddingTop = 0;
-
-		const boundingBox: THREE.Box3 = new THREE.Box3().setFromObject(target);
-		const position = new THREE.Vector3(target.position.x, target.position.y, target.position.z);
-		const size = boundingBox.getSize(position);
-		const boundingWidth = size.x + paddingLeft + paddingRight;
-		const boundingHeight = size.y + paddingTop + paddingBottom;
-		const boundingDepth = size.z;
-
-		distance = scope.cameraControls.getDistanceToFit(boundingWidth, boundingHeight, boundingDepth) * 2;
-		scope.cameraControls.dollyTo(distance, true);
-		const gameObject = target as GameObject;
-		signals.objectFocused.emit(gameObject.guid);
+		if (target instanceof GameObject) {
+			const gameObject = target as GameObject;
+			signals.objectFocused.emit(gameObject.guid);
+		}
 
 		scope.setPendingRender();
 	}

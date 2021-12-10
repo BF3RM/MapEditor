@@ -9,8 +9,6 @@ import EditorComponent from './EditorComponent.vue';
 
 @Component
 export default class PlaceholderComponent extends EditorComponent {
-	constructor() {
-		super();
-	}
+
 }
 </script>

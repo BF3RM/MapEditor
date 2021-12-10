@@ -23,7 +23,7 @@ function MapEditorClient:__init()
 end
 
 function MapEditorClient:RegisterEvents()
-	--Game events
+	--VEXT events
 	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
 	Events:Subscribe('Extension:Loaded', self, self.OnExtensionLoaded)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
@@ -130,7 +130,7 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 		end
 	end
 
-	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(s_LoadingInfo)))
+	UIManager:SetLoadingInfo('Mounting bundles: ' .. tostring(s_LoadingInfo))
 	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
 end
 
@@ -142,8 +142,8 @@ function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 	GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent )
 end
 
-function MapEditorClient:OnLoadingInfo( p_Info )
-	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('%s')", p_Info))
+function MapEditorClient:OnLoadingInfo(p_Info)
+	UIManager:SetLoadingInfo(p_Info)
 end
 
 ----------- Editor functions----------------
