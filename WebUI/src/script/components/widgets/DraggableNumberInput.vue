@@ -1,8 +1,8 @@
 <template>
 	<div
-			class="vue-draggable-number-container"
-			:class="inputName"
-			>
+		class="vue-draggable-number-container"
+		:class="inputName"
+	>
 		<label
 				:for="inputName"
 				:style="{ cursor: cursorDirection }"
@@ -10,15 +10,15 @@
 				v-if="!hideLabel">
 			{{ label }}
 		</label>
-    <lazy-input
-		type="number"
-		:min="min"
-		:max="max"
-		:name="inputName"
-		:step="step"
-		v-model="formattedValue"
-		@blur="$emit('blur')"
-    />
+		<lazy-input
+			type="number"
+			:min="min"
+			:max="max"
+			:name="inputName"
+			:step="step"
+			v-model="formattedValue"
+			@blur="$emit('blur')"
+		/>
 	</div>
 </template>
 
