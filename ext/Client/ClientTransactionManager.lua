@@ -51,6 +51,7 @@ end
 
 function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId)
 	if p_LastTransactionId ~= nil and p_TransferDatas ~= nil then
+		Events:DispatchLocal('UIManager:SyncingStart')
 		self:UpdateTransactionId(p_LastTransactionId, true)
 		self:SyncClientTransferDatas(p_TransferDatas)
 	end
