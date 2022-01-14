@@ -5,9 +5,9 @@ local matrix = require "__shared/Util/matrix"
 local TEMP_GUID_PREFIX = "ED170120"
 local CUSTOMOBJ_GUID_PREFIX = "ED170121"
 local VANILLA_GUID_PREFIX = "ED170122"
-local EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
-local HAVOK_GUID = Guid('FE9BF899-0000-0000-FF64-00FF64076739')
-local PREVIEW_GUID = Guid('ED170120-0000-0000-0000-000000000000')
+EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
+HAVOK_GUID = Guid('FE9BF899-0000-0000-FF64-00FF64076739')
+PREVIEW_GUID = Guid('ED170120-0000-0000-0000-000000000000')
 
 function MergeTables(p_Old, p_New)
 	if p_New == nil then
@@ -246,11 +246,22 @@ function GenerateCustomGuid()
 end
 
 function GenerateChildGuid(p_ParentGuid, p_Offset)
+	m_Logger:Write("GenerateChildGuid")
+	m_Logger:Write("p_ParentGuid" .. tostring(p_ParentGuid))
+	m_Logger:Write("p_Offset" .. tostring(p_Offset))
 	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
+	-- m_Logger:WriteTable(s_ParentGuidParts)
 	local s_GuidEnd = s_ParentGuidParts[5]
+	-- m_Logger:Write("s_GuidEnd" .. s_GuidEnd)
 	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
-	local s_NewGuidEnd = string.format("%x", s_GuidEndNumber + p_Offset):upper()
-	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEnd)
+	-- m_Logger:Write("s_GuidEndNumber" .. s_GuidEndNumber)
+	-- local s_NewGuidEnd = string.format("%x", s_GuidEndNumber + p_Offset):upper()
+	-- m_Logger:Write("s_NewGuidEnd" .. s_NewGuidEnd)
+	local s_NewGuidEndPadded = string.format("%012x", s_GuidEndNumber + p_Offset):upper()
+	m_Logger:Write("s_NewGuidEndPadded" .. s_NewGuidEndPadded)
+	local s_GeneratedGuidString = s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEndPadded
+	-- m_Logger:Write("s_GeneratedGuidString" .. s_GeneratedGuidString)
+	return Guid(s_GeneratedGuidString)
 end
 
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)

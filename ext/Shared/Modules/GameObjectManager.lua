@@ -1,6 +1,6 @@
 class 'GameObjectManager'
 
-local m_Logger = Logger("GameObjectManager", false)
+local m_Logger = Logger("GameObjectManager", true)
 
 function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
@@ -77,6 +77,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
 	return true
 end
+
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 	-- We dont load vanilla objects if the flag is active
 	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
@@ -136,13 +137,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		s_GameObject.overrides = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].overrides
 	end
 
-
 	s_GameObject.blueprintCtrRef = CtrRef {
 		typeName = p_Blueprint.typeInfo.name,
 		name = s_Blueprint.name,
 		partitionGuid = s_BlueprintPartitionGuid,
 		instanceGuid = s_BlueprintInstanceGuid
 	}
+
+	if self.m_GameObjects[tostring(s_GameObject.guid)] ~= nil then
+		m_Logger:Warning("GameObject with guid already existed, overwriting: " .. tostring(s_GameObject.guid))
+	end
+
 	self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
 
 	--- Resolve the parent
@@ -157,9 +162,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 		-- Root object
 		if s_ReferenceObjectData == nil or s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
+			m_Logger:Write("ResolveRootObject 1")
 			self:ResolveRootObject(s_GameObject)
-			-- Child object
 		else
+			-- Child object
+			m_Logger:Write("ResolveChildObject")
+			m_Logger:Write("Child: " .. s_GameObject.name)
+			m_Logger:Write("Parent: " .. s_ParentGameObject.name)
 			self:ResolveChildObject(s_GameObject, s_ParentGameObject)
 			self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)] = nil
 		end
@@ -167,10 +176,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
+			m_Logger:Write("ResolveRootObject 2")
 			self:ResolveRootObject(s_GameObject)
 		else
-			--m_Logger:Write('Found custom object without parent')
+			m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
+			m_Logger:Write("ResolveRootObject 3")
 			self:ResolveRootObject(s_GameObject)
 		end
 	end
