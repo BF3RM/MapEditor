@@ -1,4 +1,5 @@
-class 'ProjectManager'
+---@class ProjectManager
+ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false

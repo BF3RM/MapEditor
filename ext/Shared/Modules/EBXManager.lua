@@ -1,4 +1,5 @@
-class 'EBXManager'
+---@class EBXManager
+EBXManager = class 'EBXManager'
 
 local m_Logger = Logger("EBXManager", false)
 

@@ -1,4 +1,5 @@
-class 'GameObjectParentData'
+---@class GameObjectParentData
+GameObjectParentData = class 'GameObjectParentData'
 
 local m_Logger = Logger("GameObjectParentData", false)
 

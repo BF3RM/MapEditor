@@ -1,4 +1,5 @@
-class 'ServerTransactionManager'
+---@class ServerTransactionManager
+ServerTransactionManager = class 'ServerTransactionManager'
 
 local m_Logger = Logger("ServerTransactionManager", false)
 

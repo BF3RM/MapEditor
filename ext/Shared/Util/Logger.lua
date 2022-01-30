@@ -1,5 +1,5 @@
-class "Logger"
-
+---@class Logger
+Logger = class "Logger"
 
 function Logger:__init(p_ClassName, p_ActivateLogging)
 	if type(p_ClassName) ~= "string" then

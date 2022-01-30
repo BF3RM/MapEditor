@@ -1,4 +1,5 @@
-class 'ClientTransactionManager'
+---@class ClientTransactionManager
+ClientTransactionManager = class 'ClientTransactionManager'
 
 local m_Logger = Logger("ClientTransactionManager", false)
 

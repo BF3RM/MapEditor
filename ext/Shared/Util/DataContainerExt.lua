@@ -1,4 +1,5 @@
-class "DataContainerExt"
+---@class DataContainerExt
+DataContainerExt = class "DataContainerExt"
 
 local m_Logger = Logger("DataContainerExt", false)
 require "__shared/Util/StringExtensions"

@@ -1,4 +1,5 @@
-class 'CtrRef'
+---@class CtrRef
+CtrRef = class 'CtrRef'
 
 local m_Logger = Logger("CtrRef", false)
 

@@ -1,4 +1,5 @@
-class 'MapEditorClient'
+---@class MapEditorClient
+MapEditorClient = class 'MapEditorClient'
 
 local m_Logger = Logger("MapEditorClient", false)
 WebUpdater = require "WebUpdater"

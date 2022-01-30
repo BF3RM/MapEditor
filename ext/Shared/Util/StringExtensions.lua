@@ -1,4 +1,5 @@
-class "StringExtensions"
+---@class StringExtensions
+StringExtensions = class "StringExtensions"
 
 function string:normalizePath()
 	if self == nil then

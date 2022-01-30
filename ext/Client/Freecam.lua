@@ -1,4 +1,5 @@
-class 'FreeCam'
+---@class FreeCam
+FreeCam = class 'FreeCam'
 
 local m_Logger = Logger("FreeCam", false)
 local m_RotationHelper = require "__shared/Util/RotationHelper"

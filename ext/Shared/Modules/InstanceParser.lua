@@ -1,4 +1,5 @@
-class 'InstanceParser'
+---@class InstanceParser
+InstanceParser = class 'InstanceParser'
 
 local m_Logger = Logger("InstanceParser", false)
 

@@ -1,4 +1,5 @@
-class 'MapEditorServer'
+---@class MapEditorServer
+MapEditorServer = class 'MapEditorServer'
 
 local m_Logger = Logger("MapEditorServer", false)
 

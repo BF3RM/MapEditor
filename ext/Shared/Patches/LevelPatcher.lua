@@ -1,4 +1,5 @@
-class 'LevelPatcher'
+---@class LevelPatcher
+LevelPatcher = class 'LevelPatcher'
 
 local m_Logger = Logger("LevelPatcher", false)
 

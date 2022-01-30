@@ -1,4 +1,5 @@
-class 'GameEntity'
+---@class GameEntity
+GameEntity = class 'GameEntity'
 
 local m_Logger = Logger("GameEntity", false)
 

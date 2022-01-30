@@ -1,4 +1,5 @@
-class 'VegetationPatcher'
+---@class VegetationPatcher
+VegetationPatcher = class 'VegetationPatcher'
 
 local m_Logger = Logger("VegetationPatcher", false)
 

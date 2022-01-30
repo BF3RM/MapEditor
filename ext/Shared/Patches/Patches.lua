@@ -1,4 +1,5 @@
-class 'Patches'
+---@class Patches
+Patches = class 'Patches'
 
 require "__shared/Patches/CommonRosePatcher"
 require "__shared/Patches/LevelPatcher"

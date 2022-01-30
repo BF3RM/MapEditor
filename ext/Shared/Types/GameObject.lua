@@ -1,4 +1,5 @@
-class 'GameObject'
+---@class GameObject
+GameObject = class 'GameObject'
 
 local m_Logger = Logger("GameObject", false)
 local m_TraceableField_Suffix = "_original_value"
