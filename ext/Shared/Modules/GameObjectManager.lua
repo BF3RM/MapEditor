@@ -30,7 +30,6 @@ function GameObjectManager:GetGameObject(p_GameObjectGuid)
 	return self.m_GameObjects[tostring(p_GameObjectGuid)]
 end
 
-
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
 	p_BlueprintInstanceGuid == nil or
