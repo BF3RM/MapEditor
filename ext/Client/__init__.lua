@@ -13,7 +13,7 @@ EBXManager = require "__shared/Modules/EBXManager"
 
 GameObjectManager = GameObjectManager(Realm.Realm_Client)
 
-EditorCommon = EditorCommon(Realm.Realm_Client)
+EditorCommon = EditorCommon()
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
@@ -201,7 +201,7 @@ end
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
 	FreeCam:OnControlUpdate(s_Transform.transform)
-	Editor:OnControlUpdate(s_Transform.transform)
+	Editor:OnControlUpdate()
 end
 
 return MapEditorClient()
