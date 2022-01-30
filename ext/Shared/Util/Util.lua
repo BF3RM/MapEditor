@@ -245,14 +245,6 @@ function GenerateCustomGuid()
 	return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
-function GenerateChildGuid(p_ParentGuid, p_Offset)
-	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
-	local s_GuidEnd = s_ParentGuidParts[5]
-	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
-	local s_NewGuidEnd = string.format("%x", s_GuidEndNumber + p_Offset):upper()
-	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEnd)
-end
-
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	local s_IntHash = MathUtils:FNVHash(p_Name .. tostring(p_Transform))
 

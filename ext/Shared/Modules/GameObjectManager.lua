@@ -348,7 +348,7 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		local s_CustomGuid
 
 		repeat
-			s_CustomGuid = GenerateChildGuid(p_GameObject.parentData.guid, i)
+			s_CustomGuid = GenerateCustomGuid()
 			i = i + 1
 		until self.m_GameObjects[tostring(s_CustomGuid)] == nil
 
