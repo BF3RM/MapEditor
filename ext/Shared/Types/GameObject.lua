@@ -18,12 +18,12 @@ function GameObject:__init(arg)
 	self.localTransform = arg.localTransform
 	self.overrides = arg.overrides or {}
 	self.internalBlueprint = nil
-	--self.name = arg.name
-	--self.parentData = arg.parentData
-	--self.transform = arg.transform -- world transform
-	--self.variation = arg.variation
-	--self.isDeleted = arg.isDeleted --> only vanilla objects, dont appear in the browser anymore. entities get disabled, because we cannot destroy them
-	--self.isEnabled = arg.isEnabled
+	self.name = arg.name
+	self.parentData = arg.parentData
+	self.transform = arg.transform -- world transform
+	self.variation = arg.variation
+	self.isDeleted = arg.isDeleted --> only vanilla objects, dont appear in the browser anymore. entities get disabled, because we cannot destroy them
+	self.isEnabled = arg.isEnabled
 
 	self:RegisterUserModifiableField("name", arg.name)
 	self:RegisterUserModifiableField("parentData", arg.parentData)
