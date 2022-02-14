@@ -1,4 +1,5 @@
-class 'MapEditorClient'
+---@class MapEditorClient
+MapEditorClient = class 'MapEditorClient'
 
 local m_Logger = Logger("MapEditorClient", false)
 WebUpdater = require "WebUpdater"
@@ -12,7 +13,7 @@ EBXManager = require "__shared/Modules/EBXManager"
 
 GameObjectManager = GameObjectManager(Realm.Realm_Client)
 
-EditorCommon = EditorCommon(Realm.Realm_Client)
+EditorCommon = EditorCommon()
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
@@ -131,7 +132,7 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	end
 
 	UIManager:SetLoadingInfo('Mounting bundles: ' .. tostring(s_LoadingInfo))
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
@@ -200,7 +201,7 @@ end
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
 	FreeCam:OnControlUpdate(s_Transform.transform)
-	Editor:OnControlUpdate(s_Transform.transform)
+	Editor:OnControlUpdate()
 end
 
 return MapEditorClient()

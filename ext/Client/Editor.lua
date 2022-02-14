@@ -1,4 +1,5 @@
-class 'Editor'
+---@class Editor
+Editor = class 'Editor'
 
 local m_Logger = Logger("Editor", false)
 

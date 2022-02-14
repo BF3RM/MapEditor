@@ -1,4 +1,6 @@
-class 'GameObjectParentData'
+---@class GameObjectParentData
+---@field GetRootParentData fun():table
+GameObjectParentData = class 'GameObjectParentData'
 
 local m_Logger = Logger("GameObjectParentData", false)
 

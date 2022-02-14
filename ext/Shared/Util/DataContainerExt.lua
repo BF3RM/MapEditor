@@ -1,4 +1,5 @@
-class "DataContainerExt"
+---@class DataContainerExt
+DataContainerExt = class "DataContainerExt"
 
 local m_Logger = Logger("DataContainerExt", false)
 require "__shared/Util/StringExtensions"
@@ -172,7 +173,7 @@ function DataContainerExt:DeepCopy(p_Instance, p_DeepCopiedChildrenGuids, p_Curr
 	if p_Instance.instanceGuid ~= nil then
 		if p_Instance.isLazyLoaded then
 			m_Logger:Write("DC with guid "..tostring(p_Instance.instanceGuid).." is lazy loaded, please deepclone after everything is loaded. Type "..p_Instance.typeInfo.name)
-			return s_Instance
+			return p_Instance
 		end
 
 		if m_CopiedObjects[tostring(p_Instance.instanceGuid)] ~= nil then

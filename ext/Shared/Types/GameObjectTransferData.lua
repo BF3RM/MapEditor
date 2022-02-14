@@ -1,4 +1,5 @@
-class 'GameObjectTransferData'
+---@class GameObjectTransferData
+GameObjectTransferData = class 'GameObjectTransferData'
 
 local m_Logger = Logger("GameObjectTransferData", false)
 

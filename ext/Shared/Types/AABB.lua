@@ -1,4 +1,5 @@
-class 'AABB'
+---@class AABB
+AABB = class 'AABB'
 
 local m_Logger = Logger("AABB", false)
 

@@ -1,4 +1,5 @@
-class 'MessageActions'
+---@class MessageActions
+MessageActions = class 'MessageActions'
 
 local m_Logger = Logger("MessageActions", false)
 

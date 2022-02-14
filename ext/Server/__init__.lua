@@ -1,4 +1,5 @@
-class 'MapEditorServer'
+---@class MapEditorServer
+MapEditorServer = class 'MapEditorServer'
 
 local m_Logger = Logger("MapEditorServer", false)
 
@@ -11,7 +12,7 @@ GameObjectManager = GameObjectManager(Realm.Realm_Server)
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Server)
 CommandActions = CommandActions(Realm.Realm_ClientAndServer)
-EditorCommon = EditorCommon(Realm.Realm_ClientAndServer)
+EditorCommon = EditorCommon()
 
 local m_ClientSettingsGuids = {
 	partitionGuid = Guid('C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4'),

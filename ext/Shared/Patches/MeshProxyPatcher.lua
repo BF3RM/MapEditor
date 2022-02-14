@@ -1,4 +1,5 @@
-class 'MeshProxyPatcher'
+---@class MeshProxyPatcher
+MeshProxyPatcher = class 'MeshProxyPatcher'
 
 local m_Logger = Logger("MeshProxyPatcher", false)
 

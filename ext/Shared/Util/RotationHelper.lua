@@ -1,5 +1,5 @@
-class 'RotationHelper'
-
+---@class RotationHelper
+RotationHelper = class 'RotationHelper'
 
 local m_Logger = Logger("RotationHelper", false)
 --YPR: yaw, pitch, roll

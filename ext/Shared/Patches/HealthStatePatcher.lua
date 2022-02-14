@@ -1,4 +1,5 @@
-class 'HealthStatePatcher'
+---@class HealthStatePatcher
+HealthStatePatcher = class 'HealthStatePatcher'
 
 local m_Logger = Logger("HealthStatePatcher", false)
 

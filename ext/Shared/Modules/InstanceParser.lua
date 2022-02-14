@@ -1,4 +1,5 @@
-class 'InstanceParser'
+---@class InstanceParser
+InstanceParser = class 'InstanceParser'
 
 local m_Logger = Logger("InstanceParser", false)
 
@@ -28,7 +29,6 @@ function InstanceParser:RegisterVars()
 	self.m_PrimaryInstances = {}
 	self.m_LevelDatas = {}
 end
-
 
 function InstanceParser:OnLevelDestroy()
 	self.m_MeshVariationDatabases = {}
@@ -63,6 +63,7 @@ function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	--m_Logger:Write(self.m_StaticModelGroupEntityDataGuids)
 
 	for _, l_Data in pairs(self.m_StaticModelGroupEntityDataGuids) do
+		---@type StaticModelGroupEntityData|DataContainer|nil
 		local s_Instance = ResourceManager:FindInstanceByGuid(Guid(l_Data.partitionGuid), Guid(l_Data.instanceGuid))
 
 		if s_Instance == nil then

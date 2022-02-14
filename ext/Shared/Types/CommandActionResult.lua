@@ -1,4 +1,5 @@
-class 'CommandActionResult'
+---@class CommandActionResult
+CommandActionResult = class 'CommandActionResult'
 
 local m_Logger = Logger("CommandActionResult", false)
 
