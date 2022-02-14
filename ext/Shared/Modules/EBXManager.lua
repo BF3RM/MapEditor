@@ -15,7 +15,7 @@ function EBXManager:SetFields(p_Overrides)
 	for _, v in pairs(p_Overrides) do
 		m_Logger:Write(_)
 		m_Logger:Write(v)
-		self:SetField(v.field, v.reference, v.type, v.value)
+		self:SetField(v.field, v.reference, v.type)
 	end
 end
 
@@ -38,7 +38,7 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 				if s_TypeInfo.array then -- Go to the array index
 					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path + '.' + p_Field.field)
 				elseif s_TypeInfo.enum then
-					p_Instance[p_Field.field] = number(p_Field.value)
+					p_Instance[p_Field.field] = tonumber(p_Field.value)
 					return p_Path .. '.' .. p_Field.field
 				else
 					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field)
