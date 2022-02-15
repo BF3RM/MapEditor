@@ -1,8 +1,10 @@
 ---@class GameObjectManager
 GameObjectManager = class 'GameObjectManager'
 
+---@type Logger
 local m_Logger = Logger("GameObjectManager", false)
 
+---@param p_Realm Realm
 function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm
@@ -13,7 +15,6 @@ function GameObjectManager:RegisterVars()
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_PendingBlueprint = {}
-
 
 	self.m_PendingEntities = {}
 	self.m_VanillaGameObjectGuids = {}
@@ -26,16 +27,26 @@ function GameObjectManager:OnLevelDestroy()
 	self:RegisterVars()
 end
 
+---@param p_GameObjectGuid string|Guid
 function GameObjectManager:GetGameObject(p_GameObjectGuid)
 	return self.m_GameObjects[tostring(p_GameObjectGuid)]
 end
 
+---@param p_GameObjectGuid string|Guid
+---@param p_SenderName string
+---@param p_BlueprintPartitionGuid string|Guid
+---@param p_BlueprintInstanceGuid string|Guid
+---@param p_ParentData table
+---@param p_LinearTransform LinearTransform
+---@param p_Variation number
+---@param p_IsPreviewSpawn boolean
+---@param p_Overrides table
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
 			p_BlueprintInstanceGuid == nil or
 			p_LinearTransform == nil then
 		m_Logger:Error('InvokeBlueprintSpawn: One or more parameters are nil.')
-		
+
 		return false
 	end
 
@@ -82,8 +93,7 @@ end
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
 	local s_PendingCustomBlueprintInfo = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)]
 	
-	if s_PendingCustomBlueprintInfo and Guid(s_PendingCustomBlueprintInfo.customGuid) == PREVIEW_GUID and 
-			SharedUtils:IsServerModule() then
+	if SharedUtils:IsServerModule() and s_PendingCustomBlueprintInfo and Guid(s_PendingCustomBlueprintInfo.customGuid) == PREVIEW_GUID then
 		m_Logger:Error('Tried to spawn the preview object on server, something went wrong.')
 		p_Hook:Return()
 	end
@@ -102,13 +112,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	--local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
 
 	local s_ParentInstanceGuid
-	local s_ParentPartitionGuid
-	local s_ParentPrimaryInstance
+	-- local s_ParentPartitionGuid
+	-- local s_ParentPrimaryInstance
 
 	if p_Parent ~= nil then
 		s_ParentInstanceGuid = tostring(p_Parent.instanceGuid)
-		s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
-		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
+		-- s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
+		-- s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
 	end
 
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
