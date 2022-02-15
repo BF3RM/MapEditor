@@ -1,4 +1,5 @@
-class 'ProjectManager'
+---@class ProjectManager
+ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false
@@ -55,7 +56,7 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
 			projectName = 'Untitled Project',
 			mapName = self.m_MapName,
 			gameModeName = self.m_GameMode,
-			requiredBundles = self.m_RequiredBundles
+			requiredBundles = self.m_LoadedBundles
 		}
 	end
 
@@ -213,7 +214,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		projectName = p_ProjectSaveData.projectName,
 		mapName = self.m_MapName,
 		gameModeName = self.m_GameMode,
-		requiredBundles = self.m_RequiredBundles
+		requiredBundles = self.m_LoadedBundles
 	}
 	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
 
@@ -240,7 +241,6 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
 		-- Vanilla objects are handled in maploader
 		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
-		l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild or
 		l_GameObjectSaveData.isVanilla then -- Supports old savefiles
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
@@ -264,6 +264,8 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 			end
 
 			table.insert(s_SaveFileCommands, s_Command)
+		elseif l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild then
+			-- TODO Fool: Handle custom objects' children, they should be handled after the parent is spawned
 		else
 			s_Command = {
 				guid = s_Guid,

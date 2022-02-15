@@ -1,5 +1,5 @@
-class "Logger"
-
+---@class Logger
+Logger = class "Logger"
 
 function Logger:__init(p_ClassName, p_ActivateLogging)
 	if type(p_ClassName) ~= "string" then
@@ -57,7 +57,7 @@ function Logger:Error(p_Message)
 		return
 	end
 
-	print("["..self.className.."] ERROR: " .. tostring(p_Message))
+	print("["..self.className.."] ERROR: " .. tostring(p_Message) .. " ")
 end
 
 return Logger

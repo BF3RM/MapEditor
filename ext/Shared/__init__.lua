@@ -1,4 +1,5 @@
-class 'MapEditorShared'
+---@class MapEditorShared
+MapEditorShared = class 'MapEditorShared'
 
 require "__shared/Config"
 require "__shared/Util/Logger"

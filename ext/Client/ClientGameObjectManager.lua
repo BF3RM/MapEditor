@@ -1,4 +1,5 @@
-class ('ClientGameObjectManager')
+---@class ClientGameObjectManager
+ClientGameObjectManager = class 'ClientGameObjectManager'
 
 local m_Logger = Logger("ClientGameObjectManager", false)
 
