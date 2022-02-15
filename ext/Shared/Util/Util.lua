@@ -246,11 +246,17 @@ function GenerateCustomGuid()
 end
 
 function GenerateChildGuid(p_ParentGuid, p_Offset)
+	m_Logger:Write("GenerateChildGuid")
+	m_Logger:Write("p_ParentGuid" .. tostring(p_ParentGuid))
+	m_Logger:Write("p_Offset" .. tostring(p_Offset))
+	
 	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
 	local s_GuidEnd = s_ParentGuidParts[5]
 	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
-	local s_NewGuidEnd = string.format("%x", s_GuidEndNumber + p_Offset):upper()
-	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEnd)
+	local s_NewGuidEndPadded = string.format("%012x", s_GuidEndNumber + p_Offset):upper()
+	m_Logger:Write("s_NewGuidEndPadded" .. s_NewGuidEndPadded)
+	local s_GeneratedGuidString = s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEndPadded
+	return Guid(s_GeneratedGuidString)
 end
 
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
