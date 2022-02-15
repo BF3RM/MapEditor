@@ -135,6 +135,11 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
 		m_Logger:Error("gameObjectTransferData must be set on PreviewDestroy")
 	end
 
+	-- Return success if it's already deleted
+	if GameObjectManager:GetGameObject(s_GameObjectTransferData.guid) == nil then
+		return CARResponseType.Success
+	end
+
 	local s_Result = GameObjectManager:DeleteGameObject(s_GameObjectTransferData.guid)
 
 	if s_Result == false then
