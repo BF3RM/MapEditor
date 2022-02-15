@@ -1,6 +1,6 @@
 class 'GameObjectManager'
 
-local m_Logger = Logger("GameObjectManager", true)
+local m_Logger = Logger("GameObjectManager", false)
 
 function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
@@ -162,7 +162,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		end
 		-- Root object
 		if s_ReferenceObjectData == nil or s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
-			m_Logger:Write("ResolveRootObject 1")
 			self:ResolveRootObject(s_GameObject)
 		else
 			-- Child object
@@ -176,12 +175,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
-			m_Logger:Write("ResolveRootObject 2")
 			self:ResolveRootObject(s_GameObject)
 		else
-			m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
-			m_Logger:Write("ResolveRootObject 3")
+			m_Logger:Write('Found custom object without parent')
 			self:ResolveRootObject(s_GameObject)
 		end
 	end
