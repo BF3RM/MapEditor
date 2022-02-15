@@ -56,7 +56,7 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
 			projectName = 'Untitled Project',
 			mapName = self.m_MapName,
 			gameModeName = self.m_GameMode,
-			requiredBundles = self.m_RequiredBundles
+			requiredBundles = self.m_LoadedBundles
 		}
 	end
 
@@ -214,7 +214,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		projectName = p_ProjectSaveData.projectName,
 		mapName = self.m_MapName,
 		gameModeName = self.m_GameMode,
-		requiredBundles = self.m_RequiredBundles
+		requiredBundles = self.m_LoadedBundles
 	}
 	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
 
