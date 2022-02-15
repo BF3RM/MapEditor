@@ -1,4 +1,5 @@
-class 'UIManager'
+---@class UIManager
+UIManager = class 'UIManager'
 
 local m_Logger = Logger("UIManager", false)
 

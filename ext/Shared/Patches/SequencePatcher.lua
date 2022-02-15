@@ -1,4 +1,5 @@
-class 'SequencePatcher'
+---@class SequencePatcher
+SequencePatcher = class 'SequencePatcher'
 
 local m_Logger = Logger("SequencePatcher", false)
 

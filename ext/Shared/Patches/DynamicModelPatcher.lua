@@ -1,4 +1,5 @@
-class 'DynamicModelPatcher'
+---@class DynamicModelPatcher
+DynamicModelPatcher = class 'DynamicModelPatcher'
 
 local m_Logger = Logger("DynamicModelPatcher", false)
 

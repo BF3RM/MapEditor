@@ -1,4 +1,5 @@
-class "Timer"
+---@class Timer
+Timer = class "Timer"
 
 local m_Logger = Logger("Timer", false)
 

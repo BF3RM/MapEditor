@@ -1,4 +1,5 @@
-class 'GameObjectSaveData'
+---@class GameObjectSaveData
+GameObjectSaveData = class 'GameObjectSaveData'
 
 local m_Logger = Logger("GameObjectSaveData", false)
 

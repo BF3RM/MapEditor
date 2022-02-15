@@ -1,4 +1,5 @@
-class 'CommandActions'
+---@class CommandActions
+CommandActions = class 'CommandActions'
 
 local m_Logger = Logger("CommandActions", false)
 

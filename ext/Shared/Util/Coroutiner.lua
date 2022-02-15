@@ -1,4 +1,5 @@
-class 'Coroutiner'
+---@class Coroutiner
+Coroutiner = class 'Coroutiner'
 
 local m_Logger = Logger("Coroutiner", false)
 

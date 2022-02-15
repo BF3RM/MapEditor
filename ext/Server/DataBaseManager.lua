@@ -1,4 +1,5 @@
-class 'DataBaseManager'
+---@class DataBaseManager
+DataBaseManager = class 'DataBaseManager'
 
 local m_Logger = Logger("DataBaseManager", false)
 
