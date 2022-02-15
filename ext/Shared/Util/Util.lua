@@ -236,11 +236,13 @@ function h()
 	return p_Vars[math.floor(MathUtils:GetRandomInt(1,16))]..p_Vars[math.floor(MathUtils:GetRandomInt(1,16))]
 end
 
+---@return Guid guid
 function GenerateTempGuid()
 	return Guid(TEMP_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
--- Generates a random guid.
+--- Generates a random guid.
+---@return Guid guid
 function GenerateCustomGuid()
 	return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
@@ -249,7 +251,7 @@ function GenerateChildGuid(p_ParentGuid, p_Offset)
 	m_Logger:Write("GenerateChildGuid")
 	m_Logger:Write("p_ParentGuid" .. tostring(p_ParentGuid))
 	m_Logger:Write("p_Offset" .. tostring(p_Offset))
-	
+
 	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
 	local s_GuidEnd = s_ParentGuidParts[5]
 	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
@@ -272,6 +274,9 @@ function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	return PadAndCreateGuid(s_HashAsString)
 end
 
+---@param p_Number number
+---@param p_StringLength number
+---@return string
 function GetPaddedNumberAsString(p_Number, p_StringLength)
 	local s_Number_String = tostring(p_Number)
 	local s_Prefix = ""
@@ -285,7 +290,7 @@ function GetPaddedNumberAsString(p_Number, p_StringLength)
 		s_Number_String = s_Number_String:sub(1, s_TrimSize)
 	end
 
-	return (s_Prefix .. s_Number_String)
+	return s_Prefix .. s_Number_String
 end
 
 -- Generates a guid based on a given number. Used for vanilla objects.

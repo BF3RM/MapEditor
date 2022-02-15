@@ -1,6 +1,7 @@
 ---@class MessageActions
 MessageActions = class 'MessageActions'
 
+---@type Logger
 local m_Logger = Logger("MessageActions", false)
 
 function MessageActions:__init()
@@ -25,35 +26,47 @@ function MessageActions:RegisterVars()
 	self.RequestImportProjectMessage = self.RequestImportProject
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:GetProjects(p_Message)
 	NetEvents:SendLocal('GetProjectHeaders')
 	return CARResponseType.Success
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:RequestLoadProject(p_Message)
 	m_Logger:Write("Load requested: " .. p_Message.projectId)
 	NetEvents:SendLocal("ProjectManager:RequestProjectLoad", p_Message.projectId)
 	return CARResponseType.Success
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:RequestImportProject(p_Message)
 	m_Logger:Write("Importing requested")
 	NetEvents:SendLocal("ProjectManager:RequestProjectImport", p_Message.projectDataJSON)
 	return CARResponseType.Success
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:RequestDeleteProject(p_Message)
 	m_Logger:Write("Delete requested: " .. p_Message.projectId)
 	NetEvents:SendLocal("ProjectManager:RequestProjectDelete", p_Message.projectId)
 	return CARResponseType.Success
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:RequestProjectData(p_Message)
 	m_Logger:Write("Project Data requested: " .. p_Message.projectId)
 	NetEvents:SendLocal("ProjectManager:RequestProjectData", p_Message.projectId)
 	return CARResponseType.Success
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:MoveObject(p_Message)
 	local s_GameObjectTransferData = p_Message.gameObjectTransferData
 
@@ -71,6 +84,8 @@ function MessageActions:MoveObject(p_Message)
 	end
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:RequestSaveProject(p_Message)
 	local s_ProjectHeaderData = DecodeParams(json.decode(p_Message.projectHeaderJSON))
 
@@ -82,6 +97,8 @@ function MessageActions:RequestSaveProject(p_Message)
 	end
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:SetViewMode(p_Message)
 	local s_WorldRenderSettings = ResourceManager:GetSettings("WorldRenderSettings")
 
@@ -95,11 +112,16 @@ function MessageActions:SetViewMode(p_Message)
 	end
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:SetScreenToWorldPosition(p_Message)
 	Editor:SetPendingRaycast(RaycastType.Mouse, p_Message.direction)
 	return CARResponseType.Success
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
+---@param p_Arguments table
 function MessageActions:PreviewSpawn(p_Message, p_Arguments)
 	local s_GameObjectTransferData = p_Message.gameObjectTransferData
 
@@ -124,6 +146,9 @@ function MessageActions:PreviewSpawn(p_Message, p_Arguments)
 	end
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
+---@param p_UpdatePass number
 function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
 	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
 		return CARResponseType.Queue
@@ -135,6 +160,11 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
 		m_Logger:Error("gameObjectTransferData must be set on PreviewDestroy")
 	end
 
+	-- Return success if it's already deleted
+	if GameObjectManager:GetGameObject(s_GameObjectTransferData.guid) == nil then
+		return CARResponseType.Success
+	end
+
 	local s_Result = GameObjectManager:DeleteGameObject(s_GameObjectTransferData.guid)
 
 	if s_Result == false then
@@ -144,6 +174,8 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
 	end
 end
 
+---@return CARResponseType
+---@param p_Message IMessage
 function MessageActions:TeleportMouse(p_Message)
 	m_Logger:Write(p_Message)
 	local s_NewCoords = p_Message.coordinates
