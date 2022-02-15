@@ -198,7 +198,7 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 		return
 	end
 
-	if GameObjectManager:GetEntityByGuid(p_Command.gameObjectTransferData.guid) == nil then
+	if GameObjectManager:GetGameObject(p_Command.gameObjectTransferData.guid) == nil then
 		m_Logger:Write("Failed to select that gameobject")
 		return nil, CARResponseType.Failure
 	end

@@ -20,5 +20,11 @@
 	"settings": {
 		"Lua.workspace.maxPreload": 10000,
 		"Lua.diagnostics.libraryFiles": "Disable"
+	},
+	"extensions": {
+		"recommendations": [
+			"Imposter.vscode-lua-vu",
+			"johnsoncodehk.volar"
+		]
 	}
 }
