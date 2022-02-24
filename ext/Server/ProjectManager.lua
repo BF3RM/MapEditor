@@ -275,13 +275,13 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 					guid = s_Guid,
 					name = l_GameObjectSaveData.name,
 					blueprintCtrRef = l_GameObjectSaveData.blueprintCtrRef,
-					parentData = l_GameObjectSaveData.parentData,
+					parentData = l_GameObjectSaveData.parentData or GameObjectParentData:GetRootParentData(),
 					transform = l_GameObjectSaveData.transform,
-					variation = l_GameObjectSaveData.variation,
+					variation = l_GameObjectSaveData.variation or 0,
 					gameEntities = {},
 					isEnabled = l_GameObjectSaveData.isEnabled or true,
 					isDeleted = l_GameObjectSaveData.isDeleted or false,
-					overrides = l_GameObjectSaveData.overrides or nil
+					overrides = l_GameObjectSaveData.overrides
 				}
 			}
 
