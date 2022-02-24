@@ -276,8 +276,8 @@ export default class VEXTInterface {
 		signals.projectImportFinished.emit(msg);
 	}
 
-	SetProjectData(projectData: any) {
-		signals.setProjectData.emit(projectData);
+	SetProjectData(projectDataJSON: any) {
+		signals.setProjectData.emit(projectDataJSON);
 	}
 
 	public EditorModeChanged(mode: EDITOR_MODE) {

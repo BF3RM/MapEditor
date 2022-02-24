@@ -33,6 +33,11 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 		s_GameObjectSaveDatasJson = json.encode(p_GameObjectSaveDatas)
 	end
 
+	-- Round numbers to 3 decimals
+	s_GameObjectSaveDatasJson = string.gsub(s_GameObjectSaveDatasJson, "(%d+%.%d+)", function(n)
+		return string.format("%.3f", tonumber(n))
+	end)
+
 	if type(p_RequiredBundles) ~= 'string' then
 		s_RequiredBundlesJson = json.encode(p_RequiredBundles)
 	end
@@ -192,7 +197,9 @@ function DataBaseManager:GetProjectHeader(p_ProjectId)
 	return s_Header
 end
 
-function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
+---@param p_ProjectId number
+---@return string|nil
+function DataBaseManager:GetProjectDataJSONByProjectId(p_ProjectId)
 	p_ProjectId = tostring(math.floor(p_ProjectId))
 	m_Logger:Write("GetProjectDataByProjectId()" .. p_ProjectId)
 
@@ -210,6 +217,18 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 		return
 	end
 
+	return s_ProjectDataJSON
+end
+
+---@param p_ProjectId number
+---@return table|nil
+function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
+	local s_ProjectDataJSON = self:GetProjectDataJSONByProjectId(p_ProjectId)
+
+	if not s_ProjectDataJSON then
+		return
+	end
+
 	local s_ProjectData = DecodeParams(json.decode(s_ProjectDataJSON))
 
 	if not s_ProjectData then
@@ -220,6 +239,8 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 	return s_ProjectData
 end
 
+---@param p_ProjectId number
+---@return table|nil
 function DataBaseManager:GetProjectByProjectId(p_ProjectId)
 	p_ProjectId = tostring(math.floor(p_ProjectId))
 	m_Logger:Write("GetProjectByProjectId()" .. p_ProjectId)

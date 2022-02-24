@@ -154,9 +154,12 @@ export default class ProjectSettingsComponent extends Vue {
 				this.state.visible = false;
 			}
 		});
-		signals.setProjectData.connect((projectData: any) => {
+		signals.setProjectData.connect((projectDataJSON: any) => {
 			this.hint = 'Select all and copy (CTRL+C)';
-			this.projectData = JSON.stringify(projectData, null, '\t');
+			// Parse and stringify again to beautify
+			const projectData = JSON.parse(projectDataJSON);
+			const beautifiedJSON = JSON.stringify(projectData, null, '\t');
+			this.projectData = beautifiedJSON;
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
 		});
 	}
