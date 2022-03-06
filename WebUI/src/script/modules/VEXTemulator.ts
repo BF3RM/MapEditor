@@ -224,7 +224,7 @@ export class VEXTemulator {
 	private DestroyGameObject(commandActionResult: CommandActionResult) {
 		// Delete all children of blueprint
 		return {
-			type: 'DeletedBlueprint',
+			type: 'DeletedGameObject',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid.toString()
 			}
