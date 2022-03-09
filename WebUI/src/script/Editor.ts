@@ -365,16 +365,16 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const gameObject = this.gameObjects.getValue(gameObjectGuid);
+
 		if (gameObject === undefined) {
 			return;
 		}
-		this.threeManager.deleteObject(gameObject);
-		this.gameObjects.remove(gameObjectGuid);
 
 		if (gameObject.selected) {
 			this.selectionGroup.deselect(gameObject);
 		}
 
+		// Delete GameObject descendants and their SpatialGameEntities
 		gameObject.getAllChildren().forEach((go) => {
 			go.children.forEach((child) => {
 				if (child instanceof SpatialGameEntity) {
@@ -385,6 +385,17 @@ export default class Editor {
 			this.gameObjects.remove(go.guid);
 			this.threeManager.deleteObject(go);
 		});
+
+		// Delete children SpatialGameEntities
+		gameObject.children.forEach((child) => {
+			if (child instanceof SpatialGameEntity) {
+				this.spatialGameEntities.delete(child.instanceId);
+				child.Delete();
+			}
+		});
+
+		this.threeManager.deleteObject(gameObject);
+		this.gameObjects.remove(gameObjectGuid);
 
 		if (this.selectionGroup.selectedGameObjects.length === 0) {
 			this.threeManager.hideGizmo();

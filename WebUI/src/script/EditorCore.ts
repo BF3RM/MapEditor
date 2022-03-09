@@ -50,7 +50,7 @@ export class EditorCore {
 			const go = editor.getGameObjectByGuid(el);
 			if (go) {
 				editor.threeManager.nextFrame(() => {
-					editor.Select(el, true, true);
+					this.select(el, true, true);
 				});
 				this.pendingSelections.splice(i, 1);
 			}
@@ -235,7 +235,7 @@ export class EditorCore {
 		this.previewBlueprint = null;
 	}
 
-	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
+	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean = false, moveGizmo: boolean = false) {
 		// When selecting nothing, deselect all if its not multi selection.
 		if (guid.isEmpty()) {
 			if (!multiSelection) {
