@@ -52,15 +52,15 @@ function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectH
 	local s_Bundles = {}
 
 	if p_ProjectHeader == nil then
-		return s_Bundles
+		return p_Bundles
 	end
 
 	if p_ProjectHeader.requiredBundles == nil then
-		return s_Bundles
+		return p_Bundles
 	end
 
 	if not self:IsLevelBundle(p_Bundles) then
-		return s_Bundles
+		return p_Bundles
 	end
 
 
