@@ -35,6 +35,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('UI:DrawHud', self, self.OnDrawHud)
 	Events:Subscribe('Level:LoadingInfo', self, self.OnLoadingInfo)
+	Events:Subscribe('Level:LoadResources', self, self.OnLevelLoadResources)
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
@@ -58,6 +59,8 @@ function MapEditorClient:RegisterEvents()
 	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
+	Hooks:Install('Terrain:Load', 1, self, self.OnTerrainLoad)
+	Hooks:Install('VisualTerrain:Load', 1, self, self.OnTerrainLoad)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
@@ -120,6 +123,10 @@ function MapEditorClient:OnLevelDestroy()
 	UIManager:OnLevelDestroy()
 end
 
+function MapEditorClient:OnTerrainLoad(p_HookCtx, p_AssetName)
+	EditorCommon:OnTerrainLoad(p_HookCtx, p_AssetName, Editor.m_CurrentProjectHeader)
+end
+
 function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	local s_LoadingInfo = ''
 
@@ -132,7 +139,9 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	end
 
 	UIManager:SetLoadingInfo('Mounting bundles: ' .. tostring(s_LoadingInfo))
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	local s_Bundles = EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
+
+	p_Hook:Pass(s_Bundles, p_Compartment)
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
@@ -145,6 +154,10 @@ end
 
 function MapEditorClient:OnLoadingInfo(p_Info)
 	UIManager:SetLoadingInfo(p_Info)
+end
+
+function MapEditorClient:OnLevelLoadResources(p_LevelName, p_GameMode, p_IsDedicatedServer)
+	EditorCommon:OnLevelLoadResources(Editor.m_CurrentProjectHeader)
 end
 
 ----------- Editor functions----------------
@@ -174,10 +187,12 @@ function MapEditorClient:OnUIReloaded()
 end
 
 function MapEditorClient:OnReceiveProjectHeaders(p_ProjectHeaders)
+	Editor:SetProjectHeaders(p_ProjectHeaders)
 	WebUpdater:AddUpdate('SetProjectHeaders', p_ProjectHeaders)
 end
 
 function MapEditorClient:OnReceiveCurrentProjectHeader(p_CurrentProjectHeader)
+	Editor:SetProjectHeaders(p_CurrentProjectHeader)
 	WebUpdater:AddUpdate('SetCurrentProjectHeader', p_CurrentProjectHeader)
 end
 

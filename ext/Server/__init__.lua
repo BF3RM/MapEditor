@@ -43,8 +43,11 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Events:Subscribe('Player:Chat', self, self.OnChat)
 	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
+	Events:Subscribe('Level:LoadResources', self, self.OnLevelLoadResources)
 
 	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
+	Hooks:Install('Terrain:Load', 1, self, self.OnTerrainLoad)
+	Hooks:Install('VisualTerrain:Load', 1, self, self.OnTerrainLoad)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
@@ -125,9 +128,19 @@ function MapEditorServer:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
 end
 
+function MapEditorServer:OnLevelLoadResources(p_LevelName, p_GameMode, p_IsDedicatedServer)
+	EditorCommon:OnLevelLoadResources(ProjectManager.m_CurrentProjectHeader)
+end
+
+function MapEditorServer:OnTerrainLoad(p_HookCtx, p_AssetName)
+	EditorCommon:OnTerrainLoad(p_HookCtx, p_AssetName, ProjectManager.m_CurrentProjectHeader)
+end
+
 function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
-	ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
+	local s_Bundles = EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
+	ProjectManager:OnLoadBundles(s_Bundles, p_Compartment)
+
+	p_Hook:Pass(s_Bundles, p_Compartment)
 end
 
 function MapEditorServer:OnPlayerAuthenticated(p_Player)
