@@ -28,12 +28,10 @@ export class Guid {
 	}
 
 	private value: string = Guid.EMPTY;
-	private key: string = Guid.EMPTY;
 
 	public constructor(guid?: string) {
 		if (guid && Guid.validator.test(guid)) {
-			this.value = guid;
-			this.key = guid;
+			this.value = guid.toUpperCase();
 		}
 	}
 
@@ -43,7 +41,7 @@ export class Guid {
 
 	/** Compares one Guid instance with another */
 	public equals(other: Guid): boolean {
-		return Guid.isGuid(other) && this.value === other.toString();
+		return Guid.isGuid(other) && this.value.toUpperCase() === other.toString().toUpperCase();
 	}
 
 	public isEmpty(): boolean {

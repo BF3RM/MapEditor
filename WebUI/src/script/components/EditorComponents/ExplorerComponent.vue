@@ -67,8 +67,7 @@ export default class ExplorerComponent extends EditorComponent {
 
 	private search: string = '';
 
-	constructor() {
-		super();
+	mounted() {
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
 	}
 

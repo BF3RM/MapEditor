@@ -10,6 +10,7 @@ RaycastType = {
 	Mouse = 2
 }
 
+---@class GameObjectOriginType
 GameObjectOriginType = {
 	Vanilla = 1,
 	Custom = 2,
@@ -23,6 +24,8 @@ EditorMode = {
 	FreeCam = 4
 }
 
+--Command Action Response Type
+---@class CARResponseType
 CARResponseType = {
 	Success = 1,
 	Failure = 2,

@@ -1,6 +1,7 @@
-class 'SequencePatcher'
+---@class SequencePatcher
+SequencePatcher = class 'SequencePatcher'
 
-local m_Logger = Logger("SequencePatcher", true)
+local m_Logger = Logger("SequencePatcher", false)
 
 function SequencePatcher:__init()
 	m_Logger:Write("Initializing Patches")

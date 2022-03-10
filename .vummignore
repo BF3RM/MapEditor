@@ -1,0 +1,7 @@
+Docs/
+Tools/
+WebUI/
+.github/
+.idea/
+mod.*.json
+*.db

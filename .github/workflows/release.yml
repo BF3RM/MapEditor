@@ -2,6 +2,10 @@ name: Create Release
 on:
   workflow_dispatch:
     inputs:
+      env:
+        description: 'Environment (release, preview)'
+        default: 'release'
+        required: true
       version:
         description: 'Release Version'
         required: true
@@ -22,17 +26,44 @@ jobs:
         run: yarn install
       - name: Build
         working-directory: './WebUI'
-        run: yarn build
+        run: |
+          $env:VERSION='${{ github.event.inputs.version }}'
+          yarn build
       - name: Upload WebUI Artifact
         uses: actions/upload-artifact@v2
         with:
           name: webui-build
           retention-days: 1
           path: ui.vuic
+  build_lua:
+    name: Build Lua
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Rename Config .release files
+        run: |
+          mv ./ext/Shared/Config.release.lua ./ext/Shared/Config.lua
+#      - name: Rename mod.json
+#        run: |
+#          mv ./mod.release.json ./mod.json
+      - name: Update version in mod.json
+        run: |
+          sed -i '/"Version": "0.0.0"/s/"0.0.0"/"${{ github.event.inputs.version }}"/' mod.json
+      - name: Upload Lua Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: lua-build
+          retention-days: 1
+          path: |
+            ext
+            mod.json
   publish:
     name: Publish Release
     runs-on: ubuntu-latest
-    needs: build_ui
+    needs: [build_ui, build_lua]
     steps:
       - name: Download WebUI Artifact
         uses: actions/download-artifact@v2
@@ -61,3 +92,15 @@ jobs:
           asset_path: ./MapEditor.zip
           asset_name: MapEditor.zip
           asset_content_type: application/zip
+      - name: Publish to VUMM as tag ${{ github.event.inputs.env }}
+        if: ${{ github.event.inputs.env != 'release' }}
+        uses: BF3RM/vumm-action@v1
+        env:
+          VUMM_TOKEN: ${{ secrets.VUMM_TOKEN }}
+        with:
+          tag: ${{ github.event.inputs.env }}
+      - name: Publish to VUMM as latest
+        if: ${{ github.event.inputs.env == 'release' }}
+        uses: BF3RM/vumm-action@v1
+        env:
+          VUMM_TOKEN: ${{ secrets.VUMM_TOKEN }}

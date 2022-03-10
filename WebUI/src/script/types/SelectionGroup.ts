@@ -7,8 +7,6 @@ import { SetTransformCommand } from '@/script/commands/SetTransformCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
 import EnableGameObjectCommand from '@/script/commands/EnableGameObjectCommand';
 import DisableGameObjectCommand from '@/script/commands/DisableGameObjectCommand';
-import { Vector3 } from 'three';
-import { Vec3 } from '@/script/types/primitives/Vec3';
 
 export class SelectionGroup extends THREE.Object3D {
 	public selectedGameObjects: GameObject[] = [];
@@ -25,7 +23,10 @@ export class SelectionGroup extends THREE.Object3D {
 	public onClientOnlyMove() {
 		// Calculate the matrices of the selected objects.
 		this.updateSelectedGameObjects();
-		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
+
+		editor.threeManager.nextFrame(() => {
+			signals.selectionGroupChanged.emit(this, 'transform', this.transform);
+		});
 	}
 
 	public onClientOnlyMoveEnd() {
@@ -60,7 +61,7 @@ export class SelectionGroup extends THREE.Object3D {
 	 * so we can now apply the transformation matrix to get their new matrices.
 	 */
 	public updateSelectedGameObjects(oldMatrix = this.transform.toMatrix(), newMatrix = this.matrixWorld) {
-		this.updateMatrixWorld();
+		this.updateMatrixWorld(true);
 		const selectionGroupWorld = oldMatrix;
 		const selectionGroupWorldNew = newMatrix;
 
@@ -71,13 +72,13 @@ export class SelectionGroup extends THREE.Object3D {
 		const childWorldNew = new THREE.Matrix4();
 
 		for (const go of this.selectedGameObjects) {
-			go.updateMatrixWorld();
+			go.updateMatrixWorld(true);
 			childLocal.multiplyMatrices(go.matrixWorld, selectionOldMatrixInverse); // calculates go's matrix relative to selection group
 			childLocalNew.multiplyMatrices(transformMatrix, childLocal); // calculates go's new matrix with transformation matrix
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
 			go.setWorldMatrix(childWorldNew);
-			// Matrix is recalculated on render, we call the signal in the next frame.
-			editor.threeManager.nextFrame(() => signals.objectChanged.emit(go, 'transform', go.transform));
+			go.updateMatrixWorld(true);
+			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
 		// Save new matrix.
 		this.transform = new LinearTransform().setFromMatrix(selectionGroupWorldNew);

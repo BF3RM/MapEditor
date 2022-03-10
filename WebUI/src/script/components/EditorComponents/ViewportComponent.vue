@@ -10,8 +10,7 @@ import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
 @Component({ components: { EditorComponent } })
 export default class ViewportComponent extends EditorComponent {
-	constructor() {
-		super();
+	mounted() {
 		signals.editor.Ready.connect(this.drawStats.bind(this));
 	}
 

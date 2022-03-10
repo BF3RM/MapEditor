@@ -86,15 +86,13 @@ export default class HierarchyComponent extends EditorComponent {
 
 	private search: string = '';
 
-	private entries = new Map<Guid, INode>();
 	private queue = new Map<string, INode>();
 	private existingParents = new Map<string, INode[]>();
 
 	@Ref('infiniteTreeComponent')
 	infiniteTreeComponent: any;
 
-	constructor() {
-		super();
+	public mounted() {
 		console.log('Mounted');
 		signals.spawnedGameObject.connect(this.onSpawnedGameObject.bind(this));
 		signals.deletedGameObject.connect(this.onDeletedGameObject.bind(this));
@@ -103,9 +101,7 @@ export default class HierarchyComponent extends EditorComponent {
 		signals.selectedGameObject.connect(this.onSelectedGameObject.bind(this));
 		signals.deselectedGameObject.connect(this.onDeselectedGameObject.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
-	}
 
-	public mounted() {
 		if (this.infiniteTreeComponent !== undefined) {
 			this.tree = (this.infiniteTreeComponent).tree as InfiniteTree;
 		}
@@ -136,58 +132,53 @@ export default class HierarchyComponent extends EditorComponent {
 	}
 
 	onSpawnedGameObject(commandActionResult: CommandActionResult) {
-		return new Promise((resolve, reject) => {
-			const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
-			const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
+		const gameObjectGuid = commandActionResult.gameObjectTransferData.guid;
+		const gameObject = (window as any).editor.getGameObjectByGuid(gameObjectGuid);
 
-			// Don't add preview object to hierarchy.
-			if (gameObject.parentData.typeName === 'previewSpawn') return;
+		// Don't add preview object to hierarchy.
+		if (gameObject.parentData.typeName === 'previewSpawn') return;
 
-			const currentEntry = this.createNode(gameObject);
-			this.entries.set(gameObjectGuid, currentEntry);
-			this.queue.set(currentEntry.id, currentEntry);
+		const currentEntry = this.createNode(gameObject);
+		this.queue.set(currentEntry.id, currentEntry);
 
-			if (!window.vext.executing) {
-				const updatedNodes = {};
-
-				for (const entry of this.queue.values()) {
-					// Check if the parent is in the queue
-					if (!entry.content || !entry.content[0]) {
-						console.error('Found node without content field');
-						continue;
-					}
-					const parentId = entry.content[0].parentGuid.toString();
-					if (this.queue.has(parentId)) {
-						this.queue.get(parentId)!.children!.push(entry);
-						// Check if the parent node is already spawned
-					} else if (this.tree.getNodeById(parentId) !== null) {
-						if (!this.existingParents.has(parentId)) {
-							this.existingParents.set(parentId, []);
-						}
-						console.log('Existing' + entry.name);
-						this.existingParents.get(parentId)!.push(entry);
-					} else {
-						// Entry does not have a parent.
-						const rootId = gameObject.origin === GAMEOBJECT_ORIGIN.VANILLA ? 'vanilla_root' : 'custom_root';
-						if (!this.existingParents.has(rootId)) {
-							this.existingParents.set(rootId, []);
-						}
-						// console.log('Root');
-						this.existingParents.get(rootId)!.push(entry);
-					}
+		if (!window.vext.executing) {
+			for (const entry of this.queue.values()) {
+				// Check if the parent is in the queue
+				if (!entry.content || !entry.content[0]) {
+					console.error('Found node without content field');
+					continue;
 				}
-				for (const parentNodeId of this.existingParents.keys()) {
-					const parentNode = this.tree.getNodeById(parentNodeId);
-					if (parentNode === null) {
-						console.error('Missing parent node');
-					} else {
-						this.tree.addChildNodes(this.existingParents.get(parentNodeId) as INode[], undefined, parentNode);
+				const parentId = entry.content[0].parentGuid.toString();
+				if (this.queue.has(parentId)) {
+					this.queue.get(parentId)!.children!.push(entry);
+					// Check if the parent node is already spawned
+				} else if (this.tree.getNodeById(parentId) !== null) {
+					if (!this.existingParents.has(parentId)) {
+						this.existingParents.set(parentId, []);
 					}
-					this.existingParents.delete(parentNodeId);
+					console.log('Existing' + entry.name);
+					this.existingParents.get(parentId)!.push(entry);
+				} else {
+					// Entry does not have a parent.
+					const rootId = gameObject.origin === GAMEOBJECT_ORIGIN.VANILLA ? 'vanilla_root' : 'custom_root';
+					if (!this.existingParents.has(rootId)) {
+						this.existingParents.set(rootId, []);
+					}
+					// console.log('Root');
+					this.existingParents.get(rootId)!.push(entry);
 				}
-				this.queue.clear();
 			}
-		});
+			for (const parentNodeId of this.existingParents.keys()) {
+				const parentNode = this.tree.getNodeById(parentNodeId);
+				if (parentNode === null) {
+					console.error('Missing parent node');
+				} else {
+					this.tree.addChildNodes(this.existingParents.get(parentNodeId) as INode[], undefined, parentNode);
+				}
+				this.existingParents.delete(parentNodeId);
+			}
+			this.queue.clear();
+		}
 	}
 
 	onSelectedGameObject(guid: Guid, isMultipleSelection?: boolean, scrollTo?: boolean) {

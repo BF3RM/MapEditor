@@ -1,6 +1,7 @@
-class 'MapEditorClient'
+---@class MapEditorClient
+MapEditorClient = class 'MapEditorClient'
 
-local m_Logger = Logger("MapEditorClient", true)
+local m_Logger = Logger("MapEditorClient", false)
 WebUpdater = require "WebUpdater"
 FreeCam = require "Freecam"
 Editor = require "Editor"
@@ -12,7 +13,7 @@ EBXManager = require "__shared/Modules/EBXManager"
 
 GameObjectManager = GameObjectManager(Realm.Realm_Client)
 
-EditorCommon = EditorCommon(Realm.Realm_Client)
+EditorCommon = EditorCommon()
 --VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
 CommandActions = CommandActions(Realm.Realm_Client)
 InstanceParser = InstanceParser(Realm.Realm_Client)
@@ -23,7 +24,7 @@ function MapEditorClient:__init()
 end
 
 function MapEditorClient:RegisterEvents()
-	--Game events
+	--VEXT events
 	Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
 	Events:Subscribe('Extension:Loaded', self, self.OnExtensionLoaded)
 	Events:Subscribe('Engine:Message', self, self.OnEngineMessage)
@@ -137,7 +138,7 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 		end
 	end
 
-	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('Mounting bundles: %s')", tostring(s_LoadingInfo)))
+	UIManager:SetLoadingInfo('Mounting bundles: ' .. tostring(s_LoadingInfo))
 	local s_Bundles = EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, Editor.m_CurrentProjectHeader)
 
 	p_Hook:Pass(s_Bundles, p_Compartment)
@@ -152,7 +153,7 @@ function MapEditorClient:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tran
 end
 
 function MapEditorClient:OnLoadingInfo(p_Info)
-	WebUI:ExecuteJS(string.format("vext.SetLoadingInfo('%s')", p_Info))
+	UIManager:SetLoadingInfo(p_Info)
 end
 
 function MapEditorClient:OnLevelLoadResources(p_LevelName, p_GameMode, p_IsDedicatedServer)
@@ -215,6 +216,7 @@ end
 function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	local s_Transform = DecodeParams(json.decode(p_TransformJson))
 	FreeCam:OnControlUpdate(s_Transform.transform)
+	Editor:OnControlUpdate()
 end
 
 return MapEditorClient()

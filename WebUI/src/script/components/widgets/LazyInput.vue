@@ -7,6 +7,7 @@
 		:step="step"
 		@input="onInput"
 		@blur="onBlur"
+		@keyup.enter="onEnterPressed"
 		@focus="dirty = true"/>
 </template>
 
@@ -43,6 +44,10 @@ export default Vue.extend({
 				return;
 			}
 			this.$emit('input', this.inputValue);
+		},
+		onEnterPressed(e: any) {
+			this.onBlur();
+			e.target.blur();
 		}
 	},
 	watch: {

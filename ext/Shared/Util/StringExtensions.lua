@@ -1,4 +1,5 @@
-class "StringExtensions"
+---@class StringExtensions
+StringExtensions = class "StringExtensions"
 
 function string:normalizePath()
 	if self == nil then
@@ -30,6 +31,7 @@ end
 function string:split(p_Sep)
 	local s_Sep, s_Fields = p_Sep or ":", {}
 	local s_Pattern = string.format("([^%s]+)", s_Sep)
+	---@diagnostic disable-next-line: discard-returns
 	self:gsub(s_Pattern, function(c) s_Fields[#s_Fields+1] = c end)
 	return s_Fields
 end
@@ -39,7 +41,7 @@ function string:startsWith(p_StartOfString)
 end
 
 function string:endsWith(p_EndOfString)
-	return p_EndOfString == '' or string.sub(String, -string.len(p_EndOfString)) == p_EndOfString
+	return p_EndOfString == '' or string.sub(string, -string.len(p_EndOfString)) == p_EndOfString
 end
 
 function string:firstToLower(p_String)

@@ -1,6 +1,7 @@
-class 'GameObjectTransferData'
+---@class GameObjectTransferData
+GameObjectTransferData = class 'GameObjectTransferData'
 
-local m_Logger = Logger("GameObjectTransferData", true)
+local m_Logger = Logger("GameObjectTransferData", false)
 
 function GameObjectTransferData:__init(arg)
 	self.guid = arg.guid

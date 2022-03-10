@@ -1,6 +1,8 @@
-class 'GameObjectParentData'
+---@class GameObjectParentData
+---@field GetRootParentData fun():table
+GameObjectParentData = class 'GameObjectParentData'
 
-local m_Logger = Logger("GameObjectParentData", true)
+local m_Logger = Logger("GameObjectParentData", false)
 
 function GameObjectParentData:__init(p_Arg)
 	self.guid = p_Arg.guid

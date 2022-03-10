@@ -1,6 +1,7 @@
-class 'CommandActions'
+---@class CommandActions
+CommandActions = class 'CommandActions'
 
-local m_Logger = Logger("CommandActions", true)
+local m_Logger = Logger("CommandActions", false)
 
 function CommandActions:__init(p_Realm)
 	m_Logger:Write("Initializing CommandActions: " .. tostring(p_Realm))
@@ -197,7 +198,7 @@ function CommandActions:SelectGameObject(p_Command, p_UpdatePass)
 		return
 	end
 
-	if GameObjectManager:GetEntityByGuid(p_Command.gameObjectTransferData.guid) == nil then
+	if GameObjectManager:GetGameObject(p_Command.gameObjectTransferData.guid) == nil then
 		m_Logger:Write("Failed to select that gameobject")
 		return nil, CARResponseType.Failure
 	end

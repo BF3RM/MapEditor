@@ -1,8 +1,6 @@
 import CameraControls from 'camera-controls';
 import { Vec2 } from '@/script/types/primitives/Vec2';
-import { Guid } from '@/script/types/Guid';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
-import { Vec3 } from '@/script/types/primitives/Vec3';
 import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
 import { signals } from '@/script/modules/Signals';
 
@@ -10,6 +8,8 @@ import { signals } from '@/script/modules/Signals';
 
 export class InputControls {
 	public keys: boolean[] = [];
+	private wasMKeyDown: boolean = false;
+
 	constructor(element: HTMLCanvasElement) {
 		element.addEventListener('keydown', this.onCanvasKeyDown.bind(this));
 		window.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -33,6 +33,11 @@ export class InputControls {
 
 		switch (event.buttons) {
 		case MOUSE_BUTTONS.LEFT_CLICK:
+			if (event.shiftKey) {
+				// Box selection
+				editor.threeManager.selectionWrapper.initBoxSelection(event);
+				return;
+			}
 			selectionEnabled = !event.altKey; // Alt key is used for rotating camera
 			multiSelection = event.ctrlKey;
 			break;
@@ -107,6 +112,10 @@ export class InputControls {
 		if (event.which === KEYCODE.CTRL) {
 			editor.threeManager.disableGridSnap();
 		}
+		if (event.which === KEYCODE.KEY_M) {
+			this.wasMKeyDown = false;
+			editor.threeManager.DisableMiniBrushMode();
+		}
 	}
 
 	// Keys that should only work when the canvas is focused
@@ -177,6 +186,12 @@ export class InputControls {
 		}
 		if (event.which === KEYCODE.ESCAPE) {
 			editor.DeselectAll();
+		}
+		if (event.which === KEYCODE.KEY_M) {
+			if (!this.wasMKeyDown) {
+				this.wasMKeyDown = true;
+				editor.threeManager.EnableMiniBrushMode();
+			}
 		}
 	}
 

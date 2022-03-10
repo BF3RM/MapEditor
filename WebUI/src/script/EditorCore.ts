@@ -13,6 +13,7 @@ import { InputControls } from '@/script/modules/InputControls';
 import { Dictionary } from 'typescript-collections';
 import SpawnGameObjectCommand from '@/script/commands/SpawnGameObjectCommand';
 import BulkCommand from '@/script/commands/BulkCommand';
+import InstanceManager from '@/script/modules/InstanceManager';
 
 export class EditorCore {
 	public raycastTransform = new LinearTransform();
@@ -49,7 +50,7 @@ export class EditorCore {
 			const go = editor.getGameObjectByGuid(el);
 			if (go) {
 				editor.threeManager.nextFrame(() => {
-					editor.Select(el, true, true);
+					this.select(el, true, true);
 				});
 				this.pendingSelections.splice(i, 1);
 			}
@@ -172,11 +173,32 @@ export class EditorCore {
 		this.isPreviewBlueprintSpawned = false;
 	}
 
-	public CopySelectedObjects(): SpawnGameObjectCommand[] {
+	public CopySingleSelectedObjectTo(copyToLinearTransform: LinearTransform): SpawnGameObjectCommand {
+		const childGameObject = editor.selectionGroup.selectedGameObjects[0];
+		const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+		gameObjectTransferData.guid = Guid.create();
+		if (copyToLinearTransform) {
+			gameObjectTransferData.transform = copyToLinearTransform;
+		}
+		const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
+		// Make sure the variation is valid, otherwise set default one.
+		if (bp) {
+			if (!bp.isVariationValid(gameObjectTransferData.variation)) {
+				gameObjectTransferData.variation = bp.getDefaultVariation();
+			}
+		}
+		const spawnGameObjectCommand = new SpawnGameObjectCommand(gameObjectTransferData);
+		return spawnGameObjectCommand;
+	}
+
+	public CopySelectedObjects(copyToLinearTransform: LinearTransform | null = null): SpawnGameObjectCommand[] {
 		const commands: SpawnGameObjectCommand[] = [];
 		editor.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
 			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = Guid.create();
+			if (copyToLinearTransform) {
+				gameObjectTransferData.transform = copyToLinearTransform;
+			}
 			const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
 			// Make sure the variation is valid, otherwise set default one.
 			if (bp) {
@@ -184,7 +206,9 @@ export class EditorCore {
 					gameObjectTransferData.variation = bp.getDefaultVariation();
 				}
 			}
-			commands.push(new SpawnGameObjectCommand(gameObjectTransferData));
+			const spawnGameObjectCommand = new SpawnGameObjectCommand(gameObjectTransferData);
+			commands.push(spawnGameObjectCommand);
+			console.log(spawnGameObjectCommand);
 		});
 		return commands;
 	}
@@ -211,7 +235,7 @@ export class EditorCore {
 		this.previewBlueprint = null;
 	}
 
-	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean, moveGizmo: boolean) {
+	public select(guid: Guid, multiSelection: boolean, scrollTo: boolean = false, moveGizmo: boolean = false) {
 		// When selecting nothing, deselect all if its not multi selection.
 		if (guid.isEmpty()) {
 			if (!multiSelection) {
@@ -295,5 +319,23 @@ export class EditorCore {
 			}
 		}
 		editor.threeManager.setPendingRender();
+	}
+
+	public getGameObjectFromInstanceId(instanceId: number): GameObject {
+		const entityId = InstanceManager.getInstance().getEntityId(instanceId);
+		if (!entityId) {
+			console.error('Couldn\'t find entityId of instance. Index: ' + instanceId);
+		}
+		const spatialGE = editor.spatialGameEntities.get(entityId);
+
+		if (!spatialGE) {
+			console.error('Couldn\'t find entity with entityId: ' + entityId);
+		}
+
+		if (!spatialGE.parent) {
+			console.error('Found spatial entity without a parent, this should never happen');
+		}
+
+		return spatialGE.parent as GameObject;
 	}
 }

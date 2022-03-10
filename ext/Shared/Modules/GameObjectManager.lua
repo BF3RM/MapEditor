@@ -1,7 +1,10 @@
-class 'GameObjectManager'
+---@class GameObjectManager
+GameObjectManager = class 'GameObjectManager'
 
-local m_Logger = Logger("GameObjectManager", true)
+---@type Logger
+local m_Logger = Logger("GameObjectManager", false)
 
+---@param p_Realm Realm
 function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm
@@ -13,8 +16,7 @@ function GameObjectManager:RegisterVars()
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_PendingBlueprint = {}
 
-
-	self.m_Entities = {}
+	self.m_PendingEntities = {}
 	self.m_VanillaGameObjectGuids = {}
 
 	--- key: child (ReferenceObjectData) guid, value: parent GameObject guid
@@ -25,31 +27,26 @@ function GameObjectManager:OnLevelDestroy()
 	self:RegisterVars()
 end
 
+---@param p_GameObjectGuid string|Guid
 function GameObjectManager:GetGameObject(p_GameObjectGuid)
 	return self.m_GameObjects[tostring(p_GameObjectGuid)]
 end
 
-function GameObjectManager:GetGameEntities(p_EntityIds)
-	local s_GameEntities = {}
-
-	for _, l_EntityId in pairs(p_EntityIds) do
-		local s_Entity = self.m_Entities[l_EntityId]
-
-		if s_Entity == nil then
-			m_Logger:Error("Entity not found: " .. tostring(l_EntityId))
-		end
-
-		table.insert(s_GameEntities, s_Entity)
-	end
-
-	return s_GameEntities
-end
-
+---@param p_GameObjectGuid string|Guid
+---@param p_SenderName string
+---@param p_BlueprintPartitionGuid string|Guid
+---@param p_BlueprintInstanceGuid string|Guid
+---@param p_ParentData table
+---@param p_LinearTransform LinearTransform
+---@param p_Variation number
+---@param p_IsPreviewSpawn boolean
+---@param p_Overrides table
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
-	p_BlueprintInstanceGuid == nil or
-	p_LinearTransform == nil then
+			p_BlueprintInstanceGuid == nil or
+			p_LinearTransform == nil then
 		m_Logger:Error('InvokeBlueprintSpawn: One or more parameters are nil.')
+
 		return false
 	end
 
@@ -92,9 +89,17 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
 	return true
 end
+
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+	local s_PendingCustomBlueprintInfo = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)]
+	
+	if SharedUtils:IsServerModule() and s_PendingCustomBlueprintInfo and Guid(s_PendingCustomBlueprintInfo.customGuid) == PREVIEW_GUID then
+		m_Logger:Error('Tried to spawn the preview object on server, something went wrong.')
+		p_Hook:Return()
+	end
+	
 	-- We dont load vanilla objects if the flag is active
-	if ME_CONFIG.LOAD_VANILLA == false and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+	if ME_CONFIG.LOAD_VANILLA == false and s_PendingCustomBlueprintInfo == nil then
 		return
 	end
 
@@ -107,13 +112,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	--local s_BlueprintPrimaryInstance = InstanceParser:GetPrimaryInstance(s_BlueprintPartitionGuid)
 
 	local s_ParentInstanceGuid
-	local s_ParentPartitionGuid
-	local s_ParentPrimaryInstance
+	-- local s_ParentPartitionGuid
+	-- local s_ParentPrimaryInstance
 
 	if p_Parent ~= nil then
 		s_ParentInstanceGuid = tostring(p_Parent.instanceGuid)
-		s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
-		s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
+		-- s_ParentPartitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
+		-- s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
 	end
 
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
@@ -146,11 +151,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		originalRef = s_OriginalRef,
 	}
 
-	if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] ~= nil then
-		s_GameObject.creatorName = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].creatorName
-		s_GameObject.overrides = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)].overrides
+	if s_PendingCustomBlueprintInfo ~= nil then
+		s_GameObject.creatorName = s_PendingCustomBlueprintInfo.creatorName
+		s_GameObject.overrides = s_PendingCustomBlueprintInfo.overrides
 	end
-
 
 	s_GameObject.blueprintCtrRef = CtrRef {
 		typeName = p_Blueprint.typeInfo.name,
@@ -158,6 +162,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		partitionGuid = s_BlueprintPartitionGuid,
 		instanceGuid = s_BlueprintInstanceGuid
 	}
+
+	if self.m_GameObjects[tostring(s_GameObject.guid)] ~= nil then
+		m_Logger:Warning("GameObject with guid already existed, overwriting: " .. tostring(s_GameObject.guid))
+	end
+
 	self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
 
 	--- Resolve the parent
@@ -173,19 +182,22 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		-- Root object
 		if s_ReferenceObjectData == nil or s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
 			self:ResolveRootObject(s_GameObject)
-			-- Child object
 		else
+			-- Child object
+			m_Logger:Write("ResolveChildObject")
+			m_Logger:Write("Child: " .. s_GameObject.name)
+			m_Logger:Write("Parent: " .. s_ParentGameObject.name)
 			self:ResolveChildObject(s_GameObject, s_ParentGameObject)
 			self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)] = nil
 		end
 	else
-		if self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+		if s_PendingCustomBlueprintInfo == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
 			self:ResolveRootObject(s_GameObject)
 		else
-			--m_Logger:Write('Found custom object without parent')
 			-- Custom object, parent is root
+			m_Logger:Write('Found custom object without parent')
 			self:ResolveRootObject(s_GameObject)
 		end
 	end
@@ -224,7 +236,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
-		local s_GameEntity = self.m_Entities[l_Entity.instanceId]
+		local s_GameEntity = s_GameObject.gameEntities[l_Entity.instanceId]
+
+		if s_GameObject == nil then
+			s_GameEntity = self.m_PendingEntities[l_Entity.instanceId]
+		end
 
 		if s_GameEntity == nil then
 			s_GameEntity = GameEntity{
@@ -237,7 +253,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 		if s_GameEntity.indexInBlueprint == nil then -- GameEntity hasn't been processed yet.
 			s_GameEntity.indexInBlueprint = l_Index
 
-			if l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
+			if (s_GameEntity.aabb == nil or s_GameEntity.transform == nil) and l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
 				local s_Entity = SpatialEntity(l_Entity)
 
 				s_GameEntity.isSpatial = true
@@ -256,9 +272,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 					partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
 				}
 			end
-
-			self.m_Entities[l_Entity.instanceId] = s_GameEntity
-			table.insert(s_GameObject.gameEntities, s_GameEntity)
+			s_GameObject.gameEntities[l_Entity.instanceId] = s_GameEntity
+			self.m_PendingEntities[l_Entity.instanceId] = nil
 		end
 	end
 
@@ -289,7 +304,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	--- If its a root custom object we remove it from pending and call ready event.
-	if self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] ~= nil then
+	if s_PendingCustomBlueprintInfo ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
 
 		if s_GameObject.guid ~= PREVIEW_GUID then
@@ -320,7 +335,7 @@ function GameObjectManager:ResolveRootObject(p_GameObject)
 			primaryInstanceGuid = s_PendingInfo.parentData.primaryInstanceGuid,
 			partitionGuid = s_PendingInfo.parentData.partitionGuid
 		}
-		p_GameObject.guid = s_PendingInfo.customGuid
+		p_GameObject.guid = Guid(s_PendingInfo.customGuid)
 		p_GameObject.origin = GameObjectOriginType.Custom
 	else -- This is a vanilla root object
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
@@ -516,7 +531,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		return
 	end
 
-	local s_GameEntity = self.m_Entities[s_Entity.instanceId]
+	local s_GameEntity = self.m_PendingEntities[s_Entity.instanceId]
 
 	if s_GameEntity == nil then
 		s_GameEntity = GameEntity{
@@ -532,7 +547,8 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		instanceGuid = tostring(p_EntityData.instanceGuid),
 		partitionGuid = s_PartitionGuid
 	}
-	self.m_Entities[s_Entity.instanceId] = s_GameEntity
+
+	self.m_PendingEntities[s_Entity.instanceId] = s_GameEntity
 	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 
 	if s_PendingGameObject then
@@ -558,7 +574,8 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 			end)
 		end
 
-		table.insert(s_PendingGameObject.gameEntities, s_GameEntity)
+		s_PendingGameObject.gameEntities[s_Entity.instanceId] = s_GameEntity
+		self.m_PendingEntities[s_Entity.instanceId] = nil
 	end
 end
 

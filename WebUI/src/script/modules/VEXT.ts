@@ -204,7 +204,7 @@ export default class VEXTInterface {
 
 	public WebUpdateBatch(updates: any[]) {
 		// console.log('[VEXT] WebUpdateBatch');
-		console.log(JSON.stringify(updates));
+		// console.log(JSON.stringify(updates));
 		updates.forEach((obj: any) => {
 			(this as any)[obj.path](obj.payload);
 		});

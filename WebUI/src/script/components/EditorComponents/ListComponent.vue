@@ -53,10 +53,6 @@ export default class ListComponent extends EditorComponent {
 		search: ''
 	};
 
-	constructor() {
-		super();
-	}
-
 	private onMouseDown(e: any, item: Blueprint) {
 		console.log('dragging started');
 		window.editor.threeManager.onDragStart(e, item);

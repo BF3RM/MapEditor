@@ -1,6 +1,7 @@
-class ('ClientGameObjectManager')
+---@class ClientGameObjectManager
+ClientGameObjectManager = class 'ClientGameObjectManager'
 
-local m_Logger = Logger("ClientGameObjectManager", true)
+local m_Logger = Logger("ClientGameObjectManager", false)
 
 function ClientGameObjectManager:__init()
 	m_Logger:Write("Initializing ClientGameObjectManager")

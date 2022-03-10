@@ -1,6 +1,7 @@
-class 'DataBaseManager'
+---@class DataBaseManager
+DataBaseManager = class 'DataBaseManager'
 
-local m_Logger = Logger("DataBaseManager", true)
+local m_Logger = Logger("DataBaseManager", false)
 
 local m_DB_Header_Table_Name = "project_header"
 local m_ProjectName_Unique_Index = "idx_project_name"
@@ -24,8 +25,8 @@ function DataBaseManager:__init()
 	self:CreateOrUpdateDatabase()
 end
 
-function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredSuperBundles, p_RequiredBundles, p_TerrainLevelName, p_GameObjectSaveDatas)
-	local s_TimeStamp = SharedUtils:GetTimeMS()
+function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredSuperBundles, p_RequiredBundles, p_TerrainLevelName, p_GameObjectSaveDatas, p_TimeStamp)
+	local s_TimeStamp = p_TimeStamp or SharedUtils:GetTimeMS()
 
 	local s_GameObjectSaveDatasJson = p_GameObjectSaveDatas
 	local s_RequiredSuperBundlesJson = p_RequiredSuperBundles
@@ -286,7 +287,7 @@ function DataBaseManager:ImportProject(p_ProjectDataJSON)
 		return false, 'Save header missing necessary field(s)'
 	end
 
-	return self:SaveProject(s_Header.projectName, s_Header.mapName, s_Header.gameModeName, s_Header.requiredSuperBundles, s_Header.requiredBundles, s_Header.terrainLevelName, s_Data)
+	return self:SaveProject(s_Header.projectName, s_Header.mapName, s_Header.gameModeName, s_Header.requiredSuperBundles, s_Header.requiredBundles, s_Header.terrainLevelName, s_Data, s_Header.timeStamp)
 end
 
 function DataBaseManager:DeleteProject(p_ProjectId)

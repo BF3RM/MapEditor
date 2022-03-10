@@ -1,7 +1,7 @@
-class 'ProjectManager'
+---@class ProjectManager
+ProjectManager = class 'ProjectManager'
 
-local m_Logger = Logger("ProjectManager", true)
-
+local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
 local m_SuperBundles = {
@@ -53,6 +53,7 @@ local m_SuperBundles = {
 	["levels/xp5_003/xp5_003"] = true,
 	["levels/xp5_004/xp5_004"] = true
 }
+
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -157,7 +158,7 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
 			projectName = 'Untitled Project',
 			mapName = self.m_MapName,
 			gameModeName = self.m_GameMode,
-			requiredBundles = self.m_RequiredBundles
+			requiredBundles = self.m_LoadedBundles
 		}
 	end
 
@@ -223,6 +224,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 
 			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
 				m_Logger:Error("Cant load project that is not built for the same map as current one.")
+				return
 			end
 
 			-- Load User Data from Database
@@ -241,6 +243,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
 	if s_Project == nil then
 		m_Logger:Error('Failed to get project with id '..tostring(p_ProjectId))
+		return
 	end
 
 	self.m_CurrentProjectHeader = s_Project.header
@@ -254,6 +257,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 			GameModes[s_GameModeName] == nil then
 
 		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
+		return
 	end
 
 	self:UpdateClientProjectHeader(nil)
@@ -264,9 +268,21 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		--Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
-		RCON:SendCommand('mapList.clear')
-		local out = RCON:SendCommand('mapList.add', {s_MapName, s_GameModeName, '1'}) -- TODO: add proper map / gameplay support
-		RCON:SendCommand('mapList.runNextRound')
+		local s_Response = RCON:SendCommand('mapList.clear')
+		if s_Response[1] ~= 'OK' then
+			m_Logger:Error('Couldn\'t clear maplist. ' .. s_Response[1])
+			return
+		end
+
+		s_Response = RCON:SendCommand('mapList.add', {s_MapName, s_GameModeName, '1'}) -- TODO: add proper map / gameplay support
+		if s_Response[1] ~= 'OK' then
+			m_Logger:Error('Couldn\'t add map to maplist. ' .. s_Response[1])
+		end
+
+		s_Response = RCON:SendCommand('mapList.runNextRound')
+		if s_Response[1] ~= 'OK' then
+			m_Logger:Error('Couldn\'t run next round. ' .. s_Response[1])
+		end
 	end
 end
 
@@ -300,7 +316,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		projectName = p_ProjectSaveData.projectName,
 		mapName = self.m_MapName,
 		gameModeName = self.m_GameMode,
-		requiredBundles = self.m_RequiredBundles
+		requiredBundles = self.m_LoadedBundles
 	}
 	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedSuperBundles, self.m_LoadedBundles, self.m_CurrentProjectHeader.mapName, s_GameObjectSaveDatas)
 
@@ -327,7 +343,6 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
 		-- Vanilla objects are handled in maploader
 		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
-		l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild or
 		l_GameObjectSaveData.isVanilla then -- Supports old savefiles
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
@@ -351,6 +366,8 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 			end
 
 			table.insert(s_SaveFileCommands, s_Command)
+		elseif l_GameObjectSaveData.origin == GameObjectOriginType.CustomChild then
+			-- TODO Fool: Handle custom objects' children, they should be handled after the parent is spawned
 		else
 			s_Command = {
 				guid = s_Guid,

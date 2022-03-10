@@ -129,7 +129,7 @@ export class VEXTemulator {
 		// command.gameObjectTransferData.transform = command.gameObjectTransferData.transform.toTable();
 		return {
 			sender: commandActionResult.sender,
-			type: 'SpawnedBlueprint',
+			type: 'SpawnedGameObject',
 			gameObjectTransferData: {
 				transform: commandActionResult.gameObjectTransferData.transform.toTable(),
 				blueprintCtrRef: commandActionResult.gameObjectTransferData.blueprintCtrRef.toTable(),
@@ -224,7 +224,7 @@ export class VEXTemulator {
 	private DestroyGameObject(commandActionResult: CommandActionResult) {
 		// Delete all children of blueprint
 		return {
-			type: 'DeletedBlueprint',
+			type: 'DeletedGameObject',
 			gameObjectTransferData: {
 				guid: commandActionResult.gameObjectTransferData.guid.toString()
 			}

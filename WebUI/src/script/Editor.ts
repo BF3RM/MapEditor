@@ -28,6 +28,9 @@ import { signals } from '@/script/modules/Signals';
 import { EDITOR_MODE, GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import DisableGameObjectCommand from '@/script/commands/DisableGameObjectCommand';
 import EnableGameObjectCommand from '@/script/commands/EnableGameObjectCommand';
+import { Quat } from './types/primitives/Quat';
+import { DEG2RAD } from 'three/src/math/MathUtils';
+import { Euler } from 'three';
 
 export default class Editor {
 	public config = new Config();
@@ -43,6 +46,8 @@ export default class Editor {
 	public playerName: string;
 	public gameObjects = new Collections.Dictionary<Guid, GameObject>();
 	public favorites = new Collections.Dictionary<Guid, Blueprint>();
+
+	public spatialGameEntities = new Map();
 	public copy: SpawnGameObjectCommand[];
 
 	public selectionGroup: SelectionGroup;
@@ -163,6 +168,25 @@ export default class Editor {
 		}
 		this.threeManager.focus(target);
 		signals.objectFocused.emit(target);
+	}
+
+	public MiniBrushRandomizedDuplicate() {
+		const spawnTransform = this.editorCore.screenToWorldTransform.clone();
+		const scaleRandomness = (Math.random() / 2) - 0.25; // +- 0.25
+		spawnTransform.scale = new Vec3(spawnTransform.scale.x + scaleRandomness, spawnTransform.scale.y + scaleRandomness, spawnTransform.scale.z + scaleRandomness);
+
+		const bankRandomness = (Math.random() * 10) - 5; // +- 5
+		const rotationRandomness = (Math.random() * 360) - 180; // +- 180
+
+		const rotationQuat = new Quat().setFromEuler(new Euler(bankRandomness * DEG2RAD, rotationRandomness * DEG2RAD, bankRandomness * DEG2RAD));
+
+		spawnTransform.rotation = new Quat(rotationQuat.x, rotationQuat.y, rotationQuat.z, rotationQuat.w);
+
+		const command = this.editorCore.CopySingleSelectedObjectTo(spawnTransform);
+		this.DeselectAll();
+		const commands: SpawnGameObjectCommand[] = [];
+		commands.push(command);
+		this.editorCore.PasteObjects(commands);
 	}
 
 	public Duplicate() {
@@ -341,16 +365,37 @@ export default class Editor {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObjectGuid = gameObjectTransferData.guid;
 		const gameObject = this.gameObjects.getValue(gameObjectGuid);
+
 		if (gameObject === undefined) {
 			return;
 		}
+
+		if (gameObject.selected) {
+			this.selectionGroup.deselect(gameObject);
+		}
+
+		// Delete GameObject descendants and their SpatialGameEntities
+		gameObject.getAllChildren().forEach((go) => {
+			go.children.forEach((child) => {
+				if (child instanceof SpatialGameEntity) {
+					this.spatialGameEntities.delete(child.instanceId);
+					child.Delete();
+				}
+			});
+			this.gameObjects.remove(go.guid);
+			this.threeManager.deleteObject(go);
+		});
+
+		// Delete children SpatialGameEntities
+		gameObject.children.forEach((child) => {
+			if (child instanceof SpatialGameEntity) {
+				this.spatialGameEntities.delete(child.instanceId);
+				child.Delete();
+			}
+		});
+
 		this.threeManager.deleteObject(gameObject);
 		this.gameObjects.remove(gameObjectGuid);
-
-		gameObject.getAllChildren().forEach((go) => {
-			this.threeManager.deleteObject(go);
-			this.gameObjects.remove(go.guid);
-		});
 
 		if (this.selectionGroup.selectedGameObjects.length === 0) {
 			this.threeManager.hideGizmo();
@@ -368,20 +413,21 @@ export default class Editor {
 			const gameObjectGuid = gameObjectTransferData.guid;
 
 			if (this.gameObjects.getValue(gameObjectGuid)) {
-				console.error('Tried to create a GameObject that already exists');
+				console.error('Tried to create a GameObject that already exists. Guid: ' + gameObjectGuid.toString() + ', name: ' + gameObjectTransferData.name);
 				return;
 			}
 
 			const parentGuid = gameObjectTransferData.parentData.guid;
 			const gameObject = GameObject.CreateWithTransferData(gameObjectTransferData);
-			editor.threeManager.attachToScene(gameObject);
-			gameObject.updateTransform();
+
 			for (const gameEntityData of gameObjectTransferData.gameEntities) {
 				const entityData = gameEntityData;
 
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.transform, entityData.aabb, entityData.initiatorRef);
+					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.initiatorRef, entityData.aabb);
 					gameObject.add(gameEntity);
+					gameObject.updateMatrixWorld(); // update matrix and their children's
+					this.spatialGameEntities.set(entityData.instanceId, gameEntity);
 				}
 			}
 
@@ -419,18 +465,13 @@ export default class Editor {
 					this.missingParent.remove(gameObjectGuid);
 				}
 			}
-			// if (!window.vext.executing && commandActionResult.sender === this.getPlayerName() && gameObject.origin !== GAMEOBJECT_ORIGIN.VANILLA) {
-			// 	// Make selection happen after all signals have been handled
-			// 	this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, false, true));
-			// }
-			// if (!window.vext.executing && this.editorCore.isPendingSelection(gameObjectGuid)) {
-			if (!window.vext.executing) {
-				// Make selection happen after all signals have been handled
-				this.editorCore.selectPendingSelections();
-				// this.threeManager.nextFrame(() => scope.Select(gameObjectGuid, true, true));
-				// this.editorCore.removePendingSelection(gameObjectGuid);
-			}
+
 			signals.spawnedGameObject.emit(commandActionResult);
+
+			// Make selection happen after all signals have been handled
+			if (!window.vext.executing) {
+				this.editorCore.selectPendingSelections();
+			}
 		});
 	}
 

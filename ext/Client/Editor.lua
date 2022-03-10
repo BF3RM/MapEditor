@@ -1,6 +1,7 @@
-class 'Editor'
+---@class Editor
+Editor = class 'Editor'
 
-local m_Logger = Logger("Editor", true)
+local m_Logger = Logger("Editor", false)
 
 local MAX_CAST_DISTANCE = 10000
 local FALLBACK_DISTANCE = 10
@@ -100,6 +101,11 @@ function Editor:Raycast()
 	end
 
 	self.m_PendingRaycast = false
+end
+
+function Editor:OnControlUpdate()
+	-- Recalculate camera raycast when the camera moves
+	Editor:SetPendingRaycast(RaycastType.Camera)
 end
 
 function Editor:CameraHasMoved()

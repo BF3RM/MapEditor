@@ -1,13 +1,13 @@
-local m_Logger = Logger("Util", true)
+local m_Logger = Logger("Util", false)
 
 local matrix = require "__shared/Util/matrix"
 
 local TEMP_GUID_PREFIX = "ED170120"
 local CUSTOMOBJ_GUID_PREFIX = "ED170121"
 local VANILLA_GUID_PREFIX = "ED170122"
-local EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
-local HAVOK_GUID = Guid('FE9BF899-0000-0000-FF64-00FF64076739')
-local PREVIEW_GUID = Guid('ED170120-0000-0000-0000-000000000000')
+EMPTY_GUID = Guid('00000000-0000-0000-0000-000000000000')
+HAVOK_GUID = Guid('FE9BF899-0000-0000-FF64-00FF64076739')
+PREVIEW_GUID = Guid('ED170120-0000-0000-0000-000000000000')
 
 function MergeTables(p_Old, p_New)
 	if p_New == nil then
@@ -236,21 +236,29 @@ function h()
 	return p_Vars[math.floor(MathUtils:GetRandomInt(1,16))]..p_Vars[math.floor(MathUtils:GetRandomInt(1,16))]
 end
 
+---@return Guid guid
 function GenerateTempGuid()
 	return Guid(TEMP_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
--- Generates a random guid.
+--- Generates a random guid.
+---@return Guid guid
 function GenerateCustomGuid()
 	return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
 function GenerateChildGuid(p_ParentGuid, p_Offset)
+	m_Logger:Write("GenerateChildGuid")
+	m_Logger:Write("p_ParentGuid" .. tostring(p_ParentGuid))
+	m_Logger:Write("p_Offset" .. tostring(p_Offset))
+
 	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
 	local s_GuidEnd = s_ParentGuidParts[5]
 	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
-	local s_NewGuidEnd = string.format("%x", s_GuidEndNumber + p_Offset):upper()
-	return Guid(s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEnd)
+	local s_NewGuidEndPadded = string.format("%012x", s_GuidEndNumber + p_Offset):upper()
+	m_Logger:Write("s_NewGuidEndPadded" .. s_NewGuidEndPadded)
+	local s_GeneratedGuidString = s_ParentGuidParts[1] .. '-' .. s_ParentGuidParts[2] .. '-' .. s_ParentGuidParts[3] .. '-' .. s_ParentGuidParts[4] .. '-' .. s_NewGuidEndPadded
+	return Guid(s_GeneratedGuidString)
 end
 
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
@@ -266,6 +274,9 @@ function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	return PadAndCreateGuid(s_HashAsString)
 end
 
+---@param p_Number number
+---@param p_StringLength number
+---@return string
 function GetPaddedNumberAsString(p_Number, p_StringLength)
 	local s_Number_String = tostring(p_Number)
 	local s_Prefix = ""
@@ -279,7 +290,7 @@ function GetPaddedNumberAsString(p_Number, p_StringLength)
 		s_Number_String = s_Number_String:sub(1, s_TrimSize)
 	end
 
-	return (s_Prefix .. s_Number_String)
+	return s_Prefix .. s_Number_String
 end
 
 -- Generates a guid based on a given number. Used for vanilla objects.
@@ -293,13 +304,6 @@ function GetLength(T)
 	for _ in pairs(T) do s_Count = s_Count + 1 end
 
 	return s_Count
-end
-
-function string:split(p_Sep)
-	local s_Sep, s_Fields = p_Sep or ":", {}
-	local s_Pattern = string.format("([^%s]+)", s_Sep)
-	self:gsub(s_Pattern, function(c) s_Fields[#s_Fields+1] = c end)
-	return s_Fields
 end
 
 function dump(o)

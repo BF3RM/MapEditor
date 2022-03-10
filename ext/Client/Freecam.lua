@@ -1,6 +1,7 @@
-class 'FreeCam'
+---@class FreeCam
+FreeCam = class 'FreeCam'
 
-local m_Logger = Logger("FreeCam", true)
+local m_Logger = Logger("FreeCam", false)
 local m_RotationHelper = require "__shared/Util/RotationHelper"
 
 function FreeCam:__init()
@@ -33,16 +34,16 @@ function FreeCam:OnLevelDestroy()
 end
 
 function FreeCam:Create()
-	local s_Entity = EntityManager:CreateEntity(self.cameraData, LinearTransform())
+	local s_Entity = EntityManager:CreateEntity(self.m_CameraData, LinearTransform())
 
 	if s_Entity == nil then
 		m_Logger:Error("Could not spawn camera")
 		return
 	end
 
-	self.cameraData.transform = ClientUtils:GetCameraTransform()
-	self.cameraData.fov = 90
-	self.camera = s_Entity
+	self.m_CameraData.transform = ClientUtils:GetCameraTransform()
+	self.m_CameraData.fov = 90
+	self.m_Camera = s_Entity
 end
 
 function FreeCam:SetCameraMode(p_Mode)
@@ -149,7 +150,7 @@ function FreeCam:Enable()
 		self:Create()
 	end
 
-	if self.m_lastTransform ~= nil then
+	if self.m_LastTransform ~= nil then
 		self.m_CameraData.transform = self.m_LastTransform
 	end
 

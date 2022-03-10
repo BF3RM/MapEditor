@@ -1,6 +1,7 @@
-class 'Coroutiner'
+---@class Coroutiner
+Coroutiner = class 'Coroutiner'
 
-local m_Logger = Logger("Coroutiner", true)
+local m_Logger = Logger("Coroutiner", false)
 
 function Coroutiner:__init()
 	m_Logger:Write("Initializing Coroutiner")

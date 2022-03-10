@@ -1,6 +1,7 @@
-class 'GameEntity'
+---@class GameEntity
+GameEntity = class 'GameEntity'
 
-local m_Logger = Logger("GameEntity", true)
+local m_Logger = Logger("GameEntity", false)
 
 function GameEntity:__init(arg)
 	self.entity = arg.entity
@@ -63,7 +64,7 @@ function GameEntity:Destroy()
 		self.entity:Destroy()
 	end
 
-	GameObjectManager.m_Entities[self.instanceId] = nil
+	GameObjectManager.m_PendingEntities[self.instanceId] = nil
 end
 
 function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled)

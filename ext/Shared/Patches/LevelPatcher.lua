@@ -1,6 +1,7 @@
-class 'LevelPatcher'
+---@class LevelPatcher
+LevelPatcher = class 'LevelPatcher'
 
-local m_Logger = Logger("LevelPatcher", true)
+local m_Logger = Logger("LevelPatcher", false)
 
 function LevelPatcher:__init()
 	m_Logger:Write("Initializing Patches")
