@@ -57,8 +57,8 @@ function MapEditorClient:RegisterEvents()
 	Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
 	Hooks:Install('UI:PushScreen', 999, self, self.OnPushScreen)
 
-	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
-    Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('ResourceManager:LoadBundles', 900, self, self.OnLoadBundles)
+    Hooks:Install('EntityFactory:CreateFromBlueprint', 900, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 
