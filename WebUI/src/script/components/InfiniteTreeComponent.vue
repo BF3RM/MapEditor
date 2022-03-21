@@ -167,6 +167,16 @@ export default class InfiniteTreeComponent extends Vue {
 		}
 	}
 
+	public isNodeFiltered(node: Node) {
+		const tree = this.tree;
+
+		if (tree === undefined) {
+			return false;
+		}
+
+		return node.state.filtered === false;
+	}
+
 	private get filteredNodes() {
 		const search = this.search;
 		console.log('Filtering nodes');
