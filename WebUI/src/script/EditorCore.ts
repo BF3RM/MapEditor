@@ -255,7 +255,7 @@ export class EditorCore {
 		if (editor.selectionGroup.selectedGameObjects.length === 0) {
 			editor.threeManager.showGizmo();
 		}
-
+		this.unhighlight(gameObject.guid);
 		editor.selectionGroup.select(gameObject, multiSelection, scrollTo, moveGizmo);
 		editor.threeManager.setPendingRender();
 	}
@@ -284,14 +284,16 @@ export class EditorCore {
 			return false;
 		}
 
+		if (!multiple) {
+			this.unhighlight();
+			editor.threeManager.setPendingRender();
+		}
+
 		// Ignore if selected
 		if (gameObject.selected) {
 			return;
 		}
 
-		if (!multiple) {
-			this.unhighlight();
-		}
 		gameObject.onHighlight();
 		this.highlightedObjects.setValue(guid, gameObject);
 		editor.threeManager.setPendingRender();

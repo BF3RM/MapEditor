@@ -449,7 +449,7 @@ export class THREEManager {
 
 			if (editor.selectionGroup.isSelected(gameObject)) {
 				hitSelf = gameObject;
-				continue;
+				return hitSelf.guid;
 			}
 
 			// Select its parent if possible.

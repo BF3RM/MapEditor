@@ -114,7 +114,7 @@ export class SelectionGroup extends THREE.Object3D {
 		}
 
 		// Disabled multiselection deselection for now
-		/* if (multiSelection) {
+		if (multiSelection) {
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
 				// Edge case:
@@ -138,7 +138,6 @@ export class SelectionGroup extends THREE.Object3D {
 				}
 			}
 		}
-		 */
 
 		// If first object move group to its position
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {
