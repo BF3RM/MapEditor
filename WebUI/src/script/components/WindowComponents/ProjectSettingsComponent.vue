@@ -156,10 +156,12 @@ export default class ProjectSettingsComponent extends Vue {
 		});
 		signals.setProjectData.connect((projectDataJSON: any) => {
 			this.hint = 'Select all and copy (CTRL+C)';
-			// Parse and stringify again to beautify
-			const projectData = JSON.parse(projectDataJSON);
-			const beautifiedJSON = JSON.stringify(projectData, null, '\t');
-			this.projectData = beautifiedJSON;
+			let beautifiedJSONString = JSON.stringify(projectDataJSON, null, '\t');
+			// Round numbers to 3 decimals
+			beautifiedJSONString = beautifiedJSONString.replace(/(\d*\.\d+)/g, function(match) {
+				return Number(match).toFixed(3).toString();
+			});
+			this.projectData = beautifiedJSONString;
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
 		});
 	}
