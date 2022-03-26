@@ -33,7 +33,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public highlighted: boolean = false;
 	private _enabled: boolean = true;
 	private _raycastEnabled: boolean = true;
-	public parent: GameObject;
+	declare public parent: GameObject;
 	public isUserModified: boolean;
 	public originalRef: CtrRef | undefined;
 	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
