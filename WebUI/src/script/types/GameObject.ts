@@ -12,6 +12,7 @@ import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 import { FBPartition } from '@/script/types/gameData/FBPartition';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { isPrintable } from '@/script/modules/Utils';
+import { SpatialGameEntity } from './SpatialGameEntity';
 
 /**
 	GameObjects dont have meshes, instead they have GameEntities that hold the AABBs. When a GameObject is hidden we set
@@ -20,6 +21,8 @@ import { isPrintable } from '@/script/modules/Utils';
  */
 export class GameObject extends THREE.Object3D implements IGameEntity {
 	public guid: Guid;
+
+	// Holds the transform of the last client update. It doesn't update if its a web-only move (like moving before releasing left-click)
 	public transform: LinearTransform;
 	public parentData: GameObjectParentData;
 	public blueprintCtrRef: CtrRef;
@@ -71,8 +74,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.isUserModified = isUserModified;
 		this.originalRef = originalRef;
 		this.realm = realm;
-
-		this.updateMatrixFromTransform();
+		this.setWorldMatrix(this.transform.toMatrix(), true);
 		// Update the matrix after initialization.
 		this.updateMatrix();
 	}
@@ -176,47 +178,44 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		return changes;
 	}
 
-	public updateTransform() {
-		this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+	/**
+	 * Updates GameObjects' transforms and SpatialGameEntities' matrices.
+	 */
+	public updateChildrenMatrices(updateTransform: boolean) {
+		if (updateTransform) {
+			this.transform = new LinearTransform().setFromMatrix(this.matrixWorld);
+		}
 
 		for (const child of this.children) {
-			(child as any).updateTransform();
+			(child as any).updateChildrenMatrices();
 		}
-	}
-
-	private updateMatrixFromTransform() {
-		this.setWorldMatrix(this.transform.toMatrix());
 	}
 
 	/**
 	 * Translates world matrix to local in order to set the matrix.
 	 */
-	public setWorldMatrix(worldMatrix: THREE.Matrix4) {
-		const matrix = worldMatrix;
-
+	public setWorldMatrix(worldMatrix: THREE.Matrix4, updateTransform: boolean) {
 		// Move respective to the parent if it has one
 		if (this.parent) {
 			// Calculate local transform.
 			const parentWorldInverse = new THREE.Matrix4();
 			parentWorldInverse.copy(this.parent.matrixWorld).invert();
-			matrix.multiplyMatrices(parentWorldInverse, matrix);
+			worldMatrix.multiplyMatrices(parentWorldInverse, worldMatrix);
 		}
 
-		matrix.decompose(this.position, this.quaternion, this.scale);
+		worldMatrix.decompose(this.position, this.quaternion, this.scale);
 		this.updateMatrix(); // Matrix will be updated in next render call.
-
-		// Update transform of spatial entities and children gameobjects after matrix is recalculated
+		this.updateMatrixWorld(true);
+		// Update matrices of spatial entities and update gameobjects' transforms if it's not
+		// a web-only change after the matrix is recalculated in the next frame
 		editor.threeManager.nextFrame(() => {
-			for (const child of this.children) {
-				(child as any).updateTransform();
-			}
+			this.updateChildrenMatrices(updateTransform);
 		});
 	}
 
 	public setTransform(linearTransform: LinearTransform) {
 		const oldTransform = this.transform.clone();
-		this.transform = linearTransform;
-		this.updateMatrixFromTransform();
+		this.setWorldMatrix(linearTransform.toMatrix(), true);
 
 		if (this.originalRef !== undefined && this.parent.partition) {
 			this.parent.partition.then((res) => {

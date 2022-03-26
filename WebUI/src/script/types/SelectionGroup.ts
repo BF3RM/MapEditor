@@ -76,7 +76,7 @@ export class SelectionGroup extends THREE.Object3D {
 			childLocal.multiplyMatrices(go.matrixWorld, selectionOldMatrixInverse); // calculates go's matrix relative to selection group
 			childLocalNew.multiplyMatrices(transformMatrix, childLocal); // calculates go's new matrix with transformation matrix
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
-			go.setWorldMatrix(childWorldNew);
+			go.setWorldMatrix(childWorldNew, false);
 			go.updateMatrixWorld(true);
 			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
