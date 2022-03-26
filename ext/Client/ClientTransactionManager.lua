@@ -217,6 +217,7 @@ function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
 			return false
 		end
 
+		m_Logger:Write('Executing command ' .. l_Command.type)
 		local s_CommandActionResult, s_CARResponseType = s_CommandAction(self, l_Command, p_UpdatePass)
 
 		if s_CARResponseType == CARResponseType.Success then
@@ -273,6 +274,7 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
 			return false
 		end
 
+		m_Logger:Write('Executing message ' .. l_Message.type)
 		local s_CARResponseType = s_MessageAction(self, l_Message, p_UpdatePass)
 
 		if s_CARResponseType == CARResponseType.Success then

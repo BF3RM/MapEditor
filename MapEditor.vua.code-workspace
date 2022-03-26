@@ -19,12 +19,18 @@
 	],
 	"settings": {
 		"Lua.workspace.maxPreload": 10000,
-		"Lua.diagnostics.libraryFiles": "Disable"
+		"Lua.diagnostics.libraryFiles": "Disable",
+		"lua.targetVersion": "5.2",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": true
+		}
 	},
 	"extensions": {
 		"recommendations": [
-			"Imposter.vscode-lua-vu",
-			"johnsoncodehk.volar"
+			"imposter.vscode-lua-vu",
+			"johnsoncodehk.volar",
+			"dbaeumer.vscode-eslint",
+			"EditorConfig.EditorConfig"
 		]
 	}
 }

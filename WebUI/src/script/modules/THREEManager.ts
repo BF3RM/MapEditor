@@ -48,6 +48,7 @@ export class THREEManager {
 	public isCameraMoving = false;
 	private clock = new THREE.Clock();
 	private cameraHasMoved: boolean;
+	private miniBrushEnabled: boolean;
 
 	private raycaster = new THREE.Raycaster();
 
@@ -167,15 +168,26 @@ export class THREEManager {
 			editor.editorCore.GetMouseToScreenPosition(event);
 			this.gizmoControls.OnMouseMove(event);
 		}
+		if (this.miniBrushEnabled) {
+			editor.editorCore.GetMouseToScreenPosition(event);
+		}
 	}
 
-	public onMouseUp(event: any) {
+	public onMouseUp(event: MouseEvent) {
 		if (this.isDragSpawning) {
 			this.isDragSpawning = false;
 			editor.editorCore.onPreviewDrop();
 			editor.editorCore.onPreviewDragStop();
 		}
 		this.gizmoControls.OnMouseUp(event);
+	}
+
+	public EnableMiniBrushMode() {
+		this.miniBrushEnabled = true;
+	}
+
+	public DisableMiniBrushMode() {
+		this.miniBrushEnabled = false;
 	}
 
 	public enableFreecamMovement() {
@@ -277,7 +289,7 @@ export class THREEManager {
 	}
 
 	public setGizmoMode(mode: GIZMO_MODE) {
-		console.log('Changing gizmo mode to ' + mode);
+		// console.log('Changing gizmo mode to ' + mode);
 
 		if (mode === GIZMO_MODE.select) {
 			this.hideGizmo();
@@ -301,7 +313,7 @@ export class THREEManager {
 	public setWorldSpace(space: WORLD_SPACE) {
 		if (space === WORLD_SPACE.local || space === WORLD_SPACE.world) {
 			this.gizmoControls.setSpace(space);
-			console.log('Changed worldspace to ' + space);
+			// console.log('Changed worldspace to ' + space);
 			this.worldSpace = space;
 			signals.worldSpaceChanged.emit(space);
 		} else {
@@ -320,7 +332,7 @@ export class THREEManager {
 	public enableGridSnap() {
 		this.gridSnap = true;
 		this.gizmoControls.setTranslationSnap(0.5);
-		this.gizmoControls.setRotationSnap(THREE.MathUtils.degToRad(15));
+		this.gizmoControls.setRotationSnap(THREE.MathUtils.degToRad(5));
 	}
 
 	public disableGridSnap() {
@@ -354,9 +366,13 @@ export class THREEManager {
 		if (scope.raycastPlacing) {
 			scope.cameraControls.enabled = false;
 		} else if (this.gizmoControls.selected) {
-			console.log('Control selected');
-		} else if (selectionEnabled) {
+			// console.log('Control selected');
+		} else if (selectionEnabled && !this.miniBrushEnabled) {
 			this.selectWithRaycast(mousePos, multiSelection);
+		}
+
+		if (!this.isDragSpawning && this.miniBrushEnabled && selectionEnabled) {
+			editor.MiniBrushRandomizedDuplicate();
 		}
 	}
 
@@ -378,7 +394,7 @@ export class THREEManager {
 	}
 
 	public highlight(mousePos: Vec2) {
-		if (this.highlightingEnabled) {
+		if (this.highlightingEnabled && !this.miniBrushEnabled) {
 			this.highlightWithRaycast(mousePos);
 		}
 	}
@@ -433,7 +449,7 @@ export class THREEManager {
 
 			if (editor.selectionGroup.isSelected(gameObject)) {
 				hitSelf = gameObject;
-				continue;
+				return hitSelf.guid;
 			}
 
 			// Select its parent if possible.

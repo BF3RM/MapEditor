@@ -44,8 +44,8 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Player:Chat', self, self.OnChat)
 	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
 
-	Hooks:Install('ResourceManager:LoadBundles', 999, self, self.OnLoadBundles)
-    Hooks:Install('EntityFactory:CreateFromBlueprint', 999, self, self.OnEntityCreateFromBlueprint)
+	Hooks:Install('ResourceManager:LoadBundles', 900, self, self.OnLoadBundles)
+    Hooks:Install('EntityFactory:CreateFromBlueprint', 900, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
 

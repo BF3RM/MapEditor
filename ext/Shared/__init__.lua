@@ -6,6 +6,7 @@ require "__shared/Util/Logger"
 Coroutiner = require "__shared/Util/Coroutiner"
 require "__shared/Util/Util"
 DataContainerExt = require "__shared/Util/DataContainerExt"
+FastLoad = require "__shared/FastLoad"
 --require "__shared/Modules/ObjectManager"
 require "__shared/Modules/GameObjectManager"
 require "__shared/Modules/CommandActions"
@@ -36,6 +37,9 @@ function MapEditorShared:__init()
 	m_Logger:Write("Initializing MapEditorShared")
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
+	Events:Subscribe('Level:LoadResources', self, self.OnLoadResources)
+	Events:Subscribe('Level:Loaded', self, self.OnLevelLoaded)
+	Events:Subscribe('Extension:Unloading', self, self.OnExtensionUnloading)
 end
 
 function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)
@@ -45,6 +49,23 @@ end
 function MapEditorShared:OnLevelDestroy()
 	Timer:OnResetData()
 	InstanceParser:OnLevelDestroy()
+end
+
+---@param p_LevelName string
+---@param p_GameMode string
+---@param p_IsDedicatedServer boolean
+function MapEditorShared:OnLoadResources(p_LevelName, p_GameMode, p_IsDedicatedServer)
+	FastLoad:OnLoadResources(p_LevelName, p_GameMode, p_IsDedicatedServer)
+end
+
+---@param p_LevelName string
+---@param p_GameMode string
+function MapEditorShared:OnLevelLoaded(p_LevelName, p_GameMode)
+	FastLoad:OnLevelLoaded(p_LevelName, p_GameMode)
+end
+
+function MapEditorShared:OnExtensionUnloading()
+	FastLoad:OnExtensionUnloading()
 end
 
 return MapEditorShared()

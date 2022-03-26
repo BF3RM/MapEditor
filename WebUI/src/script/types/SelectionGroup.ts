@@ -76,7 +76,7 @@ export class SelectionGroup extends THREE.Object3D {
 			childLocal.multiplyMatrices(go.matrixWorld, selectionOldMatrixInverse); // calculates go's matrix relative to selection group
 			childLocalNew.multiplyMatrices(transformMatrix, childLocal); // calculates go's new matrix with transformation matrix
 			childWorldNew.multiplyMatrices(childLocalNew, selectionGroupWorld); // local to world transform
-			go.setWorldMatrix(childWorldNew);
+			go.setWorldMatrix(childWorldNew, false);
 			go.updateMatrixWorld(true);
 			signals.objectChanged.emit(go, 'transform', go.transform);
 		}
@@ -114,7 +114,7 @@ export class SelectionGroup extends THREE.Object3D {
 		}
 
 		// Disabled multiselection deselection for now
-		/* if (multiSelection) {
+		if (multiSelection) {
 			// If object is already selected and its multiSelection deselect it.
 			if (gameObject.selected) {
 				// Edge case:
@@ -138,7 +138,6 @@ export class SelectionGroup extends THREE.Object3D {
 				}
 			}
 		}
-		 */
 
 		// If first object move group to its position
 		if (this.selectedGameObjects.length === 0 || moveGizmo) {

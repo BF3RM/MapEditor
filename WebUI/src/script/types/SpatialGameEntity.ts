@@ -62,7 +62,7 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 		InstanceManager.getInstance().SetColor(this, color);
 	}
 
-	public updateTransform() {
+	public updateChildrenMatrices() {
 		InstanceManager.getInstance().SetMatrixFromSpatialEntity(this);
 	}
 }

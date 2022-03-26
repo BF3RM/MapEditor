@@ -173,11 +173,32 @@ export class EditorCore {
 		this.isPreviewBlueprintSpawned = false;
 	}
 
-	public CopySelectedObjects(): SpawnGameObjectCommand[] {
+	public CopySingleSelectedObjectTo(copyToLinearTransform: LinearTransform): SpawnGameObjectCommand {
+		const childGameObject = editor.selectionGroup.selectedGameObjects[0];
+		const gameObjectTransferData = childGameObject.getGameObjectTransferData();
+		gameObjectTransferData.guid = Guid.create();
+		if (copyToLinearTransform) {
+			gameObjectTransferData.transform = copyToLinearTransform;
+		}
+		const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
+		// Make sure the variation is valid, otherwise set default one.
+		if (bp) {
+			if (!bp.isVariationValid(gameObjectTransferData.variation)) {
+				gameObjectTransferData.variation = bp.getDefaultVariation();
+			}
+		}
+		const spawnGameObjectCommand = new SpawnGameObjectCommand(gameObjectTransferData);
+		return spawnGameObjectCommand;
+	}
+
+	public CopySelectedObjects(copyToLinearTransform: LinearTransform | null = null): SpawnGameObjectCommand[] {
 		const commands: SpawnGameObjectCommand[] = [];
 		editor.selectionGroup.selectedGameObjects.forEach((childGameObject: GameObject) => {
 			const gameObjectTransferData = childGameObject.getGameObjectTransferData();
 			gameObjectTransferData.guid = Guid.create();
+			if (copyToLinearTransform) {
+				gameObjectTransferData.transform = copyToLinearTransform;
+			}
 			const bp = editor.blueprintManager.getBlueprintByGuid(gameObjectTransferData.blueprintCtrRef.instanceGuid);
 			// Make sure the variation is valid, otherwise set default one.
 			if (bp) {
@@ -185,7 +206,9 @@ export class EditorCore {
 					gameObjectTransferData.variation = bp.getDefaultVariation();
 				}
 			}
-			commands.push(new SpawnGameObjectCommand(gameObjectTransferData));
+			const spawnGameObjectCommand = new SpawnGameObjectCommand(gameObjectTransferData);
+			commands.push(spawnGameObjectCommand);
+			console.log(spawnGameObjectCommand);
 		});
 		return commands;
 	}
@@ -232,7 +255,7 @@ export class EditorCore {
 		if (editor.selectionGroup.selectedGameObjects.length === 0) {
 			editor.threeManager.showGizmo();
 		}
-
+		this.unhighlight(gameObject.guid);
 		editor.selectionGroup.select(gameObject, multiSelection, scrollTo, moveGizmo);
 		editor.threeManager.setPendingRender();
 	}
@@ -261,14 +284,16 @@ export class EditorCore {
 			return false;
 		}
 
+		if (!multiple) {
+			this.unhighlight();
+			editor.threeManager.setPendingRender();
+		}
+
 		// Ignore if selected
 		if (gameObject.selected) {
 			return;
 		}
 
-		if (!multiple) {
-			this.unhighlight();
-		}
 		gameObject.onHighlight();
 		this.highlightedObjects.setValue(guid, gameObject);
 		editor.threeManager.setPendingRender();

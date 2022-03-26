@@ -8,6 +8,8 @@ import { signals } from '@/script/modules/Signals';
 
 export class InputControls {
 	public keys: boolean[] = [];
+	private wasMKeyDown: boolean = false;
+
 	constructor(element: HTMLCanvasElement) {
 		element.addEventListener('keydown', this.onCanvasKeyDown.bind(this));
 		window.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -110,6 +112,10 @@ export class InputControls {
 		if (event.which === KEYCODE.CTRL) {
 			editor.threeManager.disableGridSnap();
 		}
+		if (event.which === KEYCODE.KEY_M) {
+			this.wasMKeyDown = false;
+			editor.threeManager.DisableMiniBrushMode();
+		}
 	}
 
 	// Keys that should only work when the canvas is focused
@@ -180,6 +186,12 @@ export class InputControls {
 		}
 		if (event.which === KEYCODE.ESCAPE) {
 			editor.DeselectAll();
+		}
+		if (event.which === KEYCODE.KEY_M) {
+			if (!this.wasMKeyDown) {
+				this.wasMKeyDown = true;
+				editor.threeManager.EnableMiniBrushMode();
+			}
 		}
 	}
 

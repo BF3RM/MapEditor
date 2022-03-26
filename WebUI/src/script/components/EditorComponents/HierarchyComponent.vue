@@ -299,7 +299,9 @@ export default class HierarchyComponent extends EditorComponent {
 					break;
 				}
 
-				if (found) {
+				const isFiltered = this.infiniteTreeComponent.isNodeFiltered(node);
+
+				if (found && !isFiltered) {
 					guids.push(this.getNodeGuid(node));
 				}
 			}
