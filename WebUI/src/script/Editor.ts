@@ -340,13 +340,16 @@ export default class Editor {
 	public onSetTransform(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
 		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
+
 		if (gameObject !== undefined) {
 			(gameObject).setTransform(gameObjectTransferData.transform);
+
 			if (gameObject.parent) {
 				gameObject.parent.updateMatrixWorld();
-				if (this.selectionGroup.isSelected(gameObject)) {
-					this.selectionGroup.RefreshTransform();
-				}
+			}
+
+			if (this.selectionGroup.isSelected(gameObject)) {
+				this.selectionGroup.RefreshTransform();
 			}
 		}
 
