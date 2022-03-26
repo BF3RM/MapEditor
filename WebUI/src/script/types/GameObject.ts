@@ -45,7 +45,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
 			return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
 		} else {
-			return this.transform;
+			return new LinearTransform().setFromMatrix(this.matrixWorld);
 		}
 	}
 
