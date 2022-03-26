@@ -332,7 +332,7 @@ export class THREEManager {
 	public enableGridSnap() {
 		this.gridSnap = true;
 		this.gizmoControls.setTranslationSnap(0.5);
-		this.gizmoControls.setRotationSnap(THREE.MathUtils.degToRad(15));
+		this.gizmoControls.setRotationSnap(THREE.MathUtils.degToRad(5));
 	}
 
 	public disableGridSnap() {
