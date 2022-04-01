@@ -90,14 +90,19 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	return true
 end
 
-function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
+---@param p_HookCtx HookContext
+---@param p_Blueprint DataContainer
+---@param p_Transform LinearTransform
+---@param p_Variation integer
+---@param p_Parent DataContainer|nil
+function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p_Transform, p_Variation, p_Parent)
 	local s_PendingCustomBlueprintInfo = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)]
-	
+
 	if SharedUtils:IsServerModule() and s_PendingCustomBlueprintInfo and Guid(s_PendingCustomBlueprintInfo.customGuid) == PREVIEW_GUID then
 		m_Logger:Error('Tried to spawn the preview object on server, something went wrong.')
-		p_Hook:Return()
+		p_HookCtx:Return()
 	end
-	
+
 	-- We dont load vanilla objects if the flag is active
 	if ME_CONFIG.LOAD_VANILLA == false and s_PendingCustomBlueprintInfo == nil then
 		return
@@ -224,7 +229,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	---^^^^ This is parent to children / top to bottom ^^^^
-	local s_EntityBus = p_Hook:Call()
+	local s_EntityBus = p_HookCtx:Call()
 	---vvvv This is children to parent / bottom to top vvvv
 
 	-- Custom object have to be manually initialized.

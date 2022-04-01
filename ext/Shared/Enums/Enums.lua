@@ -1,3 +1,4 @@
+---@class CameraMode
 CameraMode = {
 	FirstPerson = 1,
 	FreeCam = 2,
@@ -5,6 +6,7 @@ CameraMode = {
 	Editor = 4
 }
 
+---@class RaycastType
 RaycastType = {
 	Camera = 1,
 	Mouse = 2
@@ -17,6 +19,7 @@ GameObjectOriginType = {
 	CustomChild = 3
 }
 
+---@class EditorMode
 EditorMode = {
 	Loading = 1,
 	Editor = 2,
@@ -24,7 +27,7 @@ EditorMode = {
 	FreeCam = 4
 }
 
---Command Action Response Type
+---Command Action Response Type
 ---@class CARResponseType
 CARResponseType = {
 	Success = 1,
@@ -32,6 +35,7 @@ CARResponseType = {
 	Queue = 3
 }
 
+---@class CommandActionType
 CommandActionType = {
 	SpawnGameObjectCommand = "SpawnGameObjectCommand",
 	DeleteGameObjectCommand = "DeleteGameObjectCommand",
@@ -45,6 +49,7 @@ CommandActionType = {
 	SetObjectNameCommand = "SetObjectNameCommand",
 }
 
+---@class CARType
 CARType = {
 	SpawnedGameObject = "SpawnedGameObject",
 	DeletedGameObject = "DeletedGameObject",
@@ -57,6 +62,7 @@ CARType = {
 	SetField = "SetField"
 }
 
+---@class CoroutineState
 CoroutineState = {
 	Scheduled = "scheduled",
 	Suspended = "suspended",

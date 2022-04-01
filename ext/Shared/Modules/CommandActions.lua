@@ -1,11 +1,13 @@
 ---@class CommandActions
 CommandActions = class 'CommandActions'
 
+---@type Logger
 local m_Logger = Logger("CommandActions", false)
 
+---@param p_Realm Realm|integer
 function CommandActions:__init(p_Realm)
 	m_Logger:Write("Initializing CommandActions: " .. tostring(p_Realm))
-	self.m_Realm = p_Realm;
+	self.m_Realm = p_Realm
 	self:RegisterVars()
 end
 
