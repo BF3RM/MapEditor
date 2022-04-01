@@ -146,4 +146,6 @@ function UIManager:OnUIReloaded()
 	self:SetEditorMode(self.m_ActiveMode)
 end
 
-return UIManager()
+UIManager = UIManager()
+
+return UIManager

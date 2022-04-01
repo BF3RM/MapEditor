@@ -64,5 +64,7 @@ function Coroutiner:OnEngineUpdate(p_Delta)
 	end
 end
 
-return Coroutiner()
+Coroutiner = Coroutiner()
+
+return Coroutiner
 

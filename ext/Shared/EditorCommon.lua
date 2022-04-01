@@ -25,4 +25,6 @@ function EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, p_ProjectH
 	end
 end
 
+EditorCommon = EditorCommon()
+
 return EditorCommon

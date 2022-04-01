@@ -292,4 +292,6 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 	ServerTransactionManager:QueueCommands(s_SaveFileCommands)
 end
 
-return ProjectManager()
+ProjectManager = ProjectManager()
+
+return ProjectManager

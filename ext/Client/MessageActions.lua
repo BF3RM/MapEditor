@@ -192,4 +192,6 @@ function MessageActions:TeleportMouse(p_Message)
 	return CARResponseType.Success
 end
 
-return MessageActions()
+MessageActions = MessageActions()
+
+return MessageActions

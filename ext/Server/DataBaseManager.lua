@@ -303,4 +303,6 @@ function DataBaseManager:DeleteProject(p_ProjectId)
 	return true
 end
 
-return DataBaseManager()
+DataBaseManager = DataBaseManager()
+
+return DataBaseManager

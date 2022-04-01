@@ -584,4 +584,10 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	end
 end
 
+if SharedUtils:IsClientModule() then
+	GameObjectManager = GameObjectManager(Realm.Realm_Client)
+else
+	GameObjectManager = GameObjectManager(Realm.Realm_Server)
+end
+
 return GameObjectManager

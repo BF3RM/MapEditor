@@ -130,4 +130,6 @@ function ClientGameObjectManager:FindMissingValues(p_OriginalTable, p_NewTable)
 	return s_MissingValues, s_Count
 end
 
-return ClientGameObjectManager()
+ClientGameObjectManager = ClientGameObjectManager()
+
+return ClientGameObjectManager

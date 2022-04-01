@@ -351,4 +351,6 @@ function ClientTransactionManager:OnSendCommandsToServer(p_Commands)
 	NetEvents:SendLocal('ClientTransactionManager:InvokeCommands', p_Commands)
 end
 
-return ClientTransactionManager()
+ClientTransactionManager = ClientTransactionManager()
+
+return ClientTransactionManager

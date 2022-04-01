@@ -1,22 +1,16 @@
 ---@class MapEditorClient
 MapEditorClient = class 'MapEditorClient'
 
+---@type Logger
 local m_Logger = Logger("MapEditorClient", false)
-WebUpdater = require "WebUpdater"
-FreeCam = require "Freecam"
-Editor = require "Editor"
-UIManager = require "UIManager"
-MessageActions = require "MessageActions"
-ClientTransactionManager = require "ClientTransactionManager"
-ClientGameObjectManager = require "ClientGameObjectManager"
-EBXManager = require "__shared/Modules/EBXManager"
 
-GameObjectManager = GameObjectManager(Realm.Realm_Client)
-
-EditorCommon = EditorCommon()
---VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
-CommandActions = CommandActions(Realm.Realm_Client)
-InstanceParser = InstanceParser(Realm.Realm_Client)
+require "WebUpdater"
+require "Freecam"
+require "Editor"
+require "UIManager"
+require "MessageActions"
+require "ClientTransactionManager"
+require "ClientGameObjectManager"
 
 function MapEditorClient:__init()
 	m_Logger:Write("Initializing MapEditorClient")

@@ -94,4 +94,6 @@ function ParseType(p_Type, p_Val)
 	end
 end
 
-return EBXManager()
+EBXManager = EBXManager()
+
+return EBXManager

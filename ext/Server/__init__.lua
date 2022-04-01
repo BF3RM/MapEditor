@@ -1,18 +1,14 @@
 ---@class MapEditorServer
 MapEditorServer = class 'MapEditorServer'
 
+---@type Logger
 local m_Logger = Logger("MapEditorServer", false)
 
-ServerTransactionManager = require "ServerTransactionManager"
-ProjectManager = require "ProjectManager"
-DataBaseManager = require "DataBaseManager"
-ServerGameObjectManager = require "ServerGameObjectManager"
-EBXManager = require "__shared/Modules/EBXManager"
-GameObjectManager = GameObjectManager(Realm.Realm_Server)
---VanillaBlueprintsParser = VanillaBlueprintsParser(Realm.Realm_Client)
-InstanceParser = InstanceParser(Realm.Realm_Server)
-CommandActions = CommandActions(Realm.Realm_ClientAndServer)
-EditorCommon = EditorCommon()
+require "ServerTransactionManager"
+require "ProjectManager"
+require "DataBaseManager"
+require "ServerGameObjectManager"
+require "FBSettingsManager"
 
 function MapEditorServer:__init()
 	m_Logger:Write("Initializing MapEditorServer")

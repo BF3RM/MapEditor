@@ -330,4 +330,6 @@ function FreeCam:UpdateFreeCamera(p_Delta)
 	--s_Transform.left = Vec3(s_Transform.left.x, 0.0, s_Transform.left.z)
 end
 
-return FreeCam()
+FreeCam = FreeCam()
+
+return FreeCam

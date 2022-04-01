@@ -135,4 +135,6 @@ function ServerGameObjectManager:ProcessClientOnlyGameObject(p_TransferData)
 	--m_Logger:Write("Added client only gameobject on server (without gameEntities), guid: " .. s_GuidString)
 end
 
-return ServerGameObjectManager()
+ServerGameObjectManager = ServerGameObjectManager()
+
+return ServerGameObjectManager
