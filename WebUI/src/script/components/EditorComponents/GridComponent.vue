@@ -92,11 +92,7 @@ export default class GridComponent extends EditorComponent {
 	}
 
 	private onSearch(a: any) {
-		if (a && a.target) {
-			this.data.search = a.target.value;
-		} else {
-			this.data.search = '';
-		}
+		this.data.search = a.target.value;
 	}
 
 	private filteredItems() {
