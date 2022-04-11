@@ -12,6 +12,7 @@ function GameObjectManager:__init(p_Realm)
 end
 
 function GameObjectManager:RegisterVars()
+	---@type table<string, GameObject>
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_PendingBlueprint = {}
@@ -131,6 +132,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		return
 	end
 
+	---@type CtrRef
 	local s_OriginalRef = CtrRef({})
 
 	if p_Parent ~= nil then
@@ -141,6 +143,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		}
 	end
 
+	---@type GameObject
 	local s_GameObject = GameObject{
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
