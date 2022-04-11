@@ -75,7 +75,7 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
 		return true
 	end
 
-	if not s_Entity:Is("SpatialEntity") then
+	if not self.isSpatial then
 		return true
 	end
 
