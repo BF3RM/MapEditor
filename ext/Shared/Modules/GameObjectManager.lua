@@ -16,6 +16,7 @@ function GameObjectManager:RegisterVars()
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_PendingBlueprint = {}
 
+	self.m_ProcessedEntities = {}
 	self.m_PendingEntities = {}
 	self.m_VanillaGameObjectGuids = {}
 
@@ -236,45 +237,54 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 	end
 
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
-		local s_GameEntity = s_GameObject.gameEntities[l_Entity.instanceId]
-
-		if s_GameObject == nil then
-			s_GameEntity = self.m_PendingEntities[l_Entity.instanceId]
+		if self.m_ProcessedEntities[l_Entity.instanceId] then
+			goto continue
 		end
 
+		local s_GameEntity = s_GameObject.gameEntities[l_Entity.instanceId]
+
+		if s_GameEntity ~= nil then
+			goto continue
+		end
+
+		s_GameEntity = self.m_PendingEntities[l_Entity.instanceId]
 		if s_GameEntity == nil then
 			s_GameEntity = GameEntity{
 				entity = l_Entity,
 				instanceId = l_Entity.instanceId,
 				typeName = l_Entity.typeInfo.name,
 			}
+		else
+			m_Logger:Write('Processing an entity that was pending')
 		end
 
-		if s_GameEntity.indexInBlueprint == nil then -- GameEntity hasn't been processed yet.
-			s_GameEntity.indexInBlueprint = l_Index
+		s_GameEntity.indexInBlueprint = l_Index
 
-			if (s_GameEntity.aabb == nil or s_GameEntity.transform == nil) and l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
-				local s_Entity = SpatialEntity(l_Entity)
+		if (s_GameEntity.aabb == nil or s_GameEntity.transform == nil) and l_Entity:Is("SpatialEntity") and l_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
+			local s_Entity = SpatialEntity(l_Entity)
 
-				s_GameEntity.isSpatial = true
-				s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
-				s_GameEntity.aabb = AABB {
-					min = SanitizeVec3(s_Entity.aabb.min:Clone()),
-					max = SanitizeVec3(s_Entity.aabb.max:Clone()),
-					transform = ToLocal(s_Entity.aabbTransform, p_Transform)
-				}
-			end
-
-			if s_GameEntity.initiatorRef == nil and s_GameEntity.data then
-				s_GameEntity.initiatorRef = CtrRef {
-					typeName = s_GameEntity.data.typeInfo.name,
-					instanceGuid = tostring(s_GameEntity.data.instanceGuid),
-					partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
-				}
-			end
-			s_GameObject.gameEntities[l_Entity.instanceId] = s_GameEntity
-			self.m_PendingEntities[l_Entity.instanceId] = nil
+			s_GameEntity.isSpatial = true
+			s_GameEntity.transform = ToLocal(s_Entity.transform, p_Transform)
+			s_GameEntity.aabb = AABB {
+				min = SanitizeVec3(s_Entity.aabb.min:Clone()),
+				max = SanitizeVec3(s_Entity.aabb.max:Clone()),
+				transform = ToLocal(s_Entity.aabbTransform, p_Transform)
+			}
 		end
+
+		if s_GameEntity.initiatorRef == nil and s_GameEntity.data then
+			s_GameEntity.initiatorRef = CtrRef {
+				typeName = s_GameEntity.data.typeInfo.name,
+				instanceGuid = tostring(s_GameEntity.data.instanceGuid),
+				partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
+			}
+		end
+
+		s_GameObject.gameEntities[l_Entity.instanceId] = s_GameEntity
+		self.m_PendingEntities[l_Entity.instanceId] = nil
+		self.m_ProcessedEntities[l_Entity.instanceId] = true
+
+		::continue::
 	end
 
 	--- If its a root object all children are now resolved so we update WebUI.
@@ -533,14 +543,16 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 	local s_GameEntity = self.m_PendingEntities[s_Entity.instanceId]
 
-	if s_GameEntity == nil then
-		s_GameEntity = GameEntity{
-			entity = s_Entity,
-			instanceId = s_Entity.instanceId,
-			typeName = s_Entity.typeInfo.name,
-		}
+	if s_GameEntity ~= nil then
+		m_Logger:Warning('Entity already pending its processing?')
+		return
 	end
 
+	s_GameEntity = GameEntity{
+		entity = s_Entity,
+		instanceId = s_Entity.instanceId,
+		typeName = s_Entity.typeInfo.name,
+	}
 	local s_PartitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid);
 	s_GameEntity.initiatorRef = CtrRef {
 		typeName = p_EntityData.typeInfo.name,
@@ -548,7 +560,6 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		partitionGuid = s_PartitionGuid
 	}
 
-	self.m_PendingEntities[s_Entity.instanceId] = s_GameEntity
 	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 
 	if s_PendingGameObject then
@@ -576,6 +587,11 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 		s_PendingGameObject.gameEntities[s_Entity.instanceId] = s_GameEntity
 		self.m_PendingEntities[s_Entity.instanceId] = nil
+		self.m_ProcessedEntities[s_Entity.instanceId] = true
+	else
+		self.m_PendingEntities[s_Entity.instanceId] = s_GameEntity
+
+		m_Logger:Write('Couldnt find entity\'s pending GO, saving')
 	end
 end
 
