@@ -71,6 +71,10 @@ export default class InstanceManager {
 	}
 
 	AddFromSpatialEntity(entity: SpatialGameEntity) {
+		if (this.entityIds.includes(entity.instanceId)) {
+			console.error('Entity with id ' + entity.instanceId + ' already exists');
+			return;
+		}
 		this.entityIds.push(entity.instanceId);
 		this.instancedMesh.setColorAt(this.entityIds.length - 1, SpatialGameEntity.HIGHLIGHTED_COLOR);
 
