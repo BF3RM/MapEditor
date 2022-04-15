@@ -472,7 +472,7 @@ export class THREEManager {
 				}
 			}
 			// Else we select the GameObject.
-			if (gameObject.enabled && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
+			if (gameObject.enabled && gameObject.blueprintCtrRef.typeName !== 'WorldPartData' && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
 				return gameObject.guid;
 			}
 		}
