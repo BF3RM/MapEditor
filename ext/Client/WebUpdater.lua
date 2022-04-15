@@ -61,4 +61,6 @@ function WebUpdater:OnUpdate(p_DeltaTime, p_SimulationDelta)
 	end
 end
 
-return WebUpdater()
+WebUpdater = WebUpdater()
+
+return WebUpdater

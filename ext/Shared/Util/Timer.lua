@@ -256,9 +256,6 @@ function Timer:Delete(name)
 end
 -- Timer.Remove = Timer.Delete -- whats this for?
 
--- Singleton.
-if g_Timer == nil then
-	g_Timer = Timer()
-end
+Timer = Timer()
 
-return g_Timer
+return Timer

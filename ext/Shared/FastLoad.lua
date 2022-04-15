@@ -52,4 +52,6 @@ function FastLoad:OnExtensionUnloading()
 	_ResetSimFPS()
 end
 
-return FastLoad()
+FastLoad = FastLoad()
+
+return FastLoad

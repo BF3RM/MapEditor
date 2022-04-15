@@ -4,9 +4,13 @@ CtrRef = class 'CtrRef'
 local m_Logger = Logger("CtrRef", false)
 
 function CtrRef:__init(arg)
+	---@type string
 	self.typeName = arg.typeName
+	---@type string
 	self.name = arg.name
+	---@type Guid
 	self.partitionGuid = arg.partitionGuid
+	---@type Guid
 	self.instanceGuid = arg.instanceGuid
 end
 

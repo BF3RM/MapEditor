@@ -3,14 +3,13 @@ MapEditorShared = class 'MapEditorShared'
 
 require "__shared/Config"
 require "__shared/Util/Logger"
-Coroutiner = require "__shared/Util/Coroutiner"
+require "__shared/Util/Coroutiner"
 require "__shared/Util/Util"
-DataContainerExt = require "__shared/Util/DataContainerExt"
-FastLoad = require "__shared/FastLoad"
---require "__shared/Modules/ObjectManager"
+require "__shared/Util/DataContainerExt"
+require "__shared/FastLoad"
+require "__shared/Modules/EBXManager"
 require "__shared/Modules/GameObjectManager"
 require "__shared/Modules/CommandActions"
---require "__shared/Modules/VanillaBlueprintsParser"
 require "__shared/Modules/InstanceParser"
 require "__shared/Enums/Enums"
 require "__shared/GameData/GameModes"
@@ -28,9 +27,10 @@ require "__shared/Types/GameObject"
 require "__shared/Types/GameObjectTransferData"
 require "__shared/Types/GameObjectParentData"
 require "__shared/Types/GameObjectSaveData"
-Patches = require "__shared/Patches/Patches"
-Timer = require "__shared/Util/Timer"
+require "__shared/Patches/Patches"
+require "__shared/Util/Timer"
 
+---@type Logger
 local m_Logger = Logger("MapEditorShared", false)
 
 function MapEditorShared:__init()

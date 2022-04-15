@@ -164,4 +164,6 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	end
 end
 
-return ServerTransactionManager()
+ServerTransactionManager = ServerTransactionManager()
+
+return ServerTransactionManager

@@ -294,4 +294,10 @@ function InstanceParser:FillVariations()
 	end
 end
 
+if SharedUtils:IsClientModule() then
+	InstanceParser = InstanceParser(Realm.Realm_Client)
+else
+	InstanceParser = InstanceParser(Realm.Realm_Server)
+end
+
 return InstanceParser

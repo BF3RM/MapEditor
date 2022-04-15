@@ -152,4 +152,6 @@ function Editor:InitializeUIData(p_CommandActionResults)
 	self:UpdateCameraTransform()
 end
 
-return Editor()
+Editor = Editor()
+
+return Editor

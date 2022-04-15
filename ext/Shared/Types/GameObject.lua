@@ -5,20 +5,25 @@ local m_Logger = Logger("GameObject", false)
 local m_TraceableField_Suffix = "_original_value"
 
 function GameObject:__init(arg)
+	---@type Guid
 	self.guid = arg.guid
 	self.creatorName = arg.creatorName -- never gets sent to js
+	---@type CtrRef
 	self.blueprintCtrRef = arg.blueprintCtrRef
 	self.origin = arg.origin -- never gets sent to js
 	self.gameEntities = arg.gameEntities or { }
 	self.children = arg.children or {} -- never gets sent to js
+	---@type Realm|integer
 	self.realm = arg.realm
 	self.isUserModified = true
 	self.userModifiedFields = {}
+	---@type CtrRef
 	self.originalRef = arg.originalRef -- never gets sent to js
 	self.localTransform = arg.localTransform
 	self.overrides = arg.overrides or {}
 	self.internalBlueprint = nil
 	self.name = arg.name
+	---@type GameObjectParentData
 	self.parentData = arg.parentData
 	self.transform = arg.transform -- world transform
 	self.variation = arg.variation
