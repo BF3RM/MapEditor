@@ -11,19 +11,27 @@ function ClientTransactionManager:__init()
 end
 
 function ClientTransactionManager:RegisterVars()
+	self:ResetVars()
+end
+
+function ClientTransactionManager:ResetVars()
 	self.m_Queue = {
 		commands = {},
 		messages = {}
 	}
 
+	self.m_IsPlayerReady = false
 	self.m_TransactionId = 0
-	--self.m_GameObjectTransferDatas = {}
 	self.m_CommandActionResults = {}
 	self.m_ExecutedCommandActions = {}
 end
 
 function ClientTransactionManager:OnLevelDestroy()
-	self:RegisterVars()
+	self:ResetVars()
+end
+
+function ClientTransactionManager:OnLoadResources()
+	self:ResetVars()
 end
 
 function ClientTransactionManager:RegisterEvents()
@@ -32,6 +40,7 @@ function ClientTransactionManager:RegisterEvents()
 
 	NetEvents:Subscribe('ServerTransactionManager:CommandsInvoked', self, self.OnServerCommandsInvoked)
 	NetEvents:Subscribe('ServerTransactionManager:SyncClientContext', self, self.OnSyncClientContext)
+	NetEvents:Subscribe('ServerTransactionManager:ResetVars', self, self.ResetVars())
 end
 
 function ClientTransactionManager:OnEngineMessage(p_Message)
@@ -43,7 +52,14 @@ end
 function ClientTransactionManager:ClientReady()
 	--- Client requests all updates that the server has.
 	m_Logger:Write("Client READY")
-	NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
+	self.m_IsPlayerReady = true
+
+	-- Debug
+	if self.m_TransactionId ~= 0 then
+		m_Logger:Warning('Some commands were executed before player was ready, should never happen')
+	end
+
+	NetEvents:SendLocal("ClientTransactionManager:ClientReady")
 end
 
 function ClientTransactionManager:OnLevelDestroy()
@@ -51,14 +67,14 @@ function ClientTransactionManager:OnLevelDestroy()
 end
 
 function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId)
+	m_Logger:Write('Syncing client context')
+
 	if p_LastTransactionId ~= nil and p_TransferDatas ~= nil then
 		Events:DispatchLocal('UIManager:SyncingStart')
 		self:UpdateTransactionId(p_LastTransactionId, true)
 		self:SyncClientTransferDatas(p_TransferDatas)
 	end
 
-	-- Request again, in case there are more packaged updates
-	--NetEvents:SendLocal("ClientTransactionManager:RequestSync", self.m_TransactionId)
 	Events:DispatchLocal('UIManager:LoadingComplete')
 end
 
@@ -141,14 +157,14 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 								name = l_GameObjectTransferData.name
 							}
 						}
-					elseif l_Change == "gameEntities" then
-						m_Logger:Write("Before: ")
-						m_Logger:WriteTable(s_ComparisonGameObjectTransferData.gameEntities)
-						m_Logger:Write("--------------")
+					-- elseif l_Change == "gameEntities" then
+					-- 	m_Logger:Write("Before: ")
+					-- 	m_Logger:WriteTable(s_ComparisonGameObjectTransferData.gameEntities)
+					-- 	m_Logger:Write("--------------")
 
-						m_Logger:Write("Updated Game Entities: ")
-						m_Logger:WriteTable(l_GameObjectTransferData.gameEntities)
-						m_Logger:Write("--------------")
+					-- 	m_Logger:Write("Updated Game Entities: ")
+					-- 	m_Logger:WriteTable(l_GameObjectTransferData.gameEntities)
+					-- 	m_Logger:Write("--------------")
 
 					elseif l_Change == "parentData" then
 						-- TODO: add this when changing parent data is implemented
@@ -164,7 +180,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 		end
 	end
 
-	self:ExecuteCommands(s_Commands, nil)
+	self:QueueCommands(s_Commands)
 end
 
 function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
@@ -179,7 +195,7 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		table.insert(s_Commands, l_Command)
 	end
 
-	self:ExecuteCommands(s_Commands, p_UpdatePass)
+	self:_executeCommands(s_Commands, p_UpdatePass)
 
 	local s_Messages = {}
 
@@ -200,13 +216,35 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 end
 
 function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_TransactionId)
-	self:UpdateTransactionId(p_TransactionId, false)
+	m_Logger:Write('OnServerCommandsInvoked')
+
+	-- Check if player is ready, otherwise ignore as it will be sent when the player tells the server that it's ready
+	if not self.m_IsPlayerReady then
+		m_Logger:Write('--- Received commands before client is ready, ignoring.')
+		return
+	end
+
 	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
-	self:ExecuteCommands(s_Commands, nil)
+	if self.m_TransactionId + #s_Commands ~= p_TransactionId then
+		m_Logger:Warning('--- The shit is not synced, gotta request sync')
+		NetEvents:SendLocal('ClientTransactionManager:RequestSync', self.m_TransactionId)
+
+		return
+	end
+	self:UpdateTransactionId(p_TransactionId, false)
+
+	-- Queue commands, in case there are commands pending that are first in order
+	self:QueueCommands(s_Commands)
 end
 
-function ClientTransactionManager:ExecuteCommands(p_Commands, p_UpdatePass)
+function ClientTransactionManager:QueueCommands(p_Commands)
+	for _, l_Command in pairs(p_Commands) do
+		table.insert(self.m_Queue.commands, l_Command)
+	end
+end
+
+function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
 
 	for _, l_Command in pairs(p_Commands) do

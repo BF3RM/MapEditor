@@ -29,6 +29,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('UI:DrawHud', self, self.OnDrawHud)
 	Events:Subscribe('Level:LoadingInfo', self, self.OnLoadingInfo)
+	Events:Subscribe('Level:LoadResources', self, self.OnLoadResources)
 
 	-- Editor Events
 	NetEvents:Subscribe('MapEditorClient:ReceiveProjectData', self, self.OnReceiveProjectData)
@@ -112,6 +113,10 @@ function MapEditorClient:OnLevelDestroy()
 	ClientTransactionManager:OnLevelDestroy()
 	ClientGameObjectManager:OnLevelDestroy()
 	UIManager:OnLevelDestroy()
+end
+
+function MapEditorClient:OnLoadResources()
+	ClientTransactionManager:OnLoadResources()
 end
 
 function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)

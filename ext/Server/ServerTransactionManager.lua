@@ -11,28 +11,55 @@ end
 
 function ServerTransactionManager:RegisterEvents()
 	NetEvents:Subscribe('ClientTransactionManager:InvokeCommands', self, self.OnInvokeCommands)
-	NetEvents:Subscribe('ClientTransactionManager:RequestSync', self, self.OnClientRequestSync)
+	NetEvents:Subscribe('ClientTransactionManager:ClientReady', self, self.OnClientReady)
+	NetEvents:Subscribe('ClientTransactionManager:RequestSync', self, self.OnRequestSync)
 end
 
 function ServerTransactionManager:RegisterVars()
 	self.m_QueueDelay = 0
 	self.m_Queue = {}
 	self.m_Transactions = {}
+	self.m_PlayersReady = {}
 end
 
 function ServerTransactionManager:OnLevelDestroy()
 	self:RegisterVars()
 end
 
-function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
+function ServerTransactionManager:OnLoadResources()
+	self:RegisterVars()
+	NetEvents:BroadcastLocal('ServerTransactionManager:ResetVars')
+end
+
+function ServerTransactionManager:IsPlayerReady(p_Player)
+	return self.m_PlayersReady[p_Player.name]
+end
+
+function ServerTransactionManager:SetPlayerReady(p_Player, p_IsReady)
+	self.m_PlayersReady[p_Player.name] = p_IsReady
+end
+
+function ServerTransactionManager:OnPlayerLeft(p_Player)
+	self:SetPlayerReady(p_Player, nil)
+end
+
+function ServerTransactionManager:OnClientReady(p_Player)
 	if p_Player == nil then
 		return
 	end
 
-	--if p_TransactionId == 0 then -- First request
-		ServerGameObjectManager:ClientReady(p_Player)
-	--end
+	self:SetPlayerReady(p_Player, true)
 
+	-- TODO: maybe do #self.m_PlayersReady to know if it's the first player that is ready
+	ServerGameObjectManager:ClientReady(p_Player)
+	self:SyncClient(p_Player, 0)
+end
+
+function ServerTransactionManager:OnRequestSync(p_Player, p_TransactionId)
+	self:SyncClient(p_Player, p_TransactionId)
+end
+
+function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 	--- Client up to date
 	if p_TransactionId == #self.m_Transactions then
 		--m_Logger:Write("Client up to date")
@@ -51,7 +78,6 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
 
 	local s_UpdatedGameObjectTransferDatas = {}
 
-	--local l_MaxTransaction = math.min(p_TransactionId + 100, #self.m_Transactions) -- TODO: limit transactions
 	local s_MaxTransaction = #self.m_Transactions
 
 	for l_TransactionId = p_TransactionId + 1, s_MaxTransaction do
@@ -79,6 +105,11 @@ function ServerTransactionManager:OnClientRequestSync(p_Player, p_TransactionId)
 end
 
 function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson)
+	if not self:IsPlayerReady(p_Player) then
+		m_Logger:Warning('Player invoked command before being ready, should not happen.')
+		return
+	end
+
 	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
 	self:QueueCommands(s_Commands)
@@ -102,7 +133,7 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 	for i, l_Command in pairs(self.m_Queue) do
 		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
 			if #s_NewQueue == 0 then
-				m_Logger:Write('Limit of 500 commands reached, queueing the rest')
+				m_Logger:Write('Limit of ' .. ME_CONFIG.QUEUE_MAX_COMMANDS .. ' commands reached, queueing the rest')
 			end
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
 			table.insert(s_NewQueue, l_Command)
