@@ -17,7 +17,8 @@ end
 function ClientTransactionManager:ResetVars()
 	self.m_Queue = {
 		commands = {},
-		messages = {}
+		messages = {},
+		delay = 0
 	}
 
 	self.m_IsPlayerReady = false
@@ -188,14 +189,6 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		return
 	end
 
-	local s_Commands = {}
-
-	for _, l_Command in pairs(self.m_Queue.commands) do
-		m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
-		table.insert(s_Commands, l_Command)
-	end
-
-	self:_executeCommands(s_Commands, p_UpdatePass)
 
 	local s_Messages = {}
 
@@ -206,13 +199,42 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 
 	self:ExecuteMessages(s_Messages, true, p_UpdatePass)
 
-	if #self.m_Queue.commands > 0 then
-		self.m_Queue.commands = {}
-	end
+	-- if #self.m_Queue.commands > 0 then
+	-- 	self.m_Queue.commands = {}
+	-- end
 
 	if #self.m_Queue.messages > 0 then
 		self.m_Queue.messages = {}
 	end
+
+	if self.m_Queue.delay > 0 then
+		self.m_Queue.delay = self.m_Queue.delay - p_DeltaTime
+		return
+	end
+
+	local s_CommandsToExecute = {}
+	local s_NewQueue = {}
+	local s_nProcessedCommands = 0
+
+	for i, l_Command in pairs(self.m_Queue.commands) do
+		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
+			if #s_NewQueue == 0 then
+				m_Logger:Write('Limit of ' .. ME_CONFIG.QUEUE_MAX_COMMANDS .. ' commands reached, queueing the rest')
+			end
+			-- Limit reached, shift remaining commands in the queue to the beginning of the array
+			table.insert(s_NewQueue, l_Command)
+		else
+			m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
+			table.insert(s_CommandsToExecute, l_Command)
+			s_nProcessedCommands = i
+		end
+	end
+
+	self.m_Queue.commands = s_NewQueue
+	self.m_Queue.delay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
+
+	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
+
 end
 
 function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_TransactionId)
