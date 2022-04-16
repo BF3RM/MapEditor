@@ -40,7 +40,7 @@ function ClientTransactionManager:RegisterEvents()
 
 	NetEvents:Subscribe('ServerTransactionManager:CommandsInvoked', self, self.OnServerCommandsInvoked)
 	NetEvents:Subscribe('ServerTransactionManager:SyncClientContext', self, self.OnSyncClientContext)
-	NetEvents:Subscribe('ServerTransactionManager:ResetVars', self, self.ResetVars())
+	NetEvents:Subscribe('ServerTransactionManager:ResetVars', self, self.ResetVars)
 end
 
 function ClientTransactionManager:OnEngineMessage(p_Message)
