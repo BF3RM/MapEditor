@@ -552,7 +552,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_GameEntity = self.m_PendingEntities[s_Entity.instanceId]
 
 	if s_GameEntity ~= nil then
-		m_Logger:Warning('Entity already pending its processing?')
+		m_Logger:Write('Entity already pending its processing')
 		return
 	end
 

@@ -70,8 +70,8 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 
 	--- Client up to date
 	if p_TransactionId == s_TargetTransactionId then
-		--m_Logger:Write("Client up to date")
-		-- Response, so the player know it has finished syncing.
+		-- m_Logger:Write("Client up to date")
+		-- Empty response, so the player know it has finished syncing.
 		NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player)
 		return
 	--- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
