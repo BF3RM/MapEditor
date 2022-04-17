@@ -15,11 +15,11 @@ end
 
 function UIManager:RegisterEvents()
 	Events:Subscribe('UIManager:LoadingComplete', self, self.OnLoadingComplete)
-	Events:Subscribe('UIManager:SyncingStart', self, self.OnSyncingStart)
+	Events:Subscribe('UIManager:SyncingProgress', self, self.OnSyncingProgress)
 end
 
-function UIManager:OnSyncingStart()
-	self:SetLoadingInfo('Syncing with server changes...')
+function UIManager:OnSyncingProgress(p_LoadedObjects, p_TotalObjects)
+	self:SetLoadingInfo(string.format('Syncing project state (%i/%i)', p_LoadedObjects, p_TotalObjects))
 end
 
 function UIManager:SetLoadingInfo(p_Info)
