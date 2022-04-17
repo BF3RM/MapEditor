@@ -23,9 +23,11 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('UpdateManager:Update', self, self.OnUpdatePass)
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 	Events:Subscribe('Level:Loaded', self, self.OnLevelLoaded)
+	Events:Subscribe('Level:LoadResources', self, self.OnLoadResources)
+
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Events:Subscribe('Player:Chat', self, self.OnChat)
-	Events:Subscribe('Player:Authenticated', self, self.OnPlayerAuthenticated)
+	Events:Subscribe('Player:Left', self, self.OnPlayerLeft)
 
 	Hooks:Install('ResourceManager:LoadBundles', 900, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 900, self, self.OnEntityCreateFromBlueprint)
@@ -95,8 +97,12 @@ function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
 end
 
-function MapEditorServer:OnPlayerAuthenticated(p_Player)
+function MapEditorServer:OnPlayerLeft(p_Player)
+	ServerTransactionManager:OnPlayerLeft(p_Player)
+end
 
+function MapEditorServer:OnLoadResources()
+	ServerTransactionManager:OnLoadResources()
 end
 
 function MapEditorServer:SetInputRestriction(p_Player, p_Enabled)

@@ -290,6 +290,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 	end
 
 	ServerTransactionManager:QueueCommands(s_SaveFileCommands)
+	ServerTransactionManager:SetLoadingProjectTransactionId(#s_SaveFileCommands)
 end
 
 ProjectManager = ProjectManager()
