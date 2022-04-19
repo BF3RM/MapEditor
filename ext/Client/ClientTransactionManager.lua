@@ -73,9 +73,8 @@ end
 function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId, p_TargetTransactionId)
 	m_Logger:Write('Syncing client context')
 
-	self.m_TargetTransactionId = p_TargetTransactionId
-
 	if p_LastTransactionId ~= nil and p_TransferDatas ~= nil then
+		self.m_TargetTransactionId = p_TargetTransactionId
 		self:UpdateTransactionId(p_LastTransactionId, true)
 		self:SyncClientTransferDatas(p_TransferDatas)
 	else
