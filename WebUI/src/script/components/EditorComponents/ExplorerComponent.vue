@@ -13,7 +13,7 @@
 						:data="treeData"
 						:selectable="true"
 						:should-select-node="shouldSelectNode"
-						:row-height="13"
+						:row-height="25"
 						:on-select-node="onSelectNode">
 					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
@@ -188,9 +188,9 @@ export default class ExplorerComponent extends EditorComponent {
 			background-color: #343434;
 		}
 	}
-	.datafont img.Icon {
+	/*.datafont img.Icon {
 		padding-top: 6px;
-	}
+	}*/
 	.type {
 		text-align: right;
 	}

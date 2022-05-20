@@ -11,7 +11,7 @@
 		<div class="tree-node" :style="nodeStyle(node)">
 			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
-					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
+					:src="require(`@/icons/editor/new/chevron-right.svg`)"/>
 			</div>
 			<div class="icon-container">
 				<img :class="getNodeIconClass(node)"/>
@@ -174,11 +174,18 @@ export default class ExpandableTreeSlot extends Vue {
 	.visibility-node {
 		display: flex;
 		align-content: center;
-		height: 13px;
-		background-color: #404040;
+		height: 100%;
+		width: 45px;
+		min-width: 45px;
+		align-items: center;
 
-		* {
-			margin: 0 2px;
+		.icon-container {
+			flex: 1 1 auto;
+			text-align: center;
+
+			img {
+				width: 16px;
+			}
 		}
 	}
 
@@ -189,38 +196,55 @@ export default class ExpandableTreeSlot extends Vue {
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
-		height: 13px;
+		align-items: center;
+		height: 25px;
 		/*white-space: nowrap;*/
 
 		.text-container {
 			display: flex;
 			flex-direction: row;
 			width: max-content;
-			overflow: hidden;
+			//overflow: hidden;
+			font-weight: 400;
+			font-size: 13px;
 		}
-		.expand-container img {
-			transition: transform 0.1s;
 
-			&.expanded {
-				transform: rotate(90deg);
-			}
-		}
-		.icon-container {
-			width: 13px;
-			max-width: 13px;
-			color: #6d6d6d;
+		.expand-container {
+			width: 22px;
+			text-align: center;
 
 			img {
-				max-width: 100%;
-				max-height: 100%;
+				width: 17px;
+				transition: transform 0.1s;
+
+				&.expanded {
+					transform: rotate(90deg);
+				}
 			}
 		}
-		&:hover {
-			background-color: #343434;
+
+		.icon-container {
+			.Icon {
+				width: 17px;
+				height: 17px;
+			}
+		}
+
+		&:hover,
+		&.selected {
+			background-color: #313848;
+			// color: #037fff;
 		}
 		&.selected {
-			background-color: #404040;
-			color: #409EFF;
+			&::after {
+				content: "";
+				position: absolute;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				width: 2px;
+				background: #037fff;
+			}
 		}
 
 		.slot-text {

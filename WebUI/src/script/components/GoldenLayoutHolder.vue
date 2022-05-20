@@ -7,8 +7,9 @@
 			:popoutWholeStack = "true"
 			:closePopoutsOnUnload = "false"
 			:showPopoutIcon = "false"
-			:showMaximiseIcon = "true"
+			:showMaximiseIcon = "false"
 			:showCloseIcon = "false"
+			:headerHeight = "30"
 			ref="gl"
 			class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
 			<gl-row>
@@ -92,7 +93,7 @@ export default class GoldenLayoutHolder extends Vue {
 		height: 100%;
 	}
 	#glHolder {
-		height: calc(100vh - 32px);
+		height: calc(100vh - 40px);
 		width: 100vw;
 		pointer-events: none;
 	}

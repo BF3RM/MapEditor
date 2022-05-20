@@ -287,7 +287,7 @@ export default class ProjectSettingsComponent extends Vue {
 
 	.selected {
 		background-color: #404040;
-		color: #409EFF;
+		color: #FAB91E;
 	}
 
 	.current {

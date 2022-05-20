@@ -1,43 +1,73 @@
 <template>
 	<EditorComponent class="inspector-component" title="Inspector">
-		<div class="scrollable">
-			<div v-if="!multiSelection" class="bpInfo" :class="{collapsed: toggleState.info}">
-				<div @click="toggleState.info = !toggleState.info">
-					<i :class="{'el-icon-arrow-right': toggleState.info, 'el-icon-arrow-down': !toggleState.info}"></i>Info
-				</div>
-				<input class="guid-input" :value="gameObjectGuid" :disabled="true">
-				<input class="Blueprint-input" id="bp-name" disabled="true" :value="blueprintName">
-				<input class="Blueprint-input" id="bp-type" disabled="true" :value="blueprintType">
-				<label for="bp-instance-guid">Instance Guid</label>
-				<input class="Blueprint-input" id="bp-instance-guid" disabled="true" :value="blueprintGuid">
-				<label for="bp-partition-guid">Partition Guid</label>
-				<input class="Blueprint-input" id="bp-partition-guid" disabled="true" :value="blueprintPartitionGuid">
-			</div>
-			<div class="header">
-				<div id="IconAndEnable">
+		<div class="header">
+			<div id="IconAndEnable" :class="enabled ? 'enabled' : ''">
+				<div class="icon-wrapper">
 					<img :class="'Large Icon Icon-' + objectType"/>
-					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 				</div>
-				<div id="NameAndVariation">
+			</div>
+			<div id="NameAndVariation">
+				<div>
+					<input class="name-input" :value="displayName" :disabled="multiSelection" id="name" @blur="onNameChange">
+				</div>
+				<label class="custom-checkbox">
+					Enable / Disable
+					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" >
+					<span class="checkmark"></span>
+				</label>
+			</div>
+			<div v-if="!multiSelection" class="details" :class="{collapsed: toggleState.info}">
+				<div @click="toggleState.info = !toggleState.info" class="toggle">
+					<i :class="{'el-icon-arrow-right': toggleState.info, 'el-icon-arrow-down': !toggleState.info}"></i>
+					Details
+				</div>
+				<div class="details-grid">
 					<div>
-						<input class="name-input" :value="displayName" :disabled="multiSelection" id="name" @blur="onNameChange">
+						<label for="bp-instance-guid">Instance Guid</label>
+						<input id="bp-instance-guid" :value="blueprintGuid" disabled="true">
 					</div>
-					<div id="Variation" class="container variation" v-if="!multiSelection">
+					<div>
+						<label for="bp-partition-guid">Partition Guid</label>
+						<input id="bp-partition-guid" :value="blueprintPartitionGuid" disabled="true" >
+					</div>
+					<div>
+						<label for="bp-guid">Guid</label>
+						<input id="bp-guid" :value="gameObjectGuid" disabled="true">
+					</div>
+					<div>
+						<label for="bp-partition-type">Type</label>
+						<input id="bp-type" :value="blueprintType" disabled="true">
+					</div>
+					<div class="block">
+						<label for="bp-name">Full name</label>
+						<input id="bp-name" :value="blueprintName" disabled="true">
+					</div>
+				</div>
+			</div>
+			<div v-if="!multiSelection" class="variations" :class="{collapsed: toggleState.variations}">
+				<div @click="toggleState.variations = !toggleState.variations" class="toggle">
+					<i :class="{'el-icon-arrow-right': toggleState.variations, 'el-icon-arrow-down': !toggleState.variations}"></i>
+					Variations
+				</div>
+				<div class="variations-grid">
+					<div id="Variation" class="variation" v-if="!multiSelection">
 						<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
 							<el-option v-for="variation of blueprintVariations" :key="variation.hash" :label="variation.name ? variation.name : 'Default variation'" :value="variation.hash"/>
 						</el-select>
 					</div>
-					<div v-if="selectedGameObject">
-						<b>Overrides:</b>
+					<div v-if="selectedGameObject && Object.keys(selectedGameObject.overrides).length > 0">
+						<label>Overrides</label>
 						<p v-for="(value, key) of Object.keys(selectedGameObject.overrides)" :key="key">{{value}}</p>
 						<div v-if="Object.keys(selectedGameObject.overrides).length > 0">
-<!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
-<!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
+	<!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
+	<!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="container transform-container">
+		</div>
+		<div class="scrollable">
+			<div class="transform-container">
 					<linear-transform-control
 							v-if="worldSpace === 'local'"
 							class="lt-control"
@@ -56,10 +86,10 @@
 							@blur="onEndDrag" />
 			</div>
 			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
-				<b>Experimental features, use with caution.</b>
+				<div class="alert">Experimental features, use with caution!</div>
 				<Promised :promise="partition">
 					<template v-slot:pending>
-						<p>Loading...</p>
+						<div class="loading">Loading...</div>
 					</template>
 					<template v-slot="data">
 						<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
@@ -70,7 +100,7 @@
 						</div>
 					</template>
 					<template v-slot:rejected="error">
-						<p>Error: {{ error.message }}</p>
+						<div class="alert">Error: {{ error.message }}</div>
 					</template>
 				</Promised>
 			</div>
@@ -127,7 +157,8 @@ export default class InspectorComponent extends EditorComponent {
 	private localTransform: LinearTransform = new LinearTransform();
 
 	private toggleState = {
-		info: true
+		info: true,
+		variations: true
 	}
 
 	private getInstance(reference: Reference) {
@@ -317,28 +348,126 @@ export default class InspectorComponent extends EditorComponent {
 		width: 100%;
 	}
 	.inspector-component {
+		.scrollable {
+			padding: 1.5vh;
+		}
+
 		.header {
-			display: flex;
+			padding: 1.5vh;
+			background: rgba(50, 58, 74, 0.4);
+			display: grid;
+			grid-template-columns: 20% 1fr;
+			grid-gap: 1.5vh;
 		}
+
 		#IconAndEnable {
-			width: 21%;
-			margin: 10px;
+			display: flex;
+			flex-flow: column;
+			opacity: .5;
+
+			div.icon-wrapper {
+				margin: 0;
+				text-align: center;
+				width: 100%;
+				background: #161924;
+				border-radius: 0.5vh;
+				padding: 1.5vh;
+				box-sizing: border-box;
+
+				.Icon {
+					height: 100%;
+					width: 100%;
+				}
+			}
+
+			&.enabled {
+				opacity: 1;
+			}
 		}
+
 		#NameAndVariation {
 			width: 100%;
+
+			.name-input {
+				height: 30px;
+				margin-bottom: 12px;
+			}
+
+			/*label {
+				input#enabled {
+					width: 16px;
+					margin: 0;
+					display: flex;
+					align-items: center;
+					justify-content: flex-start;
+				}
+			}*/
 		}
-		#Variation {
-			margin-top: 1em;
+
+		.variations,
+		.details {
+			width: 100%;
+			grid-column: span 2 / auto;
+
+			.toggle {
+				i {
+					margin-right: 4px;
+				}
+			}
+
+			.guid-input {
+				margin-top: 7px;
+			}
+
+			.details-grid {
+				margin-top: 12px;
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				grid-gap: 7px;
+
+				label {
+					margin-bottom: 4px;
+					display: block;
+				}
+
+				.block {
+					grid-column: span 2 / auto;
+				}
+			}
+
+			.variations-grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-gap: 7px;
+
+				.el-select {
+					margin-top: 12px;
+					width: 100%;
+				}
+			}
 		}
-		.title {
+
+		.transform-container {
+			margin-bottom: 14px;
+
+			.transformControls {
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-gap: 7px;
+			}
+		}
+
+		/*.title {
 			margin: 1em 0;
 			font-size: 1.5em;
 			font-weight: bold;
 		}
+
 		.enable-container {
 			display: flex;
 			flex-direction: row;
 			align-content: center;
+
 			.enable-label {
 				margin: 1em 0;
 				font-weight: bold;
@@ -350,25 +479,12 @@ export default class InspectorComponent extends EditorComponent {
 			}
 		}
 
-		.name-label {
-			margin: 1em 0;
-			font-weight: bold;
-		}
-
-		.name-input {
-			margin: 1em 0 0 0;
-			border-radius: 0.5em;
-			padding: 0.2em 0.2em 0.2em 1em;
-		}
-		input#enabled {
-			width: 20px;
-			margin: 13px;
-		}
 		.ebx-container {
 			padding-left: 1em;
-		}
+		}*/
+
 		.collapsed {
-			height: 1em;
+			height: 14px;
 			overflow: hidden;
 		}
 	}

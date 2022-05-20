@@ -1,7 +1,7 @@
 <template>
 	<div class="Vec3Control">
 		<div class="label">
-			<b v-if="label">{{label}}</b>
+			<span v-if="label">{{label}}</span>
 		</div>
 		<DraggableNumberInput
 				class="x"
@@ -80,5 +80,26 @@ export default class Vec3Control extends Vue {
 <style lang="scss" scoped>
 .Vec3Control {
 	display: flex;
+
+	.vue-draggable-number-container {
+		font-weight: 900;
+		font-size: 14px;
+
+		&::v-deep input {
+			margin-left: 4px;
+		}
+
+		&.x {
+			color: #ff2a2a;
+		}
+
+		&.y {
+			color: #35ff68;
+		}
+
+		&.z {
+			color: #037fff;
+		}
+	}
 }
 </style>

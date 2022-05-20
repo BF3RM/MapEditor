@@ -2,11 +2,11 @@
 	<EditorComponent class="grid-component" :title="title">
 		<div class="header">
 			<Search v-model="data.search" @search="onSearch"/>
-			<input type="range" min="5" max="14" step="1" v-model="data.scale"/>
+			<input type="range" min="5" max="10" step="1" v-model="data.scale"/>
 		</div>
 		<div class="container scrollable">
 			<div class="grid-container" v-if="data.scale > 5">
-				<div class="grid-item" v-for="(item, index) in filteredItems()" :key="index"
+				<div class="grid-item" :title="item.name" v-for="(item, index) in filteredItems()" :key="index"
 					@click="onClick(item)"
 					@mousedown="onMouseDown($event, item)">
 					<slot name="grid" :item="item" :data="data">
@@ -62,15 +62,16 @@ export default class GridComponent extends EditorComponent {
 
 	public data: {
 		search: string,
-		scale: Number
+		scale: number
 	} = {
 		search: '',
-		scale: 14
+		scale: 10
 	};
 
 	get style() {
+		const scaled = 40 + (10 - this.data.scale) * 10;
 		// @ts-ignore;
-		return ' <style> .grid-container { 	grid-template-columns: repeat(auto-fit, minmax(' + this.data.scale + 'em, 1fr)) } .grid-item { 	width: ' + this.data.scale + 'em; } .grid-item .Icon { 	width: ' + this.data.scale + 'em; 	height: ' + this.data.scale / 3 + 'em; } </style> ';
+		return ' <style> .grid-container { 	grid-template-columns: repeat(' + this.data.scale + ', minmax(0, 1fr)) } .grid-item .Icon { width: ' + scaled + 'px; 	height: ' + scaled + 'px; } </style> ';
 	}
 
 	get iconStyle() {
@@ -130,22 +131,6 @@ export default class GridComponent extends EditorComponent {
 	}
 }
 
-.rightAlign {
-	text-align: right;
-}
-.grid-container {
-	/* overflow: hidden; */
-	display: grid;
-}
-.grid-item {
-	overflow: hidden;
-	height: fit-content;
-	text-align: center;
-}
-.grid-item .Icon{
-	padding-top: 1em;
-}
-
 .list-component {
 	user-select: none;
 
@@ -155,6 +140,7 @@ export default class GridComponent extends EditorComponent {
 		padding: 0.2vmin;
 		border-bottom: solid 1px #4a4a4a;
 	}
+
 	.scrollable {
 		height: 100%;
 		width: 100%;
