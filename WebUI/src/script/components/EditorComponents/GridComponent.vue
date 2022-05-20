@@ -131,24 +131,8 @@ export default class GridComponent extends EditorComponent {
 	}
 }
 
-.list-component {
-	user-select: none;
-
-	.header {
-		font-weight: bold;
-		display:flex;
-		padding: 0.2vmin;
-		border-bottom: solid 1px #4a4a4a;
-	}
-
-	.scrollable {
-		height: 100%;
-		width: 100%;
-	}
-
-	.tr {
-		cursor: move;
-	}
+.container {
+	position: relative;
 }
 
 .rightAlign {

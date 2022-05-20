@@ -38,6 +38,12 @@
 				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
 					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
 				</el-select>
+				<!--
+				TODO: Add hotkeys window
+				<button class="btn">
+					<img :src="require(`@/icons/editor/new/help.svg`)" alt="">
+				</button>
+				-->
 			</div>
 		</info-top-bar>
 	</div>
@@ -303,6 +309,25 @@ export default class EditorToolbar extends Vue {
 	-webkit-mask: url(../../../icons/editor/earth.svg) no-repeat center;
 }
 
+.el-menu {
+	margin-right: 7px !important;
+}
+
+.el-menu-item,
+.el-submenu__title {
+	height: 28px !important;
+	line-height: 28px !important;
+	background-color: #1f2633 !important;
+    color: #fff !important;
+	border-radius: 6px !important
+}
+
+.el-menu.el-menu--horizontal {
+	background: #2e2e2e;
+	border-radius: 6px;
+}
+
+/*
 li.el-menu-item.separator {
 	border-bottom: 1px solid rgba(31, 38, 51, 1);
 	height: 1px !important;
@@ -318,12 +343,6 @@ li.el-menu-item.separator {
 
 .el-menu {
 	background: transparent !important;
-}
-
-.el-submenu__title {
-	background-color: #1f2633 !important;
-    color: #929ead !important;
-	border-radius: 6px;
 }
 
 /*
@@ -513,14 +532,19 @@ label i {
 
 #toolbarRight {
 	margin-left: auto;
-	margin-right: 1.5em;
-}
-/*
-span {
-	user-select: none;
-}
+	margin-right: 0.5em;
 
-ul.el-menu.el-menu--horizontal.el-menu {
-	margin-right: 5px;
-}*/
+	button {
+		padding: 0 6px;
+		box-sizing: border-box;
+
+		img {
+			height: 22px;
+		}
+	}
+
+	.el-select {
+		width: 25vh;
+	}
+}
 </style>

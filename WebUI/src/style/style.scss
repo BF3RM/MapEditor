@@ -73,6 +73,9 @@ input {
 	box-sizing: border-box;
 	color: #fff;
 	padding: 6px;
+	display: flex;
+    align-items: center;
+    justify-content: center;
 
 	&:hover {
 		opacity: .7;
@@ -83,7 +86,6 @@ input {
 	display: flex;
 	position: relative;
 	padding-left: 27px;
-	margin-bottom: 12px;
 	cursor: pointer;
 	font-size: 13px;
 	-webkit-user-select: none;
@@ -275,6 +277,64 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .el-input__inner {
 	border: none !important;
+	background: #1f2633 !important;
+	color: #fff !important;
+}
+
+.el-select-dropdown {
+	background-color: #1f2633 !important;
+	border-radius: 6px !important;
+	border: none !important;
+
+	.el-select-dropdown__item {
+		color: #fff !important;
+
+		&.hover,
+		&:hover,
+		&.selected {
+			background: #037fff !important;
+		}
+	}
+}
+
+.el-popper[x-placement^=bottom] .popper__arrow {
+	border-bottom-color: #1f2633 !important;
+
+	&::after {
+		border-bottom-color: #1f2633 !important;
+	}
+}
+
+.el-menu {
+	background: #1f2633 !important;
+	color: #fff !important;
+	border: 0 !important;
+
+	.el-submenu__title {
+		border: 0 !important;
+	}
+}
+
+.el-menu--popup {
+	background: #1f2633 !important;
+	border-radius: 6px !important;
+
+	.el-menu-item {
+		background: transparent !important;
+		border-radius: 0 !important;
+
+		&.hover,
+		&:hover,
+		&.selected {
+			background: #037fff !important;
+		}
+	}
+}
+
+li.el-menu-item.separator {
+	border-bottom: 1px solid rgba(255, 255, 255, .2);
+	height: 1px !important;
+	margin: 5px 0;
 }
 
 .grid-container {

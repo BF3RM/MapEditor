@@ -10,6 +10,9 @@
 				<div>
 					<input class="name-input" :value="displayName" :disabled="multiSelection" id="name" @blur="onNameChange">
 				</div>
+				<span class="blueprint-type">
+					{{ blueprintType ? blueprintType : "No type" }}
+				</span>
 				<label class="custom-checkbox">
 					Enable / Disable
 					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" >
@@ -379,7 +382,6 @@ export default class InspectorComponent extends EditorComponent {
 					width: 100%;
 				}
 			}
-
 			&.enabled {
 				opacity: 1;
 			}
@@ -390,7 +392,17 @@ export default class InspectorComponent extends EditorComponent {
 
 			.name-input {
 				height: 30px;
-				margin-bottom: 12px;
+				margin-bottom: 10px;
+			}
+
+			span.blueprint-type {
+				margin-bottom: 14px;
+				font-size: 13px;
+				width: 100%;
+				display: inline-block;
+				font-weight: 500;
+				box-sizing: border-box;
+				padding: 0 0 0 2px;
 			}
 
 			/*label {

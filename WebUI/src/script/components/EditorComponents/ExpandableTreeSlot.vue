@@ -2,10 +2,10 @@
 	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
-				<img :src="enabledIcnSrc"/>
+				<img :src="enabledIcnSrc" title="Enable / Disable" />
 			</div>
 			<div class="selectable-container icon-container" @click="ToggleRaycastEnabled($event, node, tree)">
-				<img :src="raycastEnabledIcnSrc"/>
+				<img :src="raycastEnabledIcnSrc" title="Selectable" />
 			</div>
 		</div>
 		<div class="tree-node" :style="nodeStyle(node)">
@@ -102,11 +102,11 @@ export default class ExpandableTreeSlot extends Vue {
 	}
 
 	get enabledIcnSrc() {
-		return this.enabled ? require('@/icons/editor/eye.svg') : require('@/icons/editor/eye-crossed.svg');
+		return this.enabled ? require('@/icons/editor/new/eye.svg') : require('@/icons/editor/new/eye-crossed.svg');
 	}
 
 	get raycastEnabledIcnSrc() {
-		return this.raycastEnabled ? require('@/icons/editor/select.svg') : require('@/icons/editor/select-crossed.svg');
+		return this.raycastEnabled ? require('@/icons/editor/new/select.svg') : require('@/icons/editor/new/select-crossed.svg');
 	}
 
 	private nodeStyle(node: Node) {

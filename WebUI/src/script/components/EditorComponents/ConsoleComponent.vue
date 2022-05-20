@@ -30,10 +30,24 @@
 					:size-dependencies="[item.expanded]"
 					:min-item-size="30"
 			>
-				<div :class="'LogLevel-' + logLevelDict[item.level]">
-					<pre v-if="typeof(item.message) === 'string'" class="message">{{FormatTime(item.time)}} [{{item.level}}] {{ item.message }}</pre>
-					<pre v-if="typeof(item.message) === 'object'" class="message">{{FormatTime(item.time)}} [{{item.level}}] {{item.message.constructor.name}} {{ Inspect(item.message) }}</pre>
-					<pre v-if="item.expanded" class="stackTrace">{{FormatStacktrace(item)}}</pre>
+				<div :class="'log-wrapper LogLevel-' + logLevelDict[item.level]">
+					<div v-if="typeof(item.message) === 'string'" class="message">
+						<span class="log-level">
+							{{logLevelDict[item.level]}}
+						</span>
+						<span class="log-time">
+							{{FormatTime(item.time)}}
+						</span>
+						<span class="log-message">
+							{{item.message}}
+						</span>
+					</div>
+					<div v-if="typeof(item.message) === 'object'" class="message">
+						{{FormatTime(item.time)}} [{{logLevelDict[item.level]}}] {{item.message.constructor.name}} {{ Inspect(item.message) }}
+					</div>
+					<div v-if="item.expanded" class="stackTrace">
+						{{FormatStacktrace(item)}}
+					</div>
 				</div>
 			</DynamicScrollerItem>
 		</DynamicScroller>
@@ -225,29 +239,66 @@ export default class ConsoleComponent extends EditorComponent {
 	}
 }
 </script>
-<style scoped>
-.LogLevel-ERROR {
-	background-color: red;
-}
+<style lang="scss" scoped>
 .header {
-	display:flex;
+	.logLevel {
+		text-align: center;
+		font-weight: 600;
+		color: #fff;
+	}
 }
-.scrollable {
-	height: 100%;
-}
+
 .consoleEntry {
-	border-bottom: 1px solid;
-	padding-top: 5px;
+	padding: 0 7px;
+	background: transparent;
+	min-height: 30px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	width: 100%;
+
+	.log-wrapper {
+		width: 100%;
+
+		.log-level {
+			font-size: 10px;
+			border-radius: 6px;
+			padding: 0 5px;
+			background: rgb(87, 87, 87);
+			color: #fff;
+			margin-right: 5px;
+		}
+
+		.log-time {
+			color: #fff;
+			opacity: .25;
+		}
+
+		.log-message {
+			color: #fff;
+		}
+
+		&.LogLevel-ERROR {
+			.log-level {
+				background: rgb(255, 45, 45);
+			}
+		}
+
+		&.LogLevel-WARNING {
+			.log-level {
+				background: rgb(255, 223, 45);
+			}
+		}
+	}
+
 }
 
-pre.stackTrace {
-	background-color: #11111199;
-	padding-bottom: 5px;
-	padding-top: 5px;
-
-}
-pre.message {
-	background-color: #24242499;
-	padding-bottom: 5px;
+.stackTrace {
+	margin: 7px 0;
+	width: 100%;
+	background: #161924;
+	padding: 7px;
+	border-radius: 6px;
+	box-sizing: border-box;
 }
 </style>

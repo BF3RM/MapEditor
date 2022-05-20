@@ -81,6 +81,7 @@ export default class GoldenLayoutHolder extends Vue {
 			const scrollables = document.getElementsByClassName('scrollable');
 			for (const scrollable of scrollables as any) {
 				const ps = new PerfectScrollbar(scrollable as HTMLElement, {
+					minScrollbarLength: 35
 				});
 			}
 		});
