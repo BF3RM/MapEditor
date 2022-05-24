@@ -48,7 +48,38 @@ html {
 input {
 	height: 25px;
 	width: 100%;
-	padding: 0 8px;
+	padding: 0 7px;
+	margin: 0;
+	border: 0;
+	background-color: #161924 !important;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	box-sizing: border-box;
+
+	&.input-large {
+		padding: 4px 12px;
+		height: 40px;
+		font-size: 14px;
+	}
+
+	&:disabled {
+		opacity: .8;
+	}
+
+	&:focus {
+		outline: 2px solid #037fff;
+	}
+}
+
+textarea {
+	width: 100%;
+	height: 100%;
+	min-height: 50px;
+	box-sizing: border-box;
+	resize: none;
+	width: 100%;
+	padding: 7px;
 	margin: 0;
 	border: 0;
 	background-color: #161924 !important;
@@ -77,8 +108,28 @@ input {
     align-items: center;
     justify-content: center;
 
+	&.btn-dark {
+		background: #161924 !important;
+	}
+
+	&.btn-danger {
+		background: #241212 !important;
+	}
+
+	&.btn-success {
+		background: #111e13 !important;
+	}
+
+	&.btn-lg {
+		padding: 9px 14px;
+	}
+
 	&:hover {
 		opacity: .7;
+	}
+
+	&:disabled {
+		opacity: .4;
 	}
 }
 
@@ -147,9 +198,14 @@ input {
 	padding: 12px 13px;
 	color: #fff;
 	background: rgba(255, 138, 138, 0.22);
-	border-radius: 4px;
 	border-left: 3px solid rgba(255, 45, 45, .8);
+	border-radius: 4px;
 	font-weight: 500;
+
+	&.alert-success {
+		background: rgba(142, 255, 138, 0.22);
+		border-left: 3px solid rgba(45, 255, 73, 0.8);
+	}
 }
 
 .loading {
@@ -355,6 +411,7 @@ li.el-menu-item.separator {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		height: 15px;
 	}
 
 	&:hover {
@@ -364,5 +421,27 @@ li.el-menu-item.separator {
 
 	.Icon {
 		margin-bottom: 8px;
+	}
+}
+
+.list-container {
+	.vue-recycle-scroller__item-view {
+		&.hover {
+			.tr {
+				background-color: #313848;
+			}
+		}
+
+		.tr {
+			height: 22px;
+			align-items: center;
+			display: flex;
+
+			.Icon {
+				margin: 0 7px;
+				height: 17px;
+				width: 17px;
+			}
+		}
 	}
 }

@@ -1,13 +1,16 @@
 <template>
-	<div class="window lm_header" v-show="state.visible">
-		<div class="header lm_tab">
-			<div class="title">{{title}}</div>
-			<div v-if="isDestructible" class="lm_close_tab" @click="state.visible = false"></div>
+	<div class="window-wrapper" v-show="state.visible">
+		<div class="window lm_header">
+			<div class="header lm_tab">
+				<div class="title">{{title}}</div>
+				<div v-if="isDestructible" class="lm_close_tab" @click="state.visible = false"></div>
+			</div>
+			<div class="content lm_content">
+				<slot>
+				</slot>
+			</div>
 		</div>
-		<div class="content lm_content">
-			<slot>
-			</slot>
-		</div>
+		<div class="overlay"></div>
 	</div>
 </template>
 <script lang="ts">
@@ -24,26 +27,77 @@ export default class WindowComponent extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+	.overlay {
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		background: rgba(13, 15, 22, .78);
+		z-index: 40;
+		pointer-events: all;
+	}
+
 	.window {
 		position: absolute;
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
-		background-color: rgba(34, 34, 34, 0.8) !important;
 		display: grid;
-		height: auto;
-		width: auto;
+		height: 45vh;
+		width: 35vw;
+		display: flex;
+		flex-flow: column;
+		z-index: 50;
+		border-radius: 6px;
+		overflow: hidden;
+
+		.header {
+			&.lm_tab {
+				margin: 0;
+				padding: 5px 15px !important;
+
+				.lm_close_tab {
+					width: 28px;
+					height: 17px;
+					position: absolute;
+					top: 0;
+					right: 0;
+					text-align: center;
+				}
+
+				&:hover {
+					background: transparent !important;
+					color: #7a8797 !important;
+				}
+			}
+		}
+
+		.content {
+			padding: 1.5vh;
+			height: 100%;
+			display: flex;
+			flex-flow: column;
+
+			.container {
+				flex: 1 1 auto;
+				margin-bottom: 1.5vh;
+			}
+
+			.footer {
+				display: flex;
+				flex-flow: row;
+				justify-content: flex-end;
+
+				.btn {
+					margin-right: 4px;
+
+					&:last-of-type {
+						margin: 0;
+					}
+				}
+			}
+		}
 	}
-	.header {
-		color: #fff;
-		background-color: rgba(34, 34, 34, 0.8) !important;
-		padding: 5px;
-		grid-row: 1;
-	}
-	.content {
-		color: #999;
-		padding: 5px;
-		grid-row: 2;
-		height: 100%;
-	}
+
 </style>

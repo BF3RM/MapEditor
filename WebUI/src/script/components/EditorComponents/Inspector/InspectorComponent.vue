@@ -3,15 +3,19 @@
 		<div class="header">
 			<div id="IconAndEnable" :class="enabled ? 'enabled' : ''">
 				<div class="icon-wrapper">
-					<img :class="'Large Icon Icon-' + objectType"/>
+					<img :class="'Large Icon Icon-' + objectType"  alt="" v-if="!multiSelection" >
+					<img :class="'Large Icon Icon-MultiSelection'" alt="" v-else >
 				</div>
 			</div>
 			<div id="NameAndVariation">
 				<div>
 					<input class="name-input" :value="displayName" :disabled="multiSelection" id="name" @blur="onNameChange">
 				</div>
-				<span class="blueprint-type">
+				<span class="blueprint-type" v-if="!multiSelection">
 					{{ blueprintType ? blueprintType : "No type" }}
+				</span>
+				<span class="blueprint-type" v-else>
+					Multiselection
 				</span>
 				<label class="custom-checkbox">
 					Enable / Disable

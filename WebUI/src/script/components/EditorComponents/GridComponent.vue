@@ -18,7 +18,7 @@
 					ref="scroller"
 					:items="filteredItems()"
 					class=""
-					:min-item-size="30"
+					:min-item-size="22"
 					:key-field="keyField"
 				>
 					<DynamicScrollerItem
@@ -27,7 +27,7 @@
 						:item="item"
 						:active="active"
 						:size-dependencies="[item.expanded]"
-						:min-item-size="30"
+						:min-item-size="22"
 						@click.native="onClick(item)"
 						@mousedown.native="onMouseDown($event, item)"
 						:key-field="keyField"
@@ -65,13 +65,37 @@ export default class GridComponent extends EditorComponent {
 		scale: number
 	} = {
 		search: '',
-		scale: 10
+		scale: 6
 	};
 
 	get style() {
-		const scaled = 40 + (10 - this.data.scale) * 10;
+		let icon = 40;
+		let grid = 12;
+		switch (this.data.scale.toString()) {
+		case '6':
+			icon = 40;
+			grid = 12;
+			break;
+		case '7':
+			icon = 60;
+			grid = 10;
+			break;
+		case '8':
+			icon = 80;
+			grid = 8;
+			break;
+		case '9':
+			icon = 100;
+			grid = 6;
+			break;
+		case '10':
+			icon = 120;
+			grid = 4;
+			break;
+		}
+		console.log(this.data.scale, icon, grid);
 		// @ts-ignore;
-		return ' <style> .grid-container { 	grid-template-columns: repeat(' + this.data.scale + ', minmax(0, 1fr)) } .grid-item .Icon { width: ' + scaled + 'px; 	height: ' + scaled + 'px; } </style> ';
+		return ' <style> .grid-container { 	grid-template-columns: repeat(' + grid + ', minmax(0, 1fr)) } .grid-item .Icon { width: ' + icon + 'px; height: ' + icon + 'px; } </style> ';
 	}
 
 	get iconStyle() {

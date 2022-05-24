@@ -182,15 +182,7 @@ export default class ExplorerComponent extends EditorComponent {
 	.expand {
 		display: inline;
 	}
-	.td {
-		padding: 0.3vmin;
-		&:hover {
-			background-color: #343434;
-		}
-	}
-	/*.datafont img.Icon {
-		padding-top: 6px;
-	}*/
+
 	.type {
 		text-align: right;
 	}

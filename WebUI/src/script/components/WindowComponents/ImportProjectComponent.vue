@@ -1,14 +1,19 @@
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
 		<div class="container">
-			<textarea v-model="projectDataJSON"/>
-			<span>{{ displayMessage }}</span>
+			<div class="alert" v-if="displayMessage">
+				{{ displayMessage }}
+			</div>
+			<div class="alert alert-success" v-else>
+				Paste the save JSON into the text area.
+			</div>
+			<div class="textarea-wrapper">
+				<textarea v-model="projectDataJSON"/>
+			</div>
 		</div>
 		<div class="footer">
-			<div>
-				<button @click="Import">Import</button>
-				<button @click="Close">Close</button>
-			</div>
+			<button @click="Close" class="btn btn-lg btn-dark">Close</button>
+			<button @click="Import" class="btn btn-lg btn-dark">Import</button>
 		</div>
 	</WindowComponent>
 </template>
@@ -60,35 +65,28 @@ export default class ImportProjectComponent extends Vue {
 
 	Close() {
 		this.state.visible = false;
+		this.displayMessage = '';
 	}
 }
 </script>
 <style lang="scss" scoped>
-.container{
-	display: grid;
-	min-width: 30vmin;
-	min-height: 20vmin;
-}
-.projectList {
-	grid-column: 1;
-	padding: 5px;
-
-}
-.saveList {
-	grid-column: 2;
-	padding: 5px;
-}
-
-.saveInfo{
-	background-color: #2e2e2e;
-	padding: 8px;
-	width: available;
+.container {
 	display: flex;
-	flex-direction: column;
-}
+    flex-flow: column;
 
-.selected {
-	background-color: #404040;
-	color: #FAB91E;
+	.textarea-wrapper {
+		flex: 1 1 auto;
+
+		textarea {
+			width: 100%;
+			height: 100%;
+			box-sizing: border-box;
+			resize: none;
+		}
+	}
+
+	.alert {
+		margin-bottom: 7px;
+	}
 }
 </style>
