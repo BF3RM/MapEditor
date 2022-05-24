@@ -20,26 +20,26 @@ export class InputControls {
 		element.addEventListener('mousedown', this.onMouseDown.bind(this));
 	}
 
-	public static getMousePos(event: MouseEvent): Vec2 {
+	public static getMousePos(e: MouseEvent): Vec2 {
 		const mousePos = new Vec2();
-		mousePos.x = (event.clientX / window.innerWidth) * 2 - 1;
-		mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		mousePos.x = (e.clientX / window.innerWidth) * 2 - 1;
+		mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
 		return mousePos;
 	}
 
-	onMouseDown(event: MouseEvent) {
+	onMouseDown(e: MouseEvent) {
 		let selectionEnabled = false;
 		let multiSelection = false;
 
-		switch (event.buttons) {
+		switch (e.buttons) {
 		case MOUSE_BUTTONS.LEFT_CLICK:
-			if (event.shiftKey) {
+			if (e.shiftKey) {
 				// Box selection
-				editor.threeManager.selectionWrapper.initBoxSelection(event);
+				editor.threeManager.selectionWrapper.initBoxSelection(e);
 				return;
 			}
-			selectionEnabled = !event.altKey; // Alt key is used for rotating camera
-			multiSelection = event.ctrlKey;
+			selectionEnabled = !e.altKey; // Alt key is used for rotating camera
+			multiSelection = e.ctrlKey;
 			break;
 		case MOUSE_BUTTONS.MIDDLE_CLICK:
 			break;
@@ -51,13 +51,12 @@ export class InputControls {
 			break;
 		}
 
-		editor.threeManager.onMouseDown(selectionEnabled, multiSelection, InputControls.getMousePos(event));
+		editor.threeManager.onMouseDown(selectionEnabled, multiSelection, InputControls.getMousePos(e));
 	}
 
-	onMouseUp(event: MouseEvent) {
+	onMouseUp(e: MouseEvent) {
 		const scope = this;
-
-		if (event.button === 0) {
+		if (e.button === 0) {
 			editor.threeManager.enableCameraControls();
 		}
 	}
@@ -74,7 +73,6 @@ export class InputControls {
 		if (!this.isTeleporting) {
 			this.movementX = (this.prevX ? e.screenX - this.prevX : 0);
 			this.movementY = (this.prevY ? e.screenY - this.prevY : 0);
-
 			this.prevX = e.screenX;
 			this.prevY = e.screenY;
 		}
@@ -97,97 +95,102 @@ export class InputControls {
 		window.vext.SendMessage(message);
 	}
 
-	onCanvasMouseMove(event: MouseEvent) {
-		if (event.buttons === 0) {
-			editor.threeManager.highlight(InputControls.getMousePos(event));
+	onCanvasMouseMove(e: MouseEvent) {
+		if (e.buttons === 0) {
+			editor.threeManager.highlight(InputControls.getMousePos(e));
 		}
 	}
 
-	onKeyUp(event: KeyboardEvent) {
-		this.keys[event.which] = false;
+	onKeyUp(e: KeyboardEvent) {
+		this.keys[e.which] = false;
 		// Disable camera rotation
-		if (event.which === KEYCODE.ALT) {
+		if (e.which === KEYCODE.ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
 		}
-		if (event.which === KEYCODE.CTRL) {
+		if (e.which === KEYCODE.CTRL) {
 			editor.threeManager.disableGridSnap();
 		}
-		if (event.which === KEYCODE.KEY_M) {
+		if (e.which === KEYCODE.KEY_M) {
 			this.wasMKeyDown = false;
 			editor.threeManager.DisableMiniBrushMode();
 		}
 	}
 
 	// Keys that should only work when the canvas is focused
-	onCanvasKeyDown(event: KeyboardEvent) {
-		if (event.which === KEYCODE.KEY_Q) {
+	onCanvasKeyDown(e: KeyboardEvent) {
+		if (e.which === KEYCODE.KEY_Q) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.select);
 		}
-		if (event.which === KEYCODE.KEY_W) {
+		if (e.which === KEYCODE.KEY_W) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.translate);
 		}
-		if (event.which === KEYCODE.KEY_E) {
+		if (e.which === KEYCODE.KEY_E) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.rotate);
 		}
-		if (event.which === KEYCODE.KEY_R) {
+		if (e.which === KEYCODE.KEY_R) {
 			editor.threeManager.setGizmoMode(GIZMO_MODE.scale);
 		}
-		if (event.which === KEYCODE.CTRL) {
+		if (e.which === KEYCODE.CTRL) {
 			editor.threeManager.enableGridSnap();
 		}
 	}
 
-	onKeyDown(event: KeyboardEvent) {
-		this.keys[event.which] = true;
+	onKeyDown(e: KeyboardEvent) {
+		const element = e.target as HTMLElement;
+		if (element && element.tagName && (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')) {
+			return;
+		}
 
-		if (event.which === KEYCODE.KEY_X) {
+		this.keys[e.which] = true;
+
+		if (e.which === KEYCODE.KEY_X) {
 			editor.threeManager.toggleWorldSpace();
 		}
-		if (event.which === KEYCODE.KEY_F) {
+		if (e.which === KEYCODE.KEY_F) {
 			editor.threeManager.focus();
 		}
-		if (event.which === KEYCODE.KEY_P) {
+		if (e.which === KEYCODE.KEY_P) {
 			editor.selectionGroup.selectParent();
 		}
 		// Enable camera rotation
-		if (event.which === KEYCODE.ALT) {
+		if (e.which === KEYCODE.ALT) {
 			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
 		}
-		if (event.which === KEYCODE.KEY_Z && event.ctrlKey && event.shiftKey) { // CTRL + Shift + Z
+		if (e.which === KEYCODE.KEY_Z && e.ctrlKey && e.shiftKey) { // CTRL + Shift + Z
 			editor.redo();
 			return false;
-		} else if (event.which === KEYCODE.KEY_Z && event.ctrlKey) { // CTRL + z
+		} else if (e.which === KEYCODE.KEY_Z && e.ctrlKey) { // CTRL + z
 			editor.undo();
 			return false;
 		}
-		if (event.which === KEYCODE.KEY_D && event.ctrlKey) { // CTRL + D
+		if (e.which === KEYCODE.KEY_D && e.ctrlKey) { // CTRL + D
 			editor.Duplicate();
 		}
-		if (event.which === KEYCODE.KEY_C && event.ctrlKey) { // CTRL + C
+		if (e.which === KEYCODE.KEY_C && e.ctrlKey) { // CTRL + C
 			editor.Copy();
 		}
-		if (event.which === KEYCODE.KEY_V && event.ctrlKey) { // CTRL + V
+		if (e.which === KEYCODE.KEY_V && e.ctrlKey) { // CTRL + V
 			editor.Paste();
 		}
-		if (event.which === KEYCODE.KEY_X && event.ctrlKey) { // CTRL + X
+		if (e.which === KEYCODE.KEY_X && e.ctrlKey) { // CTRL + X
 			editor.Cut();
 		}
-		if (event.which === KEYCODE.KEY_S && event.ctrlKey) { // CTRL + S
+		if (e.which === KEYCODE.KEY_S && e.ctrlKey) { // CTRL + S
 			signals.saveRequested.emit();
 		}
-		if (event.which === KEYCODE.DELETE) {
+		if (e.which === KEYCODE.DELETE) {
 			editor.DeleteSelected();
 		}
-		if (event.which === KEYCODE.F1) {
+		if (e.which === KEYCODE.F1) {
 			window.vext.SendEvent('DisableEditorMode');
 		}
-		if (event.which === KEYCODE.F5) {
+		if (e.which === KEYCODE.F5) {
 			window.location = (window as any).location;
 		}
-		if (event.which === KEYCODE.ESCAPE) {
+		if (e.which === KEYCODE.ESCAPE) {
 			editor.DeselectAll();
 		}
-		if (event.which === KEYCODE.KEY_M) {
+		if (e.which === KEYCODE.KEY_M) {
 			if (!this.wasMKeyDown) {
 				this.wasMKeyDown = true;
 				editor.threeManager.EnableMiniBrushMode();
