@@ -292,6 +292,25 @@ textarea {
 	flex: 1;
 }
 
+#toolbar {
+	user-select: none;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	background-color: #161924;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: relative;
+	height: 40px;
+	opacity: 1;
+
+	&.in-game {
+		background-color: rgba(22, 25, 36, 0.6);
+	}
+}
+
 .lm_header .lm_tab {
 	box-shadow: none !important;
 	padding: 0;

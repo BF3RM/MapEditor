@@ -48,7 +48,7 @@ export class THREEManager {
 	public isCameraMoving = false;
 	private clock = new THREE.Clock();
 	private cameraHasMoved: boolean;
-	private miniBrushEnabled: boolean;
+	public miniBrushEnabled: boolean;
 
 	private raycaster = new THREE.Raycaster();
 

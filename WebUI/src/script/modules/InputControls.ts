@@ -3,12 +3,11 @@ import { Vec2 } from '@/script/types/primitives/Vec2';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
 import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
 import { signals } from '@/script/modules/Signals';
-
-// TODO Fool: add config keymap
+import { Hotkey, HOTKEY_TYPE } from './Hotkey';
+import { HOTKEYS } from './HotkeyConfig';
 
 export class InputControls {
 	public keys: boolean[] = [];
-	private wasMKeyDown: boolean = false;
 
 	constructor(element: HTMLCanvasElement) {
 		element.addEventListener('keydown', this.onCanvasKeyDown.bind(this));
@@ -102,37 +101,27 @@ export class InputControls {
 	}
 
 	onKeyUp(e: KeyboardEvent) {
+		const element = e.target as HTMLElement;
+		if (element && element.tagName && (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')) {
+			return;
+		}
+
 		this.keys[e.which] = false;
-		// Disable camera rotation
-		if (e.which === KEYCODE.ALT) {
-			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
-		}
-		if (e.which === KEYCODE.CTRL) {
-			editor.threeManager.disableGridSnap();
-		}
-		if (e.which === KEYCODE.KEY_M) {
-			this.wasMKeyDown = false;
-			editor.threeManager.DisableMiniBrushMode();
-		}
+
+		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Up).forEach((hotkey: Hotkey) => {
+			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+				hotkey.callback();
+			}
+		});
 	}
 
 	// Keys that should only work when the canvas is focused
 	onCanvasKeyDown(e: KeyboardEvent) {
-		if (e.which === KEYCODE.KEY_Q) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.select);
-		}
-		if (e.which === KEYCODE.KEY_W) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.translate);
-		}
-		if (e.which === KEYCODE.KEY_E) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.rotate);
-		}
-		if (e.which === KEYCODE.KEY_R) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.scale);
-		}
-		if (e.which === KEYCODE.CTRL) {
-			editor.threeManager.enableGridSnap();
-		}
+		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.CanvasOnlyDown).forEach((hotkey: Hotkey) => {
+			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+				hotkey.callback();
+			}
+		});
 	}
 
 	onKeyDown(e: KeyboardEvent) {
@@ -143,59 +132,13 @@ export class InputControls {
 
 		this.keys[e.which] = true;
 
-		if (e.which === KEYCODE.KEY_X) {
-			editor.threeManager.toggleWorldSpace();
-		}
-		if (e.which === KEYCODE.KEY_F) {
-			editor.threeManager.focus();
-		}
-		if (e.which === KEYCODE.KEY_P) {
-			editor.selectionGroup.selectParent();
-		}
-		// Enable camera rotation
-		if (e.which === KEYCODE.ALT) {
-			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
-		}
-		if (e.which === KEYCODE.KEY_Z && e.ctrlKey && e.shiftKey) { // CTRL + Shift + Z
-			editor.redo();
-			return false;
-		} else if (e.which === KEYCODE.KEY_Z && e.ctrlKey) { // CTRL + z
-			editor.undo();
-			return false;
-		}
-		if (e.which === KEYCODE.KEY_D && e.ctrlKey) { // CTRL + D
-			editor.Duplicate();
-		}
-		if (e.which === KEYCODE.KEY_C && e.ctrlKey) { // CTRL + C
-			editor.Copy();
-		}
-		if (e.which === KEYCODE.KEY_V && e.ctrlKey) { // CTRL + V
-			editor.Paste();
-		}
-		if (e.which === KEYCODE.KEY_X && e.ctrlKey) { // CTRL + X
-			editor.Cut();
-		}
-		if (e.which === KEYCODE.KEY_S && e.ctrlKey) { // CTRL + S
-			signals.saveRequested.emit();
-		}
-		if (e.which === KEYCODE.DELETE) {
-			editor.DeleteSelected();
-		}
-		if (e.which === KEYCODE.F1) {
-			window.vext.SendEvent('DisableEditorMode');
-		}
-		if (e.which === KEYCODE.F5) {
-			window.location = (window as any).location;
-		}
-		if (e.which === KEYCODE.ESCAPE) {
-			editor.DeselectAll();
-		}
-		if (e.which === KEYCODE.KEY_M) {
-			if (!this.wasMKeyDown) {
-				this.wasMKeyDown = true;
-				editor.threeManager.EnableMiniBrushMode();
+		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Down).every((hotkey: Hotkey) => {
+			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+				hotkey.callback();
+				return false;
 			}
-		}
+			return true;
+		});
 	}
 
 	public IsKeyDown(keycode: KEYCODE): boolean {

@@ -1,5 +1,5 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
+	<div class="tree-node" :class="{ selected: selected, disabled: !enabled }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
 				<img :src="enabledIcnSrc" title="Enable / Disable" />
@@ -230,6 +230,11 @@ export default class ExpandableTreeSlot extends Vue {
 			}
 		}
 
+		&.disabled {
+			opacity: .25;
+			text-decoration: line-through;
+		}
+
 		&:hover,
 		&.selected {
 			background-color: #313848;
@@ -250,11 +255,16 @@ export default class ExpandableTreeSlot extends Vue {
 		.slot-text {
 			margin-left: 5px;
 		}
+
 		.slot-client-server-only {
-			border: 1px solid gray;
-			padding: 0 2px;
+			background: #F4AB00;
+			padding: 2px 4px 1px;
 			border-radius: 3px;
-			margin: 0 5px;
+			margin: 0 0 0 7px;
+			font-size: 10px;
+			color: #000;
+			text-transform: uppercase;
+			font-weight: 900;
 		}
 	}
 </style>

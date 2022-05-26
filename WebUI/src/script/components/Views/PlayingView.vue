@@ -1,9 +1,11 @@
 <template>
-	<info-top-bar>
-		<key-tip
-			:keys="'F1'"
-			:description="'Enable editor mode'"/>
-	</info-top-bar>
+	<div id="toolbar" class="in-game">
+		<info-top-bar>
+			<key-tip
+				:keys="'F1'"
+				:description="'Enable editor mode'"/>
+		</info-top-bar>
+	</div>
 </template>
 
 <script lang="ts">
@@ -23,8 +25,13 @@ export default class PlayingView extends Vue {
 </script>
 
 <style lang="scss" scoped>
-	#playing-view {
-		width: 100%;
-		height: 100%;
+	#toolbar {
+		::v-deep .key-tip {
+			font-size: 15px;
+
+			.key-outline {
+				height: 23px;
+			}
+		}
 	}
 </style>

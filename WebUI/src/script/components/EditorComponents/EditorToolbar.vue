@@ -26,14 +26,6 @@
 					<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
 				</el-radio-group>
 			</div>
-			<div id="toolbarCenter">
-				<key-tip
-					:keys="'F1'"
-					:description="'Enable play mode'"/>
-				<key-tip
-					:keys="'F2'"
-					:description="'Teleport soldier here'"/>
-			</div>
 			<div id="toolbarRight">
 				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
 					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
@@ -459,21 +451,6 @@ input#worldView {
 }*/
 </style>
 <style lang="scss" scoped>
-#toolbar {
-	user-select: none;
-	z-index: 1;
-	left: 0;
-	top: 0;
-	width: 100vw;
-	background-color: #161924;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	position: relative;
-	height: 40px;
-	opacity: 1;
-}
-
 .el-radio-group {
 	background-color: #1f2633;
 	border-radius: 6px;
@@ -482,6 +459,10 @@ input#worldView {
 div#worldSpace,
 div#tools {
 	margin-left: 10px;
+}
+
+div#tools:first-of-type {
+	margin-left: 0;
 }
 
 #toolbarLeft,
