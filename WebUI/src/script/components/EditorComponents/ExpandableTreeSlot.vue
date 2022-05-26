@@ -2,10 +2,10 @@
 	<div class="tree-node" :class="{ selected: selected, disabled: !enabled }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
-				<img :src="enabledIcnSrc" title="Enable / Disable" />
+				<img :src="enabledIcnSrc" v-tooltip="'Enable / Disable'" />
 			</div>
 			<div class="selectable-container icon-container" @click="ToggleRaycastEnabled($event, node, tree)">
-				<img :src="raycastEnabledIcnSrc" title="Selectable" />
+				<img :src="raycastEnabledIcnSrc" v-tooltip="'Selectable'" />
 			</div>
 		</div>
 		<div class="tree-node" :style="nodeStyle(node)">
@@ -14,7 +14,7 @@
 					:src="require(`@/icons/editor/new/chevron-right.svg`)"/>
 			</div>
 			<div class="icon-container">
-				<img :class="getNodeIconClass(node)"/>
+				<img :class="getNodeIconClass(node)" v-tooltip="node.type != 'folder' ? node.type : ''" />
 			</div>
 			<div class="text-container">
 				<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>

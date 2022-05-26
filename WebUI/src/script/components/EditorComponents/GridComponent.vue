@@ -6,7 +6,7 @@
 		</div>
 		<div class="container scrollable">
 			<div class="grid-container" v-if="data.scale > 5">
-				<div class="grid-item" :title="item.name" v-for="(item, index) in filteredItems()" :key="index"
+				<div class="grid-item" v-tooltip="item.fileName" v-for="(item, index) in filteredItems()" :key="index"
 					@click="onClick(item)"
 					@mousedown="onMouseDown($event, item)">
 					<slot name="grid" :item="item" :data="data">

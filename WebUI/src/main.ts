@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
 import vgl from 'vue-golden-layout';
+import VTooltip from 'v-tooltip';
 import '@/script/hacks/HTMLDivElement';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -31,6 +32,7 @@ window.vext = new VEXTInterface(debugMode);
 (window).LogError = LogError;
 
 Vue.use(vgl);
+Vue.use(VTooltip);
 Vue.use(ElementUI, { locale });
 Vue.component('TypeDocumentationLink', TypeDocumentationLink);
 Vue.component('Property', Property);
