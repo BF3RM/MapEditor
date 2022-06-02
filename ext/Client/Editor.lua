@@ -40,7 +40,7 @@ function Editor:OnEngineMessage(p_Message)
 	end
 end
 
-function Editor:OnUpdatePreSim()
+function Editor:OnUpdatePassPreSim()
 	-- Raycast has to be done in update
 	self:Raycast()
 end

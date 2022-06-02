@@ -102,7 +102,7 @@ end
 ---@param p_Pass UpdatePass
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
 	if p_Pass == UpdatePass.UpdatePass_PreSim then
-		Editor:OnUpdatePreSim()
+		Editor:OnUpdatePassPreSim()
 	end
 
 	ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
