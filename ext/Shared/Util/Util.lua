@@ -64,8 +64,8 @@ end
 
 function DecodeParams(p_Table)
 	if p_Table == nil then
-		m_Logger:Write("No table received")
-		return false
+		m_Logger:Warning("No table received")
+		return nil
 	end
 
 	for l_Key, l_Value in pairs(p_Table) do

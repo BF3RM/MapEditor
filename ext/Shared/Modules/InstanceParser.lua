@@ -118,7 +118,8 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 	local s_Blueprint = false
 
 	if s_PrimaryInstance == nil then
-		m_Logger:Write("Primary is nil")
+		m_Logger:Error("Primary is nil")
+		return
 	end
 
 	if s_PrimaryInstance:Is("Blueprint") then
