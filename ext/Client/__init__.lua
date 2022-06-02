@@ -60,7 +60,6 @@ end
 ----------- Game functions----------------
 
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
-	Editor:OnUpdate(p_Delta, p_SimulationDelta)
 	WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
@@ -99,7 +98,13 @@ function MapEditorClient:OnUpdateInput(p_Delta)
 	UIManager:OnUpdateInput(p_Delta)
 end
 
+---@param p_Delta number
+---@param p_Pass UpdatePass
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
+	if p_Pass == UpdatePass.UpdatePass_PreSim then
+		Editor:OnUpdatePreSim()
+	end
+
 	ClientTransactionManager:OnUpdatePass(p_Delta, p_Pass)
 end
 
