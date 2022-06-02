@@ -79,12 +79,3 @@ export default class LinearTransformControl extends Vue {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-	.transformControls::v-deep .Vec3Control {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		align-items: center;
-		grid-gap: 7px;
-	}
-</style>

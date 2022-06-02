@@ -257,11 +257,6 @@ export default class EditorToolbar extends Vue {
 }
 </script>
 <style lang="scss">
-
-/*#tools label+label, #worldSpace label+label {
-	border-left: 1px solid #151515;
-}*/
-
 #tools input+span,
 #worldSpace input+span {
     font-size: 0 !important;
@@ -318,137 +313,6 @@ export default class EditorToolbar extends Vue {
 	background: #2e2e2e;
 	border-radius: 6px;
 }
-
-/*
-li.el-menu-item.separator {
-	border-bottom: 1px solid rgba(31, 38, 51, 1);
-	height: 1px !important;
-}
-
-.el-menu-item,
-.el-submenu__title {
-	height: 28px !important;
-	line-height: 28px !important;
-	background-color: #1f2633 !important;
-    color: #929ead !important;
-}
-
-.el-menu {
-	background: transparent !important;
-}
-
-/*
-.el-submenu__icon-arrow {
-	right: 5px !important;
-	-webkit-transition: -webkit-transform .1s;
-	transition: -webkit-transform .1s;
-	transition: transform .1s;
-	transition: transform .1s, -webkit-transform .1s;
-	transition: transform .1s,-webkit-transform .1s;
-	font-size: 12px;
-}
-
-.el-menu {
-	border-right: solid 1px #e6e6e6;
-	list-style: none;
-	position: relative;
-	margin: 0;
-	padding-left: 0;
-	background-color: #2e2e2e!important;
-}
-
-.is-opened .el-submenu__title,
-.is-opened .el-submenu-item,
-.el-submenu__title:hover,
-.el-menu-item:hover {
-	background-color: #1f2633 !important;
-}
-
-.el-menu--horizontal>.el-menu-item.is-active {
-	border-bottom: 0!important;
-}
-.el-menu.el-menu--horizontal {
-	border-bottom: 0!important;
-}
-.el-menu.el-menu--horizontal {
-	background: #2e2e2e;
-	border-radius: 5px;
-	overflow: hidden;
-}
-
-.el-menu--horizontal .el-menu .el-menu-item,
-.el-menu--horizontal .el-menu .el-submenu__title {
-	background-color: #2e2e2e;
-	float: none;
-	height: 36px;
-	line-height: 36px;
-	padding: 0 10px;
-	color: #fff;
-}
-
-.el-menu-item,
-.el-submenu__title {
-	background-color: #1f2633 !important;
-}
-
-.el-menu.el-menu--horizontal {
-	background: #2e2e2e;
-	border-radius: 5px;
-}
-
-.el-menu--horizontal>.el-menu-item {
-	height: 30px;
-	line-height: 30px;
-}
-
-.el-menu-item {
-	font-size: 14px;
-	color: #fff;
-	padding: 0 5px!important;
-	cursor: pointer;
-	-webkit-transition: border-color .1s,background-color .1s,color .1s;
-	transition: border-color .1s,background-color .1s,color .1s;
-	box-sizing: border-box;
-}
-
-.el-select-dropdown {
-	border: 1px solid #151515 !important;
-	border-radius: 5px;
-	background-color: #262626;
-}
-
-.el-select-dropdown__item.selected {
-	color: #ffffff;
-	font-weight: 700;
-}
-
-.el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
-	background-color: #444;
-}
-
-input#worldView {
-	border: 0;
-	background-color: #3e3e3e !important;
-	color: #fff;
-}
-
-.el-select-dropdown {
-	border-radius: 5px!important;
-	background-color: #262626!important;
-}
-
-.el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
-	background-color: #444!important;
-}
-
-.el-select-dropdown__item.selected {
-	color: #fff!important;
-	font-weight: 700!important;
-}
-
-.el-select-dropdown__item {
-	color: #fff!important;
-}*/
 </style>
 <style lang="scss" scoped>
 .el-radio-group {
@@ -472,44 +336,6 @@ div#tools:first-of-type {
 #toolbarLeft #worldSpace {
 	display: flex;
 }
-
-/*
-button#playButton {
-	margin: auto;
-}
-
-li.ui-widget-seperator {
-	font-size: 0;
-	height: 0;
-	border-bottom: 1px solid #afafaf;
-	margin: 5px;
-}
-
-label i {
-	padding: 12px;
-	background: #b9b9b9;
-	-webkit-mask-position-y: 12px;
-}
-
-#toolbar input[type=radio] {
-	border: 0;
-	clip: rect(0 0 0 0);
-	height: 1px;
-	margin: -1px;
-	overflow: hidden;
-	padding: 0;
-	position: absolute;
-	width: 1px;
-}
-
-#toolbar input[type="radio"]:checked+label {
-	border-top: 2px solid #fff;
-	background-color: #b9b9b9;
-}
-
-#toolbar input[type="radio"]:checked+label i{
-	background-color: #111;
-}*/
 
 #toolbarRight {
 	margin-left: auto;

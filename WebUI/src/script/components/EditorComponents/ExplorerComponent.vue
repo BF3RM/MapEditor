@@ -18,7 +18,7 @@
 					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
 			</EditorComponent>
-			<gl-stack :width="90">
+			<gl-stack :width="82">
 				<GridComponent class="datafont" :right-align="true" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
 					<template v-slot:grid="{ item, data }" >
 						<img :class="'Icon Icon-' + item.typeName"/>

@@ -1,10 +1,11 @@
 <template>
 	<gl-component
-			ref="glChild"
-			class="EditorComponent"
-			:title="title"
-			:closable="closable"
-			:hidden="hidden">
+		ref="glChild"
+		class="EditorComponent"
+		:title="title"
+		:closable="closable"
+		:hidden="hidden"
+	>
 		<slot />
 	</gl-component>
 </template>

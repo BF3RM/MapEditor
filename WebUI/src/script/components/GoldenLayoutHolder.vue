@@ -8,23 +8,26 @@
 			:closePopoutsOnUnload = "false"
 			:showPopoutIcon = "false"
 			:showMaximiseIcon = "false"
-			:showCloseIcon = "false"
+			:showCloseIcon = "true"
 			:headerHeight = "30"
 			ref="gl"
-			class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
+			class="gl"
+			@initialised="onInitialised"
+			@stackCreated="onStackCreated"
+		>
 			<gl-row>
 				<gl-col>
 					<gl-row>
-						<gl-col width="17">
+						<gl-col width="18">
 							<HierarchyComponent/>
 						</gl-col>
-						<ViewportComponent :showHeader="true"/>
+						<ViewportComponent :showHeader="true" :closable="false"/>
 					</gl-row>
-					<gl-row :height="20">
+					<gl-row height="25">
 						<ExplorerComponent/>
 					</gl-row>
 				</gl-col>
-				<gl-col :width="20">
+				<gl-col width="20">
 					<gl-stack>
 						<InspectorComponent/>
 						<HistoryComponent/>

@@ -583,3 +583,46 @@ li.el-menu-item.separator {
 .ps .ps__rail-y.ps--clicking {
 	background: transparent !important;
 }
+
+.lm_header .lm_tab .lm_title {
+	display: flex !important;
+	align-items: center;
+}
+
+.lm_tab .lm_title::before {
+	content: "";
+	display: inline-flex;
+	margin-right: 7px;
+	height: 17px;
+	width: 17px;
+	background: transparent;
+	background-size: contain !important;
+}
+
+.lm_tab[title="History"] .lm_title::before {
+	background: transparent url(../icons/editor/new/history.svg) 50% 50% no-repeat;
+}
+
+.lm_tab[title="Inspector"] .lm_title::before {
+	background: transparent url(../icons/editor/new/eye-gray.svg) 50% 50% no-repeat;
+}
+
+.lm_tab[title="Viewport"] .lm_title::before {
+	background: transparent url(../icons/editor/new/viewport.svg) 50% 50% no-repeat;
+}
+
+.lm_tab[title="Scene Instances"] .lm_title::before {
+	background: transparent url(../icons/editor/new/tree.svg) 50% 50% no-repeat;
+}
+
+.lm_tab[title="Project"] .lm_title::before {
+	background: transparent url(../icons/editor/new/project.svg) 50% 50% no-repeat;
+}
+
+.lm_tab[title="Project Data"] .lm_title::before {
+	background: transparent url(../icons/editor/new/project-data.svg) 50% 50% no-repeat;
+}
+
+.lm_tab[title="Console"] .lm_title::before {
+	background: transparent url(../icons/editor/new/console.svg) 50% 50% no-repeat;
+}
