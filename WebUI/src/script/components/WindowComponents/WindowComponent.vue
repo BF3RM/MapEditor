@@ -10,7 +10,7 @@
 				</slot>
 			</div>
 		</div>
-		<div class="overlay"></div>
+		<div class="overlay" @click="onClick"></div>
 	</div>
 </template>
 <script lang="ts">
@@ -24,6 +24,10 @@ export default class WindowComponent extends Vue {
 	@Prop({ default: false }) isDestructible: boolean;
 	@Prop({ default: 'WindowComponent' }) title: string;
 	@Prop({ default: { visible: true } }) state: IWindowState;
+
+	onClick() {
+		this.state.visible = false;
+	}
 }
 </script>
 <style lang="scss" scoped>
@@ -36,6 +40,7 @@ export default class WindowComponent extends Vue {
 		background: rgba(13, 15, 22, .78);
 		z-index: 40;
 		pointer-events: all;
+		backdrop-filter: blur(2px);
 	}
 
 	.window {
@@ -44,8 +49,8 @@ export default class WindowComponent extends Vue {
 		top: 50%;
 		transform: translate(-50%, -50%);
 		display: grid;
-		height: 45vh;
-		width: 35vw;
+		height: 60vh;
+		width: 45vw;
 		display: flex;
 		flex-flow: column;
 		z-index: 50;
