@@ -2,7 +2,7 @@
 	<div class="tree-node" :class="{ selected: selected, disabled: !enabled }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
-				<img :src="enabledIcnSrc" v-tooltip="'Enable / Disable'" />
+				<img :src="enabledIcnSrc" v-tooltip="'Visible'" />
 			</div>
 			<div class="selectable-container icon-container" @click="ToggleRaycastEnabled($event, node, tree)">
 				<img :src="raycastEnabledIcnSrc" v-tooltip="'Selectable'" />

@@ -20,10 +20,10 @@
 					</el-menu-item>
 				</el-menu>
 				<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
-					<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item"/>
+					<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item" v-tooltip="getTooltipText(item)" />
 				</el-radio-group>
 				<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChange">
-					<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item"/>
+					<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item" v-tooltip="getTooltipText(item)" />
 				</el-radio-group>
 			</div>
 			<div id="toolbarRight">
@@ -194,6 +194,25 @@ export default class EditorToolbar extends Vue {
 
 	onViewModeChange(newView: number) {
 		window.vext.SendMessage(new SetViewModeMessage(newView));
+	}
+
+	getTooltipText(text: string) {
+		switch (text) {
+		case 'select':
+			return 'Select';
+		case 'translate':
+			return 'Move';
+		case 'rotate':
+			return 'Rotate';
+		case 'scale':
+			return 'Scale';
+		case 'world':
+			return 'World space';
+		case 'local':
+			return 'Local space';
+		default:
+			return '';
+		}
 	}
 
 	private onMenuRegistered(path: string[], entryCallback?: any) {

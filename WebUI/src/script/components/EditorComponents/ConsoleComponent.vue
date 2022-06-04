@@ -1,8 +1,8 @@
 <template>
-	<EditorComponent title="Console">
+	<EditorComponent title="Logs">
 		<div class="header">
 			<Search @search="onSearch"/>
-			<div>
+			<div class="rangeHolder">
 				<input type="range" min="0" max="6" step="1" :value="data.filterLevel" @input="onUpdateFilter">
 				<div class="logLevel">{{logLevelDict[data.filterLevel]}}</div>
 			</div>
@@ -18,7 +18,7 @@
 				ref="scroller"
 				:items="filteredItems()"
 				class="scrollable"
-				:min-item-size="30"
+				:min-item-size="20"
 		>
 			<DynamicScrollerItem
 					class="consoleEntry"
@@ -28,7 +28,7 @@
 
 					@click.native="onClick(item)"
 					:size-dependencies="[item.expanded]"
-					:min-item-size="30"
+					:min-item-size="20"
 			>
 				<div :class="'log-wrapper LogLevel-' + logLevelDict[item.level]">
 					<div v-if="typeof(item.message) === 'string'" class="message">
@@ -241,17 +241,25 @@ export default class ConsoleComponent extends EditorComponent {
 </script>
 <style lang="scss" scoped>
 .header {
-	.logLevel {
-		text-align: center;
-		font-weight: 600;
-		color: #fff;
+	.rangeHolder {
+		position: relative;
+
+		.logLevel {
+			text-align: center;
+			font-weight: 600;
+			color: #fff;
+			font-size: 12px;
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+		}
 	}
 }
 
 .consoleEntry {
 	padding: 0 7px;
 	background: transparent;
-	min-height: 30px;
+	min-height: 20px;
 	box-sizing: border-box;
 	display: flex;
 	align-items: center;
