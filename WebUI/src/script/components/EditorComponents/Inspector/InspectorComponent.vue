@@ -1,5 +1,5 @@
 <template>
-	<EditorComponent class="inspector-component" title="Inspector">
+	<EditorComponent class="inspector-component scrollable" title="Inspector">
 		<div class="header">
 			<div id="IconAndEnable" :class="enabled ? 'enabled' : ''">
 				<div class="icon-wrapper">
@@ -73,7 +73,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="scrollable">
+		<div class="inner">
 			<div class="transform-container">
 					<linear-transform-control
 							v-if="worldSpace === 'local'"
@@ -99,12 +99,14 @@
 						<div class="loading">Loading...</div>
 					</template>
 					<template v-slot="data">
-						<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
-							<reference-property :overrides="selectedGameObject.EBXOverrides" :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
-						</div>
-						<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
-							<array-property :overrides="selectedGameObject.EBXOverrides" :gameObject="selectedGameObject" @input="onEBXInput($event, true)" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="data.primaryInstance.fields.objects" :instance="data.primaryInstance" :reference="data.primaryInstance" :partition="data"></array-property>
-						</div>
+						<div class="ebx-wrapper">
+								<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
+									<reference-property :overrides="selectedGameObject.EBXOverrides" :gameObject="selectedGameObject" @input="onEBXInput($event)" :autoOpen="true" :currentPath="data.name" :field="data.primaryInstance && data.primaryInstance.fields.object" :reference="data.primaryInstance.fields.object.value" :partition="data"></reference-property>
+								</div>
+								<div v-else-if="data && data.primaryInstance && data.primaryInstance.fields && data.primaryInstance.fields.objects">
+									<array-property :overrides="selectedGameObject.EBXOverrides" :gameObject="selectedGameObject" @input="onEBXInput($event, true)" :autoOpen="data.primaryInstance.fields.objects.value.length < 6" :currentPath="data.name" :field="data.primaryInstance.fields.objects" :instance="data.primaryInstance" :reference="data.primaryInstance" :partition="data"></array-property>
+								</div>
+							</div>
 					</template>
 					<template v-slot:rejected="error">
 						<div class="alert">Error: {{ error.message }}</div>
@@ -354,8 +356,9 @@ export default class InspectorComponent extends EditorComponent {
 	.transformControls::v-deep input {
 		width: 100%;
 	}
+
 	.inspector-component {
-		.scrollable {
+		.inner {
 			padding: 1.5vh;
 		}
 
@@ -473,31 +476,9 @@ export default class InspectorComponent extends EditorComponent {
 			}
 		}
 
-		/*.title {
-			margin: 1em 0;
-			font-size: 1.5em;
-			font-weight: bold;
+		.ebx-wrapper {
+			margin-top: 14px;
 		}
-
-		.enable-container {
-			display: flex;
-			flex-direction: row;
-			align-content: center;
-
-			.enable-label {
-				margin: 1em 0;
-				font-weight: bold;
-			}
-
-			.enable-input {
-				height: 1.5em;
-				margin: 1em 0;
-			}
-		}
-
-		.ebx-container {
-			padding-left: 1em;
-		}*/
 
 		.collapsed {
 			height: 14px;

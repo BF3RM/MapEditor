@@ -352,8 +352,13 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .el-input__inner {
 	border: none !important;
-	background: #1f2633 !important;
 	color: #fff !important;
+}
+
+#toolbar {
+	.el-input__inner {
+		background: #1f2633 !important;
+	}
 }
 
 .el-select-dropdown {
