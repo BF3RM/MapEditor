@@ -60,7 +60,7 @@ export default class KeyTip extends Vue {
 			height: 30px;
 			box-sizing: border-box;
 			min-width: 30px;
-			max-width: 55px;
+			max-width: 65px;
 			padding: 0 10px;
 			display: flex;
 			align-items: center;

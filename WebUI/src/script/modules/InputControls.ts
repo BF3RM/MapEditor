@@ -142,6 +142,9 @@ export class InputControls {
 	}
 
 	public IsKeyDown(keycode: KEYCODE): boolean {
+		if (typeof keycode === 'string') {
+			return false;
+		}
 		return this.keys[keycode] === true; // Can also be undefined
 	}
 }

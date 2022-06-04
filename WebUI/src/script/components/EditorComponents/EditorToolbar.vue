@@ -26,16 +26,18 @@
 					<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item" v-tooltip="getTooltipText(item)" />
 				</el-radio-group>
 			</div>
+			<div id="toolbarCenter">
+				<key-tip
+					keys="F1"
+					description="Return to the game view"
+					:needsCtrl="false"
+					:needsShift="false"
+				/>
+			</div>
 			<div id="toolbarRight">
 				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
 					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
 				</el-select>
-				<!--
-				TODO: Add hotkeys window
-				<button class="btn">
-					<img :src="require(`@/icons/editor/new/help.svg`)" alt="">
-				</button>
-				-->
 			</div>
 		</info-top-bar>
 	</div>
@@ -371,6 +373,24 @@ div#tools:first-of-type {
 
 	.el-select {
 		width: 25vh;
+	}
+}
+
+#toolbarCenter {
+    display: flex;
+    margin: 0 14px;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+}
+
+.key-tip {
+	font-size: 12px;
+	font-weight: 500;
+
+	::v-deep .key-outline {
+		font-size: 13px;
+		margin-right: 10px !important;
+		height: 25px;
 	}
 }
 </style>

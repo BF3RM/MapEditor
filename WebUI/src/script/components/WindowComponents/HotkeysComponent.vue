@@ -1,27 +1,40 @@
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true" class="hotkey-window">
-		<div class="container hotkeys-container">
-			<h6>Global</h6>
-			<div class="hotkey-grid">
-				<key-tip
-					v-for="(hotkey, index) in hotkeysDown"
-					:key="index"
-					:keys="keyCodeToChar[hotkey.key]"
-					:description="hotkey.description"
-					:needsCtrl="hotkey.needsCtrl"
-					:needsShift="hotkey.needsShift"
-				/>
-			</div>
-			<h6>Canvas</h6>
-			<div class="hotkey-grid">
-				<key-tip
-					v-for="(hotkey, index) in hotkeysCanvas"
-					:key="index"
-					:keys="keyCodeToChar[hotkey.key]"
-					:description="hotkey.description"
-					:needsCtrl="hotkey.needsCtrl"
-					:needsShift="hotkey.needsShift"
-				/>
+		<div class="container hotkeys-container scrollable">
+			<div>
+				<h6>Global</h6>
+				<div class="hotkey-grid">
+					<key-tip
+						v-for="(hotkey, index) in hotkeysDown"
+						:key="index"
+						:keys="keyCodeToChar[hotkey.key]"
+						:description="hotkey.description"
+						:needsCtrl="hotkey.needsCtrl"
+						:needsShift="hotkey.needsShift"
+					/>
+				</div>
+				<h6>Viewport</h6>
+				<div class="hotkey-grid">
+					<key-tip
+						v-for="(hotkey, index) in hotkeysCanvas"
+						:key="index"
+						:keys="keyCodeToChar[hotkey.key]"
+						:description="hotkey.description"
+						:needsCtrl="hotkey.needsCtrl"
+						:needsShift="hotkey.needsShift"
+					/>
+				</div>
+				<h6>Freecam</h6>
+				<div class="hotkey-grid">
+					<key-tip
+						v-for="(hotkey, index) in hotkeysFreecam"
+						:key="index"
+						:keys="keyCodeToChar[hotkey.key]"
+						:description="hotkey.description"
+						:needsCtrl="hotkey.needsCtrl"
+						:needsShift="hotkey.needsShift"
+					/>
+				</div>
 			</div>
 		</div>
 		<div class="footer">
@@ -42,6 +55,7 @@ export default class HotkeysComponent extends Vue {
 	private title = 'Hotkeys';
 	private hotkeysDown: any = [];
 	private hotkeysCanvas: any = [];
+	private hotkeysFreecam: any = [];
 	private keyCodeToChar: any;
 	private state = {
 		visible: false
@@ -52,8 +66,9 @@ export default class HotkeysComponent extends Vue {
 			this.title = 'Hotkeys';
 			this.state.visible = true;
 		});
-		this.hotkeysDown = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Down);
+		this.hotkeysDown = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Down || key.type === HOTKEY_TYPE.Lua);
 		this.hotkeysCanvas = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.CanvasOnlyDown);
+		this.hotkeysFreecam = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Freecam);
 		this.keyCodeToChar = keyCodeToChar;
 	}
 
@@ -64,15 +79,18 @@ export default class HotkeysComponent extends Vue {
 </script>
 <style lang="scss" scoped>
 .hotkeys-container {
+	margin-bottom: 0 !important;
+
 	h6 {
 		color: #fff;
 		font-size: 14px;
 		margin-bottom: 16px;
 		text-transform: uppercase;
 		font-weight: 600;
+		margin-top: 28px;
 
-		&:last-of-type {
-			margin-top: 28px;
+		&:first-of-type {
+			margin-top: 0;
 		}
 	}
 
@@ -84,6 +102,12 @@ export default class HotkeysComponent extends Vue {
 }
 
 .hotkey-window {
+	.footer {
+		position: absolute;
+		bottom: 1.5vh;
+		right: 1.5vh;
+	}
+
 	::v-deep .window {
 		height: 75vh !important;
 	}
