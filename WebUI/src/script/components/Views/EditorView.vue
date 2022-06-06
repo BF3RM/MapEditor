@@ -6,6 +6,7 @@
 		<div class="overlays">
 			<ProjectSettingsComponent/>
 			<ImportProjectComponent/>
+			<HotkeysComponent/>
 		</div>
 	</div>
 </template>
@@ -16,9 +17,11 @@ import EditorToolbar from '../EditorComponents/EditorToolbar.vue';
 import ProjectSettingsComponent from '../WindowComponents/ProjectSettingsComponent.vue';
 import GoldenLayoutHolder from '@/script/components/GoldenLayoutHolder.vue';
 import ImportProjectComponent from '@/script/components/WindowComponents/ImportProjectComponent.vue';
+import HotkeysComponent from '@/script/components/WindowComponents/HotkeysComponent.vue';
 
 @Component({
 	components: {
+		HotkeysComponent,
 		ImportProjectComponent,
 		GoldenLayoutHolder,
 		EditorToolbar,

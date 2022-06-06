@@ -1,101 +1,162 @@
+// Icons from: https://game-icons.net/
+
 html {
     font-size: 12px;
 }
+
 .Icon {
     height: 12px;
     width: 12px;
-    -webkit-mask-size: contain!important;
-    background-color: #9c9898;
+    // Fallback
+    content: url(../icons/types/new/Default.svg);
 }
+
 .Large.Icon {
   height: 30px;
   width: 30px;
 }
 
 .selectIcon{
-    -webkit-mask: url(../icons/editor/cursor-default-outline.svg) no-repeat center;
+    content: url(../icons/editor/cursor-default-outline.svg);
 }
+
 .translateIcon {
-    -webkit-mask: url(../icons/editor/cursor-move.svg) no-repeat center;
+    content: url(../icons/editor/cursor-move.svg);
 }
+
 .rotateIcon {
-    -webkit-mask: url(../icons/editor/rotate-3d.svg) no-repeat center;
+    content: url(../icons/editor/rotate-3d.svg);
 }
+
 .scaleIcon {
-    -webkit-mask: url(../icons/editor/arrow-expand.svg) no-repeat center;
+    content: url(../icons/editor/arrow-expand.svg);
 }
+
 .globeIcon {
-    -webkit-mask: url(../icons/editor/earth.svg) no-repeat center;
+    content: url(../icons/editor/earth.svg);
 }
+
 .cubeIcon {
-    -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
+    content: url(../icons/editor/cube-outline.svg);
 }
+
 .afavoritable:hover {
-    -webkit-mask: url(../icons/editor/star.svg) no-repeat center;
+    content: url(../icons/editor/star.svg);
 }
 
 .faavoritable.favorited:hover {
-     -webkit-mask: url(../icons/editor/star-off.svg) no-repeat center;
- }
-
-
+    content: url(../icons/editor/star-off.svg);
+}
 
 .Icon-EffectBlueprint {
-    -webkit-mask: url(../icons/types/EffectBlueprint.svg) no-repeat center;
+    content: url(../icons/types/new/EffectBlueprint.svg);
+    // #F4AB00
 }
+
 .Icon-LogicPrefabBlueprint {
-    -webkit-mask: url(../icons/types/LogicPrefabBlueprint.svg) no-repeat center;
+    content: url(../icons/types/new/LogicPrefabBlueprint.svg);
+    // #9E9E9E
 }
+
 .Icon-ObjectBlueprint {
-    -webkit-mask: url(../icons/types/ObjectBlueprint.svg) no-repeat center;
+    content: url(../icons/types/new/ObjectBlueprint.svg);
+    // #C94B4B
 }
+
 .Icon-PrefabBlueprint {
-    -webkit-mask: url(../icons/types/PrefabBlueprint.svg) no-repeat center;
+    content: url(../icons/types/new/PrefabBlueprint.svg);
+    // #A0C94B
 }
+
 .Icon-SpatialPrefabBlueprint {
-    -webkit-mask: url(../icons/types/SpatialPrefabBlueprint.svg) no-repeat center;
+    content: url(../icons/types/new/SpatialPrefabBlueprint.svg);
+    // #4BC94E
 }
+
+.Icon-VisualEnvironmentBlueprint2,
 .Icon-VisualEnvironmentBlueprint {
-    -webkit-mask: url(../icons/types/VisualEnvironmentBlueprint.svg) no-repeat center;
+    content: url(../icons/types/new/VisualEnvironmentBlueprint.svg);
+    // #4B9DC9
 }
-.Icon-VisualEnvironmentBlueprint2 {
-    -webkit-mask: url(../icons/types/VisualEnvironmentBlueprint2.svg) no-repeat center;
-}
+
+.Icon-Texture2,
 .Icon-Texture {
-    -webkit-mask: url(../icons/types/Texture.svg) no-repeat center;
+    content: url(../icons/types/new/Texture.svg);
+    // #704BC9
 }
-.Icon-Texture2 {
-    -webkit-mask: url(../icons/types/Texture2.svg) no-repeat center;
-}
+
 .Icon-Light {
-    -webkit-mask: url(../icons/types/Light.svg) no-repeat center;
+    content: url(../icons/types/new/Light.svg);
+    // #EEEA33
 }
+
+.Icon-SoldierWeaponBlueprint {
+    content: url(../icons/types/new/SoldierWeaponBlueprint.svg);
+    // #81D4CB
+}
+
+.Icon-ProjectileBlueprint {
+    content: url(../icons/types/new/ProjectileBlueprint.svg);
+    // #AB81D4
+}
+
+.Icon-VehicleBlueprint {
+    content: url(../icons/types/new/VehicleBlueprint.svg);
+    // #438033
+}
+
+.Icon-WorldPartData {
+    content: url(../icons/types/new/WorldPartData.svg);
+    // #D4C59C
+}
+
+.Icon-LevelData {
+    content: url(../icons/types/new/LevelData.svg);
+    // #D4C59C
+}
+
+.Icon-SubWorldData {
+    content: url(../icons/types/new/SubWorldData.svg);
+    // #33807B
+}
+
+.Icon-SoldierBlueprint {
+    content: url(../icons/types/new/SoldierBlueprint.svg);
+    // #83AF89
+}
+
+.Icon-MultiSelection {
+    content: url(../icons/types/new/MultiSelection.svg);
+    // #037fff
+}
+
 .Icon-folder {
-  -webkit-mask: url(../icons/editor/folder.svg) no-repeat center;
+    content: url(../icons/editor/new/close-folder.svg);
+    // #79889c
+    width: 12px !important;
+    height: 12px !important;
 }
+
 .Icon-folder-open {
-  -webkit-mask: url(../icons/editor/folder-open.svg) no-repeat center;
-}
-.Icon-GameObject {
-    -webkit-mask: url(../icons/editor/cube-outline.svg) no-repeat center;
-    background-color: #9c9898;
+    content: url(../icons/editor/new/open-folder.svg);
+    // #037fff
+    width: 12px !important;
+    height: 12px !important;
 }
 
 .ExpandDown {
-    -webkit-mask: url(../icons/editor/ExpandChevronDown_16x.svg) no-repeat center;
+    content: url(../icons/editor/ExpandChevronDown_16x.svg);
 }
+
 .ExpandRight {
-    -webkit-mask: url(../icons/editor/ExpandChevronRight_16x.svg) no-repeat center;
+    content: url(../icons/editor/new/chevron-right.svg);
 }
 
 input[type="search"]::-webkit-search-cancel-button {
-
-  /* Remove default */
-  -webkit-appearance: none;
-
-  width: 20px;
-  height: 20px;
-  -webkit-mask: url(../icons/editor/close-circle.svg) no-repeat center;
-  -webkit-mask-size: 15px;
-  background-color: #9c9898;
+    /* Remove default */
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    content: url(../icons/editor/close-circle.svg);
+    right: 0px;
 }

@@ -1,20 +1,20 @@
 <template>
-	<div class="tree-node" :class="{ selected: selected }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
+	<div class="tree-node" :class="{ selected: selected, disabled: !enabled }" @mouseleave="NodeHoverEnd()" @mouseenter="NodeHover($event,node,tree)" @click="SelectNode($event, node, tree)">
 		<div v-if="hasVisibilityOptions" class="visibility-node">
 			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
-				<img :src="enabledIcnSrc"/>
+				<img :src="enabledIcnSrc" v-tooltip="'Visible'" />
 			</div>
 			<div class="selectable-container icon-container" @click="ToggleRaycastEnabled($event, node, tree)">
-				<img :src="raycastEnabledIcnSrc"/>
+				<img :src="raycastEnabledIcnSrc" v-tooltip="'Selectable'" />
 			</div>
 		</div>
 		<div class="tree-node" :style="nodeStyle(node)">
 			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
-					:src="require(`@/icons/editor/ExpandChevronRight_16x.svg`)"/>
+					:src="require(`@/icons/editor/new/chevron-right.svg`)"/>
 			</div>
 			<div class="icon-container">
-				<img :class="getNodeIconClass(node)"/>
+				<img :class="getNodeIconClass(node)" v-tooltip="node.type != 'folder' ? node.type : ''" />
 			</div>
 			<div class="text-container">
 				<Highlighter v-if="search !== ''" :text="node.name" :search="search"/>
@@ -102,11 +102,11 @@ export default class ExpandableTreeSlot extends Vue {
 	}
 
 	get enabledIcnSrc() {
-		return this.enabled ? require('@/icons/editor/eye.svg') : require('@/icons/editor/eye-crossed.svg');
+		return this.enabled ? require('@/icons/editor/new/eye.svg') : require('@/icons/editor/new/eye-crossed.svg');
 	}
 
 	get raycastEnabledIcnSrc() {
-		return this.raycastEnabled ? require('@/icons/editor/select.svg') : require('@/icons/editor/select-crossed.svg');
+		return this.raycastEnabled ? require('@/icons/editor/new/select.svg') : require('@/icons/editor/new/select-crossed.svg');
 	}
 
 	private nodeStyle(node: Node) {
@@ -174,11 +174,18 @@ export default class ExpandableTreeSlot extends Vue {
 	.visibility-node {
 		display: flex;
 		align-content: center;
-		height: 13px;
-		background-color: #404040;
+		height: 100%;
+		width: 45px;
+		min-width: 45px;
+		align-items: center;
 
-		* {
-			margin: 0 2px;
+		.icon-container {
+			flex: 1 1 auto;
+			text-align: center;
+
+			img {
+				width: 16px;
+			}
 		}
 	}
 
@@ -189,48 +196,75 @@ export default class ExpandableTreeSlot extends Vue {
 		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
-		height: 13px;
+		align-items: center;
+		height: 25px;
 		/*white-space: nowrap;*/
 
 		.text-container {
 			display: flex;
 			flex-direction: row;
 			width: max-content;
-			overflow: hidden;
+			//overflow: hidden;
+			font-weight: 400;
+			font-size: 13px;
 		}
-		.expand-container img {
-			transition: transform 0.1s;
 
-			&.expanded {
-				transform: rotate(90deg);
-			}
-		}
-		.icon-container {
-			width: 13px;
-			max-width: 13px;
-			color: #6d6d6d;
+		.expand-container {
+			width: 22px;
+			text-align: center;
 
 			img {
-				max-width: 100%;
-				max-height: 100%;
+				width: 17px;
+				transition: transform 0.1s;
+
+				&.expanded {
+					transform: rotate(90deg);
+				}
 			}
 		}
-		&:hover {
-			background-color: #343434;
+
+		.icon-container {
+			.Icon {
+				width: 17px;
+				height: 17px;
+			}
+		}
+
+		&.disabled {
+			opacity: .25;
+			text-decoration: line-through;
+		}
+
+		&:hover,
+		&.selected {
+			background-color: #313848;
+			// color: #037fff;
 		}
 		&.selected {
-			background-color: #404040;
-			color: #409EFF;
+			&::after {
+				content: "";
+				position: absolute;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				width: 2px;
+				background: #037fff;
+			}
 		}
 
 		.slot-text {
 			margin-left: 5px;
 		}
+
 		.slot-client-server-only {
-			border: 1px solid gray;
-			padding: 0 2px;
+			background: #F4AB00;
+			padding: 2px 4px 1px;
 			border-radius: 3px;
-			margin: 0 5px;
+			margin: 0 0 0 7px;
+			font-size: 10px;
+			color: #000;
+			text-transform: uppercase;
+			font-weight: 900;
 		}
 	}
 </style>

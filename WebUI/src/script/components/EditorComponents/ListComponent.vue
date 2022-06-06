@@ -91,6 +91,7 @@ export default class ListComponent extends EditorComponent {
 			padding: 0.2vmin;
 			border-bottom: solid 1px #4a4a4a;
 		}
+
 		.scrollable {
 			height: 100%;
 			width: 100%;

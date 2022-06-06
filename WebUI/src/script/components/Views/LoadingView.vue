@@ -1,11 +1,13 @@
 <template>
 	<div id="loading-view">
-		<info-top-bar>
-			<div class="loader">
-				<!--<spinner />-->
-				<p>{{loadingInfo}} <span/><span/><span/></p>
-			</div>
-		</info-top-bar>
+		<div id="toolbar">
+			<info-top-bar>
+				<div class="loader">
+					<!--<spinner />-->
+					<p>{{loadingInfo}} <span/><span/><span/></p>
+				</div>
+			</info-top-bar>
+		</div>
 	</div>
 </template>
 

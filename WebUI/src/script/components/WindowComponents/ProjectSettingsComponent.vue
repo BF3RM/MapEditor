@@ -1,71 +1,71 @@
 <template>
 	<WindowComponent :state="state" :title="title" :isDestructible="true">
-		<div v-if="showNewSave">
-			<div class="Container">
-				<input placeholder="Project Name" v-model="newSaveName"/>
+		<template v-if="showNewSave">
+			<div class="container new-container">
+				<div class="alert" v-if="hint">
+					{{ hint }}
+				</div>
+				<input placeholder="Project Name" v-model="newSaveName" class="input-large"/>
 			</div>
 			<div class="footer">
-				<div>
-					<button @click="Save(true)">Save</button>
-					<button @click="showNewSave = false">Abort</button>
-				</div>
-				<div>
-					<span>{{hint}}</span>
-				</div>
+				<button @click="showNewSave = false" class="btn btn-lg btn-dark">Cancel</button>
+				<button @click="Save(true)" class="btn btn-lg btn-success">Save</button>
 			</div>
-		</div>
-		<div v-else-if="showExportWindow">
-			<div class="Container">
+		</template>
+		<template v-else-if="showExportWindow">
+			<div class="container export-container">
+				<div class="alert alert-success">
+					{{ hint }}
+				</div>
 				<textarea class="projectDataInput" readonly placeholder="Loading..."
 					@focus="$event.target.select()" v-model="projectData"
 				/>
 			</div>
 			<div class="footer">
-				<div>
-					<div>
-<!--						<button @click="CopyToClipboard">Copy</button> Not supported in VU yet-->
-						<button @click="CloseExportWindow">Close</button>
+				<button @click="CloseExportWindow" class="btn btn-lg btn-dark">Cancel</button>
+			</div>
+		</template>
+		<template v-else>
+			<div class="container">
+				<div class="saves-wrapper">
+					<div class="list-wrapper">
+						<ul class="project-list">
+							<li v-if="projects.length === 0">No saved projects</li>
+							<li v-else
+								v-for="(project, projectName) in projects"
+								v-bind:key="projectName"
+								@click="onSelectProject(projectName)"
+								:class="{ selected: selectedProjectName === projectName, current: currentProjectHeader.projectName === projectName }">
+								{{projectName}}
+							</li>
+						</ul>
 					</div>
-					<span>{{hint}}</span>
+					<div class="list-wrapper">
+						<ul v-if="selectedProject" class="save-list">
+							<li v-for="(save, index) in selectedProject"
+								v-bind:key="save.timeStamp"
+								@click="selectSave(index)"
+								:class="{ selected: selectedSave && selectedSave.timeStamp === save.timeStamp,
+									current: save.timeStamp === currentProjectHeader.timeStamp }">
+								{{FormatTime(save.timeStamp)}}</li>
+						</ul>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div v-else>
-			<div class="Container">
-				<ul class="projectList">
-					<li v-if="projects.length === 0">No saved projects</li>
-					<li v-else
-						v-for="(project, projectName) in projects"
-						v-bind:key="projectName"
-						@click="onSelectProject(projectName)"
-						:class="{ selected: selectedProjectName === projectName, current: currentProjectHeader.projectName === projectName }">
-						{{projectName}}
-					</li>
-				</ul>
-				<ul v-if="selectedProject" class="saveList">
-					<li v-for="(save, index) in selectedProject"
-						v-bind:key="save.timeStamp"
-						@click="selectSave(index)"
-						:class="{ selected: selectedSave && selectedSave.timeStamp === save.timeStamp,
-							current: save.timeStamp === currentProjectHeader.timeStamp }">
-						{{FormatTime(save.timeStamp)}}</li>
-				</ul>
-			</div>
-			<div class="footer">
-				<div class="saveInfo" v-if="selectedSave">
+				<div class="alert alert-success" v-if="selectedSave">
 					<span>Selected save info:</span>
 					Map name: {{selectedSave.mapName}}
 					<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
 					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
 				</div>
-				<div>
-					<button :disabled="buttonsDisabled" @click="loadSave()">Load</button>
-					<button @click="NewSave()">New Save</button>
-					<button :disabled="buttonsDisabled" @click="Export">Export</button>
-					<button :disabled="buttonsDisabled" @click="Delete">Delete</button>
-				</div>
 			</div>
-		</div>
+			<div class="footer">
+				<button @click="Close" class="btn btn-lg btn-dark">Close</button>
+				<button :disabled="buttonsDisabled" @click="Export" class="btn btn-lg btn-dark">Export</button>
+				<button :disabled="buttonsDisabled" @click="Delete" class="btn btn-lg btn-danger">Delete</button>
+				<button @click="NewSave()" class="btn btn-lg btn-dark">New Save</button>
+				<button :disabled="buttonsDisabled" @click="loadSave()" class="btn btn-lg btn-success">Load</button>
+			</div>
+		</template>
 	</WindowComponent>
 </template>
 <script lang="ts">
@@ -255,10 +255,14 @@ export default class ProjectSettingsComponent extends Vue {
 
 		return date.toDateString() + ' - ' + formattedTime;
 	}
+
+	Close() {
+		this.state.visible = false;
+	}
 }
 </script>
 <style lang="scss" scoped>
-	.Container{
+	/*.Container{
 		display: grid;
 		min-width: 30vmin;
 		min-height: 20vmin;
@@ -287,10 +291,68 @@ export default class ProjectSettingsComponent extends Vue {
 
 	.selected {
 		background-color: #404040;
-		color: #409EFF;
+		color: #FAB91E;
 	}
 
 	.current {
 		background-color: #404040;
+	}*/
+
+	.container {
+		display: flex;
+		flex-flow: column;
+
+		&.new-container,
+		&.export-container {
+			.alert {
+				margin-bottom: 7px;
+			}
+		}
+
+		.saves-wrapper {
+			flex: 1 1 auto;
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			grid-gap: 7px;
+
+			.list-wrapper {
+				max-height: 200px;
+				overflow-y: auto;
+				background: #161924;
+				padding: 7px;
+				border-radius: 6px;
+			}
+
+			.save-list,
+			.project-list {
+				li {
+					display: flex;
+					font-family: sans-serif;
+					flex-direction: row;
+					align-content: center;
+					align-items: center;
+					height: 25px;
+					background-color: transparent;
+					border-radius: 6px;
+					padding: 0 7px;
+
+					&.selected {
+						background-color: #313848;
+					}
+
+					&.current {
+						color: #037fff;
+					}
+				}
+
+			}
+		}
+
+		.save-info {
+			background: #161924;
+			padding: 7px;
+			border-radius: 6px;
+			margin-top: 7px;
+		}
 	}
 </style>

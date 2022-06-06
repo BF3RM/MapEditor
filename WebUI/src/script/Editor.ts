@@ -115,7 +115,7 @@ export default class Editor {
 		signals.menuRegistered.emit(['Edit', '']); // Separator
 		signals.menuRegistered.emit(['Edit', 'Duplicate'], this.Duplicate.bind(this));
 		signals.menuRegistered.emit(['Edit', 'Delete'], this.DeleteSelected.bind(this));
-		signals.menuRegistered.emit(['Edit', '']); // Separator
+		// signals.menuRegistered.emit(['Edit', '']); // Separator
 		if (this.debug) {
 			// this.blueprintManager.registerBlueprints(GenerateBlueprints(100));
 		} else {

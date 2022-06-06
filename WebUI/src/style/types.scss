@@ -1,18 +1,27 @@
-.Int32 input, .UInt32 input, .Int16 input, .UInt16 input, .SByte input {
+.Int32 input,
+.UInt32 input,
+.Int16 input,
+.UInt16 input,
+.SByte input {
   color: #66d9ef;
 }
-.Single input, {
+
+.Single input {
   color: #9e73c6;
 }
+
 .type {
-  color: #f98926;
+  color: #037fff;
 }
+
 .path {
-  color: #688457;
+  color: #95d473;
 }
+
 .null {
-  color: #c67373;
+  color: #ed4547;
 }
+
 .guid {
-  color: #3e3e3e
+  color: #f4ab00;
 }

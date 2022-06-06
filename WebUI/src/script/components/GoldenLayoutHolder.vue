@@ -7,23 +7,27 @@
 			:popoutWholeStack = "true"
 			:closePopoutsOnUnload = "false"
 			:showPopoutIcon = "false"
-			:showMaximiseIcon = "true"
-			:showCloseIcon = "false"
+			:showMaximiseIcon = "false"
+			:showCloseIcon = "true"
+			:headerHeight = "30"
 			ref="gl"
-			class="gl" @initialised="onInitialised" @stackCreated="onStackCreated">
+			class="gl"
+			@initialised="onInitialised"
+			@stackCreated="onStackCreated"
+		>
 			<gl-row>
 				<gl-col>
 					<gl-row>
-						<gl-col width="17">
+						<gl-col width="18">
 							<HierarchyComponent/>
 						</gl-col>
-						<ViewportComponent :showHeader="true"/>
+						<ViewportComponent :showHeader="true" :closable="false"/>
 					</gl-row>
-					<gl-row :height="20">
+					<gl-row height="25">
 						<ExplorerComponent/>
 					</gl-row>
 				</gl-col>
-				<gl-col :width="20">
+				<gl-col width="20">
 					<gl-stack>
 						<InspectorComponent/>
 						<HistoryComponent/>
@@ -80,6 +84,7 @@ export default class GoldenLayoutHolder extends Vue {
 			const scrollables = document.getElementsByClassName('scrollable');
 			for (const scrollable of scrollables as any) {
 				const ps = new PerfectScrollbar(scrollable as HTMLElement, {
+					minScrollbarLength: 35
 				});
 			}
 		});
@@ -92,7 +97,7 @@ export default class GoldenLayoutHolder extends Vue {
 		height: 100%;
 	}
 	#glHolder {
-		height: calc(100vh - 32px);
+		height: calc(100vh - 40px);
 		width: 100vw;
 		pointer-events: none;
 	}
