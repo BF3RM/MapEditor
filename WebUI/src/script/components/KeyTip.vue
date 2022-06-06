@@ -1,16 +1,20 @@
 <template>
-	<div class="key-tip">
-		<div v-if="modifierKey" class="key-outline">{{ modifierKey }}</div>
-		<div v-if="modifierKey">+</div>
-		<div v-if="multiKey" class="multi-key-container">
+	<div class="key-tip" v-if="description">
+		<div v-if="needsCtrl" class="key-outline">
+			CTRL
+		</div>
+		<div v-if="needsShift" class="key-outline">
+			SHIFT
+		</div>
+		<!--div v-if="multiKey" class="multi-key-container">
 			<div v-for="key in keys"
 					:key="key"
 					class="key-outline">
 				{{ key }}
 			</div>
-		</div>
-		<div v-else class="key-outline">{{ keys }}</div>
-		<span v-if="description">{{ description }}</span>
+		</div-->
+		<div class="key-outline">{{ keys }}</div>
+		<span>{{ description }}</span>
 	</div>
 </template>
 
@@ -23,7 +27,10 @@ export default class KeyTip extends Vue {
 	keys: string | string[];
 
 	@Prop()
-	modifierKey?: string;
+	needsCtrl?: boolean;
+
+	@Prop()
+	needsShift?: boolean;
 
 	@Prop()
 	description?: string;
@@ -35,18 +42,38 @@ export default class KeyTip extends Vue {
 </script>
 
 <style lang="scss" scoped>
-	.key-tip, .multi-key-container {
+	.key-tip,
+	.multi-key-container {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: center;
+		justify-content: flex-start;
 		user-select: none;
+		color: #fff;
+		font-size: 13px;
+		line-height: 16px;
 
 		.key-outline {
-			padding: 0.4vmin;
-			border: 1px solid white;
-			border-radius: 3px;
-			margin: 0 0.5vmin;
+			border: 2px solid #fff;
+			border-radius: 6px;
+			margin: 0 7px 0 0;
+			height: 30px;
+			box-sizing: border-box;
+			min-width: 30px;
+			max-width: 65px;
+			padding: 0 10px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 14px;
+			color: #fff;
+			text-transform: uppercase;
+			font-variant-numeric: tabular-nums;
+			font-weight: 600;
+
+			&:last-of-type {
+				margin-right: 14px;
+			}
 		}
 	}
 </style>

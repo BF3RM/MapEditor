@@ -1,6 +1,8 @@
 <template>
 	<div id="container">
-		<span id="logo">VeniceEditor</span>
+		<span id="logo">
+			VeniceEditor
+		</span>
 		<slot/>
 	</div>
 </template>
@@ -21,11 +23,9 @@ export default class InfoTopBar extends Vue {
 <style lang="scss" scoped>
 	#container {
 		position: relative;
-		background-color: #202020;
-		color: white;
+		color: #fff;
 		top: 0;
 		width: 100vw;
-		height: 30px;
 		display: flex;
 		align-items: center;
 
@@ -36,9 +36,15 @@ export default class InfoTopBar extends Vue {
 		#logo {
 			margin-left: 0.5em;
 			color: #fff;
-			font-weight: bolder;
-			font-size: 20px;
-			padding: 5px;
+			font-weight: 600;
+			font-size: 15px;
+			padding: 4px 11px;
+			height: 100%;
+			background: #0774e5;
+			border-radius: 6px;
+			background: rgb(7,116,229);
+			background: linear-gradient(319deg, rgba(7,116,229,1) 0%, rgba(7,142,229,1) 100%);
+			box-shadow: 0 0px 7px 0px rgba(3,127,255,0.6);
 		}
 	}
 </style>

@@ -1,6 +1,7 @@
 <template>
 	<div id="page">
 		<ActiveView/>
+		<v-popover></v-popover>
 	</div>
 </template>
 <script lang="ts">

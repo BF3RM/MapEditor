@@ -79,34 +79,3 @@ export default class LinearTransformControl extends Vue {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-	.transformControls {
-		display: grid;
-		padding: 10px;
-	}
-	.transformControls::v-deep .Vec3Control {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-	}
-	.transformControls::v-deep .label{
-		grid-column: 1;
-		font-weight: bold;
-	}
-	.transformControls::v-deep .x{
-		grid-column: 2;
-	}
-	.transformControls::v-deep .y{
-		grid-column: 3;
-	}
-	.transformControls::v-deep .z {
-		grid-column: 4;
-	}
-	.transformControls::v-deep .w{
-		grid-column: 5;
-	}
-	.transformControls::v-deep input {
-		border: 0;
-	}
-
-</style>

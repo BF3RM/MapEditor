@@ -1,11 +1,9 @@
 <template>
     <div>
         <div class="table-container" v-if="visible">
-            <table class="table is-bordered">
-                <tbody>
-					<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :overrides="getOverrides(field.name)" :key="index" @input="$emit('input', $event)"></Property>
-                </tbody>
-            </table>
+            <div class="table is-bordered">
+				<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :overrides="getOverrides(field.name)" :key="index" @input="$emit('input', $event)"></Property>
+            </div>
         </div>
     </div>
 </template>
@@ -56,18 +54,18 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-
 input[type=text].input {
   max-width: 20%;
 }
+
 .table-container {
-	border-left: 1px solid #00000030;
-	border-bottom: 1px solid #00000030;
-	border-bottom-left-radius: 0.5em;
-	padding-left: 10px;
-	background-color: #0000001c;
+	border: 1px solid rgba(255, 255, 255, .15);
+	border-top: 0;
+	padding: 14px;
+	background-color: rgba(22, 25, 36, 0.2);
 	padding-bottom: 20px;
 	margin-bottom: 20px;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 }
-
 </style>

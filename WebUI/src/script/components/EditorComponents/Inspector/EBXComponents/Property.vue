@@ -1,16 +1,16 @@
 <template>
-    <tr v-if="field.name !== 'name'" class="row">
-        <td class="is-family-code is-narrow field-name" :class="{'numbered': !isNaN(Number(field.name))}">
+    <div v-if="field.name !== 'name'" class="row">
+        <div class="is-family-code is-narrow field-name" :class="{'numbered': !isNaN(Number(field.name))}">
 			{{ titleName }}
-        </td>
-        <td class="field-value">
+        </div>
+        <div class="field-value">
             <div class="field-spacer">
 				<component :type="field.type" :class="field.type" :autoOpen="autoOpen"
 					:currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field"
 					:value="getValue()" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value" :overrides="getOverrides()"></component>
 			</div>
-        </td>
-    </tr>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -141,12 +141,20 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss" scoped>
+	.field-name.numbered {
+		display: none;
+	}
+
 	.field-name {
 		text-transform: capitalize;
-		grid-column: 1;
-		text-align: right;
-		padding-right: 1em;
+		margin-bottom: 6px;
 	}
+
+	.field-value {
+		margin-bottom: 14px;
+	}
+
+	/*
 	.field-name.numbered {
 		min-width: 0;
 	}
@@ -154,5 +162,5 @@ export default Vue.extend({
 		grid-column: 2;
 	}
 	.value div[type=object] {
-	}
+	}*/
 </style>

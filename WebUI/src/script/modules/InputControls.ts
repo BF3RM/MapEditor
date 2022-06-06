@@ -3,12 +3,11 @@ import { Vec2 } from '@/script/types/primitives/Vec2';
 import { GIZMO_MODE, KEYCODE, MOUSE_BUTTONS } from '@/script/types/Enums';
 import { TeleportMouseMessage } from '@/script/messages/TeleportMouseMessage';
 import { signals } from '@/script/modules/Signals';
-
-// TODO Fool: add config keymap
+import { Hotkey, HOTKEY_TYPE } from './Hotkey';
+import { HOTKEYS } from './HotkeyConfig';
 
 export class InputControls {
 	public keys: boolean[] = [];
-	private wasMKeyDown: boolean = false;
 
 	constructor(element: HTMLCanvasElement) {
 		element.addEventListener('keydown', this.onCanvasKeyDown.bind(this));
@@ -20,26 +19,26 @@ export class InputControls {
 		element.addEventListener('mousedown', this.onMouseDown.bind(this));
 	}
 
-	public static getMousePos(event: MouseEvent): Vec2 {
+	public static getMousePos(e: MouseEvent): Vec2 {
 		const mousePos = new Vec2();
-		mousePos.x = (event.clientX / window.innerWidth) * 2 - 1;
-		mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		mousePos.x = (e.clientX / window.innerWidth) * 2 - 1;
+		mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
 		return mousePos;
 	}
 
-	onMouseDown(event: MouseEvent) {
+	onMouseDown(e: MouseEvent) {
 		let selectionEnabled = false;
 		let multiSelection = false;
 
-		switch (event.buttons) {
+		switch (e.buttons) {
 		case MOUSE_BUTTONS.LEFT_CLICK:
-			if (event.shiftKey) {
+			if (e.shiftKey) {
 				// Box selection
-				editor.threeManager.selectionWrapper.initBoxSelection(event);
+				editor.threeManager.selectionWrapper.initBoxSelection(e);
 				return;
 			}
-			selectionEnabled = !event.altKey; // Alt key is used for rotating camera
-			multiSelection = event.ctrlKey;
+			selectionEnabled = !e.altKey; // Alt key is used for rotating camera
+			multiSelection = e.ctrlKey;
 			break;
 		case MOUSE_BUTTONS.MIDDLE_CLICK:
 			break;
@@ -51,13 +50,12 @@ export class InputControls {
 			break;
 		}
 
-		editor.threeManager.onMouseDown(selectionEnabled, multiSelection, InputControls.getMousePos(event));
+		editor.threeManager.onMouseDown(selectionEnabled, multiSelection, InputControls.getMousePos(e));
 	}
 
-	onMouseUp(event: MouseEvent) {
+	onMouseUp(e: MouseEvent) {
 		const scope = this;
-
-		if (event.button === 0) {
+		if (e.button === 0) {
 			editor.threeManager.enableCameraControls();
 		}
 	}
@@ -74,7 +72,6 @@ export class InputControls {
 		if (!this.isTeleporting) {
 			this.movementX = (this.prevX ? e.screenX - this.prevX : 0);
 			this.movementY = (this.prevY ? e.screenY - this.prevY : 0);
-
 			this.prevX = e.screenX;
 			this.prevY = e.screenY;
 		}
@@ -97,105 +94,57 @@ export class InputControls {
 		window.vext.SendMessage(message);
 	}
 
-	onCanvasMouseMove(event: MouseEvent) {
-		if (event.buttons === 0) {
-			editor.threeManager.highlight(InputControls.getMousePos(event));
+	onCanvasMouseMove(e: MouseEvent) {
+		if (e.buttons === 0) {
+			editor.threeManager.highlight(InputControls.getMousePos(e));
 		}
 	}
 
-	onKeyUp(event: KeyboardEvent) {
-		this.keys[event.which] = false;
-		// Disable camera rotation
-		if (event.which === KEYCODE.ALT) {
-			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.NONE;
+	onKeyUp(e: KeyboardEvent) {
+		const element = e.target as HTMLElement;
+		if (element && element.tagName && (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')) {
+			return;
 		}
-		if (event.which === KEYCODE.CTRL) {
-			editor.threeManager.disableGridSnap();
-		}
-		if (event.which === KEYCODE.KEY_M) {
-			this.wasMKeyDown = false;
-			editor.threeManager.DisableMiniBrushMode();
-		}
+
+		this.keys[e.which] = false;
+
+		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Up).forEach((hotkey: Hotkey) => {
+			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+				hotkey.callback();
+			}
+		});
 	}
 
 	// Keys that should only work when the canvas is focused
-	onCanvasKeyDown(event: KeyboardEvent) {
-		if (event.which === KEYCODE.KEY_Q) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.select);
-		}
-		if (event.which === KEYCODE.KEY_W) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.translate);
-		}
-		if (event.which === KEYCODE.KEY_E) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.rotate);
-		}
-		if (event.which === KEYCODE.KEY_R) {
-			editor.threeManager.setGizmoMode(GIZMO_MODE.scale);
-		}
-		if (event.which === KEYCODE.CTRL) {
-			editor.threeManager.enableGridSnap();
-		}
+	onCanvasKeyDown(e: KeyboardEvent) {
+		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.CanvasOnlyDown).forEach((hotkey: Hotkey) => {
+			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+				hotkey.callback();
+			}
+		});
 	}
 
-	onKeyDown(event: KeyboardEvent) {
-		this.keys[event.which] = true;
+	onKeyDown(e: KeyboardEvent) {
+		const element = e.target as HTMLElement;
+		if (element && element.tagName && (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')) {
+			return;
+		}
 
-		if (event.which === KEYCODE.KEY_X) {
-			editor.threeManager.toggleWorldSpace();
-		}
-		if (event.which === KEYCODE.KEY_F) {
-			editor.threeManager.focus();
-		}
-		if (event.which === KEYCODE.KEY_P) {
-			editor.selectionGroup.selectParent();
-		}
-		// Enable camera rotation
-		if (event.which === KEYCODE.ALT) {
-			editor.threeManager.cameraControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
-		}
-		if (event.which === KEYCODE.KEY_Z && event.ctrlKey && event.shiftKey) { // CTRL + Shift + Z
-			editor.redo();
-			return false;
-		} else if (event.which === KEYCODE.KEY_Z && event.ctrlKey) { // CTRL + z
-			editor.undo();
-			return false;
-		}
-		if (event.which === KEYCODE.KEY_D && event.ctrlKey) { // CTRL + D
-			editor.Duplicate();
-		}
-		if (event.which === KEYCODE.KEY_C && event.ctrlKey) { // CTRL + C
-			editor.Copy();
-		}
-		if (event.which === KEYCODE.KEY_V && event.ctrlKey) { // CTRL + V
-			editor.Paste();
-		}
-		if (event.which === KEYCODE.KEY_X && event.ctrlKey) { // CTRL + X
-			editor.Cut();
-		}
-		if (event.which === KEYCODE.KEY_S && event.ctrlKey) { // CTRL + S
-			signals.saveRequested.emit();
-		}
-		if (event.which === KEYCODE.DELETE) {
-			editor.DeleteSelected();
-		}
-		if (event.which === KEYCODE.F1) {
-			window.vext.SendEvent('DisableEditorMode');
-		}
-		if (event.which === KEYCODE.F5) {
-			window.location = (window as any).location;
-		}
-		if (event.which === KEYCODE.ESCAPE) {
-			editor.DeselectAll();
-		}
-		if (event.which === KEYCODE.KEY_M) {
-			if (!this.wasMKeyDown) {
-				this.wasMKeyDown = true;
-				editor.threeManager.EnableMiniBrushMode();
+		this.keys[e.which] = true;
+
+		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Down).every((hotkey: Hotkey) => {
+			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+				hotkey.callback();
+				return false;
 			}
-		}
+			return true;
+		});
 	}
 
 	public IsKeyDown(keycode: KEYCODE): boolean {
+		if (typeof keycode === 'string') {
+			return false;
+		}
 		return this.keys[keycode] === true; // Can also be undefined
 	}
 }

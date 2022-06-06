@@ -1,6 +1,6 @@
 <template>
     <div class="value">
-		<div @click="visible = !visible">
+		<div @click="visible = !visible" class="elements">
 			<template v-if="field.value.length">
 				<i :class="{'el-icon-arrow-down': visible, 'el-icon-arrow-right': !visible}"></i>
 			</template>
@@ -12,13 +12,11 @@
 			</template>
 		</div>
         <div class="table-container" v-if="visible">
-            <table class="table is-array-element">
-                <div>
-					<div v-for="value in field.value" :key="value.name">
-						<property :overrides="getOverrides(value.name)" class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
-					</div>
-                </div>
-            </table>
+            <div class="table is-array-element">
+				<div v-for="value in field.value" :key="value.name">
+					<property :overrides="getOverrides(value.name)" class="arrayEntry" :autoOpen="autoOpen" :currentPath=currentPath :partition="partition" :field="value" :instance="instance" @input="onInput($event, value)"></property>
+				</div>
+            </div>
         </div>
     </div>
 </template>
@@ -86,21 +84,15 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.elements {
+	margin-bottom: 12px;
+}
 
 .value {
-  vertical-align: text-top;
+	vertical-align: text-top;
 
-  button {
-    margin-left: 0.5em;
-  }
+	::v-deep .el-select {
+		width: 100%;
+	}
 }
-
-</style>
-
-<style lang="scss">
-
-.table.is-array-element > tbody > tr > td {
-  border: none;
-}
-
 </style>

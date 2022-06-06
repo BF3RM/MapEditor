@@ -2,7 +2,7 @@
 	<span>
 		<template v-if="reference">
 			<template v-if="instance">
-				<div class="ReferenceBox" @click="expanded = !expanded">
+				<div class="ReferenceBox" :class="expanded ? 'expanded' : ''" @click="expanded = !expanded">
 					<div class="type">{{instance.typeName}}</div>
 					<div class="path">{{cleanPath}}<span class="guid">{{guid}}</span></div>
 					<div v-if="instance.typeName === 'ReferenceObjectData'" class="path">
@@ -143,12 +143,30 @@ export default class ReferenceComponent extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-.ReferenceBox {
-	padding: 5px;
-	margin: 0;
-	border: 0;
-	background-color: rgba(0, 0, 0, 0.4) !important;
-	color: #fff;
-	border-top: 1px solid rgba(0, 0, 0, 0.4) !important;
-}
+	.ReferenceBox {
+		padding: 7px;
+		margin: 0;
+		border: 0;
+		background-color: rgba(22, 25, 36, 0.8);
+		color: #8da1b6;
+		width: 100%;
+		box-sizing: border-box;
+		border: 1px solid rgba(255, 255, 255, .15);
+		border-radius: 4px;
+
+		&.expanded {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+			border-bottom: 0;
+		}
+
+		.path,
+		.type {
+			margin-bottom: 4px;
+		}
+
+		.path:last-of-type {
+			margin: 0;
+		}
+	}
 </style>
