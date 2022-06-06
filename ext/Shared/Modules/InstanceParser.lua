@@ -67,7 +67,7 @@ function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 		local s_Instance = ResourceManager:FindInstanceByGuid(Guid(l_Data.partitionGuid), Guid(l_Data.instanceGuid))
 
 		if s_Instance == nil then
-			m_Logger:Write('Couldn\'t find DataContainer. PartitionGuid: '.. tostring(l_Data.partitionGuid)..', instanceGuid'..tostring(l_Data.instanceGuid))
+			m_Logger:Write('Couldn\'t find DataContainer. PartitionGuid: ' .. tostring(l_Data.partitionGuid) .. ', instanceGuid' .. tostring(l_Data.instanceGuid))
 			goto continue
 		end
 
@@ -83,7 +83,7 @@ function InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 					local s_Mesh = tostring(s_MemberType.mesh.instanceGuid)
 					local s_Variations = {}
 
-					for _, l_Variation in ipairs(s_Member.instanceObjectVariation ) do
+					for _, l_Variation in ipairs(s_Member.instanceObjectVariation) do
 						-- Eww
 						s_Variations[l_Variation] = l_Variation
 					end
@@ -118,7 +118,7 @@ function InstanceParser:OnPartitionLoaded(p_Partition)
 	local s_Blueprint = false
 
 	if s_PrimaryInstance == nil then
-		m_Logger:Error("Primary is nil")
+		m_Logger:Error("Primary instance is nil")
 		return
 	end
 
@@ -210,7 +210,7 @@ function InstanceParser:IsValidVariation(p_InstanceGuid, p_VariationHash)
 	local s_Blueprint = self.m_Blueprints[tostring(p_InstanceGuid)]
 
 	if not s_Blueprint then
-		m_Logger:Error('Could not find blueprint with instanceGuid: '.. tostring(p_InstanceGuid))
+		m_Logger:Error('Could not find blueprint with instanceGuid: ' .. tostring(p_InstanceGuid))
 		return false
 	end
 
@@ -226,7 +226,7 @@ function InstanceParser:GetDefaultVariation(p_InstanceGuid)
 	local s_Blueprint = self.m_Blueprints[tostring(p_InstanceGuid)]
 
 	if not s_Blueprint then
-		m_Logger:Error('Could not find blueprint with instanceGuid: '.. tostring(p_InstanceGuid))
+		m_Logger:Error('Could not find blueprint with instanceGuid: ' .. tostring(p_InstanceGuid))
 		return nil
 	end
 
