@@ -57,6 +57,9 @@ function Editor:Raycast()
 	end
 
 	local s_Transform = ClientUtils:GetCameraTransform()
+
+	if s_Transform == nil then return end
+
 	local s_Direction = self.m_PendingRaycast.direction
 
 	if self.m_PendingRaycast.type == RaycastType.Camera then

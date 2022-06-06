@@ -4,6 +4,7 @@ GameEntity = class 'GameEntity'
 local m_Logger = Logger("GameEntity", false)
 
 function GameEntity:__init(arg)
+	---@type Entity
 	self.entity = arg.entity
 	self.indexInBlueprint = arg.indexInBlueprint
 	self.instanceId = arg.instanceId

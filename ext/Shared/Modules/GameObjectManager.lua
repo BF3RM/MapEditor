@@ -233,7 +233,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 
 	---^^^^ This is parent to children / top to bottom ^^^^
+	---@type EntityBus|nil
 	local s_EntityBus = p_HookCtx:Call()
+
+	if s_EntityBus == nil then
+		return
+	end
 	---vvvv This is children to parent / bottom to top vvvv
 
 	-- Custom object have to be manually initialized.
@@ -257,6 +262,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 
 		s_GameEntity = self.m_PendingEntities[l_Entity.instanceId]
 		if s_GameEntity == nil then
+			---@type GameEntity
 			s_GameEntity = GameEntity{
 				entity = l_Entity,
 				instanceId = l_Entity.instanceId,
@@ -280,11 +286,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			}
 		end
 
-		if s_GameEntity.initiatorRef == nil and s_GameEntity.data then
+		if s_GameEntity.initiatorRef == nil and s_GameEntity.entity.data then
 			s_GameEntity.initiatorRef = CtrRef {
-				typeName = s_GameEntity.data.typeInfo.name,
-				instanceGuid = tostring(s_GameEntity.data.instanceGuid),
-				partitionGuid = InstanceParser:GetPartition(s_GameEntity.data.instanceGuid)
+				typeName = s_GameEntity.entity.data.typeInfo.name,
+				instanceGuid = tostring(s_GameEntity.entity.data.instanceGuid),
+				partitionGuid = InstanceParser:GetPartition(s_GameEntity.entity.data.instanceGuid)
 			}
 		end
 
@@ -549,6 +555,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		return
 	end
 
+	---@type GameEntity|nil
 	local s_GameEntity = self.m_PendingEntities[s_Entity.instanceId]
 
 	if s_GameEntity ~= nil then
@@ -556,6 +563,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		return
 	end
 
+	---@type GameEntity
 	s_GameEntity = GameEntity{
 		entity = s_Entity,
 		instanceId = s_Entity.instanceId,

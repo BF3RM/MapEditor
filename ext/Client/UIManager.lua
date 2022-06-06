@@ -36,7 +36,7 @@ function UIManager:OnLevelDestroy()
 end
 
 function UIManager:SetEditorMode(p_Mode)
-	m_Logger:Write('Setting editor mode to '.. p_Mode)
+	m_Logger:Write('Setting editor mode to ' .. p_Mode)
 	self.m_ActiveMode = p_Mode
 	WebUpdater:AddUpdate('EditorModeChanged', p_Mode)
 end
@@ -69,6 +69,11 @@ function UIManager:OnUpdateInput(p_Delta)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F2) then
 		if self.m_ActiveMode == EditorMode.Editor then
 			local s_NewSoldierTransform = ClientUtils:GetCameraTransform()
+
+			if s_NewSoldierTransform == nil then
+				return
+			end
+
 			s_NewSoldierTransform.trans.y = s_NewSoldierTransform.trans.y - 1.8
 			s_NewSoldierTransform.forward = Vec3(s_NewSoldierTransform.forward.x * -1, s_NewSoldierTransform.forward.y * -1, s_NewSoldierTransform.forward.z * -1)
 

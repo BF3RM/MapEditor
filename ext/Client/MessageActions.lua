@@ -127,6 +127,7 @@ function MessageActions:PreviewSpawn(p_Message, p_Arguments)
 
 	if s_GameObjectTransferData == nil then
 		m_Logger:Error("gameObjectTransferData must be set on PreviewSpawn")
+		return
 	end
 
 	local s_Result = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
@@ -158,6 +159,7 @@ function MessageActions:PreviewDestroy(p_Message, p_UpdatePass)
 
 	if s_GameObjectTransferData == nil then
 		m_Logger:Error("gameObjectTransferData must be set on PreviewDestroy")
+		return
 	end
 
 	-- Return success if it's already deleted

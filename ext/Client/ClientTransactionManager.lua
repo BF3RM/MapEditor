@@ -411,6 +411,7 @@ end
 function ClientTransactionManager:OnUpdateGameObjectRealm(s_GameObject)
 	if s_GameObject == nil then
 		m_Logger:Error("OnUpdateGameObjectRealm: GameObject is nil")
+		return
 	end
 
 	WebUpdater:AddUpdate('HandleRealmUpdate', {

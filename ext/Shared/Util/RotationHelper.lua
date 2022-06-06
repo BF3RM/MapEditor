@@ -93,7 +93,7 @@ function RotationHelper:GetYPRfromLT(p_LinearTransform)
 		return
 	end
 
-	local s_Yaw, s_Pitch, s_Roll = self:GetYPRfromRUF(
+	local s_Yaw, s_Pitch, s_Roll = self:GetYPRfromLUF(
 			p_LinearTransform.left,
 			p_LinearTransform.up,
 			p_LinearTransform.forward
