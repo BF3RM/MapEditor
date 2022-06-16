@@ -227,13 +227,14 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
 			table.insert(s_NewQueue, l_Command)
 		else
-			m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
+			-- m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
 			table.insert(s_CommandsToExecute, l_Command)
 			s_nProcessedCommands = i
 		end
 	end
 
 	self.m_Queue.commands = s_NewQueue
+	m_Logger:Write('Executing ' .. s_nProcessedCommands .. ' queued commands, ' .. #self.m_Queue.commands .. ' left in queue')
 	self.m_Queue.delay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
 
 	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)

@@ -44,7 +44,7 @@ function CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 		s_GameObjectTransferData.parentData = GameObjectParentData:GetRootParentData()
 	end
 
-	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
+	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid:upper(),
 																p_Command.sender,
 																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
 																s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
@@ -57,7 +57,7 @@ function CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 
 	if s_SpawnResult == false then
 		-- Send error to webui
-		m_Logger:Write("Failed to spawn blueprint.")
+		m_Logger:Warning("Failed to spawn blueprint " .. s_GameObjectTransferData.blueprintCtrRef.name)
 		return nil, CARResponseType.Failure
 	end
 

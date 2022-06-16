@@ -92,7 +92,7 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 		local s_Guid = self.m_Transactions[l_TransactionId]
 
 		if s_Guid ~= nil then
-			local s_GameObject = GameObjectManager.m_GameObjects[s_Guid]
+			local s_GameObject = GameObjectManager:GetGameObject(s_Guid)
 
 			if s_GameObject == nil then
 				s_UpdatedGameObjectTransferDatas[s_Guid] = nil
@@ -151,14 +151,14 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
 			table.insert(s_NewQueue, l_Command)
 		else
-			m_Logger:Write("Executing command delayed: " .. l_Command.type)
+			-- m_Logger:Write("Executing command delayed: " .. l_Command.type)
 			table.insert(s_CommandsToExecute, l_Command)
 			s_nProcessedCommands = i
 		end
 	end
 
 	self.m_Queue = s_NewQueue
-
+	m_Logger:Write('Executing ' .. s_nProcessedCommands .. ' queued commands, ' .. #self.m_Queue .. ' left in queue')
 	self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
 	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
 end

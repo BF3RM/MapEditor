@@ -128,6 +128,7 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 			-- Load User Data from Database
 			local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
 			--self:UpdateLevelFromOldSaveFile(s_SaveFile)
+			m_Logger:Write('Loading project save')
 			self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
 		end
 	end
@@ -231,7 +232,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 	local s_SaveFileCommands = {}
 
 	for _, l_GameObjectSaveData in pairs(p_ProjectSaveData) do
-		local s_Guid = l_GameObjectSaveData.guid
+		local s_Guid = l_GameObjectSaveData.guid:upper()
 
 		--if (GameObjectManager.m_GameObjects[l_Guid] == nil) then
 		--	m_Logger:Error("GameObject with Guid " .. tostring(l_Guid) .. " not found in GameObjectManager.")
