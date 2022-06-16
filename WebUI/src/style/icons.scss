@@ -137,11 +137,19 @@ html {
     height: 12px !important;
 }
 
+.selected .Icon-folder {
+    content: url(../icons/editor/new/selected-folder.svg);
+}
+
 .Icon-folder-open {
     content: url(../icons/editor/new/open-folder.svg);
     // #037fff
     width: 12px !important;
     height: 12px !important;
+}
+
+.selected .Icon-folder-open {
+    content: url(../icons/editor/new/selected-open-folder.svg);
 }
 
 .ExpandDown {

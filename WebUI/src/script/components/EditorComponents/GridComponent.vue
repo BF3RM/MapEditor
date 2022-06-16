@@ -4,18 +4,24 @@
 			<Search v-model="data.search" @search="onSearch"/>
 			<input type="range" min="5" max="10" step="1" v-model="data.scale"/>
 		</div>
-		<div class="container scrollable">
-			<div class="grid-container" v-if="data.scale > 5">
-				<div class="grid-item" v-tooltip="item.fileName" v-for="(item, index) in filteredItems()" :key="index"
+		<div class="container scrollable" ref="scroller">
+			<div
+				class="grid-container"
+				v-if="data.scale > 5"
+			>
+				<div
+					class="grid-item"
+					v-tooltip="item.fileName"
+					v-for="(item, index) in filteredItems()"
+					:key="index"
 					@click="onClick(item)"
-					@mousedown="onMouseDown($event, item)">
-					<slot name="grid" :item="item" :data="data">
-					</slot>
+					@mousedown="onMouseDown($event, item)"
+				>
+					<slot name="grid" :item="item" :data="data"></slot>
 				</div>
 			</div>
 			<div class="list-container" v-else>
 				<DynamicScroller
-					ref="scroller"
 					:items="filteredItems()"
 					class=""
 					:min-item-size="22"
@@ -93,7 +99,6 @@ export default class GridComponent extends EditorComponent {
 			grid = 4;
 			break;
 		}
-		console.log(this.data.scale, icon, grid);
 		// @ts-ignore;
 		return ' <style> .grid-container { 	grid-template-columns: repeat(' + grid + ', minmax(0, 1fr)) } .grid-item .Icon { width: ' + icon + 'px; height: ' + icon + 'px; } </style> ';
 	}
@@ -126,7 +131,7 @@ export default class GridComponent extends EditorComponent {
 			return [];
 		}
 		if (this.$refs.scroller !== undefined) {
-			(this.$refs.scroller as DynamicScroller).scrollToItem(0);
+			(this.$refs.scroller as any).scrollTop = 0;
 		}
 		return this.list.filter((i) => i.name.toLowerCase().includes(lowerCaseSearch));
 	}

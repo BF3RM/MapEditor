@@ -8,7 +8,7 @@
 				<img :src="raycastEnabledIcnSrc" v-tooltip="'Selectable'" />
 			</div>
 		</div>
-		<div class="tree-node" :style="nodeStyle(node)">
+		<div class="tree-node-inner" :style="nodeStyle(node)">
 			<div class="expand-container icon-container" @click="ToggleNode($event,node,tree)">
 				<img v-if="node.children.length > 0" :class="{ expanded: node.state.open}"
 					:src="require(`@/icons/editor/new/chevron-right.svg`)"/>
@@ -193,12 +193,20 @@ export default class ExpandableTreeSlot extends Vue {
 		display: flex;
 		font-family: sans-serif;
 		flex-direction: row;
-		/*font-size: 1.3vmin;*/
 		user-select: none;
 		align-content: center;
 		align-items: center;
 		height: 25px;
-		/*white-space: nowrap;*/
+
+		.tree-node-inner {
+			display: flex;
+			font-family: sans-serif;
+			flex-direction: row;
+			user-select: none;
+			align-content: center;
+			align-items: center;
+			height: 25px;
+		}
 
 		.text-container {
 			display: flex;
@@ -235,19 +243,23 @@ export default class ExpandableTreeSlot extends Vue {
 			text-decoration: line-through;
 		}
 
-		&:hover,
+		&:hover {
+			background-color: #292e3c;
+
+		}
+
 		&.selected {
 			background-color: #313848;
-			// color: #037fff;
 		}
+
 		&.selected {
 			&::after {
 				content: "";
 				position: absolute;
-				right: 0;
+				left: 0;
 				top: 0;
 				bottom: 0;
-				width: 2px;
+				width: 3px;
 				background: #037fff;
 			}
 		}
