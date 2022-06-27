@@ -22,10 +22,10 @@
 					{{ nodeText }}
 				</span>
 				<div class="slot-client-server-only" v-if="clientOnly">
-					client-only
+					Client-only
 				</div>
 				<div class="slot-client-server-only" v-if="serverOnly">
-					server-only
+					Server-only
 				</div>
 			</div>
 		</div>
@@ -269,14 +269,15 @@ export default class ExpandableTreeSlot extends Vue {
 		}
 
 		.slot-client-server-only {
-			background: #F4AB00;
+			// background: #F4AB00;
+			border: 1px solid gray;
 			padding: 2px 4px 1px;
 			border-radius: 3px;
 			margin: 0 0 0 7px;
-			font-size: 10px;
-			color: #000;
-			text-transform: uppercase;
-			font-weight: 900;
+			font-size: 11px;
+			// color: #000;
+			// text-transform: uppercase;
+			// font-weight: 900;
 		}
 	}
 </style>
