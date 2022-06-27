@@ -1,24 +1,23 @@
 <template>
-    <EditorComponent id="history-component" title="History">
-        <ul class="undos">
-            <li v-for="(undoEntry, index) in undos" :key="index" @click="goToState(undoEntry.id)">
-				{{FormatTime(undoEntry.timeStamp)}} - {{undoEntry.name}}
-            </li>
+	<EditorComponent id="history-component" title="History">
+		<ul class="undos">
+			<li v-for="(undoEntry, index) in undos" :key="index" @click="goToState(undoEntry.id)">
+				{{ FormatTime(undoEntry.timeStamp) }} - {{ undoEntry.name }}
+			</li>
 		</ul>
 		<ul class="redos">
 			<li v-for="(redoEntry, index) in redos" :key="index" @click="goToState(redoEntry.id)">
-				{{FormatTime(redoEntry.timeStamp)}} - {{redoEntry.name}}
+				{{ FormatTime(redoEntry.timeStamp) }} - {{ redoEntry.name }}
 			</li>
 		</ul>
-    </EditorComponent>
+	</EditorComponent>
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import Command from '@/script/libs/three/Command';
-import { Computed } from 'vuex/types/helpers';
 @Component({
 	components: {
 		EditorComponent
@@ -42,7 +41,7 @@ export default class HistoryComponent extends EditorComponent {
 		window.editor.history.goToState(id);
 	}
 
-	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
+	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
 		if (type === 'since') {
 			unixTimestamp = Date.now() - unixTimestamp;
 		}
@@ -87,12 +86,12 @@ export default class HistoryComponent extends EditorComponent {
 </script>
 
 <style lang="scss" scoped>
-	.undos {
-		:last-child {
-			background-color: #0a6aa1;
-		}
+.undos {
+	:last-child {
+		background-color: #0a6aa1;
 	}
-	.redos {
-		opacity: 0.6;
-	}
+}
+.redos {
+	opacity: 0.6;
+}
 </style>

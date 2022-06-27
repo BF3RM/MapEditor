@@ -7,7 +7,12 @@ export class CtrRef {
 	public partitionGuid: Guid;
 	public instanceGuid: Guid;
 
-	constructor(typeName: string = '', name: string = '', partitionGuid: Guid = Guid.createEmpty(), instanceGuid: Guid = Guid.createEmpty()) {
+	constructor(
+		typeName: string = '',
+		name: string = '',
+		partitionGuid: Guid = Guid.createEmpty(),
+		instanceGuid: Guid = Guid.createEmpty()
+	) {
 		this.typeName = typeName;
 		this.name = name;
 		this.partitionGuid = partitionGuid;

@@ -5,7 +5,7 @@ import { CtrRef } from '@/script/types/CtrRef';
 import InstanceManager from '@/script/modules/InstanceManager';
 
 export class SpatialGameEntity extends Object3D implements IGameEntity {
-	public static SELECTED_COLOR: Color = new Color(0xFF0000);
+	public static SELECTED_COLOR: Color = new Color(0xff0000);
 	public static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
 	public AABBScale: Vector3;
 	public AABBTransformMatrix: Matrix4;

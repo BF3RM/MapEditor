@@ -12,11 +12,7 @@ export default class InstanceManager {
 	private static instance: InstanceManager;
 	private readonly maxCount = 100000;
 	private entityIds: number[] = [];
-	private boxGeom = new BoxGeometry(
-		1,
-		1,
-		1
-	);
+	private boxGeom = new BoxGeometry(1, 1, 1);
 
 	private material = new MeshBasicMaterial({
 		color: SpatialGameEntity.HIGHLIGHTED_COLOR,
@@ -66,7 +62,10 @@ export default class InstanceManager {
 	}
 
 	private setMatrixFromSpatialEntity(entity: SpatialGameEntity, index: number) {
-		this.instancedMesh.setMatrixAt(index, entity.matrixWorld.clone().multiply(entity.AABBTransformMatrix).scale(entity.AABBScale));
+		this.instancedMesh.setMatrixAt(
+			index,
+			entity.matrixWorld.clone().multiply(entity.AABBTransformMatrix).scale(entity.AABBScale)
+		);
 		this.instancedMesh.instanceMatrix.needsUpdate = true;
 	}
 
@@ -83,12 +82,10 @@ export default class InstanceManager {
 	}
 
 	DeleteSpatialEntity(entity: SpatialGameEntity) {
-		const index = this.entityIds.findIndex((el) =>
-			el === entity.instanceId
-		);
+		const index = this.entityIds.findIndex((el) => el === entity.instanceId);
 
 		if (index === -1) {
-			console.error('Tried to delete an entity that hasn\'t been registered in InstanceManager');
+			console.error("Tried to delete an entity that hasn't been registered in InstanceManager");
 			return;
 		}
 
@@ -104,16 +101,12 @@ export default class InstanceManager {
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {
-		const n = this.entityIds.findIndex((el) =>
-			el === entity.instanceId
-		);
+		const n = this.entityIds.findIndex((el) => el === entity.instanceId);
 		this.setMatrixFromSpatialEntity(entity, n);
 	}
 
 	SetColor(entity: SpatialGameEntity, color: Color) {
-		const n = this.entityIds.findIndex((el) =>
-			el === entity.instanceId
-		);
+		const n = this.entityIds.findIndex((el) => el === entity.instanceId);
 		this.instancedMesh.setColorAt(n, color);
 		if (this.instancedMesh.instanceColor) {
 			this.instancedMesh.instanceColor.needsUpdate = true;
@@ -121,11 +114,9 @@ export default class InstanceManager {
 	}
 
 	SetVisibility(entity: SpatialGameEntity, visible: boolean) {
-		const n = this.entityIds.findIndex((el) =>
-			el === entity.instanceId
-		);
+		const n = this.entityIds.findIndex((el) => el === entity.instanceId);
 		if (n === -1) {
-			console.error('Tried to set visibility of an entity that hasn\'t been registered in InstanceManager');
+			console.error("Tried to set visibility of an entity that hasn't been registered in InstanceManager");
 			return;
 		}
 		if (visible) {

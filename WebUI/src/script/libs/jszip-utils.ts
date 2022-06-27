@@ -67,7 +67,7 @@ export class JSZipUtils {
 						try {
 							resolve(_getBinaryFromXHR(xhr));
 						} catch (err) {
-							reject(new Error(err));
+							reject(err);
 						}
 					} else {
 						reject(new Error('Ajax error'));
@@ -89,7 +89,7 @@ export class JSZipUtils {
 
 			xhr.send();
 		} catch (e) {
-			reject(new Error(e), null);
+			reject(e, null);
 		}
 
 		// returns a promise or undefined depending on whether a callback was

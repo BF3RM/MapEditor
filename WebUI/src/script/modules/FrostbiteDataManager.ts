@@ -23,16 +23,22 @@ export class FrostbiteDataManager {
 	private data: JSZip;
 
 	constructor() {
-		this.superBundles.setValue('all', new FBSuperBundle({
-			name: 'all',
-			chunkCount: 0,
-			bundleCount: 0
-		}));
-		this.bundles.setValue('all', new FBBundle({
-			name: 'all',
-			partitionCount: 0,
-			size: 0
-		}));
+		this.superBundles.setValue(
+			'all',
+			new FBSuperBundle({
+				name: 'all',
+				chunkCount: 0,
+				bundleCount: 0
+			})
+		);
+		this.bundles.setValue(
+			'all',
+			new FBBundle({
+				name: 'all',
+				partitionCount: 0,
+				size: 0
+			})
+		);
 
 		this.data = new JSZip();
 
@@ -81,11 +87,14 @@ export class FrostbiteDataManager {
 			// Add filetype check here maybe?
 			const fileName = fileNameJson.replace('.json', '');
 			// @ts-ignore
-			this.data.file(fileNameJson).async('string').then((text) => {
-				this.files.setValue(fileName.toLowerCase(), JSON.parse(text));
-				window.vext.SetLoadingInfo('Loading ' + fileName);
-				this._HandleFile(fileName.toLowerCase());
-			});
+			this.data
+				.file(fileNameJson)
+				.async('string')
+				.then((text) => {
+					this.files.setValue(fileName.toLowerCase(), JSON.parse(text));
+					window.vext.SetLoadingInfo('Loading ' + fileName);
+					this._HandleFile(fileName.toLowerCase());
+				});
 		});
 	}
 
@@ -93,22 +102,22 @@ export class FrostbiteDataManager {
 		fileName = fileName.toLowerCase();
 		const scope = this;
 		const file = this.files.getValue(fileName);
-		Object.keys(file).forEach(function(entryName) {
+		Object.keys(file).forEach(function (entryName) {
 			const entry = file[entryName];
 			switch (fileName) {
-			case 'superbundles':
-				scope.superBundles.setValue(entryName, new FBSuperBundle(entry));
-				break;
-			case 'bundles':
-				scope.bundles.setValue(entryName, new FBBundle(entry));
-				break;
-			case 'partitions':
-				// eslint-disable-next-line no-case-declarations
-				const partition = new FBPartition(entry.name, entry.guid, entry.primaryInstance, entry.instances);
-				scope.partitionGuids.setValue(partition.guid.toString().toLowerCase(), partition);
-				scope.partitions.setValue(entryName, partition);
-				break;
-			default:
+				case 'superbundles':
+					scope.superBundles.setValue(entryName, new FBSuperBundle(entry));
+					break;
+				case 'bundles':
+					scope.bundles.setValue(entryName, new FBBundle(entry));
+					break;
+				case 'partitions':
+					// eslint-disable-next-line no-case-declarations
+					const partition = new FBPartition(entry.name, entry.guid, entry.primaryInstance, entry.instances);
+					scope.partitionGuids.setValue(partition.guid.toString().toLowerCase(), partition);
+					scope.partitions.setValue(entryName, partition);
+					break;
+				default:
 				// code block
 			}
 		});

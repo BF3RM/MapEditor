@@ -1,16 +1,15 @@
 <template>
-	<div class="highlighter" v-html="highlight()">
-	</div>
+	<div class="highlighter" v-html="highlight()"></div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 @Component
 export default class Highlighter extends Vue {
-	@Prop(String) private text: string;
-	@Prop(String) private search: string;
+	@Prop(String) text: string;
+	@Prop(String) search: string;
 
-	private highlight() {
+	highlight() {
 		if (!this.search) {
 			return this.text;
 		}

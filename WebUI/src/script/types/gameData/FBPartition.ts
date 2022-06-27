@@ -19,8 +19,8 @@ export class FBPartition {
 		public name: string,
 		public guid: Guid,
 		public primaryInstanceGuid: Guid | null = null,
-		public instances: { [guid: string]: Instance } = {}) {
-	}
+		public instances: { [guid: string]: Instance } = {}
+	) {}
 
 	get primaryInstance(): Instance | null {
 		if (this.primaryInstanceGuid) {
@@ -46,26 +46,31 @@ export class FBPartition {
 	}
 
 	public get data() {
-		if (this.promise) { // In case the same thing is requested rapidly
+		if (this.promise) {
+			// In case the same thing is requested rapidly
 			return this.promise;
 		}
 		return this.getData();
 	}
 
 	public getData(): Promise<AxiosResponse<EBX.JSON.Partition>> {
-		if (this.promise) { // In case the same thing is requested rapidly
+		if (this.promise) {
+			// In case the same thing is requested rapidly
 			return this.promise;
 		}
-		this.promise = axios.get('http://176.9.7.112:8081/' + this.name + '.json').then((response: AxiosResponse<EBX.JSON.Partition>) => {
-			const data = Partition.fromJSON(this.name, response.data);
-			for (const instance of response.data.$instances) {
-				this.isLoaded = true;
-				Vue.set(this.instances, instance.$guid, Instance.fromJSON(this._data, instance));
-			}
-			return data;
-		}).catch((e: any) => {
-			console.error(e);
-		});
+		this.promise = axios
+			.get('http://176.9.7.112:8081/' + this.name + '.json')
+			.then((response: AxiosResponse<EBX.JSON.Partition>) => {
+				const data = Partition.fromJSON(this.name, response.data);
+				for (const instance of response.data.$instances) {
+					this.isLoaded = true;
+					Vue.set(this.instances, instance.$guid, Instance.fromJSON(this._data, instance));
+				}
+				return data;
+			})
+			.catch((e: any) => {
+				console.error(e);
+			});
 		return this.promise;
 	}
 

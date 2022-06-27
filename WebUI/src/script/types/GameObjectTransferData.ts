@@ -55,33 +55,33 @@ export class GameObjectTransferData {
 			let value = table[key];
 
 			switch (key) {
-			case 'guid':
-				value = Guid.parse(value.toString());
-				break;
-			case 'blueprintCtrRef':
-				value = new CtrRef().setFromTable(value);
-				break;
-			case 'originalRef':
-				value = new CtrRef().setFromTable(value);
-				break;
-			case 'transform':
-				value = LinearTransform.setFromTable(value);
-				break;
-			case 'parentData':
-				value = GameObjectParentData.FromTable(table.parentData);
-				break;
-			case 'gameEntities':
-				Object.keys(value).forEach((index) => {
-					const gameEntityDataTable = value[index];
-					gameEntities.push(GameEntityData.FromTable(gameEntityDataTable));
-				});
-				value = gameEntities;
-				break;
-			default:
-				break;
+				case 'guid':
+					value = Guid.parse(value.toString());
+					break;
+				case 'blueprintCtrRef':
+					value = new CtrRef().setFromTable(value);
+					break;
+				case 'originalRef':
+					value = new CtrRef().setFromTable(value);
+					break;
+				case 'transform':
+					value = LinearTransform.setFromTable(value);
+					break;
+				case 'parentData':
+					value = GameObjectParentData.FromTable(table.parentData);
+					break;
+				case 'gameEntities':
+					Object.keys(value).forEach((index) => {
+						const gameEntityDataTable = value[index];
+						gameEntities.push(GameEntityData.FromTable(gameEntityDataTable));
+					});
+					value = gameEntities;
+					break;
+				default:
+					break;
 			}
 
-			(args)[key] = value;
+			args[key] = value;
 		});
 
 		return new GameObjectTransferData(args);

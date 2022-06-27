@@ -1,9 +1,9 @@
 import { Color, Vector3 } from 'three';
 
 export interface IVec3 {
-	x: number,
-	y: number,
-	z: number
+	x: number;
+	y: number;
+	z: number;
 }
 
 export class Vec3 extends Vector3 {

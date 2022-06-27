@@ -1,12 +1,12 @@
 <template>
 	<div @mouseup="onMouseUp">
-		<EditorToolbar/>
+		<EditorToolbar />
 		<div id="ViewportContainer"></div>
-		<GoldenLayoutHolder/>
+		<GoldenLayoutHolder />
 		<div class="overlays">
-			<ProjectSettingsComponent/>
-			<ImportProjectComponent/>
-			<HotkeysComponent/>
+			<ProjectSettingsComponent />
+			<ImportProjectComponent />
+			<HotkeysComponent />
 		</div>
 	</div>
 </template>
@@ -29,7 +29,7 @@ import HotkeysComponent from '@/script/components/WindowComponents/HotkeysCompon
 	}
 })
 export default class EditorView extends Vue {
-	public mounted() {
+	mounted() {
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
@@ -43,12 +43,12 @@ export default class EditorView extends Vue {
 </script>
 
 <style scoped>
-	.overlays {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100vh;
-		width: 100vw;
-		pointer-events: none;
-	}
+.overlays {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 100vw;
+	pointer-events: none;
+}
 </style>

@@ -1,10 +1,10 @@
 import { Quaternion } from 'three';
 
 export interface IQuat {
-	x: number,
-	y: number,
-	z: number,
-	w: number
+	x: number;
+	y: number;
+	z: number;
+	w: number;
 }
 
 export class Quat extends Quaternion {

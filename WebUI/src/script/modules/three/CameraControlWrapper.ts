@@ -42,11 +42,19 @@ export default class CameraControlWrapper extends CameraControls {
 		const linearTransform = LinearTransform.setFromTable(transform);
 		const distance = 10;
 		const target = new Vec3(
-			linearTransform.trans.x + (linearTransform.forward.x * -1 * distance),
-			linearTransform.trans.y + (linearTransform.forward.y * -1 * distance),
-			linearTransform.trans.z + (linearTransform.forward.z * -1 * distance)
+			linearTransform.trans.x + linearTransform.forward.x * -1 * distance,
+			linearTransform.trans.y + linearTransform.forward.y * -1 * distance,
+			linearTransform.trans.z + linearTransform.forward.z * -1 * distance
 		);
 
-		this.setLookAt(linearTransform.trans.x, linearTransform.trans.y, linearTransform.trans.z, target.x, target.y, target.z, false);
+		this.setLookAt(
+			linearTransform.trans.x,
+			linearTransform.trans.y,
+			linearTransform.trans.z,
+			target.x,
+			target.y,
+			target.z,
+			false
+		);
 	}
 }

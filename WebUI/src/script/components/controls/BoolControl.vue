@@ -7,7 +7,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-@Component({ components: { } })
+@Component({ components: {} })
 export default class BoolControl extends Vue {
 	@Prop() value: string;
 
@@ -19,6 +19,6 @@ export default class BoolControl extends Vue {
 
 <style lang="scss" scoped>
 .BoolControl input {
-	width:1em;
+	width: 1em;
 }
 </style>

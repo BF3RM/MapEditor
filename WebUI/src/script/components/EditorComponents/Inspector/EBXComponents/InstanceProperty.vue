@@ -1,11 +1,20 @@
 <template>
-    <div>
-        <div class="table-container" v-if="visible">
-            <div class="table is-bordered">
-				<Property :currentPath="partition.name" v-for="(field, index) in instance.fields" :partition="partition" :instance="instance" :field="field" :overrides="getOverrides(field.name)" :key="index" @input="$emit('input', $event)"></Property>
-            </div>
-        </div>
-    </div>
+	<div>
+		<div class="table-container" v-if="visible">
+			<div class="table is-bordered">
+				<Property
+					:currentPath="partition.name"
+					v-for="(field, index) in instance.fields"
+					:partition="partition"
+					:instance="instance"
+					:field="field"
+					:overrides="getOverrides(field.name)"
+					:key="index"
+					@input="$emit('input', $event)"
+				></Property>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script lang="ts">
@@ -14,7 +23,6 @@ import Vue, { PropType } from 'vue';
 import Partition from '../../../../types/ebx/Partition';
 import Instance from '../../../../types/ebx/Instance';
 import Property from './Property.vue';
-import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export default Vue.extend({
 	name: 'InstanceProperty',
@@ -54,12 +62,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-input[type=text].input {
-  max-width: 20%;
+input[type='text'].input {
+	max-width: 20%;
 }
 
 .table-container {
-	border: 1px solid rgba(255, 255, 255, .15);
+	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-top: 0;
 	padding: 14px;
 	background-color: rgba(22, 25, 36, 0.2);

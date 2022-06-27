@@ -86,7 +86,7 @@ export default class GizmoWrapper extends TransformControls {
 		this.visible = true;
 	}
 
-	public SetPosition(x:number, y:number, z:number) {
+	public SetPosition(x: number, y: number, z: number) {
 		editor.selectionGroup.setPosition(x, y, z);
 	}
 }

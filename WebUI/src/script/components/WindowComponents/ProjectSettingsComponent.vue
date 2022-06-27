@@ -5,7 +5,7 @@
 				<div class="alert" v-if="hint">
 					{{ hint }}
 				</div>
-				<input placeholder="Project Name" v-model="newSaveName" class="input-large"/>
+				<input placeholder="Project Name" v-model="newSaveName" class="input-large" />
 			</div>
 			<div class="footer">
 				<button @click="showNewSave = false" class="btn btn-lg btn-dark">Cancel</button>
@@ -17,8 +17,12 @@
 				<div class="alert alert-success">
 					{{ hint }}
 				</div>
-				<textarea class="projectDataInput" readonly placeholder="Loading..."
-					@focus="$event.target.select()" v-model="projectData"
+				<textarea
+					class="projectDataInput"
+					readonly
+					placeholder="Loading..."
+					@focus="$event.target.select()"
+					v-model="projectData"
 				/>
 			</div>
 			<div class="footer">
@@ -31,30 +35,40 @@
 					<div class="list-wrapper">
 						<ul class="project-list">
 							<li v-if="projects.length === 0">No saved projects</li>
-							<li v-else
+							<li
+								v-else
 								v-for="(project, projectName) in projects"
 								v-bind:key="projectName"
 								@click="onSelectProject(projectName)"
-								:class="{ selected: selectedProjectName === projectName, current: currentProjectHeader.projectName === projectName }">
-								{{projectName}}
+								:class="{
+									selected: selectedProjectName === projectName,
+									current: currentProjectHeader.projectName === projectName
+								}"
+							>
+								{{ projectName }}
 							</li>
 						</ul>
 					</div>
 					<div class="list-wrapper">
 						<ul v-if="selectedProject" class="save-list">
-							<li v-for="(save, index) in selectedProject"
+							<li
+								v-for="(save, index) in selectedProject"
 								v-bind:key="save.timeStamp"
 								@click="selectSave(index)"
-								:class="{ selected: selectedSave && selectedSave.timeStamp === save.timeStamp,
-									current: save.timeStamp === currentProjectHeader.timeStamp }">
-								{{FormatTime(save.timeStamp)}}</li>
+								:class="{
+									selected: selectedSave && selectedSave.timeStamp === save.timeStamp,
+									current: save.timeStamp === currentProjectHeader.timeStamp
+								}"
+							>
+								{{ FormatTime(save.timeStamp) }}
+							</li>
 						</ul>
 					</div>
 				</div>
 				<div class="alert alert-success" v-if="selectedSave">
 					<span>Selected save info:</span>
-					Map name: {{selectedSave.mapName}}
-					<span v-if="selectedSave">Gamemode: {{selectedSave.gameModeName}}</span>
+					Map name: {{ selectedSave.mapName }}
+					<span v-if="selectedSave">Gamemode: {{ selectedSave.gameModeName }}</span>
 					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
 				</div>
 			</div>
@@ -71,23 +85,29 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import WindowComponent from './WindowComponent.vue';
-import { GetProjectsMessage, RequestSaveProjectMessage, RequestDeleteProjectMessage, RequestLoadProjectMessage, RequestProjectDataMessage } from '@/script/messages/MessagesIndex';
+import {
+	GetProjectsMessage,
+	RequestSaveProjectMessage,
+	RequestDeleteProjectMessage,
+	RequestLoadProjectMessage,
+	RequestProjectDataMessage
+} from '@/script/messages/MessagesIndex';
 import { signals } from '@/script/modules/Signals';
 import { Log } from '@/script/modules/Logger';
 import { LOGLEVEL } from '@/script/types/Enums';
 
-	@Component({ components: { WindowComponent } })
+@Component({ components: { WindowComponent } })
 export default class ProjectSettingsComponent extends Vue {
-	private title = 'Project Settings';
-	private projects = {};
-	private selectedProjectName: string = '';
-	private selectedSaveIndex: number = 0;
-	private showNewSave = false;
-	private showExportWindow = false;
-	private projectData = '';
+	title = 'Project Settings';
+	projects = {};
+	selectedProjectName: string = '';
+	selectedSaveIndex: number = 0;
+	showNewSave = false;
+	showExportWindow = false;
+	projectData = '';
 
-	private hint = '';
-	private state = {
+	hint = '';
+	state = {
 		visible: false
 	};
 
@@ -119,7 +139,7 @@ export default class ProjectSettingsComponent extends Vue {
 		(this.currentProjectHeader as any).projectName = value;
 	}
 
-	private currentProjectHeader = {
+	currentProjectHeader = {
 		projectName: '',
 		timeStamp: 0
 	};
@@ -160,6 +180,7 @@ export default class ProjectSettingsComponent extends Vue {
 			// Round numbers to 3 decimals
 			beautifiedJSONString = beautifiedJSONString.replace(/("[xyz]":\s*)(\d+\.\d+)/g, function(str, prefix, n) {
 				return prefix + Number(n).toFixed(3).toString();
+
 			});
 			this.projectData = beautifiedJSONString;
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
@@ -204,11 +225,14 @@ export default class ProjectSettingsComponent extends Vue {
 	}
 
 	CopyToClipboard() {
-		navigator.clipboard.writeText(this.projectData).then(function() {
-			console.log('Async: Copying to clipboard was successful!');
-		}, function(err) {
-			console.error('Async: Could not copy text: ', err);
-		});
+		navigator.clipboard.writeText(this.projectData).then(
+			function () {
+				console.log('Async: Copying to clipboard was successful!');
+			},
+			function (err) {
+				console.error('Async: Could not copy text: ', err);
+			}
+		);
 		this.CloseExportWindow();
 	}
 
@@ -238,7 +262,7 @@ export default class ProjectSettingsComponent extends Vue {
 		this.projects = projects;
 	}
 
-	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
+	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
 		if (type === 'since') {
 			unixTimestamp = Date.now() - unixTimestamp;
 		}
@@ -262,7 +286,7 @@ export default class ProjectSettingsComponent extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-	/*.Container{
+/*.Container{
 		display: grid;
 		min-width: 30vmin;
 		min-height: 20vmin;
@@ -298,61 +322,60 @@ export default class ProjectSettingsComponent extends Vue {
 		background-color: #404040;
 	}*/
 
-	.container {
-		display: flex;
-		flex-flow: column;
+.container {
+	display: flex;
+	flex-flow: column;
 
-		&.new-container,
-		&.export-container {
-			.alert {
-				margin-bottom: 7px;
-			}
+	&.new-container,
+	&.export-container {
+		.alert {
+			margin-bottom: 7px;
 		}
+	}
 
-		.saves-wrapper {
-			flex: 1 1 auto;
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			grid-gap: 7px;
+	.saves-wrapper {
+		flex: 1 1 auto;
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		grid-gap: 7px;
 
-			.list-wrapper {
-				max-height: 200px;
-				overflow-y: auto;
-				background: #161924;
-				padding: 7px;
-				border-radius: 6px;
-			}
-
-			.save-list,
-			.project-list {
-				li {
-					display: flex;
-					font-family: sans-serif;
-					flex-direction: row;
-					align-content: center;
-					align-items: center;
-					height: 25px;
-					background-color: transparent;
-					border-radius: 6px;
-					padding: 0 7px;
-
-					&.selected {
-						background-color: #313848;
-					}
-
-					&.current {
-						color: #037fff;
-					}
-				}
-
-			}
-		}
-
-		.save-info {
+		.list-wrapper {
+			max-height: 200px;
+			overflow-y: auto;
 			background: #161924;
 			padding: 7px;
 			border-radius: 6px;
-			margin-top: 7px;
+		}
+
+		.save-list,
+		.project-list {
+			li {
+				display: flex;
+				font-family: sans-serif;
+				flex-direction: row;
+				align-content: center;
+				align-items: center;
+				height: 25px;
+				background-color: transparent;
+				border-radius: 6px;
+				padding: 0 7px;
+
+				&.selected {
+					background-color: #313848;
+				}
+
+				&.current {
+					color: #037fff;
+				}
+			}
 		}
 	}
+
+	.save-info {
+		background: #161924;
+		padding: 7px;
+		border-radius: 6px;
+		margin-top: 7px;
+	}
+}
 </style>

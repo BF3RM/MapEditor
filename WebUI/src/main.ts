@@ -25,11 +25,11 @@ if (!navigator.userAgent.includes('VeniceUnleashed')) {
 	}
 }
 window.debug = debugMode;
-(window).editor = new Editor(debugMode);
+window.editor = new Editor(debugMode);
 window.vext = new VEXTInterface(debugMode);
 
-(window).Log = Log;
-(window).LogError = LogError;
+window.Log = Log;
+window.LogError = LogError;
 
 Vue.use(vgl);
 Vue.use(VTooltip);

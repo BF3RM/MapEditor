@@ -9,6 +9,5 @@ export class AxisAlignedBoundingBox {
 		return new AxisAlignedBoundingBox(min, max, transform);
 	}
 
-	constructor(public min: Vec3, public max: Vec3, public transform: LinearTransform) {
-	}
+	constructor(public min: Vec3, public max: Vec3, public transform: LinearTransform) {}
 }

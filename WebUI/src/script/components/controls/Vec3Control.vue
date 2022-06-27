@@ -1,47 +1,50 @@
 <template>
 	<div class="Vec3Control">
 		<div class="label">
-			<span v-if="label">{{label}}</span>
+			<span v-if="label">{{ label }}</span>
 		</div>
 		<DraggableNumberInput
-				class="x"
-				label="X"
-				type="Float"
-				dragDirection="X"
-				:hideLabel="hideLabel"
-				:value="value.x"
-				:step=step
-				:min=min
-				@input="onChangeValue('x', $event)"
-				@blur="$emit('blur')"
-				@dragstart="$emit('dragstart')"
-				@dragend="$emit('dragend')" />
+			class="x"
+			label="X"
+			type="Float"
+			dragDirection="X"
+			:hideLabel="hideLabel"
+			:value="value.x"
+			:step="step"
+			:min="min"
+			@input="onChangeValue('x', $event)"
+			@blur="$emit('blur')"
+			@dragstart="$emit('dragstart')"
+			@dragend="$emit('dragend')"
+		/>
 		<DraggableNumberInput
-				class="y"
-				label="Y"
-				type="Float"
-				dragDirection="X"
-				:hideLabel="hideLabel"
-				:value="value.y"
-				:step=step
-				:min=min
-				@input="onChangeValue('y', $event)"
-				@blur="$emit('blur')"
-				@dragstart="$emit('dragstart')"
-				@dragend="$emit('dragend')" />
+			class="y"
+			label="Y"
+			type="Float"
+			dragDirection="X"
+			:hideLabel="hideLabel"
+			:value="value.y"
+			:step="step"
+			:min="min"
+			@input="onChangeValue('y', $event)"
+			@blur="$emit('blur')"
+			@dragstart="$emit('dragstart')"
+			@dragend="$emit('dragend')"
+		/>
 		<DraggableNumberInput
-				class="z"
-				type="Float"
-				label="Z"
-				dragDirection="X"
-				:hideLabel="hideLabel"
-				:value="value.z"
-				:step=step
-				:min=min
-				@input="onChangeValue('z', $event)"
-				@blur="$emit('blur')"
-				@dragstart="$emit('dragstart')"
-				@dragend="$emit('dragend')" />
+			class="z"
+			type="Float"
+			label="Z"
+			dragDirection="X"
+			:hideLabel="hideLabel"
+			:value="value.z"
+			:step="step"
+			:min="min"
+			@input="onChangeValue('z', $event)"
+			@blur="$emit('blur')"
+			@dragstart="$emit('dragstart')"
+			@dragend="$emit('dragend')"
+		/>
 		<!--div class="actions">
 			<div class="copy-btn" @click="onCopy">
 				<img :src="require('@/icons/editor/new/copy.svg')" v-tooltip="'Copy values'" />
@@ -70,14 +73,14 @@ export default class Vec3Control extends Vue {
 		const newVal = this.value.clone();
 
 		switch (axis) {
-		case 'x':
-			newVal.x = val;
-			break;
-		case 'y':
-			newVal.y = val;
-			break;
-		case 'z':
-			newVal.z = val;
+			case 'x':
+				newVal.x = val;
+				break;
+			case 'y':
+				newVal.y = val;
+				break;
+			case 'z':
+				newVal.z = val;
 		}
 
 		this.$emit('input', newVal);

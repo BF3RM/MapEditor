@@ -5,7 +5,12 @@ import { Guid } from '@/script/types/Guid';
 import { GameObject } from '@/script/types/GameObject';
 import { LogError } from '@/script/modules/Logger';
 import { signals } from '@/script/modules/Signals';
-import { SetScreenToWorldTransformMessage, PreviewDestroyMessage, MoveObjectMessage, PreviewSpawnMessage } from '@/script/messages/MessagesIndex';
+import {
+	SetScreenToWorldTransformMessage,
+	PreviewDestroyMessage,
+	MoveObjectMessage,
+	PreviewSpawnMessage
+} from '@/script/messages/MessagesIndex';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Vec2 } from '@/script/types/primitives/Vec2';
@@ -114,7 +119,13 @@ export class EditorCore {
 		const gameObject = editor.getGameObjectByGuid(gameObjectTransferData.guid);
 
 		if (gameObject === undefined) {
-			window.LogError(callerName + ': Couldn\'t find the GameObject for GameObjectTransferData. Name: ' + gameObjectTransferData.name + ' | Guid: ' + gameObjectTransferData.guid);
+			window.LogError(
+				callerName +
+					": Couldn't find the GameObject for GameObjectTransferData. Name: " +
+					gameObjectTransferData.name +
+					' | Guid: ' +
+					gameObjectTransferData.guid
+			);
 			return;
 		}
 		return gameObject;
@@ -127,7 +138,10 @@ export class EditorCore {
 	public GetMouseToScreenPosition(e: MouseEvent) {
 		const direction = editor.threeManager.getMouse3D(e);
 		const coordinates = InputControls.getMousePos(e);
-		const s2wMessage = new SetScreenToWorldTransformMessage(new Vec3(direction.x, direction.y, direction.z), coordinates);
+		const s2wMessage = new SetScreenToWorldTransformMessage(
+			new Vec3(direction.x, direction.y, direction.z),
+			coordinates
+		);
 		window.vext.SendMessage(s2wMessage);
 	}
 
@@ -227,7 +241,11 @@ export class EditorCore {
 		if (this.previewBlueprint === null || !this.isPreviewBlueprintSpawned) {
 			return;
 		}
-		editor.SpawnBlueprint(this.previewBlueprint, this.screenToWorldTransform, this.previewBlueprint.getDefaultVariation());
+		editor.SpawnBlueprint(
+			this.previewBlueprint,
+			this.screenToWorldTransform,
+			this.previewBlueprint.getDefaultVariation()
+		);
 
 		const gameObjectTransferData = new GameObjectTransferData({ guid: editor.config.PreviewGameObjectGuid });
 		window.vext.SendMessage(new PreviewDestroyMessage(gameObjectTransferData));
@@ -248,7 +266,7 @@ export class EditorCore {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 
 		if (!gameObject) {
-			LogError('Couldn\'t find gameobject with guid ' + guid.toString());
+			LogError("Couldn't find gameobject with guid " + guid.toString());
 			return false;
 		}
 
@@ -280,7 +298,7 @@ export class EditorCore {
 		const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 
 		if (!gameObject) {
-			LogError('Couldn\'t find gameobject with guid ' + guid.toString());
+			LogError("Couldn't find gameobject with guid " + guid.toString());
 			return false;
 		}
 
@@ -304,7 +322,7 @@ export class EditorCore {
 			const gameObject = editor.gameObjects.getValue(guid) as GameObject;
 
 			if (!gameObject) {
-				LogError('Couldn\'t find gameobject with guid ' + guid.toString());
+				LogError("Couldn't find gameobject with guid " + guid.toString());
 				return false;
 			}
 
@@ -326,12 +344,12 @@ export class EditorCore {
 	public getGameObjectFromInstanceId(instanceId: number): GameObject {
 		const entityId = InstanceManager.getInstance().getEntityId(instanceId);
 		if (!entityId) {
-			console.error('Couldn\'t find entityId of instance. Index: ' + instanceId);
+			console.error("Couldn't find entityId of instance. Index: " + instanceId);
 		}
 		const spatialGE = editor.spatialGameEntities.get(entityId);
 
 		if (!spatialGE) {
-			console.error('Couldn\'t find entity with entityId: ' + entityId);
+			console.error("Couldn't find entity with entityId: " + entityId);
 		}
 
 		if (!spatialGE.parent) {

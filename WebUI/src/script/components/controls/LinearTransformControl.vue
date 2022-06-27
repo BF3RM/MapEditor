@@ -2,38 +2,41 @@
 	<div class="transformControls" v-if="value">
 		<div class="pos-control">
 			<Vec3Control
-					label="Position"
-					:hideLabel="hideLabel"
-					:value="value.position"
-					:step=0.014
-					@input="onChangePosition"
-					@blur="$emit('blur')"
-					@dragstart="$emit('dragstart')"
-					@dragend="$emit('dragend')" />
+				label="Position"
+				:hideLabel="hideLabel"
+				:value="value.position"
+				:step="0.014"
+				@input="onChangePosition"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')"
+			/>
 		</div>
 		<div class="rot-control">
 			<QuatControl
-					label="Rotation"
-					mode="Euler"
-					:hideLabel="hideLabel"
-					:value="value.rotation"
-					:step=0.14
-					@input="onChangeRotation"
-					@blur="$emit('blur')"
-					@dragstart="$emit('dragstart')"
-					@dragend="$emit('dragend')" />
+				label="Rotation"
+				mode="Euler"
+				:hideLabel="hideLabel"
+				:value="value.rotation"
+				:step="0.14"
+				@input="onChangeRotation"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')"
+			/>
 		</div>
 		<div class="scale-control">
 			<Vec3Control
-					label="Scale"
-					:hideLabel="hideLabel"
-					:value="value.scale"
-					:min=0.01
-					:step=0.014
-					@input="onChangeScale"
-					@blur="$emit('blur')"
-					@dragstart="$emit('dragstart')"
-					@dragend="$emit('dragend')" />
+				label="Scale"
+				:hideLabel="hideLabel"
+				:value="value.scale"
+				:min="0.01"
+				:step="0.014"
+				@input="onChangeScale"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')"
+			/>
 		</div>
 	</div>
 </template>
