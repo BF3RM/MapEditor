@@ -95,7 +95,7 @@ function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
 
 	if s_ProjectData then
 		-- TODO: update save structure to newest save version
-		if not s_ProjectData.saveVersion or s_ProjectData.saveVersion ~= SAVE_VERSION then
+		if not s_ProjectData.data.saveVersion or s_ProjectData.data.saveVersion ~= SAVE_VERSION then
 			m_Logger:Write('Older save version found, updating to newest save structure')
 		end
 
