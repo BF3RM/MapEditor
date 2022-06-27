@@ -3,8 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        description: 'Environment (release, preview)'
-        default: 'release'
+        type: choice
+        description: Environment (release, preview)
+        options:
+        - release
+        - preview
         required: true
       version:
         description: 'Release Version'
@@ -16,11 +19,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Node 15.x
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v2.3.4
+      - name: Setup Node 16.x
+        uses: actions/setup-node@v2
         with:
-          node-version: '15.x'
+          node-version: '16.x'
       - name: Install dependencies
         working-directory: './WebUI'
         run: yarn install
@@ -69,9 +72,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: webui-build
-      - name: Create Artifact
-        run: |
-          zip -i **/*.lua ui.vuic mod.json -r MapEditor .
+      - name: Download Lua Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: lua-build
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
