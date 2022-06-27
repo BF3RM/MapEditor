@@ -20,7 +20,7 @@
 	"settings": {
 		"Lua.workspace.maxPreload": 10000,
 		"Lua.diagnostics.libraryFiles": "Disable",
-		":ua.targetVersion": "5.2",
+		"lua.targetVersion": "5.2",
 		"editor.codeActionsOnSave": {
 			"source.fixAll.eslint": true
 		},
