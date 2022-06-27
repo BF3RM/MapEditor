@@ -118,6 +118,8 @@ function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
 	NetEvents:SendToLocal("MapEditorClient:ProjectImportFinished", p_Player, s_Msg)
 end
 
+---@param p_ProjectDataJSON string
+---@return ProjectSave|nil projectData, string errorMessage
 function ProjectManager:ParseJSONProject(p_ProjectDataJSON)
 	local s_ProjectData = json.decode(p_ProjectDataJSON)
 

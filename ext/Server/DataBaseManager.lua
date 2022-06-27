@@ -16,16 +16,25 @@ local m_DB_Data_Table_Name = "project_data"
 local m_ProjectHeader_Id_Column_Name = "project_header_id"
 local m_SaveFile_Text_Column_Name = "save_file_json"
 
-
 function DataBaseManager:__init()
 	m_Logger:Write("Initializing DataBaseManager")
 
+	---@type string
 	self.m_ExportHeaderName = "header"
+	---@type string
 	self.m_ExportDataName = "data"
 
 	self:CreateOrUpdateDatabase()
 end
 
+---@param p_ProjectName string
+---@param p_MapName string
+---@param p_GameModeName string
+---@param p_RequiredBundles table|string
+---@param p_GameObjectSaveDatas table|string
+---@param p_SaveVersion string
+---@param p_TimeStamp number|nil
+---@return boolean success, string errorMessage
 function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas, p_SaveVersion, p_TimeStamp)
 	local s_TimeStamp = p_TimeStamp or SharedUtils:GetTimeMS()
 
@@ -60,9 +69,6 @@ function DataBaseManager:CreateOrUpdateDatabase()
 	if not SQL:Open() then
 		return
 	end
-print('boi')
-print(SQL:Query('SELECT ' .. m_MapName_Text_Column_Name .. ' FROM ' .. m_DB_Header_Table_Name))
-print(SQL:Query('SELECT ' .. m_SaveVersion_Text_Column_Name .. ' FROM ' .. m_DB_Header_Table_Name))
 
 	-- Create our data table:
 	local s_CreateProjectHeaderTableQuery = [[
@@ -112,6 +118,13 @@ print(SQL:Query('SELECT ' .. m_SaveVersion_Text_Column_Name .. ' FROM ' .. m_DB_
 	m_Logger:Write("Successfully created database!")
 end
 
+---@param p_ProjectName string
+---@param p_MapName string
+---@param p_GameModeName string
+---@param p_RequiredBundlesJson string
+---@param p_SaveVersion string
+---@param p_TimeStamp number
+---@return boolean success, string errorMessage, number headerId
 function DataBaseManager:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundlesJson, p_SaveVersion, p_TimeStamp)
 	if p_ProjectName == nil or type(p_ProjectName) ~= "string" then
 		return false, "Failed to save Project - header.projectName is invalid: " .. tostring(p_ProjectName)
@@ -151,6 +164,9 @@ function DataBaseManager:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeN
 	return true, nil, SQL:LastInsertId()
 end
 
+---@param p_HeaderId number
+---@param p_GameObjectSaveDatasJson string
+---@return boolean success, string errorMessage
 function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
 	m_Logger:Write("SaveProjectData() " .. tostring(p_HeaderId))
 	--m_Logger:Write(p_GameObjectSaveDatasJson)
@@ -168,6 +184,7 @@ function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
 	return true
 end
 
+---@return ProjectHeader[]|nil projectHeaders
 function DataBaseManager:GetProjectHeaders()
 	local s_ProjectHeaderRows = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name)
 
@@ -176,9 +193,11 @@ function DataBaseManager:GetProjectHeaders()
 		return
 	end
 
+	---@type ProjectHeader[]
 	local s_ProjectHeaders = { }
 
 	for _, l_Row in pairs(s_ProjectHeaderRows) do
+		---@type ProjectHeader
 		local s_Header = {
 			projectName = l_Row[m_ProjectName_Text_Column_Name],
 			mapName = l_Row[m_MapName_Text_Column_Name],
@@ -195,6 +214,8 @@ function DataBaseManager:GetProjectHeaders()
 	return s_ProjectHeaders
 end
 
+---@param p_ProjectId number
+---@return ProjectHeader|nil projectHeader
 function DataBaseManager:GetProjectHeader(p_ProjectId)
 	p_ProjectId = tostring(math.floor(p_ProjectId))
 	m_Logger:Write("GetProjectHeader()" .. p_ProjectId)
@@ -206,6 +227,7 @@ function DataBaseManager:GetProjectHeader(p_ProjectId)
 		return
 	end
 
+	---@type ProjectHeader
 	local s_Header = {
 		projectName = s_ProjectHeaderRow[1][m_ProjectName_Text_Column_Name],
 		mapName = s_ProjectHeaderRow[1][m_MapName_Text_Column_Name],
@@ -223,7 +245,7 @@ end
 ---@return string|nil
 function DataBaseManager:GetProjectDataJSONByProjectId(p_ProjectId)
 	p_ProjectId = tostring(math.floor(p_ProjectId))
-	m_Logger:Write("GetProjectDataByProjectId()" .. p_ProjectId)
+	m_Logger:Write("GetProjectDataJSONByProjectId()" .. p_ProjectId)
 
 	local s_ProjectDataTable = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. p_ProjectId .. ' LIMIT 1')
 
@@ -243,7 +265,7 @@ function DataBaseManager:GetProjectDataJSONByProjectId(p_ProjectId)
 end
 
 ---@param p_ProjectId number
----@return table|nil
+---@return ProjectDataEntry[]|nil projectData
 function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 	local s_ProjectDataJSON = self:GetProjectDataJSONByProjectId(p_ProjectId)
 
@@ -251,6 +273,7 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 		return
 	end
 
+	---@type ProjectDataEntry[]
 	local s_ProjectData = DecodeParams(json.decode(s_ProjectDataJSON))
 
 	if not s_ProjectData then
@@ -262,9 +285,8 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 end
 
 ---@param p_ProjectId number
----@return table|nil
+---@return ProjectSave|nil
 function DataBaseManager:GetProjectByProjectId(p_ProjectId)
-	p_ProjectId = tostring(math.floor(p_ProjectId))
 	m_Logger:Write("GetProjectByProjectId()" .. p_ProjectId)
 
 	local s_ProjectData = self:GetProjectDataByProjectId(p_ProjectId)
@@ -275,12 +297,15 @@ function DataBaseManager:GetProjectByProjectId(p_ProjectId)
 		return
 	end
 
+	---@type ProjectSave
 	return {
 		[self.m_ExportHeaderName] = s_Header,
 		[self.m_ExportDataName] = s_ProjectData
 	}
 end
 
+---@param p_ProjectId number
+---@return boolean success
 function DataBaseManager:DeleteProject(p_ProjectId)
 	m_Logger:Write("DeleteProject()" .. p_ProjectId)
 
