@@ -5,6 +5,7 @@ local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
 
+local SAVE_VERSION = "0.1.0"
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -89,19 +90,61 @@ end
 function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
 	m_Logger:Write("Import requested")
 
-	local s_Success, s_Msg = DataBaseManager:ImportProject(p_ProjectDataJSON)
+	local s_ProjectData, s_Msg = self:ParseJSONProject(p_ProjectDataJSON)
+	local s_Success = s_ProjectData ~= nil
+
+	if s_ProjectData then
+		-- TODO: update save structure to newest save version
+		if not s_ProjectData.saveVersion or s_ProjectData.saveVersion ~= SAVE_VERSION then
+			m_Logger:Write('Older save version found, updating to newest save structure')
+		end
+
+		local s_Header = s_ProjectData[DataBaseManager.m_ExportHeaderName]
+		local s_Data = s_ProjectData[DataBaseManager.m_ExportDataName]
+
+		s_Success, s_Msg = DataBaseManager:SaveProject(s_Header.projectName, s_Header.mapName, s_Header.gameModeName, s_Header.requiredBundles, s_Data, s_Header.saveVersion, s_Header.timeStamp)
+	end
 
 	if s_Success then
 		m_Logger:Write('Correctly imported save file')
 		-- Update clients with new save.
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
 	else
-		m_Logger:Write('Error importing save file: '..s_Msg)
+		m_Logger:Write('Error importing save file: ' .. s_Msg)
 	end
 
 	s_Msg = s_Msg or 'Successfully imported save file.'
 
 	NetEvents:SendToLocal("MapEditorClient:ProjectImportFinished", p_Player, s_Msg)
+end
+
+function ProjectManager:ParseJSONProject(p_ProjectDataJSON)
+	local s_ProjectData = json.decode(p_ProjectDataJSON)
+
+	if s_ProjectData == nil then
+		return nil, 'Incorrect save format'
+	end
+
+	local s_Header = s_ProjectData[DataBaseManager.m_ExportHeaderName]
+	local s_Data = s_ProjectData[DataBaseManager.m_ExportDataName]
+
+	if s_Header == nil then
+		return nil, 'Save file is missing header '
+	end
+
+	if s_Data == nil then
+		return nil, 'Save file is missing data'
+	end
+
+	if s_Header.projectName == nil or
+		s_Header.mapName == nil or
+		s_Header.gameModeName == nil or
+		-- s_Header.saveVersion == nil or -- not required, old saves didn't have it
+		s_Header.requiredBundles == nil then
+		return nil, 'Save header missing necessary field(s)'
+	end
+
+	return { [DataBaseManager.m_ExportHeaderName] = s_Header, [DataBaseManager.m_ExportDataName] = s_Data}
 end
 
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
@@ -217,7 +260,7 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 		gameModeName = self.m_GameMode,
 		requiredBundles = self.m_LoadedBundles
 	}
-	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
+	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas, SAVE_VERSION)
 
 	if s_Success then
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
