@@ -6,7 +6,12 @@ export class GameObjectParentData {
 	public primaryInstanceGuid: Guid;
 	public partitionGuid: Guid;
 
-	constructor(guid: Guid = Guid.createEmpty(), typeName: string = '', primaryInstanceGuid: Guid = Guid.createEmpty(), partitionGuid: Guid = Guid.createEmpty()) {
+	constructor(
+		guid: Guid = Guid.createEmpty(),
+		typeName: string = '',
+		primaryInstanceGuid: Guid = Guid.createEmpty(),
+		partitionGuid: Guid = Guid.createEmpty()
+	) {
 		this.guid = guid;
 		this.typeName = typeName;
 		this.primaryInstanceGuid = primaryInstanceGuid;
@@ -14,12 +19,7 @@ export class GameObjectParentData {
 	}
 
 	public static GetRootParentData() {
-		return new GameObjectParentData(
-			Guid.createEmpty(),
-			'custom_root',
-			Guid.createEmpty(),
-			Guid.createEmpty()
-		);
+		return new GameObjectParentData(Guid.createEmpty(), 'custom_root', Guid.createEmpty(), Guid.createEmpty());
 	}
 
 	public static FromTable(table: any) {

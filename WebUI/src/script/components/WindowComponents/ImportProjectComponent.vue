@@ -4,11 +4,9 @@
 			<div class="alert" v-if="displayMessage">
 				{{ displayMessage }}
 			</div>
-			<div class="alert alert-success" v-else>
-				Paste the save JSON into the text area.
-			</div>
+			<div class="alert alert-success" v-else>Paste the save JSON into the text area.</div>
 			<div class="textarea-wrapper">
-				<textarea v-model="projectDataJSON"/>
+				<textarea v-model="projectDataJSON" />
 			</div>
 		</div>
 		<div class="footer">
@@ -72,7 +70,7 @@ export default class ImportProjectComponent extends Vue {
 <style lang="scss" scoped>
 .container {
 	display: flex;
-    flex-flow: column;
+	flex-flow: column;
 
 	.textarea-wrapper {
 		flex: 1 1 auto;

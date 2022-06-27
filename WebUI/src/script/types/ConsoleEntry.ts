@@ -1,6 +1,4 @@
-import * as Util from 'util';
 import { LOGLEVEL } from '@/script/types/Enums';
-
 export interface IConsoleEntry {
 	level: LOGLEVEL;
 	id: number;
@@ -28,7 +26,7 @@ export class ConsoleEntry implements IConsoleEntry {
 		} else if (entry.message === null) {
 			this.message = 'null';
 		} else if (typeof entry.message === 'object') {
-			this.message = Util.inspect(entry.message);
+			this.message = JSON.stringify(entry.message);
 		} else {
 			this.message = entry.message;
 		}

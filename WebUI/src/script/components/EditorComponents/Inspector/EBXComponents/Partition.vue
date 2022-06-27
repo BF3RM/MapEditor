@@ -1,10 +1,8 @@
 <template>
-    <div>
-        <div v-if="partition">
-            <h2 class="title">
-                Partition {{ partition.guid }}
-            </h2>
-<!--
+	<div>
+		<div v-if="partition">
+			<h2 class="title">Partition {{ partition.guid }}</h2>
+			<!--
             <div v-show="graphVisible">
                 <h3 class="subtitle">
                     Graph
@@ -14,21 +12,20 @@
                 </div>
             </div>
 !-->
-            <h3 class="subtitle">
-                Instances
-            </h3>
+			<h3 class="subtitle">Instances</h3>
 
-            <ul class="content">
-                <li v-for="instance in partition.instances" :key="instance.guid">
-                    <InstanceProperty :key="instance.guid"
-                              :partition="partition" :instance="instance"></InstanceProperty>
-                </li>
-            </ul>
-        </div>
-        <div v-else>
-            Loading... {{path}}
-        </div>
-    </div>
+			<ul class="content">
+				<li v-for="instance in partition.instances" :key="instance.guid">
+					<InstanceProperty
+						:key="instance.guid"
+						:partition="partition"
+						:instance="instance"
+					></InstanceProperty>
+				</li>
+			</ul>
+		</div>
+		<div v-else>Loading... {{ path }}</div>
+	</div>
 </template>
 
 <script lang="ts">
@@ -40,16 +37,12 @@ import InstanceProperty from './InstanceProperty.vue';
 
 export default Vue.extend({
 	name: 'Partition',
-	props: [
-		'game',
-		'path',
-		'guid'
-	],
+	props: ['game', 'path', 'guid'],
 	data(): {
-        partition: Partition | undefined;
-        types: { [type: string]: any };
-        graphVisible: boolean;
-        } {
+		partition: Partition | undefined;
+		types: { [type: string]: any };
+		graphVisible: boolean;
+	} {
 		return {
 			partition: undefined,
 			types: {},
@@ -83,7 +76,7 @@ export default Vue.extend({
 		copyToClipboard(text: string) {
 			navigator.clipboard.writeText(text);
 		},
-		graphNodesChanged(nodes: Array<any>): void {
+		graphNodesChanged(): void {
 			this.graphVisible = false; // nodes.length > 0;
 		}
 	},
@@ -95,10 +88,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-
 .graph {
-  width: 100%;
-  min-height: 85vh;
+	width: 100%;
+	min-height: 85vh;
 }
-
 </style>

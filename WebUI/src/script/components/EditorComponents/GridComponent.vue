@@ -1,14 +1,11 @@
 <template>
 	<EditorComponent class="grid-component" :title="title">
 		<div class="header">
-			<Search v-model="data.search" @search="onSearch"/>
-			<input type="range" min="5" max="10" step="1" v-model="data.scale"/>
+			<Search v-model="data.search" @search="onSearch" />
+			<input type="range" min="5" max="10" step="1" v-model="data.scale" />
 		</div>
 		<div class="container scrollable" ref="scroller">
-			<div
-				class="grid-container"
-				v-if="data.scale > 5"
-			>
+			<div class="grid-container" v-if="data.scale > 5">
 				<div
 					class="grid-item"
 					v-tooltip="item.fileName"
@@ -21,12 +18,7 @@
 				</div>
 			</div>
 			<div class="list-container" v-else>
-				<DynamicScroller
-					:items="filteredItems()"
-					class=""
-					:min-item-size="22"
-					:key-field="keyField"
-				>
+				<DynamicScroller :items="filteredItems()" class="" :min-item-size="22" :key-field="keyField">
 					<DynamicScrollerItem
 						class="tr"
 						slot-scope="{ item, active }"
@@ -38,19 +30,17 @@
 						@mousedown.native="onMouseDown($event, item)"
 						:key-field="keyField"
 					>
-						<slot name="list" :item="item" :data="data">
-						</slot>
+						<slot name="list" :item="item" :data="data"> </slot>
 					</DynamicScrollerItem>
 				</DynamicScroller>
 			</div>
 		</div>
-		<div v-html="style">
-		</div>
+		<div v-html="style"></div>
 	</EditorComponent>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
@@ -58,17 +48,19 @@ import Search from '@/script/components/widgets/Search.vue';
 import { Blueprint } from '@/script/types/Blueprint';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 
-@Component({ components: { Highlighter, RecycleScroller, DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
+@Component({
+	components: { Highlighter, RecycleScroller, DynamicScroller, DynamicScrollerItem, Search, EditorComponent }
+})
 export default class GridComponent extends EditorComponent {
-	@Prop(Array) list: {name: string}[];
+	@Prop(Array) list: { name: string }[];
 	@Prop(String) keyField: string;
 	@Prop(Array) headers: string[];
 	@Prop(Function) click: void;
 	@Prop(Boolean) rightAlign: boolean;
 
 	data: {
-		search: string,
-		scale: number
+		search: string;
+		scale: number;
 	} = {
 		search: '',
 		scale: 6
@@ -78,35 +70,41 @@ export default class GridComponent extends EditorComponent {
 		let icon = 40;
 		let grid = 12;
 		switch (this.data.scale.toString()) {
-		case '6':
-			icon = 40;
-			grid = 12;
-			break;
-		case '7':
-			icon = 60;
-			grid = 10;
-			break;
-		case '8':
-			icon = 80;
-			grid = 8;
-			break;
-		case '9':
-			icon = 100;
-			grid = 6;
-			break;
-		case '10':
-			icon = 120;
-			grid = 4;
-			break;
+			case '6':
+				icon = 40;
+				grid = 12;
+				break;
+			case '7':
+				icon = 60;
+				grid = 10;
+				break;
+			case '8':
+				icon = 80;
+				grid = 8;
+				break;
+			case '9':
+				icon = 100;
+				grid = 6;
+				break;
+			case '10':
+				icon = 120;
+				grid = 4;
+				break;
 		}
 		// @ts-ignore;
-		return ' <style> .grid-container { 	grid-template-columns: repeat(' + grid + ', minmax(0, 1fr)) } .grid-item .Icon { width: ' + icon + 'px; height: ' + icon + 'px; } </style> ';
+		return (
+			' <style> .grid-container { 	grid-template-columns: repeat(' +
+			grid +
+			', minmax(0, 1fr)) } .grid-item .Icon { width: ' +
+			icon +
+			'px; height: ' +
+			icon +
+			'px; } </style> '
+		);
 	}
 
 	get iconStyle() {
-		return {
-
-		};
+		return {};
 	}
 
 	onMouseDown(e: any, item: Blueprint) {
@@ -143,7 +141,7 @@ export default class GridComponent extends EditorComponent {
 
 	.header {
 		font-weight: bold;
-		display:flex;
+		display: flex;
 		padding: 0.2vmin;
 		border-bottom: solid 1px #4a4a4a;
 	}

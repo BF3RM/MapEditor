@@ -1,5 +1,5 @@
 export interface IWindowState {
-	visible: boolean,
+	visible: boolean;
 }
 
 export default IWindowState;

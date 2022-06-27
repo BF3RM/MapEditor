@@ -24,8 +24,7 @@ export class EditorUI {
 		signals.windowResized.connect(this.onResize.bind(this));
 	}
 
-	public Initialize() {
-	}
+	public Initialize() {}
 
 	public RegisterWindow(windowId: string, windowTitle: string, windowModule: any, visible: boolean) {
 		// this.windows[windowId.toLowerCase()] = new PowWindow(windowId, windowTitle, windowModule, visible);
@@ -240,7 +239,6 @@ export class EditorUI {
 		this.inspector.UpdateInspector(gameObject);
 		this.inspector.ShowContent()
 		 */
-
 	}
 
 	public onDeselectEntity(gameObject: GameObject) {

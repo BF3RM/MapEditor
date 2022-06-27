@@ -1,13 +1,14 @@
 <template>
-	<RecycleScroller :class="className"
-					class="scrollable"
-					:items="filteredNodes"
-					ref="scroller"
-					:min-item-size="16"
-					:item-size="rowHeight"
-					:buffer="50"
+	<RecycleScroller
+		:class="className"
+		class="scrollable"
+		:items="filteredNodes"
+		ref="scroller"
+		:min-item-size="16"
+		:item-size="rowHeight"
+		:buffer="50"
 	>
-		<div slot-scope="{ item,index }">
+		<div slot-scope="{ item, index }">
 			<slot
 				class="text-slot"
 				v-bind="{
@@ -60,8 +61,13 @@ export default class InfiniteTreeComponent extends Vue {
 	@Prop({ default: true })
 	loadNodes: boolean;
 
-	@Prop({ type: Function, default(node: Node) { return true; } })
-	getNodeById: (node: Node) => boolean;
+	@Prop({
+		type: Function,
+		default() {
+			return true;
+		}
+	})
+	getNodeById: () => boolean;
 
 	@Prop({
 		type: Function,
@@ -69,7 +75,7 @@ export default class InfiniteTreeComponent extends Vue {
 			return (this as any).scrollTo(node);
 		}
 	})
-	public scrollToNode: (node: Node) => void;
+	public scrollToNode: () => void;
 
 	@Prop({
 		type: Function,
@@ -77,17 +83,19 @@ export default class InfiniteTreeComponent extends Vue {
 			console.log('ShouldLoadNodes');
 			return !(node.children.length > 0) && node.loadOnDemand;
 		}
-	}) shouldLoadNodes: boolean;
+	})
+	shouldLoadNodes: boolean;
 
 	@Prop({
 		type: Function,
 		default(node: Node) {
-			if (!node || (node === (this as any).tree.getSelectedNode())) {
+			if (!node || node === (this as any).tree.getSelectedNode()) {
 				return false; // Prevent from deselecting the current node
 			}
 			return true;
 		}
-	}) shouldSelectNode: boolean;
+	})
+	shouldSelectNode: boolean;
 
 	// @Prop({ type: Function }) onContentWillUpdate: void;
 	// @Prop({ type: Function }) onContentDidUpdate: void;
@@ -112,9 +120,9 @@ export default class InfiniteTreeComponent extends Vue {
 	onSearchChange(newValue: string) {
 		console.log('Search: ' + newValue);
 		if (newValue === '') {
-			(this.tree).unfilter();
+			this.tree.unfilter();
 		}
-		(this.tree).filter(newValue);
+		this.tree.filter(newValue);
 
 		// When the search changes, it makes sense to view the results from the top
 		if (this.$refs.scroller !== undefined) {
@@ -130,10 +138,11 @@ export default class InfiniteTreeComponent extends Vue {
 				...(this as any).$props
 			});
 		}
-	}) tree: InfiniteTree;
+	})
+	tree: InfiniteTree;
 
 	public scrollTo(node: Node) {
-		const nodeIndex = (this.filteredNodes).findIndex((i) => {
+		const nodeIndex = this.filteredNodes.findIndex((i) => {
 			return i.id === node.id;
 		});
 		this.openParentNodes(node);
@@ -178,7 +187,6 @@ export default class InfiniteTreeComponent extends Vue {
 	}
 
 	private get filteredNodes() {
-		const search = this.search;
 		console.log('Filtering nodes');
 		const tree = this.tree;
 		if (tree === undefined) {
@@ -207,7 +215,7 @@ export default class InfiniteTreeComponent extends Vue {
 		// Updates the tree.
 		this.tree.update = () => {
 			this.tree.emit('contentWillUpdate');
-			this.$nextTick(function() {
+			this.$nextTick(function () {
 				this.tree.emit('contentDidUpdate');
 			});
 		};
@@ -236,9 +244,9 @@ export default class InfiniteTreeComponent extends Vue {
 }
 </script>
 <style scoped>
-	.scroll-box {
-		width: 100%;
-		height: 100%;
-		overflow: auto;
-	}
+.scroll-box {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
 </style>

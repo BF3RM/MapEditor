@@ -1,5 +1,12 @@
 <template>
-	<input class="search" type="search" placeholder="Search..." :value="value" @change="$emit('search', $event.target.value)" @input="$emit('input', $event.target.value)"/>
+	<input
+		class="search"
+		type="search"
+		placeholder="Search..."
+		:value="value"
+		@change="$emit('search', $event.target.value)"
+		@input="$emit('input', $event.target.value)"
+	/>
 </template>
 
 <script lang="ts">
@@ -11,5 +18,4 @@ export default class Search extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -1,7 +1,18 @@
 <template>
 	<div class="NumberControl">
-		<DraggableNumberInput @blur="$emit('blur')" :hideLabel="true" dragDirection="X" :value="value" label="X"
-		:step=step :min=min @input="$emit('input', $event);" @startDrag="onStartDrag" @endDrag="onEndDrag" :type="type"/>
+		<DraggableNumberInput
+			@blur="$emit('blur')"
+			:hideLabel="true"
+			dragDirection="X"
+			:value="value"
+			label="X"
+			:step="step"
+			:min="min"
+			@input="$emit('input', $event)"
+			@startDrag="onStartDrag"
+			@endDrag="onEndDrag"
+			:type="type"
+		/>
 	</div>
 </template>
 
@@ -28,5 +39,4 @@ export default class NumberControl extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

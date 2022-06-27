@@ -2,7 +2,7 @@ import Field from './Field';
 import Partition from './Partition';
 import { Guid } from '@/script/types/Guid';
 
-type Fields = { [name: string]: Field<any> }
+type Fields = { [name: string]: Field<any> };
 
 export default class Instance {
 	public readonly fields: Fields;
@@ -24,11 +24,6 @@ export default class Instance {
 			fields[field.name] = field;
 		}
 
-		return new Instance(
-			new Guid(json.$guid),
-			json.$type,
-			json.$baseClass,
-			fields
-		);
+		return new Instance(new Guid(json.$guid), json.$type, json.$baseClass, fields);
 	}
 }

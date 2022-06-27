@@ -17,7 +17,7 @@ export default class VEXTInterface {
 	public executing: boolean;
 	public doneExecuting: boolean = true;
 	public queued: {
-		commands: VextCommand[],
+		commands: VextCommand[];
 		messages: object[];
 	};
 
@@ -216,7 +216,7 @@ export default class VEXTInterface {
 		if (messageRaw === null) {
 			return;
 		}
-		if (typeof (messageRaw) === 'object') {
+		if (typeof messageRaw === 'object') {
 			message = messageRaw;
 			emulator = true;
 		} else {
@@ -283,18 +283,18 @@ export default class VEXTInterface {
 	public EditorModeChanged(mode: EDITOR_MODE) {
 		let view = VIEW.LOADING;
 		switch (mode) {
-		case EDITOR_MODE.LOADING:
-			view = VIEW.LOADING;
-			break;
-		case EDITOR_MODE.EDITOR:
-			view = VIEW.EDITOR;
-			break;
-		case EDITOR_MODE.PLAYING:
-			view = VIEW.PLAYING;
-			break;
-		case EDITOR_MODE.FREECAM:
-			view = VIEW.FREECAM;
-			break;
+			case EDITOR_MODE.LOADING:
+				view = VIEW.LOADING;
+				break;
+			case EDITOR_MODE.EDITOR:
+				view = VIEW.EDITOR;
+				break;
+			case EDITOR_MODE.PLAYING:
+				view = VIEW.PLAYING;
+				break;
+			case EDITOR_MODE.FREECAM:
+				view = VIEW.FREECAM;
+				break;
 		}
 
 		signals.setActiveView.emit(view);

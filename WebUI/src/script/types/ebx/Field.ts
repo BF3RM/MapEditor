@@ -3,8 +3,8 @@ import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
 const customDeserializers: { [type: string]: (value: any) => any } = {
-	'LinearTransform': LinearTransform.fromJSON,
-	'Vec3': Vec3.fromJSON
+	LinearTransform: LinearTransform.fromJSON,
+	Vec3: Vec3.fromJSON
 };
 
 function normalizeFieldName(name: string): string {
@@ -22,16 +22,20 @@ function normalizeFieldName(name: string): string {
 function parseValue(json: EBX.JSON.Field<any>): any {
 	if (Array.isArray(json.$value)) {
 		if (json.$ref) {
-			return json.$value.map((value: EBX.JSON.Reference, i: number) => Field.fromJSON(`${i + 1}`, {
-				$type: json.$type,
-				$ref: true,
-				$value: value
-			}));
+			return json.$value.map((value: EBX.JSON.Reference, i: number) =>
+				Field.fromJSON(`${i + 1}`, {
+					$type: json.$type,
+					$ref: true,
+					$value: value
+				})
+			);
 		} else {
-			return json.$value.map((value: EBX.JSON.Field<any>, i: number) => Field.fromJSON(`${i + 1}`, {
-				$type: json.$type,
-				$value: value
-			}));
+			return json.$value.map((value: EBX.JSON.Field<any>, i: number) =>
+				Field.fromJSON(`${i + 1}`, {
+					$type: json.$type,
+					$value: value
+				})
+			);
 		}
 	} else if (customDeserializers[json.$type]) {
 		return customDeserializers[json.$type](json.$value);
@@ -46,7 +50,9 @@ function parseValue(json: EBX.JSON.Field<any>): any {
 	if (typeof json.$value === 'object') {
 		const fields: { [field: string]: Field<any> } = {};
 		// eslint-disable-next-line no-return-assign
-		Object.keys(json.$value).map(name => Field.fromJSON(name, { ...json.$value[name] })).forEach(field => fields[field.name] = field);
+		Object.keys(json.$value)
+			.map((name) => Field.fromJSON(name, { ...json.$value[name] }))
+			.forEach((field) => (fields[field.name] = field));
 		return fields;
 	} else {
 		return json.$value;
@@ -79,12 +85,7 @@ export default class Field<Type> {
 	}
 
 	static fromJSON<Type>(name: string, json: EBX.JSON.Field<Type>): Field<Type> {
-		return new Field(
-			normalizeFieldName(name),
-			json.$type,
-			parseValue(json),
-			json.$enumValue
-		);
+		return new Field(normalizeFieldName(name), json.$type, parseValue(json), json.$enumValue);
 	}
 
 	setValue(newValue: any) {

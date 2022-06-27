@@ -9,7 +9,7 @@ export class Vec2 extends Vector2 {
 		return new Vec2(this.x, this.y);
 	}
 
-	public setFromTable(object: {x: number, y: number}) {
+	public setFromTable(object: { x: number; y: number }) {
 		this.x = Number(object.x);
 		this.y = Number(object.y);
 		return this;

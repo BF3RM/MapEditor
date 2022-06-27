@@ -11,7 +11,15 @@ export class GameEntityData {
 	public aabb: AxisAlignedBoundingBox;
 	public initiatorRef: CtrRef;
 
-	constructor(instanceId: number, indexInBlueprint: number, typeName: string, isSpatial: boolean, transform: LinearTransform, aabb: AxisAlignedBoundingBox, initiatorRef: CtrRef) {
+	constructor(
+		instanceId: number,
+		indexInBlueprint: number,
+		typeName: string,
+		isSpatial: boolean,
+		transform: LinearTransform,
+		aabb: AxisAlignedBoundingBox,
+		initiatorRef: CtrRef
+	) {
 		this.instanceId = instanceId;
 		this.indexInBlueprint = indexInBlueprint;
 		this.typeName = typeName;
@@ -34,12 +42,14 @@ export class GameEntityData {
 		if (initiatorRef) {
 			initiatorRef = new CtrRef().setFromTable(gameEntityDataTable.initiatorRef);
 		}
-		return new GameEntityData(gameEntityDataTable.instanceId,
+		return new GameEntityData(
+			gameEntityDataTable.instanceId,
 			gameEntityDataTable.indexInBlueprint,
 			gameEntityDataTable.typeName,
 			gameEntityDataTable.isSpatial,
 			transform,
 			AABB,
-			initiatorRef);
+			initiatorRef
+		);
 	}
 }

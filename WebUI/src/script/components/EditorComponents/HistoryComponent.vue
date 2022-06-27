@@ -1,16 +1,16 @@
 <template>
-    <EditorComponent id="history-component" title="History">
-        <ul class="undos">
-            <li v-for="(undoEntry, index) in undos" :key="index" @click="goToState(undoEntry.id)">
-				{{FormatTime(undoEntry.timeStamp)}} - {{undoEntry.name}}
-            </li>
+	<EditorComponent id="history-component" title="History">
+		<ul class="undos">
+			<li v-for="(undoEntry, index) in undos" :key="index" @click="goToState(undoEntry.id)">
+				{{ FormatTime(undoEntry.timeStamp) }} - {{ undoEntry.name }}
+			</li>
 		</ul>
 		<ul class="redos">
 			<li v-for="(redoEntry, index) in redos" :key="index" @click="goToState(redoEntry.id)">
-				{{FormatTime(redoEntry.timeStamp)}} - {{redoEntry.name}}
+				{{ FormatTime(redoEntry.timeStamp) }} - {{ redoEntry.name }}
 			</li>
 		</ul>
-    </EditorComponent>
+	</EditorComponent>
 </template>
 
 <script lang="ts">
@@ -86,12 +86,12 @@ export default class HistoryComponent extends EditorComponent {
 </script>
 
 <style lang="scss" scoped>
-	.undos {
-		:last-child {
-			background-color: #0a6aa1;
-		}
+.undos {
+	:last-child {
+		background-color: #0a6aa1;
 	}
-	.redos {
-		opacity: 0.6;
-	}
+}
+.redos {
+	opacity: 0.6;
+}
 </style>

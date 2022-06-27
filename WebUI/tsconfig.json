@@ -1,12 +1,13 @@
 {
-  "compileOnSave": true,
-  "buildOnSave": true,
   "compilerOptions": {
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "module": "ESNext",
-    "target": "ESNext",
-    "lib": ["dom", "esnext"],
+    "target": "es2019",
+    "lib": ["esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"],
     "allowJs": true,
     "outDir": "./dist",
     "strict": true,

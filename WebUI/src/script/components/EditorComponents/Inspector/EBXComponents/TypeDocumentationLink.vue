@@ -1,10 +1,11 @@
 <template>
-    <span>
-        <template v-if="vuDocLink">
-            <a :href="vuDocLink" rel="noopener" target="_blank">{{ vuType }}</a>
-        </template>
-        <template v-else>{{ vuType }}</template><template v-if="field.isArray()">[]</template>
-    </span>
+	<span>
+		<template v-if="vuDocLink">
+			<a :href="vuDocLink" rel="noopener" target="_blank">{{ vuType }}</a>
+		</template>
+		<template v-else>{{ vuType }}</template
+		><template v-if="field.isArray()">[]</template>
+	</span>
 </template>
 
 <script lang="ts">

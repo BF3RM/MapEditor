@@ -2,41 +2,72 @@
 	<div id="toolbar">
 		<info-top-bar>
 			<div id="toolbarLeft">
-				<el-menu mode="horizontal" menu-trigger="hover" :unique-opened="true" size="mini" v-for="(item, index) in menuBar.children" :key="index" class="el-menu" @select="onSelectMenu">
-<!--					<recursive-menubar v-if="item.children.length > 1" :value="item" :index="index"/>-->
+				<el-menu
+					mode="horizontal"
+					menu-trigger="hover"
+					:unique-opened="true"
+					size="mini"
+					v-for="(item, index) in menuBar.children"
+					:key="index"
+					class="el-menu"
+					@select="onSelectMenu"
+				>
+					<!--					<recursive-menubar v-if="item.children.length > 1" :value="item" :index="index"/>-->
 					<el-submenu v-if="item.children" :index="item.label" :show-timeout="10" :hide-timeout="100">
-						<template slot="title">{{item.label}}</template>
+						<template slot="title">{{ item.label }}</template>
 						<template v-if="item.children.length > 0">
-							<el-menu-item v-for="(subItem, subIndex) in item.children" :key="index + '-' + subIndex" :index="index + '-' + subIndex" :class="subItem.type">
-								<recursive-menubar v-if="subItem.children && subItem.children.length > 0" :value="subItem"/>
+							<el-menu-item
+								v-for="(subItem, subIndex) in item.children"
+								:key="index + '-' + subIndex"
+								:index="index + '-' + subIndex"
+								:class="subItem.type"
+							>
+								<recursive-menubar
+									v-if="subItem.children && subItem.children.length > 0"
+									:value="subItem"
+								/>
 								<span v-else>
-									{{subItem.label}}
+									{{ subItem.label }}
 								</span>
 							</el-menu-item>
 						</template>
 					</el-submenu>
 					<el-menu-item v-else :class="item.type" :index="index">
-						{{item.label}}
+						{{ item.label }}
 					</el-menu-item>
 				</el-menu>
 				<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
-					<el-radio-button v-for="item in tools" :key="item" :label="item" :id="item" v-tooltip="getTooltipText(item)" />
+					<el-radio-button
+						v-for="item in tools"
+						:key="item"
+						:label="item"
+						:id="item"
+						v-tooltip="getTooltipText(item)"
+					/>
 				</el-radio-group>
 				<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChange">
-					<el-radio-button v-for="item in worldSpaces" :key="item" :label="item" :id="item" v-tooltip="getTooltipText(item)" />
+					<el-radio-button
+						v-for="item in worldSpaces"
+						:key="item"
+						:label="item"
+						:id="item"
+						v-tooltip="getTooltipText(item)"
+					/>
 				</el-radio-group>
 			</div>
 			<div id="toolbarCenter">
-				<key-tip
-					keys="F1"
-					description="Return to the game view"
-					:needsCtrl="false"
-					:needsShift="false"
-				/>
+				<key-tip keys="F1" description="Return to the game view" :needsCtrl="false" :needsShift="false" />
 			</div>
 			<div id="toolbarRight">
-				<el-select name="WorldView" id="worldView" :default-first-option=true v-model="worldView" size="mini" @change="onViewModeChange">
-					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value"/>
+				<el-select
+					name="WorldView"
+					id="worldView"
+					:default-first-option="true"
+					v-model="worldView"
+					size="mini"
+					@change="onViewModeChange"
+				>
+					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value" />
 				</el-select>
 			</div>
 		</info-top-bar>
@@ -44,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import { signals } from '@/script/modules/Signals';
 import IMenuEntry from '@/script/interfaces/IMenuEntry';
 import RecursiveMenubar from '@/script/components/widgets/RecursiveMenubar.vue';
@@ -56,8 +87,8 @@ import KeyTip from '@/script/components/KeyTip.vue';
 @Component({ components: { InfoTopBar, RecursiveMenubar, KeyTip } })
 export default class EditorToolbar extends Vue {
 	worldView = 0;
-	tool = (window).editor.threeManager.gizmoMode;
-	worldSpace = (window).editor.threeManager.worldSpace;
+	tool = window.editor.threeManager.gizmoMode;
+	worldSpace = window.editor.threeManager.worldSpace;
 	worldSpaces = ['world', 'local'];
 	tools = ['select', 'translate', 'rotate', 'scale'];
 
@@ -200,20 +231,20 @@ export default class EditorToolbar extends Vue {
 
 	getTooltipText(text: string) {
 		switch (text) {
-		case 'select':
-			return 'Select';
-		case 'translate':
-			return 'Move';
-		case 'rotate':
-			return 'Rotate';
-		case 'scale':
-			return 'Scale';
-		case 'world':
-			return 'World space';
-		case 'local':
-			return 'Local space';
-		default:
-			return '';
+			case 'select':
+				return 'Select';
+			case 'translate':
+				return 'Move';
+			case 'rotate':
+				return 'Rotate';
+			case 'scale':
+				return 'Scale';
+			case 'world':
+				return 'World space';
+			case 'local':
+				return 'Local space';
+			default:
+				return '';
 		}
 	}
 
@@ -230,13 +261,13 @@ export default class EditorToolbar extends Vue {
 				break;
 			}
 			if (lastEntry.entries!.get(currentEntry) === undefined) {
-				lastEntry.entries!.set(currentEntry, ({
+				lastEntry.entries!.set(currentEntry, {
 					type: 'entry',
 					label: currentEntry,
 					entries: new Map<string, IMenuEntry>(),
 					children: [],
 					callback: entryCallback
-				} as IMenuEntry));
+				} as IMenuEntry);
 				if (i === 0) {
 					this.menuBar.children.push(lastEntry.entries!.get(currentEntry) as IMenuEntry);
 				} else {
@@ -262,7 +293,7 @@ export default class EditorToolbar extends Vue {
 
 	onWorldSpaceChange(mode: string) {
 		if (this.worldSpaces.indexOf(mode) !== -1) {
-			(window).editor.threeManager.setWorldSpace(mode.toLowerCase() as WORLD_SPACE);
+			window.editor.threeManager.setWorldSpace(mode.toLowerCase() as WORLD_SPACE);
 		} else {
 			console.error('Attempted to select a world space that does not exist: ' + mode);
 		}
@@ -270,7 +301,7 @@ export default class EditorToolbar extends Vue {
 
 	onToolChange(newTool: string) {
 		if (this.tools.indexOf(newTool) !== -1) {
-			(window).editor.threeManager.setGizmoMode(newTool.toLowerCase() as GIZMO_MODE);
+			window.editor.threeManager.setGizmoMode(newTool.toLowerCase() as GIZMO_MODE);
 		} else {
 			console.error('Attempted to select a tool that does not exist: ' + newTool);
 		}
@@ -278,42 +309,42 @@ export default class EditorToolbar extends Vue {
 }
 </script>
 <style lang="scss">
-#tools input+span,
-#worldSpace input+span {
-    font-size: 0 !important;
-    height: 28px;
-    width: 45px;
-    padding: 0;
-    -webkit-mask-size: 19px !important;
+#tools input + span,
+#worldSpace input + span {
+	font-size: 0 !important;
+	height: 28px;
+	width: 45px;
+	padding: 0;
+	-webkit-mask-size: 19px !important;
 }
 
-.el-radio-button__orig-radio:checked+.el-radio-button__inner {
+.el-radio-button__orig-radio:checked + .el-radio-button__inner {
 	background-color: #037fff !important;
-    border-color: #037fff !important;
-    box-shadow: -1px 0 0 0 #037fff;
+	border-color: #037fff !important;
+	box-shadow: -1px 0 0 0 #037fff;
 }
 
-#tools input[value="select"]+span {
+#tools input[value='select'] + span {
 	-webkit-mask: url(../../../icons/editor/cursor-default-outline.svg) no-repeat center;
 }
 
-#tools input[value="translate"]+span {
+#tools input[value='translate'] + span {
 	-webkit-mask: url(../../../icons/editor/cursor-move.svg) no-repeat center;
 }
 
-#tools input[value="rotate"]+span {
+#tools input[value='rotate'] + span {
 	-webkit-mask: url(../../../icons/editor/rotate-3d.svg) no-repeat center;
 }
 
-#tools input[value="scale"]+span {
+#tools input[value='scale'] + span {
 	-webkit-mask: url(../../../icons/editor/arrow-expand.svg) no-repeat center;
 }
 
-#worldSpace input[value="local"]+span {
+#worldSpace input[value='local'] + span {
 	-webkit-mask: url(../../../icons/editor/cube-outline.svg) no-repeat center;
 }
 
-#worldSpace input[value="world"]+span {
+#worldSpace input[value='world'] + span {
 	-webkit-mask: url(../../../icons/editor/earth.svg) no-repeat center;
 }
 
@@ -326,8 +357,8 @@ export default class EditorToolbar extends Vue {
 	height: 28px !important;
 	line-height: 28px !important;
 	background-color: #1f2633 !important;
-    color: #fff !important;
-	border-radius: 6px !important
+	color: #fff !important;
+	border-radius: 6px !important;
 }
 
 .el-menu.el-menu--horizontal {
@@ -377,10 +408,10 @@ div#tools:first-of-type {
 }
 
 #toolbarCenter {
-    display: flex;
-    margin: 0 14px;
-    flex: 1 1 auto;
-    justify-content: flex-start;
+	display: flex;
+	margin: 0 14px;
+	flex: 1 1 auto;
+	justify-content: flex-start;
 }
 
 .key-tip {

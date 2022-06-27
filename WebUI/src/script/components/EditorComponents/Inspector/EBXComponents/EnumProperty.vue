@@ -1,11 +1,13 @@
 <template>
-    <div class="value">
+	<div class="value">
 		<el-select v-model="enumValue" @focus="getEnums" @input="onInput($event)">
 			<template v-if="options">
 				<Promised :promise="options">
 					<template v-slot="data">
 						<span>
-							<el-option v-for="(option, index) in data.values" :key="option.value" :value="option.value"><span class="enum">{{ cleanType(index) }}</span></el-option>
+							<el-option v-for="(option, index) in data.values" :key="option.value" :value="option.value"
+								><span class="enum">{{ cleanType(index) }}</span></el-option
+							>
 						</span>
 					</template>
 					<template v-slot:rejected="error">
@@ -17,7 +19,7 @@
 				<el-option :value="-1">Loading...</el-option>
 			</template>
 		</el-select>
-    </div>
+	</div>
 </template>
 
 <script lang="ts">
@@ -28,13 +30,13 @@ import Field from '../../../../types/ebx/Field';
 
 import Instance from '@/script/types/ebx/Instance';
 import { Promised } from 'vue-promised';
-const YAML = require('yaml');
-const axios = require('axios').default;
+import YAML from 'yaml';
+import axios from 'axios';
 
 export default Vue.extend({
 	name: 'EnumProperty',
 	components: {
-		'Promised': Promised
+		Promised: Promised
 	},
 	props: {
 		partition: {
@@ -63,13 +65,20 @@ export default Vue.extend({
 		getEnums() {
 			console.log('Grabbing enums');
 			// eslint-disable-next-line vue/no-async-in-computed-properties
-			this.$data.options = axios.get('https://raw.githubusercontent.com/EmulatorNexus/VU-Docs/master/types/fb/' + this.field.type + '.yaml').then((res: any) => {
-				console.log(YAML.parse(res.data));
-				console.log(this.$data.options);
-				return YAML.parse(res.data);
-			}).catch((e: any) => {
-				console.log(e);
-			});
+			this.$data.options = axios
+				.get(
+					'https://raw.githubusercontent.com/EmulatorNexus/VU-Docs/master/types/fb/' +
+						this.field.type +
+						'.yaml'
+				)
+				.then((res: any) => {
+					console.log(YAML.parse(res.data));
+					console.log(this.$data.options);
+					return YAML.parse(res.data);
+				})
+				.catch((e: any) => {
+					console.log(e);
+				});
 		}
 	},
 	computed: {

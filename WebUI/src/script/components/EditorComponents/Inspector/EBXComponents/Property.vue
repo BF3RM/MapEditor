@@ -1,16 +1,27 @@
 <template>
-    <div v-if="field.name !== 'name'" class="row">
-        <div class="is-family-code is-narrow field-name" :class="{'numbered': !isNaN(Number(field.name))}">
+	<div v-if="field.name !== 'name'" class="row">
+		<div class="is-family-code is-narrow field-name" :class="{ numbered: !isNaN(Number(field.name)) }">
 			{{ titleName }}
-        </div>
-        <div class="field-value">
-            <div class="field-spacer">
-				<component :type="field.type" :class="field.type" :autoOpen="autoOpen"
-					:currentPath="currentPath" :is="propertyComponent" :partition="partition" :field="field"
-					:value="getValue()" @input="onChangeValue(field.name, $event)" :instance="instance" :reference="field.value" :overrides="getOverrides()"></component>
+		</div>
+		<div class="field-value">
+			<div class="field-spacer">
+				<component
+					:type="field.type"
+					:class="field.type"
+					:autoOpen="autoOpen"
+					:currentPath="currentPath"
+					:is="propertyComponent"
+					:partition="partition"
+					:field="field"
+					:value="getValue()"
+					@input="onChangeValue(field.name, $event)"
+					:instance="instance"
+					:reference="field.value"
+					:overrides="getOverrides()"
+				></component>
 			</div>
-        </div>
-    </div>
+		</div>
+	</div>
 </template>
 
 <script lang="ts">
@@ -62,12 +73,7 @@ export default Vue.extend({
 	methods: {
 		onChangeValue(field: string, newValue: any) {
 			const out: IEBXFieldData = {
-				reference: new CtrRef(
-					undefined,
-					undefined,
-					this.partition.guid,
-					this.instance.guid
-				),
+				reference: new CtrRef(undefined, undefined, this.partition.guid, this.instance.guid),
 				field: field,
 				type: this.field.type,
 				value: newValue,
@@ -97,26 +103,27 @@ export default Vue.extend({
 
 			const type: any = async () => {
 				switch (this.field.type) {
-				case 'Vec3':
-					return Vec3Control;
-				case 'LinearTransform':
-					return LinearTransformControl;
-				case 'String':
-					return StringControl;
-				case 'Single':
-				case 'Int32':
-				case 'UInt32':
-				case 'Int16':
-				case 'UInt16':
-				case 'SByte':
-					return NumberControl;
-				case 'Boolean':
-					return BoolControl;
-				default:
-					console.log('Unknown property type: ' + this.field.type);
-					break;
+					case 'Vec3':
+						return Vec3Control;
+					case 'LinearTransform':
+						return LinearTransformControl;
+					case 'String':
+						return StringControl;
+					case 'Single':
+					case 'Int32':
+					case 'UInt32':
+					case 'Int16':
+					case 'UInt16':
+					case 'SByte':
+						return NumberControl;
+					case 'Boolean':
+						return BoolControl;
+					default:
+						console.log('Unknown property type: ' + this.field.type);
+						break;
 				}
-				if (this.field.isEnum()) { // structs
+				if (this.field.isEnum()) {
+					// structs
 					return import('./EnumProperty.vue');
 				}
 				return import('./ObjectProperty.vue');
@@ -130,7 +137,10 @@ export default Vue.extend({
 			if (!isNaN(Number(this.field.name))) {
 				return '[' + this.field.name + ']';
 			}
-			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(/([a-z0-9])([A-Z])/g, '$1 $2'); // Make first character uppercase and make it Title Case
+			return (this.field.name[0].toUpperCase() + this.field.name.substring(1)).replace(
+				/([a-z0-9])([A-Z])/g,
+				'$1 $2'
+			); // Make first character uppercase and make it Title Case
 		}
 	},
 	components: {
@@ -141,20 +151,20 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss" scoped>
-	.field-name.numbered {
-		display: none;
-	}
+.field-name.numbered {
+	display: none;
+}
 
-	.field-name {
-		text-transform: capitalize;
-		margin-bottom: 6px;
-	}
+.field-name {
+	text-transform: capitalize;
+	margin-bottom: 6px;
+}
 
-	.field-value {
-		margin-bottom: 14px;
-	}
+.field-value {
+	margin-bottom: 14px;
+}
 
-	/*
+/*
 	.field-name.numbered {
 		min-width: 0;
 	}

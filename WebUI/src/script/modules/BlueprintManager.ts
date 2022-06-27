@@ -34,7 +34,7 @@ export class BlueprintManager {
 		signals.blueprintsRegistered.emit(this.GetBlueprintsSorted());
 	}
 
-	private GetBlueprintsSorted():Blueprint[] {
+	private GetBlueprintsSorted(): Blueprint[] {
 		return this.blueprints.values().sort((a, b) => {
 			if (a.name < b.name) {
 				return -1;

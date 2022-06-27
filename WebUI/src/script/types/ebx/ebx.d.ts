@@ -51,6 +51,5 @@ declare namespace EBX {
 			forward: Field<Vec3>;
 			trans: Field<Vec3>;
 		}
-
 	}
 }

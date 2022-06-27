@@ -159,7 +159,7 @@ export default class Editor {
 			target = this.getGameObjectByGuid(guid);
 		} else {
 			target = this.selectionGroup;
-			if ((target).selectedGameObjects.length === 0) {
+			if (target.selectedGameObjects.length === 0) {
 				return;
 			} // Nothing specified, nothing selected. skip.
 		}
@@ -172,13 +172,19 @@ export default class Editor {
 
 	public MiniBrushRandomizedDuplicate() {
 		const spawnTransform = this.editorCore.screenToWorldTransform.clone();
-		const scaleRandomness = (Math.random() / 2) - 0.25; // +- 0.25
-		spawnTransform.scale = new Vec3(spawnTransform.scale.x + scaleRandomness, spawnTransform.scale.y + scaleRandomness, spawnTransform.scale.z + scaleRandomness);
+		const scaleRandomness = Math.random() / 2 - 0.25; // +- 0.25
+		spawnTransform.scale = new Vec3(
+			spawnTransform.scale.x + scaleRandomness,
+			spawnTransform.scale.y + scaleRandomness,
+			spawnTransform.scale.z + scaleRandomness
+		);
 
-		const bankRandomness = (Math.random() * 10) - 5; // +- 5
-		const rotationRandomness = (Math.random() * 360) - 180; // +- 180
+		const bankRandomness = Math.random() * 10 - 5; // +- 5
+		const rotationRandomness = Math.random() * 360 - 180; // +- 180
 
-		const rotationQuat = new Quat().setFromEuler(new Euler(bankRandomness * DEG2RAD, rotationRandomness * DEG2RAD, bankRandomness * DEG2RAD));
+		const rotationQuat = new Quat().setFromEuler(
+			new Euler(bankRandomness * DEG2RAD, rotationRandomness * DEG2RAD, bankRandomness * DEG2RAD)
+		);
 
 		spawnTransform.rotation = new Quat(rotationQuat.x, rotationQuat.y, rotationQuat.z, rotationQuat.w);
 
@@ -209,7 +215,12 @@ export default class Editor {
 		this.DeleteSelected();
 	}
 
-	public SpawnBlueprint(blueprint: Blueprint, transform?: LinearTransform, variation?: number, parentData?: GameObjectParentData) {
+	public SpawnBlueprint(
+		blueprint: Blueprint,
+		transform?: LinearTransform,
+		variation?: number,
+		parentData?: GameObjectParentData
+	) {
 		if (blueprint == null) {
 			window.LogError('Tried to spawn a nonexistent blueprint');
 			return false;
@@ -251,7 +262,7 @@ export default class Editor {
 		if (go) {
 			go.setRealm(realm);
 		} else {
-			console.error('Tried updating realm of a gameobject that doesn\'t exist. Guid: ' + guidString);
+			console.error("Tried updating realm of a gameobject that doesn't exist. Guid: " + guidString);
 		}
 	}
 
@@ -270,16 +281,20 @@ export default class Editor {
 	}
 
 	public Enable(guid: Guid) {
-		const command = new EnableGameObjectCommand(new GameObjectTransferData({
-			guid: guid
-		}));
+		const command = new EnableGameObjectCommand(
+			new GameObjectTransferData({
+				guid: guid
+			})
+		);
 		this.execute(command);
 	}
 
 	public Disable(guid: Guid) {
-		const command = new DisableGameObjectCommand(new GameObjectTransferData({
-			guid: guid
-		}));
+		const command = new DisableGameObjectCommand(
+			new GameObjectTransferData({
+				guid: guid
+			})
+		);
 		this.execute(command);
 	}
 
@@ -331,18 +346,24 @@ export default class Editor {
 
 	public onSetObjectName(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetObjectName');
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(
+			gameObjectTransferData,
+			'onSetObjectName'
+		);
 		if (gameObject !== undefined) {
-			(gameObject).setName(gameObjectTransferData.name);
+			gameObject.setName(gameObjectTransferData.name);
 		}
 	}
 
 	public onSetTransform(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetTransform');
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(
+			gameObjectTransferData,
+			'onSetTransform'
+		);
 
 		if (gameObject !== undefined) {
-			(gameObject).setTransform(gameObjectTransferData.transform);
+			gameObject.setTransform(gameObjectTransferData.transform);
 
 			if (gameObject.parent) {
 				gameObject.parent.updateMatrixWorld();
@@ -358,9 +379,12 @@ export default class Editor {
 
 	public onSetVariation(commandActionResult: CommandActionResult) {
 		const gameObjectTransferData = commandActionResult.gameObjectTransferData as GameObjectTransferData;
-		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(gameObjectTransferData, 'onSetVariation');
+		const gameObject = this.editorCore.getGameObjectFromGameObjectTransferData(
+			gameObjectTransferData,
+			'onSetVariation'
+		);
 		if (gameObject) {
-			(gameObject).setVariation(gameObjectTransferData.variation);
+			gameObject.setVariation(gameObjectTransferData.variation);
 		}
 	}
 
@@ -416,7 +440,12 @@ export default class Editor {
 			const gameObjectGuid = gameObjectTransferData.guid;
 
 			if (this.gameObjects.getValue(gameObjectGuid)) {
-				console.error('Tried to create a GameObject that already exists. Guid: ' + gameObjectGuid.toString() + ', name: ' + gameObjectTransferData.name);
+				console.error(
+					'Tried to create a GameObject that already exists. Guid: ' +
+						gameObjectGuid.toString() +
+						', name: ' +
+						gameObjectTransferData.name
+				);
 				return;
 			}
 
@@ -427,7 +456,11 @@ export default class Editor {
 				const entityData = gameEntityData;
 
 				if (entityData.isSpatial) {
-					const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.initiatorRef, entityData.aabb);
+					const gameEntity = new SpatialGameEntity(
+						entityData.instanceId,
+						entityData.initiatorRef,
+						entityData.aabb
+					);
 					gameObject.add(gameEntity);
 					gameObject.updateMatrixWorld(); // update matrix and their children's
 					this.spatialGameEntities.set(entityData.instanceId, gameEntity);
@@ -447,7 +480,8 @@ export default class Editor {
 						this.missingParent.setValue(parentGuid, []);
 						parent = this.missingParent.getValue(parentGuid);
 					}
-					if (parent !== undefined) { // hack to suppress compiler warnings.
+					if (parent !== undefined) {
+						// hack to suppress compiler warnings.
 						parent.push(gameObject);
 					}
 				} else {
@@ -479,14 +513,19 @@ export default class Editor {
 	}
 
 	public onBlueprintSpawnInvoked(commandActionResult: CommandActionResult) {
-		console.log('Successfully invoke spawning of blueprint: ' + commandActionResult.gameObjectTransferData.name + ' | ' + commandActionResult.gameObjectTransferData.guid);
+		console.log(
+			'Successfully invoke spawning of blueprint: ' +
+				commandActionResult.gameObjectTransferData.name +
+				' | ' +
+				commandActionResult.gameObjectTransferData.guid
+		);
 	}
 
 	public onEnabledBlueprint(commandActionResult: CommandActionResult) {
 		const gameObject = this.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
 
 		if (gameObject == null) {
-			window.LogError('Attempted to enable a GameObject that doesn\'t exist');
+			window.LogError("Attempted to enable a GameObject that doesn't exist");
 			return;
 		}
 
@@ -498,7 +537,7 @@ export default class Editor {
 		const gameObject = this.getGameObjectByGuid(commandActionResult.gameObjectTransferData.guid);
 
 		if (gameObject == null) {
-			window.LogError('Attempted to disable a GameObject that doesn\'t exist');
+			window.LogError("Attempted to disable a GameObject that doesn't exist");
 			return;
 		}
 

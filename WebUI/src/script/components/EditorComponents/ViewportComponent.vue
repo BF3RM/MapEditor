@@ -1,6 +1,6 @@
 <template>
 	<EditorComponent id="viewport-component" title="Viewport">
-		<div id="stats" ref="stats"/>
+		<div id="stats" ref="stats" />
 	</EditorComponent>
 </template>
 
@@ -23,5 +23,4 @@ export default class ViewportComponent extends EditorComponent {
 	}
 }
 </script>
-<style>
-</style>
+<style></style>
