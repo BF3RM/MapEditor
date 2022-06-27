@@ -36,9 +36,9 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 		s_GameObjectSaveDatasJson = json.encode(p_GameObjectSaveDatas)
 	end
 
-	-- Round numbers to 3 decimals
-	s_GameObjectSaveDatasJson = string.gsub(s_GameObjectSaveDatasJson, "(%d+%.%d+)", function(n)
-		return string.format("%.3f", tonumber(n))
+	-- Round transform numbers to 3 decimals
+	s_GameObjectSaveDatasJson = string.gsub(s_GameObjectSaveDatasJson, '(%"[xyz]%":%s*)(%d+%.%d+)', function(prefix, n)
+		return prefix .. string.format("%.3f", tonumber(n))
 	end)
 
 	if type(p_RequiredBundles) ~= 'string' then
