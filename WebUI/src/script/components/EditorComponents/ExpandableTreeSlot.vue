@@ -109,7 +109,7 @@ export default class ExpandableTreeSlot extends Vue {
 		return this.raycastEnabled ? require('@/icons/editor/new/select.svg') : require('@/icons/editor/new/select-crossed.svg');
 	}
 
-	private nodeStyle(node: Node) {
+	nodeStyle(node: Node) {
 		if (!node.state) {
 			console.error('Missing node state: ' + node);
 		}
@@ -148,12 +148,12 @@ export default class ExpandableTreeSlot extends Vue {
 	}
 
 	@Emit('node:hover')
-	private NodeHover(e: MouseEvent, node: Node, tree: InfiniteTree) {
+	NodeHover(e: MouseEvent, node: Node, tree: InfiniteTree) {
 		return node.id;
 	}
 
 	@Emit('node:hover-end')
-	private NodeHoverEnd() {
+	NodeHoverEnd() {
 		//
 	}
 

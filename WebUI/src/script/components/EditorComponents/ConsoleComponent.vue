@@ -22,7 +22,7 @@
 		>
 			<DynamicScrollerItem
 					class="consoleEntry"
-					slot-scope="{ item, index, active }"
+					slot-scope="{ item, active }"
 					:item="item"
 					:active="active"
 
@@ -68,7 +68,7 @@ import { LOGLEVEL } from '@/script/types/Enums';
 @Component({ components: { DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ConsoleComponent extends EditorComponent {
 	// WTF? What's a better way to do this?
-	private logLevelDict = [
+	logLevelDict = [
 		'NONE',
 		'ERROR',
 		'PROD',
@@ -78,7 +78,7 @@ export default class ConsoleComponent extends EditorComponent {
 		'VERBOSE'
 	];
 
-	private originals: {
+	originals: {
 		warn: (message?: any, ...optionalParams: any[]) => void;
 		log: (message?: any, ...optionalParams: any[]) => void;
 		clear: () => void;
@@ -92,7 +92,7 @@ export default class ConsoleComponent extends EditorComponent {
 		info: console.info
 	};
 
-	private data: {
+	data: {
 		logs: ConsoleEntry[];
 		filterLevel: LOGLEVEL;
 		shouldScrollToBottom: boolean;
@@ -104,7 +104,7 @@ export default class ConsoleComponent extends EditorComponent {
 		search: ''
 	};
 
-	public mounted() {
+	mounted() {
 		signals.onLog.connect(this.onLog.bind(this));
 		window.onLog = this.onLog.bind(this);
 		/*
@@ -117,19 +117,19 @@ export default class ConsoleComponent extends EditorComponent {
 		 */
 	}
 
-	private onClick(item: ConsoleEntry) {
+	onClick(item: ConsoleEntry) {
 		this.data.logs[item.id].expanded = !item.expanded;
 		Object.assign(item, this.data.logs[item.id]);
 	}
 
-	private Inspect(obj: any) {
+	Inspect(obj: any) {
 		if (obj == null) {
 			return 'null';
 		}
 		return inspect(obj);
 	}
 
-	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
+	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
 		if (type === 'since') {
 			unixTimestamp = Date.now() - unixTimestamp;
 		}
@@ -141,27 +141,27 @@ export default class ConsoleComponent extends EditorComponent {
 		return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 	}
 
-	private FormatStacktrace(item: ConsoleEntry) {
+	FormatStacktrace(item: ConsoleEntry) {
 		if (!item.stackTrace) {
 			return 'no stack?';
 		}
 		return item.stackTrace.replace(/webpack-internal:\/\/\//g, '');
 	}
 
-	private onUpdateFilter(a: any) {
+	onUpdateFilter(a: any) {
 		this.data.filterLevel = a.target.value;
 	}
 
-	private onSearch(a: any) {
+	onSearch(a: any) {
 		this.data.search = a.target.value;
 	}
 
-	private filteredItems() {
+	filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
 		return this.data.logs.filter((i) => i.message.toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
 	}
 
-	private consoleLog(message: any, ...optionalParams: any[]) {
+	consoleLog(message: any, ...optionalParams: any[]) {
 		this.originals.log(message, optionalParams);
 		this.data.logs.push(new ConsoleEntry({
 			message,
@@ -172,7 +172,7 @@ export default class ConsoleComponent extends EditorComponent {
 		this.ScrollToBottom();
 	}
 
-	private consoleError(message: any, ...optionalParams: any[]) {
+	consoleError(message: any, ...optionalParams: any[]) {
 		this.originals.error(message, optionalParams);
 		this.data.logs.push(new ConsoleEntry({
 			message,
@@ -183,7 +183,7 @@ export default class ConsoleComponent extends EditorComponent {
 		this.ScrollToBottom();
 	}
 
-	private consoleInfo(message: any, ...optionalParams: any[]) {
+	consoleInfo(message: any, ...optionalParams: any[]) {
 		this.originals.info(message, optionalParams);
 		this.data.logs.push(new ConsoleEntry({
 			message,
@@ -193,7 +193,7 @@ export default class ConsoleComponent extends EditorComponent {
 		this.ScrollToBottom();
 	}
 
-	private consoleWarn(message: any, ...optionalParams: any[]) {
+	consoleWarn(message: any, ...optionalParams: any[]) {
 		this.originals.warn(message, optionalParams);
 		this.data.logs.push(new ConsoleEntry({
 			message,
@@ -213,12 +213,12 @@ export default class ConsoleComponent extends EditorComponent {
 		this.ScrollToBottom();
 	}
 
-	private consoleClear() {
+	consoleClear() {
 		this.originals.clear();
 		this.data.logs = [];
 	}
 
-	private onShouldScrollToBottom(e: any = 'wtf') {
+	onShouldScrollToBottom(e: any = 'wtf') {
 		this.data.shouldScrollToBottom = e.target.checked;
 	}
 

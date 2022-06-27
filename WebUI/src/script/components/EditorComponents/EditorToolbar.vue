@@ -55,21 +55,21 @@ import KeyTip from '@/script/components/KeyTip.vue';
 
 @Component({ components: { InfoTopBar, RecursiveMenubar, KeyTip } })
 export default class EditorToolbar extends Vue {
-	private worldView = 0;
-	private tool = (window).editor.threeManager.gizmoMode;
-	private worldSpace = (window).editor.threeManager.worldSpace;
-	private worldSpaces = ['world', 'local'];
-	private tools = ['select', 'translate', 'rotate', 'scale'];
+	worldView = 0;
+	tool = (window).editor.threeManager.gizmoMode;
+	worldSpace = (window).editor.threeManager.worldSpace;
+	worldSpaces = ['world', 'local'];
+	tools = ['select', 'translate', 'rotate', 'scale'];
 
-	private windows = [];
-	private menuBar: IMenuEntry = {
+	windows = [];
+	menuBar: IMenuEntry = {
 		type: 'menu',
 		entries: new Map<string, IMenuEntry>(),
 		children: [],
 		callback: undefined
 	};
 
-	private worldViews = [
+	worldViews = [
 		{
 			value: 0,
 			label: 'Default'
@@ -172,13 +172,13 @@ export default class EditorToolbar extends Vue {
 		}
 	];
 
-	private mounted() {
+	mounted() {
 		signals.gizmoModeChanged.connect(this.onGizmoModeUpdated.bind(this));
 		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
 		signals.menuRegistered.connect(this.onMenuRegistered.bind(this));
 	}
 
-	private onSelectMenu(key: string, keyPath: string[]) {
+	onSelectMenu(key: string, keyPath: string[]) {
 		if (keyPath[1] === undefined) {
 			return;
 		}
@@ -260,7 +260,7 @@ export default class EditorToolbar extends Vue {
 		this.tool = mode;
 	}
 
-	private onWorldSpaceChange(mode: string) {
+	onWorldSpaceChange(mode: string) {
 		if (this.worldSpaces.indexOf(mode) !== -1) {
 			(window).editor.threeManager.setWorldSpace(mode.toLowerCase() as WORLD_SPACE);
 		} else {
@@ -268,7 +268,7 @@ export default class EditorToolbar extends Vue {
 		}
 	}
 
-	private onToolChange(newTool: string) {
+	onToolChange(newTool: string) {
 		if (this.tools.indexOf(newTool) !== -1) {
 			(window).editor.threeManager.setGizmoMode(newTool.toLowerCase() as GIZMO_MODE);
 		} else {

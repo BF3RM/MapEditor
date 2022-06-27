@@ -17,8 +17,8 @@ import LoadingView from '@/script/components/Views/LoadingView.vue';
 	components: { LoadingView, PlayingView, EditorView }
 })
 export default class ActiveView extends Vue {
-	private activeViewName: VIEW = VIEW.EDITOR;
-	private viewEnum = VIEW;
+	activeViewName: VIEW = VIEW.EDITOR;
+	viewEnum = VIEW;
 
 	mounted() {
 		signals.setActiveView.connect(this.onSetActiveView.bind(this));

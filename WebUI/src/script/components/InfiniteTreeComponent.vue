@@ -187,7 +187,7 @@ export default class InfiniteTreeComponent extends Vue {
 		return tree.nodes.filter((node) => !(node.state.filtered === false));
 	}
 
-	private nodes: Node[] = [];
+	nodes: Node[] = [];
 	private eventHandlers = {
 		// onContentWillUpdate: null,
 		// onContentDidUpdate: null,

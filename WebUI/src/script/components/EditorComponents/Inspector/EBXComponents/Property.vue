@@ -27,7 +27,7 @@ import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import Instance from '@/script/types/ebx/Instance';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 import { CtrRef } from '@/script/types/CtrRef';
-import { isPrintable } from '@/script/modules/Utils';
+
 export default Vue.extend({
 	name: 'Property',
 	props: {

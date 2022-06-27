@@ -29,7 +29,7 @@
 				>
 					<DynamicScrollerItem
 						class="tr"
-						slot-scope="{ item, index, active }"
+						slot-scope="{ item, active }"
 						:item="item"
 						:active="active"
 						:size-dependencies="[item.expanded]"
@@ -60,13 +60,13 @@ import Highlighter from '@/script/components/widgets/Highlighter.vue';
 
 @Component({ components: { Highlighter, RecycleScroller, DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class GridComponent extends EditorComponent {
-	@Prop(Array) public list: {name: string}[];
-	@Prop(String) public keyField: string;
-	@Prop(Array) public headers: string[];
-	@Prop(Function) public click: void;
-	@Prop(Boolean) public rightAlign: boolean;
+	@Prop(Array) list: {name: string}[];
+	@Prop(String) keyField: string;
+	@Prop(Array) headers: string[];
+	@Prop(Function) click: void;
+	@Prop(Boolean) rightAlign: boolean;
 
-	public data: {
+	data: {
 		search: string,
 		scale: number
 	} = {
@@ -109,23 +109,23 @@ export default class GridComponent extends EditorComponent {
 		};
 	}
 
-	private onMouseDown(e: any, item: Blueprint) {
+	onMouseDown(e: any, item: Blueprint) {
 		console.log(item);
 		window.editor.threeManager.onDragStart(e, item);
 	}
 
-	private onClick(item: any) {
+	onClick(item: any) {
 		if (this.click !== undefined) {
 			// @ts-ignore
 			this.click(item);
 		}
 	}
 
-	private onSearch(a: any) {
+	onSearch(a: any) {
 		this.data.search = a.target.value;
 	}
 
-	private filteredItems() {
+	filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
 		if (this.list === undefined) {
 			return [];

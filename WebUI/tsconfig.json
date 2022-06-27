@@ -13,6 +13,7 @@
     "strictPropertyInitialization": false,
     "importHelpers": true,
     "sourceMap": true,
+    "jsx": "preserve",
     "moduleResolution": "node",
     "baseUrl": ".",
     "typeRoots": ["node_modules/@types",

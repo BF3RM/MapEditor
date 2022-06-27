@@ -52,12 +52,12 @@ import { signals } from '@/script/modules/Signals';
 
 @Component({ components: { WindowComponent, KeyTip } })
 export default class HotkeysComponent extends Vue {
-	private title = 'Hotkeys';
-	private hotkeysDown: any = [];
-	private hotkeysCanvas: any = [];
-	private hotkeysFreecam: any = [];
-	private keyCodeToChar: any;
-	private state = {
+	title = 'Hotkeys';
+	hotkeysDown: any = [];
+	hotkeysCanvas: any = [];
+	hotkeysFreecam: any = [];
+	keyCodeToChar: any;
+	state = {
 		visible: false
 	};
 

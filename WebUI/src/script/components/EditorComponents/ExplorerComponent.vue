@@ -15,7 +15,7 @@
 						:should-select-node="shouldSelectNode"
 						:row-height="25"
 						:on-select-node="onSelectNode">
-					<expandable-tree-slot slot-scope="{ node, index, tree, active }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
+					<expandable-tree-slot slot-scope="{ node, tree }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
 				</infinite-tree-component>
 			</EditorComponent>
 			<gl-stack :width="82">
@@ -24,7 +24,7 @@
 						<img :class="'Icon Icon-' + item.typeName"/>
 						<div><Highlighter class="name" :text="item.fileName" :search="data.search"/></div>
 					</template>
-					<template v-slot:list="{ item, data }" >
+					<template v-slot:list="{ item }" >
 						<img :class="'Icon Icon-' + item.typeName"/>
 						<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search"/></div>
 						<div class="td type">{{item.typeName}}</div>
@@ -55,17 +55,17 @@ import GridComponent from '@/script/components/EditorComponents/GridComponent.vu
 @Component({ components: { GridComponent, ConsoleComponent, ExpandableTreeSlot, EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
 
 export default class ExplorerComponent extends EditorComponent {
-	private treeData: INode = {
+	treeData: INode = {
 		'type': 'folder',
 		'name': 'Venice',
 		'id': 'Venice',
 		'children': []
 	};
 
-	private list: Blueprint[] = [];
-	private selected: Node | null;
+	list: Blueprint[] = [];
+	selected: Node | null;
 
-	private search: string = '';
+	search: string = '';
 
 	mounted() {
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
@@ -130,7 +130,7 @@ export default class ExplorerComponent extends EditorComponent {
 		});
 	}
 
-	private onSelectNode(node: Node) {
+	onSelectNode(node: Node) {
 		if (node === null) {
 			this.list = [];
 			this.selected = null;
@@ -158,19 +158,19 @@ export default class ExplorerComponent extends EditorComponent {
 		return list;
 	}
 
-	private cleanPath(path: string) {
+	cleanPath(path: string) {
 		if (!this.selected) {
 			return path;
 		}
 		return path.replace(this.selected.path, '');
 	}
 
-	private shouldSelectNode(node: Node) {
+	shouldSelectNode(node: Node) {
 		console.log('ShouldSelect');
 		return true;
 	}
 
-	private SpawnBlueprint(blueprint: Blueprint) {
+	SpawnBlueprint(blueprint: Blueprint) {
 		if (!blueprint) {
 			return;
 		}

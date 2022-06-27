@@ -15,9 +15,8 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { glCustomContainer } from 'vue-golden-layout';
-import { signals } from '@/script/modules/Signals';
 import IWindowState from './IWindowState';
+
 @Component
 export default class WindowComponent extends Vue {
 	@Prop({ default: true }) showHeader: boolean;

@@ -23,7 +23,7 @@ import { signals } from '@/script/modules/Signals';
 	}
 })
 export default class LoadingView extends Vue {
-	private loadingInfo = 'Loading resources';
+	loadingInfo = 'Loading resources';
 	mounted() {
 		signals.setLoadingInfo.connect((info) => {
 			console.log('Got loading info');

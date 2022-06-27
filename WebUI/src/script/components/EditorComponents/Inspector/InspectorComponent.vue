@@ -19,7 +19,7 @@
 				</span>
 				<label class="custom-checkbox">
 					Enable / Disable
-					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" >
+					<input class="enable-input" type="checkbox" id="enabled" :disabled="multiSelection" ref="enableInput" v-model="enabled" @change="onEnableChange">
 					<span class="checkmark"></span>
 				</label>
 			</div>
@@ -75,22 +75,22 @@
 		</div>
 		<div class="inner">
 			<div class="transform-container">
-					<linear-transform-control
-							v-if="worldSpace === 'local'"
-							class="lt-control"
-							:hideLabel="false"
-							:value="localTransform"
-							@input="onLocalInput"
-							@dragend="onEndDrag"
-							@blur="onEndDrag" />
-					<linear-transform-control
-							v-else
-							class="lt-control"
-							:hideLabel="false"
-							:value="transform"
-							@input="onInput"
-							@dragend="onEndDrag"
-							@blur="onEndDrag" />
+				<linear-transform-control
+					v-if="worldSpace === 'local'"
+					class="lt-control"
+					:hideLabel="false"
+					:value="localTransform"
+					@input="onLocalInput"
+					@dragend="onEndDrag"
+					@blur="onEndDrag"/>
+				<linear-transform-control
+					v-else
+					class="lt-control"
+					:hideLabel="false"
+					:value="transform"
+					@input="onInput"
+					@dragend="onEndDrag"
+					@blur="onEndDrag"/>
 			</div>
 			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
 				<div class="alert">Experimental features, use with caution!</div>
@@ -147,30 +147,30 @@ export default class InspectorComponent extends EditorComponent {
 		};
 	}
 
-	public selectedGameObject: GameObject | null = null;
+	selectedGameObject: GameObject | null = null;
 
-	private enabled = true;
-	private gameObjectGuid: string = '';
-	private gameObjectName: string = '';
-	private blueprintName: string = '';
-	private blueprintType: string = '';
-	private blueprintGuid: string = '';
-	private blueprintPartitionGuid: string = '';
-	private blueprintVariations: {hash: number, name: string}[] = [];
-	private selectedVariation = 0;
-	private objectType = '';
-	private nOfObjectsInGroup = 0;
-	private partition: any;
-	private worldSpace: WORLD_SPACE = WORLD_SPACE.local;
-	private transform: LinearTransform = new LinearTransform();
-	private localTransform: LinearTransform = new LinearTransform();
+	enabled = true;
+	gameObjectGuid: string = '';
+	gameObjectName: string = '';
+	blueprintName: string = '';
+	blueprintType: string = '';
+	blueprintGuid: string = '';
+	blueprintPartitionGuid: string = '';
+	blueprintVariations: {hash: number, name: string}[] = [];
+	selectedVariation = 0;
+	objectType = '';
+	nOfObjectsInGroup = 0;
+	partition: any;
+	worldSpace: WORLD_SPACE = WORLD_SPACE.local;
+	transform: LinearTransform = new LinearTransform();
+	localTransform: LinearTransform = new LinearTransform();
 
-	private toggleState = {
+	toggleState = {
 		info: true,
 		variations: true
 	}
 
-	private getInstance(reference: Reference) {
+	getInstance(reference: Reference) {
 		return window.editor.fbdMan.getInstance(reference.partitionGuid, reference.instanceGuid);
 	}
 
@@ -198,7 +198,7 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
-	private onChangeVariation(newVariation: number) {
+	onChangeVariation(newVariation: number) {
 		console.log(newVariation);
 		if (window.editor.selectionGroup.selectedGameObjects.length !== 1) {
 			return;
@@ -207,7 +207,7 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.execute(command);
 	}
 
-	private onEBXInput(value: IEBXFieldData, addObjectsField = false) {
+	onEBXInput(value: IEBXFieldData, addObjectsField = false) {
 		if (this.selectedGameObject) {
 			value.guid = this.selectedGameObject.guid;
 			if (addObjectsField) {
@@ -230,7 +230,7 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
-	private onInput(newTrans: LinearTransform) {
+	onInput(newTrans: LinearTransform) {
 		const group = window.editor.selectionGroup;
 		if (group !== null) {
 			// Move selection group to the new position.
@@ -243,7 +243,7 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
-	private onLocalInput(newTrans: LinearTransform) {
+	onLocalInput(newTrans: LinearTransform) {
 		const group = window.editor.selectionGroup;
 		if (group !== null) {
 			// Move selection group to the new position.
@@ -324,7 +324,7 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.editorCore.RequestUpdate();
 	}
 
-	private onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
+	onEnableChange(e: Event) {	// TODO Fool: Enabling and disabling should work for multi-selection too.
 		this.$nextTick(() => {
 			const group = window.editor.selectionGroup;
 
@@ -340,7 +340,7 @@ export default class InspectorComponent extends EditorComponent {
 		});
 	}
 
-	private onNameChange(e: InputEvent) {
+	onNameChange(e: InputEvent) {
 		const group = window.editor.selectionGroup;
 
 		if (!group || this.isEmpty) {

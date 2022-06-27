@@ -29,7 +29,7 @@ import HotkeysComponent from '@/script/components/WindowComponents/HotkeysCompon
 	}
 })
 export default class EditorView extends Vue {
-	public mounted() {
+	mounted() {
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');

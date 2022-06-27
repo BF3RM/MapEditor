@@ -26,10 +26,10 @@ import { signals } from '@/script/modules/Signals';
 
 @Component({ components: { WindowComponent } })
 export default class ImportProjectComponent extends Vue {
-	private title = 'Import Project';
-	private displayMessage = '';
-	private projectDataJSON = '';
-	private state = {
+	title = 'Import Project';
+	displayMessage = '';
+	projectDataJSON = '';
+	state = {
 		visible: false
 	};
 

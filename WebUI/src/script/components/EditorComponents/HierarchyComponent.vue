@@ -11,7 +11,7 @@
 									:selectable="true"
 									:row-height="25"
 									:should-select-node="shouldSelectNode">
-				<expandable-tree-slot slot-scope="{ node, index, tree, active }"
+				<expandable-tree-slot slot-scope="{ node, tree }"
 									:has-visibility-options="true"
 									:node="node"
 									:tree="tree"
@@ -58,7 +58,7 @@ import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 @Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent } })
 
 export default class HierarchyComponent extends EditorComponent {
-	private data: INode[] = [{
+	data: INode[] = [{
 		'type': 'folder',
 		'name': 'Vanilla',
 		'id': 'vanilla_root',
@@ -80,14 +80,14 @@ export default class HierarchyComponent extends EditorComponent {
 		}]
 	}];
 
-	private tree: InfiniteTree;
-	private list: Blueprint[] = [];
-	private selected: Node[] = [];
+	tree: InfiniteTree;
+	list: Blueprint[] = [];
+	selected: Node[] = [];
 
-	private search: string = '';
+	search: string = '';
 
-	private queue = new Map<string, INode>();
-	private existingParents = new Map<string, INode[]>();
+	queue = new Map<string, INode>();
+	existingParents = new Map<string, INode[]>();
 
 	@Ref('infiniteTreeComponent')
 	infiniteTreeComponent: any;
@@ -219,7 +219,7 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 	}
 
-	private onNodeToggleEnable(node: Node) {
+	onNodeToggleEnable(node: Node) {
 		if (!node.content || !node.content[0]) {
 			return;
 		}
@@ -233,7 +233,7 @@ export default class HierarchyComponent extends EditorComponent {
 		}
 	}
 
-	private onNodeToggleRaycastEnable(node: Node) {
+	onNodeToggleRaycastEnable(node: Node) {
 		if (!node.content || !node.content[0]) {
 			return;
 		}
@@ -243,17 +243,17 @@ export default class HierarchyComponent extends EditorComponent {
 		window.editor.ToggleRaycastEnabled(guid, !node.content[0].raycastEnabled);
 	}
 
-	private onNodeHover(nodeId: string) {
+	onNodeHover(nodeId: string) {
 		const guid = Guid.parse(nodeId.toString());
 		if (guid.isEmpty()) return;
 		window.editor.editorCore.highlight(guid);
 	}
 
-	private onNodeHoverEnd() {
+	onNodeHoverEnd() {
 		window.editor.editorCore.unhighlight();
 	}
 
-	private onNodeClick(o: any) {
+	onNodeClick(o: any) {
 		const guid = Guid.parse(o.nodeId.toString());
 
 		if (guid.isEmpty()) return;
@@ -315,11 +315,11 @@ export default class HierarchyComponent extends EditorComponent {
 		return Guid.parse(node.id.toString());
 	}
 
-	private shouldSelectNode(node: Node) {
+	shouldSelectNode(node: Node) {
 		// TODO: logic to check if selectable
 	}
 
-	private SpawnBlueprint(blueprint: Blueprint) {
+	SpawnBlueprint(blueprint: Blueprint) {
 		if (!blueprint) {
 			return;
 		}

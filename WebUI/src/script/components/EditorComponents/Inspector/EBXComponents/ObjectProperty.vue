@@ -15,7 +15,6 @@ import Vue, { PropType } from 'vue';
 import Partition from '../../../../types/ebx/Partition';
 import Field from '../../../../types/ebx/Field';
 import Instance from '@/script/types/ebx/Instance';
-import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 export default Vue.extend({
 	name: 'ObjectProperty',

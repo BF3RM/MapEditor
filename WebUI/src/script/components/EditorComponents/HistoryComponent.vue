@@ -14,11 +14,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import Command from '@/script/libs/three/Command';
-import { Computed } from 'vuex/types/helpers';
 @Component({
 	components: {
 		EditorComponent
@@ -42,7 +41,7 @@ export default class HistoryComponent extends EditorComponent {
 		window.editor.history.goToState(id);
 	}
 
-	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
+	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
 		if (type === 'since') {
 			unixTimestamp = Date.now() - unixTimestamp;
 		}

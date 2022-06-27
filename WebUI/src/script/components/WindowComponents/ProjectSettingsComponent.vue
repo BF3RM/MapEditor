@@ -78,16 +78,16 @@ import { LOGLEVEL } from '@/script/types/Enums';
 
 	@Component({ components: { WindowComponent } })
 export default class ProjectSettingsComponent extends Vue {
-	private title = 'Project Settings';
-	private projects = {};
-	private selectedProjectName: string = '';
-	private selectedSaveIndex: number = 0;
-	private showNewSave = false;
-	private showExportWindow = false;
-	private projectData = '';
+	title = 'Project Settings';
+	projects = {};
+	selectedProjectName: string = '';
+	selectedSaveIndex: number = 0;
+	showNewSave = false;
+	showExportWindow = false;
+	projectData = '';
 
-	private hint = '';
-	private state = {
+	hint = '';
+	state = {
 		visible: false
 	};
 
@@ -119,7 +119,7 @@ export default class ProjectSettingsComponent extends Vue {
 		(this.currentProjectHeader as any).projectName = value;
 	}
 
-	private currentProjectHeader = {
+	currentProjectHeader = {
 		projectName: '',
 		timeStamp: 0
 	};
@@ -238,7 +238,7 @@ export default class ProjectSettingsComponent extends Vue {
 		this.projects = projects;
 	}
 
-	private FormatTime(unixTimestamp: number, type: string = 'timestamp') {
+	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
 		if (type === 'since') {
 			unixTimestamp = Date.now() - unixTimestamp;
 		}

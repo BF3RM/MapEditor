@@ -60,7 +60,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 	}
 })
 export default class GoldenLayoutHolder extends Vue {
-	private onInitialised() {
+	onInitialised() {
 		const viewport = document.getElementById('viewport-component');
 		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
 			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
@@ -68,7 +68,7 @@ export default class GoldenLayoutHolder extends Vue {
 		this.onMount();
 	}
 
-	private onStackCreated(stack: any) {
+	onStackCreated(stack: any) {
 		this.$nextTick(() => {
 			if (stack.contentItems.length > 0) {
 				if (!stack.contentItems[0].vueObject.$vnode.context.showHeader) {
@@ -78,7 +78,7 @@ export default class GoldenLayoutHolder extends Vue {
 		});
 	}
 
-	private onMount() {
+	onMount() {
 		this.$nextTick(() => {
 			(this.$refs.gl as any).layout.onResize();
 			const scrollables = document.getElementsByClassName('scrollable');

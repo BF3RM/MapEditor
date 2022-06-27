@@ -37,7 +37,6 @@ import Partition from '@/script/types/ebx/Partition';
 import { Component, Prop } from 'vue-property-decorator';
 import Reference from '@/script/types/ebx/Reference';
 import { GameObject } from '@/script/types/GameObject';
-import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
 @Component({
 	name: 'ReferenceProperty',
