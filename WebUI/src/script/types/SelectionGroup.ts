@@ -37,10 +37,13 @@ export class SelectionGroup extends THREE.Object3D {
 				return; // No position change
 			}
 			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
-			const command = new SetTransformCommand(new GameObjectTransferData({
-				guid: gameObject.guid,
-				transform: gameObject.transform
-			}), transform);
+			const command = new SetTransformCommand(
+				new GameObjectTransferData({
+					guid: gameObject.guid,
+					transform: gameObject.transform
+				}),
+				transform
+			);
 			commands.push(command);
 		}
 
@@ -91,7 +94,7 @@ export class SelectionGroup extends THREE.Object3D {
 		editor.threeManager.nextFrame(() => signals.selectionGroupChanged.emit(this, 'transform', this.transform));
 	}
 
-	public setPosition(x:number, y:number, z:number) {
+	public setPosition(x: number, y: number, z: number) {
 		this.position.set(x, y, z);
 		this.updateSelectedGameObjects();
 		editor.threeManager.setPendingRender();
@@ -151,7 +154,7 @@ export class SelectionGroup extends THREE.Object3D {
 
 	public deselectAll() {
 		for (const go of this.selectedGameObjects) {
-			(go).onDeselect();
+			go.onDeselect();
 			signals.deselectedGameObject.emit(go.guid);
 		}
 
@@ -203,9 +206,11 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
-			const command = new EnableGameObjectCommand(new GameObjectTransferData({
-				guid: gameObject.guid
-			}));
+			const command = new EnableGameObjectCommand(
+				new GameObjectTransferData({
+					guid: gameObject.guid
+				})
+			);
 			commands.push(command);
 		}
 
@@ -224,9 +229,11 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 
 		for (const gameObject of this.selectedGameObjects) {
-			const command = new DisableGameObjectCommand(new GameObjectTransferData({
-				guid: gameObject.guid
-			}));
+			const command = new DisableGameObjectCommand(
+				new GameObjectTransferData({
+					guid: gameObject.guid
+				})
+			);
 			commands.push(command);
 		}
 

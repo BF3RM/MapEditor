@@ -1,8 +1,8 @@
 <template>
 	<div class="screen-container">
-		<EditorView  class="screen" v-show="activeViewName === viewEnum.EDITOR"/>
-		<PlayingView class="screen" v-show="activeViewName === viewEnum.PLAYING"/>
-		<LoadingView class="screen" v-show="activeViewName === viewEnum.LOADING"/>
+		<EditorView class="screen" v-show="activeViewName === viewEnum.EDITOR" />
+		<PlayingView class="screen" v-show="activeViewName === viewEnum.PLAYING" />
+		<LoadingView class="screen" v-show="activeViewName === viewEnum.LOADING" />
 	</div>
 </template>
 
@@ -31,15 +31,15 @@ export default class ActiveView extends Vue {
 </script>
 
 <style>
-	.screen-container {
-		position: relative;
-		width: 100vw;
-		height: 100vh;
-	}
-	.screen {
-		position: absolute;
-		width: 100vw;
-		height: 100vh;
-		top: 0;
-	}
+.screen-container {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+}
+.screen {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	top: 0;
+}
 </style>

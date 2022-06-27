@@ -15,14 +15,7 @@ export const HOTKEYS: Hotkey[] = [
 		HOTKEY_TYPE.Down,
 		'Disable free camera and take control of your character again.'
 	),
-	new Hotkey(
-		KEYCODE.F2,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Lua,
-		'Teleport the player to the camera position.'
-	),
+	new Hotkey(KEYCODE.F2, false, false, () => {}, HOTKEY_TYPE.Lua, 'Teleport the player to the camera position.'),
 	new Hotkey(
 		KEYCODE.KEY_X,
 		false,
@@ -250,100 +243,16 @@ export const HOTKEYS: Hotkey[] = [
 		'While moving gizmo to snap to grid.'
 	),
 	// Freecam
-	new Hotkey(
-		KEYCODE.KEY_W,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Move forward.'
-	),
-	new Hotkey(
-		KEYCODE.KEY_A,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Move left.'
-	),
-	new Hotkey(
-		KEYCODE.KEY_S,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Move backward.'
-	),
-	new Hotkey(
-		KEYCODE.KEY_D,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Move right.'
-	),
-	new Hotkey(
-		KEYCODE.KEY_Q,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Move down.'
-	),
-	new Hotkey(
-		KEYCODE.KEY_E,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Move up.'
-	),
-	new Hotkey(
-		KEYCODE.SHIFT,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Makes the camera move faster.'
-	),
-	new Hotkey(
-		KEYCODE.PAGE_DOWN,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Change the camera rotation speed.'
-	),
-	new Hotkey(
-		KEYCODE.PAGE_UP,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Change the camera rotation speed.'
-	),
-	new Hotkey(
-		KEYCODE.UP_ARROW,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Change the camera FOV.'
-	),
-	new Hotkey(
-		KEYCODE.DOWN_ARROW,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Change the camera FOV.'
-	),
-	new Hotkey(
-		KEYCODE.SCROLL_WHEEL,
-		false,
-		false,
-		() => {},
-		HOTKEY_TYPE.Freecam,
-		'Change the camera speed.'
-	)
+	new Hotkey(KEYCODE.KEY_W, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move forward.'),
+	new Hotkey(KEYCODE.KEY_A, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move left.'),
+	new Hotkey(KEYCODE.KEY_S, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move backward.'),
+	new Hotkey(KEYCODE.KEY_D, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move right.'),
+	new Hotkey(KEYCODE.KEY_Q, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move down.'),
+	new Hotkey(KEYCODE.KEY_E, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move up.'),
+	new Hotkey(KEYCODE.SHIFT, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Makes the camera move faster.'),
+	new Hotkey(KEYCODE.PAGE_DOWN, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Change the camera rotation speed.'),
+	new Hotkey(KEYCODE.PAGE_UP, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Change the camera rotation speed.'),
+	new Hotkey(KEYCODE.UP_ARROW, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Change the camera FOV.'),
+	new Hotkey(KEYCODE.DOWN_ARROW, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Change the camera FOV.'),
+	new Hotkey(KEYCODE.SCROLL_WHEEL, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Change the camera speed.')
 ];

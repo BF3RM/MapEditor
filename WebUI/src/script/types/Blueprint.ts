@@ -38,7 +38,7 @@ export class Blueprint implements IBlueprint {
 
 	public isVariationValid(variation: number) {
 		const scope = this;
-		return (scope.hasVariations() && scope.getVariation(variation));
+		return scope.hasVariations() && scope.getVariation(variation);
 	}
 
 	public getVariation(hash: number) {

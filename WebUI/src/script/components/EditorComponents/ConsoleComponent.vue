@@ -1,10 +1,10 @@
 <template>
 	<EditorComponent title="Logs">
 		<div class="header">
-			<Search @search="onSearch"/>
+			<Search @search="onSearch" />
 			<div class="rangeHolder">
-				<input type="range" min="0" max="6" step="1" :value="data.filterLevel" @input="onUpdateFilter">
-				<div class="logLevel">{{logLevelDict[data.filterLevel]}}</div>
+				<input type="range" min="0" max="6" step="1" :value="data.filterLevel" @input="onUpdateFilter" />
+				<div class="logLevel">{{ logLevelDict[data.filterLevel] }}</div>
 			</div>
 			<!--<div>
 				<input id="shouldScrollToBottom" type="checkbox" :checked="data.shouldScrollToBottom" @change="onShouldScrollToBottom"/>
@@ -14,39 +14,34 @@
 			</div>
 			-->
 		</div>
-		<DynamicScroller
-				ref="scroller"
-				:items="filteredItems()"
-				class="scrollable"
-				:min-item-size="20"
-		>
+		<DynamicScroller ref="scroller" :items="filteredItems()" class="scrollable" :min-item-size="20">
 			<DynamicScrollerItem
-					class="consoleEntry"
-					slot-scope="{ item, active }"
-					:item="item"
-					:active="active"
-
-					@click.native="onClick(item)"
-					:size-dependencies="[item.expanded]"
-					:min-item-size="20"
+				class="consoleEntry"
+				slot-scope="{ item, active }"
+				:item="item"
+				:active="active"
+				@click.native="onClick(item)"
+				:size-dependencies="[item.expanded]"
+				:min-item-size="20"
 			>
 				<div :class="'log-wrapper LogLevel-' + logLevelDict[item.level]">
-					<div v-if="typeof(item.message) === 'string'" class="message">
+					<div v-if="typeof item.message === 'string'" class="message">
 						<span class="log-level">
-							{{logLevelDict[item.level]}}
+							{{ logLevelDict[item.level] }}
 						</span>
 						<span class="log-time">
-							{{FormatTime(item.time)}}
+							{{ FormatTime(item.time) }}
 						</span>
 						<span class="log-message">
-							{{item.message}}
+							{{ item.message }}
 						</span>
 					</div>
-					<div v-if="typeof(item.message) === 'object'" class="message">
-						{{FormatTime(item.time)}} [{{logLevelDict[item.level]}}] {{item.message.constructor.name}} {{ Inspect(item.message) }}
+					<div v-if="typeof item.message === 'object'" class="message">
+						{{ FormatTime(item.time) }} [{{ logLevelDict[item.level] }}]
+						{{ item.message.constructor.name }} {{ Inspect(item.message) }}
 					</div>
 					<div v-if="item.expanded" class="stackTrace">
-						{{FormatStacktrace(item)}}
+						{{ FormatStacktrace(item) }}
 					</div>
 				</div>
 			</DynamicScrollerItem>
@@ -55,7 +50,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+/* eslint-disable no-unused-vars */
+
+import { Component } from 'vue-property-decorator';
 import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
@@ -68,22 +65,14 @@ import { LOGLEVEL } from '@/script/types/Enums';
 @Component({ components: { DynamicScroller, DynamicScrollerItem, Search, EditorComponent } })
 export default class ConsoleComponent extends EditorComponent {
 	// WTF? What's a better way to do this?
-	logLevelDict = [
-		'NONE',
-		'ERROR',
-		'PROD',
-		'WARNING',
-		'INFO',
-		'DEBUG',
-		'VERBOSE'
-	];
+	logLevelDict = ['NONE', 'ERROR', 'PROD', 'WARNING', 'INFO', 'DEBUG', 'VERBOSE'];
 
 	originals: {
 		warn: (message?: any, ...optionalParams: any[]) => void;
 		log: (message?: any, ...optionalParams: any[]) => void;
 		clear: () => void;
 		error: (message?: any, ...optionalParams: any[]) => void;
-		info: (message?: any, ...optionalParams: any[]) => void
+		info: (message?: any, ...optionalParams: any[]) => void;
 	} = {
 		log: console.log,
 		error: console.error,
@@ -96,7 +85,7 @@ export default class ConsoleComponent extends EditorComponent {
 		logs: ConsoleEntry[];
 		filterLevel: LOGLEVEL;
 		shouldScrollToBottom: boolean;
-		search: string
+		search: string;
 	} = {
 		logs: [],
 		filterLevel: LOGLEVEL.VERBOSE,
@@ -158,58 +147,70 @@ export default class ConsoleComponent extends EditorComponent {
 
 	filteredItems() {
 		const lowerCaseSearch = this.data.search.toLowerCase();
-		return this.data.logs.filter((i) => i.message.toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel);
+		return this.data.logs.filter(
+			(i) => i.message.toLowerCase().includes(lowerCaseSearch) && i.level <= this.data.filterLevel
+		);
 	}
 
 	consoleLog(message: any, ...optionalParams: any[]) {
 		this.originals.log(message, optionalParams);
-		this.data.logs.push(new ConsoleEntry({
-			message,
-			id: this.data.logs.length,
-			level: LOGLEVEL.INFO,
-			stackTrace: this.StackTrace()
-		} as IConsoleEntry));
+		this.data.logs.push(
+			new ConsoleEntry({
+				message,
+				id: this.data.logs.length,
+				level: LOGLEVEL.INFO,
+				stackTrace: this.StackTrace()
+			} as IConsoleEntry)
+		);
 		this.ScrollToBottom();
 	}
 
 	consoleError(message: any, ...optionalParams: any[]) {
 		this.originals.error(message, optionalParams);
-		this.data.logs.push(new ConsoleEntry({
-			message,
-			id: this.data.logs.length,
-			level: LOGLEVEL.ERROR,
-			stackTrace: this.StackTrace()
-		} as IConsoleEntry));
+		this.data.logs.push(
+			new ConsoleEntry({
+				message,
+				id: this.data.logs.length,
+				level: LOGLEVEL.ERROR,
+				stackTrace: this.StackTrace()
+			} as IConsoleEntry)
+		);
 		this.ScrollToBottom();
 	}
 
 	consoleInfo(message: any, ...optionalParams: any[]) {
 		this.originals.info(message, optionalParams);
-		this.data.logs.push(new ConsoleEntry({
-			message,
-			id: this.data.logs.length,
-			level: LOGLEVEL.INFO
-		} as IConsoleEntry));
+		this.data.logs.push(
+			new ConsoleEntry({
+				message,
+				id: this.data.logs.length,
+				level: LOGLEVEL.INFO
+			} as IConsoleEntry)
+		);
 		this.ScrollToBottom();
 	}
 
 	consoleWarn(message: any, ...optionalParams: any[]) {
 		this.originals.warn(message, optionalParams);
-		this.data.logs.push(new ConsoleEntry({
-			message,
-			id: this.data.logs.length,
-			level: LOGLEVEL.WARNING
-		} as IConsoleEntry));
+		this.data.logs.push(
+			new ConsoleEntry({
+				message,
+				id: this.data.logs.length,
+				level: LOGLEVEL.WARNING
+			} as IConsoleEntry)
+		);
 		this.ScrollToBottom();
 	}
 
 	private onLog(logLevel: LOGLEVEL, message: any, info?: any) {
-		this.data.logs.push(new ConsoleEntry({
-			level: logLevel,
-			id: this.data.logs.length,
-			message,
-			info
-		} as IConsoleEntry));
+		this.data.logs.push(
+			new ConsoleEntry({
+				level: logLevel,
+				id: this.data.logs.length,
+				message,
+				info
+			} as IConsoleEntry)
+		);
 		this.ScrollToBottom();
 	}
 
@@ -279,7 +280,7 @@ export default class ConsoleComponent extends EditorComponent {
 
 		.log-time {
 			color: #fff;
-			opacity: .25;
+			opacity: 0.25;
 		}
 
 		.log-message {
@@ -298,7 +299,6 @@ export default class ConsoleComponent extends EditorComponent {
 			}
 		}
 	}
-
 }
 
 .stackTrace {

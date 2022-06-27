@@ -21,7 +21,11 @@ export default class BoxSelectionWrapper {
 	}
 
 	public initBoxSelection(event: MouseEvent) {
-		if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+		if (
+			editor.threeManager.gizmoControls.selected ||
+			window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) ||
+			window.editor.threeManager.isDragSpawning
+		) {
 			this.helper.isDown = false;
 			this.gizmoWasSelected = true;
 			this.helper.element.style.display = 'none';
@@ -33,11 +37,16 @@ export default class BoxSelectionWrapper {
 		this.selectionBox.startPoint.set(
 			(event.clientX / window.innerWidth) * 2 - 1,
 			-(event.clientY / window.innerHeight) * 2 + 1,
-			0.5);
+			0.5
+		);
 	}
 
 	public onMouseMove(event: MouseEvent) {
-		if (editor.threeManager.gizmoControls.selected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+		if (
+			editor.threeManager.gizmoControls.selected ||
+			window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) ||
+			window.editor.threeManager.isDragSpawning
+		) {
 			this.helper.isDown = false;
 			this.gizmoWasSelected = true;
 			this.boxSelectinInProgress = false;
@@ -53,7 +62,8 @@ export default class BoxSelectionWrapper {
 		this.selectionBox.endPoint.set(
 			(event.clientX / window.innerWidth) * 2 - 1,
 			-(event.clientY / window.innerHeight) * 2 + 1,
-			0.5);
+			0.5
+		);
 
 		// Temporarily set instanceMesh count to number of entities, so all can be selected
 		const instanceManager = InstanceManager.getInstance();
@@ -77,7 +87,14 @@ export default class BoxSelectionWrapper {
 	}
 
 	public onMouseUp(event: MouseEvent) {
-		if (event.which !== 1 || !this.boxSelectinInProgress || editor.threeManager.gizmoControls.selected || this.gizmoWasSelected || window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) || window.editor.threeManager.isDragSpawning) {
+		if (
+			event.which !== 1 ||
+			!this.boxSelectinInProgress ||
+			editor.threeManager.gizmoControls.selected ||
+			this.gizmoWasSelected ||
+			window.editor.threeManager.inputControls.IsKeyDown(KEYCODE.ALT) ||
+			window.editor.threeManager.isDragSpawning
+		) {
 			this.helper.isDown = false;
 			this.gizmoWasSelected = false;
 			this.boxSelectinInProgress = false;
@@ -87,7 +104,8 @@ export default class BoxSelectionWrapper {
 		this.selectionBox.endPoint.set(
 			(event.clientX / window.innerWidth) * 2 - 1,
 			-(event.clientY / window.innerHeight) * 2 + 1,
-			0.5);
+			0.5
+		);
 
 		const instanceManager = InstanceManager.getInstance();
 

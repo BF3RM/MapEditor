@@ -9,7 +9,9 @@ export class Guid {
 	}
 
 	public static create(guid?: string): Guid {
-		if (!guid) { guid = [Guid.gen(2), Guid.gen(1), Guid.gen(1), Guid.gen(1), Guid.gen(3)].join('-'); }
+		if (!guid) {
+			guid = [Guid.gen(2), Guid.gen(1), Guid.gen(1), Guid.gen(1), Guid.gen(3)].join('-');
+		}
 		return new Guid(guid);
 	}
 

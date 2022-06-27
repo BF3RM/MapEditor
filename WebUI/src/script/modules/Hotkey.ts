@@ -5,11 +5,11 @@ export enum HOTKEY_TYPE {
 	Up,
 	CanvasOnlyDown,
 	Lua, // These keys have no functions on the UI side, only on the Lua side.
-	Freecam, // These keys have no functions on the UI side, only on the Lua side.
+	Freecam // These keys have no functions on the UI side, only on the Lua side.
 }
 
 export class Hotkey {
-	public key: KEYCODE|string;
+	public key: KEYCODE | string;
 	public needsCtrl: boolean;
 	public needsShift: boolean;
 	public callback: () => void;
@@ -17,7 +17,7 @@ export class Hotkey {
 	public description: string = '';
 
 	constructor(
-		key: KEYCODE|string,
+		key: KEYCODE | string,
 		needsCtrl: boolean,
 		needsShift: boolean,
 		callback: () => void,
@@ -133,6 +133,6 @@ export const keyCodeToChar = {
 	219: '[',
 	220: '\\',
 	221: ']',
-	222: '\'',
-	'SCROLL_WHEEL': 'Scroll'
+	222: "'",
+	SCROLL_WHEEL: 'Scroll'
 };

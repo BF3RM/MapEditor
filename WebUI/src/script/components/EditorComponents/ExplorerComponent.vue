@@ -3,63 +3,89 @@
 		<gl-row>
 			<EditorComponent id="explorer-component" title="Project">
 				<div class="header">
-					<Search v-model="search"/>
+					<Search v-model="search" />
 				</div>
 				<infinite-tree-component
-						class="scrollable datafont"
-						ref="it"
+					class="scrollable datafont"
+					ref="it"
+					:search="search"
+					:autoOpen="false"
+					:data="treeData"
+					:selectable="true"
+					:should-select-node="shouldSelectNode"
+					:row-height="25"
+					:on-select-node="onSelectNode"
+				>
+					<expandable-tree-slot
+						slot-scope="{ node, tree }"
+						:node="node"
+						:tree="tree"
 						:search="search"
-						:autoOpen="false"
-						:data="treeData"
-						:selectable="true"
-						:should-select-node="shouldSelectNode"
-						:row-height="25"
-						:on-select-node="onSelectNode">
-					<expandable-tree-slot slot-scope="{ node, tree }" :node="node" :tree="tree" :search="search" :nodeText="node.name" :selected="node.state.selected"/>
+						:nodeText="node.name"
+						:selected="node.state.selected"
+					/>
 				</infinite-tree-component>
 			</EditorComponent>
 			<gl-stack :width="82">
-				<GridComponent class="datafont" :right-align="true" title="Project Data" :list="list" :keyField="'instanceGuid'" :headers="['Name', 'Type']" :click="SpawnBlueprint">
-					<template v-slot:grid="{ item, data }" >
-						<img :class="'Icon Icon-' + item.typeName"/>
-						<div><Highlighter class="name" :text="item.fileName" :search="data.search"/></div>
+				<GridComponent
+					class="datafont"
+					:right-align="true"
+					title="Project Data"
+					:list="list"
+					:keyField="'instanceGuid'"
+					:headers="['Name', 'Type']"
+					:click="SpawnBlueprint"
+				>
+					<template v-slot:grid="{ item, data }">
+						<img :class="'Icon Icon-' + item.typeName" />
+						<div><Highlighter class="name" :text="item.fileName" :search="data.search" /></div>
 					</template>
-					<template v-slot:list="{ item }" >
-						<img :class="'Icon Icon-' + item.typeName"/>
-						<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search"/></div>
-						<div class="td type">{{item.typeName}}</div>
+					<template v-slot:list="{ item }">
+						<img :class="'Icon Icon-' + item.typeName" />
+						<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search" /></div>
+						<div class="td type">{{ item.typeName }}</div>
 					</template>
 				</GridComponent>
-				<ConsoleComponent/>
+				<ConsoleComponent />
 			</gl-stack>
 		</gl-row>
 	</gl-col>
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import EditorComponent from '@/script/components/EditorComponents/EditorComponent.vue';
 import InfiniteTreeComponent from '@/script/components/InfiniteTreeComponent.vue';
 import { signals } from '@/script/modules/Signals';
 import { Blueprint } from '@/script/types/Blueprint';
-import { getFilename, getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
+import { getPaths, hasLowerCase, hasUpperCase } from '@/script/modules/Utils';
 import { Guid } from '@/script/types/Guid';
 import Highlighter from '@/script/components/widgets/Highlighter.vue';
 import ListComponent from '@/script/components/EditorComponents/ListComponent.vue';
-import InfiniteTree, { Node, INode } from 'infinite-tree';
+import { Node, INode } from 'infinite-tree';
 import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
 import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
 import GridComponent from '@/script/components/EditorComponents/GridComponent.vue';
 
-@Component({ components: { GridComponent, ConsoleComponent, ExpandableTreeSlot, EditorComponent, InfiniteTreeComponent, ListComponent, Highlighter, Search } })
-
+@Component({
+	components: {
+		GridComponent,
+		ConsoleComponent,
+		ExpandableTreeSlot,
+		EditorComponent,
+		InfiniteTreeComponent,
+		ListComponent,
+		Highlighter,
+		Search
+	}
+})
 export default class ExplorerComponent extends EditorComponent {
 	treeData: INode = {
-		'type': 'folder',
-		'name': 'Venice',
-		'id': 'Venice',
-		'children': []
+		type: 'folder',
+		name: 'Venice',
+		id: 'Venice',
+		children: []
 	};
 
 	list: Blueprint[] = [];
@@ -73,19 +99,18 @@ export default class ExplorerComponent extends EditorComponent {
 
 	private onBlueprintRegistered(blueprints: Blueprint[]) {
 		const scope = this;
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			const data: INode = {
-				'id': 'root',
-				'type': 'folder',
-				'name': 'Venice',
-				'children': []
+				id: 'root',
+				type: 'folder',
+				name: 'Venice',
+				children: []
 			};
 			// TODO: Make sure this works after the new blueprint shit.
 			for (const instance of blueprints) {
 				const path = instance.name;
 				const paths = getPaths(path);
 				let parentPath: INode = data;
-				const fileName = getFilename(path);
 				let currentPath = '';
 				paths.forEach((subPath) => {
 					currentPath += subPath + '/';
@@ -99,11 +124,11 @@ export default class ExplorerComponent extends EditorComponent {
 					const parentIndex = parentPath.children.find((x) => x.name.toLowerCase() === subPath.toLowerCase());
 					if (parentIndex === undefined) {
 						const a = parentPath.children.push({
-							'id': Guid.create().toString(),
-							'name': subPath,
-							'type': 'folder',
-							'children': [],
-							'path': currentPath
+							id: Guid.create().toString(),
+							name: subPath,
+							type: 'folder',
+							children: [],
+							path: currentPath
 						});
 						if (parentPath.children[a - 1] !== undefined) {
 							parentPath = parentPath.children[a - 1];
@@ -165,7 +190,7 @@ export default class ExplorerComponent extends EditorComponent {
 		return path.replace(this.selected.path, '');
 	}
 
-	shouldSelectNode(node: Node) {
+	shouldSelectNode() {
 		console.log('ShouldSelect');
 		return true;
 	}
@@ -179,11 +204,11 @@ export default class ExplorerComponent extends EditorComponent {
 }
 </script>
 <style lang="scss" scoped>
-	.expand {
-		display: inline;
-	}
+.expand {
+	display: inline;
+}
 
-	.type {
-		text-align: right;
-	}
+.type {
+	text-align: right;
+}
 </style>

@@ -2,23 +2,52 @@
 	<div>
 		<template v-if="mode === 'Vec4'">
 			<div class="label">
-				<b v-if="label">{{label}}</b>
+				<b v-if="label">{{ label }}</b>
 			</div>
-			<DraggableNumberInput :hideLabel="hideLabel" class="x" dragDirection="X" v-model="value.x" label="X" @input="onChangeValue('x', $event)"/>
-			<DraggableNumberInput :hideLabel="hideLabel" class="y" dragDirection="X" v-model="value.y" label="Y" @input="onChangeValue('y', $event)"/>
-			<DraggableNumberInput :hideLabel="hideLabel" class="z" dragDirection="X" v-model="value.z" label="Z" @input="onChangeValue('z', $event)"/>
-			<DraggableNumberInput :hideLabel="hideLabel" class="w" dragDirection="X" v-model="value.w" label="W" @input="onChangeValue('w', $event)"/>
+			<DraggableNumberInput
+				:hideLabel="hideLabel"
+				class="x"
+				dragDirection="X"
+				v-model="value.x"
+				label="X"
+				@input="onChangeValue('x', $event)"
+			/>
+			<DraggableNumberInput
+				:hideLabel="hideLabel"
+				class="y"
+				dragDirection="X"
+				v-model="value.y"
+				label="Y"
+				@input="onChangeValue('y', $event)"
+			/>
+			<DraggableNumberInput
+				:hideLabel="hideLabel"
+				class="z"
+				dragDirection="X"
+				v-model="value.z"
+				label="Z"
+				@input="onChangeValue('z', $event)"
+			/>
+			<DraggableNumberInput
+				:hideLabel="hideLabel"
+				class="w"
+				dragDirection="X"
+				v-model="value.w"
+				label="W"
+				@input="onChangeValue('w', $event)"
+			/>
 		</template>
 		<template v-else>
 			<Vec3Control
-					v-model="euler"
-					:hideLabel="hideLabel"
-					:label="label"
-					:step="step"
-					@input="onChangeEuler"
-					@blur="$emit('blur')"
-					@dragstart="$emit('dragstart')"
-					@dragend="$emit('dragend')" />
+				v-model="euler"
+				:hideLabel="hideLabel"
+				:label="label"
+				:step="step"
+				@input="onChangeEuler"
+				@blur="$emit('blur')"
+				@dragstart="$emit('dragstart')"
+				@dragend="$emit('dragend')"
+			/>
 		</template>
 	</div>
 </template>
@@ -47,11 +76,15 @@ export default class QuatControl extends Vue {
 	}
 
 	set euler(newEulerVec3: Vec3) {
-		this.value.setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
+		this.value.setFromEuler(
+			new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD)
+		);
 	}
 
 	onChangeEuler(newEulerVec3: Vec3) {
-		const newVal = new Quat().setFromEuler(new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD));
+		const newVal = new Quat().setFromEuler(
+			new Euler(newEulerVec3.x * DEG2RAD, newEulerVec3.y * DEG2RAD, newEulerVec3.z * DEG2RAD)
+		);
 		this.$emit('input', newVal);
 	}
 
@@ -59,17 +92,17 @@ export default class QuatControl extends Vue {
 		const newVal = this.value.clone();
 
 		switch (axis) {
-		case 'x':
-			newVal.x = val;
-			break;
-		case 'y':
-			newVal.y = val;
-			break;
-		case 'z':
-			newVal.z = val;
-			break;
-		case 'w':
-			newVal.w = val;
+			case 'x':
+				newVal.x = val;
+				break;
+			case 'y':
+				newVal.y = val;
+				break;
+			case 'z':
+				newVal.z = val;
+				break;
+			case 'w':
+				newVal.w = val;
 		}
 
 		this.$emit('input', newVal);
@@ -77,5 +110,4 @@ export default class QuatControl extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

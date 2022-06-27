@@ -31,23 +31,23 @@ export class InputControls {
 		let multiSelection = false;
 
 		switch (e.buttons) {
-		case MOUSE_BUTTONS.LEFT_CLICK:
-			if (e.shiftKey) {
-				// Box selection
-				editor.threeManager.selectionWrapper.initBoxSelection(e);
-				return;
-			}
-			selectionEnabled = !e.altKey; // Alt key is used for rotating camera
-			multiSelection = e.ctrlKey;
-			break;
-		case MOUSE_BUTTONS.MIDDLE_CLICK:
-			break;
-		case MOUSE_BUTTONS.RIGHT_CLICK:
-			editor.threeManager.enableFreecamMovement();
-			break;
-		default:
-			// alert('You have a strange Mouse!');
-			break;
+			case MOUSE_BUTTONS.LEFT_CLICK:
+				if (e.shiftKey) {
+					// Box selection
+					editor.threeManager.selectionWrapper.initBoxSelection(e);
+					return;
+				}
+				selectionEnabled = !e.altKey; // Alt key is used for rotating camera
+				multiSelection = e.ctrlKey;
+				break;
+			case MOUSE_BUTTONS.MIDDLE_CLICK:
+				break;
+			case MOUSE_BUTTONS.RIGHT_CLICK:
+				editor.threeManager.enableFreecamMovement();
+				break;
+			default:
+				// alert('You have a strange Mouse!');
+				break;
 		}
 
 		editor.threeManager.onMouseDown(selectionEnabled, multiSelection, InputControls.getMousePos(e));
@@ -70,8 +70,8 @@ export class InputControls {
 
 	onMouseMove(e: MouseEvent) {
 		if (!this.isTeleporting) {
-			this.movementX = (this.prevX ? e.screenX - this.prevX : 0);
-			this.movementY = (this.prevY ? e.screenY - this.prevY : 0);
+			this.movementX = this.prevX ? e.screenX - this.prevX : 0;
+			this.movementY = this.prevY ? e.screenY - this.prevY : 0;
 			this.prevX = e.screenX;
 			this.prevY = e.screenY;
 		}
@@ -102,14 +102,22 @@ export class InputControls {
 
 	onKeyUp(e: KeyboardEvent) {
 		const element = e.target as HTMLElement;
-		if (element && element.tagName && (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')) {
+		if (
+			element &&
+			element.tagName &&
+			(element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')
+		) {
 			return;
 		}
 
 		this.keys[e.which] = false;
 
 		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Up).forEach((hotkey: Hotkey) => {
-			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+			if (
+				e.which === hotkey.key &&
+				(hotkey.needsCtrl ? e.ctrlKey : true) &&
+				(hotkey.needsShift ? e.shiftKey : true)
+			) {
 				hotkey.callback();
 			}
 		});
@@ -118,7 +126,11 @@ export class InputControls {
 	// Keys that should only work when the canvas is focused
 	onCanvasKeyDown(e: KeyboardEvent) {
 		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.CanvasOnlyDown).forEach((hotkey: Hotkey) => {
-			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+			if (
+				e.which === hotkey.key &&
+				(hotkey.needsCtrl ? e.ctrlKey : true) &&
+				(hotkey.needsShift ? e.shiftKey : true)
+			) {
 				hotkey.callback();
 			}
 		});
@@ -126,14 +138,22 @@ export class InputControls {
 
 	onKeyDown(e: KeyboardEvent) {
 		const element = e.target as HTMLElement;
-		if (element && element.tagName && (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')) {
+		if (
+			element &&
+			element.tagName &&
+			(element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'TEXTAREA')
+		) {
 			return;
 		}
 
 		this.keys[e.which] = true;
 
 		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Down).every((hotkey: Hotkey) => {
-			if (e.which === hotkey.key && (hotkey.needsCtrl ? e.ctrlKey : true) && (hotkey.needsShift ? e.shiftKey : true)) {
+			if (
+				e.which === hotkey.key &&
+				(hotkey.needsCtrl ? e.ctrlKey : true) &&
+				(hotkey.needsShift ? e.shiftKey : true)
+			) {
 				hotkey.callback();
 				return false;
 			}

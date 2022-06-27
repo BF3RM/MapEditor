@@ -1,11 +1,5 @@
 <template>
-	<gl-component
-		ref="glChild"
-		class="EditorComponent"
-		:title="title"
-		:closable="closable"
-		:hidden="hidden"
-	>
+	<gl-component ref="glChild" class="EditorComponent" :title="title" :closable="closable" :hidden="hidden">
 		<slot />
 	</gl-component>
 </template>
@@ -14,8 +8,7 @@ import { Component } from 'vue-property-decorator';
 import { glCustomContainer } from 'vue-golden-layout';
 
 @Component
-export default class EditorComponent extends glCustomContainer {
-}
+export default class EditorComponent extends glCustomContainer {}
 </script>
 <style lang="scss">
 .EditorComponent {
@@ -23,14 +16,14 @@ export default class EditorComponent extends glCustomContainer {
 		display: flex;
 		padding: 7px;
 
-		input[type="range"] {
+		input[type='range'] {
 			width: 8em;
 			margin: 0 20px;
 			-webkit-appearance: none;
 			background: transparent !important;
 		}
 
-		input[type="range"]::-webkit-slider-thumb {
+		input[type='range']::-webkit-slider-thumb {
 			-webkit-appearance: none;
 			height: 20px;
 			width: 10px;
@@ -40,7 +33,7 @@ export default class EditorComponent extends glCustomContainer {
 			border-radius: 3px;
 		}
 
-		input[type="range"]:focus {
+		input[type='range']:focus {
 			outline: none;
 
 			&::-webkit-slider-thumb {
@@ -48,7 +41,7 @@ export default class EditorComponent extends glCustomContainer {
 			}
 		}
 
-		input[type="range"]::-webkit-slider-runnable-track {
+		input[type='range']::-webkit-slider-runnable-track {
 			width: 100%;
 			height: 8.4px;
 			cursor: pointer;
@@ -56,7 +49,7 @@ export default class EditorComponent extends glCustomContainer {
 			border-radius: 6px;
 		}
 
-		input[type="range"]:focus::-webkit-slider-runnable-track {
+		input[type='range']:focus::-webkit-slider-runnable-track {
 			background: #161924;
 		}
 	}

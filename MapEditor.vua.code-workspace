@@ -20,17 +20,21 @@
 	"settings": {
 		"Lua.workspace.maxPreload": 10000,
 		"Lua.diagnostics.libraryFiles": "Disable",
-		"lua.targetVersion": "5.2",
+		":ua.targetVersion": "5.2",
 		"editor.codeActionsOnSave": {
 			"source.fixAll.eslint": true
-		}
+		},
+		"eslint.format.enable": true,
+		"eslint.validate": [
+			"typescript"
+		]
 	},
 	"extensions": {
 		"recommendations": [
 			"imposter.vscode-lua-vu",
-			"johnsoncodehk.volar",
 			"dbaeumer.vscode-eslint",
-			"EditorConfig.EditorConfig"
+			"editorconfig.editorconfig",
+			"octref.vetur"
 		]
 	}
 }

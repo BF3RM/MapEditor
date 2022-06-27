@@ -1,10 +1,9 @@
-
 export function hasLowerCase(str: string) {
-	return (/[a-z]/.test(str));
+	return /[a-z]/.test(str);
 }
 
 export function hasUpperCase(str: string) {
-	return (/[A-Z]/.test(str));
+	return /[A-Z]/.test(str);
 }
 
 export function getPaths(path: string) {
@@ -14,13 +13,17 @@ export function getPaths(path: string) {
 }
 
 export function getFilename(path: string) {
-	return path.split('/').filter((value) => {
-		return value && value.length;
-	}).reverse()[0];
+	return path
+		.split('/')
+		.filter((value) => {
+			return value && value.length;
+		})
+		.reverse()[0];
 }
 export function isPrintable(type: string) {
 	type = type.toLowerCase();
-	return (type === 'cstring' ||
+	return (
+		type === 'cstring' ||
 		type === 'single' ||
 		type === 'float8' ||
 		type === 'float16' ||
@@ -40,5 +43,6 @@ export function isPrintable(type: string) {
 		type === 'vec4' ||
 		type === 'boolean' ||
 		type === 'guid' ||
-		type === 'sbyte');
+		type === 'sbyte'
+	);
 }

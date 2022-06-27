@@ -1,32 +1,36 @@
 <template>
-		<EditorComponent id="explorer-component" title="Scene Instances">
-			<div class="header">
-				<Search v-model="search"/>
-			</div>
-			<infinite-tree-component class="scrollable datafont"
-									ref="infiniteTreeComponent"
-									:search="search"
-									:autoOpen="true"
-									:data="data"
-									:selectable="true"
-									:row-height="25"
-									:should-select-node="shouldSelectNode">
-				<expandable-tree-slot slot-scope="{ node, tree }"
-									:has-visibility-options="true"
-									:node="node"
-									:tree="tree"
-									:search="search"
-									:content="node.content"
-									:nodeText="nodeText(node)"
-									:selected="node.state.selected"
-									@node:toggle-enable="onNodeToggleEnable"
-									@node:toggle-raycast-enable="onNodeToggleRaycastEnable"
-									@node:hover="onNodeHover"
-									@node:hover-end="onNodeHoverEnd"
-									@node:click="onNodeClick" />
-			</infinite-tree-component>
-		</EditorComponent>
-		<!--<ListComponent class="datafont" title="Explorer data"
+	<EditorComponent id="explorer-component" title="Scene Instances">
+		<div class="header">
+			<Search v-model="search" />
+		</div>
+		<infinite-tree-component
+			class="scrollable datafont"
+			ref="infiniteTreeComponent"
+			:search="search"
+			:autoOpen="true"
+			:data="data"
+			:selectable="true"
+			:row-height="25"
+			:should-select-node="shouldSelectNode"
+		>
+			<expandable-tree-slot
+				slot-scope="{ node, tree }"
+				:has-visibility-options="true"
+				:node="node"
+				:tree="tree"
+				:search="search"
+				:content="node.content"
+				:nodeText="nodeText(node)"
+				:selected="node.state.selected"
+				@node:toggle-enable="onNodeToggleEnable"
+				@node:toggle-raycast-enable="onNodeToggleRaycastEnable"
+				@node:hover="onNodeHover"
+				@node:hover-end="onNodeHoverEnd"
+				@node:click="onNodeClick"
+			/>
+		</infinite-tree-component>
+	</EditorComponent>
+	<!--<ListComponent class="datafont" title="Explorer data"
 					:list="list"
 					:keyField="'instanceGuid'"
 					:headers="['Name', 'Type']"
@@ -55,30 +59,38 @@ import Search from '@/script/components/widgets/Search.vue';
 import ExpandableTreeSlot from '@/script/components/EditorComponents/ExpandableTreeSlot.vue';
 import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 
-@Component({ components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent } })
-
+@Component({
+	components: { InfiniteTreeComponent, ListComponent, Highlighter, Search, ExpandableTreeSlot, EditorComponent }
+})
 export default class HierarchyComponent extends EditorComponent {
-	data: INode[] = [{
-		'type': 'folder',
-		'name': 'Vanilla',
-		'id': 'vanilla_root',
-		'children': [],
-		'content': [{
-			'enabled': true,
-			'raycastEnabled': true,
-			'realm': REALM.CLIENT_AND_SERVER
-		}]
-	}, {
-		'type': 'folder',
-		'name': 'Custom',
-		'id': 'custom_root',
-		'children': [],
-		'content': [{
-			'enabled': true,
-			'raycastEnabled': true,
-			'realm': REALM.CLIENT_AND_SERVER
-		}]
-	}];
+	data: INode[] = [
+		{
+			type: 'folder',
+			name: 'Vanilla',
+			id: 'vanilla_root',
+			children: [],
+			content: [
+				{
+					enabled: true,
+					raycastEnabled: true,
+					realm: REALM.CLIENT_AND_SERVER
+				}
+			]
+		},
+		{
+			type: 'folder',
+			name: 'Custom',
+			id: 'custom_root',
+			children: [],
+			content: [
+				{
+					enabled: true,
+					raycastEnabled: true,
+					realm: REALM.CLIENT_AND_SERVER
+				}
+			]
+		}
+	];
 
 	tree: InfiniteTree;
 	list: Blueprint[] = [];
@@ -103,7 +115,7 @@ export default class HierarchyComponent extends EditorComponent {
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
 
 		if (this.infiniteTreeComponent !== undefined) {
-			this.tree = (this.infiniteTreeComponent).tree as InfiniteTree;
+			this.tree = this.infiniteTreeComponent.tree as InfiniteTree;
 		}
 	}
 
@@ -113,17 +125,19 @@ export default class HierarchyComponent extends EditorComponent {
 			name: gameObject.getCleanName(),
 			type: gameObject.blueprintCtrRef.typeName,
 			children: [],
-			content: [{
-				parentGuid: gameObject.parentData.guid,
-				enabled: gameObject.enabled,
-				raycastEnabled: gameObject.raycastEnabled,
-				realm: gameObject.realm
-			}]
+			content: [
+				{
+					parentGuid: gameObject.parentData.guid,
+					enabled: gameObject.enabled,
+					raycastEnabled: gameObject.raycastEnabled,
+					realm: gameObject.realm
+				}
+			]
 		};
 	}
 
 	nodeText(node: Node) {
-		return (node.children.length === 0) ? node.name : node.name + ' (' + node.children.length + ')';
+		return node.children.length === 0 ? node.name : node.name + ' (' + node.children.length + ')';
 	}
 
 	onDeletedGameObject(commandActionResult: CommandActionResult) {
@@ -211,7 +225,7 @@ export default class HierarchyComponent extends EditorComponent {
 		const node = this.tree.getNodeById(guid.toString());
 		if (node) {
 			node.state.selected = false;
-			const nodeIndex = (this.selected).findIndex((i) => {
+			const nodeIndex = this.selected.findIndex((i) => {
 				// console.log(i.id === node.id);
 				return i.id === node.id;
 			});
@@ -315,7 +329,7 @@ export default class HierarchyComponent extends EditorComponent {
 		return Guid.parse(node.id.toString());
 	}
 
-	shouldSelectNode(node: Node) {
+	shouldSelectNode() {
 		// TODO: logic to check if selectable
 	}
 
@@ -360,7 +374,7 @@ export default class HierarchyComponent extends EditorComponent {
 }
 </script>
 <style lang="scss" scoped>
-	.expand {
-		display: inline;
-	}
+.expand {
+	display: inline;
+}
 </style>

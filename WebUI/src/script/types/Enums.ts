@@ -5,7 +5,7 @@ export enum LOGLEVEL {
 	WARNING = 3,
 	INFO = 4,
 	DEBUG = 5,
-	VERBOSE = 6,
+	VERBOSE = 6
 }
 
 export enum MOUSE_BUTTONS {
@@ -121,19 +121,19 @@ export enum KEYCODE {
 	BACK_SLASH = 220,
 	CLOSE_BRACKET = 221,
 	SINGLE_QUOTE = 222,
-	SCROLL_WHEEL = 'SCROLL_WHEEL',
+	SCROLL_WHEEL = 'SCROLL_WHEEL'
 }
 
 export enum WORLD_SPACE {
 	local = 'local',
-	world = 'world',
+	world = 'world'
 }
 
 export enum GIZMO_MODE {
 	select = 'select',
 	translate = 'translate',
 	rotate = 'rotate',
-	scale = 'scale',
+	scale = 'scale'
 }
 
 export enum EDITOR_MODE {

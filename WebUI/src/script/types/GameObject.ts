@@ -33,17 +33,19 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public highlighted: boolean = false;
 	private _enabled: boolean = true;
 	private _raycastEnabled: boolean = true;
-	declare public parent: GameObject;
+	public declare parent: GameObject;
 	public isUserModified: boolean;
 	public originalRef: CtrRef | undefined;
 	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
-	public overrides: { [path: string]: IEBXFieldData } = {}
+	public overrides: { [path: string]: IEBXFieldData } = {};
 	public realm: REALM;
 
 	public get localTransform(): LinearTransform {
 		if (this.parent) {
 			const parentWorldInverse = new THREE.Matrix4().copy(this.parent.matrixWorld).invert();
-			return new LinearTransform().setFromMatrix(new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld));
+			return new LinearTransform().setFromMatrix(
+				new THREE.Matrix4().multiplyMatrices(parentWorldInverse, this.matrixWorld)
+			);
 		} else {
 			return new LinearTransform().setFromMatrix(this.matrixWorld);
 		}
@@ -53,11 +55,19 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.matrix = newValue.toMatrix();
 	}
 
-	constructor(guid: Guid = Guid.create(), name: string = 'Unnamed GameObject',
-		transform: LinearTransform = new LinearTransform(), parentData: GameObjectParentData = new GameObjectParentData(),
-		blueprintCtrRef: CtrRef = new CtrRef(), variation: number = 0, gameEntities: GameEntityData[] = [],
-		origin: GAMEOBJECT_ORIGIN = GAMEOBJECT_ORIGIN.CUSTOM, isUserModified: boolean = false,
-		originalRef: CtrRef | undefined = undefined, realm: REALM = REALM.CLIENT_AND_SERVER) {
+	constructor(
+		guid: Guid = Guid.create(),
+		name: string = 'Unnamed GameObject',
+		transform: LinearTransform = new LinearTransform(),
+		parentData: GameObjectParentData = new GameObjectParentData(),
+		blueprintCtrRef: CtrRef = new CtrRef(),
+		variation: number = 0,
+		gameEntities: GameEntityData[] = [],
+		origin: GAMEOBJECT_ORIGIN = GAMEOBJECT_ORIGIN.CUSTOM,
+		isUserModified: boolean = false,
+		originalRef: CtrRef | undefined = undefined,
+		realm: REALM = REALM.CLIENT_AND_SERVER
+	) {
 		super();
 		this.guid = guid;
 		this.name = name;
@@ -225,7 +235,12 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 				if (instance) {
 					const transform = new LinearTransform().setFromMatrix(this.matrix);
 					if (this.originalRef) {
-						this.parent.setOverride({ field: 'blueprintTransform', value: transform, oldValue: oldTransform, type: 'LinearTransform' });
+						this.parent.setOverride({
+							field: 'blueprintTransform',
+							value: transform,
+							oldValue: oldTransform,
+							type: 'LinearTransform'
+						});
 					}
 					instance.fields.blueprintTransform.value.set(transform);
 				}
@@ -262,9 +277,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		// this.overrides.setValue(path, newOverride);
 	}
 
-	public ApplyOverrides() {
-
-	}
+	public ApplyOverrides() {}
 
 	public setName(name: string) {
 		this.name = name;
@@ -288,7 +301,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	set raycastEnabled(value: boolean) {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child).raycastEnabled = value;
+				child.raycastEnabled = value;
 			}
 		}
 		this._raycastEnabled = value;
@@ -302,7 +315,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Enable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child).Enable();
+				child.Enable();
 			}
 		}
 		this._enabled = true;
@@ -312,7 +325,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public Disable() {
 		for (const child of this.children) {
 			if (child instanceof GameObject) {
-				(child).Disable();
+				child.Disable();
 			}
 		}
 		this._enabled = false;
@@ -327,14 +340,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.selected = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach(go => (go as unknown as IGameEntity).onSelect());
+		this.children.forEach((go) => (go as unknown as IGameEntity).onSelect());
 	}
 
 	onDeselect() {
 		this.selected = false;
 		this.visible = false;
 		this.makeParentsInvisible();
-		this.children.forEach(go => (go as unknown as IGameEntity).onDeselect());
+		this.children.forEach((go) => (go as unknown as IGameEntity).onDeselect());
 	}
 
 	onHighlight() {
@@ -342,7 +355,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach(go => (go as unknown as IGameEntity).onHighlight());
+		this.children.forEach((go) => (go as unknown as IGameEntity).onHighlight());
 	}
 
 	onUnhighlight() {
@@ -350,13 +363,13 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = false;
 		this.visible = false;
 		this.makeParentsInvisible();
-		this.children.forEach(go => (go as unknown as IGameEntity).onUnhighlight());
+		this.children.forEach((go) => (go as unknown as IGameEntity).onUnhighlight());
 	}
 
 	makeParentsInvisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = false;
-			(this.parent).makeParentsInvisible();
+			this.parent.makeParentsInvisible();
 		}
 		editor.selectionGroup.makeParentsVisible();
 	}
@@ -364,7 +377,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	makeParentsVisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
 			this.parent.visible = true;
-			(this.parent).makeParentsVisible();
+			this.parent.makeParentsVisible();
 		}
 	}
 

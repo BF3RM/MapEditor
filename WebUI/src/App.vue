@@ -1,6 +1,6 @@
 <template>
 	<div id="page">
-		<ActiveView/>
+		<ActiveView />
 		<v-popover></v-popover>
 	</div>
 </template>
@@ -14,11 +14,7 @@ import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import 'golden-layout/src/css/goldenlayout-dark-theme.css';
 import './style/icons.scss';
 
-import Editor from '@/script/Editor';
-import { Log, LogError } from '@/script/modules/Logger';
 import ActiveView from '@/script/components/Views/ActiveView.vue';
-import { EDITOR_MODE } from '@/script/types/Enums';
-import VEXTInterface from '@/script/modules/VEXT';
 
 @Component({
 	components: {
@@ -51,30 +47,31 @@ export default class App extends Vue {
 </script>
 
 <style scoped>
-	#viewport-component * {
-		background: none !important;
-	}
+#viewport-component * {
+	background: none !important;
+}
 </style>
 <style>
-	.lm_splitter {
-		position: relative;
-		z-index: 0;
-		opacity: 0.5;
-	}
-	.lm_drag_handle:hover {
-		opacity: 0;
-	}
-	.lm_splitter:hover, .lm_splitter.lm_dragging {
-		background: #409EFF;
-	}
-	.lm_header {
-		overflow: visible;
-		position: relative;
-		z-index: 0;
-	}
-	.selectBox {
-		border: 1px solid #55aaff;
-		background-color: rgba(75, 160, 255, 0.3);
-		position: fixed;
-	}
+.lm_splitter {
+	position: relative;
+	z-index: 0;
+	opacity: 0.5;
+}
+.lm_drag_handle:hover {
+	opacity: 0;
+}
+.lm_splitter:hover,
+.lm_splitter.lm_dragging {
+	background: #409eff;
+}
+.lm_header {
+	overflow: visible;
+	position: relative;
+	z-index: 0;
+}
+.selectBox {
+	border: 1px solid #55aaff;
+	background-color: rgba(75, 160, 255, 0.3);
+	position: fixed;
+}
 </style>

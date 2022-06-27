@@ -1,3 +1,4 @@
+/* eslint-env node */
 const { VextPackPlugin } = require('vextpack');
 
 module.exports = {

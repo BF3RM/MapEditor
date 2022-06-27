@@ -79,7 +79,13 @@ export class THREEManager {
 			const planeSize = 100;
 			const grid = new THREE.GridHelper(planeSize, planeSize, 0x444444, 0x888888);
 			const plGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
-			const plMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x444444), side: THREE.DoubleSide, opacity: 0.5, transparent: true, depthWrite: false });
+			const plMaterial = new THREE.MeshBasicMaterial({
+				color: new THREE.Color(0x444444),
+				side: THREE.DoubleSide,
+				opacity: 0.5,
+				transparent: true,
+				depthWrite: false
+			});
 			const planeMesh = new THREE.Mesh(plGeometry, plMaterial);
 			planeMesh.name = 'groundPlane';
 			planeMesh.rotateX(1.5708);
@@ -411,7 +417,7 @@ export class THREEManager {
 
 	private highlightWithRaycast(mousePos: Vec2) {
 		const now = new Date();
-		if ((now.getTime() - this.lastRaycastTime.getTime() >= 100) && !this.pendingRaycast) {
+		if (now.getTime() - this.lastRaycastTime.getTime() >= 100 && !this.pendingRaycast) {
 			this.pendingRaycast = true;
 			this.raycastSelection(mousePos).then((guid: Guid | null) => {
 				if (guid !== null) {
@@ -464,22 +470,33 @@ export class THREEManager {
 					continue;
 				}
 
-				if (parent.enabled && !parent.selected && parent.constructor === GameObject &&
-					(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' || parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
-					!editor.selectionGroup.isSelected(parent) && parent.name !== 'Gameplay/Logic/ShowRoom' &&
-					parent.raycastEnabled) {
+				if (
+					parent.enabled &&
+					!parent.selected &&
+					parent.constructor === GameObject &&
+					(parent.blueprintCtrRef.typeName === 'PrefabBlueprint' ||
+						parent.blueprintCtrRef.typeName === 'SpatialPrefabBlueprint') &&
+					!editor.selectionGroup.isSelected(parent) &&
+					parent.name !== 'Gameplay/Logic/ShowRoom' &&
+					parent.raycastEnabled
+				) {
 					return parent.guid;
 				}
 			}
 			// Else we select the GameObject.
-			if (gameObject.enabled && gameObject.blueprintCtrRef.typeName !== 'WorldPartData' && gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover') {
+			if (
+				gameObject.enabled &&
+				gameObject.blueprintCtrRef.typeName !== 'WorldPartData' &&
+				gameObject.name !== 'Objects/UI_CharacterBackdrop/UI_Menu_BlackCover'
+			) {
 				return gameObject.guid;
 			}
 		}
 		// A selected GameObject was hit.
 		if (hitSelf) {
 			return hitSelf.guid;
-		} else { // Didn't hit any GameObjects
+		} else {
+			// Didn't hit any GameObjects
 			return null;
 		}
 	}

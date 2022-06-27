@@ -1,6 +1,7 @@
 <template>
-  <input v-model="inputValue"
-		:class="{'error': (isNaN(value))}"
+	<input
+		v-model="inputValue"
+		:class="{ error: isNaN(value) }"
 		:type="type"
 		:min="min"
 		:max="max"
@@ -8,7 +9,8 @@
 		@input="onInput"
 		@blur="onBlur"
 		@keyup.enter="onEnterPressed"
-		@focus="dirty = true"/>
+		@focus="dirty = true"
+	/>
 </template>
 
 <script lang="ts">

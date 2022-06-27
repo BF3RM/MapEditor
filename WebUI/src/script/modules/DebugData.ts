@@ -1,8 +1,29 @@
 import { Guid } from '@/script/types/Guid';
 import { IBlueprint } from '@/script/interfaces/IBlueprint';
 
-const names = ['Textures', 'UI', 'Vehicles', 'VisualEnvironments', 'Weapons', 'Weapons_old', 'XP2', 'XP3', 'XP4', 'XP5', 'XP_Raw', 'default', 'lodgroups', 'profile'];
-const blueprintTypes = ['ObjectBlueprint', 'PrefabBlueprint', 'EffectBlueprint', 'VisualEnvironmentBlueprint', 'SpatialPrefabBlueprint'];
+const names = [
+	'Textures',
+	'UI',
+	'Vehicles',
+	'VisualEnvironments',
+	'Weapons',
+	'Weapons_old',
+	'XP2',
+	'XP3',
+	'XP4',
+	'XP5',
+	'XP_Raw',
+	'default',
+	'lodgroups',
+	'profile'
+];
+const blueprintTypes = [
+	'ObjectBlueprint',
+	'PrefabBlueprint',
+	'EffectBlueprint',
+	'VisualEnvironmentBlueprint',
+	'SpatialPrefabBlueprint'
+];
 function randomName() {
 	let out = '';
 	for (let i = 0; i < 6; i++) {
@@ -27,13 +48,16 @@ export function GenerateBlueprints(count: number): IBlueprint[] {
 				{
 					hash: Math.floor(Math.random() * 1000),
 					name: randomName()
-				}, {
+				},
+				{
 					hash: Math.floor(Math.random() * 1000),
 					name: randomName()
-				}, {
+				},
+				{
 					hash: Math.floor(Math.random() * 1000),
 					name: randomName()
-				}, {
+				},
+				{
 					hash: Math.floor(Math.random() * 1000),
 					name: randomName()
 				}
