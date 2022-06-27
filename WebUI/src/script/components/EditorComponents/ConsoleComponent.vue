@@ -38,7 +38,7 @@
 					</div>
 					<div v-if="typeof item.message === 'object'" class="message">
 						{{ FormatTime(item.time) }} [{{ logLevelDict[item.level] }}]
-						{{ item.message.constructor.name }} {{ Inspect(item.message) }}
+						{{ item.message.constructor.name }} {{ item.message | json }}
 					</div>
 					<div v-if="item.expanded" class="stackTrace">
 						{{ FormatStacktrace(item) }}
@@ -57,7 +57,6 @@ import EditorComponent from './EditorComponent.vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { signals } from '@/script/modules/Signals';
-import { inspect } from 'util';
 import { ConsoleEntry, IConsoleEntry } from '@/script/types/ConsoleEntry';
 import Search from '@/script/components/widgets/Search.vue';
 import { LOGLEVEL } from '@/script/types/Enums';
@@ -115,7 +114,7 @@ export default class ConsoleComponent extends EditorComponent {
 		if (obj == null) {
 			return 'null';
 		}
-		return inspect(obj);
+		return JSON.stringify(obj);
 	}
 
 	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
