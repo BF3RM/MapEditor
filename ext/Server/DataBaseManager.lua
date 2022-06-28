@@ -34,7 +34,7 @@ end
 ---@param p_GameObjectSaveDatas table|string
 ---@param p_SaveVersion string
 ---@param p_TimeStamp number|nil
----@return boolean success, string errorMessage
+---@return boolean success, string|nil errorMessage
 function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundles, p_GameObjectSaveDatas, p_SaveVersion, p_TimeStamp)
 	local s_TimeStamp = p_TimeStamp or SharedUtils:GetTimeMS()
 
@@ -124,7 +124,7 @@ end
 ---@param p_RequiredBundlesJson string
 ---@param p_SaveVersion string
 ---@param p_TimeStamp number
----@return boolean success, string errorMessage, number headerId
+---@return boolean success, string|nil errorMessage, number headerId
 function DataBaseManager:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundlesJson, p_SaveVersion, p_TimeStamp)
 	if p_ProjectName == nil or type(p_ProjectName) ~= "string" then
 		return false, "Failed to save Project - header.projectName is invalid: " .. tostring(p_ProjectName)
@@ -166,7 +166,7 @@ end
 
 ---@param p_HeaderId number
 ---@param p_GameObjectSaveDatasJson string
----@return boolean success, string errorMessage
+---@return boolean success, string|nil errorMessage
 function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
 	m_Logger:Write("SaveProjectData() " .. tostring(p_HeaderId))
 	--m_Logger:Write(p_GameObjectSaveDatasJson)
