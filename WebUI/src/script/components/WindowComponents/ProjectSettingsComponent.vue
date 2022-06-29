@@ -178,9 +178,8 @@ export default class ProjectSettingsComponent extends Vue {
 			this.hint = 'Select all and copy (CTRL+C)';
 			let beautifiedJSONString = JSON.stringify(projectDataJSON, null, '\t');
 			// Round numbers to 3 decimals
-			beautifiedJSONString = beautifiedJSONString.replace(/("[xyz]":\s*)(\d+\.\d+)/g, function(str, prefix, n) {
+			beautifiedJSONString = beautifiedJSONString.replace(/("[xyz]":\s*)(\d+\.\d+)/g, (str, prefix, n) => {
 				return prefix + Number(n).toFixed(3).toString();
-
 			});
 			this.projectData = beautifiedJSONString;
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
@@ -226,10 +225,10 @@ export default class ProjectSettingsComponent extends Vue {
 
 	CopyToClipboard() {
 		navigator.clipboard.writeText(this.projectData).then(
-			function () {
+			() => {
 				console.log('Async: Copying to clipboard was successful!');
 			},
-			function (err) {
+			(err) => {
 				console.error('Async: Could not copy text: ', err);
 			}
 		);

@@ -102,7 +102,7 @@ export class FrostbiteDataManager {
 		fileName = fileName.toLowerCase();
 		const scope = this;
 		const file = this.files.getValue(fileName);
-		Object.keys(file).forEach(function (entryName) {
+		Object.keys(file).forEach((entryName) => {
 			const entry = file[entryName];
 			switch (fileName) {
 				case 'superbundles':

@@ -215,7 +215,7 @@ export default class InfiniteTreeComponent extends Vue {
 		// Updates the tree.
 		this.tree.update = () => {
 			this.tree.emit('contentWillUpdate');
-			this.$nextTick(function () {
+			this.$nextTick(() => {
 				this.tree.emit('contentDidUpdate');
 			});
 		};
