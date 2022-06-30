@@ -99,17 +99,29 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportDataName].saveVersion
 
 	if s_SaveVersion == nil then -- Save from before versioning was implemented, try to upgrade to current version
-		-- TODO
+		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
+
+		-- Some pre-versioning save files had an isVanilla flag
+		for _, l_DataEntry in pairs(s_Data) do
+			if l_DataEntry.isVanilla ~= nil then
+				l_DataEntry.origin = GameObjectOriginType.Vanilla and l_DataEntry.isVanilla or GameObjectOriginType.Custom
+				l_DataEntry.isVanilla = nil
+			end
+		end
+
 		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
+
 		return p_ProjectSave
 	elseif s_SaveVersion > SAVE_VERSION then
 		return nil, 'Importing save with a higher save format version than supported in the current MapEditor build, please update MapEditor before importing'
 	else
-		-- New version updates go here
+		-- New version updates are handled here
+
+		-- Update save version
+		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
 		return p_ProjectSave
 	end
 end
-
 
 ---@param p_Player Player
 ---@param p_ProjectSaveJSON string
@@ -201,17 +213,29 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 			m_LoadDelay = 0
 
 			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
-				m_Logger:Error("Cant load project that is not built for the same map as current one.")
+				m_Logger:Error("Can'classt load project that is not built for the same map as current one.")
 				return
 			end
 
-			-- Load User Data from Database
-			local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
-			--self:UpdateLevelFromOldSaveFile(s_SaveFile)
-			if s_ProjectSaveData then
-				m_Logger:Write('Loading project save')
-				self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
+			local s_ProjectSave = DataBaseManager:GetProjectByProjectId(self.m_CurrentProjectHeader.id)
+
+			if s_ProjectSave == nil then
+				m_Logger:Error("Can't load project, not found in database.")
+				return
 			end
+
+			m_Logger:Write('Loading project save')
+
+			-- Upgrade if necessary
+			local s_Msg
+			s_ProjectSave, s_Msg = self:UpgradeSaveStructure(s_ProjectSave)
+
+			if s_ProjectSave == nil then
+				m_Logger:Error("Can't load project. Error: " .. tostring(s_Msg))
+				return
+			end
+
+			self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
 		end
 	end
 end
@@ -328,8 +352,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 		local s_Command
 
 		-- Vanilla objects are handled in maploader
-		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
-		l_GameObjectSaveData.isVanilla then -- Supports old savefiles
+		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla then
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
 					guid = s_Guid,

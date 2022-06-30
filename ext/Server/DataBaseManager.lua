@@ -25,6 +25,7 @@ function DataBaseManager:__init()
 	self.m_ExportDataName = "data"
 
 	self:CreateOrUpdateDatabase()
+	--TODO: maybe update all project save files' structure if they are not up-to-date?
 end
 
 ---@param p_ProjectName string
