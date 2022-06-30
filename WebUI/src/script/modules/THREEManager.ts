@@ -8,7 +8,7 @@ import CameraControlWrapper from '@/script/modules/three/CameraControlWrapper';
 import GizmoWrapper from '@/script/modules/three/GizmoWrapper';
 import { InputControls } from '@/script/modules/InputControls';
 import { Guid } from '@/script/types/Guid';
-import { GIZMO_MODE, WORLD_SPACE } from '@/script/types/Enums';
+import { GIZMO_MODE, LOGLEVEL, WORLD_SPACE } from '@/script/types/Enums';
 import { Blueprint } from '@/script/types/Blueprint';
 import InstanceManager from '@/script/modules/InstanceManager';
 import BoxSelectionWrapper from '@/script/modules/three/BoxSelectionWrapper';
@@ -48,7 +48,7 @@ export class THREEManager {
 	public isCameraMoving = false;
 	private clock = new THREE.Clock();
 	private cameraHasMoved: boolean;
-	public miniBrushEnabled: boolean;
+	public miniBrushEnabled = false;
 
 	private raycaster = new THREE.Raycaster();
 
@@ -189,10 +189,12 @@ export class THREEManager {
 	}
 
 	public EnableMiniBrushMode() {
+		window.Log(LOGLEVEL.VERBOSE, 'Minibrush Mode enabled');
 		this.miniBrushEnabled = true;
 	}
 
 	public DisableMiniBrushMode() {
+		window.Log(LOGLEVEL.VERBOSE, 'Minibrush Mode disabled');
 		this.miniBrushEnabled = false;
 	}
 
