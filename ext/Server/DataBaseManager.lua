@@ -44,6 +44,7 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 	if type(p_GameObjectSaveDatas) ~= 'string' then
 		s_GameObjectSaveDatasJson = json.encode(p_GameObjectSaveDatas)
 	end
+	---@cast s_GameObjectSaveDatasJson -table
 
 	-- Round transform numbers to 3 decimals
 	s_GameObjectSaveDatasJson = string.gsub(s_GameObjectSaveDatasJson, '(%"[xyz]%":%s*)(%d+%.%d+)', function(prefix, n)
@@ -53,10 +54,12 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 	if type(p_RequiredBundles) ~= 'string' then
 		s_RequiredBundlesJson = json.encode(p_RequiredBundles)
 	end
+	---@cast s_RequiredBundlesJson -table
 
 	local s_Success, s_ErrorMsg, s_HeaderId = self:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, s_RequiredBundlesJson, p_SaveVersion, s_TimeStamp)
 
 	if s_Success then
+		---@cast s_HeaderId -nil
 		return self:SaveProjectData(s_HeaderId, s_GameObjectSaveDatasJson)
 	else
 		return s_Success, s_ErrorMsg
@@ -124,7 +127,7 @@ end
 ---@param p_RequiredBundlesJson string
 ---@param p_SaveVersion string
 ---@param p_TimeStamp number
----@return boolean success, string|nil errorMessage, number headerId
+---@return boolean success, string|nil errorMessage, number|nil headerId
 function DataBaseManager:SaveProjectHeader(p_ProjectName, p_MapName, p_GameModeName, p_RequiredBundlesJson, p_SaveVersion, p_TimeStamp)
 	if p_ProjectName == nil or type(p_ProjectName) ~= "string" then
 		return false, "Failed to save Project - header.projectName is invalid: " .. tostring(p_ProjectName)
@@ -217,10 +220,11 @@ end
 ---@param p_ProjectId number
 ---@return ProjectHeader|nil projectHeader
 function DataBaseManager:GetProjectHeader(p_ProjectId)
-	p_ProjectId = tostring(math.floor(p_ProjectId))
-	m_Logger:Write("GetProjectHeader()" .. p_ProjectId)
+	local s_ProjectIdInt = math.floor(p_ProjectId)
 
-	local s_ProjectHeaderRow = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE '.. 'id' .. ' = ' .. p_ProjectId .. ' LIMIT 1')
+	m_Logger:Write("GetProjectHeader()" .. s_ProjectIdInt)
+
+	local s_ProjectHeaderRow = SQL:Query('SELECT * FROM ' .. m_DB_Header_Table_Name .. ' WHERE '.. 'id' .. ' = ' .. s_ProjectIdInt .. ' LIMIT 1')
 
 	if not s_ProjectHeaderRow then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
@@ -244,10 +248,10 @@ end
 ---@param p_ProjectId number
 ---@return string|nil
 function DataBaseManager:GetProjectDataJSONByProjectId(p_ProjectId)
-	p_ProjectId = tostring(math.floor(p_ProjectId))
-	m_Logger:Write("GetProjectDataJSONByProjectId()" .. p_ProjectId)
+	local s_ProjectIdInt = math.floor(p_ProjectId)
+	m_Logger:Write("GetProjectDataJSONByProjectId()" .. s_ProjectIdInt)
 
-	local s_ProjectDataTable = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. p_ProjectId .. ' LIMIT 1')
+	local s_ProjectDataTable = SQL:Query('SELECT ' .. m_SaveFile_Text_Column_Name .. ' FROM ' .. m_DB_Data_Table_Name .. ' WHERE '.. m_ProjectHeader_Id_Column_Name .. ' = ' .. s_ProjectIdInt .. ' LIMIT 1')
 
 	if not s_ProjectDataTable then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
@@ -273,8 +277,8 @@ function DataBaseManager:GetProjectDataByProjectId(p_ProjectId)
 		return
 	end
 
-	---@type ProjectDataEntry[]
 	local s_ProjectData = DecodeParams(json.decode(s_ProjectDataJSON))
+	---@cast s_ProjectData ProjectDataEntry[]
 
 	if not s_ProjectData then
 		m_Logger:Error('Failed to decode project data')

@@ -52,7 +52,7 @@ function ProjectManager:OnLevelDestroy()
 	m_IsLevelLoaded = false
 end
 
----@param p_Player Player
+---@param p_Player Player|nil
 function ProjectManager:UpdateClientProjectHeader(p_Player)
 	if self.m_CurrentProjectHeader == nil then
 		self.m_CurrentProjectHeader = {
@@ -97,13 +97,16 @@ end
 ---@return ProjectSave|nil projectSave, string|nil errorMessage
 function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportDataName].saveVersion
-	
+
 	if s_SaveVersion == nil then -- Save from before versioning was implemented, try to upgrade to current version
 		-- TODO
 		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
-		return p_ProjectSave, nil
+		return p_ProjectSave
 	elseif s_SaveVersion > SAVE_VERSION then
 		return nil, 'Importing save with a higher save format version than supported in the current MapEditor build, please update MapEditor before importing'
+	else
+		-- New version updates go here
+		return p_ProjectSave
 	end
 end
 
@@ -205,8 +208,10 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 			-- Load User Data from Database
 			local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
 			--self:UpdateLevelFromOldSaveFile(s_SaveFile)
-			m_Logger:Write('Loading project save')
-			self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
+			if s_ProjectSaveData then
+				m_Logger:Write('Loading project save')
+				self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
+			end
 		end
 	end
 end
