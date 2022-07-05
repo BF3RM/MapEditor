@@ -5,6 +5,7 @@ local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false
 local m_LoadDelay = 0
 
+local SAVE_VERSION = "0.1.0"
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -36,6 +37,7 @@ function ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
 	end
 end
 
+---@param p_Player Player
 function ProjectManager:OnRequestProjectHeaders(p_Player)
 	if p_Player == nil then -- update all players
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
@@ -50,6 +52,7 @@ function ProjectManager:OnLevelDestroy()
 	m_IsLevelLoaded = false
 end
 
+---@param p_Player Player|nil
 function ProjectManager:UpdateClientProjectHeader(p_Player)
 	if self.m_CurrentProjectHeader == nil then
 		self.m_CurrentProjectHeader = {
@@ -67,6 +70,8 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
 	end
 end
 
+---@param p_Player Player
+---@param p_ProjectId integer
 function ProjectManager:OnRequestProjectData(p_Player, p_ProjectId)
 	m_Logger:Write("Data requested: " .. p_ProjectId)
 
@@ -75,6 +80,8 @@ function ProjectManager:OnRequestProjectData(p_Player, p_ProjectId)
 	NetEvents:SendToLocal("MapEditorClient:ReceiveProjectData", p_Player, s_ProjectData)
 end
 
+---@param p_Player Player
+---@param p_ProjectId integer
 function ProjectManager:OnRequestProjectDelete(p_Player, p_ProjectId)
 	m_Logger:Write("Delete requested: " .. p_ProjectId)
 
@@ -86,17 +93,68 @@ function ProjectManager:OnRequestProjectDelete(p_Player, p_ProjectId)
 	end
 end
 
-function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
+---@param p_ProjectSave ProjectSave
+---@return ProjectSave|nil projectSave, string|nil errorMessage
+function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
+	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportDataName].saveVersion
+
+	if s_SaveVersion == nil then -- Save from before versioning was implemented, try to upgrade to current version
+		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
+
+		-- Some pre-versioning save files had an isVanilla flag
+		for _, l_DataEntry in pairs(s_Data) do
+			if l_DataEntry.isVanilla ~= nil then
+				l_DataEntry.origin = GameObjectOriginType.Vanilla and l_DataEntry.isVanilla or GameObjectOriginType.Custom
+				l_DataEntry.isVanilla = nil
+			end
+		end
+
+		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
+
+		return p_ProjectSave
+	elseif s_SaveVersion > SAVE_VERSION then
+		return nil, 'Importing save with a higher save format version than supported in the current MapEditor build, please update MapEditor before importing'
+	else
+		-- New version updates are handled here
+
+		-- Update save version
+		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
+		return p_ProjectSave
+	end
+end
+
+---@param p_Player Player
+---@param p_ProjectSaveJSON string
+function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectSaveJSON)
 	m_Logger:Write("Import requested")
 
-	local s_Success, s_Msg = DataBaseManager:ImportProject(p_ProjectDataJSON)
+	local s_ProjectSave, s_Msg = self:ParseJSONProject(p_ProjectSaveJSON)
+	local s_Success = s_ProjectSave ~= nil
+
+	-- Update save structure to newest save version
+	if s_ProjectSave then
+		if not s_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion or s_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion ~= SAVE_VERSION then
+			m_Logger:Write('Older save version found, updating to newest save structure..')
+
+			s_ProjectSave, s_Msg = self:UpgradeSaveStructure(s_ProjectSave)
+			s_Success = s_ProjectSave ~= nil
+		end
+	end
+
+	-- Attempt saving the project
+	if s_ProjectSave then
+		local s_Header = s_ProjectSave[DataBaseManager.m_ExportHeaderName]
+		local s_Data = s_ProjectSave[DataBaseManager.m_ExportDataName]
+
+		s_Success, s_Msg = DataBaseManager:SaveProject(s_Header.projectName, s_Header.mapName, s_Header.gameModeName, s_Header.requiredBundles, s_Data, s_Header.saveVersion, s_Header.timeStamp)
+	end
 
 	if s_Success then
 		m_Logger:Write('Correctly imported save file')
 		-- Update clients with new save.
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
 	else
-		m_Logger:Write('Error importing save file: '..s_Msg)
+		m_Logger:Write('Error importing save file: ' .. s_Msg)
 	end
 
 	s_Msg = s_Msg or 'Successfully imported save file.'
@@ -104,6 +162,40 @@ function ProjectManager:OnRequestProjectImport(p_Player, p_ProjectDataJSON)
 	NetEvents:SendToLocal("MapEditorClient:ProjectImportFinished", p_Player, s_Msg)
 end
 
+---@param p_ProjectSaveJSON string
+---@return ProjectSave|nil projectSave, string|nil errorMessage
+function ProjectManager:ParseJSONProject(p_ProjectSaveJSON)
+	local s_ProjectSave = json.decode(p_ProjectSaveJSON)
+
+	if s_ProjectSave == nil then
+		return nil, 'Incorrect save format'
+	end
+
+	local s_Header = s_ProjectSave[DataBaseManager.m_ExportHeaderName]
+	local s_Data = s_ProjectSave[DataBaseManager.m_ExportDataName]
+
+	if s_Header == nil then
+		return nil, 'Save file is missing header '
+	end
+
+	if s_Data == nil then
+		return nil, 'Save file is missing data'
+	end
+
+	if s_Header.projectName == nil or
+		s_Header.mapName == nil or
+		s_Header.gameModeName == nil or
+		-- s_Header.saveVersion == nil or -- not required, old saves didn't have it
+		s_Header.requiredBundles == nil then
+		return nil, 'Save header missing necessary field(s)'
+	end
+
+	return { [DataBaseManager.m_ExportHeaderName] = s_Header, [DataBaseManager.m_ExportDataName] = s_Data}
+end
+
+---@param p_Map string
+---@param p_GameMode string
+---@param p_Round integer
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	m_IsLevelLoaded = true
 
@@ -121,19 +213,35 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 			m_LoadDelay = 0
 
 			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
-				m_Logger:Error("Cant load project that is not built for the same map as current one.")
+				m_Logger:Error("Can'classt load project that is not built for the same map as current one.")
 				return
 			end
 
-			-- Load User Data from Database
-			local s_ProjectSaveData = DataBaseManager:GetProjectDataByProjectId(self.m_CurrentProjectHeader.id)
-			--self:UpdateLevelFromOldSaveFile(s_SaveFile)
+			local s_ProjectSave = DataBaseManager:GetProjectByProjectId(self.m_CurrentProjectHeader.id)
+
+			if s_ProjectSave == nil then
+				m_Logger:Error("Can't load project, not found in database.")
+				return
+			end
+
 			m_Logger:Write('Loading project save')
-			self:CreateAndExecuteImitationCommands(s_ProjectSaveData)
+
+			-- Upgrade if necessary
+			local s_Msg
+			s_ProjectSave, s_Msg = self:UpgradeSaveStructure(s_ProjectSave)
+
+			if s_ProjectSave == nil then
+				m_Logger:Error("Can't load project. Error: " .. tostring(s_Msg))
+				return
+			end
+
+			self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
 		end
 	end
 end
 
+---@param p_Player Player
+---@param p_ProjectId integer
 function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	m_Logger:Write("Load requested: " .. p_ProjectId)
 	-- TODO: check player's permission once that is implemented
@@ -185,13 +293,14 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	end
 end
 
-function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectSaveData)
+function ProjectManager:OnRequestProjectSave(p_Player, p_ProjectHeader)
 	-- TODO: check player's permission once that is implemented
-	self:SaveProjectCoroutine(p_ProjectSaveData)
+	self:SaveProjectCoroutine(p_ProjectHeader)
 end
 
-function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
-	m_Logger:Write("Save requested: " .. p_ProjectSaveData.projectName)
+---@param p_ProjectHeader ProjectHeader
+function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
+	m_Logger:Write("Save requested: " .. p_ProjectHeader.projectName)
 
 	local s_GameObjectSaveDatas = {}
 	local s_Count = 0
@@ -212,12 +321,12 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 	-- m_Logger:Write(json.encode(s_GameObjectSaveDatas))
 	-- m_Logger:Write("^^^^^^^^^^^^^^^^^")
 	self.m_CurrentProjectHeader = {
-		projectName = p_ProjectSaveData.projectName,
+		projectName = p_ProjectHeader.projectName,
 		mapName = self.m_MapName,
 		gameModeName = self.m_GameMode,
 		requiredBundles = self.m_LoadedBundles
 	}
-	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectSaveData.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas)
+	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectHeader.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas, SAVE_VERSION)
 
 	if s_Success then
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
@@ -227,7 +336,9 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectSaveData)
 	end
 end
 
--- we're creating commands from the savefile, basically imitating every step that has been undertaken
+
+---We're creating commands from the savefile, basically imitating every step that has been undertaken
+---@param p_ProjectSaveData ProjectDataEntry[]
 function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 	local s_SaveFileCommands = {}
 
@@ -241,8 +352,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 		local s_Command
 
 		-- Vanilla objects are handled in maploader
-		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
-		l_GameObjectSaveData.isVanilla then -- Supports old savefiles
+		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla then
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
 					guid = s_Guid,

@@ -40,7 +40,7 @@ end
 ---@param p_BlueprintInstanceGuid string|Guid
 ---@param p_ParentData table
 ---@param p_LinearTransform LinearTransform
----@param p_Variation number
+---@param p_Variation integer
 ---@param p_IsPreviewSpawn boolean
 ---@param p_Overrides table
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
@@ -190,7 +190,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 		-- Root object
 		if s_ReferenceObjectData == nil or s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
-			self:ResolveRootObject(s_GameObject)
+			self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
 		else
 			-- Child object
 			m_Logger:Write("ResolveChildObject")
@@ -203,11 +203,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		if s_PendingCustomBlueprintInfo == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
-			self:ResolveRootObject(s_GameObject)
+			self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
 		else
 			-- Custom object, parent is root
 			m_Logger:Write('Found custom object without parent')
-			self:ResolveRootObject(s_GameObject)
+			self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
 		end
 	end
 
@@ -348,18 +348,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 end
 
-function GameObjectManager:ResolveRootObject(p_GameObject)
-	local s_PendingInfo = self.m_PendingCustomBlueprintGuids[tostring(p_GameObject.blueprintCtrRef.instanceGuid)]
+function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 
-	if s_PendingInfo then -- We spawned this custom entitybus
+	if p_PendingInfo then -- We spawned this custom entitybus
 		p_GameObject.parentData = GameObjectParentData{
-			guid = s_PendingInfo.parentData.guid,
-			typeName = s_PendingInfo.parentData.typeName,
-			primaryInstanceGuid = s_PendingInfo.parentData.primaryInstanceGuid,
-			partitionGuid = s_PendingInfo.parentData.partitionGuid
+			guid = p_PendingInfo.parentData.guid,
+			typeName = p_PendingInfo.parentData.typeName,
+			primaryInstanceGuid = p_PendingInfo.parentData.primaryInstanceGuid,
+			partitionGuid = p_PendingInfo.parentData.partitionGuid
 		}
-		p_GameObject.guid = Guid(s_PendingInfo.customGuid)
+		p_GameObject.guid = Guid(p_PendingInfo.customGuid)
 		p_GameObject.origin = GameObjectOriginType.Custom
 	else -- This is a vanilla root object
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
