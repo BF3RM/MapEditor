@@ -1,11 +1,24 @@
 # Vext-MapEditor
-A realtime map editor for Venice Unleashed
+A real-time, multiplayer in-game level for Battlefield 3/[Venice Unleashed](https://veniceunleashed.net/)
 
 ### IMPORTANT NOTE:
-This is currently a WIP, it's not intended to be used yet. 
-If you want to mess around go ahead, but expect crashes and bugs. 
-It's not recommended to start any project yet, but if you still want to set up a server and try it out you need to follow the steps in the next section.
-Public releases will have the compiled UI available for download. 
+This mod is still under development, some features are missing and there can be bugs and crashes. That said, it's already possible to develop projects with it. Preview versions are currently being published and come with a compiled UI.
+
+## Prerequisites:
+- Install Venice Unleashed and [set it up](https://docs.veniceunleashed.net/hosting/prereq/)
+- Set up a [dedicated server environment](https://docs.veniceunleashed.net/hosting/setup-win/)
+
+## Set-up
+The recommended way of installing and keeping the mod up-to-date is to use [VUMM](https://github.com/BF3RM/vumm-cli), short for Venice Unleashed Mod Manager. 
+
+The installation steps are:
+- Install VUMM and register an account (check VUMM repository for more info)
+- Open the command line
+- Type `vumm install mapeditor@preview`
+
+This will install the mod in the `Mods` folder and update your `modllist.txt` to include MapEditor. The VUMM command is also used to update the mod.
+
+Alternatively, the mod can be installed manually by downloading the zip file attached in each [release version](https://github.com/BF3RM/MapEditor/releases).
 
 ## Developer set-up
 - Install [nodejs](https://nodejs.org/en/).
@@ -17,52 +30,15 @@ Public releases will have the compiled UI available for download.
 
 ## Controls:
 
-F1 to enable freecam.
-
-Once in freecam, hold right click and:
-
-- F1 to disable freecam and take control of your character again
-- WASD to move camera
-- Mouse to rotate camera
-- Q to move down
-- E to move up
-- Shift to move camera faster
-- Scrollwheel to change camera speed
-- Page up/down to change rotation speed
-- Arrow up/down to change FOV
-
-In freecam, without holding right click:
-
-- ALT+Right click to orbit-rotate camera
-- Middle mouse click to truck
-- CTRL while moving gizmo to snap to grid
-- F to focus the camera on the selected object
-- Q to hide gizmo
-- W to change gizmo mode to translate
-- E to change gizmo mode to rotate 
-- R to change gizmo mode to scale 
-- X to toggle world/local coordinates
-- F3 to reset the camera
-- P to select parent
-- CTRL+D to clone selected entity to the same directory
-- CTRL+SHIFT+D to clone selected entity to the root directory
-- CTRL+C to copy selected entity
-- CTRL+V to paste saved entity to the selected group 
-- CTRL+Z to undo 
-- CTRL+SHIFT+Z to redo
-- DEL to delete selected object
-- F5 to reload UI
-- ESC to clear selection
+A list of controls can be found in-game. To reveal it, navigate in the toolbar to File->Hotkeys
 
 ## Mod Dependencies
 MapEditor requires other mods to work fully:
-- NoHavok. (Not publicly available yet). This mod transforms Havok objects into Frosbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing.
+- [NoHavok](https://github.com/BF3RM/NoHavok/issues). This mod converts Havok objects into Frostbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing. NoHavok is still not completed and might lead to unexpected crashes and not work on some maps. To use it, simply download the mod in the `/Admin/Mods` folder and add `nohavok` to `modlist.txt`.
 
 ## Running saves for playing
 If your project is ready to be used for playing, export your project's save from MapEditor and load it with
- [MapLoader](https://github.com/BF3RM/MapLoader). The save can be loaded from an external mod (you can find an 
- example here: [CustomLevel](https://github.com/BF3RM/CustomLevel)) or MapLoader can be modified to include and load
- the save.
+ [CustomLevelLoader](https://github.com/BF3RM/CustomLevelLoader). You can find an example in the [RealityMod branch](https://github.com/BF3RM/CustomLevelLoader/tree/realitymod-dev). For more information on how to similarly set up a project, check CustomLevelLoader's README file.
 
 ## Used libraries and tools
 This project is using:
