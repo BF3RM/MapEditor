@@ -78,7 +78,7 @@ jobs:
           name: lua-build
       - name: Create Zip File
         run: |
-          zip MapEditor.zip .
+          zip -r MapEditor.zip .
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
