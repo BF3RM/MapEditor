@@ -48,7 +48,7 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 	---@cast s_GameObjectSaveDatasJson -table
 
 	-- Round transform numbers to 3 decimals
-	s_GameObjectSaveDatasJson = string.gsub(s_GameObjectSaveDatasJson, '(%"[xyz]%":%s*)(%d+%.%d+)', function(prefix, n)
+	s_GameObjectSaveDatasJson = string.gsub(s_GameObjectSaveDatasJson, '(%"[xyz]%":%s*)([-]?%d+%.%d+)', function(prefix, n)
 		return prefix .. string.format("%.3f", tonumber(n))
 	end)
 

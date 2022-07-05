@@ -178,7 +178,7 @@ export default class ProjectSettingsComponent extends Vue {
 			this.hint = 'Select all and copy (CTRL+C)';
 			let beautifiedJSONString = JSON.stringify(projectDataJSON, null, '\t');
 			// Round numbers to 3 decimals
-			beautifiedJSONString = beautifiedJSONString.replace(/("[xyz]":\s*)(\d+\.\d+)/g, (str, prefix, n) => {
+			beautifiedJSONString = beautifiedJSONString.replace(/("[xyz]":\s*)([-]?\d+\.\d+)/g, (str, prefix, n) => {
 				return prefix + Number(n).toFixed(3).toString();
 			});
 			this.projectData = beautifiedJSONString;
