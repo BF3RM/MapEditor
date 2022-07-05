@@ -200,6 +200,7 @@ export class THREEManager {
 
 	public enableFreecamMovement() {
 		this.highlightingEnabled = false;
+		editor.editorCore.unhighlight();
 		window.vext.SendEvent('EnableFreeCamMovement');
 		this.cameraControls.enableVextCameraUpdates(false);
 		this.OnCameraMoveEnable();
