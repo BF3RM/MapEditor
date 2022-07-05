@@ -142,9 +142,9 @@ export const HOTKEYS: Hotkey[] = [
 		false,
 		() => {
 			if (editor.threeManager.miniBrushEnabled) {
-				editor.threeManager.EnableMiniBrushMode();
-			} else {
 				editor.threeManager.DisableMiniBrushMode();
+			} else {
+				editor.threeManager.EnableMiniBrushMode();
 			}
 		},
 		HOTKEY_TYPE.Down,
