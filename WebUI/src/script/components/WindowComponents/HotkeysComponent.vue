@@ -80,6 +80,8 @@ export default class HotkeysComponent extends Vue {
 <style lang="scss" scoped>
 .hotkeys-container {
 	margin-bottom: 0 !important;
+	position: relative;
+	padding: 1.5vh;
 
 	h6 {
 		color: #fff;
@@ -110,6 +112,10 @@ export default class HotkeysComponent extends Vue {
 
 	::v-deep .window {
 		height: 75vh !important;
+
+		.content {
+			padding: 0;
+		}
 	}
 }
 </style>
