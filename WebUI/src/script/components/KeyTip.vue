@@ -50,23 +50,23 @@ export default class KeyTip extends Vue {
 	line-height: 16px;
 
 	.key-outline {
-        border: 0.2vmin solid #fff;
-        border-radius: .75vmin;
-        margin: 0 0.5vmin 0 0;
-        height: 3.25vmin;
-        box-sizing: border-box;
-        min-width: 3vmin;
-        max-width: 5vmin;
-        padding: 0 2vmin;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25vmin;
-        line-height: 1.25vmin;
-        color: #fff;
-        text-transform: uppercase;
-        font-variant-numeric: tabular-nums;
-        font-weight: 600;
+		border: 0.2vmin solid #fff;
+		border-radius: 0.75vmin;
+		margin: 0 0.5vmin 0 0;
+		height: 3.25vmin;
+		box-sizing: border-box;
+		min-width: 3vmin;
+		max-width: 5vmin;
+		padding: 0 2vmin;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.25vmin;
+		line-height: 1.25vmin;
+		color: #fff;
+		text-transform: uppercase;
+		font-variant-numeric: tabular-nums;
+		font-weight: 600;
 		font-size: 1.25vmin;
 		line-height: 1.45vmin;
 
