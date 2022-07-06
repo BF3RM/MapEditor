@@ -2448,7 +2448,7 @@ flatted@^3.1.0:
   resolved "https://registry.npmjs.org/flatted/-/flatted-3.1.0.tgz"
   integrity sha512-tW+UkmtNg/jv9CSofAKvgVcO7c2URjhTdW1ZTkcAritblu8tajiYy7YisnIflEwtKssCtOxpnBRoCB7iap0/TA==
 
-flattree@0.11.1, flattree@^0.11.1:
+flattree@0.11.1, flattree@^0.10.0:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/flattree/-/flattree-0.11.1.tgz#5fd0be125e74eb28d3885e3f6dcfa784844cac56"
   integrity sha512-3+Rup2VS406JqWsf+eGKVvwfs7aCmquu+GIFb3KyB8/8vnlj3KCfoDUx7xjMSmolyoebEjjvXIthj1s0uC2CvA==
@@ -2856,17 +2856,17 @@ imurmurhash@^0.1.4:
   resolved "https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=
 
-infinite-tree@1.17.0:
-  version "1.17.0"
-  resolved "https://registry.yarnpkg.com/infinite-tree/-/infinite-tree-1.17.0.tgz#2d98a79411efabf8c54f0e60a0725313c7cdc7ff"
-  integrity sha512-dkq++vAShpwggkz5ESjmBJlS6LSaVhNAmGRmOjn8Z5MKiBZyYJ6x/JJweIP9Eki2qn+3OEDlFrwkuGJluKaWTg==
+infinite-tree@1.16.2:
+  version "1.16.2"
+  resolved "https://registry.yarnpkg.com/infinite-tree/-/infinite-tree-1.16.2.tgz#52993721ba5ae3b4c858484c0084f863ab26311e"
+  integrity sha512-TYhRhozcvJg6LOos5rPHj1XwMa65QX/ivhMMOL18lB0JUkHI9HMBiwDgTJK8K1XMHDr/OQRKqSTZ0KEOaS1Ztg==
   dependencies:
     classnames "^2.2.5"
     element-class "^0.2.2"
     escape-html "^1.0.3"
-    flattree "^0.11.1"
+    flattree "^0.10.0"
     html5-tag "^0.3.0"
-    is-dom "^1.1.0"
+    is-dom "^1.0.9"
 
 inflight@^1.0.4:
   version "1.0.6"
@@ -2937,7 +2937,7 @@ is-docker@^2.1.1:
   resolved "https://registry.npmjs.org/is-docker/-/is-docker-2.2.1.tgz"
   integrity sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ==
 
-is-dom@^1.1.0:
+is-dom@^1.0.9:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-dom/-/is-dom-1.1.0.tgz#af1fced292742443bb59ca3f76ab5e80907b4e8a"
   integrity sha512-u82f6mvhYxRPKpw8V1N0W8ce1xXwOrQtgGcxl6UCL5zBmZu3is/18K0rR7uFCnMDuAsS/3W54mGL4vsaFUQlEQ==
