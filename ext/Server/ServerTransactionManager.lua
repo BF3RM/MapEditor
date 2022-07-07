@@ -20,7 +20,7 @@ function ServerTransactionManager:RegisterVars()
 	self.m_Queue = {}
 	self.m_Transactions = {}
 	self.m_PlayersReady = {}
-	self.m_LoadingProjectTransactionId = nil
+	self.m_LoadingProjectLastTransactionId = nil
 end
 
 function ServerTransactionManager:OnLevelDestroy()
@@ -61,15 +61,8 @@ function ServerTransactionManager:OnRequestSync(p_Player, p_TransactionId)
 end
 
 function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
-	local s_TargetTransactionId = #self.m_Transactions
-	
-	if self.m_LoadingProjectTransactionId ~= nil then
-		-- There is a project in loading, target is the last transaction id of the project
-		s_TargetTransactionId = self.m_LoadingProjectTransactionId
-	end
-
 	--- Client up to date
-	if p_TransactionId == s_TargetTransactionId then
+	if p_TransactionId == #self.m_Transactions then
 		-- m_Logger:Write("Client up to date")
 		-- Empty response, so the player know it has finished syncing.
 		NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player)
@@ -109,12 +102,12 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 		p_Player,
 		s_UpdatedGameObjectTransferDatas,
 		s_LastTransaction,
-		s_TargetTransactionId
+		self.m_LoadingProjectLastTransactionId
 	)
 end
 
-function ServerTransactionManager:SetLoadingProjectTransactionId(p_TransactionId)
-	self.m_LoadingProjectTransactionId = p_TransactionId
+function ServerTransactionManager:SetLoadingProjectLastTransactionId(p_Id)
+	self.m_LoadingProjectLastTransactionId = p_Id
 end
 
 function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson)

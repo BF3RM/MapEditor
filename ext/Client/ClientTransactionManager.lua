@@ -22,9 +22,12 @@ function ClientTransactionManager:ResetVars()
 	}
 
 	self.m_IsPlayerReady = false
+	self.m_Syncing = {
+		inProgress = false,
+		targetCommandNum = 0,
+		currentCommandNum = 0
+	}
 	self.m_LastTransactionId = 0 -- Last synced transaction
-	self.m_ExecutedTransactions = 0
-	self.m_TargetTransactionId = 0 -- Target transaction to finish loading/syncing
 	self.m_CommandActionResults = {}
 	self.m_ExecutedCommandActions = {}
 end
@@ -70,13 +73,15 @@ function ClientTransactionManager:OnLevelDestroy()
 	self.m_LastTransactionId = 0
 end
 
-function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId, p_TargetTransactionId)
+---@param p_TransferDatas table
+---@param p_LastTransactionId any
+---@param p_ProjectLastTransactionId any
+function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId, p_ProjectLastTransactionId)
 	m_Logger:Write('Syncing client context')
 
 	if p_LastTransactionId ~= nil and p_TransferDatas ~= nil then
-		self.m_TargetTransactionId = p_TargetTransactionId
 		self:UpdateTransactionId(p_LastTransactionId, true)
-		self:SyncClientTransferDatas(p_TransferDatas)
+		self:SyncClientTransferDatas(p_TransferDatas, p_ProjectLastTransactionId)
 	else
 		Events:DispatchLocal('UIManager:LoadingComplete')
 	end
@@ -84,7 +89,9 @@ end
 
 --- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
 --- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
-function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTransferDatas)
+---@param p_UpdatedGameObjectTransferDatas table
+---@param p_ProjectLastTransactionId number|nil
+function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTransferDatas, p_ProjectLastTransactionId)
 	local s_Commands = {}
 
 	for l_Guid, l_GameObjectTransferData in pairs(p_UpdatedGameObjectTransferDatas) do
@@ -184,6 +191,12 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 		end
 	end
 
+	self.m_Syncing = {
+		inProgress = true,
+		targetCommandNum = p_ProjectLastTransactionId or #s_Commands, -- Target is either the last command that is sent or, if there is a project loading, the last command number
+		currentCommandNum = 0
+	}
+
 	self:QueueCommands(s_Commands)
 end
 
@@ -271,7 +284,6 @@ end
 
 function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	local s_CommandActionResults = {}
-	local s_OldExecutedTransactions = self.m_ExecutedTransactions
 
 	for _, l_Command in pairs(p_Commands) do
 		local s_CommandAction = CommandActions[l_Command.type]
@@ -279,6 +291,10 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 		if s_CommandAction == nil then
 			m_Logger:Error("Attempted to call a nil command action: " .. l_Command.type)
 			return false
+		end
+
+		if self.m_Syncing.inProgress then
+			self.m_Syncing.currentCommandNum = self.m_Syncing.currentCommandNum + 1
 		end
 
 		m_Logger:Write('Executing command ' .. l_Command.type)
@@ -298,8 +314,6 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 				-- Spawned objects are sent when they are ready on OnGameObjectReady
 				table.insert(s_CommandActionResults, s_CommandActionResult)
 			end
-
-			self.m_ExecutedTransactions = self.m_ExecutedTransactions + 1
 		elseif s_CARResponseType == CARResponseType.Queue then
 			m_Logger:Write("Queued command: " .. l_Command.type)
 			table.insert(self.m_Queue.commands, l_Command)
@@ -311,11 +325,18 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 		end
 	end
 
-	if self.m_ExecutedTransactions < self.m_TargetTransactionId then
-		Events:DispatchLocal('UIManager:SyncingProgress', self.m_ExecutedTransactions, self.m_TargetTransactionId)
-	elseif s_OldExecutedTransactions < self.m_TargetTransactionId then
-		-- This command batch finished the loading of the project
-		Events:DispatchLocal('UIManager:LoadingComplete')
+	if self.m_Syncing.inProgress then
+		if self.m_Syncing.currentCommandNum < self.m_Syncing.targetCommandNum then
+			Events:DispatchLocal('UIManager:SyncingProgress', self.m_Syncing.currentCommandNum, self.m_Syncing.targetCommandNum)
+		else
+			-- This command batch finished the loading of the project
+			Events:DispatchLocal('UIManager:LoadingComplete')
+			self.m_Syncing = {
+				inProgress = false,
+				targetCommandNum = 0,
+				currentCommandNum = 0
+			}
+		end
 	end
 
 	if #s_CommandActionResults > 0 then
