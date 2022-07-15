@@ -13,7 +13,7 @@ The recommended way of installing and keeping the mod up-to-date is to use [VUMM
 
 The installation steps are:
 - Install VUMM and register an account (check VUMM repository for more info)
-- Open the command line
+- Open the command line in ``..\<user>\Documents\Battlefield 3\Server\Admin`` folder
 - Type `vumm install mapeditor@preview`
 
 This will install the mod in the `Mods` folder and update your `modllist.txt` to include MapEditor. The VUMM command is also used to update the mod.
