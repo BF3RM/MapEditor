@@ -27,7 +27,8 @@
 		"eslint.format.enable": true,
 		"eslint.validate": [
 			"typescript"
-		]
+		],
+		"terminal.integrated.cwd": "D:\\Fulgen\\Documents\\Battlefield 3\\Server\\Admin\\Mods\\MapEditor\\WebUI"
 	},
 	"extensions": {
 		"recommendations": [
