@@ -87,7 +87,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           release_name: ${{ github.event.inputs.version }}
-          draft: true
+          draft: false
           prerelease: false
       - name: Upload Release Asset
         id: upload-release-asset
