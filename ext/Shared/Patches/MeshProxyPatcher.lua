@@ -12,14 +12,17 @@ function MeshProxyPatcher:Patch(p_DynamicModel)
 	local s_ReplacementData = StaticModelEntityData(p_DynamicModel.instanceGuid)
 
 	s_ReplacementData.transform = s_Instance.transform
-	s_ReplacementData.enabled = true
 	s_ReplacementData.visible = true
 
 	if s_Instance.mesh.isLazyLoaded then
+		s_ReplacementData.enabled = false
+
 		s_Instance.mesh:RegisterLoadHandlerOnce(function(p_Mesh)
+			s_ReplacementData.enabled = true
 			s_ReplacementData.mesh = MeshAsset(p_Mesh)
 		end)
 	else
+		s_ReplacementData.enabled = true
 		s_ReplacementData.mesh = MeshAsset(s_Instance.mesh)
 	end
 	s_Instance:ReplaceReferences(s_ReplacementData)
