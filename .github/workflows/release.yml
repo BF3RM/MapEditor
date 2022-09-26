@@ -99,6 +99,8 @@ jobs:
           asset_path: ./MapEditor.zip
           asset_name: MapEditor.zip
           asset_content_type: application/zip
+      - name: Delete zip file
+        run: rm MapEditor.zip
       - name: Publish to VUMM as tag ${{ github.event.inputs.env }}
         if: ${{ github.event.inputs.env != 'release' }}
         uses: BF3RM/vumm-action@v1
