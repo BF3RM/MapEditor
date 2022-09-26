@@ -204,6 +204,10 @@ function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 end
 
 function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
+	if p_Pass ~= UpdatePass.UpdatePass_PreSim then
+		return
+	end
+
 	-- TODO: ugly, find a better entry point to invoke project data loading
 	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil then
 		m_LoadDelay = m_LoadDelay + p_Delta

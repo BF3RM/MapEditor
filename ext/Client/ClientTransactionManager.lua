@@ -52,9 +52,15 @@ end
 function ClientTransactionManager:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.CoreEnteredIngameMessage then
 		self:ClientReady()
+	elseif p_Message.type == MessageType.ClientStateRequestUnloadMessage then
+		self:ClientUnready()
 	end
 end
 
+function ClientTransactionManager:ClientUnready()
+	m_Logger:Write("Client Unready")
+	self.m_IsPlayerReady = false
+end
 
 function ClientTransactionManager:ClientReady()
 	--- Client requests all updates that the server has.
