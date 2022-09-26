@@ -233,6 +233,7 @@ export default class ExpandableTreeSlot extends Vue {
 		img {
 			width: 17px;
 			transition: transform 0.1s;
+			pointer-events: none;
 
 			&.expanded {
 				transform: rotate(90deg);

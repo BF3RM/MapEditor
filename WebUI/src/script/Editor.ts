@@ -305,6 +305,10 @@ export default class Editor {
 		}
 	}
 
+	public getGameObjectByGuidStr(s: string) {
+		return this.getGameObjectByGuid(new Guid(s));
+	}
+
 	public getGameObjectByGuid(guid: Guid) {
 		return this.gameObjects.getValue(guid);
 	}
