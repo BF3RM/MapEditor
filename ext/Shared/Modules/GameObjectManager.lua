@@ -135,6 +135,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 
 	---@type CtrRef
 	local s_OriginalRef = CtrRef({})
+	local s_Variation = p_Variation
 
 	if p_Parent ~= nil then
 		s_OriginalRef = CtrRef {
@@ -142,6 +143,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			instanceGuid = s_ParentInstanceGuid,
 			partitionGuid = InstanceParser:GetPartition(s_ParentInstanceGuid)
 		}
+
+		-- Overwrite variation if ReferenceObjectData has it
+		local s_ROD = ReferenceObjectData(p_Parent)
+
+		if s_ROD.objectVariation then
+			s_Variation = ObjectVariation(s_ROD.objectVariation).nameHash
+		end
 	end
 
 	---@type GameObject
@@ -150,7 +158,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		name = s_Blueprint.name,
 		parentData = GameObjectParentData{},
 		transform = p_Transform,
-		variation = p_Variation,
+		variation = s_Variation,
 		origin = GameObjectOriginType.Vanilla,
 		isDeleted = false,
 		isEnabled = true,
