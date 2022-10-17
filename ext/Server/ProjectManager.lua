@@ -3,7 +3,6 @@ ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false
-local m_LoadDelay = 0
 
 local SAVE_VERSION = "0.1.0"
 
@@ -209,38 +208,33 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 	end
 
 	-- TODO: ugly, find a better entry point to invoke project data loading
-	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil then
-		m_LoadDelay = m_LoadDelay + p_Delta
+	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil and self.m_CurrentProjectHeader.projectName ~= nil then
+		m_IsLevelLoaded = false
 
-		if m_LoadDelay > ME_CONFIG.SAVE_LOAD_DELAY and self.m_CurrentProjectHeader.projectName ~= nil then
-			m_IsLevelLoaded = false
-			m_LoadDelay = 0
-
-			if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
-				m_Logger:Error("Can'classt load project that is not built for the same map as current one.")
-				return
-			end
-
-			local s_ProjectSave = DataBaseManager:GetProjectByProjectId(self.m_CurrentProjectHeader.id)
-
-			if s_ProjectSave == nil then
-				m_Logger:Error("Can't load project, not found in database.")
-				return
-			end
-
-			m_Logger:Write('Loading project save')
-
-			-- Upgrade if necessary
-			local s_Msg
-			s_ProjectSave, s_Msg = self:UpgradeSaveStructure(s_ProjectSave)
-
-			if s_ProjectSave == nil then
-				m_Logger:Error("Can't load project. Error: " .. tostring(s_Msg))
-				return
-			end
-
-			self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
+		if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
+			m_Logger:Error("Can't load project that is not built for the same map as current one.")
+			return
 		end
+
+		local s_ProjectSave = DataBaseManager:GetProjectByProjectId(self.m_CurrentProjectHeader.id)
+
+		if s_ProjectSave == nil then
+			m_Logger:Error("Can't load project, not found in database.")
+			return
+		end
+
+		m_Logger:Write('Loading project save')
+
+		-- Upgrade if necessary
+		local s_Msg
+		s_ProjectSave, s_Msg = self:UpgradeSaveStructure(s_ProjectSave)
+
+		if s_ProjectSave == nil then
+			m_Logger:Error("Can't load project. Error: " .. tostring(s_Msg))
+			return
+		end
+
+		self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
 	end
 end
 

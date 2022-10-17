@@ -39,8 +39,8 @@ function ServerGameObjectManager:ClientReady(p_Player)
 		NetEvents:SendToLocal('ClientGameObjectManager:ClientOnlyGuids', p_Player, self.m_ClientOnlyGameObjectGuids)
 		local s_ServerOnlyTransferDatas = self:GetServerOnlyGameObjectsTransferDatas(self.m_ServerOnlyGameObjectGuids)
 		NetEvents:SendToLocal("ClientGameObjectManager:ServerOnlyGameObjectsTransferData", p_Player, s_ServerOnlyTransferDatas)
-	-- If this is the first player we calculate which objects are server or client only
-	else
+
+	else -- If this is the first player we calculate which objects are server or client only
 		m_Logger:Write("Fist player ready, sending vanilla GameObjects guids")
 		NetEvents:SendToLocal("ClientGameObjectManager:ServerGameObjectsGuids", p_Player, GameObjectManager:GetVanillaGameObjectsGuids())
 	end
@@ -53,6 +53,7 @@ function ServerGameObjectManager:OnServerOnlyGameObjectsGuidsReceived(p_Player, 
 	-- Set the flag to true, so players that connect after get the info directly instead of comparing like the first client
 	self.m_FirstPlayerLoaded = true
 	NetEvents:SendToLocal("ClientGameObjectManager:ServerOnlyGameObjectsTransferData", p_Player, s_ServerOnlyTransferDatas)
+	Events:DispatchLocal('ServerGameObjectManager:RealmsSynced')
 end
 
 function ServerGameObjectManager:GetServerOnlyGameObjectsTransferDatas(p_Guids)

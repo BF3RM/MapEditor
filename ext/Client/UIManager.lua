@@ -19,6 +19,10 @@ function UIManager:RegisterEvents()
 end
 
 function UIManager:OnSyncingProgress(p_LoadedObjects, p_TotalObjects)
+	if self.m_ActiveMode ~= EditorMode.Loading then
+		self:SetEditorMode(EditorMode.Loading)
+	end
+
 	self:SetLoadingInfo(string.format('Syncing project state (%i/%i)', p_LoadedObjects, p_TotalObjects))
 end
 

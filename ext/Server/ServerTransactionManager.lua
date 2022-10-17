@@ -13,6 +13,7 @@ function ServerTransactionManager:RegisterEvents()
 	NetEvents:Subscribe('ClientTransactionManager:InvokeCommands', self, self.OnInvokeCommands)
 	NetEvents:Subscribe('ClientTransactionManager:ClientReady', self, self.OnClientReady)
 	NetEvents:Subscribe('ClientTransactionManager:RequestSync', self, self.OnRequestSync)
+	Events:Subscribe('ServerGameObjectManager:RealmsSynced', self, self.OnRealmsSynced)
 end
 
 function ServerTransactionManager:RegisterVars()
@@ -21,6 +22,7 @@ function ServerTransactionManager:RegisterVars()
 	self.m_Transactions = {}
 	self.m_PlayersReady = {}
 	self.m_LoadingProjectLastTransactionId = nil
+	self.m_ReadyToProcess = false -- Server is ready to process when the first client has loaded and it has synced client/server only objects with the server
 end
 
 function ServerTransactionManager:OnLevelDestroy()
@@ -30,6 +32,10 @@ end
 function ServerTransactionManager:OnLoadResources()
 	self:RegisterVars()
 	NetEvents:BroadcastLocal('ServerTransactionManager:ResetVars')
+end
+
+function ServerTransactionManager:OnRealmsSynced()
+	self.m_ReadyToProcess = true
 end
 
 function ServerTransactionManager:IsPlayerReady(p_Player)
@@ -128,6 +134,11 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 
 	if self.m_QueueDelay > 0 then
 		self.m_QueueDelay = self.m_QueueDelay - p_DeltaTime
+		return
+	end
+
+	-- Wait until client/server only objects are synced to prevent errors
+	if not self.m_ReadyToProcess then
 		return
 	end
 
