@@ -18,6 +18,7 @@ function GameObjectTransferData:__init(arg)
 	self.origin = arg.origin
 	self.isUserModified = arg.isUserModified
 	self.overrides = arg.overrides
+	self.originalRef = arg.originalRef
 end
 
 function GameObjectTransferData:GetGameObject()
@@ -34,7 +35,8 @@ function GameObjectTransferData:GetGameObject()
 		origin = self.origin,
 		realm = self.realm,
 		isUserModified = self.isUserModified,
-		overrides = self.overrides
+		overrides = self.overrides,
+		originalRef = CtrRef(self.originalRef)
 	}
 
 	return s_GameObject

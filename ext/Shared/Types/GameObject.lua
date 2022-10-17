@@ -240,7 +240,8 @@ function GameObject:GetGameObjectTransferData()
 		origin = self.origin,
 		realm = self.realm,
 		isUserModified = self.isUserModified,
-		overrides = self.overrides
+		overrides = self.overrides,
+		originalRef = self.originalRef:GetTable()
 		-- entities have to be set externally
 	}
 
