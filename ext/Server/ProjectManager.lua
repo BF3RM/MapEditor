@@ -4,7 +4,7 @@ ProjectManager = class 'ProjectManager'
 local m_Logger = Logger("ProjectManager", false)
 local m_IsLevelLoaded = false
 
-local SAVE_VERSION = "0.1.0"
+local SAVE_VERSION = "0.1.1"
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -112,7 +112,7 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 
 		return p_ProjectSave
 	elseif s_SaveVersion > SAVE_VERSION then
-		return nil, 'Importing save with a higher save format version than supported in the current MapEditor build, please update MapEditor before importing'
+		return nil, 'Importing save with a higher save format version than supported, please update MapEditor before importing'
 	else
 		-- New version updates are handled here
 
