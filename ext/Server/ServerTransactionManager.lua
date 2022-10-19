@@ -71,7 +71,7 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 	if p_TransactionId == #self.m_Transactions then
 		-- m_Logger:Write("Client up to date")
 		-- Empty response, so the player know it has finished syncing.
-		NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player)
+		NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, nil, nil, self.m_LoadingProjectLastTransactionId)
 		return
 	--- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
 	elseif p_TransactionId ~= 0 then
@@ -114,6 +114,22 @@ end
 
 function ServerTransactionManager:SetLoadingProjectLastTransactionId(p_Id)
 	self.m_LoadingProjectLastTransactionId = p_Id
+
+	-- Notify ready players that there is a project loading. Probably not needed, the server loads before clients so at this point there shouldn't be ready players
+	-- But just to be safe.
+	for l_PlayerName, l_IsReady in pairs(self.m_PlayersReady) do
+		local l_Player = PlayerManager:GetPlayerByName(l_PlayerName)
+
+		if l_IsReady and l_Player then
+			NetEvents:SendToLocal(
+				"ServerTransactionManager:SyncClientContext",
+				l_Player,
+				nil,
+				nil,
+				self.m_LoadingProjectLastTransactionId
+			)
+		end
+	end
 end
 
 function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson)

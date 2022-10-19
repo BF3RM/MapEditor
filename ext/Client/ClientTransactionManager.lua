@@ -85,11 +85,21 @@ end
 function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTransactionId, p_ProjectLastTransactionId)
 	m_Logger:Write('Syncing client context')
 
-	if p_LastTransactionId ~= nil and p_TransferDatas ~= nil then
+	if p_LastTransactionId ~= nil and p_TransferDatas ~= nil then -- There is desync
 		self:UpdateTransactionId(p_LastTransactionId, true)
 		self:SyncClientTransferDatas(p_TransferDatas, p_ProjectLastTransactionId)
-	else
-		Events:DispatchLocal('UIManager:LoadingComplete')
+	else -- No desync
+		if p_ProjectLastTransactionId then
+			self.m_Syncing = {
+				inProgress = true,
+				targetCommandNum = p_ProjectLastTransactionId,
+				currentCommandNum = 0
+			}
+
+			Events:DispatchLocal('UIManager:SyncingProgress', self.m_Syncing.currentCommandNum, self.m_Syncing.targetCommandNum)
+		else
+			Events:DispatchLocal('UIManager:LoadingComplete')
+		end
 	end
 end
 
@@ -337,6 +347,7 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 		else
 			-- This command batch finished the loading of the project
 			Events:DispatchLocal('UIManager:LoadingComplete')
+
 			self.m_Syncing = {
 				inProgress = false,
 				targetCommandNum = 0,
