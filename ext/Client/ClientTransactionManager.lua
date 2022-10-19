@@ -1,6 +1,8 @@
 ---@class ClientTransactionManager
+---@overload fun():ClientTransactionManager
 ClientTransactionManager = class 'ClientTransactionManager'
 
+---@type Logger
 local m_Logger = Logger("ClientTransactionManager", false)
 
 function ClientTransactionManager:__init()
@@ -49,6 +51,7 @@ function ClientTransactionManager:RegisterEvents()
 	NetEvents:Subscribe('ServerTransactionManager:ResetVars', self, self.ResetVars)
 end
 
+---@param p_Message Message
 function ClientTransactionManager:OnEngineMessage(p_Message)
 	if p_Message.type == MessageType.CoreEnteredIngameMessage then
 		self:ClientReady()
@@ -79,6 +82,7 @@ function ClientTransactionManager:OnLevelDestroy()
 	self.m_LastTransactionId = 0
 end
 
+---Syncs client content, queuing the missing commands and updating the project loading/syncing state
 ---@param p_TransferDatas table
 ---@param p_LastTransactionId any
 ---@param p_ProjectLastTransactionId any
@@ -103,7 +107,7 @@ function ClientTransactionManager:OnSyncClientContext(p_TransferDatas, p_LastTra
 	end
 end
 
---- We're recreating commands that lead to the current state of the server, so the client's GameObjects and UI gets updated properly
+--- Recreates the commands that lead to the current state of the server, so the client's GameObjects and UI get updated properly
 --- Not a pretty solution, but the only way to avoid having a complicated command storing and updating logic on the server (which would probably still be better)
 ---@param p_UpdatedGameObjectTransferDatas table
 ---@param p_ProjectLastTransactionId number|nil
@@ -198,7 +202,7 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 					elseif l_Change == "name" then
 						-- TODO: add this when changing name is implemented on lua
 					else
-						m_Logger:Error("Found an unhandled change: "..l_Change)
+						m_Logger:Error("Found an unhandled change: " .. l_Change)
 					end
 
 					table.insert(s_Commands, s_Command)
@@ -216,11 +220,12 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 	self:QueueCommands(s_Commands)
 end
 
+---@param p_DeltaTime number
+---@param p_UpdatePass UpdatePass
 function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim or (#self.m_Queue.commands == 0 and #self.m_Queue.messages == 0) then
 		return
 	end
-
 
 	local s_Messages = {}
 
@@ -229,11 +234,7 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		table.insert(s_Messages, l_Message)
 	end
 
-	self:ExecuteMessages(s_Messages, true, p_UpdatePass)
-
-	-- if #self.m_Queue.commands > 0 then
-	-- 	self.m_Queue.commands = {}
-	-- end
+	self:ExecuteMessages(s_Messages, p_UpdatePass)
 
 	if #self.m_Queue.messages > 0 then
 		self.m_Queue.messages = {}
@@ -269,6 +270,8 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
 end
 
+---@param p_CommandsJson string
+---@param p_TransactionId number
 function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_TransactionId)
 	m_Logger:Write('OnServerCommandsInvoked')
 
@@ -279,6 +282,11 @@ function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_Tran
 	end
 
 	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
+
+	if not s_Commands then
+		m_Logger:Warning('Commands not queued due to incorrect command format ')
+		return
+	end
 
 	if self.m_LastTransactionId + #s_Commands ~= p_TransactionId then
 		m_Logger:Warning('Client is not synced, requesting sync')
@@ -292,17 +300,24 @@ function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_Tran
 	self:QueueCommands(s_Commands)
 end
 
+---Queues commands for their execution
+---@param p_Commands table
 function ClientTransactionManager:QueueCommands(p_Commands)
 	for _, l_Command in pairs(p_Commands) do
 		table.insert(self.m_Queue.commands, l_Command)
 	end
 end
 
+---Executes the commands given
+---@param p_Commands table
+---@param p_UpdatePass UpdatePass
+---@return boolean
 function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
-	local s_CommandActionResults = {}
+	local s_CommandActionResults = {} ---@cast s_CommandActionResults CommandActionResult[]
 
 	for _, l_Command in pairs(p_Commands) do
 		local s_CommandAction = CommandActions[l_Command.type]
+		---@cast s_CommandAction function
 
 		if s_CommandAction == nil then
 			m_Logger:Error("Attempted to call a nil command action: " .. l_Command.type)
@@ -315,6 +330,8 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 
 		m_Logger:Write('Executing command ' .. l_Command.type)
 		local s_CommandActionResult, s_CARResponseType = s_CommandAction(self, l_Command, p_UpdatePass)
+		---@cast s_CommandActionResult CommandActionResult
+		---@cast s_CARResponseType CARResponseType
 
 		if s_CARResponseType == CARResponseType.Success then
 			if s_CommandActionResult.gameObjectTransferData == nil then
@@ -360,20 +377,29 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 		WebUpdater:AddUpdate('HandleResponse', s_CommandActionResults)
 		table.insert(self.m_ExecutedCommandActions, json.encode(s_CommandActionResults))
 	end
+
+	return true
 end
 
+---comment
+---@return table
 function ClientTransactionManager:GetExecutedCommandActions()
 	return self.m_ExecutedCommandActions
 end
 
+---@param p_Messages string
 function ClientTransactionManager:OnReceiveMessages(p_Messages)
-	self:ExecuteMessages(p_Messages, nil, nil)
+	self:ExecuteMessages(p_Messages, nil)
 end
 
-function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePass)
+---@param p_Messages string|table
+---@param p_UpdatePass UpdatePass?
+---@return boolean success
+function ClientTransactionManager:ExecuteMessages(p_Messages, p_UpdatePass)
 	local s_Messages = p_Messages
 
-	if p_Raw == nil then
+	if type(p_Messages) == "string" then
+		---@cast s_Messages table
 		s_Messages = DecodeParams(json.decode(p_Messages))
 	end
 
@@ -389,7 +415,7 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
 		local s_CARResponseType = s_MessageAction(self, l_Message, p_UpdatePass)
 
 		if s_CARResponseType == CARResponseType.Success then
-			return
+			m_Logger:Write('Executed message of type ' .. l_Message.type .. ' successfully')
 		elseif s_CARResponseType == CARResponseType.Queue then
 			table.insert(self.m_Queue.messages, l_Message)
 		elseif s_CARResponseType == CARResponseType.Failure then
@@ -398,8 +424,12 @@ function ClientTransactionManager:ExecuteMessages(p_Messages, p_Raw, p_UpdatePas
 			m_Logger:Error("Unknown CARResponseType for message: " .. l_Message.type)
 		end
 	end
+
+	return true
 end
 
+---@param p_TransactionId number
+---@param p_IsFirstUpdate boolean?
 function ClientTransactionManager:UpdateTransactionId(p_TransactionId, p_IsFirstUpdate)
 	if p_TransactionId < self.m_LastTransactionId then
 		m_Logger:Error("Client's transaction id is greater than the server's. This should never happen.")
@@ -414,6 +444,7 @@ function ClientTransactionManager:UpdateTransactionId(p_TransactionId, p_IsFirst
 	self.m_LastTransactionId = p_TransactionId
 end
 
+---@param p_GameObject GameObject
 function ClientTransactionManager:CreateCommandActionResultsRecursively(p_GameObject)
 	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
 
@@ -432,6 +463,7 @@ function ClientTransactionManager:CreateCommandActionResultsRecursively(p_GameOb
 	table.insert(self.m_CommandActionResults, s_CommandActionResult)
 end
 
+---@param p_GameObject GameObject
 function ClientTransactionManager:OnGameObjectReady(p_GameObject)
 	--m_Logger:Write("ClientTransactionManager:OnGameObjectReady(p_GameObject)")
 	self:CreateCommandActionResultsRecursively(p_GameObject)
@@ -444,18 +476,19 @@ function ClientTransactionManager:OnGameObjectReady(p_GameObject)
 		m_Logger:Error("OnGameObjectReady: No results were yielded for some reason")
 	end
 
-	self.m_CommandActionResults = { }
+	self.m_CommandActionResults = {}
 end
 
-function ClientTransactionManager:OnUpdateGameObjectRealm(s_GameObject)
-	if s_GameObject == nil then
+---@param p_GameObject GameObject
+function ClientTransactionManager:OnUpdateGameObjectRealm(p_GameObject)
+	if p_GameObject == nil then
 		m_Logger:Error("OnUpdateGameObjectRealm: GameObject is nil")
 		return
 	end
 
 	WebUpdater:AddUpdate('HandleRealmUpdate', {
-		guid = tostring(s_GameObject.guid),
-		realm = s_GameObject.realm
+		guid = tostring(p_GameObject.guid),
+		realm = p_GameObject.realm
 	})
 end
 

@@ -61,7 +61,9 @@ function GetChanges(p_Old, p_New)
 	return s_Changes
 end
 
-
+---Traverses the values of the given @p_Table substituting fb structures in plain Lua with the appropiate class (Vec3s and LinearTransforms)
+---@param p_Table table
+---@return table?
 function DecodeParams(p_Table)
 	if p_Table == nil then
 		m_Logger:Warning("No table received")
@@ -247,11 +249,15 @@ function GenerateCustomGuid()
 	return Guid(CUSTOMOBJ_GUID_PREFIX.."-"..h()..h().."-"..h()..h().."-"..h()..h().."-"..h()..h()..h()..h()..h()..h(), "D")
 end
 
+---@param p_ParentGuid Guid|string
+---@param p_Offset number
+---@return Guid
 function GenerateChildGuid(p_ParentGuid, p_Offset)
 	m_Logger:Write("GenerateChildGuid")
 	m_Logger:Write("p_ParentGuid" .. tostring(p_ParentGuid))
 	m_Logger:Write("p_Offset" .. tostring(p_Offset))
 
+---@diagnostic disable-next-line: param-type-mismatch
 	local s_ParentGuidParts = string.split(tostring(p_ParentGuid), '-')
 	local s_GuidEnd = s_ParentGuidParts[5]
 	local s_GuidEndNumber = tonumber(s_GuidEnd, 16)
@@ -261,6 +267,10 @@ function GenerateChildGuid(p_ParentGuid, p_Offset)
 	return Guid(s_GeneratedGuidString)
 end
 
+---@param p_Name string
+---@param p_Transform LinearTransform|table
+---@param p_Increment number
+---@return Guid
 function GenerateVanillaGuid(p_Name, p_Transform, p_Increment)
 	local s_IntHash = MathUtils:FNVHash(p_Name .. tostring(p_Transform))
 

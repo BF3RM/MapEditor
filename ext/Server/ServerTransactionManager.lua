@@ -1,4 +1,5 @@
 ---@class ServerTransactionManager
+---@overload fun():ServerTransactionManager
 ServerTransactionManager = class 'ServerTransactionManager'
 
 local m_Logger = Logger("ServerTransactionManager", false)
@@ -38,18 +39,23 @@ function ServerTransactionManager:OnRealmsSynced()
 	self.m_ReadyToProcess = true
 end
 
+---@param p_Player Player
 function ServerTransactionManager:IsPlayerReady(p_Player)
 	return self.m_PlayersReady[p_Player.name]
 end
 
+---@param p_Player Player
+---@param p_IsReady boolean
 function ServerTransactionManager:SetPlayerReady(p_Player, p_IsReady)
 	self.m_PlayersReady[p_Player.name] = p_IsReady
 end
 
+---@param p_Player Player
 function ServerTransactionManager:OnPlayerLeft(p_Player)
-	self:SetPlayerReady(p_Player, nil)
+	self:SetPlayerReady(p_Player, false)
 end
 
+---@param p_Player Player
 function ServerTransactionManager:OnClientReady(p_Player)
 	if p_Player == nil then
 		return
@@ -62,10 +68,14 @@ function ServerTransactionManager:OnClientReady(p_Player)
 	self:SyncClient(p_Player, 0)
 end
 
+---@param p_Player Player
+---@param p_TransactionId number
 function ServerTransactionManager:OnRequestSync(p_Player, p_TransactionId)
 	self:SyncClient(p_Player, p_TransactionId)
 end
 
+---@param p_Player Player
+---@param p_TransactionId number
 function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 	--- Client up to date
 	if p_TransactionId == #self.m_Transactions then
@@ -75,7 +85,7 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 		return
 	--- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
 	elseif p_TransactionId ~= 0 then
-		m_Logger:Warning(p_Player.name.."'s client is desynced, syncing it. This should rarely happen, did the client hung up? network problem? Please report it on the repo.")
+		m_Logger:Warning(p_Player.name .. "'s client is desynced, syncing it. This should rarely happen, did the client hung up? network problem? Please report it on the repo.")
 	end
 
 	if p_TransactionId > #self.m_Transactions then
@@ -112,6 +122,7 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 	)
 end
 
+---@param p_Id number
 function ServerTransactionManager:SetLoadingProjectLastTransactionId(p_Id)
 	self.m_LoadingProjectLastTransactionId = p_Id
 
@@ -132,6 +143,8 @@ function ServerTransactionManager:SetLoadingProjectLastTransactionId(p_Id)
 	end
 end
 
+---@param p_Player Player
+---@param p_CommandsJson string
 function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson)
 	if not self:IsPlayerReady(p_Player) then
 		m_Logger:Warning('Player invoked command before being ready, should not happen.')
@@ -140,9 +153,13 @@ function ServerTransactionManager:OnInvokeCommands(p_Player, p_CommandsJson)
 
 	local s_Commands = DecodeParams(json.decode(p_CommandsJson))
 
-	self:QueueCommands(s_Commands)
+	if s_Commands then
+		self:QueueCommands(s_Commands)
+	end
 end
 
+---@param p_DeltaTime number
+---@param p_UpdatePass UpdatePass
 function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0 then
 		return
@@ -183,12 +200,16 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
 end
 
+---@param p_Commands table
 function ServerTransactionManager:QueueCommands(p_Commands)
 	for _, l_Command in pairs(p_Commands) do
 		table.insert(self.m_Queue, l_Command)
 	end
 end
 
+---@param p_Commands table
+---@param p_UpdatePass UpdatePass
+---@return boolean
 function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	local s_ExecutedCommands = {}
 
@@ -226,6 +247,8 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	if #s_ExecutedCommands > 0 then
 		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(s_ExecutedCommands), #self.m_Transactions)
 	end
+
+	return true
 end
 
 ServerTransactionManager = ServerTransactionManager()

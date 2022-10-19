@@ -6,3 +6,4 @@ WebUI/data/*.json
 node_modules/
 *.db
 .vu/
+.vscode

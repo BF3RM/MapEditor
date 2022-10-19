@@ -59,6 +59,8 @@ end
 
 ----------- Game functions----------------
 
+---@param p_Delta number
+---@param p_SimulationDelta number
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 end
@@ -80,6 +82,7 @@ function MapEditorClient:OnPartitionLoaded(p_Partition)
 	InstanceParser:OnPartitionLoaded(p_Partition)
 end
 
+---@param p_Message Message
 function MapEditorClient:OnEngineMessage(p_Message)
 	Editor:OnEngineMessage(p_Message)
 	ClientTransactionManager:OnEngineMessage(p_Message)
