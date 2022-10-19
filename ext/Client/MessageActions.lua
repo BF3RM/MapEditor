@@ -1,4 +1,5 @@
 ---@class MessageActions
+---@overload fun():MessageActions
 MessageActions = class 'MessageActions'
 
 ---@type Logger

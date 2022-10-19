@@ -1,4 +1,5 @@
 ---@class Logger
+---@overload fun(p_ClassName, p_ActivateLogging):Logger
 Logger = class "Logger"
 
 function Logger:__init(p_ClassName, p_ActivateLogging)

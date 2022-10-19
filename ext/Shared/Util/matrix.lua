@@ -3,14 +3,14 @@
 LUA MODULE
 
   matrix v$(_VERSION) - matrix functions implemented with Lua tables
-	
+
 SYNOPSIS
 
   local matrix = require 'matrix'
   m1 = matrix{{8,4,1},{6,8,3}}
   m2 = matrix{{-8,1,3},{5,2,1}}
   assert(m1 + m2 == matrix{{0,5,4},{11,10,4}})
-  
+
 DESCRIPTION
 
   With simple matrices this script is quite useful, though for more
@@ -18,9 +18,9 @@ DESCRIPTION
   Matrices of size 100x100 can still be handled very well.
   The error for the determinant and the inverted matrix is around 10^-9
   with a 100x100 matrix and an element range from -100 to 100.
- 	
+
    Characteristics:
-	
+
 	- functions called via matrix.<function> should be able to handle
 	  any table matrix of structure t[i][j] = value
 	- can handle a type of complex matrix
@@ -39,7 +39,7 @@ DESCRIPTION
 	  or use num = vec1:scalar( vec2 ), where num is a number
 
 API
-	
+
 	matrix function list:
 
 	matrix.add
@@ -83,7 +83,7 @@ API
 	matrix.tostring
 	matrix.transpose
 	matrix.type
-	
+
 	See code and test_matrix.lua.
 
 DEPENDENCIES
@@ -100,11 +100,11 @@ DOWNLOAD/INSTALL
   ./util.mk
   cd tmp/*
   luarocks make
-  
+
 LICENSE
-  
+
   Licensed under the same terms as Lua itself.
-	
+
   Developers:
     Michael Lutz (chillcode) - original author
     David Manura http://lua-users.org/wiki/DavidManura
@@ -324,22 +324,22 @@ function matrix.det( m1 )
 
 	-- check if matrix is quadratic
 	assert(#m1 == #m1[1], "matrix not square")
-	
+
 	local size = #m1
-	
+
 	if size == 1 then
 		return m1[1][1]
 	end
-	
+
 	if size == 2 then
 		return m1[1][1]*m1[2][2] - m1[2][1]*m1[1][2]
 	end
-	
+
 	if size == 3 then
 		return ( m1[1][1]*m1[2][2]*m1[3][3] + m1[1][2]*m1[2][3]*m1[3][1] + m1[1][3]*m1[2][1]*m1[3][2]
 			- m1[1][3]*m1[2][2]*m1[3][1] - m1[1][1]*m1[2][3]*m1[3][2] - m1[1][2]*m1[2][1]*m1[3][3] )
 	end
-	
+
 	--// no symbolic matrix supported below here
 	local e = m1[1][1]
 	local zero  = type(e) == "table" and e.zero or 0
@@ -491,7 +491,7 @@ function matrix.dogauss( mtx )
 		end
 		-- start parsing rows
 		for i = j-1,1,-1 do
-			-- check if element is not already zero			
+			-- check if element is not already zero
 			if mtx[i][j] ~= zero then
 				local factor = mtx[i][j]
 				for _j = j+1,columns do
@@ -721,7 +721,7 @@ function matrix.type( mtx )
 	end
 	return "number"
 end
-	
+
 -- local functions to copy matrix values
 local num_copy = function( num )
 	return num
@@ -1039,6 +1039,7 @@ function matrix.solve( m1 )
 	for i = 1,#m1 do
 		mtx[i] = {}
 		for j = 1,#m1[1] do
+			---@diagnostic disable-next-line: deprecated
 			mtx[i][j] = tonumber( loadstring( "return "..m1[i][j][1] )() )
 		end
 	end

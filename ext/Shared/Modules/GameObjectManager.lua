@@ -1,4 +1,5 @@
 ---@class GameObjectManager
+---@overload fun(p_Realm):GameObjectManager
 GameObjectManager = class 'GameObjectManager'
 
 ---@type Logger
@@ -38,7 +39,7 @@ end
 ---@param p_SenderName string
 ---@param p_BlueprintPartitionGuid string|Guid
 ---@param p_BlueprintInstanceGuid string|Guid
----@param p_ParentData table
+---@param p_ParentData table?
 ---@param p_LinearTransform LinearTransform
 ---@param p_Variation integer
 ---@param p_IsPreviewSpawn boolean

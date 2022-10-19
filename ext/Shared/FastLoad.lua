@@ -1,4 +1,5 @@
 ---@class FastLoad
+---@overload fun():FastLoad
 FastLoad = class 'FastLoad'
 
 ---@type number

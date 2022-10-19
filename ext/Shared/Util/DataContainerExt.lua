@@ -1,4 +1,5 @@
 ---@class DataContainerExt
+---@overload fun():DataContainerExt
 DataContainerExt = class "DataContainerExt"
 
 local m_Logger = Logger("DataContainerExt", false)

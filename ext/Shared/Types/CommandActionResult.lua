@@ -1,4 +1,8 @@
 ---@class CommandActionResult
+---@field type CARType
+---@field sender string
+---@field ebxFieldData table?
+---@field gameObjectTransferData table?
 CommandActionResult = class 'CommandActionResult'
 
 local m_Logger = Logger("CommandActionResult", false)

@@ -1,4 +1,5 @@
 ---@class UIManager
+---@overload fun():MessageActions
 UIManager = class 'UIManager'
 
 local m_Logger = Logger("UIManager", false)

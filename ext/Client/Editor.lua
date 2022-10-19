@@ -1,4 +1,5 @@
 ---@class Editor
+---@overload fun():Editor
 Editor = class 'Editor'
 
 local m_Logger = Logger("Editor", false)
@@ -112,6 +113,7 @@ end
 
 function Editor:UpdateCameraTransform()
 	local s_Transform = ClientUtils:GetCameraTransform()
+	---@cast s_Transform -LinearTransform, -nil, +table
 	--WebUpdater:AddUpdate('UpdateCameraTransform', s_Transform, true)
 	--[[
 		JSON encoded so it's faster to parse

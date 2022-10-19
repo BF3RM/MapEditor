@@ -1,4 +1,5 @@
 ---@class ClientGameObjectManager
+---@overload fun():ClientGameObjectManager
 ClientGameObjectManager = class 'ClientGameObjectManager'
 
 local m_Logger = Logger("ClientGameObjectManager", false)

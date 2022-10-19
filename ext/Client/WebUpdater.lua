@@ -1,4 +1,5 @@
 ---@class WebUpdater
+---@overload fun():WebUpdater
 WebUpdater = class "WebUpdater"
 
 local m_Logger = Logger("WebUpdater", false)

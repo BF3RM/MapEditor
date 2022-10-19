@@ -1,4 +1,5 @@
 ---@class Timer
+---@overload fun():Timer
 Timer = class "Timer"
 
 local m_Logger = Logger("Timer", false)

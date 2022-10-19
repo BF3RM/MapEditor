@@ -1,4 +1,5 @@
 ---@class StringExtensions
+---@overload fun():StringExtensions
 StringExtensions = class "StringExtensions"
 
 function string:normalizePath()

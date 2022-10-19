@@ -1,4 +1,5 @@
 ---@class FreeCam
+---@overload fun():FreeCam
 FreeCam = class 'FreeCam'
 
 local m_Logger = Logger("FreeCam", false)

@@ -1,4 +1,5 @@
 ---@class RotationHelper
+---@overload fun():RotationHelper
 RotationHelper = class 'RotationHelper'
 
 local m_Logger = Logger("RotationHelper", false)
