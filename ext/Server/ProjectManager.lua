@@ -189,7 +189,7 @@ function ProjectManager:ParseJSONProject(p_ProjectSaveJSON)
 		return nil, 'Save header missing necessary field(s)'
 	end
 
-	return { [DataBaseManager.m_ExportHeaderName] = s_Header, [DataBaseManager.m_ExportDataName] = s_Data}
+	return { [DataBaseManager.m_ExportHeaderName] = s_Header, [DataBaseManager.m_ExportDataName] = s_Data }
 end
 
 ---@param p_Map string
@@ -198,8 +198,8 @@ end
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	m_IsLevelLoaded = true
 
-	self.m_MapName = p_Map
-	self.m_GameMode = p_GameMode
+	self.m_MapName = p_Map:gsub(".*/", "")
+	self.m_GameMode = p_GameMode:gsub(".*/", "")
 end
 
 function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
@@ -211,8 +211,8 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil and self.m_CurrentProjectHeader.projectName ~= nil then
 		m_IsLevelLoaded = false
 
-		if self.m_MapName ~= self.m_CurrentProjectHeader.mapName then
-			m_Logger:Error("Can't load project that is not built for the same map as current one.")
+		if self.m_MapName:gsub(".*/", "") ~= self.m_CurrentProjectHeader.mapName:gsub(".*/", "") then
+			m_Logger:Error("Can't load project that is not built for the same map as current one. Current: " .. tostring(self.m_MapName) .. ", target: " .. tostring(self.m_CurrentProjectHeader.mapName))
 			return
 		end
 
@@ -247,7 +247,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	local s_Project = DataBaseManager:GetProjectByProjectId(p_ProjectId)
 
 	if s_Project == nil then
-		m_Logger:Error('Failed to get project with id '..tostring(p_ProjectId))
+		m_Logger:Error('Failed to get project with id ' .. tostring(p_ProjectId))
 		return
 	end
 
@@ -257,9 +257,9 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 	local s_GameModeName = s_Project.header.gameModeName
 
 	if s_MapName == nil or
-			Maps[s_MapName] == nil or
-			s_GameModeName == nil or
-			GameModes[s_GameModeName] == nil then
+		Maps[s_MapName] == nil or
+		s_GameModeName == nil or
+		GameModes[s_GameModeName] == nil then
 
 		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
 		return
@@ -279,7 +279,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 			return
 		end
 
-		s_Response = RCON:SendCommand('mapList.add', {s_MapName, s_GameModeName, '1'}) -- TODO: add proper map / gameplay support
+		s_Response = RCON:SendCommand('mapList.add', { s_MapName, s_GameModeName, '1' }) -- TODO: add proper map / gameplay support
 		if s_Response[1] ~= 'OK' then
 			m_Logger:Error('Couldn\'t add map to maplist. ' .. s_Response[1])
 		end
@@ -333,7 +333,6 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 		m_Logger:Error(s_Msg)
 	end
 end
-
 
 ---We're creating commands from the savefile, basically imitating every step that has been undertaken
 ---@param p_ProjectSaveData ProjectDataEntry[]
