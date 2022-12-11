@@ -227,7 +227,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		const oldTransform = this.transform.clone();
 		this.setWorldMatrix(linearTransform.toMatrix(), true);
 
-		if (this.originalRef !== undefined && this.parent.partition) {
+		if (this.originalRef !== undefined && this.parent && this.parent.partition) {
 			this.parent.partition.then((res) => {
 				// @ts-ignore
 				const instance = res.getInstance(this.originalRef.instanceGuid);
