@@ -61,7 +61,7 @@ export class THREEManager {
 
 	public initialize() {
 		const scope = this;
-		scope.scene.autoUpdate = false;
+		scope.scene.matrixWorldAutoUpdate = false;
 		scope.scene.matrixAutoUpdate = false;
 		scope.renderer.setPixelRatio(window.devicePixelRatio);
 		scope.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -211,13 +211,13 @@ export class THREEManager {
 
 	private OnCameraMoveEnable() {
 		this.isCameraMoving = true;
-		this.scene.autoUpdate = false;
+		this.scene.matrixWorldAutoUpdate = false;
 		this.scene.matrixAutoUpdate = false;
 	}
 
 	private OnCameraMoveDisable() {
 		this.isCameraMoving = false;
-		this.scene.autoUpdate = true;
+		this.scene.matrixWorldAutoUpdate = true;
 		this.scene.matrixAutoUpdate = true;
 		this.scene.updateMatrix();
 		this.setPendingRender();

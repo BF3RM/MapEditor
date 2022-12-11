@@ -574,15 +574,22 @@
   dependencies:
     "@types/node" "*"
 
-"@types/three@0.134.0":
-  version "0.134.0"
-  resolved "https://registry.npmjs.org/@types/three/-/three-0.134.0.tgz"
-  integrity sha512-4YB+99Rgqq27EjiYTItEoZtdjLnTh8W9LxowgpC9eWsjaQJIL4Kn/ZcUKAnW3gB/jS4hqGN8iqmid+RcUZDzpA==
+"@types/three@0.146.0":
+  version "0.146.0"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.146.0.tgz#83813ba0d2fff6bdc6d7fda3a77993a932bba45f"
+  integrity sha512-75AgysUrIvTCB054eQa2pDVFurfeFW8CrMQjpzjt3yHBfuuknoSvvsESd/3EhQxPrz9si3+P0wiDUVsWUlljfA==
+  dependencies:
+    "@types/webxr" "*"
 
 "@types/webpack-env@^1.15.2":
   version "1.16.0"
   resolved "https://registry.npmjs.org/@types/webpack-env/-/webpack-env-1.16.0.tgz"
   integrity sha512-Fx+NpfOO0CpeYX2g9bkvX8O5qh9wrU1sOF4g8sft4Mu7z+qfe387YlyY8w8daDyDsKY5vUxM0yxkAYnbkRbZEw==
+
+"@types/webxr@*":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@types/webxr/-/webxr-0.5.0.tgz#aae1cef3210d88fd4204f8c33385a0bbc4da07c9"
+  integrity sha512-IUMDPSXnYIbEO2IereEFcgcqfDREOgmbGqtrMpVPpACTU6pltYLwHgVkrnYv0XhWEcjio9sYEfIEzgn3c7nDqA==
 
 "@types/ws@^8.5.1":
   version "8.5.3"
@@ -1337,10 +1344,10 @@ camel-case@^4.1.2:
     pascal-case "^3.1.2"
     tslib "^2.0.3"
 
-camera-controls@1.34.6:
-  version "1.34.6"
-  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.34.6.tgz#555fde209d91356e86824cd80d3062d9cb86a107"
-  integrity sha512-dmXSPtzbuBC1053pXphOJz3Y9VVZpjWaoH2Cn2OEaJS34BF7owZ75H0JhFWQiZaUjYP42pdYDQDC8TgK/Gtxjw==
+camera-controls@1.37.4:
+  version "1.37.4"
+  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.37.4.tgz#5359ec8518f1a272e5fc0841b711635203479956"
+  integrity sha512-CwdkFgSRM6nBJtC1U+BIbETlK6rit/w4+RU8uKnEpPWnArm/sj1+1GL3im2GbgoR3ySjtD4fQ6eBK3vP6b90aQ==
 
 caniuse-api@^3.0.0:
   version "3.0.0"
@@ -5006,10 +5013,10 @@ thread-loader@^3.0.0:
     neo-async "^2.6.2"
     schema-utils "^3.0.0"
 
-three@0.134.0:
-  version "0.134.0"
-  resolved "https://registry.npmjs.org/three/-/three-0.134.0.tgz"
-  integrity sha512-LbBerg7GaSPjYtTOnu41AMp7tV6efUNR3p4Wk5NzkSsNTBuA5mDGOfwwZL1jhhVMLx9V20HolIUo0+U3AXehbg==
+three@0.147.0:
+  version "0.147.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.147.0.tgz#1974af9e8e0c1efb3a8561334d57c0b6c29a7951"
+  integrity sha512-LPTOslYQXFkmvceQjFTNnVVli2LaVF6C99Pv34fJypp8NbQLbTlu3KinZ0zURghS5zEehK+VQyvWuPZ/Sm8fzw==
 
 throttle-debounce@^1.0.1:
   version "1.1.0"

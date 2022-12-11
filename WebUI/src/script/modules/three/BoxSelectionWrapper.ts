@@ -13,7 +13,7 @@ export default class BoxSelectionWrapper {
 
 	constructor(canvas: HTMLCanvasElement, scene: Scene, camera: Camera, renderer: WebGLRenderer) {
 		this.selectionBox = new SelectionBox(camera, scene);
-		this.helper = new SelectionHelper(this.selectionBox, renderer, 'selectBox');
+		this.helper = new SelectionHelper(renderer, 'selectBox');
 		this.gizmoWasSelected = false;
 
 		document.addEventListener('mousemove', this.onMouseMove.bind(this));
