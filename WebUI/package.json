@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@vue/composition-api": "1.6.3",
-    "axios": "^0.21.0",
+    "axios": "^0.21.2",
     "camera-controls": "1.37.4",
     "element-ui": "2.15.9",
     "golden-layout": "1.5.9",
