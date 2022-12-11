@@ -21,12 +21,11 @@ This will install the mod in the `Mods` folder and update your `modllist.txt` to
 Alternatively, the mod can be installed manually by downloading the zip file attached in each [release version](https://github.com/BF3RM/MapEditor/releases).
 
 ## Developer set-up
-- Install [nodejs](https://nodejs.org/en/).
-- Install [yarn](https://yarnpkg.com/).
+- Install [pnpm](https://pnpm.io/installation/).
 - Download MapEditor files and place them in  ``.../Server/Admin/Mods``. Path should look like ``.../Server/Admin/Mods/MapEditor``.
 - Add ``mapeditor`` to your ``modlist.txt`` file.
-- Open cmd, cd to ``.../Server/Admin/Mods/MapEditor/WebUI`` and run yarn.
-- After all the dependencies are installed run ``yarn build``.
+- Open cmd, cd to ``.../Server/Admin/Mods/MapEditor/WebUI`` and run `pnpm i`.
+- After all the dependencies are installed run ``pnpm build``.
 
 ## Controls:
 

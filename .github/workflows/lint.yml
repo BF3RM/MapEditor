@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -25,15 +25,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
-      - name: Setup Node 16.x
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v3
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
         with:
-          node-version: '16.x'
+          version: 7
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
       - name: Install dependencies
         working-directory: './WebUI'
-        run: yarn install
+        run: pnpm install --frozen-lockfile
       - name: Build
         working-directory: './WebUI'
         run: |
-          yarn build
+          pnpm build
