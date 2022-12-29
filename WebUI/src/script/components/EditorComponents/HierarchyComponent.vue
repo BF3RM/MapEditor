@@ -174,7 +174,12 @@ export default class HierarchyComponent extends EditorComponent {
 					this.existingParents.get(parentId)!.push(entry);
 				} else {
 					// Entry does not have a parent.
-					const rootId = gameObject.origin === GAMEOBJECT_ORIGIN.VANILLA ? 'vanilla_root' : 'custom_root';
+					const rootId =
+						gameObject.origin === GAMEOBJECT_ORIGIN.VANILLA ||
+						gameObject.origin == GAMEOBJECT_ORIGIN.NOHAVOK
+							? 'vanilla_root'
+							: 'custom_root';
+
 					if (!this.existingParents.has(rootId)) {
 						this.existingParents.set(rootId, []);
 					}

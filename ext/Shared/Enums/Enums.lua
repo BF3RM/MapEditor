@@ -16,7 +16,8 @@ RaycastType = {
 GameObjectOriginType = {
 	Vanilla = 1,
 	Custom = 2,
-	CustomChild = 3
+	CustomChild = 3,
+	NoHavok = 4
 }
 
 ---@class EditorMode

@@ -56,7 +56,7 @@ function GameObject:SetField(p_FieldName, p_NewValue, p_AutoModified)
 end
 
 function GameObject:IsUserModified()
-	if self.origin ~= GameObjectOriginType.Vanilla then
+	if self.origin == GameObjectOriginType.Custom or self.origin == GameObjectOriginType.CustomChild then
 		return true
 	end
 
@@ -107,7 +107,7 @@ function GameObject:Enable(p_AutoModified)
 end
 
 function GameObject:MarkAsDeleted(p_AutoModified)
-	if self.origin ~= GameObjectOriginType.Vanilla then
+	if self.origin == GameObjectOriginType.Custom or self.origin == GameObjectOriginType.CustomChild then
 		m_Logger:Error("Cant delete a non-vanilla object, use destroy instead")
 		return
 	end
@@ -130,7 +130,7 @@ function GameObject:MarkAsDeleted(p_AutoModified)
 end
 
 function GameObject:MarkAsUndeleted(p_AutoModified)
-	if self.origin ~= GameObjectOriginType.Vanilla then
+	if self.origin == GameObjectOriginType.Custom or self.origin == GameObjectOriginType.CustomChild then
 		m_Logger:Error("Cant undelete a non-vanilla object, use spawn instead")
 		return
 	end
@@ -153,7 +153,7 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
 end
 
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
-	if self.origin == GameObjectOriginType.Vanilla then
+	if self.origin == GameObjectOriginType.Vanilla or self.origin == GameObjectOriginType.NoHavok then
 		m_Logger:Error("Cant destroy vanilla object, use disable instead")
 		return
 	end
