@@ -353,8 +353,9 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
 		local s_Command
 
-		-- Vanilla objects are handled in maploader
-		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla then
+		-- Vanilla and nohavok objects are handled in levelloader
+		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
+			l_GameObjectSaveData.origin == GameObjectOriginType.NoHavok then
 			if l_GameObjectSaveData.isDeleted then
 				s_Command = {
 					guid = s_Guid,
