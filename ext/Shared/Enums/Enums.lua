@@ -27,6 +27,13 @@ EditorMode = {
 	FreeCam = 4
 }
 
+---@class ProjectLoadingState
+ProjectLoadingState = {
+	Loaded = 1,
+	PendingLevelLoad = 2,
+	PendingProjectLoad = 3,
+}
+
 ---Command Action Response Type
 ---@class CARResponseType
 CARResponseType = {

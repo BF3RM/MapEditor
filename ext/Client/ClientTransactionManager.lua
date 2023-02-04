@@ -78,10 +78,6 @@ function ClientTransactionManager:ClientReady()
 	NetEvents:SendLocal("ClientTransactionManager:ClientReady")
 end
 
-function ClientTransactionManager:OnLevelDestroy()
-	self.m_LastTransactionId = 0
-end
-
 ---Syncs client content, queuing the missing commands and updating the project loading/syncing state
 ---@param p_TransferDatas table
 ---@param p_LastTransactionId any

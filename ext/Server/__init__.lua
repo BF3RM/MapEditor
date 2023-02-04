@@ -77,7 +77,6 @@ function MapEditorServer:OnLevelDestroy()
 	GameObjectManager:OnLevelDestroy()
 	ServerTransactionManager:OnLevelDestroy()
 	ServerGameObjectManager:OnLevelDestroy()
-	ProjectManager:OnLevelDestroy()
 end
 
 function MapEditorServer:OnPartitionLoaded(p_Partition)

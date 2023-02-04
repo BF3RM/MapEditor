@@ -2,7 +2,6 @@
 ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
-local m_IsLevelLoaded = false
 
 local SAVE_VERSION = "0.1.1"
 
@@ -10,6 +9,8 @@ function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
 
 	self.m_CurrentProjectHeader = nil -- dont reset this, is required info for map restart
+	self.m_ProjectLoadingState = ProjectLoadingState.Loaded
+
 	self:RegisterVars()
 	self:RegisterEvents()
 end
@@ -45,10 +46,6 @@ function ProjectManager:OnRequestProjectHeaders(p_Player)
 		NetEvents:SendToLocal("MapEditorClient:ReceiveProjectHeaders", p_Player, DataBaseManager:GetProjectHeaders())
 		self:UpdateClientProjectHeader(p_Player)
 	end
-end
-
-function ProjectManager:OnLevelDestroy()
-	m_IsLevelLoaded = false
 end
 
 ---@param p_Player Player|nil
@@ -196,7 +193,9 @@ end
 ---@param p_GameMode string
 ---@param p_Round integer
 function ProjectManager:OnLevelLoaded(p_Map, p_GameMode, p_Round)
-	m_IsLevelLoaded = true
+	if self.m_ProjectLoadingState == ProjectLoadingState.PendingLevelLoad then
+		self.m_ProjectLoadingState = ProjectLoadingState.PendingProjectLoad
+	end
 
 	self.m_MapName = p_Map:gsub(".*/", "")
 	self.m_GameMode = p_GameMode:gsub(".*/", "")
@@ -207,9 +206,14 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 		return
 	end
 
-	-- TODO: ugly, find a better entry point to invoke project data loading
-	if m_IsLevelLoaded == true and self.m_CurrentProjectHeader ~= nil and self.m_CurrentProjectHeader.id ~= nil and self.m_CurrentProjectHeader.projectName ~= nil then
-		m_IsLevelLoaded = false
+	if self.m_ProjectLoadingState == ProjectLoadingState.PendingProjectLoad then
+		if self.m_CurrentProjectHeader == nil or self.m_CurrentProjectHeader.id == nil or self.m_CurrentProjectHeader.projectName == nil then
+			self.m_CurrentProjectHeader = ProjectLoadingState.Loaded
+			m_Logger:Warning('Pending load of project cancelled due to missing project data')
+			return
+		end
+
+		self.m_ProjectLoadingState = ProjectLoadingState.Loaded
 
 		if self.m_MapName:gsub(".*/", "") ~= self.m_CurrentProjectHeader.mapName:gsub(".*/", "") then
 			m_Logger:Error("Can't load project that is not built for the same map as current one. Current: " .. tostring(self.m_MapName) .. ", target: " .. tostring(self.m_CurrentProjectHeader.mapName))
@@ -251,6 +255,7 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		return
 	end
 
+	self.m_ProjectLoadingState = ProjectLoadingState.PendingLevelLoad
 	self.m_CurrentProjectHeader = s_Project.header
 
 	local s_MapName = s_Project.header.mapName
