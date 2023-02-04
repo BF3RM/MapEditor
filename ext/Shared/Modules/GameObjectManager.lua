@@ -370,9 +370,12 @@ function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 		p_GameObject.guid = Guid(p_PendingInfo.customGuid)
 		p_GameObject.origin = GameObjectOriginType.Custom
 	else
-		if p_GameObject.blueprintCtrRef.name:lower() == "nohavok" then
+
+		if string.find(p_GameObject.blueprintCtrRef.name:lower(), "nohavok") then
+			local s_BundleName = p_GameObject.blueprintCtrRef.name:gsub('NoHavok_', '')
 			p_GameObject.origin = GameObjectOriginType.NoHavok
-			p_GameObject.guid = self:GetNoHavokGuid(p_GameObject.parentData.guid, p_GameObject.name, p_GameObject.transform.trans)
+			-- No parent data, add the bundle name as an offset and use a predefined havok guid
+			p_GameObject.guid = self:GetNoHavokGuid(HAVOK_GUID, s_BundleName .. '/' .. p_GameObject.name, p_GameObject.transform.trans)
 		else
 			-- This is a vanilla root object
 			p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
@@ -465,7 +468,6 @@ function GameObjectManager:GetVanillaGuid(p_Name, p_Transform)
 end
 
 function GameObjectManager:GetNoHavokGuid(p_ParentGuid, p_Name, p_Transform)
-	p_ParentGuid = p_ParentGuid or HAVOK_GUID
 	local s_NewGuid = GenerateNoHavokGuid(p_ParentGuid, p_Name, p_Transform, 0)
 	local s_Increment = 1
 
