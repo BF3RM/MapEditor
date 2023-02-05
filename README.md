@@ -33,11 +33,10 @@ A list of controls can be found in-game. To reveal it, navigate in the toolbar t
 
 ## Mod Dependencies
 MapEditor requires other mods to work fully:
-- [NoHavok](https://github.com/BF3RM/NoHavok/issues). This mod converts Havok objects into Frostbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing. NoHavok is still not completed and might lead to unexpected crashes and not work on some maps. To use it, simply download the mod in the `/Admin/Mods` folder and add `nohavok` to `modlist.txt`.
+- [NoHavok](https://github.com/BF3RM/NoHavokGen). This mod converts Havok objects into Frostbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing.
 
 ## Running saves for playing
-If your project is ready to be used for playing, export your project's save from MapEditor and load it with
- [CustomLevelLoader](https://github.com/BF3RM/CustomLevelLoader). You can find an example in the [RealityMod branch](https://github.com/BF3RM/CustomLevelLoader/tree/realitymod-dev). For more information on how to similarly set up a project, check CustomLevelLoader's README file.
+If your project is ready to be used for playing, export your project's save from `MapEditor`, save it in a `.json` file and use [LevelLoaderGen](https://github.com/BF3RM/LevelLoaderGen) to generate the loader mod. Check out `LevelLoaderGen` repository for more information. If the level was generated with `NoHavok`, you will need to run it as well.
 
 ## Used libraries and tools
 This project is using:
