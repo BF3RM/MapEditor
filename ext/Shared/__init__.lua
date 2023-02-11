@@ -3,7 +3,7 @@ MapEditorShared = class 'MapEditorShared'
 
 require "__shared/Config"
 require "__shared/Util/Logger"
-require "__shared/Util/Coroutiner"
+-- require "__shared/Util/Coroutiner"
 require "__shared/Util/Util"
 require "__shared/Util/DataContainerExt"
 require "__shared/FastLoad"

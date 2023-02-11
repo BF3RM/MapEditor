@@ -118,7 +118,8 @@ function CommandActions:UndeleteGameObject(p_Command, p_UpdatePass)
 
 	m_Logger:Write("UndeleteGameObject with guid " .. p_Command.gameObjectTransferData.guid)
 
-	if SanitizeEnum(p_Command.gameObjectTransferData.origin) ~= GameObjectOriginType.Vanilla then
+	if SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.Custom or
+			SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.CustomChild then
 		return CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 	end
 

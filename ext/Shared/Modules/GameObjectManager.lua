@@ -46,8 +46,8 @@ end
 ---@param p_Overrides table
 function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
 	if p_BlueprintPartitionGuid == nil or
-			p_BlueprintInstanceGuid == nil or
-			p_LinearTransform == nil then
+		p_BlueprintInstanceGuid == nil or
+		p_LinearTransform == nil then
 		m_Logger:Error('InvokeBlueprintSpawn: One or more parameters are nil.')
 
 		return false
@@ -68,7 +68,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	if p_IsPreviewSpawn == false then
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
 	else
-		local s_PreviewSpawnParentData = GameObjectParentData{
+		local s_PreviewSpawnParentData = GameObjectParentData {
 			guid = EMPTY_GUID, -- Root
 			typeName = "previewSpawn",
 		}
@@ -154,10 +154,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 
 	---@type GameObject
-	local s_GameObject = GameObject{
+	local s_GameObject = GameObject {
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
 		name = s_Blueprint.name,
-		parentData = GameObjectParentData{},
+		parentData = GameObjectParentData {},
 		transform = p_Transform,
 		variation = s_Variation,
 		origin = GameObjectOriginType.Vanilla,
@@ -210,7 +210,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 	else
 		if s_PendingCustomBlueprintInfo == nil then
-			m_Logger:Write('Found vanilla object without parent. Name: '..tostring(s_Blueprint.name)..', Guid: '..tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
+			m_Logger:Write('Found vanilla object without parent. Name: ' .. tostring(s_Blueprint.name) .. ', Guid: ' .. tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
 			self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
 		else
@@ -251,7 +251,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	---vvvv This is children to parent / bottom to top vvvv
 
 	-- Custom object have to be manually initialized.
-	if not s_GameObject.origin == GameObjectOriginType.Vanilla then
+	if s_GameObject.origin == GameObjectOriginType.Custom or s_GameObject.origin == GameObjectOriginType.CustomChild then
 		for _, l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
 			l_Entity:Init(self.m_Realm, true)
@@ -272,7 +272,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		s_GameEntity = self.m_PendingEntities[l_Entity.instanceId]
 		if s_GameEntity == nil then
 			---@type GameEntity
-			s_GameEntity = GameEntity{
+			s_GameEntity = GameEntity {
 				entity = l_Entity,
 				instanceId = l_Entity.instanceId,
 				typeName = l_Entity.typeInfo.name,
@@ -318,9 +318,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			-- TODO: update blueprint data with the correct realm if its client or server only
 			if self.m_Realm == Realm.Realm_Server then
 				m_Logger:Write(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
-				-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
-				-- 	m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
-				-- end
+			-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
+			-- 	m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
+			-- end
 			elseif self.m_Realm == Realm.Realm_Client then
 				m_Logger:Write(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
 				-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
@@ -361,7 +361,7 @@ function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 
 	if p_PendingInfo then -- We spawned this custom entitybus
-		p_GameObject.parentData = GameObjectParentData{
+		p_GameObject.parentData = GameObjectParentData {
 			guid = p_PendingInfo.parentData.guid,
 			typeName = p_PendingInfo.parentData.typeName,
 			primaryInstanceGuid = p_PendingInfo.parentData.primaryInstanceGuid,
@@ -369,13 +369,21 @@ function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 		}
 		p_GameObject.guid = Guid(p_PendingInfo.customGuid)
 		p_GameObject.origin = GameObjectOriginType.Custom
-	else -- This is a vanilla root object
-		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
-		p_GameObject.origin = GameObjectOriginType.Vanilla
+	else
 
-		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
-		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
+		if string.find(p_GameObject.blueprintCtrRef.name:lower(), "nohavok") then
+			local s_BundleName = p_GameObject.blueprintCtrRef.name:gsub('NoHavok_', '')
+			p_GameObject.origin = GameObjectOriginType.NoHavok
+			-- No parent data, add the bundle name as an offset and use a predefined havok guid
+			p_GameObject.guid = self:GetNoHavokGuid(HAVOK_GUID, s_BundleName .. '/' .. p_GameObject.name, p_GameObject.transform.trans)
+		else
+			-- This is a vanilla root object
+			p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
+			p_GameObject.origin = GameObjectOriginType.Vanilla
 
+			--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+			self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
+		end
 	end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
@@ -383,7 +391,7 @@ end
 
 function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	-- This is a child of either a custom gameObject or a vanilla gameObject, find the parent!
-	p_GameObject.parentData = GameObjectParentData{
+	p_GameObject.parentData = GameObjectParentData {
 		guid = p_ParentGameObject.guid,
 		typeName = p_ParentGameObject.blueprintCtrRef.typeName,
 		primaryInstanceGuid = p_ParentGameObject.blueprintCtrRef.instanceGuid,
@@ -401,6 +409,8 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
+	elseif p_GameObject.origin == GameObjectOriginType.NoHavok then
+		p_GameObject.guid = self:GetNoHavokGuid(p_GameObject.parentData.guid, p_GameObject.name, p_GameObject.transform.trans)
 	else
 		local i = 1
 		local s_CustomGuid
@@ -457,6 +467,18 @@ function GameObjectManager:GetVanillaGuid(p_Name, p_Transform)
 	return s_VanillaGuid
 end
 
+function GameObjectManager:GetNoHavokGuid(p_ParentGuid, p_Name, p_Transform)
+	local s_NewGuid = GenerateNoHavokGuid(p_ParentGuid, p_Name, p_Transform, 0)
+	local s_Increment = 1
+
+	while self.m_GameObjects[tostring(s_NewGuid)] ~= nil do
+		s_NewGuid = GenerateNoHavokGuid(p_ParentGuid, p_Name, p_Transform, s_Increment)
+		s_Increment = s_Increment + 1
+	end
+
+	return s_NewGuid
+end
+
 function GameObjectManager:DeleteGameObject(p_Guid)
 	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
 
@@ -470,7 +492,7 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 		return true
 	end
 
-	if s_GameObject.origin == GameObjectOriginType.Vanilla then
+	if s_GameObject.origin == GameObjectOriginType.Vanilla or s_GameObject.origin == GameObjectOriginType.NoHavok then
 		s_GameObject:MarkAsDeleted()
 	else
 		s_GameObject:Destroy()
@@ -492,7 +514,7 @@ function GameObjectManager:UndeleteGameObject(p_Guid)
 		m_Logger:Error("GameObject was not marked as deleted before undeleting: " .. p_Guid)
 		return false
 	end
-	if s_GameObject.origin ~= GameObjectOriginType.Vanilla then
+	if s_GameObject.origin ~= GameObjectOriginType.Vanilla and s_GameObject.origin ~= GameObjectOriginType.NoHavok then
 		m_Logger:Error("GameObject was not a vanilla object " .. p_Guid)
 		return false
 	end
@@ -572,7 +594,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	end
 
 	---@type GameEntity
-	s_GameEntity = GameEntity{
+	s_GameEntity = GameEntity {
 		entity = s_Entity,
 		instanceId = s_Entity.instanceId,
 		typeName = s_Entity.typeInfo.name,
@@ -600,9 +622,9 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 		-- Set custom objects' entities enabled by default. This can't be done in CreateEntitiesFromBlueprint, for
 		-- some reason it doesn't work
-		if s_PendingGameObject.origin ~= GameObjectOriginType.Vanilla and
-				(s_Entity:Is('GameEntity') or s_Entity:Is('EffectEntity')) and
-				s_Entity.typeInfo.name ~= "ServerVehicleEntity" then
+		if (s_PendingGameObject.origin == GameObjectOriginType.Custom or s_PendingGameObject.origin == GameObjectOriginType.CustomChild) and
+			(s_Entity:Is('GameEntity') or s_Entity:Is('EffectEntity')) and
+			s_Entity.typeInfo.name ~= "ServerVehicleEntity" then
 			-- Small delay before firing an event, otherwise it may crash
 			Timer:Simple(0.2, function()
 				s_GameEntity:Enable()
