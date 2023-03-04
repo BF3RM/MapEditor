@@ -18,7 +18,6 @@ end
 function ProjectManager:RegisterVars()
 	self.m_MapName = nil
 	self.m_GameMode = nil
-	self.m_LoadedBundles = {}
 end
 
 function ProjectManager:RegisterEvents()
@@ -29,12 +28,6 @@ function ProjectManager:RegisterEvents()
 	NetEvents:Subscribe('ProjectManager:RequestProjectLoad', self, self.OnRequestProjectLoad)
 	NetEvents:Subscribe('ProjectManager:RequestProjectDelete', self, self.OnRequestProjectDelete)
 	NetEvents:Subscribe('ProjectManager:RequestProjectImport', self, self.OnRequestProjectImport)
-end
-
-function ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
-	for _, l_Bundle in pairs(p_Bundles) do
-		self.m_LoadedBundles[l_Bundle] = true
-	end
 end
 
 ---@param p_Player Player
@@ -55,7 +48,7 @@ function ProjectManager:UpdateClientProjectHeader(p_Player)
 			projectName = 'Untitled Project',
 			mapName = self.m_MapName,
 			gameModeName = self.m_GameMode,
-			requiredBundles = self.m_LoadedBundles
+			requiredBundles = BundleManager:GetLoadedBundles()
 		}
 	end
 
@@ -207,13 +200,13 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 	end
 
 	if self.m_ProjectLoadingState == ProjectLoadingState.PendingProjectLoad then
+		self.m_ProjectLoadingState = ProjectLoadingState.Loaded
+
 		if self.m_CurrentProjectHeader == nil or self.m_CurrentProjectHeader.id == nil or self.m_CurrentProjectHeader.projectName == nil then
 			self.m_CurrentProjectHeader = ProjectLoadingState.Loaded
 			m_Logger:Warning('Pending load of project cancelled due to missing project data')
 			return
 		end
-
-		self.m_ProjectLoadingState = ProjectLoadingState.Loaded
 
 		if self.m_MapName:gsub(".*/", "") ~= self.m_CurrentProjectHeader.mapName:gsub(".*/", "") then
 			m_Logger:Error("Can't load project that is not built for the same map as current one. Current: " .. tostring(self.m_MapName) .. ", target: " .. tostring(self.m_CurrentProjectHeader.mapName))
@@ -236,6 +229,22 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 		if s_ProjectSave == nil then
 			m_Logger:Error("Can't load project. Error: " .. tostring(s_Msg))
 			return
+		end
+
+		-- Check if the required bundles are loaded
+		local s_LoadedBundles = BundleManager:GetLoadedBundles()
+		local s_RequiredBundles = s_ProjectSave.header.requiredBundles
+
+		local s_MissingBundles = {}
+		for s_BundleName, _ in pairs(s_RequiredBundles) do
+			if not s_LoadedBundles[s_BundleName] then
+				table.insert(s_MissingBundles, s_BundleName)
+			end
+		end
+
+		if #s_MissingBundles > 0 then
+			m_Logger:Warning("Some required bundles are missing, the project might not load correctly. Missing bundles: ")
+			m_Logger:Warning(json.encode(s_MissingBundles))
 		end
 
 		self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
@@ -327,9 +336,15 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 		projectName = p_ProjectHeader.projectName,
 		mapName = self.m_MapName,
 		gameModeName = self.m_GameMode,
-		requiredBundles = self.m_LoadedBundles
+		requiredBundles = BundleManager:GetLoadedBundles()
 	}
-	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectHeader.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas, SAVE_VERSION)
+	local s_Success, s_Msg = DataBaseManager:SaveProject(
+		p_ProjectHeader.projectName,
+		self.m_CurrentProjectHeader.mapName,
+		self.m_CurrentProjectHeader.gameModeName,
+		BundleManager:GetLoadedBundles(),
+		s_GameObjectSaveDatas,
+		SAVE_VERSION)
 
 	if s_Success then
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())

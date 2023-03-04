@@ -8,6 +8,7 @@ require "__shared/Util/Util"
 require "__shared/Util/DataContainerExt"
 require "__shared/FastLoad"
 require "__shared/Modules/EBXManager"
+require "__shared/Modules/BundleManager"
 require "__shared/Modules/GameObjectManager"
 require "__shared/Modules/CommandActions"
 require "__shared/Modules/InstanceParser"
@@ -40,6 +41,12 @@ function MapEditorShared:__init()
 	Events:Subscribe('Level:LoadResources', self, self.OnLoadResources)
 	Events:Subscribe('Level:Loaded', self, self.OnLevelLoaded)
 	Events:Subscribe('Extension:Unloading', self, self.OnExtensionUnloading)
+
+	Hooks:Install('ResourceManager:LoadBundles', 100, self, self.OnLoadBundles)
+end
+
+function MapEditorShared:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	BundleManager:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 end
 
 function MapEditorShared:OnEngineUpdate(p_Delta, p_SimulationDelta)

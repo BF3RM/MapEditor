@@ -29,7 +29,6 @@ function MapEditorServer:RegisterEvents()
 	Events:Subscribe('Player:Chat', self, self.OnChat)
 	Events:Subscribe('Player:Left', self, self.OnPlayerLeft)
 
-	Hooks:Install('ResourceManager:LoadBundles', 900, self, self.OnLoadBundles)
     Hooks:Install('EntityFactory:CreateFromBlueprint', 900, self, self.OnEntityCreateFromBlueprint)
 	Hooks:Install('EntityFactory:Create', 999, self, self.OnEntityCreate)
 end
@@ -89,11 +88,6 @@ end
 
 function MapEditorServer:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
-end
-
-function MapEditorServer:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment, ProjectManager.m_CurrentProjectHeader)
-	ProjectManager:OnLoadBundles(p_Bundles, p_Compartment)
 end
 
 function MapEditorServer:OnPlayerLeft(p_Player)

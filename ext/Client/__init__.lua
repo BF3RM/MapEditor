@@ -139,7 +139,6 @@ function MapEditorClient:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	end
 
 	UIManager:SetLoadingInfo('Mounting bundles: ' .. tostring(s_LoadingInfo))
-	EditorCommon:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 end
 
 function MapEditorClient:OnEntityCreate(p_Hook, p_EntityData, p_Transform )
