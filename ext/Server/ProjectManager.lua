@@ -258,8 +258,9 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 			for l_Index, l_Value in ipairs(s_ProjectSave.data) do
 				-- store the timestamps to reference later
 				self.m_GUID_To_Timestamps[l_Value.guid] = l_Value.timeStamp
-				print(l_Value.timeStamp)
+				-- print(l_Value.timeStamp)
 			end
+			NetEvents:BroadcastLocal("Shared:StoreTimeStamps", self.m_GUID_To_Timestamps)
 		end
 
 		self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
@@ -334,9 +335,6 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
 		if l_GameObject:IsUserModified() == true or l_GameObject:HasOverrides() then
-			if not l_GameObject.timeStamp then
-				l_GameObject.timeStamp = self.m_GUID_To_Timestamps[l_GameObject.guid]
-			end
 			s_Count = s_Count + 1
 			table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
 		end
@@ -383,10 +381,6 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
 		local s_Command
 		local s_TimeStamp = self.m_GUID_To_Timestamps[s_Guid]
-		if not s_TimeStamp then
-			s_TimeStamp = SharedUtils:GetTimeMS()
-			self.m_GUID_To_Timestamps[s_Guid] = s_TimeStamp
-		end
 
 		-- Vanilla and nohavok objects are handled in levelloader
 		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or

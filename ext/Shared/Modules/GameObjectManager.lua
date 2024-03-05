@@ -10,6 +10,17 @@ function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm
 	self:RegisterVars()
+	self:RegisterEvents()
+end
+
+function GameObjectManager:RegisterEvents()
+	Events:Subscribe("Shared:StoreTimeStamps", self, self.StoreTimeStamps)
+end
+
+---@param p_GUID_To_Timestamps table
+function GameObjectManager:StoreTimeStamps(p_GUID_To_Timestamps)
+	print("RECEIVED TIMESTAMPS OBJECT OF LENGTH: " .. #p_GUID_To_Timestamps)
+	self.m_GUID_To_Timestamps = p_GUID_To_Timestamps
 end
 
 function GameObjectManager:RegisterVars()
@@ -24,6 +35,9 @@ function GameObjectManager:RegisterVars()
 
 	--- key: child (ReferenceObjectData) guid, value: parent GameObject guid
 	self.m_ReferenceObjectDatas = {}
+
+	-- workaround for origin type 3
+	self.m_GUID_To_Timestamps = {}
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -154,11 +168,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 	end
 
-	local s_TimeStamp
-	if not s_PendingCustomBlueprintInfo then
-		s_TimeStamp = 0
-	else
+	local s_TimeStamp = 0
+	if s_PendingCustomBlueprintInfo then
 		s_TimeStamp = s_PendingCustomBlueprintInfo.timeStamp
+		if not s_TimeStamp then
+			s_TimeStamp = 0
+		end
 	end
 
 	---@type GameObject
@@ -378,16 +393,25 @@ function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 		}
 		p_GameObject.guid = Guid(p_PendingInfo.customGuid)
 		p_GameObject.origin = GameObjectOriginType.Custom
+		if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+			self:InsertTimestamp(p_GameObject)
+		end
 	else
 		if string.find(p_GameObject.blueprintCtrRef.name:lower(), "nohavok") then
 			local s_BundleName = p_GameObject.blueprintCtrRef.name:gsub('NoHavok_', '')
 			p_GameObject.origin = GameObjectOriginType.NoHavok
 			-- No parent data, add the bundle name as an offset and use a predefined havok guid
 			p_GameObject.guid = self:GetNoHavokGuid(HAVOK_GUID, s_BundleName .. '/' .. p_GameObject.name, p_GameObject.transform.trans)
+			if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+				self:InsertTimestamp(p_GameObject)
+			end
 		else
 			-- This is a vanilla root object
 			p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 			p_GameObject.origin = GameObjectOriginType.Vanilla
+			if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+				self:InsertTimestamp(p_GameObject)
+			end
 
 			--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 			self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
@@ -398,6 +422,15 @@ function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 	-- end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
+end
+
+---@param p_GameObject GameObject
+function GameObjectManager:InsertTimestamp(p_GameObject)
+	local s_ObjectTimeStamp = self.m_GUID_To_Timestamps[p_GameObject.guid]
+	if not s_ObjectTimeStamp then
+		s_ObjectTimeStamp = SharedUtils:GetTimeMS()
+	end
+	p_GameObject.timeStamp = s_ObjectTimeStamp
 end
 
 function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
@@ -419,9 +452,16 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	if p_GameObject.origin == GameObjectOriginType.Vanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+		if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+			self:InsertTimestamp(p_GameObject)
+		end
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
 	elseif p_GameObject.origin == GameObjectOriginType.NoHavok then
 		p_GameObject.guid = self:GetNoHavokGuid(p_GameObject.parentData.guid, p_GameObject.name, p_GameObject.transform.trans)
+
+		if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+			self:InsertTimestamp(p_GameObject)
+		end
 	else
 		local i = 1
 		local s_CustomGuid
@@ -433,6 +473,10 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 
 		p_GameObject.guid = s_CustomGuid
 		p_GameObject.origin = GameObjectOriginType.CustomChild
+
+		if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+			self:InsertTimestamp(p_GameObject)
+		end
 	end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
