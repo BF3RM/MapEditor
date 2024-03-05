@@ -3,7 +3,7 @@ ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
 
-local SAVE_VERSION = "0.1.1"
+local SAVE_VERSION = "0.1.2"
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -96,6 +96,7 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 
 	if s_SaveVersion == nil then -- Save from before versioning was implemented, try to upgrade to current version
 		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
+		self:InsertTimestampsIntoObjects(s_Data)
 
 		-- Some pre-versioning save files had an isVanilla flag
 		for _, l_DataEntry in pairs(s_Data) do
@@ -112,12 +113,23 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 		return nil, 'Importing save with a higher save format version than supported, please update MapEditor before importing'
 	elseif s_SaveVersion < SAVE_VERSION then
 		-- New version updates are handled here
+		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
+		self:InsertTimestampsIntoObjects(s_Data)
 
 		-- Update save version
 		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
 		return p_ProjectSave
 	elseif s_SaveVersion == SAVE_VERSION then
 		return p_ProjectSave
+	end
+end
+
+---@param p_Data table
+function ProjectManager:InsertTimestampsIntoObjects(p_Data)
+	for l_Index, l_DataEntry in ipairs(p_Data) do
+		if not l_DataEntry.timeStamp then
+			l_DataEntry.timeStamp = 1000000000000 + l_Index
+		end
 	end
 end
 
