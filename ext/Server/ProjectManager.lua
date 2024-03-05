@@ -92,7 +92,7 @@ end
 ---@param p_ProjectSave ProjectSave
 ---@return ProjectSave|nil projectSave, string|nil errorMessage
 function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
-	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportDataName].saveVersion
+	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion
 
 	if s_SaveVersion == nil then -- Save from before versioning was implemented, try to upgrade to current version
 		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
@@ -110,11 +110,13 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 		return p_ProjectSave
 	elseif s_SaveVersion > SAVE_VERSION then
 		return nil, 'Importing save with a higher save format version than supported, please update MapEditor before importing'
-	else
+	elseif s_SaveVersion < SAVE_VERSION then
 		-- New version updates are handled here
 
 		-- Update save version
 		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
+		return p_ProjectSave
+	elseif s_SaveVersion == SAVE_VERSION then
 		return p_ProjectSave
 	end
 end
@@ -265,7 +267,6 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		Maps[s_MapName] == nil or
 		s_GameModeName == nil or
 		GameModes[s_GameModeName] == nil then
-
 		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
 		return
 	end
