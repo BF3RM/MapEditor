@@ -12,6 +12,7 @@
 ---@field guid string
 ---@field blueprintCtrRef table|nil
 ---@field transform LinearTransform
+---@field timeStamp number
 ---@field origin GameObjectOriginType
 ---@field original table|nil
 ---@field localTransform LinearTransform
