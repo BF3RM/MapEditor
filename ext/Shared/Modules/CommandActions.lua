@@ -95,6 +95,7 @@ function CommandActions:DeleteGameObject(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
+		timeStamp = p_Command.gameObjectTransferData.timeStamp,
 		isDeleted = true
 	}
 
@@ -235,7 +236,8 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
-		transform = p_Command.gameObjectTransferData.transform
+		transform = p_Command.gameObjectTransferData.transform,
+		timeStamp = p_Command.gameObjectTransferData.timeStamp
 	}
 
 	local s_CommandActionResult = {
