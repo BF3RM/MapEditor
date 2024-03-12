@@ -168,12 +168,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 	end
 
-	local s_TimeStamp = 0
+	local s_TimeStamp
 	if s_PendingCustomBlueprintInfo then
 		s_TimeStamp = s_PendingCustomBlueprintInfo.timeStamp
-		if not s_TimeStamp then
-			s_TimeStamp = 0
-		end
+	end
+	if not s_TimeStamp then
+		s_TimeStamp = SharedUtils:GetTimeMS()
 	end
 
 	---@type GameObject

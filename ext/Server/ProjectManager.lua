@@ -335,8 +335,12 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
 		if l_GameObject:IsUserModified() == true or l_GameObject:HasOverrides() then
-			if l_GameObject.timeStamp == 0 then
-				l_GameObject.timeStamp = self.m_GUID_To_Timestamps[tostring(l_GameObject.guid)]
+			-- check the old values that are stored
+			local s_Guid = tostring(l_GameObject.guid)
+			if self.m_GUID_To_Timestamps[s_Guid] ~= nil then
+				l_GameObject.timeStamp = self.m_GUID_To_Timestamps[s_Guid]
+			else
+				self.m_GUID_To_Timestamps[s_Guid] = l_GameObject.timeStamp
 			end
 			s_Count = s_Count + 1
 			table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
