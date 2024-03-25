@@ -10,6 +10,17 @@ function GameObjectManager:__init(p_Realm)
 	m_Logger:Write("Initializing GameObjectManager: " .. tostring(p_Realm))
 	self.m_Realm = p_Realm
 	self:RegisterVars()
+	self:RegisterEvents()
+end
+
+function GameObjectManager:RegisterEvents()
+	Events:Subscribe("Shared:StoreTimeStamps", self, self.StoreTimeStamps)
+end
+
+---@param p_GUID_To_Timestamps table
+function GameObjectManager:StoreTimeStamps(p_GUID_To_Timestamps)
+	print("RECEIVED TIMESTAMPS OBJECT OF LENGTH: " .. #p_GUID_To_Timestamps)
+	self.m_GUID_To_Timestamps = p_GUID_To_Timestamps
 end
 
 function GameObjectManager:RegisterVars()
@@ -24,6 +35,9 @@ function GameObjectManager:RegisterVars()
 
 	--- key: child (ReferenceObjectData) guid, value: parent GameObject guid
 	self.m_ReferenceObjectDatas = {}
+
+	-- workaround for origin type 3
+	self.m_GUID_To_Timestamps = {}
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -44,7 +58,8 @@ end
 ---@param p_Variation integer
 ---@param p_IsPreviewSpawn boolean
 ---@param p_Overrides table
-function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides)
+---@param p_TimeStamp number
+function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn, p_Overrides, p_TimeStamp)
 	if p_BlueprintPartitionGuid == nil or
 		p_BlueprintInstanceGuid == nil or
 		p_LinearTransform == nil then
@@ -66,7 +81,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 
 	-- m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
 	if p_IsPreviewSpawn == false then
-		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides }
+		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides, timeStamp = p_TimeStamp }
 	else
 		local s_PreviewSpawnParentData = GameObjectParentData {
 			guid = EMPTY_GUID, -- Root
@@ -74,7 +89,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		}
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
 		m_Logger:WriteTable(s_PreviewSpawnParentData)
-		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides }
+		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides, timeStamp = p_TimeStamp }
 	end
 
 	local s_Params = EntityCreationParams()
@@ -153,6 +168,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 	end
 
+	local s_TimeStamp
+	if s_PendingCustomBlueprintInfo then
+		s_TimeStamp = s_PendingCustomBlueprintInfo.timeStamp
+	end
+	if not s_TimeStamp then
+		s_TimeStamp = SharedUtils:GetTimeMS()
+	end
+
 	---@type GameObject
 	local s_GameObject = GameObject {
 		guid = GenerateTempGuid(), -- we set a tempGuid, it will later be set to a vanilla or custom guid
@@ -161,6 +184,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		transform = p_Transform,
 		variation = s_Variation,
 		origin = GameObjectOriginType.Vanilla,
+		timeStamp = s_TimeStamp,
 		isDeleted = false,
 		isEnabled = true,
 		gameEntities = {},
@@ -318,9 +342,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			-- TODO: update blueprint data with the correct realm if its client or server only
 			if self.m_Realm == Realm.Realm_Server then
 				m_Logger:Write(s_UnresolvedRODCount .. ' client-only gameobjects weren\'t resolved')
-			-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
-			-- 	m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
-			-- end
+				-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
+				-- 	m_Logger:Write(tostring(l_Guid) .. ', '..l_Value.typeName)
+				-- end
 			elseif self.m_Realm == Realm.Realm_Client then
 				m_Logger:Write(s_UnresolvedRODCount .. ' server-only gameobjects weren\'t resolved')
 				-- for l_Guid, l_Value in pairs(self.m_ReferenceObjectDatas) do
@@ -360,7 +384,7 @@ end
 function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 	self.m_GameObjects[tostring(p_GameObject.guid)] = nil -- Remove temp guid from array
 
-	if p_PendingInfo then -- We spawned this custom entitybus
+	if p_PendingInfo then                              -- We spawned this custom entitybus
 		p_GameObject.parentData = GameObjectParentData {
 			guid = p_PendingInfo.parentData.guid,
 			typeName = p_PendingInfo.parentData.typeName,
@@ -369,24 +393,44 @@ function GameObjectManager:ResolveRootObject(p_GameObject, p_PendingInfo)
 		}
 		p_GameObject.guid = Guid(p_PendingInfo.customGuid)
 		p_GameObject.origin = GameObjectOriginType.Custom
+		-- if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+		-- 	self:InsertTimestamp(p_GameObject)
+		-- end
 	else
-
 		if string.find(p_GameObject.blueprintCtrRef.name:lower(), "nohavok") then
 			local s_BundleName = p_GameObject.blueprintCtrRef.name:gsub('NoHavok_', '')
 			p_GameObject.origin = GameObjectOriginType.NoHavok
 			-- No parent data, add the bundle name as an offset and use a predefined havok guid
 			p_GameObject.guid = self:GetNoHavokGuid(HAVOK_GUID, s_BundleName .. '/' .. p_GameObject.name, p_GameObject.transform.trans)
+			-- if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+			-- 	self:InsertTimestamp(p_GameObject)
+			-- end
 		else
 			-- This is a vanilla root object
 			p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 			p_GameObject.origin = GameObjectOriginType.Vanilla
+			-- if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+			-- 	self:InsertTimestamp(p_GameObject)
+			-- end
 
 			--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
 			self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
 		end
 	end
+	-- if p_GameObject.timeStamp == 0 then
+	-- 	self:InsertTimestamp(p_GameObject)
+	-- end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject
+end
+
+---@param p_GameObject GameObject
+function GameObjectManager:InsertTimestamp(p_GameObject)
+	local s_ObjectTimeStamp = self.m_GUID_To_Timestamps[tostring(p_GameObject.guid)]
+	if not s_ObjectTimeStamp then
+		s_ObjectTimeStamp = SharedUtils:GetTimeMS()
+	end
+	p_GameObject.timeStamp = s_ObjectTimeStamp
 end
 
 function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
@@ -408,9 +452,16 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 	if p_GameObject.origin == GameObjectOriginType.Vanilla then
 		p_GameObject.guid = self:GetVanillaGuid(p_GameObject.name, p_GameObject.transform.trans)
 		--table.insert(self.m_VanillaGameObjectGuids, p_GameObject.guid)
+		-- if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+		-- 	self:InsertTimestamp(p_GameObject)
+		-- end
 		self.m_VanillaGameObjectGuids[tostring(p_GameObject.guid)] = p_GameObject.guid
 	elseif p_GameObject.origin == GameObjectOriginType.NoHavok then
 		p_GameObject.guid = self:GetNoHavokGuid(p_GameObject.parentData.guid, p_GameObject.name, p_GameObject.transform.trans)
+
+		-- if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+		-- 	self:InsertTimestamp(p_GameObject)
+		-- end
 	else
 		local i = 1
 		local s_CustomGuid
@@ -422,6 +473,10 @@ function GameObjectManager:ResolveChildObject(p_GameObject, p_ParentGameObject)
 
 		p_GameObject.guid = s_CustomGuid
 		p_GameObject.origin = GameObjectOriginType.CustomChild
+
+		-- if not p_GameObject.timeStamp or p_GameObject.timeStamp == 0 then
+		-- 	self:InsertTimestamp(p_GameObject)
+		-- end
 	end
 
 	self.m_GameObjects[tostring(p_GameObject.guid)] = p_GameObject

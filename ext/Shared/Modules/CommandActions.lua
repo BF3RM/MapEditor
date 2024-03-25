@@ -45,14 +45,15 @@ function CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 	end
 
 	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid:upper(),
-																p_Command.sender,
-																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
-																s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
-																s_GameObjectTransferData.parentData,
-																s_GameObjectTransferData.transform,
-																s_GameObjectTransferData.variation,
-																false,
-																s_GameObjectTransferData.overrides
+		p_Command.sender,
+		s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
+		s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
+		s_GameObjectTransferData.parentData,
+		s_GameObjectTransferData.transform,
+		s_GameObjectTransferData.variation,
+		false,
+		s_GameObjectTransferData.overrides,
+		s_GameObjectTransferData.timeStamp
 	)
 
 	if s_SpawnResult == false then
@@ -94,6 +95,7 @@ function CommandActions:DeleteGameObject(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
+		timeStamp = p_Command.gameObjectTransferData.timeStamp,
 		isDeleted = true
 	}
 
@@ -119,7 +121,7 @@ function CommandActions:UndeleteGameObject(p_Command, p_UpdatePass)
 	m_Logger:Write("UndeleteGameObject with guid " .. p_Command.gameObjectTransferData.guid)
 
 	if SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.Custom or
-			SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.CustomChild then
+		SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.CustomChild then
 		return CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 	end
 
@@ -234,7 +236,8 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
-		transform = p_Command.gameObjectTransferData.transform
+		transform = p_Command.gameObjectTransferData.transform,
+		timeStamp = p_Command.gameObjectTransferData.timeStamp
 	}
 
 	local s_CommandActionResult = {
@@ -245,7 +248,6 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	return s_CommandActionResult, CARResponseType.Success
 end
-
 
 function CommandActions:SetVariation(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
