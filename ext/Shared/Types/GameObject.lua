@@ -10,8 +10,9 @@ function GameObject:__init(arg)
 	self.creatorName = arg.creatorName -- never gets sent to js
 	---@type CtrRef
 	self.blueprintCtrRef = arg.blueprintCtrRef
-	self.origin = arg.origin -- never gets sent to js
-	self.gameEntities = arg.gameEntities or { }
+	self.timeStamp = arg.timeStamp
+	self.origin = arg.origin        -- never gets sent to js
+	self.gameEntities = arg.gameEntities or {}
 	self.children = arg.children or {} -- never gets sent to js
 	---@type Realm|integer
 	self.realm = arg.realm
@@ -32,6 +33,7 @@ function GameObject:__init(arg)
 
 	self:RegisterUserModifiableField("name", arg.name)
 	self:RegisterUserModifiableField("parentData", arg.parentData)
+	self:RegisterUserModifiableField("timeStamp", arg.timeStamp)
 	self:RegisterUserModifiableField("transform", arg.transform)
 	self:RegisterUserModifiableField("localTransform", arg.localTransform)
 	self:RegisterUserModifiableField("variation", arg.variation)
@@ -237,6 +239,7 @@ function GameObject:GetGameObjectTransferData()
 		isEnabled = self.isEnabled,
 		isDeleted = self.isDeleted,
 		creatorName = self.creatorName,
+		timeStamp = self.timeStamp,
 		origin = self.origin,
 		realm = self.realm,
 		isUserModified = self.isUserModified,
@@ -265,6 +268,7 @@ function GameObject:GetEntities()
 
 	return s_Entities
 end
+
 function GameObject:SetOverrides(p_Overrides)
 	if not self.internalBlueprint then
 		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
