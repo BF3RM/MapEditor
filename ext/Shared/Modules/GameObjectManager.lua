@@ -19,7 +19,6 @@ end
 
 ---@param p_GUID_To_Timestamps table
 function GameObjectManager:StoreTimeStamps(p_GUID_To_Timestamps)
-	print("RECEIVED TIMESTAMPS OBJECT OF LENGTH: " .. #p_GUID_To_Timestamps)
 	self.m_GUID_To_Timestamps = p_GUID_To_Timestamps
 end
 
