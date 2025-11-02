@@ -42,43 +42,52 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import Vec3Control from '@/script/components/controls/Vec3Control.vue';
 import QuatControl from '@/script/components/controls/QuatControl.vue';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 import { Quat } from '@/script/types/primitives/Quat';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
 
-@Component({ components: { DraggableNumberInput, Vec3Control, QuatControl } })
-export default class LinearTransformControl extends Vue {
-	@Prop()
-	value: LinearTransform;
+import { defineComponent } from '@vue/composition-api';
 
-	@Prop({ default: false })
-	hideLabel: boolean;
+export default defineComponent({
+    name: 'LinearTransformControl',
+    components: {
+        Vec3Control,
+        QuatControl
+    },
+    props: {
+        value: {
+            type: Object as () => LinearTransform,
+            required: true
+        },
+        hideLabel: {
+            type: Boolean,
+            default: false
+        },
+        parentTransform: {
+            type: Object as () => LinearTransform,
+            default: null
+        }
+    },
+    methods: {
+        onChangePosition(newPos: Vec3) {
+            const newVal = this.value.clone();
+            newVal.position = newPos;
 
-	@Prop({ default: null })
-	parentTransform: LinearTransform;
+            this.$emit('input', newVal);
+        },
+        onChangeScale(newScale: Vec3) {
+            const newVal = this.value.clone();
+            newVal.scale = newScale;
 
-	onChangePosition(newPos: Vec3) {
-		const newVal = this.value.clone();
-		newVal.position = newPos;
-
-		this.$emit('input', newVal);
-	}
-
-	onChangeScale(newScale: Vec3) {
-		const newVal = this.value.clone();
-		newVal.scale = newScale;
-
-		this.$emit('input', newVal);
-	}
-
-	onChangeRotation(newRotation: Quat) {
-		const newVal = this.value.clone();
-		newVal.rotation = newRotation;
-		this.$emit('input', newVal);
-	}
-}
+            this.$emit('input', newVal);
+        },
+        onChangeRotation(newRotation: Quat) {
+            const newVal = this.value.clone();
+            newVal.rotation = newRotation;
+            this.$emit('input', newVal);
+        }
+    }
+});
 </script>

@@ -39,56 +39,55 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import ExplorerComponent from '@/script/components/EditorComponents/ExplorerComponent.vue';
-import ConsoleComponent from '@/script/components/EditorComponents/ConsoleComponent.vue';
 import ViewportComponent from '@/script/components/EditorComponents/ViewportComponent.vue';
 import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
 import InspectorComponent from '@/script/components/EditorComponents/Inspector/InspectorComponent.vue';
 import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
 import PerfectScrollbar from 'perfect-scrollbar';
 
-@Component({
-	components: {
-		ExplorerComponent,
-		ConsoleComponent,
-		ViewportComponent,
-		HierarchyComponent,
-		InspectorComponent,
-		HistoryComponent
-	}
-})
-export default class GoldenLayoutHolder extends Vue {
-	onInitialised() {
-		const viewport = document.getElementById('viewport-component');
-		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
-			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
-		}
-		this.onMount();
-	}
+export default defineComponent({
+    name: 'GoldenLayoutHolder',
+    components: {
+        ExplorerComponent,
+        ViewportComponent,
+        HierarchyComponent,
+        InspectorComponent,
+        HistoryComponent
+    },
+    methods: {
+        onInitialised() {
+            const viewport = document.getElementById('viewport-component');
+            if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
+                viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
+            }
+            this.onMount();
+        },
 
-	onStackCreated(stack: any) {
-		this.$nextTick(() => {
-			if (stack.contentItems.length > 0) {
-				if (!stack.contentItems[0].vueObject.$vnode.context.showHeader) {
-					stack.header.position();
-				}
-			}
-		});
-	}
+        onStackCreated(stack: any) {
+            this.$nextTick(() => {
+                if (stack.contentItems.length > 0) {
+                    if (!stack.contentItems[0].vueObject.$vnode.context.showHeader) {
+                        stack.header.position();
+                    }
+                }
+            });
+        },
 
-	onMount() {
-		this.$nextTick(() => {
-			(this.$refs.gl as any).layout.onResize();
-			const scrollables = document.getElementsByClassName('scrollable');
-			for (const scrollable of scrollables as any) {
-				new PerfectScrollbar(scrollable as HTMLElement, {
-					minScrollbarLength: 35
-				});
-			}
-		});
-	}
-}
+        onMount() {
+            this.$nextTick(() => {
+                (this.$refs.gl as any).layout.onResize();
+                const scrollables = document.getElementsByClassName('scrollable');
+                for (const scrollable of scrollables as any) {
+                    new PerfectScrollbar(scrollable as HTMLElement, {
+                        minScrollbarLength: 35
+                    });
+                }
+            });
+        }
+    }
+});
 </script>
 
 <style>

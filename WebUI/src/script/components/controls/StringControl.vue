@@ -5,12 +5,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 
-@Component({ components: {} })
-export default class StringControl extends Vue {
-	@Prop() value: string;
-}
+export default defineComponent({
+    name: 'StringControl',
+    props: {
+        value: {
+            type: String,
+            required: true
+        }
+    }
+});
 </script>
-
-<style lang="scss" scoped></style>

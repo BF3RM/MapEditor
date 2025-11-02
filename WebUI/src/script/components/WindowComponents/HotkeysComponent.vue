@@ -1,5 +1,5 @@
 <template>
-	<WindowComponent :state="state" :title="title" :isDestructible="true" class="hotkey-window">
+	<WindowComponent :visible="state.visible" :title="title" :isDestructible="true" class="hotkey-window" @update:visible="Close">
 		<div class="container hotkeys-container scrollable">
 			<div>
 				<h6>Global</h6>
@@ -43,39 +43,43 @@
 	</WindowComponent>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import WindowComponent from './WindowComponent.vue';
 import KeyTip from '../KeyTip.vue';
 import { HOTKEYS } from '../../modules/HotkeyConfig';
 import { HOTKEY_TYPE, keyCodeToChar } from '../../modules/Hotkey';
 import { signals } from '@/script/modules/Signals';
 
-@Component({ components: { WindowComponent, KeyTip } })
-export default class HotkeysComponent extends Vue {
-	title = 'Hotkeys';
-	hotkeysDown: any = [];
-	hotkeysCanvas: any = [];
-	hotkeysFreecam: any = [];
-	keyCodeToChar: any;
-	state = {
-		visible: false
-	};
-
-	mounted() {
-		signals.menuRegistered.emit(['File', 'Hotkeys'], () => {
-			this.title = 'Hotkeys';
-			this.state.visible = true;
-		});
-		this.hotkeysDown = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Down || key.type === HOTKEY_TYPE.Lua);
-		this.hotkeysCanvas = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.CanvasOnlyDown);
-		this.hotkeysFreecam = HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Freecam);
-		this.keyCodeToChar = keyCodeToChar;
-	}
-
-	Close() {
-		this.state.visible = false;
-	}
-}
+export default defineComponent({
+    name: 'HotkeysComponent',
+    components: {
+        WindowComponent,
+        KeyTip
+    },
+    data() {
+        return {
+            title: 'Hotkeys',
+            hotkeysDown: HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Down || key.type === HOTKEY_TYPE.Lua),
+            hotkeysCanvas: HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.CanvasOnlyDown),
+            hotkeysFreecam: HOTKEYS.filter((key) => key.type === HOTKEY_TYPE.Freecam),
+            keyCodeToChar: keyCodeToChar,
+            state: {
+                visible: false
+            }
+        };
+    },
+    mounted() {
+        signals.menuRegistered.emit(['File', 'Hotkeys'], () => {
+            this.title = 'Hotkeys';
+            this.state.visible = true;
+        });
+    },
+    methods: {
+        Close() {
+            this.state.visible = false;
+        }
+    }
+});
 </script>
 <style lang="scss" scoped>
 .hotkeys-container {

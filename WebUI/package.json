@@ -2,7 +2,7 @@
 	"private": true,
 	"version": "0.0.0",
 	"dependencies": {
-		"@vue/composition-api": "1.6.3",
+		"@vue/composition-api": "1.7.2",
 		"axios": "^0.21.0",
 		"camera-controls": "1.37.4",
 		"element-ui": "2.15.9",

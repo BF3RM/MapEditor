@@ -12,34 +12,34 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import EditorToolbar from '../EditorComponents/EditorToolbar.vue';
 import ProjectSettingsComponent from '../WindowComponents/ProjectSettingsComponent.vue';
 import GoldenLayoutHolder from '@/script/components/GoldenLayoutHolder.vue';
 import ImportProjectComponent from '@/script/components/WindowComponents/ImportProjectComponent.vue';
 import HotkeysComponent from '@/script/components/WindowComponents/HotkeysComponent.vue';
 
-@Component({
-	components: {
-		HotkeysComponent,
-		ImportProjectComponent,
-		GoldenLayoutHolder,
-		EditorToolbar,
-		ProjectSettingsComponent
-	}
-})
-export default class EditorView extends Vue {
-	mounted() {
-		const viewport = document.getElementById('viewport-component');
-		if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
-			viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
-		}
-	}
-
-	onMouseUp(e: any) {
-		window.editor.threeManager.onDragStop(e);
-	}
-}
+export default defineComponent({
+    name: 'EditorView',
+    components: {
+        HotkeysComponent,
+        ImportProjectComponent,
+        GoldenLayoutHolder,
+        EditorToolbar,
+        ProjectSettingsComponent
+    },
+    methods: {
+        onMouseUp(e: any) {
+            window.editor.threeManager.onDragStop(e);
+        }
+    },
+    mounted() {
+        const viewport = document.getElementById('viewport-component');
+        if (viewport !== null && viewport.parentElement !== null && viewport.parentElement.parentElement !== null) {
+            viewport.parentElement.parentElement.setAttribute('id', 'viewport-container');
+        }
+    }
+});
 </script>
 
 <style scoped>

@@ -6,16 +6,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 
-@Component
-export default class InfoTopBar extends Vue {
-	@Prop()
-	keyName: string;
-
-	@Prop()
-	description: string;
-}
+export default defineComponent({
+    name: 'InfoTopBar',
+});
 </script>
 
 <style lang="scss" scoped>

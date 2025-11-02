@@ -57,36 +57,57 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from '@vue/composition-api';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 
-@Component({ components: { DraggableNumberInput } })
-export default class Vec3Control extends Vue {
-	@Prop(String) label: string;
-	@Prop({ default: 0.014 }) step: number;
-	@Prop() value: Vec3;
-	@Prop(Number) min: number;
-	@Prop({ default: false }) hideLabel: boolean;
+export default defineComponent({
+    name: 'Vec3Control',
+    components: {
+        DraggableNumberInput
+    },
+    props: {
+        label: {
+            type: String,
+            required: false
+        },
+        step: {
+            type: Number,
+            default: 0.014
+        },
+        value: {
+            type: Object as () => Vec3,
+            required: true
+        },
+        min: {
+            type: Number,
+            required: false
+        },
+        hideLabel: {
+            type: Boolean,
+            default: false
+        }
+    },
+    methods: {
+        onChangeValue(axis: string, val: number) {
+            const newVal = this.value.clone();
 
-	onChangeValue(axis: string, val: number) {
-		const newVal = this.value.clone();
+            switch (axis) {
+                case 'x':
+                    newVal.x = val;
+                    break;
+                case 'y':
+                    newVal.y = val;
+                    break;
+                case 'z':
+                    newVal.z = val;
+            }
 
-		switch (axis) {
-			case 'x':
-				newVal.x = val;
-				break;
-			case 'y':
-				newVal.y = val;
-				break;
-			case 'z':
-				newVal.z = val;
-		}
+            this.$emit('input', newVal);
+        }
 
-		this.$emit('input', newVal);
-	}
-
-	/*
+    /*
 	// TODO: Instead of localStorage we must use a state!
 	onCopy() {
 		localStorage.setItem('copy_' + this.label, JSON.stringify(this.value));
@@ -108,7 +129,8 @@ export default class Vec3Control extends Vue {
 		}
 	}
 	*/
-}
+    }
+});
 </script>
 
 <style lang="scss" scoped>

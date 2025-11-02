@@ -18,14 +18,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import IMenuEntry from '@/script/interfaces/IMenuEntry';
 
-@Component
-export default class RecursiveMenubar extends Vue {
-	@Prop(Object) value: IMenuEntry;
-	@Prop(Number) index: number;
-}
+export default defineComponent({
+	name: 'RecursiveMenubar',
+	props: {
+		value: {
+			type: Object as () => IMenuEntry,
+			required: true
+		},
+		index: {
+			type: Number,
+			required: true
+		}
+	}
+});
 </script>
-
-<style scoped></style>

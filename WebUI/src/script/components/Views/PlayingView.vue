@@ -7,17 +7,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import KeyTip from '@/script/components/KeyTip.vue';
 import InfoTopBar from '@/script/components/InfoTopBar.vue';
 
-@Component({
-	components: {
-		InfoTopBar,
-		KeyTip
-	}
-})
-export default class PlayingView extends Vue {}
+export default defineComponent({
+    name: 'PlayingView',
+    components: {
+        InfoTopBar,
+        KeyTip
+    }
+});
 </script>
 
 <style lang="scss" scoped>

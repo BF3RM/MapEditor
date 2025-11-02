@@ -5,8 +5,7 @@
 	</div>
 </template>
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import '@/style/reset.scss';
 import '@/style/style.scss';
 
@@ -16,34 +15,25 @@ import './style/icons.scss';
 
 import ActiveView from '@/script/components/Views/ActiveView.vue';
 
-@Component({
-	components: {
-		ActiveView
-	}
-})
-export default class App extends Vue {
-	mounted() {
-		console.log('UI RELOADED');
-		this.$nextTick(() => {
-			window.vext.SendEvent('UIReloaded');
-		});
-	}
+export default defineComponent({
+    name: 'App',
+    components: {
+        ActiveView
+    },
+    mounted() {
+        console.log('UI RELOADED');
+        this.$nextTick(() => {
+            window.vext.SendEvent('UIReloaded');
+        });
+    },
+    beforeDestroy() {
+        console.log('Reloading UI');
+        // Hack to force a complete UI reload when a component is destroyed because we did a hot-reload
 
-	@Prop()
-	public title: string;
-
-	get editor() {
-		return window.editor;
-	}
-
-	public beforeDestroy() {
-		console.log('Reloading UI');
-		// Hack to force a complete UI reload when a component is destroyed because we did a hot-reload
-
-		// eslint-disable-next-line no-self-assign
-		window.location = window.location;
-	}
-}
+        // eslint-disable-next-line no-self-assign
+        window.location = window.location;
+    }
+});
 </script>
 
 <style scoped>

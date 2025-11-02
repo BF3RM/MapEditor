@@ -1,32 +1,46 @@
 <template>
-	<div class="window-wrapper" v-show="state.visible">
+	<div class="window-wrapper" v-show="visible">
 		<div class="window lm_header">
 			<div class="header lm_tab">
 				<div class="title">{{ title }}</div>
-				<div v-if="isDestructible" class="lm_close_tab" @click="state.visible = false"></div>
+				<div v-if="isDestructible" class="lm_close_tab" @click="onClose"></div>
 			</div>
 			<div class="content lm_content">
 				<slot> </slot>
 			</div>
 		</div>
-		<div class="overlay" @click="onClick"></div>
+		<div class="overlay" @click="onClose"></div>
 	</div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import IWindowState from './IWindowState';
+import { defineComponent } from '@vue/composition-api';
 
-@Component
-export default class WindowComponent extends Vue {
-	@Prop({ default: true }) showHeader: boolean;
-	@Prop({ default: false }) isDestructible: boolean;
-	@Prop({ default: 'WindowComponent' }) title: string;
-	@Prop({ default: { visible: true } }) state: IWindowState;
-
-	onClick() {
-		this.state.visible = false;
-	}
-}
+export default defineComponent({
+    name: 'WindowComponent',
+    props: {
+        showHeader: {
+            type: Boolean,
+            default: true
+        },
+        isDestructible: {
+            type: Boolean,
+            default: false
+        },
+        title: {
+            type: String,
+            default: 'WindowComponent'
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+    },
+    methods: {
+        onClose() {
+            this.$emit('update:visible', false);
+        }
+    }
+});
 </script>
 <style lang="scss" scoped>
 .overlay {

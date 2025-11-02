@@ -10,12 +10,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-@Component
-export default class Search extends Vue {
-	@Prop(String) private value: string;
-	@Prop(String) private search: string;
-}
-</script>
+import { defineComponent } from '@vue/composition-api';
 
-<style lang="scss" scoped></style>
+export default defineComponent({
+	name: 'Search',
+	props: {
+		value: {
+			type: String,
+			required: false
+		},
+	}
+});
+</script>

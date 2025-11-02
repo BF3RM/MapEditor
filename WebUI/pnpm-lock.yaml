@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@vue/composition-api':
-        specifier: 1.6.3
-        version: 1.6.3(vue@2.7.16)
+        specifier: 1.7.2
+        version: 1.7.2(vue@2.7.16)
       axios:
         specifier: ^0.21.0
         version: 0.21.4
@@ -64,7 +64,7 @@ importers:
         version: 2.1.1(golden-layout@1.5.9)(jquery@3.7.1)(vue@2.7.16)
       vue-promised:
         specifier: 2.2.0
-        version: 2.2.0(@vue/composition-api@1.6.3(vue@2.7.16))(vue@2.7.16)
+        version: 2.2.0(@vue/composition-api@1.7.2(vue@2.7.16))(vue@2.7.16)
       vue-property-decorator:
         specifier: 9.1.2
         version: 9.1.2(vue-class-component@7.2.6(vue@2.7.16))(vue@2.7.16)
@@ -648,10 +648,10 @@ packages:
   '@vue/component-compiler-utils@3.3.0':
     resolution: {integrity: sha512-97sfH2mYNU+2PzGrmK2haqffDpVASuib9/w2/noxiFi31Z54hW+q3izKQXXQZSNhtiUpAI36uSuYepeBe4wpHQ==}
 
-  '@vue/composition-api@1.6.3':
-    resolution: {integrity: sha512-f0TgOKqU460QyVLp5URi8LMVJ3eE3/3OuFrytItSNmp5FbisS67jVvUZg7pzIzZonqc4chG1SNS48PMOsH7a4g==}
+  '@vue/composition-api@1.7.2':
+    resolution: {integrity: sha512-M8jm9J/laYrYT02665HkZ5l2fWTK4dcVg3BsDHm/pfz+MjDYwX+9FUaZyGwEyXEDonQYRCo0H7aLgdklcIELjw==}
     peerDependencies:
-      vue: '>= 2.5 < 3'
+      vue: '>= 2.5 < 2.7'
 
   '@vue/eslint-config-prettier@7.1.0':
     resolution: {integrity: sha512-Pv/lVr0bAzSIHLd9iz0KnvAr4GKyCEl+h52bc4e5yWuDVtLgFwycF7nrbWTAQAS+FU6q1geVd07lc6EWfJiWKQ==}
@@ -4431,7 +4431,7 @@ snapshots:
       - walrus
       - whiskers
 
-  '@vue/composition-api@1.6.3(vue@2.7.16)':
+  '@vue/composition-api@1.7.2(vue@2.7.16)':
     dependencies:
       vue: 2.7.16
 
@@ -7034,11 +7034,11 @@ snapshots:
     dependencies:
       vue: 2.7.16
 
-  vue-demi@0.14.10(@vue/composition-api@1.6.3(vue@2.7.16))(vue@2.7.16):
+  vue-demi@0.14.10(@vue/composition-api@1.7.2(vue@2.7.16))(vue@2.7.16):
     dependencies:
       vue: 2.7.16
     optionalDependencies:
-      '@vue/composition-api': 1.6.3(vue@2.7.16)
+      '@vue/composition-api': 1.7.2(vue@2.7.16)
 
   vue-eslint-parser@9.4.3(eslint@8.57.1):
     dependencies:
@@ -7140,12 +7140,12 @@ snapshots:
 
   vue-observe-visibility@0.4.6: {}
 
-  vue-promised@2.2.0(@vue/composition-api@1.6.3(vue@2.7.16))(vue@2.7.16):
+  vue-promised@2.2.0(@vue/composition-api@1.7.2(vue@2.7.16))(vue@2.7.16):
     dependencies:
       vue: 2.7.16
-      vue-demi: 0.14.10(@vue/composition-api@1.6.3(vue@2.7.16))(vue@2.7.16)
+      vue-demi: 0.14.10(@vue/composition-api@1.7.2(vue@2.7.16))(vue@2.7.16)
     optionalDependencies:
-      '@vue/composition-api': 1.6.3(vue@2.7.16)
+      '@vue/composition-api': 1.7.2(vue@2.7.16)
 
   vue-property-decorator@9.1.2(vue-class-component@7.2.6(vue@2.7.16))(vue@2.7.16):
     dependencies:
