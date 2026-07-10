@@ -3,21 +3,31 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-@Component
-export default class Highlighter extends Vue {
-	@Prop(String) text: string;
-	@Prop(String) search: string;
+import { defineComponent } from '@vue/composition-api';
 
-	highlight() {
-		if (!this.search) {
-			return this.text;
-		}
-		return this.text.replace(new RegExp(this.search, 'gi'), (match) => {
-			return '<span class="highlightText">' + match + '</span>';
-		});
-	}
-}
+export default defineComponent({
+    name: 'Highlighter',
+    props: {
+        text: {
+            type: String,
+            required: true
+        },
+        search: {
+            type: String,
+            required: true
+        }
+    },
+    methods: {
+        highlight() {
+            if (!this.search) {
+                return this.text;
+            }
+            return this.text.replace(new RegExp(this.search, 'gi'), (match) => {
+                return '<span class="highlightText">' + match + '</span>';
+            });
+        }
+    }
+});
 </script>
 
 <style lang="scss">

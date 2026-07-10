@@ -3,7 +3,7 @@ ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
 
-local SAVE_VERSION = "0.1.1"
+local SAVE_VERSION = "0.1.2"
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -19,6 +19,7 @@ function ProjectManager:RegisterVars()
 	self.m_MapName = nil
 	self.m_GameMode = nil
 	self.m_LoadedBundles = {}
+	self.m_GUID_To_Timestamps = {}
 end
 
 function ProjectManager:RegisterEvents()
@@ -92,10 +93,11 @@ end
 ---@param p_ProjectSave ProjectSave
 ---@return ProjectSave|nil projectSave, string|nil errorMessage
 function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
-	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportDataName].saveVersion
+	local s_SaveVersion = p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion
 
 	if s_SaveVersion == nil then -- Save from before versioning was implemented, try to upgrade to current version
 		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
+		self:InsertTimestampsIntoObjects(s_Data)
 
 		-- Some pre-versioning save files had an isVanilla flag
 		for _, l_DataEntry in pairs(s_Data) do
@@ -110,12 +112,25 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 		return p_ProjectSave
 	elseif s_SaveVersion > SAVE_VERSION then
 		return nil, 'Importing save with a higher save format version than supported, please update MapEditor before importing'
-	else
+	elseif s_SaveVersion < SAVE_VERSION then
 		-- New version updates are handled here
+		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
+		self:InsertTimestampsIntoObjects(s_Data)
 
 		-- Update save version
 		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
 		return p_ProjectSave
+	elseif s_SaveVersion == SAVE_VERSION then
+		return p_ProjectSave
+	end
+end
+
+---@param p_Data table
+function ProjectManager:InsertTimestampsIntoObjects(p_Data)
+	for l_Index, l_DataEntry in ipairs(p_Data) do
+		if not l_DataEntry.timeStamp then
+			l_DataEntry.timeStamp = 1000000000000 + l_Index
+		end
 	end
 end
 
@@ -233,9 +248,19 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 		local s_Msg
 		s_ProjectSave, s_Msg = self:UpgradeSaveStructure(s_ProjectSave)
 
+
 		if s_ProjectSave == nil then
 			m_Logger:Error("Can't load project. Error: " .. tostring(s_Msg))
 			return
+		end
+
+		if s_ProjectSave.data ~= nil then
+			for l_Index, l_Value in ipairs(s_ProjectSave.data) do
+				-- store the timestamps to reference later
+				self.m_GUID_To_Timestamps[l_Value.guid] = l_Value.timeStamp
+				-- print(l_Value.timeStamp)
+			end
+			NetEvents:BroadcastLocal("Shared:StoreTimeStamps", self.m_GUID_To_Timestamps)
 		end
 
 		self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
@@ -265,7 +290,6 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 		Maps[s_MapName] == nil or
 		s_GameModeName == nil or
 		GameModes[s_GameModeName] == nil then
-
 		m_Logger:Error("Failed to load project, one or more fields of the project header are not set: " .. s_MapName .. " | " .. s_GameModeName)
 		return
 	end
@@ -311,10 +335,21 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 	-- TODO: get the GameObjectSaveDatas not from the transferdatas array, but from the GO array of the GOManager. (remove the GOTD array)
 	for _, l_GameObject in pairs(GameObjectManager.m_GameObjects) do
 		if l_GameObject:IsUserModified() == true or l_GameObject:HasOverrides() then
+			-- check the old values that are stored
+			local s_Guid = tostring(l_GameObject.guid)
+			if self.m_GUID_To_Timestamps[s_Guid] ~= nil then
+				l_GameObject.timeStamp = self.m_GUID_To_Timestamps[s_Guid]
+			else
+				self.m_GUID_To_Timestamps[s_Guid] = l_GameObject.timeStamp
+			end
 			s_Count = s_Count + 1
 			table.insert(s_GameObjectSaveDatas, GameObjectSaveData(l_GameObject):GetAsTable())
 		end
 	end
+
+	table.sort(s_GameObjectSaveDatas, function(a, b)
+		return a.timeStamp < b.timeStamp
+	end)
 
 	-- m_Logger:Write("vvvvvvvvvvvvvvvvv")
 	-- m_Logger:Write("GameObjectSaveDatas: " .. count)
@@ -352,6 +387,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 		--end
 
 		local s_Command
+		local s_TimeStamp = self.m_GUID_To_Timestamps[s_Guid]
 
 		-- Vanilla and nohavok objects are handled in levelloader
 		if l_GameObjectSaveData.origin == GameObjectOriginType.Vanilla or
@@ -362,7 +398,8 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 					sender = "LoadingSaveFile",
 					type = CommandActionType.DeleteGameObjectCommand,
 					gameObjectTransferData = {
-						guid = s_Guid
+						guid = s_Guid,
+						timeStamp = s_TimeStamp
 					}
 				}
 			else
@@ -372,7 +409,8 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 					type = CommandActionType.SetTransformCommand,
 					gameObjectTransferData = {
 						guid = s_Guid,
-						transform = l_GameObjectSaveData.transform
+						transform = l_GameObjectSaveData.transform,
+						timeStamp = s_TimeStamp
 					}
 				}
 			end
@@ -390,6 +428,7 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 					name = l_GameObjectSaveData.name,
 					blueprintCtrRef = l_GameObjectSaveData.blueprintCtrRef,
 					parentData = l_GameObjectSaveData.parentData or GameObjectParentData:GetRootParentData(),
+					timeStamp = s_TimeStamp,
 					transform = l_GameObjectSaveData.transform,
 					variation = l_GameObjectSaveData.variation or 0,
 					gameEntities = {},

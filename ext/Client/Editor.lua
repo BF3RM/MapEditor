@@ -108,7 +108,24 @@ function Editor:OnControlUpdate()
 end
 
 function Editor:CameraHasMoved()
-	return self.m_CameraTransform ~= ClientUtils:GetCameraTransform()
+	-- IMPORTANT (Gameface): GetCameraTransform() returns a NEW object each frame, and
+	-- `~=` compares by REFERENCE, so the old code was always true -> it fired
+	-- WebUI:ExecuteJS every single frame (60/s), flooding Gameface and making it drop
+	-- UI clicks (tree/slider). Compare by VALUE with a small threshold instead.
+	local s_New = ClientUtils:GetCameraTransform()
+	if s_New == nil then
+		return false
+	end
+	if self.m_CameraTransform == nil then
+		return true
+	end
+	local a = self.m_CameraTransform.trans
+	local b = s_New.trans
+	local f1 = self.m_CameraTransform.forward
+	local f2 = s_New.forward
+	local dPos = math.abs(a.x - b.x) + math.abs(a.y - b.y) + math.abs(a.z - b.z)
+	local dRot = math.abs(f1.x - f2.x) + math.abs(f1.y - f2.y) + math.abs(f1.z - f2.z)
+	return dPos > 0.0005 or dRot > 0.0005
 end
 
 function Editor:UpdateCameraTransform()
@@ -118,7 +135,14 @@ function Editor:UpdateCameraTransform()
 	--[[
 		JSON encoded so it's faster to parse
 	--]]
-	WebUI:ExecuteJS(string.format('editor.threeManager.updateCameraTransform(JSON.parse(\'%s\'))', json.encode(s_Transform)))
+	-- Send the REAL render FOV along with the transform so the WebUI's picking camera matches
+	-- the actual view (it's per-user: 55 * fovMultiplier). Without this the pick ray diverged
+	-- off-centre and hover/click landed on the wrong object.
+	local s_Fov = 55.0
+	if FreeCam ~= nil and FreeCam.GetCameraFOV ~= nil then
+		s_Fov = FreeCam:GetCameraFOV() or 55.0
+	end
+	WebUI:ExecuteJS(string.format('editor.threeManager.updateCameraTransform(JSON.parse(\'%s\'), %s)', json.encode(s_Transform), tostring(s_Fov)))
 	self.m_CameraTransform = s_Transform
 end
 

@@ -2,73 +2,93 @@
 	<div id="toolbar">
 		<info-top-bar>
 			<div id="toolbarLeft">
-				<el-menu
-					mode="horizontal"
-					menu-trigger="hover"
-					:unique-opened="true"
-					size="mini"
-					v-for="(item, index) in menuBar.children"
-					:key="index"
-					class="el-menu"
-					@select="onSelectMenu"
-				>
-					<!--					<recursive-menubar v-if="item.children.length > 1" :value="item" :index="index"/>-->
-					<el-submenu v-if="item.children" :index="item.label" :show-timeout="10" :hide-timeout="100">
-						<template slot="title">{{ item.label }}</template>
-						<template v-if="item.children.length > 0">
-							<el-menu-item
-								v-for="(subItem, subIndex) in item.children"
-								:key="index + '-' + subIndex"
-								:index="index + '-' + subIndex"
-								:class="subItem.type"
-							>
-								<recursive-menubar
-									v-if="subItem.children && subItem.children.length > 0"
-									:value="subItem"
-								/>
-								<span v-else>
+				<!-- Gameface port: element-ui el-menu dropdowns never open in Gameface, so
+				     the File/Edit menubar is a plain clickable div dropdown reading the
+				     same menuBar tree (populated via signals.menuRegistered). -->
+				<div class="fx-menubar">
+					<div
+						v-for="(item, index) in menuBar.children"
+						:key="index"
+						class="fx-menu"
+						:class="{ open: openMenu === index }"
+						@mouseenter="onMenuHover(index)"
+					>
+						<div class="fx-menu-title" @click.stop="toggleMenu(index)">{{ item.label }}</div>
+						<div v-if="openMenu === index && item.children" class="fx-menu-dropdown">
+							<template v-for="(subItem, subIndex) in item.children">
+								<div
+									v-if="subItem.type === 'separator'"
+									:key="index + '-' + subIndex"
+									class="fx-menu-separator"
+								></div>
+								<div
+									v-else
+									:key="index + '-' + subIndex"
+									class="fx-menu-entry"
+									@click.stop="onMenuEntryClick(subItem)"
+								>
 									{{ subItem.label }}
-								</span>
-							</el-menu-item>
-						</template>
-					</el-submenu>
-					<el-menu-item v-else :class="item.type" :index="index">
-						{{ item.label }}
-					</el-menu-item>
-				</el-menu>
-				<el-radio-group v-model="tool" size="mini" id="tools" @change="onToolChange">
-					<el-radio-button
+								</div>
+							</template>
+						</div>
+					</div>
+				</div>
+				<!-- Gameface port: element-ui el-radio-group swallows all clicks in Gameface
+				     (same as the el-menu dropdowns), so the gizmo tool + world-space
+				     selectors are plain clickable divs (the tree / inspector use this
+				     working pattern). Same setGizmoMode / setWorldSpace path underneath. -->
+				<div id="tools" class="fx-tool-group">
+					<div
 						v-for="item in tools"
 						:key="item"
-						:label="item"
+						class="fx-tool-btn"
+						:class="{ active: tool === item }"
 						:id="item"
 						v-tooltip="getTooltipText(item)"
-					/>
-				</el-radio-group>
-				<el-radio-group v-model="worldSpace" size="mini" id="worldSpace" @change="onWorldSpaceChange">
-					<el-radio-button
+						@click="onToolClick(item)"
+					>
+						<img class="tool-icon" :src="iconFor(item)" alt="" />
+					</div>
+				</div>
+				<div id="worldSpace" class="fx-tool-group">
+					<div
 						v-for="item in worldSpaces"
 						:key="item"
-						:label="item"
+						class="fx-tool-btn"
+						:class="{ active: worldSpace === item }"
 						:id="item"
 						v-tooltip="getTooltipText(item)"
-					/>
-				</el-radio-group>
+						@click="onWorldSpaceClick(item)"
+					>
+						<img class="tool-icon" :src="iconFor(item)" alt="" />
+					</div>
+				</div>
 			</div>
 			<div id="toolbarCenter">
 				<key-tip keys="F1" description="Return to the game view" :needsCtrl="false" :needsShift="false" />
 			</div>
 			<div id="toolbarRight">
-				<el-select
-					name="WorldView"
-					id="worldView"
-					:default-first-option="true"
-					v-model="worldView"
-					size="mini"
-					@change="onViewModeChange"
-				>
-					<el-option v-for="item in worldViews" :key="item.value" :label="item.label" :value="item.value" />
-				</el-select>
+				<!-- Gameface port: view-mode selector (Default / Lit / Unlit / Diffuse /
+				     Normal / Light / Overdraw ...) was an element-ui el-select, dead in
+				     Gameface. Plain-div dropdown; same onViewModeChange -> SetViewModeMessage
+				     -> Lua WorldRenderSettings.viewMode path. -->
+				<div class="fx-select" :class="{ open: viewMenuOpen }">
+					<div class="fx-select-value" @click.stop="toggleViewMenu">
+						<span>{{ currentViewLabel }}</span>
+						<span class="fx-select-caret">▾</span>
+					</div>
+					<div v-if="viewMenuOpen" class="fx-select-dropdown">
+						<div
+							v-for="item in worldViews"
+							:key="item.value"
+							class="fx-select-option"
+							:class="{ active: worldView === item.value }"
+							@click.stop="onViewOptionClick(item.value)"
+						>
+							{{ item.label }}
+						</div>
+					</div>
+				</div>
 			</div>
 		</info-top-bar>
 	</div>
@@ -91,6 +111,11 @@ export default class EditorToolbar extends Vue {
 	worldSpace = window.editor.threeManager.worldSpace;
 	worldSpaces = ['world', 'local'];
 	tools = ['select', 'translate', 'rotate', 'scale'];
+
+	// Index of the currently open top-level menu (File=0/Edit=1...), or null.
+	openMenu: number | null = null;
+	// View-mode (worldView) dropdown open state.
+	viewMenuOpen = false;
 
 	windows = [];
 	menuBar: IMenuEntry = {
@@ -207,6 +232,53 @@ export default class EditorToolbar extends Vue {
 		signals.gizmoModeChanged.connect(this.onGizmoModeUpdated.bind(this));
 		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
 		signals.menuRegistered.connect(this.onMenuRegistered.bind(this));
+		// Close any open menu when clicking elsewhere (the title/entry handlers use
+		// @click.stop so they don't trigger this).
+		document.addEventListener('click', this.closeMenus);
+	}
+
+	beforeDestroy() {
+		document.removeEventListener('click', this.closeMenus);
+	}
+
+	closeMenus() {
+		this.openMenu = null;
+		this.viewMenuOpen = false;
+	}
+
+	get currentViewLabel(): string {
+		const v = this.worldViews.find((w) => w.value === this.worldView);
+		return v ? v.label : 'Default';
+	}
+
+	toggleViewMenu() {
+		this.viewMenuOpen = !this.viewMenuOpen;
+		this.openMenu = null;
+	}
+
+	onViewOptionClick(value: number) {
+		this.viewMenuOpen = false;
+		this.worldView = value;
+		this.onViewModeChange(value);
+	}
+
+	toggleMenu(index: number) {
+		this.openMenu = this.openMenu === index ? null : index;
+	}
+
+	// Once a menu is open, hovering another top-level entry switches to it (classic
+	// menubar behaviour).
+	onMenuHover(index: number) {
+		if (this.openMenu !== null && this.openMenu !== index) {
+			this.openMenu = index;
+		}
+	}
+
+	onMenuEntryClick(subItem: IMenuEntry) {
+		this.openMenu = null;
+		if (subItem && subItem.callback) {
+			subItem.callback();
+		}
 	}
 
 	onSelectMenu(key: string, keyPath: string[]) {
@@ -246,6 +318,25 @@ export default class EditorToolbar extends Vue {
 			default:
 				return '';
 		}
+	}
+
+	// Gameface port: toolbar gizmo icons are <img> (SVG-in-CSS / -webkit-mask do
+	// not render in Gameface; only <img> and <img>-loaded PNGs do).
+	public iconFor(item: string): string {
+		const map: { [k: string]: string } = {
+			select: 'cursor-default-outline',
+			translate: 'cursor-move',
+			rotate: 'rotate-3d',
+			scale: 'arrow-expand',
+			local: 'cube-outline',
+			world: 'earth'
+		};
+		const name = map[item];
+		if (!name) {
+			return '';
+		}
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		return require(`@/icons/editor/${name}.png`);
 	}
 
 	private onMenuRegistered(path: string[], entryCallback?: any) {
@@ -306,6 +397,19 @@ export default class EditorToolbar extends Vue {
 			console.error('Attempted to select a tool that does not exist: ' + newTool);
 		}
 	}
+
+	// Gameface port: element-ui's el-radio-group @change does NOT fire in Gameface
+	// (same reason the el-menu dropdowns don't open), so wire the native click on
+	// each button directly to the same setGizmoMode / setWorldSpace path.
+	onToolClick(item: string) {
+		this.tool = item as GIZMO_MODE;
+		this.onToolChange(item);
+	}
+
+	onWorldSpaceClick(item: string) {
+		this.worldSpace = item as WORLD_SPACE;
+		this.onWorldSpaceChange(item);
+	}
 }
 </script>
 <style lang="scss">
@@ -315,55 +419,154 @@ export default class EditorToolbar extends Vue {
 	height: 28px;
 	width: 45px;
 	padding: 0;
-	-webkit-mask-size: 19px !important;
+	/* Gameface has no -webkit-mask support; use background-image with light-filled
+	   SVGs instead (SVG via CSS background/img works in Gameface, mask does not). */
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+	background-size: 19px !important;
 }
 
-.el-radio-button__orig-radio:checked + .el-radio-button__inner {
+/* Gameface port: gizmo tool + world-space selectors are plain clickable divs
+   (element-ui el-radio-group swallows clicks in Gameface). Blue = active tool,
+   matching the original el-radio-button checked style (#037fff). */
+.fx-tool-group {
+	display: flex;
+	background-color: #1f2633;
+	border-radius: 6px;
+	overflow: hidden;
+}
+.fx-tool-btn {
+	height: 28px;
+	width: 45px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #1f2633;
+	border: 1px solid #05070b;
+	cursor: pointer;
+}
+.fx-tool-btn.active {
 	background-color: #037fff !important;
 	border-color: #037fff !important;
-	box-shadow: -1px 0 0 0 #037fff;
+}
+.tool-icon {
+	width: 19px;
+	height: 19px;
+	pointer-events: none;
 }
 
-#tools input[value='select'] + span {
-	-webkit-mask: url(../../../icons/editor/cursor-default-outline.svg) no-repeat center;
+/* Gameface port: plain-div File/Edit menubar (element-ui el-menu never opens in
+   Gameface). Styling mirrors the original dark toolbar buttons. */
+.fx-menubar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
-
-#tools input[value='translate'] + span {
-	-webkit-mask: url(../../../icons/editor/cursor-move.svg) no-repeat center;
+.fx-menu {
+	position: relative;
 }
-
-#tools input[value='rotate'] + span {
-	-webkit-mask: url(../../../icons/editor/rotate-3d.svg) no-repeat center;
-}
-
-#tools input[value='scale'] + span {
-	-webkit-mask: url(../../../icons/editor/arrow-expand.svg) no-repeat center;
-}
-
-#worldSpace input[value='local'] + span {
-	-webkit-mask: url(../../../icons/editor/cube-outline.svg) no-repeat center;
-}
-
-#worldSpace input[value='world'] + span {
-	-webkit-mask: url(../../../icons/editor/earth.svg) no-repeat center;
-}
-
-.el-menu {
-	margin-right: 7px !important;
-}
-
-.el-menu-item,
-.el-submenu__title {
-	height: 28px !important;
-	line-height: 28px !important;
-	background-color: #1f2633 !important;
-	color: #fff !important;
-	border-radius: 6px !important;
-}
-
-.el-menu.el-menu--horizontal {
-	background: #2e2e2e;
+.fx-menu-title {
+	height: 28px;
+	line-height: 28px;
+	padding: 0 12px;
+	margin-right: 7px;
+	background-color: #1f2633;
+	color: #fff;
 	border-radius: 6px;
+	font-size: 13px;
+	cursor: pointer;
+	user-select: none;
+}
+.fx-menu.open .fx-menu-title,
+.fx-menu-title:hover {
+	background-color: #037fff;
+}
+.fx-menu-dropdown {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	min-width: 170px;
+	background-color: #1f2633;
+	border: 1px solid #05070b;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+	padding: 4px 0;
+	z-index: 1000;
+}
+.fx-menu-entry {
+	height: 26px;
+	line-height: 26px;
+	padding: 0 14px;
+	color: #dfe4ea;
+	font-size: 13px;
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
+}
+.fx-menu-entry:hover {
+	background-color: #037fff;
+	color: #fff;
+}
+.fx-menu-separator {
+	height: 1px;
+	margin: 4px 6px;
+	background-color: #05070b;
+}
+
+/* Gameface port: view-mode selector (was element-ui el-select). */
+.fx-select {
+	position: relative;
+}
+.fx-select-value {
+	height: 28px;
+	line-height: 28px;
+	padding: 0 10px;
+	background-color: #1f2633;
+	border: 1px solid #05070b;
+	border-radius: 6px;
+	color: #dfe4ea;
+	font-size: 13px;
+	cursor: pointer;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.fx-select-caret {
+	margin-left: 8px;
+	font-size: 10px;
+	opacity: 0.7;
+}
+.fx-select-dropdown {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	right: 0;
+	max-height: 70vh;
+	overflow-y: auto;
+	background-color: #1f2633;
+	border: 1px solid #05070b;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+	padding: 4px 0;
+	z-index: 1000;
+}
+.fx-select-option {
+	height: 26px;
+	line-height: 26px;
+	padding: 0 12px;
+	color: #dfe4ea;
+	font-size: 13px;
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
+}
+.fx-select-option:hover {
+	background-color: #037fff;
+	color: #fff;
+}
+.fx-select-option.active {
+	color: #409eff;
 }
 </style>
 <style lang="scss" scoped>
@@ -402,7 +605,7 @@ div#tools:first-of-type {
 		}
 	}
 
-	.el-select {
+	.fx-select {
 		width: 25vh;
 	}
 }

@@ -375,6 +375,10 @@ export default class Editor {
 
 			if (this.selectionGroup.isSelected(gameObject)) {
 				this.selectionGroup.RefreshTransform();
+				// Gameface port: re-sync the native gizmo centre after any transform
+				// command applies (undo/redo, inspector, network) -- otherwise the
+				// gizmo lags at its old spot until the object is re-clicked.
+				this.threeManager.pushGizmoCenter();
 			}
 		}
 

@@ -1,6 +1,7 @@
 <template>
-	<gl-col>
-		<gl-row>
+	<!-- Gameface port: golden-layout gl-col/gl-row/gl-stack replaced with flexbox. -->
+	<div class="explorer-flex">
+		<div class="ex-col ex-project">
 			<EditorComponent id="explorer-component" title="Project">
 				<div class="header">
 					<Search v-model="search" />
@@ -15,6 +16,7 @@
 					:should-select-node="shouldSelectNode"
 					:row-height="25"
 					:on-select-node="onSelectNode"
+					@node-activate="onExplorerActivate"
 				>
 					<expandable-tree-slot
 						slot-scope="{ node, tree }"
@@ -22,35 +24,113 @@
 						:tree="tree"
 						:search="search"
 						:nodeText="node.name"
-						:selected="node.state.selected"
+						:selected="selectedId === node.id"
+						:on-select="onNodeSelected"
 					/>
 				</infinite-tree-component>
 			</EditorComponent>
-			<gl-stack :width="82">
-				<GridComponent
-					class="datafont"
-					:right-align="true"
-					title="Project Data"
-					:list="list"
-					:keyField="'instanceGuid'"
-					:headers="['Name', 'Type']"
-					:click="SpawnBlueprint"
-				>
-					<template v-slot:grid="{ item, data }">
-						<img :class="'Icon Icon-' + item.typeName" />
-						<div><Highlighter class="name" :text="item.fileName" :search="data.search" /></div>
-					</template>
-					<template v-slot:list="{ item }">
-						<img :class="'Icon Icon-' + item.typeName" />
-						<div><Highlighter class="td name" :text="cleanPath(item.name)" :search="search" /></div>
-						<div class="td type">{{ item.typeName }}</div>
-					</template>
-				</GridComponent>
-				<ConsoleComponent />
-			</gl-stack>
-		</gl-row>
-	</gl-col>
+		</div>
+		<div class="ex-col ex-tabs">
+			<div class="ex-tab-bar">
+				<div class="ex-tab" :class="{ active: tab === 'data' }" @click="tab = 'data'">Project Data</div>
+				<div class="ex-tab" :class="{ active: tab === 'logs' }" @click="tab = 'logs'">Logs</div>
+			</div>
+			<div class="ex-tab-body">
+				<div class="ex-tab-pane" v-show="tab === 'data'">
+					<GridComponent
+						class="datafont"
+						:right-align="true"
+						title=""
+						:list="list"
+						:keyField="'instanceGuid'"
+						:headers="['Name', 'Type']"
+						:click="SpawnBlueprint"
+					>
+						<template v-slot:grid="{ item, data, iconSize }">
+							<img
+								class="Icon"
+								:src="iconSrc(item.typeName)"
+								:style="{ width: iconSize + 'px', height: iconSize + 'px' }"
+							/>
+							<!-- Gameface port: Highlighter is a full Vue component (composition-api +
+							     v-html) PER item. Mounting hundreds at once when a big folder is
+							     selected cost ~2s and blocked the thread. Only use it when actually
+							     searching; plain text otherwise (the common browse case). -->
+							<div v-if="!data.search" class="name">{{ item.fileName }}</div>
+							<div v-else><Highlighter class="name" :text="item.fileName" :search="data.search" /></div>
+						</template>
+						<template v-slot:list="{ item }">
+							<img class="Icon" :src="iconSrc(item.typeName)" />
+							<div v-if="!search" class="td name">{{ cleanPath(item.name) }}</div>
+							<div v-else><Highlighter class="td name" :text="cleanPath(item.name)" :search="search" /></div>
+							<div class="td type">{{ item.typeName }}</div>
+						</template>
+					</GridComponent>
+				</div>
+				<div class="ex-tab-pane" v-show="tab === 'logs'">
+					<ConsoleComponent />
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
+
+<style scoped>
+.explorer-flex {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+	width: 100%;
+}
+.ex-col {
+	display: flex;
+	min-width: 0;
+	min-height: 0;
+	height: 100%;
+}
+.ex-project {
+	flex: 0 0 22%;
+	border-right: 1px solid #05070b;
+}
+.ex-tabs {
+	flex: 1 1 auto;
+	flex-direction: column;
+}
+.ex-tab-bar {
+	display: flex;
+	flex: 0 0 auto;
+	background: rgba(22, 25, 36, 1);
+	border-bottom: 1px solid rgba(5, 7, 11, 0.6);
+}
+.ex-tab {
+	padding: 6px 14px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #6b7a8d;
+	cursor: pointer;
+}
+.ex-tab.active {
+	color: #dfe4ea;
+	background: rgba(31, 38, 51, 0.92);
+}
+.ex-tab-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	display: flex;
+}
+.ex-tab-pane {
+	flex: 1 1 auto;
+	min-height: 0;
+	min-width: 0;
+	display: flex;
+}
+.ex-tab-pane > * {
+	width: 100%;
+}
+.ex-col > * {
+	width: 100%;
+}
+</style>
 
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
@@ -92,6 +172,8 @@ export default class ExplorerComponent extends EditorComponent {
 	selected: Node | null;
 
 	search: string = '';
+	tab: 'data' | 'logs' = 'data';
+	selectedId: string = '';
 
 	mounted() {
 		signals.blueprintsRegistered.connect(this.onBlueprintRegistered.bind(this));
@@ -155,13 +237,33 @@ export default class ExplorerComponent extends EditorComponent {
 		});
 	}
 
+	// Gameface port: fired by the delegated listener on the tree scroll container (per-row
+	// listeners are unreliable). Both mousedown and click fire this; onNodeSelected is
+	// idempotent so double-firing is harmless.
+	onExplorerActivate(o: { node: Node; event: MouseEvent }) {
+		if (o && o.node) {
+			this.onNodeSelected(o.node);
+		}
+	}
+
+	// Called directly from the slot click (infinite-tree's on-select-node fires
+	// unreliably in Gameface) -> guarantees Project Data loads + the folder highlights.
+	onNodeSelected(node: Node) {
+		if (!node) {
+			return;
+		}
+		this.selectedId = node.id;
+		this.list = this.buildList(node);
+		this.selected = node;
+	}
+
 	onSelectNode(node: Node) {
 		if (node === null) {
 			this.list = [];
 			this.selected = null;
 			return;
 		}
-		this.list = this.getBlueprintsRecursive(node);
+		this.list = this.buildList(node);
 		if (this.selected) {
 			this.selected.state.selected = false;
 		}
@@ -171,16 +273,31 @@ export default class ExplorerComponent extends EditorComponent {
 		this.$set(node.state, 'selected', true);
 	}
 
-	private getBlueprintsRecursive(node: Node): Blueprint[] {
-		let list: Blueprint[] = node.content as Blueprint[];
-		if (list === undefined) {
-			list = [];
-		}
+	// Gameface port: selecting a big folder (Objects has thousands of blueprints) used
+	// to FREEZE for a second. The cost wasn't rendering (the grid is virtualized now) —
+	// it was Vue DEEP-OBSERVING every blueprint object when the array was assigned to
+	// the reactive `list`. The blueprints are read-only in the grid, so Object.freeze()
+	// the result: Vue skips observation of non-extensible objects, making assignment
+	// O(1) instead of O(n * fields). Also flatten via push (not repeated concat, which
+	// was ~O(n^2)).
+	private buildList(node: Node): Blueprint[] {
+		const out: Blueprint[] = [];
+		this.collectBlueprints(node, out);
+		return Object.freeze(out) as unknown as Blueprint[];
+	}
 
-		node.children.forEach((child) => {
-			list = list.concat(this.getBlueprintsRecursive(child));
-		});
-		return list;
+	private collectBlueprints(node: Node, out: Blueprint[]): void {
+		if (node.content) {
+			const content = node.content as Blueprint[];
+			for (let i = 0; i < content.length; i++) {
+				out.push(content[i]);
+			}
+		}
+		if (node.children) {
+			for (let i = 0; i < node.children.length; i++) {
+				this.collectBlueprints(node.children[i] as Node, out);
+			}
+		}
 	}
 
 	cleanPath(path: string) {
@@ -188,6 +305,18 @@ export default class ExplorerComponent extends EditorComponent {
 			return path;
 		}
 		return path.replace(this.selected.path, '');
+	}
+
+	// Gameface port: type icons via CSS `content:url()` don't render in Gameface;
+	// use a real <img src> per blueprint type (Default.svg fallback).
+	iconSrc(type: string): string {
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			return require('@/icons/types/new/' + type + '.svg');
+		} catch (e) {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			return require('@/icons/types/new/Default.svg');
+		}
 	}
 
 	shouldSelectNode() {

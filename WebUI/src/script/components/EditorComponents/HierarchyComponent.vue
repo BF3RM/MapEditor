@@ -12,6 +12,8 @@
 			:selectable="true"
 			:row-height="25"
 			:should-select-node="shouldSelectNode"
+			@node-activate="onHierarchyActivate"
+			@node-toggle-enable="onDelegatedToggleEnable"
 		>
 			<expandable-tree-slot
 				slot-scope="{ node, tree }"
@@ -24,6 +26,7 @@
 				:selected="node.state.selected"
 				@node:toggle-enable="onNodeToggleEnable"
 				@node:toggle-raycast-enable="onNodeToggleRaycastEnable"
+				@node:toggle-select="onToggleSelect"
 				@node:hover="onNodeHover"
 				@node:hover-end="onNodeHoverEnd"
 				@node:click="onNodeClick"
@@ -262,7 +265,29 @@ export default class HierarchyComponent extends EditorComponent {
 		window.editor.ToggleRaycastEnabled(guid, !node.content[0].raycastEnabled);
 	}
 
+	// Multi-select checkbox next to the eye: add/remove this object from the current
+	// selection (the box shows an X when selected).
+	onToggleSelect(node: Node) {
+		const guid = Guid.parse(node.id.toString());
+		if (guid.isEmpty()) return;
+		if (node.state && node.state.selected) {
+			window.editor.Deselect(guid);
+		} else {
+			// multiSelection = true (add), moveGizmo = false so the pivot stays on the
+			// first-selected object.
+			window.editor.Select(guid, true, false, false);
+		}
+		window.editor.threeManager.syncNativeSelection();
+	}
+
+	private lastHoverTime = 0;
+
 	onNodeHover(nodeId: string) {
+		// Throttle: onHighlight/onUnhighlight recurse through children/parents, so doing
+		// it on every pixel of mouse movement over the huge list is wasteful.
+		const now = Date.now();
+		if (now - this.lastHoverTime < 60) return;
+		this.lastHoverTime = now;
 		const guid = Guid.parse(nodeId.toString());
 		if (guid.isEmpty()) return;
 		window.editor.editorCore.highlight(guid);
@@ -272,24 +297,62 @@ export default class HierarchyComponent extends EditorComponent {
 		window.editor.editorCore.unhighlight();
 	}
 
+	// Gameface port: fired by the delegated listener on the tree scroll container (per-row
+	// listeners silently fail on this streaming tree). Routes to the existing click logic.
+	onHierarchyActivate(o: { node: Node; event: MouseEvent }) {
+		if (o && o.node) {
+			this.onNodeClick({ event: o.event, nodeId: o.node.id });
+		}
+	}
+
+	// Gameface port: the eye button is driven by the same delegated listener (its per-row
+	// @click doesn't fire in Cohtml). Routes to the existing enable/disable toggle.
+	onDelegatedToggleEnable(o: { node: Node; event: MouseEvent }) {
+		if (o && o.node) {
+			this.onNodeToggleEnable(o.node);
+		}
+	}
+
 	onNodeClick(o: any) {
 		const guid = Guid.parse(o.nodeId.toString());
 
 		if (guid.isEmpty()) return;
 
-		if (o.event.detail === 1) {
-			// Click
-			if (o.event.shiftKey) {
-				const selectedNode = this.tree.getNodeById(o.nodeId);
-				window.editor.SelectMultiple(this.getConsecutiveNodesGuids(selectedNode));
-			} else {
-				window.editor.Select(guid, o.event.ctrlKey, false, true);
-			}
-		} else if (o.event.detail === 2) {
-			// Double Click
+		const e = o.event;
+		if (!e) return;
+
+		const id = String(o.nodeId);
+		const now = Date.now();
+
+		// Double-click (a click event with detail 2) = focus the camera on the object.
+		if (e.type === 'click' && e.detail === 2) {
 			window.editor.Focus(guid);
+			return;
 		}
+
+		// Gameface port: like the Project tree, selection is bound to BOTH mousedown and
+		// click for robustness (Gameface intermittently drops one or the other). To avoid
+		// a Ctrl multi-select toggling twice, the `click` only acts as a FALLBACK: if we
+		// already selected this exact node moments ago (from its paired mousedown), skip.
+		if (e.type === 'click' && this.lastSelectId === id && now - this.lastSelectTime < 500) {
+			return;
+		}
+		this.lastSelectId = id;
+		this.lastSelectTime = now;
+
+		if (e.shiftKey) {
+			const selectedNode = this.tree.getNodeById(o.nodeId);
+			window.editor.SelectMultiple(this.getConsecutiveNodesGuids(selectedNode));
+		} else {
+			window.editor.Select(guid, e.ctrlKey, false, true);
+		}
+		// Push the selection to Lua so the native selection box + gizmo appear (the 3D
+		// pick path does this; a tree click must too, or nothing shows in the world).
+		window.editor.threeManager.syncNativeSelection();
 	}
+
+	private lastSelectId: string | null = null;
+	private lastSelectTime = 0;
 
 	private getConsecutiveNodesGuids(newSelectedNode: Node): Guid[] {
 		const guids = [];
@@ -349,31 +412,28 @@ export default class HierarchyComponent extends EditorComponent {
 		if (!gameObject) {
 			return;
 		}
-		if (field === 'enabled') {
-			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
-			if (node) {
-				if (node.content && node.content[0]) {
-					node.content[0].enabled = value;
-				}
-			}
+		if (field !== 'enabled' && field !== 'raycastEnabled' && field !== 'realm') {
+			return;
 		}
-
-		if (field === 'raycastEnabled') {
-			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
-			if (node) {
-				if (node.content && node.content[0]) {
-					node.content[0].raycastEnabled = value;
-				}
-			}
+		const node: INode = this.tree.getNodeById(gameObject.guid.toString());
+		if (!node || !node.content || !node.content[0]) {
+			return;
 		}
+		// Gameface port: the tree nodes are marked non-reactive (_isVue) for perf, so a
+		// plain `node.content[0].enabled = value` never re-renders the row — the eye icon
+		// (eye <-> eye-crossed) and the disabled strikethrough would stay stale even though
+		// the object really did hide/show in the world. Swap in a FRESH content object so
+		// the slot's `:content` prop identity changes, then force the tree to re-render (the
+		// same path selection uses). The slot's `enabled` computed then re-reads the value.
+		node.content = [{ ...node.content[0], [field]: value }];
+		this.forceTreeRerender();
+	}
 
-		if (field === 'realm') {
-			const node: INode = this.tree.getNodeById(gameObject.guid.toString());
-			if (node) {
-				if (node.content && node.content[0]) {
-					node.content[0].realm = value;
-				}
-			}
+	// Bump the (non-reactive) tree's render version so the visible rows re-evaluate their
+	// slot props. Used whenever we mutate node.content out-of-band (visibility / realm).
+	private forceTreeRerender() {
+		if (this.tree && typeof (this.tree as any).emit === 'function') {
+			(this.tree as any).emit('contentWillUpdate');
 		}
 	}
 }

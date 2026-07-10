@@ -2,6 +2,7 @@
 	<div class="key-tip" v-if="description">
 		<div v-if="needsCtrl" class="key-outline">CTRL</div>
 		<div v-if="needsShift" class="key-outline">SHIFT</div>
+		<div v-if="needsAlt" class="key-outline">ALT</div>
 		<!--div v-if="multiKey" class="multi-key-container">
 			<div v-for="key in keys"
 					:key="key"
@@ -15,26 +16,38 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 
-@Component
-export default class KeyTip extends Vue {
-	@Prop()
-	keys: string | string[];
-
-	@Prop()
-	needsCtrl?: boolean;
-
-	@Prop()
-	needsShift?: boolean;
-
-	@Prop()
-	description?: string;
-
-	get multiKey() {
-		return Array.isArray(this.keys);
-	}
-}
+export default defineComponent({
+    name: 'KeyTip',
+    props: {
+        keys: {
+            type: [String, Array],
+            required: true
+        },
+        needsCtrl: {
+            type: Boolean,
+            required: false
+        },
+        needsShift: {
+            type: Boolean,
+            required: false
+        },
+        needsAlt: {
+            type: Boolean,
+            required: false
+        },
+        description: {
+            type: String,
+            required: false
+        }
+    },
+    computed: {
+        multiKey(): boolean {
+            return Array.isArray(this.keys);
+        }
+    }
+});
 </script>
 
 <style lang="scss" scoped>

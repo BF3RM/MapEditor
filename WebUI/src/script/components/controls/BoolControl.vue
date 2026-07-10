@@ -1,20 +1,26 @@
 <template>
 	<div class="BoolControl">
-		<el-checkbox v-model="value" @input="onChangeValue"></el-checkbox>
+		<el-checkbox :value="value" @input="onChangeValue"></el-checkbox>
 	</div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 
-@Component({ components: {} })
-export default class BoolControl extends Vue {
-	@Prop() value: string;
-
-	onChangeValue(newVal: string) {
-		this.$emit('input', newVal);
-	}
-}
+export default defineComponent({
+    name: 'BoolControl',
+    props: {
+        value: {
+            type: Boolean,
+            required: true
+        }
+    },
+    methods: {
+        onChangeValue(newVal: boolean) {
+            this.$emit('input', newVal);
+        }
+    }
+});
 </script>
 
 <style lang="scss" scoped>

@@ -12,25 +12,29 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from '@vue/composition-api';
 import { Component, Vue } from 'vue-property-decorator';
 import InfoTopBar from '@/script/components/InfoTopBar.vue';
 import { signals } from '@/script/modules/Signals';
 
-@Component({
-	components: {
-		InfoTopBar
-	}
-})
-export default class LoadingView extends Vue {
-	loadingInfo = 'Loading resources';
-	mounted() {
-		signals.setLoadingInfo.connect((info) => {
-			console.log('Got loading info');
-			this.loadingInfo = info;
-			this.$forceUpdate();
-		});
-	}
-}
+export default defineComponent({
+    name: 'LoadingView',
+    components: {
+        InfoTopBar
+    },
+    data() {
+        return {
+            loadingInfo: 'Loading resources'
+        };
+    },
+    mounted() {
+        signals.setLoadingInfo.connect((info: string) => {
+            console.log('Got loading info');
+            this.loadingInfo = info;
+            this.$forceUpdate();
+        });
+    }
+});
 </script>
 
 <style lang="scss" scoped>

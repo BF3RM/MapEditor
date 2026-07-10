@@ -1,12 +1,11 @@
 <template>
 	<input
 		v-model="inputValue"
-		:class="{ error: isNaN(value) }"
+		:class="{ error: isInvalidNumber }"
 		:type="type"
 		:min="min"
 		:max="max"
 		:step="step"
-		@input="onInput"
 		@blur="onBlur"
 		@keyup.enter="onEnterPressed"
 		@focus="dirty = true"
@@ -14,53 +13,57 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, PropType } from '@vue/composition-api';
 
-export default Vue.extend({
+export default defineComponent({
 	name: 'LazyInput',
 	props: {
-		value: [Number, String],
-		type: String,
+		value: {
+			type: [Number, String] as PropType<number | string>,
+			required: true
+		},
+		type: {
+			type: String,
+			default: 'text'
+		},
 		min: [String, Number],
 		max: [String, Number],
 		step: [String, Number]
 	},
-	data: () => ({
-		inputValue: '' as any,
-		dirty: false
-	}),
+
+	data() {
+		return {
+			inputValue: this.value as number | string
+		};
+	},
+
+	computed: {
+		isInvalidNumber(): boolean {
+			return this.type === 'number' && Number.isNaN(Number(this.inputValue));
+		}
+	},
 
 	methods: {
 		onBlur() {
-			if (isNaN(this.$props.value)) {
-				return;
+			let emitValue: string | number = this.inputValue;
+
+			if (this.type === 'number' && this.inputValue !== '') {
+				emitValue = Number(this.inputValue);
 			}
-			this.dirty = false;
-			if (this.inputValue !== this.value) {
-				this.inputValue = this.value;
-			}
+
+			this.$emit('input', emitValue);
 			this.$emit('blur');
 		},
-		onInput() {
-			if (isNaN(this.$props.value)) {
-				return;
-			}
-			this.$emit('input', this.inputValue);
-		},
-		onEnterPressed(e: any) {
-			this.onBlur();
-			e.target.blur();
+		onEnterPressed(event: Event) {
+			(event.target as HTMLInputElement).blur();
 		}
 	},
+
 	watch: {
 		value(newVal) {
-			if (!this.dirty) {
-				this.inputValue = newVal;
-			}
+			// Update internal state when prop changes externally
+			this.inputValue = newVal;
 		}
-	},
-	mounted() {
-		this.inputValue = this.value;
 	}
 });
 </script>

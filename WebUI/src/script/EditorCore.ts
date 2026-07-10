@@ -36,9 +36,12 @@ export class EditorCore {
 	// @ts-ignore
 	public stats = new Stats();
 
+	// Cached once so the rAF loop doesn't allocate a new bound closure per frame.
+	private boundRenderLoop: () => void = this.renderLoop.bind(this);
+
 	constructor() {
 		this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-		signals.editor.Ready.connect(this.renderLoop.bind(this));
+		signals.editor.Ready.connect(this.boundRenderLoop);
 		this.previewBlueprint = null;
 
 		this.lastUpdateTime = 0;
@@ -56,6 +59,9 @@ export class EditorCore {
 			if (go) {
 				editor.threeManager.nextFrame(() => {
 					this.select(el, true, true);
+					// Push the selection to Lua so the native selection box + gizmo appear on
+					// the freshly-spawned object (the 3D pick path does this too).
+					editor.threeManager.syncNativeSelection();
 				});
 				this.pendingSelections.splice(i, 1);
 			}
@@ -106,7 +112,9 @@ export class EditorCore {
 			this.updateRequested = false;
 		}
 		// TODO: Add an FPS and rendering indicator.
-		requestAnimationFrame(this.renderLoop.bind(this));
+		// Gameface port: reuse ONE bound function instead of allocating a fresh
+		// `.bind(this)` closure every frame (60/s of garbage feeding GC stalls).
+		requestAnimationFrame(this.boundRenderLoop);
 		editor.threeManager.RenderLoop();
 		scope.stats.end();
 	}

@@ -8,6 +8,7 @@ function GameObjectSaveData:__init(p_GameObject)
 	self.name = p_GameObject.name
 	self.blueprintCtrRef = p_GameObject.blueprintCtrRef
 	self.transform = p_GameObject.transform
+	self.timeStamp = p_GameObject.timeStamp
 	self.origin = p_GameObject.origin
 	self.original = p_GameObject.original
 	self.localTransform = p_GameObject.localTransform
@@ -49,6 +50,7 @@ function GameObjectSaveData:GetAsTable()
 		isDeleted = self.isDeleted,
 		isEnabled = self.isEnabled,
 		origin = self.origin,
+		timeStamp = self.timeStamp
 	}
 
 	if self.parentData then

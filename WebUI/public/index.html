@@ -4,6 +4,87 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<title>MapEditor</title>
+		<!-- Gameface polyfills: Coherent's DOM is missing some APIs that common
+		     libraries (jQuery/jstree, etc.) touch at load time. Must run BEFORE
+		     any bundle script. -->
+		<script>
+			(function () {
+				// axios' isURLSameOrigin resolves window.location.href through an <a>
+				// element at load time and reads .pathname.charAt(0); Gameface anchors
+				// don't parse the webui:// scheme so .pathname is undefined and it
+				// throws. Making navigator.product report a non-standard-browser value
+				// makes axios skip that whole code path (only used for XSRF cookies,
+				// which we don't need; external requests are CSP-blocked anyway).
+				try {
+					if (navigator.product !== 'ReactNative' && navigator.product !== 'NS' && navigator.product !== 'NativeScript') {
+						Object.defineProperty(navigator, 'product', { value: 'NS', configurable: true });
+					}
+				} catch (e) { /* read-only */ }
+				// NOTE: removed an HTMLAnchorElement.prototype.pathname getter polyfill
+				// that read this.href -- Cohtml's URL decoding re-entered the getter,
+				// causing an infinite recursion that hard-crashed the renderer (native
+				// stack overflow). axios' pathname use is avoided via navigator.product.
+
+				// camera-controls does `new DOMRect` in its constructor. In Gameface
+				// window.DOMRect EXISTS but is NOT constructable ("Illegal constructor"),
+				// so test constructability (not existence) and force-replace it.
+				var domRectOk = false;
+				try { new window.DOMRect(0, 0, 0, 0); domRectOk = true; } catch (e) { domRectOk = false; }
+				if (!domRectOk) {
+					var DOMRectPoly = function (x, y, w, h) {
+						this.x = +x || 0; this.y = +y || 0; this.width = +w || 0; this.height = +h || 0;
+					};
+					Object.defineProperties(DOMRectPoly.prototype, {
+						left: { get: function () { return this.x; }, configurable: true },
+						top: { get: function () { return this.y; }, configurable: true },
+						right: { get: function () { return this.x + this.width; }, configurable: true },
+						bottom: { get: function () { return this.y + this.height; }, configurable: true }
+					});
+					DOMRectPoly.fromRect = function (o) { o = o || {}; return new DOMRectPoly(o.x, o.y, o.width, o.height); };
+					try { window.DOMRect = DOMRectPoly; } catch (e) { /* readonly */ }
+					try { Object.defineProperty(window, 'DOMRect', { value: DOMRectPoly, configurable: true, writable: true }); } catch (e) { /* ignore */ }
+					try { new window.DOMRect(0, 0, 0, 0); } catch (e) { window.__bootErrors && window.__bootErrors.push('DOMRect poly failed: ' + e); }
+				}
+
+				// jQuery's feature-detection calls document.implementation.createHTMLDocument("")
+				// at load time; Gameface has no document.implementation.
+				if (!document.implementation) {
+					try { document.implementation = {}; } catch (e) { /* readonly? fall through */ }
+				}
+				if (document.implementation && !document.implementation.createHTMLDocument) {
+					document.implementation.createHTMLDocument = function (title) {
+						var head = document.createElement('head');
+						var body = document.createElement('body');
+						if (title != null) {
+							var t = document.createElement('title');
+							t.appendChild(document.createTextNode(String(title)));
+							head.appendChild(t);
+						}
+						return {
+							head: head,
+							body: body,
+							documentElement: document.documentElement,
+							createElement: function (tag) { return document.createElement(tag); },
+							createElementNS: function (ns, tag) { return document.createElement(tag); },
+							createTextNode: function (txt) { return document.createTextNode(txt); },
+							createDocumentFragment: function () { return document.createDocumentFragment(); },
+							getElementsByTagName: function (tag) { return body.getElementsByTagName(tag); }
+						};
+					};
+				}
+			})();
+		</script>
+		<!-- TEMP Gameface boot diagnostics: capture module-eval errors that fire
+		     before the app can install its own handlers. Read via the Lua probe. -->
+		<script>
+			window.__bootErrors = [];
+			window.addEventListener('error', function (e) {
+				window.__bootErrors.push('ERR: ' + (e.message || '') + ' @ ' + (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + ' | ' + ((e.error && e.error.stack) || ''));
+			});
+			window.addEventListener('unhandledrejection', function (e) {
+				window.__bootErrors.push('REJ: ' + ((e.reason && e.reason.stack) || e.reason || ''));
+			});
+		</script>
 	</head>
 	<body>
 		<div id="app"></div>

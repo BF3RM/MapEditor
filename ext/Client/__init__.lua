@@ -11,6 +11,7 @@ require "UIManager"
 require "MessageActions"
 require "ClientTransactionManager"
 require "ClientGameObjectManager"
+local m_NativeViewport = require "NativeViewport"
 
 function MapEditorClient:__init()
 	m_Logger:Write("Initializing MapEditorClient")
@@ -42,11 +43,20 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:SendToServer', self, self.OnSendCommandsToServer)
 	Events:Subscribe('MapEditor:ReceiveMessage', self, self.OnReceiveMessages)
 
+	Events:Subscribe('MapEditor:SetHighlight', self, self.OnSetHighlight)
+	Events:Subscribe('MapEditor:SetSelection', self, self.OnSetSelection)
+	Events:Subscribe('MapEditor:SetGizmoMode', self, self.OnSetGizmoMode)
+	Events:Subscribe('MapEditor:SetWorldSpace', self, self.OnSetWorldSpace)
+	Events:Subscribe('MapEditor:SetGizmoCenter', self, self.OnSetGizmoCenter)
+	Events:Subscribe('MapEditor:SetGizmoBasis', self, self.OnSetGizmoBasis)
+	Events:Subscribe('MapEditor:NativePick', self, self.OnNativePick)
+	Events:Subscribe('MapEditor:NativeHighlight', self, self.OnNativeHighlight)
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
 	Events:Subscribe('MapEditor:DisableEditorMode', self, self.OnDisableEditorMode)
 	Events:Subscribe('MapEditor:controlStart', self, self.OnCameraControlStart)
 	Events:Subscribe('MapEditor:controlEnd', self, self.OnCameraControlEnd)
 	Events:Subscribe('MapEditor:controlUpdate', self, self.OnCameraControlUpdate)
+	Events:Subscribe('MapEditor:FocusCamera', self, self.OnFocusCamera)
 
 	-- Hooks
 	Hooks:Install('Input:PreUpdate', 200, self, self.OnUpdateInputHook)
@@ -72,6 +82,13 @@ end
 function MapEditorClient:OnExtensionLoaded()
 	WebUI:Init()
 	WebUI:Show()
+	-- Default input to the GAME (freecam) on load; the WebUI grabs it only in
+	-- editor mode (F1). Without this the shown WebUI swallows mouse+keyboard so
+	-- freecam/WASD stop working.
+	pcall(function()
+		WebUI:DisableMouse()
+		WebUI:DisableKeyboard()
+	end)
 end
 
 function MapEditorClient:OnExtensionUnloading()
@@ -113,6 +130,122 @@ end
 
 function MapEditorClient:OnDrawHud()
 	Editor:OnDrawHud()
+	-- DebugRenderer draws must be issued from UI:DrawHud (not Engine:Update).
+	m_NativeViewport:OnDraw()
+end
+
+---@param p_Json string
+function MapEditorClient:OnSetHighlight(p_Json)
+	local s_Ok, s_Guid = pcall(function() return json.decode(p_Json) end)
+	m_NativeViewport:SetHighlight(s_Ok and s_Guid or nil)
+end
+
+---@param p_Json string
+function MapEditorClient:OnSetSelection(p_Json)
+	local s_Ok, s_List = pcall(function() return json.decode(p_Json) end)
+	m_NativeViewport:SetSelection((s_Ok and type(s_List) == 'table') and s_List or {})
+end
+
+---@param p_Json string
+function MapEditorClient:OnSetGizmoMode(p_Json)
+	local s_Ok, s_Mode = pcall(function() return json.decode(p_Json) end)
+	m_NativeViewport:SetGizmoMode((s_Ok and type(s_Mode) == 'string') and s_Mode or 'select')
+end
+
+---@param p_Json string
+function MapEditorClient:OnSetWorldSpace(p_Json)
+	local s_Ok, s_Space = pcall(function() return json.decode(p_Json) end)
+	m_NativeViewport:SetWorldSpace((s_Ok and type(s_Space) == 'string') and s_Space or 'world')
+end
+
+---@param p_Json string
+function MapEditorClient:OnSetGizmoCenter(p_Json)
+	local s_Ok, s_List = pcall(function() return json.decode(p_Json) end)
+	m_NativeViewport:SetGizmoCenter((s_Ok and type(s_List) == 'table') and s_List or nil)
+end
+
+---@param p_Json string
+function MapEditorClient:OnSetGizmoBasis(p_Json)
+	local s_Ok, s_List = pcall(function() return json.decode(p_Json) end)
+	if s_Ok and type(s_List) == 'table' then
+		m_NativeViewport:SetGizmoBasis(s_List)
+	end
+end
+
+-- Precise picking: native physics raycast against the real collision geometry, then
+-- map the hit point to the GameObject whose spatial OBB contains it (smallest one, so
+-- a big overlapping box never wins over the object you actually clicked).
+function MapEditorClient:FindGuidAtPoint(p_Point)
+	if GameObjectManager == nil or GameObjectManager.m_GameObjects == nil then
+		return ''
+	end
+	local s_Best = ''
+	local s_BestVol = 1e30
+	for l_GuidStr, l_GO in pairs(GameObjectManager.m_GameObjects) do
+		if l_GO ~= nil and l_GO.gameEntities ~= nil then
+			for _, l_GE in pairs(l_GO.gameEntities) do
+				if l_GE.entity ~= nil and l_GE.isSpatial then
+					pcall(function()
+						local s_S = SpatialEntity(l_GE.entity)
+						if s_S == nil or s_S.aabb == nil then return end
+						local s_AABB = s_S.aabb
+						local s_T = s_S.aabbTransform
+						local s_Rel = p_Point - s_T.trans
+						local lx = s_Rel:Dot(s_T.left)
+						local ly = s_Rel:Dot(s_T.up)
+						local lz = s_Rel:Dot(s_T.forward)
+						-- small epsilon so a surface hit still counts as inside
+						local e = 0.05
+						if lx >= s_AABB.min.x - e and lx <= s_AABB.max.x + e and
+							ly >= s_AABB.min.y - e and ly <= s_AABB.max.y + e and
+							lz >= s_AABB.min.z - e and lz <= s_AABB.max.z + e then
+							local vol = (s_AABB.max.x - s_AABB.min.x) *
+								(s_AABB.max.y - s_AABB.min.y) *
+								(s_AABB.max.z - s_AABB.min.z)
+							if vol < s_BestVol then
+								s_BestVol = vol
+								s_Best = l_GuidStr
+							end
+						end
+					end)
+				end
+			end
+		end
+	end
+	return s_Best
+end
+
+---@param p_Json string
+function MapEditorClient:OnNativePick(p_Json)
+	local s_Ok, s_D = pcall(function() return json.decode(p_Json) end)
+	if not s_Ok or s_D == nil then return end
+	local s_Guid = ''
+	pcall(function()
+		local s_From = Vec3(s_D.ox, s_D.oy, s_D.oz)
+		local s_To = Vec3(s_D.ox + s_D.dx * 2000.0, s_D.oy + s_D.dy * 2000.0, s_D.oz + s_D.dz * 2000.0)
+		local s_Hit = RaycastManager:Raycast(s_From, s_To, RayCastFlags.DontCheckWater)
+		if s_Hit ~= nil and s_Hit.position ~= nil then
+			s_Guid = self:FindGuidAtPoint(s_Hit.position)
+		end
+	end)
+	local s_Safe = tostring(s_Guid):gsub("[^%x%-]", "")
+	WebUI:ExecuteJS("if(window.__onNativePick){window.__onNativePick('" .. s_Safe .. "');}")
+end
+
+---@param p_Json string
+function MapEditorClient:OnNativeHighlight(p_Json)
+	local s_Ok, s_D = pcall(function() return json.decode(p_Json) end)
+	if not s_Ok or s_D == nil then return end
+	local s_Guid = ''
+	pcall(function()
+		local s_From = Vec3(s_D.ox, s_D.oy, s_D.oz)
+		local s_To = Vec3(s_D.ox + s_D.dx * 2000.0, s_D.oy + s_D.dy * 2000.0, s_D.oz + s_D.dz * 2000.0)
+		local s_Hit = RaycastManager:Raycast(s_From, s_To, RayCastFlags.DontCheckWater)
+		if s_Hit ~= nil and s_Hit.position ~= nil then
+			s_Guid = self:FindGuidAtPoint(s_Hit.position)
+		end
+	end)
+	m_NativeViewport:SetHighlight(s_Guid ~= '' and s_Guid or nil)
 end
 
 function MapEditorClient:OnLevelDestroy()
@@ -213,6 +346,13 @@ function MapEditorClient:OnCameraControlUpdate(p_TransformJson)
 	end
 
 	Editor:OnControlUpdate()
+end
+
+function MapEditorClient:OnFocusCamera(p_Json)
+	local s_Params = DecodeParams(json.decode(p_Json))
+	if s_Params and s_Params.transform then
+		FreeCam:StartFocus(s_Params.transform, s_Params.duration or 0.26)
+	end
 end
 
 return MapEditorClient()

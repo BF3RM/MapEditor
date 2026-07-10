@@ -1,5 +1,5 @@
 <template>
-	<WindowComponent :state="state" :title="title" :isDestructible="true">
+	<WindowComponent :visible="state.visible" :title="title" :isDestructible="true" @update:visible="Close">
 		<template v-if="showNewSave">
 			<div class="container new-container">
 				<div class="alert" v-if="hint">
@@ -65,10 +65,10 @@
 						</ul>
 					</div>
 				</div>
-				<div class="alert alert-success" v-if="selectedSave">
-					<span>Selected save info:</span>
-					Map name: {{ selectedSave.mapName }}
-					<span v-if="selectedSave">Gamemode: {{ selectedSave.gameModeName }}</span>
+				<div class="alert alert-success save-info-bar" v-if="selectedSave">
+					<span class="save-info-label">Selected save info:</span>
+					<span>Map name: {{ selectedSave.mapName }}</span>
+					<span>Gamemode: {{ selectedSave.gameModeName }}</span>
 					<!--<span v-if="selectedSave">Bundles: {{selectedSave.requiredBundles}}</span>-->
 				</div>
 			</div>
@@ -83,7 +83,7 @@
 	</WindowComponent>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api';
 import WindowComponent from './WindowComponent.vue';
 import {
 	GetProjectsMessage,
@@ -96,72 +96,73 @@ import { signals } from '@/script/modules/Signals';
 import { Log } from '@/script/modules/Logger';
 import { LOGLEVEL } from '@/script/types/Enums';
 
-@Component({ components: { WindowComponent } })
-export default class ProjectSettingsComponent extends Vue {
-	title = 'Project Settings';
-	projects = {};
-	selectedProjectName: string = '';
-	selectedSaveIndex: number = 0;
-	showNewSave = false;
-	showExportWindow = false;
-	projectData = '';
-
-	hint = '';
-	state = {
-		visible: false
-	};
-
-	get projectsArray() {
-		return Object.values(this.projects);
-	}
-
-	get selectedProject(): object[] | null {
-		return (this.projects as any)[this.selectedProjectName];
-	}
-
-	get selectedSave(): object | null {
-		const project = this.selectedProject;
-		if (project) {
-			return (project as any)[this.selectedSaveIndex];
+export default defineComponent({
+	name: 'ProjectSettingsComponent',
+	components: {
+		WindowComponent
+	},
+	data() {
+		return {
+			title: 'Project Settings',
+			projects: {} as Record<string, any[]>,
+			selectedProjectName: '',
+			selectedSaveIndex: 0,
+			showNewSave: false,
+			showExportWindow: false,
+			projectData: '',
+			hint: '',
+			state: {
+				visible: false
+			},
+			currentProjectHeader: {
+				projectName: '',
+				timeStamp: 0
+			}
+		};
+	},
+	computed: {
+		projectsArray(): any[] {
+			return Object.values(this.projects);
+		},
+		selectedProject(): any[] | null {
+			return this.projects[this.selectedProjectName] || null;
+		},
+		selectedSave(): any | null {
+			const project = this.selectedProject;
+			if (project) {
+				return project[this.selectedSaveIndex] || null;
+			}
+			return null;
+		},
+		buttonsDisabled(): boolean {
+			return this.projectsArray.length === 0 || this.selectedProject === null || this.selectedSave == null;
+		},
+		newSaveName: {
+			get(): string {
+				return this.currentProjectHeader.projectName;
+			},
+			set(value: string) {
+				this.currentProjectHeader.projectName = value;
+			}
 		}
-		return null;
-	}
-
-	get buttonsDisabled() {
-		return this.projectsArray.length === 0 || this.selectedProject === null || this.selectedSave == null;
-	}
-
-	get newSaveName() {
-		return (this.currentProjectHeader as any).projectName;
-	}
-
-	set newSaveName(value: string) {
-		(this.currentProjectHeader as any).projectName = value;
-	}
-
-	currentProjectHeader = {
-		projectName: '',
-		timeStamp: 0
-	};
-
-	NotImplemented() {
-		console.error('Not implemented');
-	}
-
+	},
 	mounted() {
 		signals.saveRequested.connect(this.Save.bind(this));
 		signals.setProjectHeaders.connect(this.onGetProjects.bind(this));
+
 		signals.menuRegistered.emit(['File', 'Save as'], () => {
 			this.showNewSave = true;
 			this.title = 'New Project';
 			this.state.visible = true;
 		});
+
 		signals.menuRegistered.emit(['File', 'Project Settings'], () => {
 			window.vext.SendMessage(new GetProjectsMessage());
 			this.showNewSave = false;
 			this.title = 'Project Settings';
 			this.state.visible = true;
 		});
+
 		signals.setCurrentProjectHeader.connect((projectHeader) => {
 			this.hint = '';
 			this.currentProjectHeader = projectHeader;
@@ -174,115 +175,87 @@ export default class ProjectSettingsComponent extends Vue {
 				this.state.visible = false;
 			}
 		});
+
 		signals.setProjectData.connect((projectDataJSON: any) => {
 			this.hint = 'Select all and copy (CTRL+C)';
 			let beautifiedJSONString = JSON.stringify(projectDataJSON, null, '\t');
-			// Round numbers to 3 decimals
 			beautifiedJSONString = beautifiedJSONString.replace(/("[xyz]":\s*)([-]?\d+\.\d+)/g, (str, prefix, n) => {
 				return prefix + Number(n).toFixed(3).toString();
 			});
 			this.projectData = beautifiedJSONString;
 			Log(LOGLEVEL.INFO, 'Received project data successfully');
 		});
-	}
-
-	selectSave(index: number) {
-		this.selectedSaveIndex = index;
-	}
-
-	loadSave() {
-		if (this.selectedSave) {
-			console.log('Loading save: ' + (this.selectedSave as any).projectName);
-			window.vext.SendMessage(new RequestLoadProjectMessage((this.selectedSave as any).id));
-		}
-	}
-
-	NewSave() {
-		console.log('New save');
-		this.showNewSave = true;
-	}
-
-	Save(newSave: boolean = false) {
-		const projectHeader = { ...this.currentProjectHeader };
-		(projectHeader as any).projectName = this.selectedProjectName;
-		if (newSave) {
-			(projectHeader as any).projectName = this.newSaveName;
-		}
-		window.vext.SendMessage(new RequestSaveProjectMessage(JSON.stringify(projectHeader)));
-		this.hint = 'Saving...';
-		Log(LOGLEVEL.INFO, 'Saving project: ' + (projectHeader as any).projectName);
-	}
-
-	Export() {
-		this.hint = 'Retrieving save...';
-		this.showExportWindow = true;
-		window.vext.SendMessage(new RequestProjectDataMessage((this.selectedSave as any).id));
-	}
-
-	Delete() {
-		window.vext.SendMessage(new RequestDeleteProjectMessage((this.selectedSave as any).id));
-	}
-
-	CopyToClipboard() {
-		navigator.clipboard.writeText(this.projectData).then(
-			() => {
-				console.log('Async: Copying to clipboard was successful!');
-			},
-			(err) => {
-				console.error('Async: Could not copy text: ', err);
+	},
+	methods: {
+		selectSave(index: number) {
+			this.selectedSaveIndex = index;
+		},
+		loadSave() {
+			if (this.selectedSave) {
+				console.log('Loading save: ' + this.selectedSave.projectName);
+				window.vext.SendMessage(new RequestLoadProjectMessage(this.selectedSave.id));
 			}
-		);
-		this.CloseExportWindow();
-	}
-
-	CloseExportWindow() {
-		this.hint = '';
-		this.showExportWindow = false;
-		this.projectData = '';
-	}
-
-	onSelectProject(projectName: string) {
-		this.selectedProjectName = projectName;
-		this.selectedSaveIndex = 0;
-	}
-
-	onGetProjects(availableProjects: any) {
-		console.log(availableProjects);
-		const projects: any = {};
-		if (Object.keys(availableProjects).length !== 0) {
-			for (const project of availableProjects) {
-				if (projects[project.projectName] === undefined) {
-					projects[project.projectName] = [];
+		},
+		NewSave() {
+			console.log('New save');
+			this.showNewSave = true;
+		},
+		Save(newSave: boolean = false) {
+			const projectHeader = { ...this.currentProjectHeader };
+			projectHeader.projectName = this.selectedProjectName;
+			if (newSave) {
+				projectHeader.projectName = this.newSaveName;
+			}
+			window.vext.SendMessage(new RequestSaveProjectMessage(JSON.stringify(projectHeader)));
+			this.hint = 'Saving...';
+			Log(LOGLEVEL.INFO, 'Saving project: ' + projectHeader.projectName);
+		},
+		Export() {
+			this.hint = 'Retrieving save...';
+			this.showExportWindow = true;
+			window.vext.SendMessage(new RequestProjectDataMessage(this.selectedSave.id));
+		},
+		Delete() {
+			window.vext.SendMessage(new RequestDeleteProjectMessage(this.selectedSave.id));
+		},
+		CloseExportWindow() {
+			this.hint = '';
+			this.showExportWindow = false;
+			this.projectData = '';
+		},
+		onSelectProject(projectName: string) {
+			this.selectedProjectName = projectName;
+			this.selectedSaveIndex = 0;
+		},
+		onGetProjects(availableProjects: any) {
+			console.log(availableProjects);
+			const projectsObj: any = {};
+			if (Object.keys(availableProjects).length !== 0) {
+				for (const project of availableProjects) {
+					if (projectsObj[project.projectName] === undefined) {
+						projectsObj[project.projectName] = [];
+					}
+					projectsObj[project.projectName].push(project);
 				}
-				projects[project.projectName].push(project);
 			}
+			this.projects = projectsObj;
+		},
+		FormatTime(unixTimestamp: number, type: string = 'timestamp') {
+			if (type === 'since') {
+				unixTimestamp = Date.now() - unixTimestamp;
+			}
+			const date = new Date(unixTimestamp);
+			const hours = date.getHours();
+			const minutes = '0' + date.getMinutes();
+			const seconds = '0' + date.getSeconds();
+			const formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+			return date.toDateString() + ' - ' + formattedTime;
+		},
+		Close() {
+			this.state.visible = false;
 		}
-		// Object.assign(this.projects, projects);
-		this.projects = projects;
 	}
-
-	FormatTime(unixTimestamp: number, type: string = 'timestamp') {
-		if (type === 'since') {
-			unixTimestamp = Date.now() - unixTimestamp;
-		}
-		const date = new Date(unixTimestamp);
-		// Hours part from the timestamp
-		const hours = date.getHours();
-		// Minutes part from the timestamp
-		const minutes = '0' + date.getMinutes();
-		// Seconds part from the timestamp
-		const seconds = '0' + date.getSeconds();
-
-		// Will display time in 10:30:23 format
-		const formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-
-		return date.toDateString() + ' - ' + formattedTime;
-	}
-
-	Close() {
-		this.state.visible = false;
-	}
-}
+});
 </script>
 <style lang="scss" scoped>
 /*.Container{
@@ -323,7 +296,9 @@ export default class ProjectSettingsComponent extends Vue {
 
 .container {
 	display: flex;
-	flex-flow: column;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
 
 	&.new-container,
 	&.export-container {
@@ -332,14 +307,18 @@ export default class ProjectSettingsComponent extends Vue {
 		}
 	}
 
+	/* Gameface port: CSS Grid doesn't work -> flex-row for the two lists. Fixed height
+	   (like the original) so they sit at the top, not stretched to the whole window. */
 	.saves-wrapper {
-		flex: 1 1 auto;
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		grid-gap: 7px;
+		flex: 0 0 auto;
+		display: flex;
+		flex-direction: row;
+		gap: 7px;
 
 		.list-wrapper {
-			max-height: 200px;
+			flex: 1 1 0;
+			min-width: 0;
+			height: 260px;
 			overflow-y: auto;
 			background: #161924;
 			padding: 7px;
@@ -355,12 +334,16 @@ export default class ProjectSettingsComponent extends Vue {
 				align-content: center;
 				align-items: center;
 				height: 25px;
+				color: #dfe4ea;
 				background-color: transparent;
 				border-radius: 6px;
 				padding: 0 7px;
+				cursor: pointer;
 
+				/* Selected entry: blue text (like the original). */
 				&.selected {
 					background-color: #313848;
+					color: #037fff;
 				}
 
 				&.current {
@@ -375,6 +358,44 @@ export default class ProjectSettingsComponent extends Vue {
 		padding: 7px;
 		border-radius: 6px;
 		margin-top: 7px;
+	}
+
+	/* "Selected save info" bar: horizontal (Gameface stacked it) and pushed to the bottom
+	   of the content, like the original. */
+	.save-info-bar {
+		margin-top: auto;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 16px;
+
+		.save-info-label {
+			font-weight: 700;
+		}
+	}
+}
+
+/* Gameface port: pin the footer to natural height + center the buttons so they don't
+   stretch to full window height (were rendering as tall vertical bars). */
+.footer {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	margin-top: 10px;
+
+	.btn {
+		flex: 0 0 auto;
+		height: 34px;
+		padding: 0 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 6px;
+		cursor: pointer;
+		white-space: nowrap;
 	}
 }
 </style>

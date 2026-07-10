@@ -44,15 +44,35 @@ function CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 		s_GameObjectTransferData.parentData = GameObjectParentData:GetRootParentData()
 	end
 
-	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid:upper(),
-																p_Command.sender,
-																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
-																s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
-																s_GameObjectTransferData.parentData,
-																s_GameObjectTransferData.transform,
-																s_GameObjectTransferData.variation,
-																false,
-																s_GameObjectTransferData.overrides
+	local s_SpawnGuid = s_GameObjectTransferData.guid:upper()
+
+	-- Fix duplicate-on-load: when a vanilla object's variation is changed it is turned into a
+	-- Custom object that REUSES the original vanilla guid (SetVariation does DeleteGameObject +
+	-- InvokeBlueprintSpawn with the same guid). Live this is fine because the native vanilla was
+	-- deleted first, but on level reload the native vanilla loads again and this spawn just adds
+	-- the custom copy ON TOP of it, so both are visible (original at its old spot / variation,
+	-- custom at the new one). Mirror the live behaviour: if a native (Vanilla/NoHavok) object
+	-- with the exact same guid already exists, hide it before spawning the custom copy over it.
+	-- Normal custom spawns use fresh guids, so this is a no-op for them.
+	local s_ExistingObject = GameObjectManager:GetGameObject(s_SpawnGuid)
+
+	if s_ExistingObject ~= nil and s_ExistingObject.isDeleted ~= true and
+		(s_ExistingObject.origin == GameObjectOriginType.Vanilla or
+			s_ExistingObject.origin == GameObjectOriginType.NoHavok) then
+		m_Logger:Write("Hiding native vanilla before spawning modified copy over guid " .. s_SpawnGuid)
+		GameObjectManager:DeleteGameObject(s_SpawnGuid)
+	end
+
+	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_SpawnGuid,
+		p_Command.sender,
+		s_GameObjectTransferData.blueprintCtrRef.partitionGuid,
+		s_GameObjectTransferData.blueprintCtrRef.instanceGuid,
+		s_GameObjectTransferData.parentData,
+		s_GameObjectTransferData.transform,
+		s_GameObjectTransferData.variation,
+		false,
+		s_GameObjectTransferData.overrides,
+		s_GameObjectTransferData.timeStamp
 	)
 
 	if s_SpawnResult == false then
@@ -94,6 +114,7 @@ function CommandActions:DeleteGameObject(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
+		timeStamp = p_Command.gameObjectTransferData.timeStamp,
 		isDeleted = true
 	}
 
@@ -119,7 +140,7 @@ function CommandActions:UndeleteGameObject(p_Command, p_UpdatePass)
 	m_Logger:Write("UndeleteGameObject with guid " .. p_Command.gameObjectTransferData.guid)
 
 	if SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.Custom or
-			SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.CustomChild then
+		SanitizeEnum(p_Command.gameObjectTransferData.origin) == GameObjectOriginType.CustomChild then
 		return CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
 	end
 
@@ -234,7 +255,8 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	local s_GameObjectTransferData = {
 		guid = p_Command.gameObjectTransferData.guid,
-		transform = p_Command.gameObjectTransferData.transform
+		transform = p_Command.gameObjectTransferData.transform,
+		timeStamp = p_Command.gameObjectTransferData.timeStamp
 	}
 
 	local s_CommandActionResult = {
@@ -245,7 +267,6 @@ function CommandActions:SetTransform(p_Command, p_UpdatePass)
 
 	return s_CommandActionResult, CARResponseType.Success
 end
-
 
 function CommandActions:SetVariation(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then

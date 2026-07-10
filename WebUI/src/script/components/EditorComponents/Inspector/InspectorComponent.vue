@@ -1,15 +1,18 @@
 <template>
-	<EditorComponent class="inspector-component scrollable" title="Inspector">
-		<div class="header">
-			<div id="IconAndEnable" :class="enabled ? 'enabled' : ''">
-				<div class="icon-wrapper">
+	<div class="EditorComponent panel inspector-component scrollable">
+		<div class="panel-header">Inspector</div>
+		<div class="panel-body">
+		<div class="header" style="display:flex; flex-direction:column; gap:10px; padding:12px;">
+			<div id="IconAndEnable" :class="enabled ? 'enabled' : ''" style="flex:0 0 auto; width:48px; height:48px;">
+				<div class="icon-wrapper" style="width:48px; height:48px; padding:6px; box-sizing:border-box;">
 					<img :class="'Large Icon Icon-' + objectType" alt="" v-if="!multiSelection" />
 					<img :class="'Large Icon Icon-MultiSelection'" alt="" v-else />
 				</div>
 			</div>
-			<div id="NameAndVariation">
+			<div id="NameAndVariation" style="width:100%; min-width:0;">
 				<div>
 					<input
+						style="width:100%; box-sizing:border-box;"
 						class="name-input"
 						:value="displayName"
 						:disabled="multiSelection"
@@ -21,70 +24,62 @@
 					{{ blueprintType ? blueprintType : 'No type' }}
 				</span>
 				<span class="blueprint-type" v-else> Multiselection </span>
-				<label class="custom-checkbox">
-					Enable / Disable
-					<input
-						class="enable-input"
-						type="checkbox"
-						id="enabled"
-						:disabled="multiSelection"
-						ref="enableInput"
-						v-model="enabled"
-						@change="onEnableChange"
-					/>
-					<span class="checkmark"></span>
-				</label>
+				<!-- Gameface port: native checkbox doesn't toggle reliably -> plain
+				     clickable div (same enable()/disable() path). -->
+				<div class="fx-checkbox" :class="{ checked: enabled, disabled: multiSelection }">
+					<span class="fx-checkbox-box" @click="onToggleEnable">
+						<span class="fx-check"></span>
+					</span>
+					<span class="fx-checkbox-label">Enable / Disable</span>
+				</div>
 			</div>
-			<div v-if="!multiSelection" class="details" :class="{ collapsed: toggleState.info }">
+			<div v-if="!multiSelection" class="details" :class="{ collapsed: toggleState.info }" style="width:100%; min-width:0;">
 				<div @click="toggleState.info = !toggleState.info" class="toggle">
-					<i
-						:class="{ 'el-icon-arrow-right': toggleState.info, 'el-icon-arrow-down': !toggleState.info }"
-					></i>
+					<span class="fx-caret" :class="{ open: !toggleState.info }"></span>
 					Details
 				</div>
 				<div class="details-grid">
 					<div>
 						<label for="bp-instance-guid">Instance Guid</label>
-						<input id="bp-instance-guid" :value="blueprintGuid" disabled="true" />
+						<input id="bp-instance-guid" :value="blueprintGuid" readonly @click="$event.target.select()" />
 					</div>
 					<div>
 						<label for="bp-partition-guid">Partition Guid</label>
-						<input id="bp-partition-guid" :value="blueprintPartitionGuid" disabled="true" />
+						<input id="bp-partition-guid" :value="blueprintPartitionGuid" readonly @click="$event.target.select()" />
 					</div>
 					<div>
 						<label for="bp-guid">Guid</label>
-						<input id="bp-guid" :value="gameObjectGuid" disabled="true" />
+						<input id="bp-guid" :value="gameObjectGuid" readonly @click="$event.target.select()" />
 					</div>
 					<div>
 						<label for="bp-partition-type">Type</label>
-						<input id="bp-type" :value="blueprintType" disabled="true" />
+						<input id="bp-type" :value="blueprintType" readonly @click="$event.target.select()" />
 					</div>
 					<div class="block">
 						<label for="bp-name">Full name</label>
-						<input id="bp-name" :value="blueprintName" disabled="true" />
+						<input id="bp-name" :value="blueprintName" readonly @click="$event.target.select()" />
 					</div>
 				</div>
 			</div>
-			<div v-if="!multiSelection" class="variations" :class="{ collapsed: toggleState.variations }">
+			<div v-if="!multiSelection" class="variations" :class="{ collapsed: toggleState.variations }" style="width:100%; min-width:0;">
 				<div @click="toggleState.variations = !toggleState.variations" class="toggle">
-					<i
-						:class="{
-							'el-icon-arrow-right': toggleState.variations,
-							'el-icon-arrow-down': !toggleState.variations
-						}"
-					></i>
+					<span class="fx-caret" :class="{ open: !toggleState.variations }"></span>
 					Variations
 				</div>
 				<div class="variations-grid">
 					<div id="Variation" class="variation" v-if="!multiSelection">
-						<el-select v-model="selectedVariation" size="mini" @change="onChangeVariation">
-							<el-option
+						<!-- Gameface port: variation options listed directly (no dropdown). -->
+						<div class="variation-list">
+							<div
 								v-for="variation of blueprintVariations"
 								:key="variation.hash"
-								:label="variation.name ? variation.name : 'Default variation'"
-								:value="variation.hash"
-							/>
-						</el-select>
+								class="variation-option"
+								:class="{ active: selectedVariation === variation.hash }"
+								@click="onVariationClick(variation.hash)"
+							>
+								{{ variation.name ? variation.name : 'Default variation' }}
+							</div>
+						</div>
 					</div>
 					<div v-if="selectedGameObject && Object.keys(selectedGameObject.overrides).length > 0">
 						<label>Overrides</label>
@@ -166,7 +161,8 @@
 				</Promised>
 			</div>
 		</div>
-	</EditorComponent>
+		</div>
+	</div>
 </template>
 
 <script lang="ts">
@@ -208,6 +204,10 @@ export default class InspectorComponent extends EditorComponent {
 	blueprintPartitionGuid: string = '';
 	blueprintVariations: { hash: number; name: string }[] = [];
 	selectedVariation = 0;
+	variationMenuOpen = false;
+	private boundCloseVariationMenu = () => {
+		this.variationMenuOpen = false;
+	};
 	objectType = '';
 	nOfObjectsInGroup = 0;
 	partition: any;
@@ -233,6 +233,22 @@ export default class InspectorComponent extends EditorComponent {
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
 		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
+		document.addEventListener('click', this.boundCloseVariationMenu);
+	}
+
+	beforeDestroy() {
+		document.removeEventListener('click', this.boundCloseVariationMenu);
+	}
+
+	get selectedVariationLabel(): string {
+		const v = this.blueprintVariations.find((x) => x.hash === this.selectedVariation);
+		return v && v.name ? v.name : 'Default variation';
+	}
+
+	onVariationClick(hash: number) {
+		this.variationMenuOpen = false;
+		this.selectedVariation = hash;
+		this.onChangeVariation(hash);
 	}
 
 	private onWorldSpaceUpdated(ws: WORLD_SPACE) {
@@ -381,6 +397,14 @@ export default class InspectorComponent extends EditorComponent {
 		window.editor.editorCore.RequestUpdate();
 	}
 
+	onToggleEnable() {
+		if (this.multiSelection) {
+			return;
+		}
+		this.enabled = !this.enabled;
+		this.onEnableChange();
+	}
+
 	onEnableChange() {
 		// TODO Fool: Enabling and disabling should work for multi-selection too.
 		this.$nextTick(() => {
@@ -415,21 +439,130 @@ export default class InspectorComponent extends EditorComponent {
 	}
 }
 </script>
-<style lang="scss" scoped>
-.transformControls::v-deep input {
+<style lang="scss">
+/* Gameface port: NOT scoped. InspectorComponent's root is <EditorComponent> (and it
+   extends it), which broke Vue 2 scoped-attribute matching -> none of these rules
+   applied and the content overflowed out of the panel. Prefixed with
+   .inspector-component so it still only affects the inspector. */
+.inspector-component .transformControls input {
 	width: 100%;
 }
 
-.inspector-component {
+/* CSS triangle caret — unicode arrows (▸/▾) render as tofu boxes in Gameface. */
+.fx-caret {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-left: 5px solid #8da1b6;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	margin-right: 7px;
+	vertical-align: middle;
+}
+.fx-caret.open {
+	transform: rotate(90deg);
+}
+
+/* Gameface port: plain-div Enable/Disable checkbox (native checkbox unreliable). */
+.fx-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: #fff;
+	user-select: none;
+}
+.fx-checkbox.disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+.fx-checkbox-label {
+	cursor: default;
+}
+.fx-checkbox-box {
+	position: relative;
+	flex: 0 0 18px;
+	width: 18px;
+	height: 18px;
+	border-radius: 3px;
+	background: #eee;
+	cursor: pointer;
+}
+.fx-checkbox.checked .fx-checkbox-box {
+	background: #037fff;
+}
+.fx-check {
+	display: none;
+}
+.fx-checkbox.checked .fx-check {
+	display: block;
+	position: absolute;
+	left: 6px;
+	top: 1px;
+	width: 6px;
+	height: 11px;
+	border: solid #fff;
+	border-width: 0 3px 3px 0;
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+/* Variation options shown directly as a clickable list. */
+.variation-list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	max-height: 180px;
+	overflow-y: auto;
+}
+.variation-option {
+	padding: 5px 10px;
+	font-size: 13px;
+	color: #dfe4ea;
+	background: #1f2633;
+	border: 1px solid #05070b;
+	border-radius: 4px;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.variation-option:hover {
+	background: #2a3242;
+}
+.variation-option.active {
+	background: #037fff;
+	color: #fff;
+}
+
+.EditorComponent.inspector-component {
+	/* Keep every inspector control within the panel width. Higher specificity than
+	   EditorComponent's own `.EditorComponent.panel > .panel-body { overflow:auto }`
+	   and `.EditorComponent .header { display:flex }`, which otherwise win. */
+	&.panel > .panel-body {
+		overflow-x: hidden;
+	}
+
+	input {
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	.ebx-container {
+		overflow-x: auto;
+		max-width: 100%;
+	}
+
 	.inner {
 		padding: 1.5vh;
+		min-width: 0;
 	}
 
 	.header {
 		padding: 1.5vh;
 		background: rgba(50, 58, 74, 0.4);
 		display: grid;
-		grid-template-columns: 20% 1fr;
+		grid-template-columns: 20% minmax(0, 1fr);
 		grid-gap: 1.5vh;
 	}
 
@@ -459,6 +592,7 @@ export default class InspectorComponent extends EditorComponent {
 
 	#NameAndVariation {
 		width: 100%;
+		min-width: 0;
 
 		.name-input {
 			height: 30px;
@@ -501,26 +635,35 @@ export default class InspectorComponent extends EditorComponent {
 			margin-top: 7px;
 		}
 
+		/* Gameface has no CSS Grid -> flexbox. */
 		.details-grid {
 			margin-top: 12px;
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			grid-gap: 7px;
+			display: flex;
+			flex-direction: column;
+			gap: 7px;
 
-			label {
-				margin-bottom: 4px;
-				display: block;
+			> div {
+				width: 100%;
+				min-width: 0;
 			}
 
-			.block {
-				grid-column: span 2 / auto;
+			label {
+				margin-bottom: 3px;
+				display: block;
+				font-size: 11px;
+				color: #8da1b6;
+			}
+
+			input {
+				width: 100%;
+				box-sizing: border-box;
 			}
 		}
 
 		.variations-grid {
-			display: grid;
-			grid-template-columns: 1fr;
-			grid-gap: 7px;
+			display: flex;
+			flex-direction: column;
+			gap: 7px;
 
 			.el-select {
 				margin-top: 12px;
@@ -532,10 +675,11 @@ export default class InspectorComponent extends EditorComponent {
 	.transform-container {
 		margin-bottom: 14px;
 
+		/* Gameface has no CSS Grid -> flexbox column. */
 		.transformControls {
-			display: grid;
-			grid-template-columns: 1fr;
-			grid-gap: 7px;
+			display: flex;
+			flex-direction: column;
+			gap: 7px;
 		}
 	}
 
@@ -543,9 +687,20 @@ export default class InspectorComponent extends EditorComponent {
 		margin-top: 14px;
 	}
 
-	.collapsed {
-		height: 14px;
-		overflow: hidden;
+	/* Collapse = hide the content grid, keep the full toggle row visible (the old
+	   height:14px clipped the "Details"/"Variations" label). */
+	.details.collapsed .details-grid,
+	.variations.collapsed .variations-grid {
+		display: none;
+	}
+
+	.details .toggle,
+	.variations .toggle {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		font-size: 13px;
+		padding: 3px 0;
 	}
 }
 </style>

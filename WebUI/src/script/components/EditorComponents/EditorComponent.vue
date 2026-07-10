@@ -1,16 +1,58 @@
 <template>
-	<gl-component ref="glChild" class="EditorComponent" :title="title" :closable="closable" :hidden="hidden">
-		<slot />
-	</gl-component>
+	<div class="EditorComponent panel" v-show="!hidden">
+		<div class="panel-header" v-if="title && showHeader">{{ title }}</div>
+		<div class="panel-body">
+			<slot />
+		</div>
+	</div>
 </template>
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
-import { glCustomContainer } from 'vue-golden-layout';
+// Gameface port: golden-layout hard-crashes Coherent/Gameface (heavy DOM
+// measurement + drag-drop docking). This base panel used to extend
+// `glCustomContainer` and render a `<gl-component>`; it is now a plain flexbox
+// panel with a header + body, hosted by the flexbox GoldenLayoutHolder.
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
-export default class EditorComponent extends glCustomContainer {}
+export default class EditorComponent extends Vue {
+	@Prop({ default: '' }) readonly title!: string;
+	@Prop({ default: true }) readonly closable!: boolean;
+	@Prop({ default: false }) readonly hidden!: boolean;
+	@Prop({ default: true }) readonly showHeader!: boolean;
+}
 </script>
 <style lang="scss">
+.EditorComponent.panel {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	/* Flex items default to min-width:auto (won't shrink below content), so a panel
+	   with wide content (the Inspector's EBX/transform rows) forces its flex column
+	   wider and overflows to the right. min-width:0 lets it stay at its column width
+	   and clip via overflow:hidden. */
+	min-width: 0;
+	overflow: hidden;
+	/* Exact original mapeditor panel colours (from the .lm_content / .lm_header
+	   overrides in style.scss). */
+	background: rgba(31, 38, 51, 0.92);
+	color: #8da1b6;
+	box-sizing: border-box;
+}
+.EditorComponent.panel > .panel-header {
+	flex: 0 0 auto;
+	padding: 6px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	background: rgba(22, 25, 36, 1);
+	border-bottom: 1px solid rgba(5, 7, 11, 0.6);
+	color: #8fa6c0;
+}
+.EditorComponent.panel > .panel-body {
+	flex: 1 1 auto;
+	overflow: auto;
+	min-height: 0;
+}
 .EditorComponent {
 	.header {
 		display: flex;

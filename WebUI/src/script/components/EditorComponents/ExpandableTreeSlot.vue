@@ -1,21 +1,33 @@
 <template>
+	<!-- Gameface port: selection is handled by a DELEGATED listener on the scroll
+	     container (InfiniteTreeComponent), not per-row @mousedown. Per-row listeners
+	     silently fail to fire on the Scene Instances tree (rows are rebuilt as objects
+	     stream in). The delegated listener finds the row via this data-node-id. -->
 	<div
 		class="tree-node"
 		:class="{ selected: selected, disabled: !enabled }"
+		:data-node-id="String(node.id)"
 		@mouseleave="NodeHoverEnd()"
 		@mouseenter="NodeHover($event, node, tree)"
-		@click="SelectNode($event, node, tree)"
 	>
 		<div v-if="hasVisibilityOptions" class="visibility-node">
-			<div class="enable-container icon-container" @click="ToggleEnabled($event, node, tree)">
+			<!-- Gameface port: the eye's per-row @click doesn't fire (the <img> is the click
+			     target and Cohtml won't bubble it to the div's @click). Handled instead by the
+			     DELEGATED listener on the tree scroller (see InfiniteTreeComponent), which emits
+			     'node-toggle-enable'. No @mousedown.stop here so the event reaches the scroller. -->
+			<div class="enable-container icon-container">
 				<img :src="enabledIcnSrc" v-tooltip="'Visible'" />
 			</div>
-			<div class="selectable-container icon-container" @click="ToggleRaycastEnabled($event, node, tree)">
-				<img :src="raycastEnabledIcnSrc" v-tooltip="'Selectable'" />
+			<div
+				class="selectable-container icon-container"
+				@mousedown.stop
+				@click.stop="ToggleSelect($event, node, tree)"
+			>
+				<span class="fx-select-box" :class="{ checked: selected }" v-tooltip="'Select'"></span>
 			</div>
 		</div>
 		<div class="tree-node-inner" :style="nodeStyle(node)">
-			<div class="expand-container icon-container" @click="ToggleNode($event, node, tree)">
+			<div class="expand-container icon-container" @mousedown.stop @click="ToggleNode($event, node, tree)">
 				<img
 					v-if="node.children.length > 0"
 					:class="{ expanded: node.state.open }"
@@ -23,7 +35,7 @@
 				/>
 			</div>
 			<div class="icon-container">
-				<img :class="getNodeIconClass(node)" v-tooltip="node.type != 'folder' ? node.type : ''" />
+				<img class="Icon" :src="nodeIconSrc(node)" />
 			</div>
 			<div class="text-container">
 				<Highlighter v-if="search !== ''" :text="node.name" :search="search" />
@@ -65,6 +77,9 @@ export default class ExpandableTreeSlot extends Vue {
 	selected: boolean;
 
 	@Prop()
+	onSelect?: (node: Node) => void;
+
+	@Prop()
 	content: any[] | null;
 
 	get enabled() {
@@ -88,6 +103,23 @@ export default class ExpandableTreeSlot extends Vue {
 			return this.content[0].realm === REALM.SERVER;
 		} else {
 			return false;
+		}
+	}
+
+	// Gameface port: icons via CSS content:url don't render -> <img src>. Folder icon
+	// only on folders; leaf nodes get their type icon.
+	nodeIconSrc(node: Node): string {
+		if (node.type === 'folder') {
+			const open = node.state && node.state.open;
+			if (open && this.selected) return require('@/icons/editor/new/selected-open-folder.svg');
+			if (open) return require('@/icons/editor/new/open-folder.svg');
+			if (this.selected) return require('@/icons/editor/new/selected-folder.svg');
+			return require('@/icons/editor/new/close-folder.svg');
+		}
+		try {
+			return require('@/icons/types/new/' + node.type + '.svg');
+		} catch (e) {
+			return require('@/icons/types/new/Default.svg');
 		}
 	}
 
@@ -127,13 +159,6 @@ export default class ExpandableTreeSlot extends Vue {
 		};
 	}
 
-	@Emit('node:click')
-	public SelectNode(e: MouseEvent, node: Node) {
-		this.tree.selectNode(node);
-		this.$forceUpdate();
-		return { event: e, nodeId: node.id };
-	}
-
 	@Emit('node:toggle-enable')
 	public ToggleEnabled(e: MouseEvent, node: Node) {
 		e.stopPropagation();
@@ -142,6 +167,14 @@ export default class ExpandableTreeSlot extends Vue {
 
 	@Emit('node:toggle-raycast-enable')
 	public ToggleRaycastEnabled(e: MouseEvent, node: Node) {
+		e.stopPropagation();
+		return node;
+	}
+
+	// The square next to the eye = multi-select checkbox: toggles this object in/out of
+	// the current selection (shows an X when selected). Handled in HierarchyComponent.
+	@Emit('node:toggle-select')
+	public ToggleSelect(e: MouseEvent, node: Node) {
 		e.stopPropagation();
 		return node;
 	}
@@ -195,6 +228,40 @@ export default class ExpandableTreeSlot extends Vue {
 		img {
 			width: 16px;
 		}
+	}
+
+	/* Multi-select checkbox: a small square that shows an X (two crossed bars, drawn in
+	   CSS since glyphs are unreliable in Gameface — same trick as the window close btn)
+	   when the object is selected. */
+	.fx-select-box {
+		display: inline-block;
+		position: relative;
+		width: 13px;
+		height: 13px;
+		border: 1px solid #5a6678;
+		border-radius: 3px;
+		vertical-align: middle;
+		cursor: pointer;
+	}
+	.fx-select-box.checked {
+		border-color: #037fff;
+	}
+	.fx-select-box.checked::before,
+	.fx-select-box.checked::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 11px;
+		height: 2px;
+		margin: -1px 0 0 -5.5px;
+		background: #037fff;
+	}
+	.fx-select-box.checked::before {
+		transform: rotate(45deg);
+	}
+	.fx-select-box.checked::after {
+		transform: rotate(-45deg);
 	}
 }
 
