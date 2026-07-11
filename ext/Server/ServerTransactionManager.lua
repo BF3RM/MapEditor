@@ -31,6 +31,10 @@ function ServerTransactionManager:RegisterVars()
 	self.m_LoadingInProgress = false
 	self.m_WaitingForBatchAck = false
 	self.m_BatchAckSafety = 0
+	-- Commands that FAILED server-side during a bulk load (e.g. a save referencing blueprints whose
+	-- bundles aren't loaded on this level). They are never broadcast, so the client must be told
+	-- about them separately or its sync progress target is unreachable (stuck syncing -> timeout kick).
+	self.m_SkippedDuringLoad = 0
 end
 
 --- Client finished spawning the previous batch -> release the next one.
@@ -89,11 +93,24 @@ end
 ---@param p_Player Player
 ---@param p_TransactionId number
 function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
+	-- Effective project target = commands the client can still expect to receive. Commands that
+	-- failed server-side (m_SkippedDuringLoad) were never stored/broadcast, so a client syncing
+	-- mid/post-load would otherwise wait for them forever.
+	local s_ProjectTarget = self.m_LoadingProjectLastTransactionId
+
+	if s_ProjectTarget ~= nil then
+		s_ProjectTarget = s_ProjectTarget - self.m_SkippedDuringLoad
+
+		if s_ProjectTarget <= 0 then
+			s_ProjectTarget = nil
+		end
+	end
+
 	--- Client up to date
 	if p_TransactionId == #self.m_Transactions then
 		-- m_Logger:Write("Client up to date")
 		-- Empty response, so the player know it has finished syncing.
-		NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, nil, nil, self.m_LoadingProjectLastTransactionId)
+		NetEvents:SendToLocal("ServerTransactionManager:SyncClientContext", p_Player, nil, nil, s_ProjectTarget)
 		return
 	--- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
 	elseif p_TransactionId ~= 0 then
@@ -130,7 +147,7 @@ function ServerTransactionManager:SyncClient(p_Player, p_TransactionId)
 		p_Player,
 		s_UpdatedGameObjectTransferDatas,
 		s_LastTransaction,
-		self.m_LoadingProjectLastTransactionId
+		s_ProjectTarget
 	)
 end
 
@@ -141,6 +158,7 @@ function ServerTransactionManager:SetLoadingProjectLastTransactionId(p_Id)
 	-- A project is loading in bulk -> use completion-gated batches (see OnUpdatePass).
 	self.m_LoadingInProgress = (p_Id ~= nil and p_Id > 0)
 	self.m_WaitingForBatchAck = false
+	self.m_SkippedDuringLoad = 0
 
 	-- Notify ready players that there is a project loading. Probably not needed, the server loads before clients so at this point there shouldn't be ready players
 	-- But just to be safe.
@@ -185,6 +203,10 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		-- Bulk load drained; clear the loading flag once the last batch was ACKed.
 		if self.m_LoadingInProgress and not self.m_WaitingForBatchAck then
 			self.m_LoadingInProgress = false
+
+			if self.m_SkippedDuringLoad > 0 then
+				m_Logger:Warning('Project load finished with ' .. self.m_SkippedDuringLoad .. ' skipped commands (assets not found on this level, see errors above)')
+			end
 		end
 		return
 	end
@@ -242,7 +264,14 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
 	end
 
-	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
+	local s_ExecutedCount = self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
+
+	-- If nothing was actually executed (e.g. the whole batch failed on missing blueprints) nothing
+	-- was broadcast, so the client has nothing to spawn and no BatchDone will ever come back ->
+	-- don't wait for an ACK, move straight on to the next batch.
+	if self.m_LoadingInProgress and (s_ExecutedCount == nil or s_ExecutedCount == 0) then
+		self.m_WaitingForBatchAck = false
+	end
 end
 
 ---@param p_Commands table
@@ -254,16 +283,17 @@ end
 
 ---@param p_Commands table
 ---@param p_UpdatePass UpdatePass
----@return boolean
+---@return number|nil executedCount
 function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	local s_ExecutedCommands = {}
+	local s_SkippedCount = 0
 
 	for _, l_Command in pairs(p_Commands) do
 		local s_CommandAction = CommandActions[l_Command.type]
 
 		if s_CommandAction == nil then
 			m_Logger:Error("Attempted to call a nil command action: " .. l_Command.type)
-			return false
+			return nil
 		end
 
 		local s_CommandActionResult, s_CARResponseType = s_CommandAction(self, l_Command, p_UpdatePass)
@@ -282,6 +312,7 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 		elseif s_CARResponseType == CARResponseType.Failure then
 			-- TODO: Handle errors
 			m_Logger:Warning("Failed to execute command: " .. l_Command.type)
+			s_SkippedCount = s_SkippedCount + 1
 		else
 			m_Logger:Error("Unknown CommandCARResponseType for command: " .. l_Command.type)
 		end
@@ -289,11 +320,18 @@ function ServerTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 
 	-- m_Logger:Write(json.encode(self.m_GameObjects))
 
+	if self.m_LoadingInProgress and s_SkippedCount > 0 then
+		self.m_SkippedDuringLoad = self.m_SkippedDuringLoad + s_SkippedCount
+		-- Failed commands are never broadcast, so clients must count them into their sync progress
+		-- separately or the progress target is unreachable (stuck syncing -> timeout kick).
+		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsSkipped', s_SkippedCount)
+	end
+
 	if #s_ExecutedCommands > 0 then
 		NetEvents:BroadcastLocal('ServerTransactionManager:CommandsInvoked', json.encode(s_ExecutedCommands), #self.m_Transactions)
 	end
 
-	return true
+	return #s_ExecutedCommands
 end
 
 ServerTransactionManager = ServerTransactionManager()

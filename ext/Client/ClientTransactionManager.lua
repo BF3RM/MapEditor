@@ -32,6 +32,9 @@ function ClientTransactionManager:ResetVars()
 	self.m_LastTransactionId = 0 -- Last synced transaction
 	self.m_CommandActionResults = {}
 	self.m_ExecutedCommandActions = {}
+	-- Commands the server SKIPPED during a bulk load (failed server-side, never broadcast); they
+	-- count into the syncing progress or the target is never reached (stuck syncing -> timeout kick).
+	self.m_SyncSkippedCount = 0
 end
 
 function ClientTransactionManager:OnLevelDestroy()
@@ -47,6 +50,7 @@ function ClientTransactionManager:RegisterEvents()
 	Events:Subscribe('ClientGameObjectManager:UpdateGameObjectRealm', self, self.OnUpdateGameObjectRealm)
 
 	NetEvents:Subscribe('ServerTransactionManager:CommandsInvoked', self, self.OnServerCommandsInvoked)
+	NetEvents:Subscribe('ServerTransactionManager:CommandsSkipped', self, self.OnServerCommandsSkipped)
 	NetEvents:Subscribe('ServerTransactionManager:SyncClientContext', self, self.OnSyncClientContext)
 	NetEvents:Subscribe('ServerTransactionManager:ResetVars', self, self.ResetVars)
 end
@@ -309,6 +313,20 @@ function ClientTransactionManager:OnServerCommandsInvoked(p_CommandsJson, p_Tran
 	self:QueueCommands(s_Commands)
 end
 
+---The server SKIPPED p_Count commands of a bulk load (they failed server-side, e.g. a save
+---referencing blueprints whose bundles aren't loaded on this level). They are never broadcast,
+---so count them into the syncing progress here or the target is never reached.
+---@param p_Count number
+function ClientTransactionManager:OnServerCommandsSkipped(p_Count)
+	if not self.m_Syncing.inProgress or type(p_Count) ~= 'number' or p_Count <= 0 then
+		return
+	end
+
+	self.m_Syncing.currentCommandNum = self.m_Syncing.currentCommandNum + p_Count
+	self.m_SyncSkippedCount = self.m_SyncSkippedCount + p_Count
+	self:UpdateSyncingProgress()
+end
+
 ---Queues commands for their execution
 ---@param p_Commands table
 function ClientTransactionManager:QueueCommands(p_Commands)
@@ -367,20 +385,7 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 		end
 	end
 
-	if self.m_Syncing.inProgress then
-		if self.m_Syncing.currentCommandNum < self.m_Syncing.targetCommandNum then
-			Events:DispatchLocal('UIManager:SyncingProgress', self.m_Syncing.currentCommandNum, self.m_Syncing.targetCommandNum)
-		else
-			-- This command batch finished the loading of the project
-			Events:DispatchLocal('UIManager:LoadingComplete')
-
-			self.m_Syncing = {
-				inProgress = false,
-				targetCommandNum = 0,
-				currentCommandNum = 0
-			}
-		end
-	end
+	self:UpdateSyncingProgress()
 
 	if #s_CommandActionResults > 0 then
 		WebUpdater:AddUpdate('HandleResponse', s_CommandActionResults)
@@ -388,6 +393,32 @@ function ClientTransactionManager:_executeCommands(p_Commands, p_UpdatePass)
 	end
 
 	return true
+end
+
+---Advances the syncing UI state, completing the load when the target is reached. Called after
+---executing a command batch and when the server reports skipped commands.
+function ClientTransactionManager:UpdateSyncingProgress()
+	if not self.m_Syncing.inProgress then
+		return
+	end
+
+	if self.m_Syncing.currentCommandNum < self.m_Syncing.targetCommandNum then
+		Events:DispatchLocal('UIManager:SyncingProgress', self.m_Syncing.currentCommandNum, self.m_Syncing.targetCommandNum)
+	else
+		-- This command batch finished the loading of the project
+		Events:DispatchLocal('UIManager:LoadingComplete')
+
+		if self.m_SyncSkippedCount > 0 then
+			m_Logger:Warning('Project loaded with ' .. self.m_SyncSkippedCount .. ' objects skipped: their assets are not loaded on this level (save from another map, or made with extra content/bundle mods?)')
+			self.m_SyncSkippedCount = 0
+		end
+
+		self.m_Syncing = {
+			inProgress = false,
+			targetCommandNum = 0,
+			currentCommandNum = 0
+		}
+	end
 end
 
 ---comment
