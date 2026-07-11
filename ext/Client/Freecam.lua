@@ -227,7 +227,15 @@ function FreeCam:Enable()
 	end
 
 	if self.m_LastTransform ~= nil then
-		self.m_CameraData.transform = self.m_LastTransform
+		-- Restoring the last freecam pose can throw a LinearTransform type error if m_LastTransform
+		-- got into a bad state (repro: hold right-mouse while NOT in the editor, then F1). That
+		-- error used to abort Enable BEFORE SetCameraMode/TakeControl and before EnableFreeCam's
+		-- WebUI:EnableMouse/SetEditorMode ran, leaving the client hard-stuck (needing a restart).
+		-- Guard it: if the restore fails, fall back to the current camera transform (always valid).
+		local s_Ok = pcall(function() self.m_CameraData.transform = self.m_LastTransform end)
+		if not s_Ok then
+			pcall(function() self.m_CameraData.transform = ClientUtils:GetCameraTransform() end)
+		end
 	end
 
 	self:SetCameraMode(CameraMode.FreeCam)
