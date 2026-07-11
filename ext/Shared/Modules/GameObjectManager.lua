@@ -15,11 +15,52 @@ end
 
 function GameObjectManager:RegisterEvents()
 	Events:Subscribe("Shared:StoreTimeStamps", self, self.StoreTimeStamps)
+	-- Drain the deferred "GameObjectReady" queue for load-injected objects a few per frame, so
+	-- registering thousands of injected objects into the editor/WebUI tree doesn't block the frame
+	-- (the objects already rendered NATIVELY with the level; this only makes them editable/appear
+	-- in the tree, and doing it all at once on a huge save froze/crashed the client).
+	Events:Subscribe("Engine:Update", self, self.OnInjectedReadyPump)
 end
 
 ---@param p_GUID_To_Timestamps table
 function GameObjectManager:StoreTimeStamps(p_GUID_To_Timestamps)
 	self.m_GUID_To_Timestamps = p_GUID_To_Timestamps
+end
+
+-- How many deferred injected objects to register into the editor/tree per frame.
+local INJ_READY_PER_TICK = 25
+
+--- Drain the deferred injected-object ready queue a few per frame (spread the editor/tree
+--- registration so a huge save doesn't freeze the client all at once).
+function GameObjectManager:OnInjectedReadyPump()
+	local s_Queue = self.m_PendingInjectedReady
+	if s_Queue == nil then
+		return
+	end
+
+	local s_Total = #s_Queue
+	if s_Total == 0 then
+		return
+	end
+
+	local s_Idx = self.m_InjectedReadyIdx or 1
+	local s_Done = 0
+	while s_Idx <= s_Total and s_Done < INJ_READY_PER_TICK do
+		local s_GameObject = s_Queue[s_Idx]
+		-- Skip if it was deleted between queueing and now.
+		if s_GameObject ~= nil and self.m_GameObjects[tostring(s_GameObject.guid)] ~= nil then
+			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+		end
+		s_Idx = s_Idx + 1
+		s_Done = s_Done + 1
+	end
+
+	if s_Idx > s_Total then
+		self.m_PendingInjectedReady = {}
+		self.m_InjectedReadyIdx = 1
+	else
+		self.m_InjectedReadyIdx = s_Idx
+	end
 end
 
 function GameObjectManager:RegisterVars()
@@ -37,6 +78,10 @@ function GameObjectManager:RegisterVars()
 
 	-- workaround for origin type 3
 	self.m_GUID_To_Timestamps = {}
+
+	-- Load-injected GameObjects awaiting their (spread-over-frames) GameObjectReady dispatch.
+	self.m_PendingInjectedReady = {}
+	self.m_InjectedReadyIdx = 1
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -430,7 +475,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 
 		if s_GameObject.guid ~= PREVIEW_GUID then
-			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+			if s_GameObject.wasInjected then
+				-- Defer: register into the editor/WebUI tree over frames (see OnInjectedReadyPump)
+				-- so a huge save doesn't block the frame while thousands register at once. The
+				-- object is already in m_GameObjects (selectable) and rendered natively.
+				table.insert(self.m_PendingInjectedReady, s_GameObject)
+			else
+				Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+			end
 		end
 	end
 

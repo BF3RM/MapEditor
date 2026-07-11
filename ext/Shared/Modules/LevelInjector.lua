@@ -78,21 +78,143 @@ function LevelInjector:RegisterEvents()
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
 	if SharedUtils:IsClientModule() then
-		-- Server pushes the data before the restart, but on a full MAP CHANGE the client VM
-		-- reloads and loses it, so re-request once we see the LevelData partition.
-		NetEvents:Subscribe('MapEditor:ReceiveInjectorData', self, self.OnReceiveInjectorData)
+		-- Data arrives CHUNKED (a single NetEvent with a 2500+ object save is too big for the
+		-- reliable channel → the client times out / gets kicked). Server pushes it before the
+		-- restart; on a full MAP CHANGE the client VM reloads and loses it → re-request on
+		-- Partition:Loaded.
+		NetEvents:Subscribe('MapEditor:InjBegin', self, self.OnInjBegin)
+		NetEvents:Subscribe('MapEditor:InjChunk', self, self.OnInjChunk)
+		NetEvents:Subscribe('MapEditor:InjEnd', self, self.OnInjEnd)
 	else
-		-- Answer a client's fallback request with the currently-armed project data.
+		-- Answer a client's fallback request with the currently-armed project data (chunked).
 		NetEvents:Subscribe('MapEditor:RequestInjectorData', self, self.OnRequestInjectorData)
+		-- Pump the chunk send-queue a few messages per frame.
+		Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
+	end
+
+	self:RegisterTimeoutBump()
+end
+
+-- Big injected loads take a while; bump the loading/ingame timeouts so the client/server don't
+-- kick during a heavy load (proven technique from LevelLoaderGen & MapLoader — we were missing it).
+function LevelInjector:RegisterTimeoutBump()
+	local s_Timeout = 1000
+
+	if SharedUtils:IsClientModule() then
+		ResourceManager:RegisterInstanceLoadHandler(
+			Guid("C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4"),
+			Guid("B479A8FA-67FF-8825-9421-B31DE95B551A"),
+			function(p_Instance)
+				p_Instance = ClientSettings(p_Instance)
+				p_Instance:MakeWritable()
+				p_Instance.loadingTimeout = math.max(s_Timeout, p_Instance.loadingTimeout or 0)
+				p_Instance.loadedTimeout = math.max(s_Timeout, p_Instance.loadedTimeout or 0)
+				p_Instance.ingameTimeout = math.max(s_Timeout, p_Instance.ingameTimeout or 0)
+			end
+		)
+	else
+		ResourceManager:RegisterInstanceLoadHandler(
+			Guid("C4DCACFF-ED8F-BC87-F647-0BC8ACE0D9B4"),
+			Guid("818334B3-CEA6-FC3F-B524-4A0FED28CA35"),
+			function(p_Instance)
+				p_Instance = ServerSettings(p_Instance)
+				p_Instance:MakeWritable()
+				p_Instance.loadingTimeout = math.max(s_Timeout, p_Instance.loadingTimeout or 0)
+				p_Instance.ingameTimeout = math.max(s_Timeout, p_Instance.ingameTimeout or 0)
+				p_Instance.timeoutTime = math.max(s_Timeout, p_Instance.timeoutTime or 0)
+			end
+		)
+	end
+end
+
+-- Objects per chunk. Small enough that a chunk NetEvent stays well under the reliable-message
+-- size limit even with big transforms/overrides.
+local INJ_CHUNK_SIZE = 100
+-- Chunks flushed per server Engine:Update tick. Spreading the send over frames avoids a single
+-- huge-serialization hitch (8000+ object saves) that would still time the client out.
+local INJ_MSGS_PER_TICK = 8
+
+--- Queue the armed project data as small chunk-messages, flushed over frames (see OnEngineUpdate).
+--- p_Player = nil → broadcast to all; else to one.
+---@param p_Player Player|nil
+function LevelInjector:SendChunked(p_Player)
+	if not self:HasData() then
+		return
+	end
+
+	local s_Data = self.m_LevelData.data
+	local s_Msgs = {}
+	s_Msgs[#s_Msgs + 1] = { e = 'MapEditor:InjBegin', p = { header = self.m_LevelData.header, total = #s_Data } }
+
+	local s_Chunk = {}
+	for i = 1, #s_Data do
+		s_Chunk[#s_Chunk + 1] = s_Data[i]
+		if #s_Chunk >= INJ_CHUNK_SIZE then
+			s_Msgs[#s_Msgs + 1] = { e = 'MapEditor:InjChunk', p = s_Chunk }
+			s_Chunk = {}
+		end
+	end
+	if #s_Chunk > 0 then
+		s_Msgs[#s_Msgs + 1] = { e = 'MapEditor:InjChunk', p = s_Chunk }
+	end
+	s_Msgs[#s_Msgs + 1] = { e = 'MapEditor:InjEnd', p = true }
+
+	self.m_SendQueue = { player = p_Player, msgs = s_Msgs, idx = 1 }
+end
+
+--- SERVER: flush a few queued chunk-messages per frame.
+function LevelInjector:OnEngineUpdate()
+	local s_Q = self.m_SendQueue
+	if s_Q == nil then
+		return
+	end
+
+	local s_Sent = 0
+	while s_Q.idx <= #s_Q.msgs and s_Sent < INJ_MSGS_PER_TICK do
+		local s_M = s_Q.msgs[s_Q.idx]
+		if s_Q.player == nil then
+			NetEvents:BroadcastLocal(s_M.e, s_M.p)
+		else
+			NetEvents:SendToLocal(s_M.e, s_Q.player, s_M.p)
+		end
+		s_Q.idx = s_Q.idx + 1
+		s_Sent = s_Sent + 1
+	end
+
+	if s_Q.idx > #s_Q.msgs then
+		self.m_SendQueue = nil
 	end
 end
 
 --- Server responder: a client asked for the injector data after its VM reloaded on a map change.
 ---@param p_Player Player
 function LevelInjector:OnRequestInjectorData(p_Player)
-	if self:HasData() then
-		NetEvents:SendToLocal('MapEditor:ReceiveInjectorData', p_Player, self.m_LevelData)
+	self:SendChunked(p_Player)
+end
+
+-- CLIENT: reassemble the chunked project data.
+function LevelInjector:OnInjBegin(p_Info)
+	self.m_IncomingHeader = p_Info and p_Info.header or nil
+	self.m_IncomingData = {}
+end
+
+function LevelInjector:OnInjChunk(p_Objects)
+	if self.m_IncomingData == nil then
+		self.m_IncomingData = {}
 	end
+	if p_Objects ~= nil then
+		for _, l_Object in ipairs(p_Objects) do
+			self.m_IncomingData[#self.m_IncomingData + 1] = l_Object
+		end
+	end
+end
+
+function LevelInjector:OnInjEnd()
+	if self.m_IncomingHeader ~= nil and self.m_IncomingData ~= nil then
+		self:SetData({ header = self.m_IncomingHeader, data = self.m_IncomingData })
+	end
+	self.m_IncomingHeader = nil
+	self.m_IncomingData = nil
 end
 
 --- Called on the SERVER by ProjectManager, and on the CLIENT via NetEvent, before the level (re)loads.
@@ -141,10 +263,6 @@ function LevelInjector:GetInjectedByBpPos(p_BlueprintInstanceGuid, p_Transform)
 	return table.remove(s_Bucket, 1)
 end
 
-function LevelInjector:OnReceiveInjectorData(p_LevelData)
-	self:SetData(p_LevelData)
-end
-
 -- nº 1 in calling order
 function LevelInjector:OnLoadResources()
 	self.m_ObjectVariations = {}
@@ -178,7 +296,8 @@ function LevelInjector:OnPartitionLoaded(p_Partition)
 			}
 
 			-- On a map change the client VM reloaded and lost the data; ask the server for it.
-			if SharedUtils:IsClientModule() and not self:HasData() then
+			-- Skip if chunks are already streaming in (m_IncomingData set) so we don't restart it.
+			if SharedUtils:IsClientModule() and not self:HasData() and self.m_IncomingData == nil then
 				NetEvents:Send('MapEditor:RequestInjectorData')
 			end
 		end
@@ -237,22 +356,21 @@ function LevelInjector:OnLoadingInfo(p_Info)
 	s_RegistryContainer = RegistryContainer(s_RegistryContainer)
 	s_RegistryContainer:MakeWritable()
 
-	local s_WorldPartReference = self:CreateWorldPart(s_PrimaryLevel, s_RegistryContainer)
-
-	s_WorldPartReference.indexInBlueprint = #s_PrimaryLevel.objects
-	s_PrimaryLevel.objects:add(s_WorldPartReference)
-	s_RegistryContainer.referenceObjectRegistry:add(s_WorldPartReference)
+	self:CreateWorldParts(s_PrimaryLevel, s_RegistryContainer)
 
 	self.m_HasPatched = true
 	m_Logger:Write('Level patched')
 end
 
+-- Native levels spread their objects across MANY WorldPartData (spatial partitions). Dumping
+-- thousands of injected refs into ONE WorldPart makes the engine's parallel entity-registration
+-- job choke/crash on huge saves, so we split them into parts of this size (mirrors the ~200-300
+-- batch the old runtime-spawn path used without crashing).
+local INJ_OBJECTS_PER_WORLDPART = 250
+
 ---@param p_PrimaryLevel LevelData
 ---@param p_RegistryContainer RegistryContainer
-function LevelInjector:CreateWorldPart(p_PrimaryLevel, p_RegistryContainer)
-	local s_World = WorldPartData()
-	p_RegistryContainer.blueprintRegistry:add(s_World)
-
+function LevelInjector:CreateWorldParts(p_PrimaryLevel, p_RegistryContainer)
 	-- Find the highest existing indexInBlueprint so our custom refs don't collide.
 	self.m_IndexCount = 0
 	for _, l_Object in pairs(p_PrimaryLevel.objects) do
@@ -273,28 +391,51 @@ function LevelInjector:CreateWorldPart(p_PrimaryLevel, p_RegistryContainer)
 		end
 	end
 
-	local s_Vanilla, s_Custom = 0, 0
+	-- Per-blueprint cache: 8000+ objects usually share a handful of blueprints, so resolving the
+	-- blueprint (FindInstanceByGuid + Is/Banger checks) ONCE per unique guid instead of per object.
+	self.m_BpCache = {}
+
+	local s_World = nil
+	local s_WorldCount = 0
+	local s_Parts = 0
+
+	-- Close the current WorldPart: reference it from the primary level + registry, then reset.
+	local function s_FinalizePart()
+		if s_World == nil then
+			return
+		end
+		local s_Ref = WorldPartReferenceObjectData()
+		s_Ref.blueprint = s_World
+		s_Ref.isEventConnectionTarget = Realm.Realm_None
+		s_Ref.isPropertyConnectionTarget = Realm.Realm_None
+		s_Ref.excluded = false
+		s_Ref.indexInBlueprint = #p_PrimaryLevel.objects
+		p_PrimaryLevel.objects:add(s_Ref)
+		p_RegistryContainer.referenceObjectRegistry:add(s_Ref)
+		s_World = nil
+		s_WorldCount = 0
+	end
+
 	for _, l_Object in pairs(self.m_LevelData.data) do
 		local s_Origin = l_Object.origin
 
 		if s_Origin == GameObjectOriginType.Vanilla then
 			self:PatchOriginalObject(l_Object)
-			s_Vanilla = s_Vanilla + 1
 		elseif s_Origin == GameObjectOriginType.Custom or s_Origin == GameObjectOriginType.NoHavok then
+			if s_World == nil then
+				s_World = WorldPartData()
+				p_RegistryContainer.blueprintRegistry:add(s_World)
+				s_Parts = s_Parts + 1
+			end
 			self:AddCustomObject(l_Object, s_World, p_RegistryContainer)
-			s_Custom = s_Custom + 1
+			s_WorldCount = s_WorldCount + 1
+			if s_WorldCount >= INJ_OBJECTS_PER_WORLDPART then
+				s_FinalizePart()
+			end
 		end
 		-- CustomChild is left to the post-load command path (needs its parent resolved first).
 	end
-	m_Logger:Write('Injected vanilla=' .. s_Vanilla .. ' custom/nohavok=' .. s_Custom)
-
-	local s_WorldPartReference = WorldPartReferenceObjectData()
-	s_WorldPartReference.blueprint = s_World
-	s_WorldPartReference.isEventConnectionTarget = Realm.Realm_None
-	s_WorldPartReference.isPropertyConnectionTarget = Realm.Realm_None
-	s_WorldPartReference.excluded = false
-
-	return s_WorldPartReference
+	s_FinalizePart()
 end
 
 --- Move / delete a modified vanilla object in place. The object stays vanilla (byte-identical
@@ -353,26 +494,47 @@ function LevelInjector:AddCustomObject(p_Object, p_World, p_RegistryContainer)
 		return
 	end
 
-	local s_Blueprint = ResourceManager:FindInstanceByGuid(
-		Guid(p_Object.blueprintCtrRef.partitionGuid),
-		Guid(p_Object.blueprintCtrRef.instanceGuid))
+	-- Resolve the blueprint ONCE per unique guid (cached): the lookup + Is()/Banger checks +
+	-- Blueprint wrapper are the per-object hot cost on huge saves.
+	local s_BpKey = tostring(p_Object.blueprintCtrRef.instanceGuid)
+	local s_Cached = self.m_BpCache[s_BpKey]
 
-	if s_Blueprint == nil then
-		m_Logger:Write('Cannot find blueprint with guid ' .. tostring(p_Object.blueprintCtrRef.instanceGuid))
+	if s_Cached == nil then
+		local s_Blueprint = ResourceManager:FindInstanceByGuid(
+			Guid(p_Object.blueprintCtrRef.partitionGuid),
+			Guid(p_Object.blueprintCtrRef.instanceGuid))
+
+		if s_Blueprint == nil then
+			m_Logger:Write('Cannot find blueprint with guid ' .. s_BpKey)
+			self.m_BpCache[s_BpKey] = false
+			return
+		end
+
+		local s_IsBanger = false
+		if s_Blueprint:Is("ObjectBlueprint") then
+			local s_ObjectBlueprint = ObjectBlueprint(s_Blueprint)
+			-- Filter BangerEntityData (crashes when injected this way), same as MapLoader.
+			if s_ObjectBlueprint.object and s_ObjectBlueprint.object:Is("BangerEntityData") then
+				s_IsBanger = true
+			end
+		end
+
+		s_Cached = {
+			isBanger = s_IsBanger,
+			isEffect = s_Blueprint:Is("EffectBlueprint"),
+			raw = s_Blueprint, -- the DataContainer; wrap per-object below (sharing one wrapper is risky)
+		}
+		self.m_BpCache[s_BpKey] = s_Cached
+	elseif s_Cached == false then
+		return -- blueprint not found (cached miss)
+	end
+
+	if s_Cached.isBanger then
 		return
 	end
 
-	-- Filter BangerEntityData (crashes when injected this way), same as MapLoader.
-	if s_Blueprint:Is("ObjectBlueprint") then
-		local s_ObjectBlueprint = ObjectBlueprint(s_Blueprint)
-		if s_ObjectBlueprint.object and s_ObjectBlueprint.object:Is("BangerEntityData") then
-			m_Logger:Write('Skipping BangerEntityData: ' .. tostring(p_Object.name))
-			return
-		end
-	end
-
 	local s_Reference
-	if s_Blueprint:Is("EffectBlueprint") then
+	if s_Cached.isEffect then
 		s_Reference = EffectReferenceObjectData()
 		s_Reference.autoStart = true
 	else
@@ -387,7 +549,7 @@ function LevelInjector:AddCustomObject(p_Object, p_World, p_RegistryContainer)
 		s_Reference.blueprintTransform = LinearTransform(p_Object.transform)
 	end
 
-	s_Reference.blueprint = Blueprint(s_Blueprint)
+	s_Reference.blueprint = Blueprint(s_Cached.raw)
 
 	local s_Variation = p_Object.variation or 0
 	if s_Variation ~= 0 then
@@ -402,7 +564,8 @@ function LevelInjector:AddCustomObject(p_Object, p_World, p_RegistryContainer)
 		end
 	end
 
-	self.m_IndexCount = self.m_IndexCount + 1
+	-- Index within THIS world part + base offset above existing level objects (like MapLoader).
+	-- `#p_World.objects` is now cheap because each part is capped at INJ_OBJECTS_PER_WORLDPART.
 	s_Reference.indexInBlueprint = #p_World.objects + self.m_IndexCount + 1
 	s_Reference.isEventConnectionTarget = Realm.Realm_None
 	s_Reference.isPropertyConnectionTarget = Realm.Realm_None

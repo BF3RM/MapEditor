@@ -236,9 +236,16 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		self.m_Queue.messages = {}
 	end
 
-	if self.m_Queue.delay > 0 then
-		self.m_Queue.delay = self.m_Queue.delay - p_DeltaTime
-		return
+	-- During a bulk load/sync we drain FAST (no time delay): the SERVER gates the batches (waits
+	-- for our BatchDone before sending the next), so we can't be flooded. Outside loading keep the
+	-- original time pacing for smooth user-edit replays.
+	local s_Syncing = self.m_Syncing.inProgress
+
+	if not s_Syncing then
+		if self.m_Queue.delay > 0 then
+			self.m_Queue.delay = self.m_Queue.delay - p_DeltaTime
+			return
+		end
 	end
 
 	local s_CommandsToExecute = {}
@@ -247,13 +254,9 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 
 	for i, l_Command in pairs(self.m_Queue.commands) do
 		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
-			if #s_NewQueue == 0 then
-				m_Logger:Write('Limit of ' .. ME_CONFIG.QUEUE_MAX_COMMANDS .. ' commands reached, queueing the rest')
-			end
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
 			table.insert(s_NewQueue, l_Command)
 		else
-			-- m_Logger:Write("Executing command in the correct UpdatePass: " .. l_Command.type)
 			table.insert(s_CommandsToExecute, l_Command)
 			s_nProcessedCommands = i
 		end
@@ -261,9 +264,19 @@ function ClientTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 
 	self.m_Queue.commands = s_NewQueue
 	m_Logger:Write('Executing ' .. s_nProcessedCommands .. ' queued commands, ' .. #self.m_Queue.commands .. ' left in queue')
-	self.m_Queue.delay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
+
+	if not s_Syncing then
+		self.m_Queue.delay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
+	end
 
 	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
+
+	-- Finished the current batch during a bulk load -> let the server send the next one. (This tick
+	-- only runs when there were commands, and next tick early-returns on an empty queue, so it fires
+	-- once per drained batch.)
+	if s_Syncing and #self.m_Queue.commands == 0 then
+		NetEvents:SendLocal('ClientTransactionManager:BatchDone')
+	end
 end
 
 ---@param p_CommandsJson string

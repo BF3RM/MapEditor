@@ -14,6 +14,7 @@ function ServerTransactionManager:RegisterEvents()
 	NetEvents:Subscribe('ClientTransactionManager:InvokeCommands', self, self.OnInvokeCommands)
 	NetEvents:Subscribe('ClientTransactionManager:ClientReady', self, self.OnClientReady)
 	NetEvents:Subscribe('ClientTransactionManager:RequestSync', self, self.OnRequestSync)
+	NetEvents:Subscribe('ClientTransactionManager:BatchDone', self, self.OnBatchDone)
 	Events:Subscribe('ServerGameObjectManager:RealmsSynced', self, self.OnRealmsSynced)
 end
 
@@ -24,6 +25,17 @@ function ServerTransactionManager:RegisterVars()
 	self.m_PlayersReady = {}
 	self.m_LoadingProjectLastTransactionId = nil
 	self.m_ReadyToProcess = false -- Server is ready to process when the first client has loaded and it has synced client/server only objects with the server
+
+	-- Completion-gated bulk loading: send a batch of LOAD_BATCH_SIZE, then WAIT for the client to
+	-- report it finished (OnBatchDone) before sending the next, so batches never overlap/pile up.
+	self.m_LoadingInProgress = false
+	self.m_WaitingForBatchAck = false
+	self.m_BatchAckSafety = 0
+end
+
+--- Client finished spawning the previous batch -> release the next one.
+function ServerTransactionManager:OnBatchDone(p_Player)
+	self.m_WaitingForBatchAck = false
 end
 
 function ServerTransactionManager:OnLevelDestroy()
@@ -126,6 +138,10 @@ end
 function ServerTransactionManager:SetLoadingProjectLastTransactionId(p_Id)
 	self.m_LoadingProjectLastTransactionId = p_Id
 
+	-- A project is loading in bulk -> use completion-gated batches (see OnUpdatePass).
+	self.m_LoadingInProgress = (p_Id ~= nil and p_Id > 0)
+	self.m_WaitingForBatchAck = false
+
 	-- Notify ready players that there is a project loading. Probably not needed, the server loads before clients so at this point there shouldn't be ready players
 	-- But just to be safe.
 	for l_PlayerName, l_IsReady in pairs(self.m_PlayersReady) do
@@ -161,12 +177,15 @@ end
 ---@param p_DeltaTime number
 ---@param p_UpdatePass UpdatePass
 function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
-	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim or #self.m_Queue == 0 then
+	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
 		return
 	end
 
-	if self.m_QueueDelay > 0 then
-		self.m_QueueDelay = self.m_QueueDelay - p_DeltaTime
+	if #self.m_Queue == 0 then
+		-- Bulk load drained; clear the loading flag once the last batch was ACKed.
+		if self.m_LoadingInProgress and not self.m_WaitingForBatchAck then
+			self.m_LoadingInProgress = false
+		end
 		return
 	end
 
@@ -175,20 +194,39 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		return
 	end
 
+	local s_BatchSize
+
+	if self.m_LoadingInProgress then
+		-- COMPLETION-GATED: don't send the next batch until the client reports it finished the
+		-- previous one (OnBatchDone), so batches never overlap/pile up. A safety timer keeps it
+		-- from deadlocking if an ACK is ever lost.
+		if self.m_WaitingForBatchAck then
+			self.m_BatchAckSafety = self.m_BatchAckSafety - p_DeltaTime
+			if self.m_BatchAckSafety > 0 then
+				return
+			end
+			m_Logger:Warning('Batch ACK timed out, proceeding anyway')
+		end
+		s_BatchSize = ME_CONFIG.LOAD_BATCH_SIZE
+	else
+		-- Normal (user-edit) commands: original time-paced path.
+		if self.m_QueueDelay > 0 then
+			self.m_QueueDelay = self.m_QueueDelay - p_DeltaTime
+			return
+		end
+		s_BatchSize = ME_CONFIG.QUEUE_MAX_COMMANDS
+	end
+
 	local s_CommandsToExecute = {}
 	local s_NewQueue = {}
 
 	local s_nProcessedCommands = 0
 
 	for i, l_Command in pairs(self.m_Queue) do
-		if i > ME_CONFIG.QUEUE_MAX_COMMANDS then
-			if #s_NewQueue == 0 then
-				m_Logger:Write('Limit of ' .. ME_CONFIG.QUEUE_MAX_COMMANDS .. ' commands reached, queueing the rest')
-			end
+		if i > s_BatchSize then
 			-- Limit reached, shift remaining commands in the queue to the beginning of the array
 			table.insert(s_NewQueue, l_Command)
 		else
-			-- m_Logger:Write("Executing command delayed: " .. l_Command.type)
 			table.insert(s_CommandsToExecute, l_Command)
 			s_nProcessedCommands = i
 		end
@@ -196,7 +234,14 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 
 	self.m_Queue = s_NewQueue
 	m_Logger:Write('Executing ' .. s_nProcessedCommands .. ' queued commands, ' .. #self.m_Queue .. ' left in queue')
-	self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
+
+	if self.m_LoadingInProgress then
+		self.m_WaitingForBatchAck = true
+		self.m_BatchAckSafety = 20
+	else
+		self.m_QueueDelay = ME_CONFIG.QUEUE_DELAY_PER_COMMAND * s_nProcessedCommands
+	end
+
 	self:_executeCommands(s_CommandsToExecute, p_UpdatePass)
 end
 

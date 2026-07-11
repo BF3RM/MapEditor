@@ -298,11 +298,12 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
 	-- Arm the level injector so the project's objects load NATIVELY during the loading screen
 	-- (no post-load popping). Set on the server (persists through the restart) and push to
-	-- connected clients; a client whose VM reloads on a map change re-requests it (LevelInjector).
+	-- connected clients CHUNKED over frames (a single NetEvent with a 2500+ object save is too big
+	-- for the reliable channel → the client times out / gets kicked). A client whose VM reloads on
+	-- a map change re-requests it (LevelInjector).
 	if ME_CONFIG.LOAD_INJECTION then
-		local s_InjectData = { header = s_Project.header, data = s_Project.data }
-		LevelInjector:SetData(s_InjectData)
-		NetEvents:BroadcastLocal('MapEditor:ReceiveInjectorData', s_InjectData)
+		LevelInjector:SetData({ header = s_Project.header, data = s_Project.data })
+		LevelInjector:SendChunked(nil)
 	end
 
 	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
