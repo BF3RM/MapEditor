@@ -144,8 +144,19 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
-	if s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil and s_Blueprint.object.typeInfo.name == "DebrisClusterData" then
-		return
+	-- Skip TRACKING baked static geometry the editor can't edit (a bare return is a hook
+	-- PASS-THROUGH in VU, so the engine still creates and RENDERS it — we just don't track it),
+	-- keeping B2K/XP1's thousands of baked statics out of the Scene Instances tree and the hover
+	-- pick scan (what froze the game). ONLY for vanilla level objects: a USER spawn of such a
+	-- prop from Project Data (s_PendingCustomBlueprintInfo set) MUST still be tracked, or it'd
+	-- appear nowhere even though the command "succeeded".
+	if s_PendingCustomBlueprintInfo == nil and s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil then
+		local s_ObjType = s_Blueprint.object.typeInfo.name
+		if s_ObjType == "DebrisClusterData"
+			or s_ObjType == "StaticModelEntityData"
+			or s_ObjType == "StaticModelGroupEntityData" then
+			return
+		end
 	end
 
 	---@type CtrRef

@@ -89,14 +89,17 @@ function Editor:Raycast()
 	end
 
 	if self.m_PendingRaycast.type == RaycastType.Camera then
-		WebUpdater:AddUpdate('SetRaycastPosition', s_Transform.trans)
+		-- Dedup: this now fires every frame the camera moves, and only the latest position
+		-- matters. Without dedup it floods the (throttled) WebUI queue and starves the spawn
+		-- response, so blueprints appeared not to spawn at all.
+		WebUpdater:AddUpdate('SetRaycastPosition', s_Transform.trans, true)
 	end
 
 	if self.m_PendingRaycast.type == RaycastType.Mouse then
 		WebUpdater:AddUpdate('SetScreenToWorldPosition', {
 			type = "SetScreenToWorldPosition",
 			position = s_Transform.trans
-		})
+		}, true)
 	end
 
 	self.m_PendingRaycast = false

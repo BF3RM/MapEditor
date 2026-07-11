@@ -325,6 +325,17 @@ export default class InfiniteTreeComponent extends Vue {
 		const items = this.filteredNodes;
 		const out: { node: Node; index: number }[] = [];
 		for (let i = this.startIndex; i < this.endIndex && i < items.length; i++) {
+			const node = items[i] as any;
+			// PERF (Gameface): markNodesRaw only tags nodes present at loadData. Nodes that
+			// STREAM in afterwards (added via addChildNodes as the level loads its objects) stay
+			// untagged, so the first time one is bound to a slot as :node, Vue deep-observes it
+			// AND its whole prefab subtree — the ~2s-per-node freeze that, across B2K/XP1's ~17k
+			// objects, became a multi-second (perceived "forever") hang. Tag each node right
+			// before it renders so observe() skips it and its subtree. O(window) => never O(n²).
+			if (node && node.__raw !== true) {
+				node._isVue = true;
+				node.__raw = true;
+			}
 			out.push({ node: items[i], index: i });
 		}
 		return out;

@@ -142,9 +142,11 @@ function UIManager:DisableFreeCamMovement()
 	-- mouse STUCK disabled (clicks dead) until an F1 toggle re-ran EnableMouse. This was
 	-- the intermittent "folders stop selecting, F1 fixes it" bug. Re-enabling an
 	-- already-enabled mouse is harmless, so drop the guard for the mouse part.
-	if FreeCam:GetCameraMode() == CameraMode.FreeCam then
-		Editor:SetPendingRaycast(RaycastType.Camera) -- Recalculate camera raycast when the camera finishes freecam
-	end
+	-- Refresh the camera-forward raycast (the "spawn where you're looking" position) every time
+	-- you stop flying — NOT gated on camera mode. The old `if mode == FreeCam` guard sometimes
+	-- skipped it (a controlStart can flip the mode to Editor mid-look), leaving the raycast
+	-- position stale, so a blueprint spawned from Project Data landed at a random old spot.
+	Editor:SetPendingRaycast(RaycastType.Camera)
 	WebUI:EnableMouse()
 	WebUI:EnableKeyboard()
 	WebUpdater:AddUpdate('MouseEnabled')

@@ -6,6 +6,13 @@ local m_Logger = Logger("WebUpdater", false)
 
 local UI_UPDATE_TIME = 0.016667 -- 60 fps
 
+-- Max WebUI updates flushed per tick. A B2K/XP1 level streams ~17k object updates into the
+-- editor; sending them all in one batch makes Gameface build its tree in a single blocking
+-- burst (multi-second freeze, esp. on entering the editor). Capping the batch drains the
+-- backlog PROGRESSIVELY over many frames so objects load in the background and the game stays
+-- responsive. (CEF tolerated the burst; Cohtml/Gameface does not.)
+local MAX_UPDATES_PER_TICK = 40
+
 function WebUpdater:__init()
 	m_Logger:Write("Initializing WebUpdater")
 	self:RegisterEvents()
@@ -56,8 +63,28 @@ function WebUpdater:OnUpdate(p_DeltaTime, p_SimulationDelta)
 		self.m_ElapsedTime = 0
 
 		if self.m_WebUpdateStack ~= nil and #self.m_WebUpdateStack > 0 then
-			WebUI:ExecuteJS(string.format("window.vext.WebUpdateBatch(%s)", json.encode(self.m_WebUpdateStack)))
-			self.m_WebUpdateStack = {}
+			local s_Count = #self.m_WebUpdateStack
+
+			if s_Count <= MAX_UPDATES_PER_TICK then
+				-- Small backlog: send it all.
+				WebUI:ExecuteJS(string.format("window.vext.WebUpdateBatch(%s)", json.encode(self.m_WebUpdateStack)))
+				self.m_WebUpdateStack = {}
+			else
+				-- Big backlog: send only the first MAX_UPDATES_PER_TICK this tick, keep the rest
+				-- queued for following ticks so the WebUI ingests them progressively.
+				local s_Batch = {}
+				for i = 1, MAX_UPDATES_PER_TICK do
+					s_Batch[i] = self.m_WebUpdateStack[i]
+				end
+
+				local s_Rest = {}
+				for i = MAX_UPDATES_PER_TICK + 1, s_Count do
+					s_Rest[#s_Rest + 1] = self.m_WebUpdateStack[i]
+				end
+				self.m_WebUpdateStack = s_Rest
+
+				WebUI:ExecuteJS(string.format("window.vext.WebUpdateBatch(%s)", json.encode(s_Batch)))
+			end
 		end
 	end
 end

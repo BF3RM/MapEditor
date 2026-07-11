@@ -175,14 +175,48 @@ end
 -- Precise picking: native physics raycast against the real collision geometry, then
 -- map the hit point to the GameObject whose spatial OBB contains it (smallest one, so
 -- a big overlapping box never wins over the object you actually clicked).
-function MapEditorClient:FindGuidAtPoint(p_Point)
+function MapEditorClient:FindGuidAtPoint(p_Point, p_HitEntity, p_CullSq)
 	if GameObjectManager == nil or GameObjectManager.m_GameObjects == nil then
 		return ''
 	end
+
+	-- Fast path: the physics ray reports the exact entity it hit (RayCastHit.rigidBody). If we
+	-- track that entity, map it to its GameObject by matching instanceId — just integer compares,
+	-- NO engine reads / OBB math — and return immediately. This is what makes hover usable on
+	-- B2K/XP1 (thousands of objects). Falls through to the OBB scan if the hit entity isn't one
+	-- we track (e.g. baked static-model-group physics).
+	if p_HitEntity ~= nil then
+		local s_HitId = nil
+		pcall(function() s_HitId = p_HitEntity.instanceId end)
+		if s_HitId ~= nil then
+			for l_GuidStr, l_GO in pairs(GameObjectManager.m_GameObjects) do
+				if l_GO ~= nil and l_GO.gameEntities ~= nil then
+					for _, l_GE in pairs(l_GO.gameEntities) do
+						if l_GE.instanceId == s_HitId then
+							return l_GuidStr
+						end
+					end
+				end
+			end
+		end
+	end
+
 	local s_Best = ''
 	local s_BestVol = 1e30
+	-- Broad-phase cull (squared radius): only objects whose origin is within this distance of
+	-- the physics-ray hit point run the expensive per-entity SpatialEntity/OBB test. Turns an
+	-- O(all objects) hover scan — unusable on B2K/XP1's thousands of objects (~150ms/hover, and
+	-- it fires on every mouse move) — into O(the few nearby ones). Generous (150m) so even large
+	-- prefabs whose origin sits far from the hovered surface are never wrongly skipped.
+	local s_CullSq = p_CullSq or (150.0 * 150.0)
 	for l_GuidStr, l_GO in pairs(GameObjectManager.m_GameObjects) do
-		if l_GO ~= nil and l_GO.gameEntities ~= nil then
+		local s_Near = true
+		if l_GO ~= nil and l_GO.transform ~= nil and l_GO.transform.trans ~= nil then
+			local o = l_GO.transform.trans
+			local dx, dy, dz = p_Point.x - o.x, p_Point.y - o.y, p_Point.z - o.z
+			s_Near = (dx * dx + dy * dy + dz * dz) <= s_CullSq
+		end
+		if l_GO ~= nil and l_GO.gameEntities ~= nil and s_Near then
 			for _, l_GE in pairs(l_GO.gameEntities) do
 				if l_GE.entity ~= nil and l_GE.isSpatial then
 					pcall(function()
@@ -225,7 +259,7 @@ function MapEditorClient:OnNativePick(p_Json)
 		local s_To = Vec3(s_D.ox + s_D.dx * 2000.0, s_D.oy + s_D.dy * 2000.0, s_D.oz + s_D.dz * 2000.0)
 		local s_Hit = RaycastManager:Raycast(s_From, s_To, RayCastFlags.DontCheckWater)
 		if s_Hit ~= nil and s_Hit.position ~= nil then
-			s_Guid = self:FindGuidAtPoint(s_Hit.position)
+			s_Guid = self:FindGuidAtPoint(s_Hit.position, s_Hit.rigidBody)
 		end
 	end)
 	local s_Safe = tostring(s_Guid):gsub("[^%x%-]", "")
@@ -242,7 +276,11 @@ function MapEditorClient:OnNativeHighlight(p_Json)
 		local s_To = Vec3(s_D.ox + s_D.dx * 2000.0, s_D.oy + s_D.dy * 2000.0, s_D.oz + s_D.dz * 2000.0)
 		local s_Hit = RaycastManager:Raycast(s_From, s_To, RayCastFlags.DontCheckWater)
 		if s_Hit ~= nil and s_Hit.position ~= nil then
-			s_Guid = self:FindGuidAtPoint(s_Hit.position)
+			-- Hover fires continuously, so cull tighter (50m): only objects near the hovered
+			-- surface get the expensive per-entity test. An occasional missed highlight on a
+			-- huge prefab is fine — the CLICK below uses a generous radius, so selection stays
+			-- accurate.
+			s_Guid = self:FindGuidAtPoint(s_Hit.position, s_Hit.rigidBody, 50.0 * 50.0)
 		end
 	end)
 	m_NativeViewport:SetHighlight(s_Guid ~= '' and s_Guid or nil)

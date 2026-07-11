@@ -64,6 +64,20 @@ document.addEventListener('mousedown', (e: MouseEvent) => {
 });
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
+// Gameface port: Vue component errors are EXPENSIVE to surface in-engine. With no custom
+// handler, Vue logs every caught error to console.error (which is NOT neutered), and the
+// WebUI mounts + re-renders continuously from the moment the mod loads (independent of
+// editor mode). A component that throws on a per-frame re-render then floods the engine
+// logger and freezes the game for seconds at a time. Swallow them in-engine (nothing is
+// lost: the in-game Logs panel is fed by window.Log, not console.*); log them in a dev
+// browser for debugging.
+Vue.config.errorHandler = (err, _vm, info) => {
+	if (!inEngine) {
+		// eslint-disable-next-line no-console
+		console.error('[Vue] ' + info, err);
+	}
+};
+
 Vue.use(vgl);
 // Gameface port: the v-tooltip LIBRARY uses document.createRange() (missing in Gameface)
 // and `instanceof` on undefined globals -> it THREW on every bind/unbind/hover, spamming
