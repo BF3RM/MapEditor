@@ -240,7 +240,6 @@ function FreeCam:Enable()
 
 	self:SetCameraMode(CameraMode.FreeCam)
 	self:TakeControl()
-	print('[MapEditor] FreeCam:Enable -> m_Camera=' .. tostring(self.m_Camera ~= nil) .. ' mode=' .. tostring(self.m_Mode))
 end
 
 function FreeCam:Disable()
@@ -314,10 +313,6 @@ function FreeCam:UpdateCameraControls(p_Delta)
 	local s_MoveX = InputManager:GetLevel(InputConceptIdentifiers.ConceptMoveLR)
 	local s_MoveY = 0.0
 	local s_MoveZ = -InputManager:GetLevel(InputConceptIdentifiers.ConceptMoveFB)
-
-	if s_MoveX ~= 0.0 or s_MoveZ ~= 0.0 then
-		print('[MapEditor] FreeCam input mode=' .. tostring(self.m_Mode) .. ' LR=' .. tostring(s_MoveX) .. ' FB=' .. tostring(s_MoveZ))
-	end
 
 	if InputManager:IsKeyDown(InputDeviceKeys.IDK_E) then
 		s_MoveY = 1.0

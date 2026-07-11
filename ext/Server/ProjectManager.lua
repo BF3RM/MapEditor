@@ -296,9 +296,21 @@ function ProjectManager:OnRequestProjectLoad(p_Player, p_ProjectId)
 
 	self:UpdateClientProjectHeader(nil)
 
+	-- Arm the level injector so the project's objects load NATIVELY during the loading screen
+	-- (no post-load popping). Set on the server (persists through the restart) and push to
+	-- connected clients; a client whose VM reloads on a map change re-requests it (LevelInjector).
+	if ME_CONFIG.LOAD_INJECTION then
+		local s_InjectData = { header = s_Project.header, data = s_Project.data }
+		LevelInjector:SetData(s_InjectData)
+		NetEvents:BroadcastLocal('MapEditor:ReceiveInjectorData', s_InjectData)
+	end
+
 	-- TODO: Check if we need to delay the restart to ensure all clients have properly updated headers. Would be nice to show a 'Loading Project' screen too (?)
 	-- Invoke Restart
-	if self.m_MapName == s_MapName then
+	-- With load-screen injection we can NOT use restartRound on the same map: the LevelData
+	-- partition stays mounted, Partition:Loaded doesn't re-fire, and the level is never re-patched.
+	-- A full clear/add/runNextRound re-mounts the level so injection sees a fresh LevelData.
+	if self.m_MapName == s_MapName and not ME_CONFIG.LOAD_INJECTION then
 		--Events:Dispatch('MapLoader:LoadLevel', { header = s_Project.header, data = s_Project.data, vanillaOnly = true })
 		RCON:SendCommand('mapList.restartRound')
 	else
@@ -380,6 +392,12 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 	local s_SaveFileCommands = {}
 
 	for _, l_GameObjectSaveData in pairs(p_ProjectSaveData) do
+		-- With load-screen injection, Vanilla/Custom/NoHavok are placed natively during load and
+		-- CustomChild isn't command-driven yet, so there's nothing to queue post-load.
+		if ME_CONFIG.LOAD_INJECTION then
+			goto continue
+		end
+
 		local s_Guid = l_GameObjectSaveData.guid:upper()
 
 		--if (GameObjectManager.m_GameObjects[l_Guid] == nil) then
@@ -440,10 +458,18 @@ function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 
 			table.insert(s_SaveFileCommands, s_Command)
 		end
+
+		::continue::
 	end
 
 	ServerTransactionManager:QueueCommands(s_SaveFileCommands)
-	ServerTransactionManager:SetLoadingProjectLastTransactionId(#s_SaveFileCommands)
+	-- IMPORTANT: pass nil (not 0) when there are no commands. The client's OnSyncClientContext
+	-- does `if p_ProjectLastTransactionId then` and 0 is TRUTHY in Lua, so it would enter syncing
+	-- mode with target 0, and 'LoadingComplete' (only fired while processing a command batch)
+	-- would NEVER dispatch -> client stuck in Loading, editor UI dead. With injection there are
+	-- usually 0 commands, so this is essential.
+	local s_CommandCount = #s_SaveFileCommands
+	ServerTransactionManager:SetLoadingProjectLastTransactionId(s_CommandCount > 0 and s_CommandCount or nil)
 end
 
 ProjectManager = ProjectManager()

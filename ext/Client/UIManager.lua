@@ -84,7 +84,6 @@ function UIManager:OnUpdateInput(p_Delta)
 	end
 
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F1) then
-		print('[MapEditor] F1 pressed, m_ActiveMode=' .. tostring(self.m_ActiveMode))
 		if self.m_ActiveMode == EditorMode.Editor then
 			self:DisableFreeCam()
 		elseif self.m_ActiveMode == EditorMode.Playing then
@@ -92,7 +91,6 @@ function UIManager:OnUpdateInput(p_Delta)
 		else
 			-- Gameface port fallback: if we never reached Playing (sync), still allow
 			-- F1 to enter the editor so the UI/freecam are usable.
-			print('[MapEditor] F1 in non-Playing mode -> forcing Playing then EnableFreeCam')
 			self.m_ActiveMode = EditorMode.Playing
 			self:EnableFreeCam()
 		end
@@ -159,7 +157,7 @@ end
 
 function UIManager:EnableFreeCam()
 	if self.m_ActiveMode ~= EditorMode.Playing then
-		print('[MapEditor] EnableFreeCam: not in Playing mode (' .. tostring(self.m_ActiveMode) .. '), abort')
+		m_Logger:Write('EnableFreeCam: not in Playing mode (' .. tostring(self.m_ActiveMode) .. '), abort')
 		return
 	end
 
@@ -167,11 +165,10 @@ function UIManager:EnableFreeCam()
 
 	-- Don't change to freecam if the player isnt alive, maybe add message saying so?
 	if s_LocalPlayer == nil or s_LocalPlayer.soldier == nil then
-		print('[MapEditor] EnableFreeCam: no local player/soldier (player=' .. tostring(s_LocalPlayer ~= nil) .. ', soldier=' .. tostring(s_LocalPlayer ~= nil and s_LocalPlayer.soldier ~= nil) .. '), abort')
+		m_Logger:Write('EnableFreeCam: no local player/soldier, abort')
 		return
 	end
 
-	print('[MapEditor] EnableFreeCam: enabling freecam')
 	NetEvents:SendLocal('EnableInputRestriction')
 
 	-- Hide the vanilla BF3 HUD (minimap/tickets/ammo/etc) while in the editor.
@@ -189,7 +186,6 @@ function UIManager:EnableFreeCam()
 	-- Re-assert the WebUI mouse over the next several input frames so it reliably grabs
 	-- the cursor on the FIRST activation (see RegisterVars note).
 	self.m_ForceMouseFrames = 8
-	print('[MapEditor] EnableFreeCam: done, mode now Editor. Move = WASD + hold RIGHT-MOUSE to look.')
 end
 
 function UIManager:DisableFreeCam()

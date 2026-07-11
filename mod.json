@@ -3,7 +3,7 @@
 	"Authors": ["Powback", "FoolHen", "RealityMod Team"],
 	"Description": "A powerful ingame editor",
 	"URL": "https://github.com/BF3RM/MapEditor",
-	"Version": "0.1.74",
+	"Version": "0.1.93",
 	"HasWebUI": true,
 	"HasVeniceEXT": true,
 	"Tags": ["mapeditor"],

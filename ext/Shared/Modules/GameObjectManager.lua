@@ -143,6 +143,21 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		-- s_ParentPrimaryInstance = InstanceParser:GetPrimaryInstance(s_ParentPartitionGuid)
 	end
 
+	-- Load-screen injection: was this entity pre-injected into the LevelData by LevelInjector?
+	-- If so, we adopt its saved editor identity below and must NOT drop it via the baked-static
+	-- skip, nor manually init/enable it (the engine already did, since it spawned natively).
+	local s_InjectedInfo = nil
+	if ME_CONFIG.LOAD_INJECTION then
+		-- Vanilla injected objects keep their real original ROD guid.
+		if s_ParentInstanceGuid ~= nil then
+			s_InjectedInfo = LevelInjector:GetInjected(s_ParentInstanceGuid)
+		end
+		-- Custom injected objects (fresh RODs, no guid) match by blueprint + position instead.
+		if s_InjectedInfo == nil and LevelInjector:IsInjectedBlueprint(tostring(p_Blueprint.instanceGuid)) then
+			s_InjectedInfo = LevelInjector:GetInjectedByBpPos(p_Blueprint.instanceGuid, p_Transform)
+		end
+	end
+
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
 	-- Skip TRACKING baked static geometry the editor can't edit (a bare return is a hook
 	-- PASS-THROUGH in VU, so the engine still creates and RENDERS it — we just don't track it),
@@ -150,7 +165,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	-- pick scan (what froze the game). ONLY for vanilla level objects: a USER spawn of such a
 	-- prop from Project Data (s_PendingCustomBlueprintInfo set) MUST still be tracked, or it'd
 	-- appear nowhere even though the command "succeeded".
-	if s_PendingCustomBlueprintInfo == nil and s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil then
+	if s_PendingCustomBlueprintInfo == nil and s_InjectedInfo == nil and s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil then
 		local s_ObjType = s_Blueprint.object.typeInfo.name
 		if s_ObjType == "DebrisClusterData"
 			or s_ObjType == "StaticModelEntityData"
@@ -215,6 +230,52 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		instanceGuid = s_BlueprintInstanceGuid
 	}
 
+	-- Load-screen injection: adopt the saved editor identity instead of computing a fresh guid.
+	-- The object spawned natively with the level (engine already inited/enabled it), so wasInjected
+	-- also skips the manual init/enable paths below.
+	if s_InjectedInfo ~= nil then
+		s_GameObject.wasInjected = true
+		s_GameObject.guid = Guid(s_InjectedInfo.guid)
+		s_GameObject.origin = s_InjectedInfo.origin
+
+		if s_InjectedInfo.timeStamp then
+			s_GameObject.timeStamp = s_InjectedInfo.timeStamp
+		end
+
+		if s_InjectedInfo.overrides then
+			s_GameObject.overrides = s_InjectedInfo.overrides
+		end
+
+		s_GameObject.isDeleted = s_InjectedInfo.isDeleted or false
+
+		-- Only adopt a REAL parent guid. Saved parentData often carries the string "nil" (from
+		-- tostring(nil) at save time), or the EMPTY_GUID root sentinel — both mean "no parent", i.e.
+		-- a root object. Leaving the default parentData (Lua-nil guid) lets the root-dispatch check
+		-- below recognise it and send it to the WebUI tree. (A malformed "nil"-string guid would
+		-- otherwise fail the `== nil` check and the object would never reach the tree.)
+		if s_InjectedInfo.parentData and s_InjectedInfo.parentData.guid then
+			local s_PGuid = tostring(s_InjectedInfo.parentData.guid)
+			if s_PGuid ~= "nil" and s_PGuid ~= "" and s_PGuid ~= "00000000-0000-0000-0000-000000000000" then
+				s_GameObject.parentData = GameObjectParentData(s_InjectedInfo.parentData)
+			end
+		end
+
+		if s_InjectedInfo.variation and s_InjectedInfo.variation ~= 0 then
+			s_GameObject.variation = s_InjectedInfo.variation
+		end
+
+		-- NOTE: a multi-entity vanilla object re-enters the hook once per sub-blueprint, all under
+		-- the same original ROD guid, so re-adopting the same guid here is expected (one editor
+		-- object). No warning.
+		self.m_GameObjects[tostring(s_GameObject.guid)] = s_GameObject
+
+		if s_GameObject.origin == GameObjectOriginType.Vanilla or s_GameObject.origin == GameObjectOriginType.NoHavok then
+			self.m_VanillaGameObjectGuids[tostring(s_GameObject.guid)] = s_GameObject.guid
+		end
+
+		goto injected_resolved
+	end
+
 	if self.m_GameObjects[tostring(s_GameObject.guid)] ~= nil then
 		m_Logger:Warning("GameObject with guid already existed, overwriting: " .. tostring(s_GameObject.guid))
 	end
@@ -254,6 +315,8 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 	end
 
+	::injected_resolved::
+
 	--- Save ReferenceObjectDatas that the blueprint might have, to resolve parents of descendants.
 	--For prefabs:
 	if s_Blueprint.objects ~= nil then
@@ -284,8 +347,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 	---vvvv This is children to parent / bottom to top vvvv
 
-	-- Custom object have to be manually initialized.
-	if s_GameObject.origin == GameObjectOriginType.Custom or s_GameObject.origin == GameObjectOriginType.CustomChild then
+	-- Custom object have to be manually initialized. Injected objects spawned natively with the
+	-- level, so the engine already inited them — re-initing would double-init and can crash.
+	if not s_GameObject.wasInjected and (s_GameObject.origin == GameObjectOriginType.Custom or s_GameObject.origin == GameObjectOriginType.CustomChild) then
 		for _, l_Entity in pairs(s_EntityBus.entities) do
 			-- TODO: find out if the blueprint is client or server only and init in correct realm, maybe Realm_ClientAndServer otherwise.
 			l_Entity:Init(self.m_Realm, true)
@@ -687,7 +751,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 		-- Set custom objects' entities enabled by default. This can't be done in CreateEntitiesFromBlueprint, for
 		-- some reason it doesn't work
-		if (s_PendingGameObject.origin == GameObjectOriginType.Custom or s_PendingGameObject.origin == GameObjectOriginType.CustomChild) and
+		if not s_PendingGameObject.wasInjected and (s_PendingGameObject.origin == GameObjectOriginType.Custom or s_PendingGameObject.origin == GameObjectOriginType.CustomChild) and
 			(s_Entity:Is('GameEntity') or s_Entity:Is('EffectEntity')) and
 			s_Entity.typeInfo.name ~= "ServerVehicleEntity" then
 			-- Small delay before firing an event, otherwise it may crash
