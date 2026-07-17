@@ -58,7 +58,6 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import { Vue, Component, Prop } from 'vue-property-decorator';
 import DraggableNumberInput from '@/script/components/widgets/DraggableNumberInput.vue';
 import { Vec3 } from '@/script/types/primitives/Vec3';
 

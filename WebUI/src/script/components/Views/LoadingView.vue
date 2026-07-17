@@ -13,7 +13,6 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import { Component, Vue } from 'vue-property-decorator';
 import InfoTopBar from '@/script/components/InfoTopBar.vue';
 import { signals } from '@/script/modules/Signals';
 
