@@ -19,5 +19,13 @@ ME_CONFIG = {
 
 	SAVE_LOAD_DELAY = 5,
 
-	LOADING_TIMEOUT = 1000
+	LOADING_TIMEOUT = 1000,
+
+	-- Boot the Gameface WebUI lazily, on the FIRST F1 (editor enter), instead of at
+	-- Extension:Loaded. The booted Gameface app costs ~400-500MB inside the 32-bit client
+	-- process; on heavy maps whose load already peaks near the 4GB address-space ceiling,
+	-- an eagerly-booted WebUI pushes the load over it (DirectX CreateBuffer E_OUTOFMEMORY).
+	-- Booting after the load spike keeps the map loadable; the editor UI appears a few
+	-- seconds after the first F1 while the web app boots.
+	LAZY_WEBUI = true
 }

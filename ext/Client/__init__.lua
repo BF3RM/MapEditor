@@ -72,6 +72,9 @@ end
 ---@param p_Delta number
 ---@param p_SimulationDelta number
 function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
+	-- Perform a lazy WebUI boot requested by F1, here in Engine:Update — doing WebUI:Init()
+	-- inside the input event froze the client.
+	UIManager:PumpPendingBoot()
 	WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
@@ -80,15 +83,16 @@ function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnExtensionLoaded()
-	WebUI:Init()
-	WebUI:Show()
-	-- Default input to the GAME (freecam) on load; the WebUI grabs it only in
+	-- Lazy WebUI: defer the boot to the first F1 (UIManager:BootWebUI) so the Gameface
+	-- app's ~400-500MB never stack on top of the level-load memory peak (32-bit process).
+	if ME_CONFIG.LAZY_WEBUI then
+		return
+	end
+
+	-- Eager boot. Default input to the GAME (freecam) on load; the WebUI grabs it only in
 	-- editor mode (F1). Without this the shown WebUI swallows mouse+keyboard so
 	-- freecam/WASD stop working.
-	pcall(function()
-		WebUI:DisableMouse()
-		WebUI:DisableKeyboard()
-	end)
+	UIManager:BootWebUI()
 end
 
 function MapEditorClient:OnExtensionUnloading()
