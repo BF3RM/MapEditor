@@ -22,11 +22,59 @@ function UIManager:RegisterVars()
 	-- True while the right mouse is held to fly the freecam (WebUI mouse intentionally
 	-- disabled); used to not fight that with the force-enable above.
 	self.m_MovementActive = false
+	-- Whether the Gameface WebUI has been booted (WebUI:Init). With ME_CONFIG.LAZY_WEBUI the
+	-- boot is deferred to the first F1 so its ~400-500MB don't stack on top of the level-load
+	-- memory peak (32-bit process). WebUpdater drops UI updates while this is false.
+	self.m_WebUIBooted = false
+	-- Lazy boot handshake: F1 (input context) only REQUESTS the boot; PumpPendingBoot does it
+	-- from Engine:Update (clean context); OnUIReady requests the enter; the enter itself runs
+	-- from OnUpdateInput (input context — the proven home of the EnableFreeCam chain).
+	self.m_BootPending = false
+	self.m_EnterAfterReady = false
+	self.m_EnterPending = false
+end
+
+--- Runs from Engine:Update (MapEditorClient:OnUpdate): performs a boot requested by F1
+--- OUTSIDE the input event (WebUI:Init from input context froze the client).
+function UIManager:PumpPendingBoot()
+	if self.m_BootPending then
+		self.m_BootPending = false
+		self:BootWebUI()
+	end
+end
+
+--- Boots the Gameface WebUI. Input is handed to the GAME by default; the editor-enter flow
+--- (EnableFreeCam) enables the WebUI mouse afterwards.
+function UIManager:BootWebUI()
+	if self.m_WebUIBooted then
+		return
+	end
+	self.m_WebUIBooted = true
+
+	WebUI:Init()
+	WebUI:Show()
+	pcall(function()
+		WebUI:DisableMouse()
+		WebUI:DisableKeyboard()
+	end)
 end
 
 function UIManager:RegisterEvents()
 	Events:Subscribe('UIManager:LoadingComplete', self, self.OnLoadingComplete)
 	Events:Subscribe('UIManager:SyncingProgress', self, self.OnSyncingProgress)
+	Events:Subscribe('MapEditor:UIReady', self, self.OnUIReady)
+end
+
+--- The web app finished booting. If the boot was requested by an F1 (lazy path), request the
+--- editor enter — but do NOT run EnableFreeCam here: this handler runs in the WebUI-event
+--- delivery context, where the enter chain (HudToggle/FreeCam/EnableMouse) has never run
+--- before (froze the client). The enter is performed from OnUpdateInput (the input context
+--- the eager-boot F1 path always used).
+function UIManager:OnUIReady()
+	if self.m_EnterAfterReady then
+		self.m_EnterAfterReady = false
+		self.m_EnterPending = true
+	end
 end
 
 function UIManager:OnSyncingProgress(p_LoadedObjects, p_TotalObjects)
@@ -46,7 +94,9 @@ function UIManager:OnLoadingComplete()
 end
 
 function UIManager:OnLevelDestroy()
-	WebUI:ExecuteJS("window.location = window.location")
+	if self.m_WebUIBooted then
+		WebUI:ExecuteJS("window.location = window.location")
+	end
 	self:SetEditorMode(EditorMode.Loading)
 end
 
@@ -73,6 +123,15 @@ function UIManager:RemoveUINodes(p_Hook, p_Screen, p_GraphPriority, p_ParentGrap
 end
 
 function UIManager:OnUpdateInput(p_Delta)
+	-- Deferred lazy-boot editor enter (requested by OnUIReady): run it HERE, in the input
+	-- context where the eager-boot F1 path always ran it.
+	if self.m_EnterPending then
+		self.m_EnterPending = false
+		if self.m_ActiveMode == EditorMode.Playing then
+			self:EnableFreeCam()
+		end
+	end
+
 	-- Re-assert the WebUI mouse for a few frames after entering the editor (the first
 	-- EnableMouse doesn't reliably grab the cursor in Gameface). Skip while flying the
 	-- freecam with right-mouse (mouse is intentionally handed to the game then).
@@ -169,6 +228,19 @@ function UIManager:EnableFreeCam()
 		return
 	end
 
+	-- Lazy WebUI: this F1 arrives inside the Client:UpdateInput event; calling WebUI:Init()
+	-- from input context hard-froze the client (input-system re-entrancy). Request the boot
+	-- and do it on the next Engine:Update tick (PumpPendingBoot); the editor is entered when
+	-- the web app reports ready (OnUIReady), not now.
+	if not self.m_WebUIBooted then
+		if not self.m_BootPending then
+			self.m_BootPending = true
+			self.m_EnterAfterReady = true
+			print('[MapEditor] Booting editor UI... (F1 again once it appears, if needed)')
+		end
+		return
+	end
+
 	NetEvents:SendLocal('EnableInputRestriction')
 
 	-- Hide the vanilla BF3 HUD (minimap/tickets/ammo/etc) while in the editor.
@@ -208,6 +280,14 @@ end
 
 function UIManager:OnUIReloaded()
 	self:SetEditorMode(self.m_ActiveMode)
+	-- Lazy boot: the web app finishes booting SECONDS after the first F1, long after the
+	-- editor-enter re-assert frames expired — re-assert the WebUI mouse again now so the
+	-- freshly-booted page reliably captures the cursor.
+	if self.m_ActiveMode == EditorMode.Editor then
+		WebUI:BringToFront()
+		WebUI:EnableMouse()
+		self.m_ForceMouseFrames = 8
+	end
 end
 
 UIManager = UIManager()

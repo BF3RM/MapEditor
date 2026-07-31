@@ -35,6 +35,13 @@ function WebUpdater:OnUIReady()
 end
 
 function WebUpdater:AddUpdate(p_Path, p_Payload, p_RemoveDuplicates)
+	-- No WebUI booted yet (lazy boot pending) -> drop the update instead of queueing (the
+	-- queue would grow unbounded since UIReady never fires, and on boot the UIReloaded ->
+	-- InitializeUIData handshake resends the full state anyway).
+	if UIManager == nil or not UIManager.m_WebUIBooted then
+		return
+	end
+
 	m_Logger:Write('Added update. Path: '..p_Path)
 
 	if p_RemoveDuplicates then

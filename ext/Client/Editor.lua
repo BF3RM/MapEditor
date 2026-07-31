@@ -145,7 +145,13 @@ function Editor:UpdateCameraTransform()
 	if FreeCam ~= nil and FreeCam.GetCameraFOV ~= nil then
 		s_Fov = FreeCam:GetCameraFOV() or 55.0
 	end
-	WebUI:ExecuteJS(string.format('editor.threeManager.updateCameraTransform(JSON.parse(\'%s\'), %s)', json.encode(s_Transform), tostring(s_Fov)))
+	-- Only push once the web APP is ready (not merely booted): while the page is still
+	-- parsing its bundles, ExecuteJS calls pile up and all fire the moment it finishes —
+	-- a burst of scripts against a half-initialized app, right when the lazy-boot editor
+	-- appears (suspected freeze contributor).
+	if WebUpdater ~= nil and WebUpdater.m_IsUIReady then
+		WebUI:ExecuteJS(string.format('editor.threeManager.updateCameraTransform(JSON.parse(\'%s\'), %s)', json.encode(s_Transform), tostring(s_Fov)))
+	end
 	self.m_CameraTransform = s_Transform
 end
 
