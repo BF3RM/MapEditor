@@ -151,6 +151,10 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 				local s_Changes = GetChanges(s_ComparisonGameObjectTransferData, l_GameObjectTransferData)
 
 				for _, l_Change in pairs(s_Changes) do
+					-- Reset per change: the no-op branches below don't set s_Command, so inserting a
+					-- stale value from a previous iteration would replay a bogus/duplicate command.
+					s_Command = nil
+
 					if l_Change == "transform" then
 						s_Command = {
 							type = CommandActionType.SetTransformCommand,
@@ -199,13 +203,19 @@ function ClientTransactionManager:SyncClientTransferDatas(p_UpdatedGameObjectTra
 
 					elseif l_Change == "parentData" then
 						-- TODO: add this when changing parent data is implemented
-					elseif l_Change == "name" then
-						-- TODO: add this when changing name is implemented on lua
+					elseif l_Change == "realm" or l_Change == "origin" or l_Change == "gameEntities" or l_Change == "localTransform" or l_Change == "timeStamp" then
+						-- Engine-managed / internal fields, not user-editable: realm & origin are set by the
+						-- server, gameEntities/localTransform are derived from the spawn+transform we already
+						-- replay, and timeStamp is bookkeeping. None map to a client command, so intentionally
+						-- do nothing instead of logging them as unhandled (they fire on every normal update).
 					else
 						m_Logger:Error("Found an unhandled change: " .. l_Change)
 					end
 
-					table.insert(s_Commands, s_Command)
+					-- Only queue a real command; no-op branches above leave s_Command nil.
+					if s_Command ~= nil then
+						table.insert(s_Commands, s_Command)
+					end
 				end
 			end
 		end

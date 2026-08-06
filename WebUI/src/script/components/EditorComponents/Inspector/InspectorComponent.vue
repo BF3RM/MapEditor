@@ -14,6 +14,7 @@
 					<input
 						style="width:100%; box-sizing:border-box;"
 						class="name-input"
+						:class="{ disabled: multiSelection }"
 						:value="displayName"
 						:disabled="multiSelection"
 						id="name"

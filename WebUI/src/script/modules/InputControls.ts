@@ -115,8 +115,13 @@ export class InputControls {
 		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Up).forEach((hotkey: Hotkey) => {
 			if (
 				e.which === hotkey.key &&
-				(hotkey.needsCtrl ? e.ctrlKey : true) &&
-				(hotkey.needsShift ? e.shiftKey : true)
+				// EXACT modifier match. The old `needsCtrl ? e.ctrlKey : true` let a
+				// no-modifier hotkey match even while Ctrl was held, so Ctrl+X hit the
+				// bare-X "toggle world space" binding (which comes first in the array and
+				// short-circuits `.every`) instead of Cut. Requiring the modifier state to
+				// match exactly lets Ctrl-combos (Copy/Paste/Cut/Duplicate) resolve.
+				hotkey.needsCtrl === e.ctrlKey &&
+				hotkey.needsShift === e.shiftKey
 			) {
 				hotkey.callback();
 			}
@@ -128,8 +133,13 @@ export class InputControls {
 		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.CanvasOnlyDown).forEach((hotkey: Hotkey) => {
 			if (
 				e.which === hotkey.key &&
-				(hotkey.needsCtrl ? e.ctrlKey : true) &&
-				(hotkey.needsShift ? e.shiftKey : true)
+				// EXACT modifier match. The old `needsCtrl ? e.ctrlKey : true` let a
+				// no-modifier hotkey match even while Ctrl was held, so Ctrl+X hit the
+				// bare-X "toggle world space" binding (which comes first in the array and
+				// short-circuits `.every`) instead of Cut. Requiring the modifier state to
+				// match exactly lets Ctrl-combos (Copy/Paste/Cut/Duplicate) resolve.
+				hotkey.needsCtrl === e.ctrlKey &&
+				hotkey.needsShift === e.shiftKey
 			) {
 				hotkey.callback();
 			}
@@ -151,8 +161,13 @@ export class InputControls {
 		HOTKEYS.filter((hotkey: Hotkey) => hotkey.type === HOTKEY_TYPE.Down).every((hotkey: Hotkey) => {
 			if (
 				e.which === hotkey.key &&
-				(hotkey.needsCtrl ? e.ctrlKey : true) &&
-				(hotkey.needsShift ? e.shiftKey : true)
+				// EXACT modifier match. The old `needsCtrl ? e.ctrlKey : true` let a
+				// no-modifier hotkey match even while Ctrl was held, so Ctrl+X hit the
+				// bare-X "toggle world space" binding (which comes first in the array and
+				// short-circuits `.every`) instead of Cut. Requiring the modifier state to
+				// match exactly lets Ctrl-combos (Copy/Paste/Cut/Duplicate) resolve.
+				hotkey.needsCtrl === e.ctrlKey &&
+				hotkey.needsShift === e.shiftKey
 			) {
 				hotkey.callback();
 				return false;

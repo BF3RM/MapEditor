@@ -295,11 +295,9 @@ export default class ReferenceComponent extends Vue {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		margin-bottom: 2px;
-	}
-
-	.path:last-of-type {
-		margin: 0;
+		/* Gameface (Cohtml) has no :last-of-type. Use a TOP margin instead of a bottom
+		   margin + last-child reset, so the final path never leaves trailing space. */
+		margin-top: 2px;
 	}
 
 	.guid {

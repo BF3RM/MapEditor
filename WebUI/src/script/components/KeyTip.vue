@@ -10,7 +10,8 @@
 				{{ key }}
 			</div>
 		</div-->
-		<div class="key-outline">{{ keys }}</div>
+		<!-- always the last key-outline; class replaces the Gameface-unsupported :last-of-type -->
+		<div class="key-outline key-outline-last">{{ keys }}</div>
 		<span>{{ description }}</span>
 	</div>
 </template>
@@ -83,7 +84,8 @@ export default defineComponent({
 		font-size: 1.25vmin;
 		line-height: 1.45vmin;
 
-		&:last-of-type {
+		/* Gameface (Cohtml) has no :last-of-type -> target the last key via an explicit class. */
+		&.key-outline-last {
 			margin-right: 14px;
 		}
 	}

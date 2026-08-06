@@ -237,7 +237,9 @@ export class EditorCore {
 
 	public PasteObjects(copy: SpawnGameObjectCommand[]) {
 		const scope = this;
-		if (copy !== null) {
+		// Nothing copied (or the copy produced no commands) -> paste is a no-op. Bail before
+		// building an empty BulkCommand, whose constructor would dereference commands[0].
+		if (copy !== null && copy.length > 0) {
 			copy.forEach((command: SpawnGameObjectCommand) => {
 				scope.setPendingSelection(command.gameObjectTransferData.guid);
 			});

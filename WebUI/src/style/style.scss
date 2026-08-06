@@ -63,7 +63,9 @@ input {
 		font-size: 14px;
 	}
 
-	&:disabled {
+	/* Cohtml/Gameface can't match the :disabled pseudo -> style a .disabled class the
+	   template toggles alongside the disabled attribute. */
+	&.disabled {
 		opacity: 0.8;
 	}
 
@@ -88,7 +90,9 @@ textarea {
 	border-radius: 6px;
 	box-sizing: border-box;
 
-	&:disabled {
+	/* Cohtml/Gameface can't match the :disabled pseudo -> style a .disabled class the
+	   template toggles alongside the disabled attribute. */
+	&.disabled {
 		opacity: 0.8;
 	}
 
@@ -128,7 +132,9 @@ textarea {
 		opacity: 0.7;
 	}
 
-	&:disabled {
+	/* Cohtml/Gameface can't match :disabled -> use a .disabled class (see buttons that
+	   bind :class="{ disabled: ... }"). */
+	&.disabled {
 		opacity: 0.4;
 	}
 }

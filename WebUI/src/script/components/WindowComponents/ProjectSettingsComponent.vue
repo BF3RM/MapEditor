@@ -74,10 +74,10 @@
 			</div>
 			<div class="footer">
 				<button @click="Close" class="btn btn-lg btn-dark">Close</button>
-				<button :disabled="buttonsDisabled" @click="Export" class="btn btn-lg btn-dark">Export</button>
-				<button :disabled="buttonsDisabled" @click="Delete" class="btn btn-lg btn-danger">Delete</button>
+				<button :disabled="buttonsDisabled" :class="{ disabled: buttonsDisabled }" @click="Export" class="btn btn-lg btn-dark">Export</button>
+				<button :disabled="buttonsDisabled" :class="{ disabled: buttonsDisabled }" @click="Delete" class="btn btn-lg btn-danger">Delete</button>
 				<button @click="NewSave()" class="btn btn-lg btn-dark">New Save</button>
-				<button :disabled="buttonsDisabled" @click="loadSave()" class="btn btn-lg btn-success">Load</button>
+				<button :disabled="buttonsDisabled" :class="{ disabled: buttonsDisabled }" @click="loadSave()" class="btn btn-lg btn-success">Load</button>
 			</div>
 		</template>
 	</WindowComponent>
