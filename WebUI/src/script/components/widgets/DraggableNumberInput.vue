@@ -111,9 +111,12 @@ export default defineComponent({
             this.fieldDidDrag = false;
             document.addEventListener('mousemove', this.boundFieldMove);
             document.addEventListener('mouseup', this.boundFieldUp);
-            // Block native text-selection/focus so the drag can scrub cleanly; a plain
-            // click (no drag) re-focuses the input in onFieldUp for typing.
-            e.preventDefault();
+            // Gameface: do NOT preventDefault here. Blocking native focus and then
+            // re-focusing on mouseup relies on a document-level mouseup + input.focus()
+            // that Cohtml doesn't fire reliably — so vector fields became un-clickable
+            // (you couldn't focus them to type, while plain NumberControl inputs worked).
+            // Let the native click focus the input; a real drag (detected in onFieldMove)
+            // blurs the input and scrubs instead.
         },
         onFieldMove(e: MouseEvent): void {
             const dx = e.clientX - this.fieldStartX;

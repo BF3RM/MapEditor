@@ -95,6 +95,23 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.value {
+	width: 100%;
+}
+
+.value ::v-deep .el-select {
+	width: 100%;
+}
+
+/* Keep the chosen enum value compact and on-theme inside the select box. */
+.value ::v-deep .el-input__inner {
+	height: 26px;
+	line-height: 26px;
+	background: #161924 !important;
+	border-radius: 6px;
+	font-size: 12px;
+}
+
 .enum {
 	color: #ebff56;
 }

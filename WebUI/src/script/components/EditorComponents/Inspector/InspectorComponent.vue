@@ -683,8 +683,82 @@ export default class InspectorComponent extends EditorComponent {
 		}
 	}
 
+	.ebx-container {
+		margin-top: 6px;
+
+		.alert {
+			font-size: 12px;
+			padding: 8px 11px;
+			margin-bottom: 12px;
+		}
+	}
+
+	/* The recursive EBX field tree — comfortable, consistent inspector sizing. */
 	.ebx-wrapper {
-		margin-top: 14px;
+		margin-top: 12px;
+		font-size: 12px;
+		line-height: 1.45;
+
+		/* Gameface (Cohtml) flex items don't shrink below their content width without an
+		   explicit min-width:0 at EVERY level. Without this the recursive EBX tree grew
+		   wider at each nesting level (a reference chip measured 692px in a ~320px panel)
+		   and expanded-reference field rows laid out far off-screen to the right (x≈1673)
+		   — the fields were in the DOM but painted outside the inspector, so the panel
+		   looked empty. Constraining the whole subtree keeps every level within the panel.
+		   !important is required to beat the flex-item default min-width:auto and the
+		   per-row width rules; without it the tree still blows out. (Harmless in the
+		   browser, which already shrank these correctly.) */
+		* {
+			min-width: 0 !important;
+		}
+
+		.ReferenceBox {
+			max-width: 100% !important;
+			width: auto !important;
+			box-sizing: border-box !important;
+		}
+
+		.table,
+		.table-container,
+		.field-value,
+		.field-spacer {
+			max-width: 100% !important;
+		}
+
+		/* Vector / transform value fields: a row-wide value column was collapsing to the
+		   axis-label width, cramming the X/Y/Z inputs — and the blanket `* { min-width:0 }`
+		   above let the first axis collapse to nothing. Force the value column + vector
+		   controls to fill the row, and give each axis a real minimum (more specific than
+		   the blanket, so it wins) so none disappears. */
+		.row-wide > .field-value,
+		.field-spacer {
+			width: 100%;
+		}
+		.Vec2Control,
+		.Vec3Control,
+		.Vec4Control {
+			width: 100%;
+			flex: 1 1 auto;
+		}
+		.Vec2Control .vue-draggable-number-container,
+		.Vec3Control .vue-draggable-number-container,
+		.Vec4Control .vue-draggable-number-container {
+			flex: 1 1 0 !important;
+			min-width: 30px !important;
+		}
+
+		/* Keep number/text inputs on-theme and compact throughout the tree. */
+		input {
+			height: 24px;
+			font-size: 12px;
+		}
+	}
+
+	/* Divider above the EBX property tree so it reads as its own section under
+	   the transform block. */
+	.transform-container {
+		padding-bottom: 14px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
 	/* Collapse = hide the content grid, keep the full toggle row visible (the old

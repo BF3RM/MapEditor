@@ -9,6 +9,7 @@ require "ProjectManager"
 require "DataBaseManager"
 require "ServerGameObjectManager"
 require "FBSettingsManager"
+require "PartitionSerializer"
 
 function MapEditorServer:__init()
 	m_Logger:Write("Initializing MapEditorServer")

@@ -1,6 +1,6 @@
 <template>
 	<div class="table">
-		<div v-if="field.value">
+		<div v-if="field.value" class="struct-body">
 			<property
 				v-for="value in field.value"
 				:key="value.name"
@@ -28,6 +28,16 @@
 		</div>
 	</div>
 </template>
+
+<style lang="scss" scoped>
+/* Nested struct: indent its fields under the field header with a guide line,
+   matching the instance-body nesting cue. */
+.struct-body {
+	padding-left: 10px;
+	margin-left: 1px;
+	border-left: 1px solid rgba(141, 161, 182, 0.18);
+}
+</style>
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';

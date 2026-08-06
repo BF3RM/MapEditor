@@ -173,6 +173,23 @@ export class FrostbiteDataManager {
 		return partition || null;
 	}
 
+	// Register a partition on demand when it isn't in the preloaded metadata. Its
+	// instances lazy-load via FBPartition.data (webx/server). Without this, selecting
+	// an object whose partition wasn't preloaded leaves the inspector stuck loading,
+	// because GameObject.partition returned null -> <Promised :promise="null">.
+	public registerPartition(name: string, guid: Guid): FBPartition {
+		const key = name.toString().toLowerCase();
+		let partition = this.partitions.getValue(key);
+		if (!partition) {
+			partition = new FBPartition(name, guid);
+			this.partitions.setValue(key, partition);
+			if (guid) {
+				this.partitionGuids.setValue(guid.toString().toLowerCase(), partition);
+			}
+		}
+		return partition;
+	}
+
 	public getSuperBundle(superBundleName: string) {
 		// return this.superBundles[superBundleName.toLowerCase()];
 	}

@@ -19,9 +19,13 @@ export default class Instance {
 	static fromJSON(partition: Partition, json: EBX.JSON.Instance): Instance {
 		const fields: Fields = {};
 
-		for (const [name, data] of Object.entries(json.$fields)) {
-			const field = Field.fromJSON(name, data);
-			fields[field.name] = field;
+		// $fields can be absent on a partially-serialized / placeholder instance;
+		// guard the iteration so one bad instance can't crash the inspector.
+		if (json.$fields) {
+			for (const [name, data] of Object.entries(json.$fields)) {
+				const field = Field.fromJSON(name, data);
+				fields[field.name] = field;
+			}
 		}
 
 		return new Instance(new Guid(json.$guid), json.$type, json.$baseClass, fields);

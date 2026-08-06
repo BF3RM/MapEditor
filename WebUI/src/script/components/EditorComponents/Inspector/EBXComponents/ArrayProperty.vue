@@ -90,8 +90,29 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+/* Array field: a collapsible "N elements" header row, then an indented list of
+   entries sharing the same left-guide nesting cue as structs/instances. */
 .elements {
-	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 6px;
+	margin-bottom: 4px;
+	font-size: 12px;
+	color: #8da1b6;
+	cursor: pointer;
+	border-radius: 4px;
+	user-select: none;
+
+	i {
+		font-size: 12px;
+		color: #037fff;
+	}
+
+	&:hover {
+		background: rgba(141, 161, 182, 0.07);
+		color: #dfe4ea;
+	}
 }
 
 .value {
@@ -100,5 +121,18 @@ export default Vue.extend({
 	::v-deep .el-select {
 		width: 100%;
 	}
+}
+
+.table-container {
+	padding-left: 10px;
+	margin-left: 1px;
+	border-left: 1px solid rgba(141, 161, 182, 0.18);
+}
+
+/* Separate each array element a touch so lists of structs don't run together. */
+.is-array-element > div + div {
+	margin-top: 2px;
+	padding-top: 2px;
+	border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 </style>

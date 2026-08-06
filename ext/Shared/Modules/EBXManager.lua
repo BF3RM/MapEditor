@@ -36,7 +36,7 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 
 			if s_TypeInfo then
 				if s_TypeInfo.array then -- Go to the array index
-					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path + '.' + p_Field.field)
+					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field)
 				elseif s_TypeInfo.enum then
 					p_Instance[p_Field.field] = tonumber(p_Field.value)
 					return p_Path .. '.' .. p_Field.field
@@ -52,46 +52,58 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 	end
 end
 
-function ParseType(p_Type, p_Val)
-	--m_Logger:Write(p_Type)
-	--m_Logger:Write(p_Val)
+-- The LIVE serializer emits VEXT engine type-names (Float32/Uint32/Int64/CString/…)
+-- while the old webx JSON used pipeline names (Single/Int32/UInt32/String). Handle BOTH:
+-- otherwise ParseType returns nil for a modern type-name, and assigning nil to a typed
+-- engine field throws ("expected number, received nil") — which aborted the whole edit
+-- in GameObject:SetOverride before Disable/Enable, so nothing ever applied.
+local s_NumericTypes = {
+	Single = true, Double = true,
+	Float8 = true, Float16 = true, Float32 = true, Float64 = true,
+	Int8 = true, Int16 = true, Int32 = true, Int64 = true,
+	Uint8 = true, Uint16 = true, Uint32 = true, Uint64 = true,
+	UInt16 = true, UInt32 = true, UInt64 = true,
+	SByte = true, Byte = true, Enum = true,
+}
+local s_StringTypes = { String = true, CString = true }
 
+function ParseType(p_Type, p_Val)
 	if p_Type == "Boolean" then
-		if p_Val == "true" then
-			return true
-		else
-			return false
-		end
+		return p_Val == true or p_Val == "true"
 	end
 
-	if p_Type == "Single" or
-	p_Type == "Int32" or
-	p_Type == "UInt32" or
-	p_Type == "Int16" or
-	p_Type == "UInt16" or
-	p_Type == "SByte" then
+	if s_NumericTypes[p_Type] then
 		return tonumber(p_Val)
 	end
 
-	if p_Type == "Vec2" then -- Vec2
-		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y))
+	if s_StringTypes[p_Type] then
+		return tostring(p_Val)
 	end
 
-	if p_Type == "Vec3" then -- Vec3
+	if p_Type == "Vec2" then
+		return Vec2(tonumber(p_Val.x), tonumber(p_Val.y))
+	end
+
+	if p_Type == "Vec3" then
 		return Vec3(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z))
 	end
 
-	if p_Type == "Vec4" then -- Vec3
+	if p_Type == "Vec4" then
 		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
 	end
 
-	if p_Type == "Enum" then -- Enum
-		return tonumber(p_Val) -- Value
+	if p_Type == "Guid" then
+		return Guid(tostring(p_Val))
 	end
 
-	if p_Type == "String" then -- Enum
-		return p_Val -- Value
+	-- Fallback: an unlisted enum/number spelling -> number; otherwise the raw value.
+	-- NEVER return nil — assigning nil to a typed engine field throws and aborts the edit.
+	local s_Number = tonumber(p_Val)
+	if s_Number ~= nil then
+		return s_Number
 	end
+
+	return p_Val
 end
 
 EBXManager = EBXManager()

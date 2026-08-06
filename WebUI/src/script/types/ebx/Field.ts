@@ -1,10 +1,17 @@
 import Reference from './Reference';
 import { LinearTransform } from '@/script/types/primitives/LinearTransform';
+import { Vec2 } from '@/script/types/primitives/Vec2';
 import { Vec3 } from '@/script/types/primitives/Vec3';
+import { Vec4 } from '@/script/types/primitives/Vec4';
 
+// Types that get a purpose-built grouped control (Property.vue) instead of the
+// generic nested-field fallback. Each turns the {x:{$value},...} wire shape into a
+// typed vector so the editor can emit the whole value on change (see Vec3 pattern).
 const customDeserializers: { [type: string]: (value: any) => any } = {
 	LinearTransform: LinearTransform.fromJSON,
-	Vec3: Vec3.fromJSON
+	Vec2: Vec2.fromJSON,
+	Vec3: Vec3.fromJSON,
+	Vec4: Vec4.fromJSON
 };
 
 function normalizeFieldName(name: string): string {

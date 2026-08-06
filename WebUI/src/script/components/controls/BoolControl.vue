@@ -1,6 +1,12 @@
 <template>
 	<div class="BoolControl">
-		<el-checkbox :value="value" @input="onChangeValue"></el-checkbox>
+		<!-- Gameface port: el-checkbox (native <input type=checkbox>) does not toggle in
+		     Cohtml and emits `change`, not the `input` this was wired to — so bool fields
+		     were dead. Plain clickable div instead, same pattern as the inspector
+		     Enable/Disable checkbox. -->
+		<span class="fx-checkbox-box" :class="{ checked: value }" @click="toggle">
+			<span class="fx-check"></span>
+		</span>
 	</div>
 </template>
 
@@ -16,15 +22,39 @@ export default defineComponent({
         }
     },
     methods: {
-        onChangeValue(newVal: boolean) {
-            this.$emit('input', newVal);
+        toggle() {
+            this.$emit('input', !this.value);
         }
     }
 });
 </script>
 
 <style lang="scss" scoped>
-.BoolControl input {
-	width: 1em;
+.BoolControl .fx-checkbox-box {
+	position: relative;
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	border-radius: 3px;
+	background: #eee;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+.BoolControl .fx-checkbox-box.checked {
+	background: #037fff;
+}
+.BoolControl .fx-check {
+	display: none;
+}
+.BoolControl .fx-checkbox-box.checked .fx-check {
+	display: block;
+	position: absolute;
+	left: 6px;
+	top: 1px;
+	width: 6px;
+	height: 11px;
+	border: solid #fff;
+	border-width: 0 3px 3px 0;
+	transform: rotate(45deg);
 }
 </style>

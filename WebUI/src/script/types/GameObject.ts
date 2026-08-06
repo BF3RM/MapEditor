@@ -90,7 +90,9 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	}
 
 	public get partition(): Promise<FBPartition> | null {
-		const partition = window.editor.fbdMan.getPartitionByName(this.blueprintCtrRef.name);
+		// registerPartition = get-or-create: returns the preloaded partition, or lazily
+		// registers one so its data still loads. Avoids the null -> stuck-loading path.
+		const partition = window.editor.fbdMan.registerPartition(this.blueprintCtrRef.name, this.blueprintCtrRef.partitionGuid);
 		if (!partition) {
 			return null;
 		}

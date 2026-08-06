@@ -66,13 +66,14 @@ input[type='text'].input {
 	max-width: 20%;
 }
 
+/* Body of an (expanded) instance: a subtle left guide line + indent marks the
+   nesting depth instead of a boxed-in border, so deep structures stay legible.
+   Sits flush under the ReferenceBox header that toggled it open. */
 .table-container {
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	border-top: 0;
-	padding: 14px;
-	background-color: rgba(22, 25, 36, 0.2);
-	padding-bottom: 20px;
-	margin-bottom: 20px;
+	padding: 4px 0 6px 10px;
+	margin-left: 1px;
+	border-left: 1px solid rgba(141, 161, 182, 0.22);
+	background-color: rgba(22, 25, 36, 0.25);
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
 }

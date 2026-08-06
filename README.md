@@ -31,12 +31,24 @@ Alternatively, the mod can be installed manually by downloading the zip file att
 
 A list of controls can be found in-game. To reveal it, navigate in the toolbar to File->Hotkeys
 
-## Mod Dependencies
-MapEditor requires other mods to work fully:
-- [NoHavok](https://github.com/BF3RM/NoHavokGen). This mod converts Havok objects into Frostbite objects, allowing their manipulation. MapEditor works without this mod, but not all vanilla objects will be available for editing.
+## Server setup
+- Disable the pre-round on the server (`vu.DisablePreRound true` in `Admin/Startup.txt`),
+  otherwise the round restarts on join and the editor crashes mid-init on spawn.
+- The inspector loads EBX partition data as JSON from `https://webx.powback.com/Games/Venice/<name>.json`
+  (see `WebUI/src/script/types/gameData/FBPartition.ts`). A serverside serializer to
+  produce these live from the running game is the intended replacement (WIP).
+
+## Optional: NoHavok
+Converting vanilla Havok objects into editable Frostbite objects is optional (MapEditor
+works without it — you just can't edit vanilla objects). The old runtime
+[NoHavok](https://github.com/BF3RM/NoHavok) mod is unmaintained (2023) and crashes on
+current VU builds during conversion; prefer the offline generator
+[NoHavokGen](https://github.com/BF3RM/NoHavokGen) over runtime conversion.
 
 ## Running saves for playing
-If your project is ready to be used for playing, export your project's save from `MapEditor`, save it in a `.json` file and use [LevelLoaderGen](https://github.com/BF3RM/LevelLoaderGen) to generate the loader mod. Check out `LevelLoaderGen` repository for more information. If the level was generated with `NoHavok`, you will need to run it as well.
+Export a project's save from `MapEditor` to a `.json`, then use
+[LevelLoaderGen](https://github.com/BF3RM/LevelLoaderGen) to generate the loader mod.
+If the level used NoHavok, run that as well.
 
 ## Used libraries and tools
 This project is using:

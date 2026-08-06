@@ -2,7 +2,7 @@
 	<!-- Gameface port: golden-layout gl-col/gl-row/gl-stack replaced with flexbox. -->
 	<div class="explorer-flex">
 		<div class="ex-col ex-project">
-			<EditorComponent id="explorer-component" title="Project">
+			<EditorComponent id="explorer-component" class="tree-panel" title="Project">
 				<div class="header">
 					<Search v-model="search" />
 				</div>

@@ -53,6 +53,28 @@ export default class EditorComponent extends Vue {
 	overflow: auto;
 	min-height: 0;
 }
+/* Panels whose body is a search `.header` + a single fill-height `.scrollable` list
+   (Scene Instances / Project = `.tree-panel`, Project Data = `.grid-component`): make
+   the body a flex column so the list fills the space BELOW the search bar and scrolls
+   internally. Without this the list's `height:100%` ignores the header, so the body
+   overflows (outer scrollbar) while the list scrolls too (inner scrollbar) = double
+   scrollbar. Class-scoped so the Inspector (plain body) is unaffected. */
+.EditorComponent.tree-panel > .panel-body,
+.EditorComponent.grid-component > .panel-body {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+.EditorComponent.tree-panel > .panel-body > .header,
+.EditorComponent.grid-component > .panel-body > .header {
+	flex: 0 0 auto;
+}
+.EditorComponent.tree-panel > .panel-body > .scrollable,
+.EditorComponent.grid-component > .panel-body > .scrollable {
+	flex: 1 1 0;
+	min-height: 0;
+}
+
 .EditorComponent {
 	.header {
 		display: flex;

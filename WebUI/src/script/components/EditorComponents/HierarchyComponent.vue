@@ -1,5 +1,5 @@
 <template>
-	<EditorComponent id="explorer-component" title="Scene Instances">
+	<EditorComponent id="explorer-component" class="tree-panel" title="Scene Instances">
 		<div class="header">
 			<Search v-model="search" />
 		</div>

@@ -968,6 +968,16 @@ export class THREEManager {
 	private pendingPickMulti = false;
 
 	private selectWithRaycast(mousePos: Vec2, multiSelection: boolean) {
+		this.pendingPickMulti = multiSelection;
+		// Browser/emulator (no VEXT/Lua): there is no native physics raycast, so fall
+		// back to the original three.js AABB pick against the instanced meshes and feed
+		// the resulting guid through the same result handler as the native path.
+		if (editor.debug) {
+			this.raycastSelection(mousePos).then((guid) => {
+				this.onNativePickResult(guid ? guid.toString() : '');
+			});
+			return;
+		}
 		// Precise picking: instead of raycasting the overlapping AABB boxes (which
 		// often grabs a far object whose bounding box is bigger), send the world ray
 		// to Lua for a NATIVE physics raycast against the real collision geometry.
@@ -975,7 +985,6 @@ export class THREEManager {
 		this.raycaster.setFromCamera(mousePos as any, this.camera);
 		const o = this.raycaster.ray.origin;
 		const d = this.raycaster.ray.direction;
-		this.pendingPickMulti = multiSelection;
 		window.vext.SendEvent('NativePick', { ox: o.x, oy: o.y, oz: o.z, dx: d.x, dy: d.y, dz: d.z });
 	}
 
@@ -998,6 +1007,12 @@ export class THREEManager {
 	// gizmo. Selecting from the 3D pick does this; the hierarchy tree needs it too,
 	// otherwise a tree click selects in JS but nothing shows in the world.
 	public syncNativeSelection() {
+		// Browser/emulator: there is no native side to draw selection boxes / the gizmo.
+		// The JS selection already colours the instanced meshes (SpatialGameEntity.onSelect),
+		// so skip the native push (which would otherwise log NotImplemented in the emulator).
+		if (editor.debug) {
+			return;
+		}
 		const guids = editor.selectionGroup.selectedGameObjects.map((go: GameObject) => go.guid.toString());
 		window.vext.SendEvent('SetSelection', guids);
 		this.pushGizmoCenter();
@@ -1007,6 +1022,18 @@ export class THREEManager {
 		const now = new Date();
 		if (now.getTime() - this.lastRaycastTime.getTime() >= 80) {
 			this.lastRaycastTime = now;
+			// Browser/emulator (no VEXT/Lua): use the original three.js AABB raycast and the
+			// JS highlight path (SpatialGameEntity.onHighlight colours the instanced mesh).
+			if (editor.debug) {
+				this.raycastSelection(mousePos).then((guid) => {
+					if (guid) {
+						editor.editorCore.highlight(guid);
+					} else {
+						editor.editorCore.unhighlight();
+					}
+				});
+				return;
+			}
 			// Native physics raycast (precise). Lua sets its own hover box directly, so
 			// only the exact object under the cursor highlights (no overlapping AABBs).
 			this.raycaster.setFromCamera(mousePos as any, this.camera);

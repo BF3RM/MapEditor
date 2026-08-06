@@ -23,4 +23,13 @@ export class Vec2 extends Vector2 {
 		this.y = Number(matrix[1]);
 		return this;
 	}
+
+	public toTable(): { x: number; y: number } {
+		return { x: this.x, y: this.y };
+	}
+
+	// Wire shape: { x: { $value }, y: { $value } } (see PartitionSerializer:_EncodePrimitive).
+	static fromJSON(json: any): Vec2 {
+		return new Vec2().set(json.x.$value, json.y.$value);
+	}
 }

@@ -11,6 +11,7 @@ require "UIManager"
 require "MessageActions"
 require "ClientTransactionManager"
 require "ClientGameObjectManager"
+require "PartitionInspector"
 local m_NativeViewport = require "NativeViewport"
 
 function MapEditorClient:__init()
