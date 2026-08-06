@@ -270,32 +270,78 @@ function GameObject:GetEntities()
 end
 
 function GameObject:SetOverrides(p_Overrides)
+	-- Per-instance clone-on-first-edit (Unity prefab semantics). The FIRST EBX edit to an
+	-- instance deep-clones its blueprint so the change isolates to THIS instance; sibling
+	-- instances keep reading the shared prefab until they're edited too. The clone is
+	-- registered on the GameObjectManager keyed by this object's editor-guid, so it SURVIVES
+	-- the delete+respawn below (which recreates the GameObject and would otherwise reset
+	-- internalBlueprint to the shared original — that's the "only the first edit sticks, every
+	-- later one hits the original blueprint" bug). On respawn the create hook re-adopts the
+	-- registered clone as internalBlueprint, so edits accumulate on the SAME clone.
 	if not self.internalBlueprint then
-		self.internalBlueprint = self.blueprintCtrRef:Get() --:Clone(self.guid)
+		local s_Registered = GameObjectManager:GetInstanceClone(self.guid)
+
+		if s_Registered ~= nil then
+			self.internalBlueprint = s_Registered
+		else
+			local s_Shared = self.blueprintCtrRef:Get()
+			local s_Ok, s_Clone = pcall(function()
+				return g_DataContainerExt:DeepClone(s_Shared, GenerateGuid())
+			end)
+
+			if s_Ok and s_Clone ~= nil and (s_Shared == nil or s_Clone.instanceGuid ~= s_Shared.instanceGuid) then
+				self.internalBlueprint = s_Clone
+				GameObjectManager:RegisterInstanceClone(self.guid, s_Clone, self.blueprintCtrRef:GetTable())
+			else
+				-- Clone bailed (lazy-load / error). Fall back to editing the SHARED blueprint
+				-- (old behavior: the edit leaks to all instances, but that beats doing nothing).
+				-- No respawn needed here — Disable/Enable re-reads the shared DC we just wrote.
+				m_Logger:Warning("Per-instance clone failed for '" .. tostring(self.name) ..
+					"'; editing the shared blueprint (this edit will affect ALL instances)")
+				self.internalBlueprint = s_Shared
+			end
+		end
 	end
 
-	m_Logger:Write("Setting overrides")
-
 	for l_Key, l_Field in pairs(p_Overrides) do
-		m_Logger:Write(l_Key)
-		m_Logger:Write(l_Field)
 		self:SetOverride(l_Field)
 	end
 
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.
 
+	-- Make the edit visible on THIS instance. A per-instance clone needs a real respawn (the
+	-- live entities were built from the shared DC and won't re-read the clone).
+	--
+	-- CLIENT-SIDE ONLY: the clone is a runtime DataContainer whose guid was minted locally
+	-- (GenerateGuid) and is NOT registered in ResourceManager. Each realm deep-clones
+	-- independently, so a networked / server-side spawn would replicate a blueprint guid the
+	-- peer can't resolve → native crash (the server went down on the very first edit doing
+	-- exactly this). So the client re-spawns the instance locally (non-networked) to render the
+	-- change; the server just keeps the edit in its own clone + self.overrides for save/export.
+	-- The shared-fallback path (clone bailed) keeps the cheap Disable/Enable on every realm.
+	local s_Clone = GameObjectManager:GetInstanceClone(self.guid)
+
+	if s_Clone ~= nil then
+		if SharedUtils:IsClientModule() then
+			GameObjectManager:ReinstantiateFromClone(self.guid, s_Clone)
+		end
+	else
+		self:Disable(true)
+		self:Enable(true)
+	end
+
 	return true
 end
 
+-- Applies a single edited field to this instance's (already-resolved) internalBlueprint and
+-- records it in self.overrides. The live re-instantiation is driven once by SetOverrides after
+-- the whole field loop, NOT per field.
 function GameObject:SetOverride(p_Field)
 	local s_Path = EBXManager:SetField(self.internalBlueprint, p_Field, '')
 
 	if s_Path then
 		self.overrides[s_Path] = p_Field
 	end
-
-	self:Disable(true)
-	self:Enable(true)
 
 	return s_Path ~= '', s_Path
 end

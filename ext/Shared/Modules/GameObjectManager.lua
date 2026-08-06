@@ -69,6 +69,12 @@ function GameObjectManager:RegisterVars()
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_PendingBlueprint = {}
 
+	-- [M1] Per-instance blueprint clones, keyed by editor GameObject guid:
+	--   { dc = <cloned DataContainer>, originalRef = <blueprintCtrRef table> }
+	-- Lives on the MANAGER (not the GameObject) so it survives the delete+respawn that
+	-- re-instantiation performs — the rebuilt GameObject re-adopts its clone from here.
+	self.m_InstanceClones = {}
+
 	self.m_ProcessedEntities = {}
 	self.m_PendingEntities = {}
 	self.m_VanillaGameObjectGuids = {}
@@ -490,6 +496,22 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	if s_PendingCustomBlueprintInfo ~= nil then
 		self.m_PendingCustomBlueprintGuids[tostring(s_GameObject.blueprintCtrRef.instanceGuid)] = nil
 
+		-- [M1] Is this the respawn of a per-instance clone (ReinstantiateFromClone)? If a clone is
+		-- registered for this editor-guid, adopt it as internalBlueprint and RESTORE the original
+		-- blueprintCtrRef — the clone spawned as p_Blueprint, so the ctrRef computed above points at
+		-- the clone's unregistered guid/partition, which would break the inspector fetch and the
+		-- object's identity. Must run AFTER the pending-cleanup above (which keys off the clone
+		-- guid) and BEFORE the dispatch below (so the WebUI receives the correct reference). The
+		-- overrides are already baked into the clone, so flag isCloneRespawn to skip the re-apply
+		-- further down (re-applying would re-clone + respawn endlessly).
+		local s_CloneEntry = self.m_InstanceClones[tostring(s_GameObject.guid)]
+
+		if s_CloneEntry ~= nil then
+			s_GameObject.internalBlueprint = s_CloneEntry.dc
+			s_GameObject.blueprintCtrRef = CtrRef(s_CloneEntry.originalRef)
+			s_GameObject.isCloneRespawn = true
+		end
+
 		if s_GameObject.guid ~= PREVIEW_GUID then
 			--m_Logger:Write("Spawning: " .. s_GameObject.guid)
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
@@ -501,7 +523,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		s_GameObject:SetTransform(p_Transform, false)
 	end
 
-	if s_GameObject:HasOverrides() then
+	-- Re-apply saved overrides on a fresh spawn (e.g. load-injected objects). Skip clone
+	-- respawns: their overrides are already baked into the adopted clone, and re-applying would
+	-- clone-and-respawn again forever.
+	if not s_GameObject.isCloneRespawn and s_GameObject:HasOverrides() then
 		m_Logger:Write("Patching GameObject: " .. tostring(s_GameObject.guid))
 		s_GameObject:SetOverrides(s_GameObject.overrides)
 	end
@@ -756,6 +781,80 @@ function GameObjectManager:SetVariation(p_Guid, p_Variation)
 	self:DeleteGameObject(p_Guid)
 	--function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid, p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_IsPreviewSpawn)
 	self:InvokeBlueprintSpawn(p_Guid, "server", s_TransferData.blueprintCtrRef.partitionGuid, s_TransferData.blueprintCtrRef.instanceGuid, s_TransferData.parentData, s_TransferData.transform, p_Variation, false, s_TransferData.overrides)
+	return true
+end
+
+-- [M1] Register a per-instance blueprint clone for an editor GameObject. p_OriginalRefTable is
+-- the object's ORIGINAL blueprintCtrRef (as a table) — the create hook restores it after a
+-- clone respawn, since the clone's own guid isn't registered in InstanceParser/ResourceManager.
+function GameObjectManager:RegisterInstanceClone(p_Guid, p_CloneDC, p_OriginalRefTable)
+	self.m_InstanceClones[tostring(p_Guid)] = { dc = p_CloneDC, originalRef = p_OriginalRefTable }
+end
+
+-- Returns the cloned DataContainer for an editor GameObject, or nil if the instance hasn't been
+-- made unique yet (still sharing the prefab blueprint).
+function GameObjectManager:GetInstanceClone(p_Guid)
+	local s_Entry = self.m_InstanceClones[tostring(p_Guid)]
+
+	if s_Entry ~= nil then
+		return s_Entry.dc
+	end
+
+	return nil
+end
+
+-- Re-instantiate an object's live entities from a per-instance clone DC, preserving its editor
+-- identity (guid/transform/parent/variation/overrides). Mirrors SetVariation's proven
+-- delete+respawn model but spawns from the clone directly (an unregistered runtime DC that
+-- FindInstanceByGuid can't resolve).
+function GameObjectManager:ReinstantiateFromClone(p_Guid, p_CloneDC)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+
+	if s_GameObject == nil then
+		m_Logger:Error('ReinstantiateFromClone: object ' .. tostring(p_Guid) .. ' does not exist')
+		return false
+	end
+
+	local s_TransferData = s_GameObject:GetGameObjectTransferData()
+
+	self:DeleteGameObject(p_Guid)
+	self:InvokeBlueprintSpawnFromClone(p_Guid, "server", p_CloneDC, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, s_TransferData.overrides, s_TransferData.timeStamp)
+	return true
+end
+
+-- Like InvokeBlueprintSpawn, but spawns from a runtime clone DataContainer instead of resolving
+-- a registered blueprint by guid. Pending is keyed on the clone's (unique) instanceGuid, since
+-- the create hook fires with the clone as p_Blueprint.
+function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_SenderName, p_CloneDC, p_ParentData, p_LinearTransform, p_Variation, p_Overrides, p_TimeStamp)
+	if p_CloneDC == nil or p_LinearTransform == nil then
+		m_Logger:Error('InvokeBlueprintSpawnFromClone: clone or transform is nil.')
+		return false
+	end
+
+	p_Variation = p_Variation or 0
+
+	local s_ObjectBlueprint = _G[p_CloneDC.typeInfo.name](p_CloneDC)
+	local s_CloneGuid = tostring(p_CloneDC.instanceGuid)
+
+	self.m_PendingCustomBlueprintGuids[s_CloneGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides, timeStamp = p_TimeStamp }
+
+	local s_Params = EntityCreationParams()
+	s_Params.transform = p_LinearTransform
+	s_Params.variationNameHash = p_Variation
+	-- NON-networked: the clone DC isn't registered in ResourceManager, so replicating it would
+	-- hand the peer a blueprint guid it can't resolve. Each realm renders its own clone locally.
+	s_Params.networked = false
+
+	local s_Ok, s_EntityBus = pcall(function()
+		return EntityManager:CreateEntitiesFromBlueprint(p_CloneDC, s_Params)
+	end)
+
+	if not s_Ok or s_EntityBus == nil then
+		m_Logger:Error("Spawning from clone failed: " .. tostring(s_EntityBus))
+		self.m_PendingCustomBlueprintGuids[s_CloneGuid] = nil
+		return false
+	end
+
 	return true
 end
 
