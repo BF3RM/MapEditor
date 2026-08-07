@@ -23,6 +23,7 @@ function CommandActions:RegisterVars()
 	self.DisableGameObjectCommand = self.DisableGameObject
 	self.SetVariationCommand = self.SetVariation
 	self.SetEBXFieldCommand = self.SetEBXField
+	self.ApplyBlueprintOverridesCommand = self.ApplyBlueprintOverrides
 end
 
 function CommandActions:SpawnGameObject(p_Command, p_UpdatePass)
@@ -331,6 +332,30 @@ function CommandActions:SetEBXField(p_Command)
 		sender = p_Command.sender,
 		type = CARType.SetField,
 		gameObjectTransferData = s_GameObjectTransferData
+	}
+
+	return s_CommandActionResult, CARResponseType.Success
+end
+
+-- "Apply to Blueprint" (Unity Apply-to-Prefab): promote one instance's per-instance overrides
+-- onto the shared base blueprint, then rebuild every instance of it so they pick up the new base
+-- (siblings keep their own not-yet-applied overrides on top). See GameObjectManager for details.
+function CommandActions:ApplyBlueprintOverrides(p_Command)
+	if p_Command.gameObjectTransferData == nil or p_Command.gameObjectTransferData.guid == nil then
+		m_Logger:Error("ApplyBlueprintOverridesCommand needs a gameObjectTransferData with a guid.")
+		return nil, CARResponseType.Failure
+	end
+
+	local s_Ok = GameObjectManager:ApplyOverridesToBlueprint(p_Command.gameObjectTransferData.guid)
+
+	if not s_Ok then
+		return nil, CARResponseType.Failure
+	end
+
+	local s_CommandActionResult = {
+		sender = p_Command.sender,
+		type = CARType.SetField,
+		gameObjectTransferData = { guid = p_Command.gameObjectTransferData.guid, overrides = {} }
 	}
 
 	return s_CommandActionResult, CARResponseType.Success

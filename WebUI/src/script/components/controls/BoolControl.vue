@@ -4,7 +4,7 @@
 		     Cohtml and emits `change`, not the `input` this was wired to — so bool fields
 		     were dead. Plain clickable div instead, same pattern as the inspector
 		     Enable/Disable checkbox. -->
-		<span class="fx-checkbox-box" :class="{ checked: value }" @click="toggle">
+		<span class="fx-checkbox-box" :class="{ checked: local }" @click="toggle">
 			<span class="fx-check"></span>
 		</span>
 	</div>
@@ -21,9 +21,23 @@ export default defineComponent({
             required: true
         }
     },
+    data() {
+        return {
+            // Local copy so the checkbox flips on click regardless of the prop round-trip. Without
+            // it, the click emitted !value but nothing re-rendered, so it looked dead and every
+            // click re-sent the same value (this.value never changed).
+            local: this.value as boolean
+        };
+    },
+    watch: {
+        value(v: boolean) {
+            this.local = v;
+        }
+    },
     methods: {
         toggle() {
-            this.$emit('input', !this.value);
+            this.local = !this.local;
+            this.$emit('input', this.local);
         }
     }
 });

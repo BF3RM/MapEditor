@@ -9,7 +9,7 @@
 			type="Float"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.x"
+			:value="local.x"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('x', $event)"
@@ -23,7 +23,7 @@
 			type="Float"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.y"
+			:value="local.y"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('y', $event)"
@@ -37,7 +37,7 @@
 			type="Float"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.z"
+			:value="local.z"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('z', $event)"
@@ -51,7 +51,7 @@
 			type="Float"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.w"
+			:value="local.w"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('w', $event)"
@@ -94,9 +94,20 @@ export default defineComponent({
             default: false
         }
     },
+    data() {
+        return {
+            // Persistent working copy so multi-axis edits accumulate (see Vec3Control).
+            local: (this.value as Vec4).clone()
+        };
+    },
+    watch: {
+        value(newVal: Vec4) {
+            this.local = newVal.clone();
+        }
+    },
     methods: {
         onChangeValue(axis: string, val: number) {
-            const newVal = this.value.clone();
+            const newVal = (this.local as Vec4).clone();
 
             switch (axis) {
                 case 'x':
@@ -112,7 +123,8 @@ export default defineComponent({
                     newVal.w = val;
             }
 
-            this.$emit('input', newVal);
+            this.local = newVal;
+            this.$emit('input', newVal.clone());
         }
     }
 });

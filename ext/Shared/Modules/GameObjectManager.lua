@@ -858,6 +858,87 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	return true
 end
 
+-- [M3] "Apply to Blueprint" (Unity Apply-to-Prefab). Promote one instance's per-instance EBX
+-- overrides onto the SHARED base blueprint, then rebuild every instance of that blueprint so they
+-- pick up the new base. Siblings that have their OWN overrides keep them layered on top (they get
+-- re-cloned from the new base and re-apply their overrides); the applying instance's overrides are
+-- cleared, since they're now the base.
+--
+-- Reuses only proven-safe paths: the shared blueprint is a REGISTERED DC (so writing to it +
+-- Disable/Enable is the original, crash-free EBX path), and re-cloning goes back through the
+-- client-only SetOverrides from M1.
+function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
+	local s_GameObject = self.m_GameObjects[tostring(p_Guid)]
+
+	if s_GameObject == nil then
+		m_Logger:Error("ApplyOverridesToBlueprint: object " .. tostring(p_Guid) .. " does not exist")
+		return false
+	end
+
+	if s_GameObject.overrides == nil or next(s_GameObject.overrides) == nil then
+		m_Logger:Warning("ApplyOverridesToBlueprint: nothing to apply for " .. tostring(p_Guid))
+		return false
+	end
+
+	local s_BpGuid = tostring(s_GameObject.blueprintCtrRef.instanceGuid)
+
+	-- 1) Write the applying instance's overrides onto the SHARED registered blueprint DC.
+	local s_Shared = s_GameObject.blueprintCtrRef:Get()
+
+	if s_Shared == nil then
+		m_Logger:Error("ApplyOverridesToBlueprint: shared blueprint not resolvable for " .. tostring(p_Guid))
+		return false
+	end
+
+	local s_Applied = s_GameObject.overrides
+
+	for _, l_Field in pairs(s_Applied) do
+		EBXManager:SetField(s_Shared, l_Field, '')
+	end
+
+	-- 2) Collect every instance of this blueprint BEFORE we start respawning (respawns mutate
+	--    m_GameObjects, so we can't iterate it live).
+	local s_InstanceGuids = {}
+
+	for l_Guid, l_GO in pairs(self.m_GameObjects) do
+		if l_GO ~= nil and l_GO.blueprintCtrRef ~= nil and
+			tostring(l_GO.blueprintCtrRef.instanceGuid) == s_BpGuid then
+			table.insert(s_InstanceGuids, l_Guid)
+		end
+	end
+
+	-- 3) Rebuild each instance against the new base.
+	for _, l_Guid in ipairs(s_InstanceGuids) do
+		local l_GO = self.m_GameObjects[l_Guid]
+
+		if l_GO ~= nil then
+			local l_HadClone = self.m_InstanceClones[l_Guid] ~= nil
+			local l_IsApplier = (l_Guid == tostring(p_Guid))
+			-- The applier's overrides are now the base -> drop them. Siblings keep theirs.
+			local l_Remaining = l_IsApplier and {} or l_GO.overrides
+
+			-- Reset any per-instance clone so it re-clones from the MUTATED shared base.
+			self.m_InstanceClones[l_Guid] = nil
+			l_GO.internalBlueprint = nil
+			l_GO.overrides = {}
+			l_GO:SetField('overrides', l_GO.overrides)
+
+			if l_HadClone or next(l_Remaining) ~= nil then
+				-- Was unique (or still has its own overrides): re-clone from the new base and
+				-- re-apply the remaining overrides. SetOverrides respawns client-side only (safe).
+				l_GO:SetOverrides(l_Remaining)
+			else
+				-- Clone-less, no overrides: its live entities read the shared DC directly, so a
+				-- Disable/Enable re-reads the new base (the original crash-free refresh).
+				l_GO:Disable(true)
+				l_GO:Enable(true)
+			end
+		end
+	end
+
+	return true
+end
+
 function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_Entity = p_Hook:Call()
 

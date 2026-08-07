@@ -20,6 +20,10 @@
 			<div class="fx-inspector">
 				<InspectorComponent />
 			</div>
+			<div class="fx-divider-h" @mousedown="startDrag('overrides', $event)"></div>
+			<div class="fx-overrides" :style="{ flexBasis: overridesHeight + 'px' }">
+				<OverridesComponent />
+			</div>
 			<div class="fx-divider-h" @mousedown="startDrag('history', $event)"></div>
 			<div class="fx-history" :style="{ flexBasis: historyHeight + 'px' }">
 				<HistoryComponent />
@@ -37,6 +41,7 @@ import { defineComponent } from '@vue/composition-api';
 import ViewportComponent from '@/script/components/EditorComponents/ViewportComponent.vue';
 import InspectorComponent from '@/script/components/EditorComponents/Inspector/InspectorComponent.vue';
 import HistoryComponent from '@/script/components/EditorComponents/HistoryComponent.vue';
+import OverridesComponent from '@/script/components/EditorComponents/OverridesComponent.vue';
 import HierarchyComponent from '@/script/components/EditorComponents/HierarchyComponent.vue';
 import ExplorerComponent from '@/script/components/EditorComponents/ExplorerComponent.vue';
 
@@ -46,6 +51,7 @@ export default defineComponent({
 		ViewportComponent,
 		InspectorComponent,
 		HistoryComponent,
+		OverridesComponent,
 		HierarchyComponent,
 		ExplorerComponent
 	},
@@ -54,7 +60,8 @@ export default defineComponent({
 			hierarchyWidth: 250,
 			rightWidth: 340,
 			bottomHeight: 200,
-			historyHeight: 150
+			historyHeight: 150,
+			overridesHeight: 160
 		};
 	},
 	methods: {
@@ -69,7 +76,8 @@ export default defineComponent({
 				hierarchy: this.hierarchyWidth,
 				right: this.rightWidth,
 				bottom: this.bottomHeight,
-				history: this.historyHeight
+				history: this.historyHeight,
+				overrides: this.overridesHeight
 			};
 			const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 			const onMove = (ev: MouseEvent) => {
@@ -89,6 +97,8 @@ export default defineComponent({
 					this.bottomHeight = clamp(start.bottom - dy, 90, 700);
 				} else if (which === 'history') {
 					this.historyHeight = clamp(start.history - dy, 60, 500);
+				} else if (which === 'overrides') {
+					this.overridesHeight = clamp(start.overrides - dy, 60, 600);
 				}
 			};
 			const onUp = () => {
@@ -180,6 +190,15 @@ export default defineComponent({
 	display: flex;
 }
 .fx-history > * {
+	width: 100%;
+}
+.fx-overrides {
+	flex-grow: 0;
+	flex-shrink: 0;
+	min-height: 0;
+	display: flex;
+}
+.fx-overrides > * {
 	width: 100%;
 }
 

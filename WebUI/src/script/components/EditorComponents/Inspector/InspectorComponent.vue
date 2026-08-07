@@ -82,14 +82,6 @@
 							</div>
 						</div>
 					</div>
-					<div v-if="selectedGameObject && Object.keys(selectedGameObject.overrides).length > 0">
-						<label>Overrides</label>
-						<p v-for="(value, key) of Object.keys(selectedGameObject.overrides)" :key="key">{{ value }}</p>
-						<div v-if="Object.keys(selectedGameObject.overrides).length > 0">
-							<!--							<button @click="selectedGameObject.applyOverrides">Apply</button>-->
-							<!--							<button @click="selectedGameObject.revertOverrides">Revert</button>-->
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -234,7 +226,17 @@ export default class InspectorComponent extends EditorComponent {
 		signals.deselectedGameObject.connect(this.onSelection.bind(this));
 		signals.objectChanged.connect(this.onObjectChanged.bind(this));
 		signals.worldSpaceChanged.connect(this.onWorldSpaceUpdated.bind(this));
+		// Re-render after an EBX edit is echoed (FrostbiteDataManager applies the override to the
+		// GameObject just before us) so EBXOverrides re-fans the ACCUMULATED value into the field
+		// controls. Without this, a Vec3 control keeps cloning the base value, so editing one
+		// colour channel resets the others — only the last edit survives (0,0,0 -> "1,1,1" ended
+		// up 0,0,1). $nextTick guards against handler-order surprises.
+		signals.setEBXField.connect(this.onEBXFieldEchoed.bind(this));
 		document.addEventListener('click', this.boundCloseVariationMenu);
+	}
+
+	onEBXFieldEchoed() {
+		this.$nextTick(() => this.$forceUpdate());
 	}
 
 	beforeDestroy() {
@@ -280,27 +282,22 @@ export default class InspectorComponent extends EditorComponent {
 	onEBXInput(value: IEBXFieldData, addObjectsField = false) {
 		if (this.selectedGameObject) {
 			value.guid = this.selectedGameObject.guid;
-			if (addObjectsField) {
-				window.editor.execute(
-					new SetEBXFieldCommand({
-						guid: this.selectedGameObject.guid,
-						reference: this.selectedGameObject.originalRef,
-						field: 'objects',
-						type: 'GameObjectData',
-						value: value
-					})
-				);
-			} else {
-				window.editor.execute(
-					new SetEBXFieldCommand({
-						guid: this.selectedGameObject.guid,
-						reference: this.selectedGameObject.originalRef,
-						field: 'object',
-						type: 'GameObjectData',
-						value: value
-					})
-				);
-			}
+			const field = addObjectsField ? 'objects' : 'object';
+			const payload = {
+				guid: this.selectedGameObject.guid,
+				reference: this.selectedGameObject.originalRef,
+				field,
+				type: 'GameObjectData',
+				value: value
+			};
+			// Apply the override to the local GameObject IMMEDIATELY (same shape the ext echo would
+			// store), instead of waiting for the round-trip. This is what makes multi-component
+			// edits accumulate: a Vec2/3/4 control clones its current value + sets one axis, so the
+			// other axes must already reflect the prior edits. Then re-render so the controls read
+			// the fresh value. The ext echo re-applies the same path idempotently.
+			this.selectedGameObject.setOverride({ field, type: 'GameObjectData', value: value } as IEBXFieldData);
+			this.$forceUpdate();
+			window.editor.execute(new SetEBXFieldCommand(payload));
 		}
 	}
 
@@ -447,6 +444,98 @@ export default class InspectorComponent extends EditorComponent {
    .inspector-component so it still only affects the inspector. */
 .inspector-component .transformControls input {
 	width: 100%;
+}
+
+/* Prefab-override panel: a compact list of the fields that diverge from the base blueprint,
+   each showing original -> new, with an Apply-to-Blueprint action. Gameface-safe (flexbox,
+   no grid / :not / pseudo-classes). */
+.inspector-component .override-panel {
+	margin: 8px 0 4px;
+	padding: 8px 9px;
+	background-color: rgba(3, 127, 255, 0.06);
+	border: 1px solid rgba(3, 127, 255, 0.25);
+	border-left: 2px solid #037fff;
+	border-radius: 5px;
+}
+
+.inspector-component .override-panel-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 6px;
+}
+
+.inspector-component .override-panel-head label {
+	color: #4ea3ff;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.inspector-component .override-apply {
+	background-color: #037fff;
+	color: #fff;
+	border: 0;
+	border-radius: 4px;
+	padding: 4px 10px;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.inspector-component .override-apply:hover {
+	background-color: #2a95ff;
+}
+
+.inspector-component .override-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 3px 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.inspector-component .override-field {
+	font-family: 'Consolas', 'Menlo', monospace;
+	font-size: 11px;
+	color: #cdd6e0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex: 0 1 auto;
+	min-width: 0;
+	margin-right: 8px;
+}
+
+.inspector-component .override-values {
+	display: flex;
+	align-items: center;
+	flex: 0 0 auto;
+	font-family: 'Consolas', 'Menlo', monospace;
+	font-size: 11px;
+}
+
+.inspector-component .override-old {
+	color: #7a8797;
+	text-decoration: line-through;
+	max-width: 90px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.inspector-component .override-arrow {
+	color: #5f6f80;
+	margin: 0 6px;
+}
+
+.inspector-component .override-new {
+	color: #57d18a;
+	max-width: 110px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 /* CSS triangle caret — unicode arrows (▸/▾) render as tofu boxes in Gameface. */

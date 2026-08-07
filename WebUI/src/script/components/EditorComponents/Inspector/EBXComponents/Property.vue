@@ -1,5 +1,5 @@
 <template>
-	<div v-if="field.name !== 'name'" class="row" :class="'row-' + rowKind">
+	<div v-if="field.name !== 'name'" class="row" :class="['row-' + rowKind, { overridden: isOverridden }]">
 		<div
 			class="is-family-code is-narrow field-name"
 			:class="{ numbered: !isNaN(Number(field.name)) }"
@@ -24,6 +24,14 @@
 					:overrides="getOverrides()"
 				></component>
 			</div>
+			<button
+				v-if="isOverridden && isLeaf"
+				class="field-revert"
+				@click="revert"
+				title="Revert this field to the blueprint value"
+			>
+				⟲
+			</button>
 		</div>
 	</div>
 </template>
@@ -129,9 +137,25 @@ export default Vue.extend({
 			if (this.overrides) {
 				return this.overrides;
 			}
+		},
+		// Revert an overridden field back to the blueprint's value (this.field.value is the base
+		// partition value; getValue() only shows the override on top). Round-trips through the
+		// normal edit path so the ext writes the base value back onto this instance's clone.
+		revert() {
+			this.onChangeValue(this.field.name, this.field.value);
 		}
 	},
 	computed: {
+		// An override exists for THIS field (getOverrides fanned a value down to us). Also true
+		// for the container rows on the path to a leaf override, which get the highlight but no
+		// revert button (revert is per-value, shown only on leaves).
+		isOverridden(): boolean {
+			return this.overrides !== null && this.overrides !== undefined;
+		},
+		// A concrete value row (scalar / enum / vector), not a container (array/reference/struct).
+		isLeaf(): boolean {
+			return this.rowKind !== 'container';
+		},
 		// Layout hint for styling only (does NOT affect which control renders):
 		//   inline    -> label | value on one line (primitives, enums, bools)
 		//   wide      -> label above a full-width control (Vec3 / LinearTransform)
@@ -240,6 +264,36 @@ export default Vue.extend({
 
 .field-value {
 	min-width: 0;
+}
+
+/* Overridden field: amber label + faint wash so it stands out from base values, plus a small
+   revert button to the right of the input. Highlight also lands on the container rows on the
+   path to the override (Unity-style); the revert button only renders on leaf value rows. */
+.row.overridden {
+	background: rgba(224, 182, 78, 0.07);
+}
+.row.overridden > .field-name {
+	color: #e0b64e;
+	font-weight: 600;
+}
+.field-revert {
+	flex: 0 0 auto;
+	margin-left: 6px;
+	background: rgba(255, 255, 255, 0.06);
+	color: #cdd6e0;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 4px;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	font-size: 12px;
+	line-height: 1;
+	cursor: pointer;
+}
+.field-revert:hover {
+	background: rgba(224, 82, 82, 0.2);
+	border-color: #e05252;
+	color: #ff8c8c;
 }
 
 /* --- inline: single-line label | value (strings, numbers, bools, enums) --- */

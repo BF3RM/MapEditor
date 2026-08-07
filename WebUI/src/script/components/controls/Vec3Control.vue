@@ -9,7 +9,7 @@
 			type="Float"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.x"
+			:value="local.x"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('x', $event)"
@@ -23,7 +23,7 @@
 			type="Float"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.y"
+			:value="local.y"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('y', $event)"
@@ -37,7 +37,7 @@
 			label="Z"
 			dragDirection="X"
 			:hideLabel="hideLabel"
-			:value="value.z"
+			:value="local.z"
 			:step="step"
 			:min="min"
 			@input="onChangeValue('z', $event)"
@@ -88,9 +88,24 @@ export default defineComponent({
             default: false
         }
     },
+    data() {
+        return {
+            // Persistent working copy. Editing one axis mutates THIS (not a fresh clone of the
+            // prop), so multi-axis edits accumulate even before the prop round-trips back — the
+            // reason "0,0,0 -> 1,1,1" used to collapse to 0,0,1 (each axis cloned the stale base).
+            local: (this.value as Vec3).clone()
+        };
+    },
+    watch: {
+        // Re-seed on genuine external changes (revert, reselect, apply). During the user's own
+        // edits the incoming value equals local, so this is a harmless no-op.
+        value(newVal: Vec3) {
+            this.local = newVal.clone();
+        }
+    },
     methods: {
         onChangeValue(axis: string, val: number) {
-            const newVal = this.value.clone();
+            const newVal = (this.local as Vec3).clone();
 
             switch (axis) {
                 case 'x':
@@ -103,7 +118,8 @@ export default defineComponent({
                     newVal.z = val;
             }
 
-            this.$emit('input', newVal);
+            this.local = newVal;
+            this.$emit('input', newVal.clone());
         }
 
     /*

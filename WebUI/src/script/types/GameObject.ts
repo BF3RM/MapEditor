@@ -66,7 +66,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		origin: GAMEOBJECT_ORIGIN = GAMEOBJECT_ORIGIN.CUSTOM,
 		isUserModified: boolean = false,
 		originalRef: CtrRef | undefined = undefined,
-		realm: REALM = REALM.CLIENT_AND_SERVER
+		realm: REALM = REALM.CLIENT_AND_SERVER,
+		overrides: { [path: string]: IEBXFieldData } = {}
 	) {
 		super();
 		this.guid = guid;
@@ -84,6 +85,20 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.isUserModified = isUserModified;
 		this.originalRef = originalRef;
 		this.realm = realm;
+		// Carry per-instance EBX overrides through construction. The ext sends them in the
+		// transfer data (GameObject:GetGameObjectTransferData), keyed by dot-path. Without this,
+		// a GameObject rebuilt on reselect/duplicate (CreateWithTransferData) started with an
+		// empty overrides map, so the inspector showed the prefab's ORIGINAL values instead of
+		// this instance's edits. Normalize an array payload (legacy) into the path-keyed map.
+		if (Array.isArray(overrides)) {
+			const map: { [path: string]: IEBXFieldData } = {};
+			for (const o of overrides as IEBXFieldData[]) {
+				map[this._GetPath(o, '')] = o;
+			}
+			this.overrides = map;
+		} else {
+			this.overrides = overrides || {};
+		}
 		this.setWorldMatrix(this.transform.toMatrix(), true);
 		// Update the matrix after initialization.
 		this.updateMatrix();
@@ -113,7 +128,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.origin,
 			gameObjectTransferData.isUserModified,
 			gameObjectTransferData.originalRef,
-			gameObjectTransferData.realm
+			gameObjectTransferData.realm,
+			gameObjectTransferData.overrides as any
 		);
 	}
 
@@ -270,16 +286,78 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public setOverride(newOverride: IEBXFieldData) {
 		const path = this._GetPath(newOverride, '');
 
+		// A field set back to its base value is NOT an override — drop it from tracking. This is
+		// what makes Revert (which re-sends the field's captured base value) actually clear the
+		// entry, instead of leaving a no-op "base -> base" row lingering in the Overrides panel.
+		// It also naturally un-tracks a field the user manually types back to its base value.
+		if (this._isRevertToBase(newOverride)) {
+			if (this.overrides[path] !== undefined) {
+				const next = { ...this.overrides };
+				delete next[path];
+				this.overrides = next;
+			}
+			return;
+		}
+
 		this.overrides = {
 			...this.overrides,
 			[path]: newOverride
 		};
+	}
 
-		console.log(this.overrides);
-		// this.overrides.setValue(path, newOverride);
+	// Walk an override chain to its printable leaf and check whether the new value equals the
+	// base value the leaf captured at edit time (Property.vue oldValue).
+	private _isRevertToBase(node: IEBXFieldData): boolean {
+		let leaf: IEBXFieldData = node;
+		while (leaf && !isPrintable(leaf.type)) {
+			leaf = leaf.value as IEBXFieldData;
+		}
+		if (!leaf) {
+			return false;
+		}
+		const oldValue = (leaf as any).oldValue;
+		if (oldValue === undefined) {
+			return false;
+		}
+		return this._valuesEqual(leaf.value, oldValue);
+	}
+
+	private _valuesEqual(a: any, b: any): boolean {
+		if (a === b) {
+			return true;
+		}
+		if (a && b && typeof a === 'object' && typeof b === 'object') {
+			return JSON.stringify(a) === JSON.stringify(b);
+		}
+		return false;
 	}
 
 	public ApplyOverrides() {}
+
+	// Flattens the per-path override map into a display list for the inspector's override panel.
+	// Each override is a nested IEBXFieldData chain (field -> value -> field -> ... -> leaf); we
+	// descend to the printable leaf to read the new value and the oldValue the leaf control
+	// captured at edit time (Property.vue onChangeValue), so the panel can show new vs original
+	// without re-walking the blueprint partition.
+	public get overrideSummary(): { path: string; label: string; newValue: any; oldValue: any }[] {
+		const out: { path: string; label: string; newValue: any; oldValue: any }[] = [];
+		for (const [path, override] of Object.entries(this.overrides)) {
+			let node: IEBXFieldData = override;
+			while (node && !isPrintable(node.type)) {
+				node = node.value as IEBXFieldData;
+			}
+			if (node) {
+				const segments = path.split('.');
+				out.push({
+					path,
+					label: segments[segments.length - 1] || path,
+					newValue: node.value,
+					oldValue: (node as any).oldValue
+				});
+			}
+		}
+		return out;
+	}
 
 	public setName(name: string) {
 		this.name = name;

@@ -333,6 +333,43 @@ function GameObject:SetOverrides(p_Overrides)
 	return true
 end
 
+-- Compares an override leaf's new value against the base value it captured (oldValue). Handles
+-- scalars and vector tables (x/y/z/w).
+local function m_ValuesEqual(a, b)
+	if a == b then
+		return true
+	end
+
+	if type(a) == "table" and type(b) == "table" then
+		for _, l_Key in ipairs({ "x", "y", "z", "w" }) do
+			if a[l_Key] ~= b[l_Key] then
+				return false
+			end
+		end
+
+		return true
+	end
+
+	return false
+end
+
+-- True when this edit sets the field back to its base value (a Revert, or manually matching the
+-- base) — such an override is a no-op and must NOT be tracked, or a "base -> base" row lingers in
+-- the Overrides panel and rides back in the transfer data on reselect.
+local function m_IsRevertToBase(p_Field)
+	local s_Leaf = p_Field
+
+	while s_Leaf ~= nil and type(s_Leaf) == "table" and not isPrintable(s_Leaf.type) do
+		s_Leaf = s_Leaf.value
+	end
+
+	if type(s_Leaf) ~= "table" or s_Leaf.oldValue == nil then
+		return false
+	end
+
+	return m_ValuesEqual(s_Leaf.value, s_Leaf.oldValue)
+end
+
 -- Applies a single edited field to this instance's (already-resolved) internalBlueprint and
 -- records it in self.overrides. The live re-instantiation is driven once by SetOverrides after
 -- the whole field loop, NOT per field.
@@ -340,7 +377,11 @@ function GameObject:SetOverride(p_Field)
 	local s_Path = EBXManager:SetField(self.internalBlueprint, p_Field, '')
 
 	if s_Path then
-		self.overrides[s_Path] = p_Field
+		if m_IsRevertToBase(p_Field) then
+			self.overrides[s_Path] = nil -- reverted to base: stop tracking it
+		else
+			self.overrides[s_Path] = p_Field
+		end
 	end
 
 	return s_Path ~= '', s_Path
