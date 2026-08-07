@@ -27,5 +27,10 @@ ME_CONFIG = {
 	-- an eagerly-booted WebUI pushes the load over it (DirectX CreateBuffer E_OUTOFMEMORY).
 	-- Booting after the load spike keeps the map loadable; the editor UI appears a few
 	-- seconds after the first F1 while the web app boots.
-	LAZY_WEBUI = true
+	LAZY_WEBUI = true,
+
+	-- Dev/test: auto-enter the editor (equivalent to the first F1) once the level finishes
+	-- loading, so an e2e harness can drive the editor over CDP without injecting physical input
+	-- (deploy + F1). F1 still toggles back to play. Set false for pure play-testing.
+	DEV_AUTO_ENTER_EDITOR = true
 }

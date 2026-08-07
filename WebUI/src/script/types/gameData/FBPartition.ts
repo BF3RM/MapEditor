@@ -40,7 +40,7 @@ if (!g.__ebxPending) {
     };
 }
 
-function requestPartitionFromGame(guid: string, name: string): Promise<EBX.JSON.Partition> {
+function requestPartitionFromGame(guid: string, name: string, instance?: string): Promise<EBX.JSON.Partition> {
     const requestId = ++g.__ebxReqId;
     const promise = new Promise<EBX.JSON.Partition>((resolve, reject) => {
         g.__ebxPending[requestId] = { resolve, reject };
@@ -52,7 +52,10 @@ function requestPartitionFromGame(guid: string, name: string): Promise<EBX.JSON.
             }
         }, 15000);
     });
-    window.vext.SendEvent('RequestPartitionData', { requestId, guid, name });
+    // `instance` is a target-instance-guid hint: for an external reference whose partition isn't
+    // in the server's Partition:Loaded cache, the server resolves that single instance via
+    // ResourceManager and returns a one-instance partition (see PartitionSerializer fallback).
+    window.vext.SendEvent('RequestPartitionData', { requestId, guid, name, instance });
     return promise;
 }
 
@@ -61,6 +64,9 @@ export class FBPartition {
     public instanceCount: number;
     public _data: any = undefined;
     public isLoaded = false;
+    // Optional target-instance-guid hint for the server's single-instance fallback (set when this
+    // partition is registered to resolve one external reference).
+    public instanceHint: string | null = null;
 
     private promise: Promise<AxiosResponse<EBX.JSON.Partition>>;
     constructor(
@@ -137,7 +143,7 @@ export class FBPartition {
             // In-game: request live serialization from the server over the NetEvent bridge.
             // (Cast: the resolved value is ignored by the GameObject.partition getter, which
             // returns the FBPartition itself — same as the axios/any path above.)
-            this.promise = requestPartitionFromGame(this.guid.toString(), this.name)
+            this.promise = requestPartitionFromGame(this.guid.toString(), this.name, this.instanceHint || undefined)
                 .then((json: EBX.JSON.Partition) => this.ingest(json))
                 .catch((e: any) => {
                     console.error(e);

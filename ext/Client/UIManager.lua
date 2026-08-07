@@ -32,6 +32,28 @@ function UIManager:RegisterVars()
 	self.m_BootPending = false
 	self.m_EnterAfterReady = false
 	self.m_EnterPending = false
+	-- Dev/test auto-enter (ME_CONFIG.DEV_AUTO_ENTER_EDITOR): one-shot guard + a delay timer so the
+	-- editor opens a few seconds after Level:Loaded, without deploy or F1.
+	self.m_DevAutoEntered = false
+	self.m_DevAutoEnterPending = false
+	self.m_DevAutoEnterTimer = 0.0
+end
+
+--- Enter the editor programmatically, equivalent to the first F1. Sets the same lazy-boot flags
+--- the F1 handler does (boot requested by PumpPendingBoot, enter by OnUIReady -> OnUpdateInput),
+--- so it's safe to call from any context. Lets an e2e harness open the editor over CDP without
+--- injecting physical deploy/F1 input.
+function UIManager:DevEnterEditor()
+	if self.m_ActiveMode == EditorMode.Editor then
+		return
+	end
+	if self.m_WebUIBooted then
+		self.m_ActiveMode = EditorMode.Playing
+		self.m_EnterPending = true
+	else
+		self.m_BootPending = true
+		self.m_EnterAfterReady = true
+	end
 end
 
 --- Runs from Engine:Update (MapEditorClient:OnUpdate): performs a boot requested by F1
@@ -91,6 +113,33 @@ end
 
 function UIManager:OnLoadingComplete()
 	self:SetEditorMode(EditorMode.Playing)
+
+	-- Dev/test: auto-enter the editor once (see ME_CONFIG.DEV_AUTO_ENTER_EDITOR) so e2e tests can
+	-- drive the editor over CDP without physical deploy/F1 input. F1 still toggles back to play.
+end
+
+--- Dev/test auto-enter: requested from Level:Loaded (fires at the soldier screen once the level
+--- is up), then fired after a short delay by TickAutoEnter so the WebUI boot lands AFTER the
+--- load-memory spike settles (mirrors when a human would press F1). Depends on neither deploy nor
+--- the server sync context (OnLoadingComplete only fires after those).
+function UIManager:RequestDevAutoEnter()
+	if not ME_CONFIG.DEV_AUTO_ENTER_EDITOR or self.m_DevAutoEntered then
+		return
+	end
+	self.m_DevAutoEnterPending = true
+	self.m_DevAutoEnterTimer = 0.0
+end
+
+function UIManager:TickAutoEnter(p_Delta)
+	if not self.m_DevAutoEnterPending then
+		return
+	end
+	self.m_DevAutoEnterTimer = self.m_DevAutoEnterTimer + (p_Delta or 0.016)
+	if self.m_DevAutoEnterTimer >= 5.0 then
+		self.m_DevAutoEnterPending = false
+		self.m_DevAutoEntered = true
+		self:DevEnterEditor()
+	end
 end
 
 function UIManager:OnLevelDestroy()

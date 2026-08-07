@@ -177,7 +177,7 @@ export class FrostbiteDataManager {
 	// instances lazy-load via FBPartition.data (webx/server). Without this, selecting
 	// an object whose partition wasn't preloaded leaves the inspector stuck loading,
 	// because GameObject.partition returned null -> <Promised :promise="null">.
-	public registerPartition(name: string, guid: Guid): FBPartition {
+	public registerPartition(name: string, guid: Guid, instanceHint?: string): FBPartition {
 		const key = name.toString().toLowerCase();
 		let partition = this.partitions.getValue(key);
 		if (!partition) {
@@ -186,6 +186,11 @@ export class FrostbiteDataManager {
 			if (guid) {
 				this.partitionGuids.setValue(guid.toString().toLowerCase(), partition);
 			}
+		}
+		// Carry a target-instance hint so the server can fall back to single-instance resolution
+		// when the partition isn't cached (see FBPartition.instanceHint / PartitionSerializer).
+		if (instanceHint && !partition.instanceHint) {
+			partition.instanceHint = instanceHint;
 		}
 		return partition;
 	}

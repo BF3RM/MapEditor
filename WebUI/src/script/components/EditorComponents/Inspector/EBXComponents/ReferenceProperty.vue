@@ -15,6 +15,7 @@
 				@click="toggle"
 			>
 				<div class="type">{{ (instance && instance.typeName) || type || 'Reference' }}</div>
+				<div v-if="referenceName" class="path name" :title="referenceName">{{ referenceName }}</div>
 				<div class="path">
 					{{ cleanPath }}<span class="guid">{{ guid || reference.instanceGuid }}</span>
 				</div>
@@ -113,6 +114,7 @@ export default class ReferenceComponent extends Vue {
 		cleanPath: string;
 		guid: string;
 		referenceObjectBlueprint: string;
+		referenceName: string;
 	} {
 		return {
 			loading: true,
@@ -123,7 +125,8 @@ export default class ReferenceComponent extends Vue {
 			partition: null,
 			cleanPath: '',
 			guid: '',
-			referenceObjectBlueprint: ''
+			referenceObjectBlueprint: '',
+			referenceName: ''
 		};
 	}
 
@@ -154,84 +157,111 @@ export default class ReferenceComponent extends Vue {
 			refPartitionGuid === ZERO_GUID
 				? window.editor.fbdMan.getPartitionByName(this.currentPath)
 				: window.editor.fbdMan.getPartition(this.reference.partitionGuid);
-		// External reference (non-zero partition guid) that isn't cached yet: REGISTER it so it
-		// fetches on demand from the game. getPartition() is a pure lookup — most external refs
-		// were never preloaded, so they showed "not loaded" forever. The server serializer
-		// resolves the request by guid (PartitionSerializer:_ResolvePartition), so we use the guid
-		// as the name/key since the partition name isn't known for an uncached external partition.
-		// If the target genuinely isn't loaded server-side, the fetch resolves empty and the
-		// existing not-loaded handling below still applies.
+		// External reference (non-zero partition guid) not cached yet: REGISTER it so it fetches
+		// on demand from the game (getPartition is a pure lookup). Pass the target instance guid as
+		// a hint so the server can single-instance-resolve when the whole partition isn't cached.
 		if (!partition && refPartitionGuid !== ZERO_GUID) {
-			partition = window.editor.fbdMan.registerPartition(refPartitionGuid, this.reference.partitionGuid);
+			partition = window.editor.fbdMan.registerPartition(
+				refPartitionGuid,
+				this.reference.partitionGuid,
+				this.reference.instanceGuid.toString()
+			);
 		}
 		if (!partition) {
-			console.warn(
-				`Reference target partition not loaded: ${refPartitionGuid}/${this.reference.instanceGuid}`
-			);
-			this.$data.loading = false;
-			this.$data.notLoaded = true;
+			// No partition to try — resolve the instance globally by its guid instead of giving up.
+			this.resolveGlobally();
 			return;
 		}
-		this.$data.partition = partition;
-		this.$data.partition.data
+		// const so TS keeps it non-null inside the async closure below.
+		const resolved = partition;
+		this.$data.partition = resolved;
+		resolved.data
 			.then(() => {
-				this.$data.referencePath = this.$data.partition.name;
-				this.$data.instance =
-					this.$data.partition.instances[this.reference.instanceGuid.toString().toLowerCase()];
-				this.$data.loading = false;
-				// Partition loaded but this instance isn't in it (a different partition that
-				// wasn't fully provided). Show the placeholder instead of dereferencing
-				// undefined (`.guid` / `.typeName`) below.
-				if (!this.$data.instance) {
-					this.$data.notLoaded = true;
+				const inst = resolved.instances[this.reference.instanceGuid.toString().toLowerCase()];
+				if (!inst) {
+					// Instance isn't in this partition. A ZERO partition guid does NOT always mean
+					// "same partition": Frostbite leaves it zero for IMPORTED blueprint references
+					// (e.g. VehicleSpawnReferenceObjectData.blueprint), which the engine resolves
+					// GLOBALLY by instance guid at load. Search across all loaded partitions instead
+					// of rendering "not loaded".
+					this.resolveGlobally();
 					return;
 				}
-				if (this.autoOpen) {
-					this.$data.expanded = true;
-				}
-				this.$data.cleanPath = './';
-				const regEx = new RegExp(this.currentPath.substring(0, this.currentPath.lastIndexOf('/')), 'ig');
-				if (this.$data.partition.name.toLowerCase() !== this.currentPath.toLowerCase()) {
-					// If instance is not located in the current path
-					const path = this.$data.partition.name.replace(regEx, '');
-					if (path.startsWith('/')) {
-						this.$data.cleanPath = '.' + path + '/'; // Strip the path from the filename
-					} else {
-						this.$data.cleanPath = path + '/'; // Strip the path from the filename
-					}
-				}
-				this.$data.guid = this.$data.instance.guid;
-
-				if (this.$data.instance.typeName === 'ReferenceObjectData') {
-					// The blueprint field can itself be a null / unresolved reference — guard
-					// every hop so a nested unloaded partition can't crash the inspector.
-					const blueprint = this.$data.instance.fields.blueprint && this.$data.instance.fields.blueprint.value;
-					const bpPartition = blueprint && blueprint.getPartition && blueprint.getPartition();
-					if (bpPartition) {
-						bpPartition.data
-							.then(() => {
-								const bpInstance = blueprint.getInstance && blueprint.getInstance();
-								if (bpInstance && bpInstance.fields.name) {
-									this.$data.referenceObjectBlueprint = String(bpInstance.fields.name.value).replace(
-										regEx,
-										''
-									);
-								}
-							})
-							.catch(() => {
-								/* nested blueprint partition not loaded — leave label blank */
-							});
-					}
-				}
+				this.onInstanceResolved(inst, resolved);
 			})
 			.catch((e: any) => {
 				console.warn(
 					`Failed to resolve reference ${this.reference.partitionGuid}/${this.reference.instanceGuid}`,
 					e
 				);
+				this.resolveGlobally();
+			});
+	}
+
+	// Resolve the reference target by its INSTANCE guid alone, across all loaded partitions —
+	// for imported/zero-partition references. Registers a synthetic partition keyed by the instance
+	// guid; the server's PartitionSerializer falls back to SearchForInstanceByGuid and returns a
+	// one-instance partition.
+	resolveGlobally() {
+		const instGuidStr = this.reference.instanceGuid.toString();
+		const p = window.editor.fbdMan.registerPartition(instGuidStr, this.reference.instanceGuid, instGuidStr);
+		this.$data.partition = p;
+		p.data
+			.then(() => {
+				const inst = p.instances[instGuidStr.toLowerCase()];
+				if (!inst) {
+					this.$data.loading = false;
+					this.$data.notLoaded = true;
+					return;
+				}
+				this.onInstanceResolved(inst, p);
+			})
+			.catch((e: any) => {
+				console.warn(`Global reference resolve failed ${instGuidStr}`, e);
 				this.$data.loading = false;
 				this.$data.notLoaded = true;
 			});
+	}
+
+	// Shared handling once the target instance is resolved (from either the partition or the global
+	// path): fill the chip label/path and, for a nested ReferenceObjectData, its blueprint name.
+	onInstanceResolved(instance: any, partition: any) {
+		this.$data.instance = instance;
+		this.$data.referencePath = partition.name;
+		this.$data.loading = false;
+		if (this.autoOpen) {
+			this.$data.expanded = true;
+		}
+		this.$data.cleanPath = './';
+		const regEx = new RegExp(this.currentPath.substring(0, this.currentPath.lastIndexOf('/')), 'ig');
+		if (partition.name && partition.name.toLowerCase() !== this.currentPath.toLowerCase()) {
+			const path = partition.name.replace(regEx, '');
+			this.$data.cleanPath = path.startsWith('/') ? '.' + path + '/' : path + '/';
+		}
+		this.$data.guid = instance.guid;
+
+		// Surface the target's own name/path so the chip says WHAT it points to (e.g. which
+		// vehicle blueprint), not just its type. Blueprints carry their asset path in `name`.
+		if (instance.fields && instance.fields.name && instance.fields.name.value != null) {
+			this.$data.referenceName = String(instance.fields.name.value);
+		}
+
+		if (instance.typeName === 'ReferenceObjectData') {
+			const blueprint = instance.fields.blueprint && instance.fields.blueprint.value;
+			const bpPartition = blueprint && blueprint.getPartition && blueprint.getPartition();
+			if (bpPartition) {
+				bpPartition.data
+					.then(() => {
+						const bpInstance = blueprint.getInstance && blueprint.getInstance();
+						if (bpInstance && bpInstance.fields.name) {
+							this.$data.referenceObjectBlueprint = String(bpInstance.fields.name.value).replace(regEx, '');
+						}
+					})
+					.catch(() => {
+						/* nested blueprint partition not loaded — leave label blank */
+					});
+			}
+		}
 	}
 }
 </script>
@@ -323,6 +353,13 @@ export default class ReferenceComponent extends Vue {
 	.path.hint {
 		color: #7a8797;
 		font-style: italic;
+	}
+
+	/* The target's own name/path (which blueprint this points to) — the most useful line, so
+	   give it the readable body colour and let it wrap instead of truncating the tail. */
+	.path.name {
+		color: #cdd6e0;
+		font-weight: 600;
 	}
 
 	/* Loading: identical chip, just a faint pulse so it reads as "filling in" rather

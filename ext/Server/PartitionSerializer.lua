@@ -451,6 +451,55 @@ function PartitionSerializer:_PartitionName(p_Partition, p_Fallback)
 	return tostring(p_Fallback)
 end
 
+--- Resolve a SINGLE referenced instance when its partition isn't in the Partition:Loaded cache
+--- (lazy/streamed blueprint partitions). The reference carries the instance guid and the instance
+--- is loaded in memory, so find it via ResourceManager (by partition+instance guid, else a global
+--- search by instance guid) and serialize a one-instance partition keyed by that guid — enough for
+--- the WebUI to resolve the reference (type + fields) instead of showing "not loaded".
+---@param p_PartitionGuid string|nil
+---@param p_InstanceGuid string
+---@param p_Name string|nil
+---@return table|nil
+function PartitionSerializer:_SerializeInstanceFallback(p_PartitionGuid, p_InstanceGuid, p_Name)
+	if p_InstanceGuid == nil then
+		return nil
+	end
+
+	local s_Instance = nil
+
+	-- SEPARATE pcalls: a throw in FindInstanceByGuid (e.g. the partition guid is bogus, which it is
+	-- for a zero/imported reference) must not skip the global SearchForInstanceByGuid below.
+	if p_PartitionGuid ~= nil and tostring(p_PartitionGuid) ~= tostring(p_InstanceGuid) then
+		pcall(function()
+			s_Instance = ResourceManager:FindInstanceByGuid(Guid(tostring(p_PartitionGuid)), Guid(tostring(p_InstanceGuid)))
+		end)
+	end
+	if s_Instance == nil then
+		pcall(function()
+			s_Instance = ResourceManager:SearchForInstanceByGuid(Guid(tostring(p_InstanceGuid)))
+		end)
+	end
+
+	if s_Instance == nil then
+		m_Logger:Error("Instance fallback: couldn't resolve " .. tostring(p_PartitionGuid) .. "/" .. tostring(p_InstanceGuid))
+		return nil
+	end
+
+	local s_Ok, s_InstTable = pcall(function() return self:_SerializeInstance(s_Instance) end)
+
+	if not s_Ok or s_InstTable == nil then
+		m_Logger:Error("Instance fallback: serialize failed for " .. tostring(p_InstanceGuid))
+		return nil
+	end
+
+	return {
+		["$guid"] = tostring(p_PartitionGuid or ""),
+		["$name"] = p_Name or tostring(p_PartitionGuid or ""),
+		["$primaryInstance"] = tostring(p_InstanceGuid),
+		["$instances"] = { s_InstTable },
+	}
+end
+
 --============================ Transport (NetEvent, chunked) ============================--
 
 --- Client requested a partition. Payload is a JSON string { requestId, guid, name }.
@@ -470,6 +519,15 @@ function PartitionSerializer:OnRequestPartitionData(p_Player, p_RequestJson)
 	m_Logger:Write("Partition requested: " .. tostring(s_Key) .. " (req " .. tostring(s_RequestId) .. ")")
 
 	local s_Partition = self:SerializePartition(s_Key, s_Request.name)
+
+	-- Fallback for references whose PARTITION isn't in the Partition:Loaded cache (blueprint
+	-- partitions that loaded lazily or before we subscribed — e.g. VehicleSpawnReferenceObjectData
+	-- blueprints). The reference still carries the target instance guid, and the instance IS loaded
+	-- in memory, so resolve just that instance via ResourceManager and serialize a one-instance
+	-- partition. Without this the WebUI showed those references as "not loaded" forever.
+	if s_Partition == nil and s_Request.instance ~= nil then
+		s_Partition = self:_SerializeInstanceFallback(s_Request.guid, s_Request.instance, s_Request.name)
+	end
 
 	if s_Partition == nil then
 		NetEvents:SendToLocal("MapEditorClient:PartitionDataError", p_Player, {

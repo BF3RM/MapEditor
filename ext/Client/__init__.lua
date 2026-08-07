@@ -76,11 +76,14 @@ function MapEditorClient:OnUpdate(p_Delta, p_SimulationDelta)
 	-- Perform a lazy WebUI boot requested by F1, here in Engine:Update — doing WebUI:Init()
 	-- inside the input event froze the client.
 	UIManager:PumpPendingBoot()
+	UIManager:TickAutoEnter(p_Delta)
 	WebUpdater:OnUpdate(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
+	-- Dev/test: schedule the auto-enter (fires ~5s later via TickAutoEnter in OnUpdate).
+	UIManager:RequestDevAutoEnter()
 end
 
 function MapEditorClient:OnExtensionLoaded()
