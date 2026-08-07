@@ -213,6 +213,17 @@ local function DrawGameObject(p_GameObject, p_Color)
 			end)
 		end
 	end
+
+	-- Recurse into child GameObjects so nested children's AABBs draw too — parity with the
+	-- three.js viewport, which walks the whole subtree on select/highlight (GameObject.ts). The
+	-- native drawer previously only drew the top object's own entities. Data's already here: each
+	-- child carries its own gameEntities with live entity handles. (`local function` above already
+	-- supports this self-recursion — the local is in scope inside its own body.)
+	if p_GameObject.children ~= nil then
+		for _, l_Child in pairs(p_GameObject.children) do
+			DrawGameObject(l_Child, p_Color)
+		end
+	end
 end
 
 -- Called from UI:DrawHud each frame.

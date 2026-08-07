@@ -210,20 +210,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 
 	local s_Blueprint = _G[p_Blueprint.typeInfo.name](p_Blueprint) -- do we need that? for the name?
-	-- Skip TRACKING baked static geometry the editor can't edit (a bare return is a hook
-	-- PASS-THROUGH in VU, so the engine still creates and RENDERS it — we just don't track it),
-	-- keeping B2K/XP1's thousands of baked statics out of the Scene Instances tree and the hover
-	-- pick scan (what froze the game). ONLY for vanilla level objects: a USER spawn of such a
-	-- prop from Project Data (s_PendingCustomBlueprintInfo set) MUST still be tracked, or it'd
-	-- appear nowhere even though the command "succeeded".
-	if s_PendingCustomBlueprintInfo == nil and s_InjectedInfo == nil and s_Blueprint:Is("ObjectBlueprint") and s_Blueprint.object ~= nil then
-		local s_ObjType = s_Blueprint.object.typeInfo.name
-		if s_ObjType == "DebrisClusterData"
-			or s_ObjType == "StaticModelEntityData"
-			or s_ObjType == "StaticModelGroupEntityData" then
-			return
-		end
-	end
+	-- NOTE: baked static geometry (StaticModelEntityData / StaticModelGroupEntityData /
+	-- DebrisClusterData) is NO LONGER skipped. Dropping it broke NoHavok (whose whole point is to
+	-- make those statics individually editable). The reason it was skipped — registering thousands
+	-- at once froze the client — is a SYNC problem, not a size problem: fixed by routing bulk
+	-- level-load registration through the async per-frame pump (see the dispatch below +
+	-- OnInjectedReadyPump), so any object count spreads over frames without blocking.
 
 	---@type CtrRef
 	local s_OriginalRef = CtrRef({})
@@ -481,14 +473,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 
 		if s_GameObject.guid ~= PREVIEW_GUID then
-			if s_GameObject.wasInjected then
-				-- Defer: register into the editor/WebUI tree over frames (see OnInjectedReadyPump)
-				-- so a huge save doesn't block the frame while thousands register at once. The
-				-- object is already in m_GameObjects (selectable) and rendered natively.
-				table.insert(self.m_PendingInjectedReady, s_GameObject)
-			else
-				Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
-			end
+			-- Defer editor/WebUI-tree registration over frames (OnInjectedReadyPump) for ALL bulk
+			-- level-load root objects — injected saves AND vanilla/NoHavok statics alike — so
+			-- registering thousands at once never blocks the frame (the freeze the baked-static
+			-- skip used to dodge by dropping them). The object is already in m_GameObjects
+			-- (selectable via the engine raycast) and rendered natively; this only makes it appear
+			-- and become tree-editable a few frames later. User spawns go through the immediate
+			-- pending-custom path below, so interactive placement still feels instant.
+			table.insert(self.m_PendingInjectedReady, s_GameObject)
 		end
 	end
 

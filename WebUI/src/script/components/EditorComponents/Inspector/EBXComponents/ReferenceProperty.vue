@@ -150,10 +150,20 @@ export default class ReferenceComponent extends Vue {
 		const refPartitionGuid = this.reference.partitionGuid
 			? this.reference.partitionGuid.toString().toLowerCase()
 			: ZERO_GUID;
-		const partition =
+		let partition =
 			refPartitionGuid === ZERO_GUID
 				? window.editor.fbdMan.getPartitionByName(this.currentPath)
 				: window.editor.fbdMan.getPartition(this.reference.partitionGuid);
+		// External reference (non-zero partition guid) that isn't cached yet: REGISTER it so it
+		// fetches on demand from the game. getPartition() is a pure lookup — most external refs
+		// were never preloaded, so they showed "not loaded" forever. The server serializer
+		// resolves the request by guid (PartitionSerializer:_ResolvePartition), so we use the guid
+		// as the name/key since the partition name isn't known for an uncached external partition.
+		// If the target genuinely isn't loaded server-side, the fetch resolves empty and the
+		// existing not-loaded handling below still applies.
+		if (!partition && refPartitionGuid !== ZERO_GUID) {
+			partition = window.editor.fbdMan.registerPartition(refPartitionGuid, this.reference.partitionGuid);
+		}
 		if (!partition) {
 			console.warn(
 				`Reference target partition not loaded: ${refPartitionGuid}/${this.reference.instanceGuid}`

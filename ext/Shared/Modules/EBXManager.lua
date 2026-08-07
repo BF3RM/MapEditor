@@ -20,7 +20,17 @@ function EBXManager:SetFields(p_Overrides)
 end
 
 function EBXManager:SetField(p_Instance, p_Field, p_Path)
-	m_Logger:Write(p_Path .. "/" .. p_Field.field)
+	-- Guard a malformed override chain: a non-printable node whose nested `.value` is nil (e.g.
+	-- the edited path runs through a null/unresolved reference, as in some VisualEnvironment
+	-- sub-objects). Recursing into it would index a nil field and throw an UNHANDLED error that
+	-- aborts the command AND spams — the server must never die on a bad edit. Skip the field.
+	if p_Field == nil then
+		m_Logger:Error("SetField: nil field at path '" .. tostring(p_Path) ..
+			"' — malformed override chain (edited path runs through a nil value); skipping.")
+		return p_Path or ''
+	end
+
+	m_Logger:Write(tostring(p_Path) .. "/" .. tostring(p_Field.field))
 
 	if p_Instance ~= nil then
 		if p_Instance.instanceGuid ~= nil then
