@@ -71,6 +71,62 @@ end
 -- only the (expensive) respawn waits.
 local REINSTANTIATE_DEBOUNCE = 0.2
 
+--- Build a UNIQUE ReferenceObjectData to hand to EntityCreationParams.parentRepresentative.
+---
+--- Every spawn used to go in with no representative at all, so entities created from the same
+--- blueprint ended up sharing a representative and therefore data that is supposed to be
+--- per-instance (GH #202, and the crashes traced to it: #296, #364, #2). Per the issue: the
+--- representative must be a unique ReferenceObjectData, must define its `.blueprint`, and must be
+--- STORED so the GC doesn't collect it while the entities are alive.
+---
+--- Mirrors how LevelInjector:AddCustomObject builds its RODs (EffectReferenceObjectData for
+--- effects, autoStart set). Returns nil on any failure, which simply restores the previous
+--- behaviour rather than breaking the spawn.
+---@param p_Guid Guid|string editor GameObject guid (owns the representative's lifetime)
+---@param p_Blueprint DataContainer raw blueprint being spawned
+---@param p_Transform LinearTransform
+---@return DataContainer|nil
+function GameObjectManager:CreateRepresentative(p_Guid, p_Blueprint, p_Transform)
+	local s_Ok, s_Rod = pcall(function()
+		local s_Reference
+
+		if p_Blueprint:Is("EffectBlueprint") then
+			s_Reference = EffectReferenceObjectData()
+			s_Reference.autoStart = true
+		else
+			s_Reference = ReferenceObjectData()
+		end
+
+		s_Reference.blueprint = Blueprint(p_Blueprint)
+		s_Reference.blueprintTransform = LinearTransform(p_Transform)
+		s_Reference.isEventConnectionTarget = Realm.Realm_None
+		s_Reference.isPropertyConnectionTarget = Realm.Realm_None
+		s_Reference.excluded = false
+
+		return s_Reference
+	end)
+
+	if not s_Ok or s_Rod == nil then
+		-- print(), not the logger: the logger is disabled by default, and silently degrading back
+		-- to the shared-representative behaviour is exactly the failure mode #202 describes.
+		print("[MapEditor] parentRepresentative could not be built for " .. tostring(p_Guid) ..
+			" (" .. tostring(s_Rod) .. "); spawning without one")
+		return nil
+	end
+
+
+	-- Keep it alive for as long as the object exists (released in ReleaseRepresentative).
+	self.m_Representatives[tostring(p_Guid)] = s_Rod
+
+	return s_Rod
+end
+
+--- Drop the stored representative for an object (called when it's deleted/re-instantiated), so
+--- the table doesn't grow without bound over a long editing session.
+function GameObjectManager:ReleaseRepresentative(p_Guid)
+	self.m_Representatives[tostring(p_Guid)] = nil
+end
+
 --- Issue a strictly increasing creation timestamp.
 --- The timestamp is what orders objects in the Scene Instances list and in the save file
 --- (ProjectManager sorts by it). SharedUtils:GetTimeMS() only has millisecond resolution, so bulk
@@ -143,6 +199,10 @@ function GameObjectManager:RegisterVars()
 	-- Last timestamp handed out by NextTimeStamp (keeps creation stamps strictly increasing).
 	self.m_LastTimeStamp = 0
 
+	-- [#202] Per-spawn ReferenceObjectData handed to EntityCreationParams.parentRepresentative,
+	-- keyed by editor guid. Held here so the GC can't collect them while their entities live.
+	self.m_Representatives = {}
+
 	self.m_ProcessedEntities = {}
 	self.m_PendingEntities = {}
 	self.m_VanillaGameObjectGuids = {}
@@ -214,6 +274,7 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.transform = p_LinearTransform
 	s_Params.variationNameHash = p_Variation
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
+	s_Params.parentRepresentative = self:CreateRepresentative(p_GameObjectGuid, s_Blueprint, p_LinearTransform)
 
 	local s_EntityBus = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 
@@ -765,6 +826,9 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 		self.m_GameObjects[tostring(p_Guid)] = nil
 	end
 
+	-- The entities are gone, so the representative that kept them unique can go too.
+	self:ReleaseRepresentative(p_Guid)
+
 	return true
 end
 
@@ -944,6 +1008,7 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	-- NON-networked: the clone DC isn't registered in ResourceManager, so replicating it would
 	-- hand the peer a blueprint guid it can't resolve. Each realm renders its own clone locally.
 	s_Params.networked = false
+	s_Params.parentRepresentative = self:CreateRepresentative(p_GameObjectGuid, p_CloneDC, p_LinearTransform)
 
 	local s_Ok, s_EntityBus = pcall(function()
 		return EntityManager:CreateEntitiesFromBlueprint(p_CloneDC, s_Params)

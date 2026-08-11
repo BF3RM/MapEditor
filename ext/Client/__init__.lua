@@ -84,6 +84,7 @@ function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
 	-- Dev/test: schedule the auto-enter (fires ~5s later via TickAutoEnter in OnUpdate).
 	UIManager:RequestDevAutoEnter()
+
 end
 
 function MapEditorClient:OnExtensionLoaded()
