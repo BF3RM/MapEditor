@@ -114,6 +114,165 @@ function PartitionSerializer:SerializePartition(p_GuidOrName, p_Name)
 	return s_Result
 end
 
+--============================ Runtime clone subtree ============================--
+
+local ZERO_GUID = "00000000-0000-0000-0000-000000000000"
+
+--- True when a DataContainer is a RUNTIME object rather than a member of a loaded partition.
+---
+--- The per-instance blueprint clones (GameObject:SetOverrides -> DeepClone) are created at runtime
+--- and belong to no partition, which is exactly what makes them un-bakeable today: they exist only
+--- in this process. That also makes them easy to tell apart from the stock content they reference —
+--- a clone's own members have no partition guid, while everything it points at that came with the
+--- game still does, and must stay an external reference rather than being copied into our bundle.
+---@param p_Dc DataContainer
+---@return boolean
+function PartitionSerializer:_IsRuntimeDc(p_Dc)
+	if p_Dc == nil then
+		return false
+	end
+
+	local s_PartitionGuid = nil
+	pcall(function() s_PartitionGuid = p_Dc.partitionGuid end)
+
+	if s_PartitionGuid == nil then
+		return true
+	end
+
+	local s_Str = tostring(s_PartitionGuid)
+
+	return s_Str == "" or s_Str == ZERO_GUID
+end
+
+--- Collect every runtime DataContainer reachable from p_Root (inclusive), following only fields
+--- that are themselves runtime — references into real partitions are endpoints, not edges.
+---@param p_Root DataContainer
+---@return table[] list of DataContainers, root first
+function PartitionSerializer:_CollectRuntimeSubtree(p_Root)
+	local s_Collected = {}
+	local s_Seen = {}
+	local s_Queue = { p_Root }
+
+	while #s_Queue > 0 do
+		local s_Dc = table.remove(s_Queue, 1)
+		local s_Guid = nil
+		pcall(function() s_Guid = tostring(s_Dc.instanceGuid) end)
+
+		if s_Guid ~= nil and not s_Seen[s_Guid] then
+			s_Seen[s_Guid] = true
+			s_Collected[#s_Collected + 1] = s_Dc
+
+			for _, l_Child in ipairs(self:_ChildDataContainers(s_Dc)) do
+				if self:_IsRuntimeDc(l_Child) then
+					s_Queue[#s_Queue + 1] = l_Child
+				end
+			end
+		end
+	end
+
+	return s_Collected
+end
+
+--- Every DataContainer directly referenced by p_Dc's fields (scalar fields and array elements).
+--- Mirrors the field walk in _SerializeFields so the two can never disagree about what a field is.
+---@param p_Dc DataContainer
+---@return table[]
+function PartitionSerializer:_ChildDataContainers(p_Dc)
+	local s_Children = {}
+
+	local s_TypeInfo = nil
+	pcall(function() s_TypeInfo = p_Dc.typeInfo end)
+
+	if s_TypeInfo == nil then
+		return s_Children
+	end
+
+	local s_Casted = p_Dc
+	pcall(function() s_Casted = _G[s_TypeInfo.name](p_Dc) end)
+
+	for _, l_Field in ipairs(getFields(s_TypeInfo)) do
+		if l_Field.typeInfo == nil or l_Field.typeInfo.enum or isPrintable(l_Field.typeInfo.name) then
+			goto continue
+		end
+
+		local s_Ok, s_Value = pcall(function() return s_Casted[firstToLower(l_Field.name)] end)
+
+		if not s_Ok or s_Value == nil then
+			goto continue
+		end
+
+		if l_Field.typeInfo.array then
+			local s_Len = 0
+			pcall(function() s_Len = #s_Value end)
+
+			for i = 1, s_Len do
+				local s_Member = nil
+				pcall(function() s_Member = s_Value[i] end)
+
+				local s_MemberIsDc = false
+				pcall(function() s_MemberIsDc = (s_Member ~= nil and s_Member.instanceGuid ~= nil) end)
+
+				if s_MemberIsDc then
+					s_Children[#s_Children + 1] = s_Member
+				end
+			end
+		else
+			local s_IsDc = false
+			pcall(function() s_IsDc = (s_Value.instanceGuid ~= nil) end)
+
+			if s_IsDc then
+				s_Children[#s_Children + 1] = s_Value
+			end
+		end
+
+		::continue::
+	end
+
+	return s_Children
+end
+
+--- Serialize a runtime clone (and its runtime members) as a standalone partition table, in the
+--- same shape SerializePartition produces. This is what makes a per-instance EBX override
+--- bakeable: the level generator can compile it as a real partition and point the object's
+--- ReferenceObjectData at it instead of the stock blueprint (GH #396).
+---@param p_Root DataContainer the cloned blueprint
+---@param p_Name string partition name to embed
+---@return table|nil
+function PartitionSerializer:SerializeCloneSubtree(p_Root, p_Name)
+	if p_Root == nil then
+		return nil
+	end
+
+	local s_RootGuid = nil
+	pcall(function() s_RootGuid = tostring(p_Root.instanceGuid) end)
+
+	if s_RootGuid == nil then
+		m_Logger:Error("SerializeCloneSubtree: root has no instanceGuid")
+		return nil
+	end
+
+	local s_Members = self:_CollectRuntimeSubtree(p_Root)
+
+	local s_Result = {
+		["$guid"] = s_RootGuid, -- the generator remaps this to a fresh partition guid
+		["$name"] = p_Name or ("CustomBlueprints/" .. s_RootGuid),
+		["$primaryInstance"] = s_RootGuid,
+		["$instances"] = {},
+	}
+
+	for _, l_Dc in ipairs(s_Members) do
+		local s_Ok, s_Table = pcall(function() return self:_SerializeInstance(l_Dc) end)
+
+		if s_Ok and s_Table ~= nil then
+			table.insert(s_Result["$instances"], s_Table)
+		elseif not s_Ok then
+			m_Logger:Write("SerializeCloneSubtree: skipped a member: " .. tostring(s_Table))
+		end
+	end
+
+	return s_Result
+end
+
 --============================ Instance / field walking ============================--
 
 ---@param p_Instance Instance|DataContainer

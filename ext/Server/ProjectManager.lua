@@ -439,13 +439,94 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 		gameModeName = self.m_GameMode,
 		requiredBundles = self.m_LoadedBundles
 	}
-	local s_Success, s_Msg = DataBaseManager:SaveProject(p_ProjectHeader.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas, SAVE_VERSION)
+	local s_Success, s_Msg, s_HeaderId = DataBaseManager:SaveProject(p_ProjectHeader.projectName, self.m_CurrentProjectHeader.mapName, self.m_CurrentProjectHeader.gameModeName, self.m_LoadedBundles, s_GameObjectSaveDatas, SAVE_VERSION)
+
+	if s_Success and s_HeaderId ~= nil then
+		self:SaveClonedBlueprints(s_HeaderId)
+	end
 
 	if s_Success then
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveProjectHeaders", DataBaseManager:GetProjectHeaders())
 		NetEvents:BroadcastLocal("MapEditorClient:ReceiveCurrentProjectHeader", self.m_CurrentProjectHeader)
 	else
 		m_Logger:Error(s_Msg)
+	end
+end
+
+--- Persist every per-instance blueprint clone as a standalone EBX partition (GH #396).
+---
+--- An EBX override means "this instance uses a MODIFIED blueprint". The modification lives in a
+--- runtime DeepClone that exists only in this process, so a save that records the override deltas
+--- alone cannot be baked: the level generator has no blueprint to point at. Serializing the clone
+--- subtree here gives it one — the generator compiles these as real partitions and repoints the
+--- object's ReferenceObjectData at its own blueprint instead of the stock one.
+---
+--- Failures are logged and skipped rather than aborting the save: losing an override in the bake is
+--- bad, losing the whole project save is worse.
+---@param p_HeaderId number
+function ProjectManager:SaveClonedBlueprints(p_HeaderId)
+	if PartitionSerializer == nil or GameObjectManager.m_InstanceClones == nil then
+		return
+	end
+
+	local s_Saved = 0
+
+	for l_Guid, l_Entry in pairs(GameObjectManager.m_InstanceClones) do
+		local s_Dc = l_Entry ~= nil and l_Entry.dc or nil
+
+		if s_Dc ~= nil then
+			-- Partition names must be unique within the bundle and stable across saves, so key it
+			-- on the editor guid rather than the blueprint name (several instances of one prefab
+			-- can each carry different overrides).
+			local s_Name = "CustomBlueprints/" .. tostring(l_Guid):lower()
+
+			local s_Ok, s_Partition = pcall(function()
+				return PartitionSerializer:SerializeCloneSubtree(s_Dc, s_Name)
+			end)
+
+			if s_Ok and s_Partition ~= nil then
+				local s_JsonOk, s_Json = pcall(function() return json.encode(s_Partition) end)
+
+				if s_JsonOk and s_Json ~= nil then
+					if DataBaseManager:SaveProjectEbx(p_HeaderId, tostring(l_Guid), s_Name, s_Json) then
+						s_Saved = s_Saved + 1
+					end
+				else
+					m_Logger:Error("Could not encode cloned blueprint for " .. tostring(l_Guid) .. ": " .. tostring(s_Json))
+				end
+			else
+				m_Logger:Error("Could not serialize cloned blueprint for " .. tostring(l_Guid) .. ": " .. tostring(s_Partition))
+			end
+		end
+	end
+
+	-- Blueprints permanently modified via Apply-to-Blueprint. These are stock, partition-resident
+	-- containers rather than runtime clones, so the whole ORIGINAL partition is serialized and
+	-- stored under its own name. The generator emits it under that same name so the custom bundle
+	-- SHADOWS the stock partition — which is what makes an applied change reach every instance,
+	-- including vanilla ReferenceObjectDatas the editor never tracked and therefore cannot repoint.
+	-- Marked by an empty object_guid: these belong to a blueprint, not to one instance.
+	for l_BpGuid, l_Info in pairs(GameObjectManager.m_AppliedBlueprints or {}) do
+		local s_Ok, s_Partition = pcall(function()
+			return PartitionSerializer:SerializePartition(l_Info.partitionGuid, l_Info.name)
+		end)
+
+		if s_Ok and s_Partition ~= nil then
+			local s_JsonOk, s_Json = pcall(function() return json.encode(s_Partition) end)
+
+			if s_JsonOk and s_Json ~= nil then
+				if DataBaseManager:SaveProjectEbx(p_HeaderId, '', l_Info.name, s_Json) then
+					s_Saved = s_Saved + 1
+				end
+			end
+		else
+			m_Logger:Error("Could not serialize applied blueprint " .. tostring(l_BpGuid) ..
+				": " .. tostring(s_Partition))
+		end
+	end
+
+	if s_Saved > 0 then
+		m_Logger:Write("Stored " .. tostring(s_Saved) .. " cloned blueprint partition(s)")
 	end
 end
 

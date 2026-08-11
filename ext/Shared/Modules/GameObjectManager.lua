@@ -203,6 +203,13 @@ function GameObjectManager:RegisterVars()
 	-- kept separately so the viewport can draw them every frame without scanning every object.
 	self.m_Placeholders = {}
 
+	-- Blueprints whose SHARED DataContainer has been permanently modified by Apply-to-Blueprint,
+	-- keyed by blueprint instance guid -> { partitionGuid, name }. Apply writes the stock,
+	-- partition-resident blueprint and then CLEARS the instance's overrides, so after it runs
+	-- nothing on any GameObject records the change and it would silently vanish from the bake.
+	-- Saving needs this list to serialize those partitions too (GH #396).
+	self.m_AppliedBlueprints = {}
+
 	-- Set to the editor guid while one of OUR CreateEntitiesFromBlueprint calls is in flight.
 	-- The generic EntityFactory:Create hook fires for every entity the engine makes and carries no
 	-- indication of who asked for it, so this window is the only way to tell entities we own from
@@ -1209,6 +1216,14 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	for _, l_Field in pairs(s_Applied) do
 		EBXManager:SetField(s_Shared, l_Field, '')
 	end
+
+	-- Remember that this blueprint's shared DC is no longer stock. The overrides are cleared from
+	-- the instance right after this, so this table is the ONLY remaining record that the baked
+	-- level has to ship a modified copy of the blueprint (GH #396).
+	self.m_AppliedBlueprints[s_BpGuid] = {
+		partitionGuid = tostring(s_GameObject.blueprintCtrRef.partitionGuid),
+		name = tostring(s_GameObject.blueprintCtrRef.name),
+	}
 
 	-- 2) Collect every instance of this blueprint BEFORE we start respawning (respawns mutate
 	--    m_GameObjects, so we can't iterate it live).

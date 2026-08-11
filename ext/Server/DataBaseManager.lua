@@ -16,6 +16,14 @@ local m_DB_Data_Table_Name = "project_data"
 local m_ProjectHeader_Id_Column_Name = "project_header_id"
 local m_SaveFile_Text_Column_Name = "save_file_json"
 
+-- Per-instance blueprint clones, serialized as standalone EBX partitions so the level generator can
+-- compile them into the custom bundle and repoint the object at its OWN blueprint (GH #396).
+-- Without this, EBX overrides survive save/reload inside the editor but vanish silently at bake.
+local m_DB_Ebx_Table_Name = "project_ebx"
+local m_ObjectGuid_Text_Column_Name = "object_guid"
+local m_PartitionName_Text_Column_Name = "partition_name"
+local m_PartitionJson_Text_Column_Name = "partition_json"
+
 function DataBaseManager:__init()
 	m_Logger:Write("Initializing DataBaseManager")
 
@@ -61,7 +69,10 @@ function DataBaseManager:SaveProject(p_ProjectName, p_MapName, p_GameModeName, p
 
 	if s_Success then
 		---@cast s_HeaderId -nil
-		return self:SaveProjectData(s_HeaderId, s_GameObjectSaveDatasJson)
+		-- Pass the header id back: cloned-blueprint partitions are written against it afterwards
+		-- (SaveProjectEbx), and the caller has no other way to learn which row it just created.
+		local s_DataOk, s_DataErr = self:SaveProjectData(s_HeaderId, s_GameObjectSaveDatasJson)
+		return s_DataOk, s_DataErr, s_HeaderId
 	else
 		return s_Success, s_ErrorMsg
 	end
@@ -115,6 +126,23 @@ function DataBaseManager:CreateOrUpdateDatabase()
 	]]
 
 	if not SQL:Query(s_CreateProjectDataTableQuery) then
+		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
+		return
+	end
+
+	-- Cloned-blueprint EBX table. Purely additive: a side table keyed by header id, so saves
+	-- written before it existed still load and SAVE_VERSION does not move.
+	local s_CreateProjectEbxTableQuery = [[
+		CREATE TABLE IF NOT EXISTS ]] .. m_DB_Ebx_Table_Name .. [[ (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			]] .. m_ProjectHeader_Id_Column_Name .. [[ INTEGER REFERENCES ]] .. m_DB_Header_Table_Name .. [[(id) ON DELETE CASCADE,
+			]] .. m_ObjectGuid_Text_Column_Name .. [[ TEXT,
+			]] .. m_PartitionName_Text_Column_Name .. [[ TEXT,
+			]] .. m_PartitionJson_Text_Column_Name .. [[ TEXT
+		);
+	]]
+
+	if not SQL:Query(s_CreateProjectEbxTableQuery) then
 		m_Logger:Error('Failed to execute query: ' .. SQL:Error())
 		return
 	end
@@ -185,6 +213,27 @@ function DataBaseManager:SaveProjectData(p_HeaderId, p_GameObjectSaveDatasJson)
 	end
 
 	m_Logger:Write('Inserted data. Insert ID: ' .. tostring(SQL:LastInsertId()) .. '. Rows affected: ' .. tostring(SQL:AffectedRows()))
+	return true
+end
+
+---Store one cloned-blueprint partition for a saved project (GH #396).
+---@param p_HeaderId number
+---@param p_ObjectGuid string editor GameObject guid the clone belongs to
+---@param p_PartitionName string
+---@param p_PartitionJson string
+---@return boolean
+function DataBaseManager:SaveProjectEbx(p_HeaderId, p_ObjectGuid, p_PartitionName, p_PartitionJson)
+	local s_Query = 'INSERT INTO ' .. m_DB_Ebx_Table_Name .. ' (' ..
+		m_ProjectHeader_Id_Column_Name .. ', ' ..
+		m_ObjectGuid_Text_Column_Name .. ', ' ..
+		m_PartitionName_Text_Column_Name .. ', ' ..
+		m_PartitionJson_Text_Column_Name .. ') VALUES (?, ?, ?, ?)'
+
+	if not SQL:Query(s_Query, p_HeaderId, p_ObjectGuid, p_PartitionName, p_PartitionJson) then
+		m_Logger:Error('Failed to store cloned blueprint: ' .. SQL:Error())
+		return false
+	end
+
 	return true
 end
 
