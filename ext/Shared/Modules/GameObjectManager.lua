@@ -546,6 +546,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 				entity = l_Entity,
 				instanceId = l_Entity.instanceId,
 				typeName = l_Entity.typeInfo.name,
+				-- Pending info present == this spawn was requested by the editor, so the entity is
+				-- ours to free later. Level-load entities arrive with no pending info and stay
+				-- untagged, which keeps them on the Disable-only path.
+				isEditorSpawned = s_PendingCustomBlueprintInfo ~= nil,
 			}
 		else
 			m_Logger:Write('Processing an entity that was pending')

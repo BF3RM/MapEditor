@@ -13,6 +13,10 @@ function GameEntity:__init(arg)
 	self.transform = arg.transform -- local transform
 	self.aabb = arg.aabb
 	self.initiatorRef = arg.initiatorRef
+	-- True only for entities the EDITOR created via CreateEntitiesFromBlueprint. Entities that
+	-- came with the level must never be Destroy()ed — that crashes the game — so this flag is what
+	-- makes it safe to actually free the ones we own (see GameObject:Destroy).
+	self.isEditorSpawned = arg.isEditorSpawned or false
 
 	self.entity:RegisterDestroyCallback(self, self.OnDestroyed)
 end
@@ -66,6 +70,11 @@ function GameEntity:Destroy()
 	end
 
 	GameObjectManager.m_PendingEntities[self.instanceId] = nil
+	-- Also forget it as PROCESSED. That table is otherwise append-only, and the create hook skips
+	-- any entity whose instanceId it has already seen — so once entities are genuinely destroyed
+	-- (rather than just disabled) a recycled instanceId would make the hook silently drop the new
+	-- entity, leaving an object that renders but can't be tracked or selected.
+	GameObjectManager.m_ProcessedEntities[self.instanceId] = nil
 end
 
 function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled)

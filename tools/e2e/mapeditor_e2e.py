@@ -374,7 +374,14 @@ def t_no_leak(addr):
       if(!vm||typeof vm.onEBXInput!=='function') return JSON.stringify({skip:'inspector vm unavailable'});
       e.selectionGroup.select(go,false,false); vm.selectedGameObject=go;
       window.__leak={samples:[], done:false};
-      var snap=function(t){ window.__leak.samples.push({tag:t,total:e.gameObjects.size(),kids:go.children.length}); };
+      var snap=function(t){
+        // spatialGameEntities is the WebUI's live map of tracked entities; it grows if the ext
+        // leaks entity buses on re-instantiation (each respawn registers a fresh set).
+        var ents = e.spatialGameEntities && e.spatialGameEntities.size !== undefined
+                 ? (typeof e.spatialGameEntities.size === 'function' ? e.spatialGameEntities.size() : e.spatialGameEntities.size)
+                 : null;
+        window.__leak.samples.push({tag:t,total:e.gameObjects.size(),kids:go.children.length,ents:ents});
+      };
       [0,1,2].forEach(function(i){
         setTimeout(function(){
           vm.onEBXInput({field:ap.elemField,type:'GameObjectData',
@@ -391,11 +398,17 @@ def t_no_leak(addr):
     assert res is not None, "leak probe never finished"
     totals = [s["total"] for s in res["samples"]]
     kids = [s["kids"] for s in res["samples"]]
+    ents = [s.get("ents") for s in res["samples"]]
     growth = totals[-1] - totals[0]
     assert growth <= 0, (
         f"LEAK: tracked objects grew {totals} across 3 edits (+{growth}) and children went {kids} — "
         f"each re-instantiation is leaving its predecessor's children behind")
-    return f"objects stable across 3 edits ({totals}), children {kids}"
+    if all(isinstance(v, int) for v in ents) and len(ents) > 1:
+        ent_growth = ents[-1] - ents[0]
+        assert ent_growth <= 0, (
+            f"ENTITY LEAK: tracked entities grew {ents} across 3 edits (+{ent_growth}) — "
+            f"re-instantiation is abandoning entity buses")
+    return f"objects stable across 3 edits ({totals}), children {kids}, entities {ents}"
 
 
 @test("rapid edits coalesce into few respawns (drag debounce)")

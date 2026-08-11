@@ -223,13 +223,36 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
 		end
 	end
 
+	-- Free the entities we created; only DISABLE anything else.
+	--
+	-- Destroying an entity that came with the level CRASHES the game, which is why this used to
+	-- disable everything unconditionally. But disabling alone leaks a whole entity bus per call,
+	-- and per-instance EBX editing now re-instantiates on every (debounced) edit, so that leak
+	-- fires constantly. isEditorSpawned is set only for entities built by our own
+	-- CreateEntitiesFromBlueprint calls (see the create hook), so it's the safe discriminator.
+	--
+	-- This distinction matters more than it looks: a VANILLA object is re-registered as Custom
+	-- after its first EBX edit, so from the second edit on we're destroying an object whose
+	-- original entities came from level data. Those stay untagged and keep being disabled; only
+	-- the ones our respawn created get destroyed.
 	if self.gameEntities ~= nil then
 		for _, l_GameEntity in pairs(self.gameEntities) do
 			if l_GameEntity ~= nil then
-				l_GameEntity:Disable()
+				if l_GameEntity.isEditorSpawned then
+					local s_Ok, s_Err = pcall(function() l_GameEntity:Destroy() end)
+
+					if not s_Ok then
+						-- Never let a failed destroy take the object down; fall back to the old behaviour.
+						print("[MapEditor] entity Destroy failed (" .. tostring(s_Err) .. "); disabling instead")
+						pcall(function() l_GameEntity:Disable() end)
+					end
+				else
+					l_GameEntity:Disable()
+				end
 			end
 		end
 	end
+
 end
 
 function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoModified)
