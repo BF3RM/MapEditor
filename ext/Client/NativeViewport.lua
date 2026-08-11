@@ -180,6 +180,57 @@ function NativeViewport:__init()
 	self.m_AxisX = Vec3(1, 0, 0)     -- gizmo basis (world, or object-local in local space)
 	self.m_AxisY = Vec3(0, 1, 0)
 	self.m_AxisZ = Vec3(0, 0, 1)
+
+	-- Which overlays to draw (GH #395). Defaults are "everything on", i.e. the behaviour before
+	-- the toggles existed. maxDistance 0 = unlimited; anything else culls markers further than
+	-- that from the camera, which also bounds the per-frame DebugRenderer cost on a busy level.
+	self.m_Overlays = {
+		enabled = true,
+		selection = true,
+		highlight = true,
+		placeholders = true,
+		maxDistance = 0,
+	}
+end
+
+--- Apply overlay visibility settings pushed from the WebUI. Unknown/missing keys keep their
+--- current value, so the UI can send partial updates.
+---@param p_Settings table
+function NativeViewport:SetOverlaySettings(p_Settings)
+	if type(p_Settings) ~= 'table' then
+		return
+	end
+
+	for l_Key, l_Default in pairs(self.m_Overlays) do
+		local l_Value = p_Settings[l_Key]
+
+		if type(l_Value) == type(l_Default) then
+			self.m_Overlays[l_Key] = l_Value
+		end
+	end
+end
+
+--- True when a marker at p_Transform is within the configured draw distance of the camera.
+---@param p_Transform LinearTransform
+---@return boolean
+function NativeViewport:WithinDrawDistance(p_Transform)
+	local s_Max = self.m_Overlays.maxDistance
+
+	if s_Max == nil or s_Max <= 0 then
+		return true
+	end
+
+	local s_Ok, s_Within = pcall(function()
+		local s_Cam = ClientUtils:GetCameraTransform().trans
+		local s_Pos = p_Transform.trans
+		local s_Dx, s_Dy, s_Dz = s_Pos.x - s_Cam.x, s_Pos.y - s_Cam.y, s_Pos.z - s_Cam.z
+
+		return (s_Dx * s_Dx + s_Dy * s_Dy + s_Dz * s_Dz) <= (s_Max * s_Max)
+	end)
+
+	-- No camera (or anything else unexpected) -> draw it; a missing cull is far better than a
+	-- silently blank viewport.
+	return (not s_Ok) or s_Within
 end
 
 -- p_List = {xx,xy,xz, yx,yy,yz, zx,zy,zz} from JS (the 3 gizmo axes).
@@ -277,23 +328,30 @@ function NativeViewport:OnDraw()
 		return
 	end
 
-	-- Placed-but-not-instantiated objects (cyan), always visible — they have no entities, so
-	-- nothing else draws them. Iterates a dedicated table, not every tracked object.
-	if GameObjectManager.m_Placeholders ~= nil then
+	local s_Overlays = self.m_Overlays
+
+	-- Placed-but-not-instantiated objects (cyan) — they have no entities, so nothing else draws
+	-- them. Iterates a dedicated table, not every tracked object, and the flag is checked BEFORE
+	-- the loop so switching the category off costs nothing per frame.
+	if s_Overlays.enabled and s_Overlays.placeholders and GameObjectManager.m_Placeholders ~= nil then
 		for _, l_GameObject in pairs(GameObjectManager.m_Placeholders) do
-			if l_GameObject ~= nil and l_GameObject.transform ~= nil and l_GameObject.isDeleted ~= true then
+			if l_GameObject ~= nil and l_GameObject.transform ~= nil and l_GameObject.isDeleted ~= true
+				and self:WithinDrawDistance(l_GameObject.transform) then
 				pcall(function() DrawPlaceholderMarker(l_GameObject.transform, m_ColorPlaceholder) end)
 			end
 		end
 	end
 
 	-- Selected objects (orange).
-	for l_GuidStr, _ in pairs(self.m_SelectedGuids) do
-		DrawGameObject(GameObjectManager.m_GameObjects[l_GuidStr], m_ColorSelected)
+	if s_Overlays.enabled and s_Overlays.selection then
+		for l_GuidStr, _ in pairs(self.m_SelectedGuids) do
+			DrawGameObject(GameObjectManager.m_GameObjects[l_GuidStr], m_ColorSelected)
+		end
 	end
 
 	-- Hover highlight (white), unless it's already selected.
-	if self.m_HighlightedGuid ~= nil and self.m_SelectedGuids[self.m_HighlightedGuid] ~= true then
+	if s_Overlays.enabled and s_Overlays.highlight
+		and self.m_HighlightedGuid ~= nil and self.m_SelectedGuids[self.m_HighlightedGuid] ~= true then
 		DrawGameObject(GameObjectManager.m_GameObjects[self.m_HighlightedGuid], m_ColorHighlight)
 	end
 

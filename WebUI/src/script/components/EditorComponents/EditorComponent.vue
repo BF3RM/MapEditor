@@ -1,6 +1,11 @@
 <template>
 	<div class="EditorComponent panel" v-show="!hidden">
-		<div class="panel-header" v-if="title && showHeader">{{ title }}</div>
+		<div class="panel-header" v-if="title && showHeader">
+			<span class="panel-title">{{ title }}</span>
+			<!-- Right-aligned slot for per-panel controls (the Viewport's overlay menu). Panels that
+			     don't fill it render exactly as before. -->
+			<span class="panel-actions"><slot name="header-actions" /></span>
+		</div>
 		<div class="panel-body">
 			<slot />
 		</div>
@@ -47,6 +52,20 @@ export default class EditorComponent extends Vue {
 	background: rgba(22, 25, 36, 1);
 	border-bottom: 1px solid rgba(5, 7, 11, 0.6);
 	color: #8fa6c0;
+	/* Title left, per-panel controls right. `position: relative` anchors any popover a panel
+	   puts in the actions slot (the Viewport overlay menu) to the header rather than the page. */
+	display: flex;
+	align-items: center;
+	position: relative;
+}
+.EditorComponent.panel > .panel-header > .panel-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+}
+.EditorComponent.panel > .panel-header > .panel-actions {
+	flex: 0 0 auto;
+	font-weight: 400;
 }
 .EditorComponent.panel > .panel-body {
 	flex: 1 1 auto;

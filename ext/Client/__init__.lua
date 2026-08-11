@@ -50,6 +50,7 @@ function MapEditorClient:RegisterEvents()
 	Events:Subscribe('MapEditor:SetWorldSpace', self, self.OnSetWorldSpace)
 	Events:Subscribe('MapEditor:SetGizmoCenter', self, self.OnSetGizmoCenter)
 	Events:Subscribe('MapEditor:SetGizmoBasis', self, self.OnSetGizmoBasis)
+	Events:Subscribe('MapEditor:SetOverlaySettings', self, self.OnSetOverlaySettings)
 	Events:Subscribe('MapEditor:NativePick', self, self.OnNativePick)
 	Events:Subscribe('MapEditor:NativeHighlight', self, self.OnNativeHighlight)
 	Events:Subscribe('MapEditor:EnableFreeCamMovement', self, self.OnEnableFreeCamMovement)
@@ -178,6 +179,16 @@ function MapEditorClient:OnSetGizmoBasis(p_Json)
 	local s_Ok, s_List = pcall(function() return json.decode(p_Json) end)
 	if s_Ok and type(s_List) == 'table' then
 		m_NativeViewport:SetGizmoBasis(s_List)
+	end
+end
+
+---Overlay/gizmo visibility toggles from the viewport header (GH #395).
+---@param p_Json string
+function MapEditorClient:OnSetOverlaySettings(p_Json)
+	local s_Ok, s_Settings = pcall(function() return json.decode(p_Json) end)
+
+	if s_Ok and type(s_Settings) == 'table' then
+		m_NativeViewport:SetOverlaySettings(s_Settings)
 	end
 end
 
