@@ -3,7 +3,10 @@ ProjectManager = class 'ProjectManager'
 
 local m_Logger = Logger("ProjectManager", false)
 
-local SAVE_VERSION = "0.1.2"
+-- 0.1.3: object order is now guaranteed by unique, strictly-increasing creation timestamps.
+-- Saves written before this can contain COLLIDING timestamps (bulk spawns landed in the same
+-- millisecond), so upgrading re-spaces them once — see RespaceDuplicateTimestamps.
+local SAVE_VERSION = "0.1.3"
 
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
@@ -116,6 +119,7 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 		-- New version updates are handled here
 		local s_Data = p_ProjectSave[DataBaseManager.m_ExportDataName]
 		self:InsertTimestampsIntoObjects(s_Data)
+		self:RespaceDuplicateTimestamps(s_Data)
 
 		-- Update save version
 		p_ProjectSave[DataBaseManager.m_ExportHeaderName].saveVersion = SAVE_VERSION
@@ -123,6 +127,50 @@ function ProjectManager:UpgradeSaveStructure(p_ProjectSave)
 	elseif s_SaveVersion == SAVE_VERSION then
 		return p_ProjectSave
 	end
+end
+
+--- Give every object a UNIQUE timestamp, preserving the save's current order.
+--- Pre-0.1.3 saves can hold many objects sharing one millisecond (bulk spawns), which the
+--- non-stable sort then reshuffled on each load. Freezing the order once, here, makes such a save
+--- permanently stable from its next write onwards. The order we freeze is the save's own
+--- (timestamp, guid) order — the same total order the save path now uses — so nothing moves for a
+--- file that was already collision-free.
+---@param p_Data table
+function ProjectManager:RespaceDuplicateTimestamps(p_Data)
+	local s_HasDuplicate = false
+	local s_Seen = {}
+
+	for _, l_DataEntry in ipairs(p_Data) do
+		local s_Stamp = l_DataEntry.timeStamp or 0
+
+		if s_Seen[s_Stamp] then
+			s_HasDuplicate = true
+			break
+		end
+
+		s_Seen[s_Stamp] = true
+	end
+
+	if not s_HasDuplicate then
+		return
+	end
+
+	table.sort(p_Data, function(a, b)
+		local s_A = a.timeStamp or 0
+		local s_B = b.timeStamp or 0
+
+		if s_A == s_B then
+			return tostring(a.guid) < tostring(b.guid)
+		end
+
+		return s_A < s_B
+	end)
+
+	for l_Index, l_DataEntry in ipairs(p_Data) do
+		l_DataEntry.timeStamp = 1000000000000 + l_Index
+	end
+
+	m_Logger:Write('Re-spaced ' .. tostring(#p_Data) .. ' colliding save timestamps (order frozen)')
 end
 
 ---@param p_Data table
@@ -360,8 +408,22 @@ function ProjectManager:SaveProjectCoroutine(p_ProjectHeader)
 		end
 	end
 
+	-- Restore creation order from the guid-keyed (i.e. unordered) walk above. Lua's table.sort is
+	-- NOT stable, so equal timestamps would come out in an arbitrary — and differently arbitrary
+	-- each run — order, which is what made the Scene Instances list reshuffle on every reload.
+	-- Tie-breaking on the guid makes this a TOTAL order, so the result is deterministic even for
+	-- legacy saves that still contain colliding timestamps. (New saves can't collide: see
+	-- GameObjectManager:NextTimeStamp.) The `or 0` guards a save missing a timestamp entirely,
+	-- which would otherwise throw inside the comparator.
 	table.sort(s_GameObjectSaveDatas, function(a, b)
-		return a.timeStamp < b.timeStamp
+		local s_A = a.timeStamp or 0
+		local s_B = b.timeStamp or 0
+
+		if s_A == s_B then
+			return tostring(a.guid) < tostring(b.guid)
+		end
+
+		return s_A < s_B
 	end)
 
 	-- m_Logger:Write("vvvvvvvvvvvvvvvvv")
@@ -392,7 +454,10 @@ end
 function ProjectManager:CreateAndExecuteImitationCommands(p_ProjectSaveData)
 	local s_SaveFileCommands = {}
 
-	for _, l_GameObjectSaveData in pairs(p_ProjectSaveData) do
+	-- ipairs, not pairs: the save array is written in sorted creation order and the commands are
+	-- queued/executed in the order we build them here, so iteration order IS the load order that
+	-- the Scene Instances tree ends up showing. pairs() gives no ordering guarantee.
+	for _, l_GameObjectSaveData in ipairs(p_ProjectSaveData) do
 		-- With load-screen injection, Vanilla/Custom/NoHavok are placed natively during load and
 		-- CustomChild isn't command-driven yet, so there's nothing to queue post-load.
 		if ME_CONFIG.LOAD_INJECTION then

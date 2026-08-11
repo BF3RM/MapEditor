@@ -155,7 +155,7 @@ def t_reference(addr):
       var target=null;
       for(var i=0;i<vals.length && !target;i++){
         var p=vals[i]; if(!p||!p.instances) continue;
-        if(p.name && p.name.indexOf('e2e_probe_')===0) continue;  // skip harness probes
+        if(p.name && (p.name.indexOf('e2e_probe_')===0 || p.name.indexOf('e2e_ref_')===0)) continue;  // skip harness probes
         for(var g in p.instances){
           var inst=p.instances[g];
           var bp = inst && inst.fields && inst.fields.blueprint && inst.fields.blueprint.value;
@@ -164,8 +164,14 @@ def t_reference(addr):
       }
       if(!target) return JSON.stringify({skip:'no blueprint reference found in cached partitions'});
       // Resolve globally by instance guid (mirrors ReferenceProperty.resolveGlobally).
+      // Use a UNIQUE key per run and restore the editor's guid->partition mapping afterwards, so
+      // repeated runs against one long-lived client don't resolve to a stale probe partition
+      // (that made this test pass on the first run and fail on later ones).
       var ig=target.instGuid;
-      var part=fm.registerPartition(ig, ig, ig);
+      window.__refN=(window.__refN||0)+1;
+      var prevMap=fm.partitionGuids.getValue(ig.toLowerCase());
+      var part=fm.registerPartition('e2e_ref_'+window.__refN, ig, ig);
+      if(prevMap){ fm.partitionGuids.setValue(ig.toLowerCase(), prevMap); }
       window.__e2eRefResult=null;
       part.data.then(function(){
         var inst=part.instances[ig.toLowerCase()];
@@ -456,6 +462,78 @@ def t_debounce(addr):
         f"NO DEBOUNCE: {edits} rapid edits caused {respawns} respawns (expected far fewer) — "
         f"this is the churn that froze the client")
     return f"{edits} rapid edits -> {respawns} respawn(s)"
+
+
+MOD_DB = os.environ.get(
+    "MAPEDITOR_DB",
+    "/home/powos/Games/VeniceUnleashed/instance/Admin/Mods/MapEditor/mod.db",
+)
+
+
+@test("saved object order is deterministic (unique timestamps)")
+def t_save_order(addr):
+    """Scene Instances order must survive save->reload. The save is ordered purely by timeStamp,
+    so colliding timestamps (bulk spawns landing in the same millisecond) + Lua's non-stable
+    table.sort reshuffled the list on every load. Spawn a burst, save, then read the project row
+    straight out of mod.db and assert the persisted timestamps are unique and ascending."""
+    import sqlite3
+
+    proj = "e2e_order_probe"
+    spawned = cdp_eval(addr, """(function(){
+      var e=window.editor, vals=e.gameObjects.values();
+      // Duplicate one object several times in a tight loop — the classic collision case.
+      var src=null;
+      for(var i=0;i<vals.length;i++){ if(vals[i] && vals[i].blueprintCtrRef){ src=vals[i]; break; } }
+      if(!src) return JSON.stringify({err:'no source object'});
+      e.selectionGroup.select(src,false,false);
+      var before=e.gameObjects.size();
+      var err=null;
+      for(var k=0;k<6;k++){ try{ e.Duplicate(); }catch(x){ err=String(x); } }
+      window.__dupBefore=before; window.__dupErr=err;
+      return JSON.stringify({before:before, err:err});
+    })()""")
+    if not isinstance(spawned, dict) or spawned.get("before") is None:
+        return f"SKIP: could not start duplication ({spawned})"
+    time.sleep(4)
+    grew = cdp_eval(addr, "(function(){return JSON.stringify({grew:window.editor.gameObjects.size()-window.__dupBefore,"
+                          "err:window.__dupErr});})()")
+    # If nothing actually spawned, this test would pass vacuously — say so instead of pretending.
+    if not (isinstance(grew, dict) and grew.get("grew", 0) > 0):
+        return (f"SKIP: duplication spawned nothing ({grew}) — the collision path was not exercised; "
+                f"deterministic-ordering logic is covered by the Lua unit test instead")
+
+    saved = cdp_eval(addr, """(function(){
+      // Same message the Project Settings window sends (MessageActions:RequestSaveProject ->
+      // ProjectManager:RequestProjectSave). Header only needs a projectName.
+      window.vext.SendMessage({type:'RequestSaveProjectMessage',
+        projectHeaderJSON: JSON.stringify({projectName:'""" + proj + """'})});
+      return JSON.stringify({requested:true});
+    })()""")
+    if not (isinstance(saved, dict) and saved.get("requested")):
+        return f"SKIP: save request failed ({saved})"
+    time.sleep(6)
+
+    try:
+        con = sqlite3.connect(f"file:{MOD_DB}?mode=ro", uri=True)
+        # Newest saved blob (we just triggered the save); avoids depending on the join columns.
+        rows = con.execute(
+            "SELECT save_file_json FROM project_data ORDER BY rowid DESC LIMIT 1"
+        ).fetchall()
+        con.close()
+    except Exception as e:
+        return f"SKIP: could not read mod.db ({e})"
+    if not rows:
+        return "SKIP: no project_data rows (save may not have completed)"
+
+    data = json.loads(rows[0][0])
+    stamps = [o.get("timeStamp") for o in data]
+    assert all(s is not None for s in stamps), "some saved objects have no timeStamp"
+    dupes = len(stamps) - len(set(stamps))
+    assert dupes == 0, (
+        f"COLLIDING TIMESTAMPS: {dupes} duplicate(s) among {len(stamps)} saved objects — "
+        f"a non-stable sort will reshuffle those on every reload")
+    assert stamps == sorted(stamps), "saved objects are not written in timestamp order"
+    return f"{len(stamps)} objects saved with unique, ascending timestamps"
 
 
 # ── Runner ────────────────────────────────────────────────────────────────────

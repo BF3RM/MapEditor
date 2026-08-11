@@ -71,6 +71,25 @@ end
 -- only the (expensive) respawn waits.
 local REINSTANTIATE_DEBOUNCE = 0.2
 
+--- Issue a strictly increasing creation timestamp.
+--- The timestamp is what orders objects in the Scene Instances list and in the save file
+--- (ProjectManager sorts by it). SharedUtils:GetTimeMS() only has millisecond resolution, so bulk
+--- operations — Copy/Paste, Duplicate, a project load — stamp many objects identically, and a
+--- non-stable sort then shuffles those siblings differently on every reload. Bumping by one
+--- whenever the clock hasn't advanced keeps values unique and in creation order; the tiny forward
+--- drift is irrelevant because this is only ever used as an ordering key.
+function GameObjectManager:NextTimeStamp()
+	local s_Now = SharedUtils:GetTimeMS()
+
+	if self.m_LastTimeStamp == nil or s_Now > self.m_LastTimeStamp then
+		self.m_LastTimeStamp = s_Now
+	else
+		self.m_LastTimeStamp = self.m_LastTimeStamp + 1
+	end
+
+	return self.m_LastTimeStamp
+end
+
 --- Queue a re-instantiation for an edited object, restarting the debounce timer if one is already
 --- pending. Fired from OnReinstantiatePump once the edits settle.
 function GameObjectManager:RequestReinstantiate(p_Guid, p_CloneDC)
@@ -120,6 +139,9 @@ function GameObjectManager:RegisterVars()
 
 	-- [M1] Debounced re-instantiation requests: guid -> { dc, timer } (see OnReinstantiatePump).
 	self.m_PendingReinstantiate = {}
+
+	-- Last timestamp handed out by NextTimeStamp (keeps creation stamps strictly increasing).
+	self.m_LastTimeStamp = 0
 
 	self.m_ProcessedEntities = {}
 	self.m_PendingEntities = {}
@@ -287,7 +309,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		s_TimeStamp = s_PendingCustomBlueprintInfo.timeStamp
 	end
 	if not s_TimeStamp then
-		s_TimeStamp = SharedUtils:GetTimeMS()
+		s_TimeStamp = self:NextTimeStamp()
 	end
 
 	---@type GameObject
