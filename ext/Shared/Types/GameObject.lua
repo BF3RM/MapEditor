@@ -365,8 +365,13 @@ function GameObject:SetOverrides(p_Overrides)
 			self.internalBlueprint = s_Registered
 		else
 			local s_Shared = self.blueprintCtrRef:Get()
+			-- DETERMINISTIC clone guid, derived from the editor guid (which is identical on both
+			-- realms) rather than GenerateGuid(), which is random and therefore minted a DIFFERENT
+			-- guid per realm — the concrete reason a networked spawn couldn't be resolved by the
+			-- peer. With both realms holding a clone under the same guid, replication has a guid
+			-- each side can resolve locally. GH #391 (G2).
 			local s_Ok, s_Clone = pcall(function()
-				return g_DataContainerExt:DeepClone(s_Shared, GenerateGuid())
+				return g_DataContainerExt:DeepClone(s_Shared, Guid(tostring(self.guid)))
 			end)
 
 			if s_Ok and s_Clone ~= nil and (s_Shared == nil or s_Clone.instanceGuid ~= s_Shared.instanceGuid) then
