@@ -1,12 +1,23 @@
 <template>
 	<EditorComponent id="history-component" title="History">
 		<ul class="undos">
-			<li v-for="(undoEntry, index) in undos" :key="index" @click="goToState(undoEntry.id)">
+			<li
+				v-for="undoEntry in undos"
+				:key="undoEntry.id"
+				class="history-entry"
+				:class="{ current: undoEntry.id === currentId }"
+				@click="goToState(undoEntry.id)"
+			>
 				{{ FormatTime(undoEntry.timeStamp) }} - {{ undoEntry.name }}
 			</li>
 		</ul>
 		<ul class="redos">
-			<li v-for="(redoEntry, index) in redos" :key="index" @click="goToState(redoEntry.id)">
+			<li
+				v-for="redoEntry in redos"
+				:key="redoEntry.id"
+				class="history-entry"
+				@click="goToState(redoEntry.id)"
+			>
 				{{ FormatTime(redoEntry.timeStamp) }} - {{ redoEntry.name }}
 			</li>
 		</ul>
@@ -36,12 +47,25 @@ export default class HistoryComponent extends EditorComponent {
 	// diffed across the assignment below.
 	private lastUndoCount = 0;
 
+	// Id of the command the scene currently reflects (the newest applied one). Bound as a class in
+	// the template. The Gameface port previously marked "current" with a `.undos :last-child` CSS
+	// rule — a descendant combinator plus :last-child, both restricted in Cohtml, so the highlight
+	// silently disappeared. It also carried no actual notion of the stack pointer. The three.js
+	// original this was ported from highlighted by id (outliner.setValue(cmd.id)); this restores
+	// that, using only a simple class selector.
+	currentId = -1;
+
 	onHistoryChanged() {
-		const newUndoCount = window.editor.history.undos.length;
+		const history = window.editor.history;
+		const newUndoCount = history.undos.length;
+		this.currentId = newUndoCount > 0 ? history.undos[newUndoCount - 1].id : -1;
 		// Only follow the list when a NEW action was appended. Undo/redo and clicking an older
 		// entry to time-travel also emit historyChanged; auto-scrolling on those would yank the
 		// view back to the bottom right after the user scrolled up to pick an entry.
-		const appended = newUndoCount > this.lastUndoCount;
+		// Redoing raises the undo count too, so the count alone can't tell "new action" from
+		// "time-travelling back to an entry the user scrolled up to click". History sets
+		// timeTravelling for the duration of a goToState walk; never follow the tail then.
+		const appended = newUndoCount > this.lastUndoCount && !history.timeTravelling;
 		this.lastUndoCount = newUndoCount;
 
 		this.undos = window.editor.history.undos;
@@ -63,7 +87,6 @@ export default class HistoryComponent extends EditorComponent {
 	}
 
 	goToState(id: number) {
-		console.log(id);
 		window.editor.history.goToState(id);
 	}
 
@@ -112,12 +135,25 @@ export default class HistoryComponent extends EditorComponent {
 </script>
 
 <style lang="scss" scoped>
-.undos {
-	:last-child {
-		background-color: #0a6aa1;
-	}
+/* Gameface (Cohtml) restricts descendant combinators and :last-child, so the current step is
+   marked with an explicitly bound class instead of inferring it from tree position. */
+.history-entry {
+	cursor: pointer;
+	padding: 2px 6px;
 }
+
+.history-entry:hover {
+	background-color: rgba(255, 255, 255, 0.06);
+}
+
+.history-entry.current {
+	background-color: #0a6aa1;
+	color: #fff;
+}
+
+/* Redone-away entries: dimmed, and separated from the applied ones. */
 .redos {
 	opacity: 0.6;
+	border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 </style>

@@ -12,10 +12,36 @@ export interface IEBXFieldData {
 	value?: any;
 	oldValue?: any | undefined;
 }
+/** Dot-path of the edited leaf (e.g. "objects.2.radius"), used as the merge identity. */
+function describePath(node: any): string {
+	const parts: string[] = [];
+	let cur = node;
+	while (cur && typeof cur === 'object' && 'field' in cur) {
+		parts.push(String(cur.field));
+		cur = cur.value;
+	}
+	return parts.join('.');
+}
+
 export default class SetEBXFieldCommand extends Command {
 	constructor(public EBXFieldUpdateData: IEBXFieldData) {
 		super('SetEBXFieldCommand');
 		this.name = 'Change EBX Data';
+		// Dragging a slider or typing in a numeric field fires one command per tick/keystroke,
+		// which used to flood History with near-identical entries. Consecutive edits to the SAME
+		// field on the SAME object now merge into one entry (History's 500ms window).
+		this.updatable = true;
+		this.mergeKey = `${EBXFieldUpdateData.guid}:${describePath(EBXFieldUpdateData.value)}`;
+	}
+
+	/**
+	 * Fold a newer edit of the same field into this command. Deliberately keeps the ORIGINAL
+	 * value chain's oldValue, so undoing the merged entry returns to the value the field had
+	 * before the drag started rather than to the previous tick.
+	 */
+	public update(cmd: SetEBXFieldCommand) {
+		this.EBXFieldUpdateData.value = cmd.EBXFieldUpdateData.value;
+		this.timeStamp = cmd.timeStamp;
 	}
 
 	public execute() {

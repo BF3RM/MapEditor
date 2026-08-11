@@ -4,6 +4,7 @@
  */
 
 import { signals } from '../../modules/Signals';
+import { LogError } from '../../modules/Logger';
 
 export default class History {
 	constructor(editor) {
@@ -16,6 +17,11 @@ export default class History {
 		this.historyDisabled = false;
 		this.config = editor.config;
 
+		// True while goToState is walking the stack: suppresses the per-step historyChanged
+		// (see emitChanged) and lets listeners tell time-travel apart from a new action.
+		this.suppressSignal = false;
+		this.timeTravelling = false;
+
 		// Set editor-reference in Command
 
 		// signals
@@ -27,13 +33,17 @@ export default class History {
 		const lastCmd = this.undos[ this.undos.length - 1 ];
 		const timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
 
+		// Merge consecutive edits of the SAME field into one history entry (three.js's
+		// updatable-command optimisation). The original predicate compared `object`, `script` and
+		// `attributeName` — none of which exist on this port's Command — so every comparison was
+		// `undefined === undefined` and the guard was meaningless. Compare a real mergeKey instead;
+		// commands that don't set one (mergeKey undefined) never merge.
 		const isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
 			cmd.updatable &&
-			lastCmd.object === cmd.object &&
 			lastCmd.type === cmd.type &&
-			lastCmd.script === cmd.script &&
-			lastCmd.attributeName === cmd.attributeName;
+			lastCmd.mergeKey !== undefined &&
+			lastCmd.mergeKey === cmd.mergeKey;
 		if (isUpdatableCmd && timeDifference < 500) {
 			lastCmd.update(cmd);
 			cmd = lastCmd;
@@ -69,7 +79,7 @@ export default class History {
 		if (cmd !== undefined) {
 			cmd.undo();
 			this.redos.push(cmd);
-			signals.historyChanged.emit(cmd);
+			this.emitChanged(cmd);
 		}
 
 		return cmd;
@@ -89,10 +99,28 @@ export default class History {
 		if (cmd !== undefined) {
 			cmd.execute();
 			this.undos.push(cmd);
-			signals.historyChanged.emit(cmd);
+			this.emitChanged(cmd);
 		}
 
 		return cmd;
+	}
+
+	/**
+	 * Emit historyChanged unless a multi-step walk (goToState) is in progress.
+	 *
+	 * The three.js original suppressed these with `signals.historyChanged.active = false`, but
+	 * that was a feature of the signals.js library it used. This port uses typed-signals, which
+	 * has NO `active` property — so every one of those suppression statements was a silent no-op
+	 * and a 40-step walk emitted 41 times, each triggering a full re-render of both history lists.
+	 * That is quadratic, and in Cohtml it stalls the UI long enough to look like the click went
+	 * to the wrong step.
+	 */
+	emitChanged(cmd) {
+		if (this.suppressSignal) {
+			return;
+		}
+
+		signals.historyChanged.emit(cmd);
 	}
 
 	toJSON() {
@@ -149,39 +177,52 @@ export default class History {
 	clear() {
 		this.undos = [];
 		this.redos = [];
-		this.idCounter = 0;
+		// idCounter is deliberately NOT reset: goToState identifies entries purely by id, so
+		// reusing ids after a clear could send you to the wrong step if any older Command object
+		// is still referenced. Monotonic ids cost nothing.
 
 		signals.historyChanged.emit();
 	}
 
 	goToState(id) {
 		if (this.historyDisabled) {
-			alert('Undo/Redo disabled while scene is playing.');
+			LogError('Undo/Redo disabled while scene is playing.');
 			return;
 		}
 
-		signals.historyChanged.active = false;
+		// Walk the stack in ONE batch: suppress the per-step signal (see emitChanged) and pause the
+		// VEXT transport so the N commands go to the ext as a single batch instead of N round-trips
+		// (BulkCommand already does this for its children; this walk never did).
+		this.suppressSignal = true;
+		this.timeTravelling = true;
+		window.vext.Pause();
 
-		var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
+		try {
+			var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
 
-		if (cmd === undefined || id > cmd.id) {
-			cmd = this.redo();
-			while (cmd !== undefined && id > cmd.id) {
+			if (cmd === undefined || id > cmd.id) {
 				cmd = this.redo();
-			}
-		} else {
-			while (true) {
-				cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
+				while (cmd !== undefined && id > cmd.id) {
+					cmd = this.redo();
+				}
+			} else {
+				while (true) {
+					cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
 
-				if (cmd === undefined || id === cmd.id) break;
+					if (cmd === undefined || id === cmd.id) break;
 
-				this.undo();
+					this.undo();
+				}
 			}
+		} finally {
+			// finally: an exception mid-walk must not leave the panel permanently mute or the
+			// transport permanently paused.
+			this.suppressSignal = false;
+			window.vext.Resume();
 		}
 
-		signals.historyChanged.active = true;
-
 		signals.historyChanged.emit(cmd);
+		this.timeTravelling = false;
 	}
 
 	enableSerialization(id) {
@@ -194,7 +235,7 @@ export default class History {
 
 		this.goToState(-1);
 
-		signals.historyChanged.active = false;
+		this.suppressSignal = true;
 
 		var cmd = this.redo();
 		while (cmd !== undefined) {
@@ -204,7 +245,7 @@ export default class History {
 			cmd = this.redo();
 		}
 
-		signals.historyChanged.active = true;
+		this.suppressSignal = false;
 
 		this.goToState(id);
 	}

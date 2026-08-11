@@ -536,6 +536,62 @@ def t_save_order(addr):
     return f"{len(stamps)} objects saved with unique, ascending timestamps"
 
 
+@test("history: drag coalesces into one entry, and goToState walks to the exact step")
+def t_history(addr):
+    """Two things the user reported: the panel didn't show which step is current, and clicking an
+    entry seemed not to go to the right step. Verify the data-model half here — one history entry
+    per drag (not per tick), and goToState landing on exactly the clicked id."""
+    probe = cdp_eval(addr, """(function(){
+      var ap=window.__ap;
+      if(!ap) return JSON.stringify({skip:'no target from the apply test'});
+      var e=window.editor, go=ap.b;
+      var insp=document.querySelector('.inspector-component'), vm=insp&&insp.__vue__;
+      if(!vm||typeof vm.onEBXInput!=='function') return JSON.stringify({skip:'inspector vm unavailable'});
+      e.selectionGroup.select(go,false,false); vm.selectedGameObject=go;
+      window.__h={};
+      window.__h.start=e.history.undos.length;
+      // Simulate a drag: 8 edits to the SAME field in quick succession.
+      for(var i=0;i<8;i++){
+        vm.onEBXInput({field:ap.elemField,type:'GameObjectData',
+          value:{field:ap.scalar,type:'Float32',value:400+i,oldValue:399+i}}, true);
+      }
+      window.__h.afterDrag=e.history.undos.length;
+      return JSON.stringify({started:true, start:window.__h.start, afterDrag:window.__h.afterDrag});
+    })()""")
+    if isinstance(probe, dict) and probe.get("skip"):
+        return "SKIP: " + probe["skip"]
+    assert isinstance(probe, dict) and probe.get("started"), f"history probe failed ({probe})"
+    added = probe["afterDrag"] - probe["start"]
+    assert added <= 2, (
+        f"HISTORY FLOOD: 8 rapid edits to one field created {added} history entries — "
+        f"the updatable/mergeKey coalescing is not working")
+
+    # Now walk back to an earlier entry and confirm we land exactly there.
+    walk = cdp_eval(addr, """(function(){
+      var e=window.editor, u=e.history.undos;
+      if(u.length<3) return JSON.stringify({skip:'not enough history to walk'});
+      var targetIdx=Math.max(0,u.length-3);
+      var targetId=u[targetIdx].id;
+      var before=u.length;
+      e.history.goToState(targetId);
+      var after=e.history.undos;
+      return JSON.stringify({targetId:targetId, before:before, after:after.length,
+        topId: after.length? after[after.length-1].id : -1,
+        redos: e.history.redos.length});
+    })()""")
+    if isinstance(walk, dict) and walk.get("skip"):
+        return f"{added} entry per drag; " + walk["skip"]
+    assert isinstance(walk, dict) and walk.get("topId") is not None, f"goToState probe failed ({walk})"
+    assert walk["topId"] == walk["targetId"], (
+        f"WRONG STEP: asked goToState({walk['targetId']}) but the stack top is {walk['topId']} — "
+        f"the walk did not land on the clicked entry")
+    moved = walk["before"] - walk["after"]
+    assert moved > 0 and walk["redos"] >= moved, (
+        f"goToState moved {moved} entries but redos={walk['redos']} — stacks are inconsistent")
+    return (f"8 rapid edits -> {added} history entry; goToState landed exactly on id "
+            f"{walk['targetId']} ({moved} steps undone, redos {walk['redos']})")
+
+
 # ── Runner ────────────────────────────────────────────────────────────────────
 def main():
     ap = argparse.ArgumentParser()
