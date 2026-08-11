@@ -9,6 +9,12 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 	public static HIGHLIGHTED_COLOR: Color = new Color(0x999999);
 	public AABBScale: Vector3;
 	public AABBTransformMatrix: Matrix4;
+	// True once Delete() has unregistered this instance from InstanceManager. Anything still
+	// holding a reference (selection group, a parent's children list, an in-flight highlight)
+	// must not touch it again — InstanceManager would otherwise console.error per call AND
+	// rescan the whole instance array, which is how a single stale reference floods the log
+	// and wedges the client.
+	public deleted = false;
 
 	constructor(public instanceId: number, public initiatorRef: CtrRef, aabb: AxisAlignedBoundingBox) {
 		super();
@@ -29,6 +35,7 @@ export class SpatialGameEntity extends Object3D implements IGameEntity {
 	}
 
 	public Delete() {
+		this.deleted = true;
 		InstanceManager.getInstance().DeleteSpatialEntity(this);
 	}
 

@@ -85,7 +85,8 @@ export default class InstanceManager {
 		const index = this.entityIds.findIndex((el) => el === entity.instanceId);
 
 		if (index === -1) {
-			console.error("Tried to delete an entity that hasn't been registered in InstanceManager");
+			// Double-delete is harmless and happens when an object is torn down from two paths
+			// (respawn refresh + deletion). Don't log per call — see SetVisibility.
 			return;
 		}
 
@@ -101,12 +102,30 @@ export default class InstanceManager {
 	}
 
 	SetMatrixFromSpatialEntity(entity: SpatialGameEntity) {
+		if (entity.deleted) {
+			return;
+		}
+
 		const n = this.entityIds.findIndex((el) => el === entity.instanceId);
+		// n === -1 would index the instanced mesh out of bounds rather than merely logging.
+		if (n === -1) {
+			return;
+		}
+
 		this.setMatrixFromSpatialEntity(entity, n);
 	}
 
 	SetColor(entity: SpatialGameEntity, color: Color) {
+		if (entity.deleted) {
+			return;
+		}
+
 		const n = this.entityIds.findIndex((el) => el === entity.instanceId);
+		// setColorAt(-1, ...) writes outside the instance buffer — guard before touching it.
+		if (n === -1) {
+			return;
+		}
+
 		this.instancedMesh.setColorAt(n, color);
 		if (this.instancedMesh.instanceColor) {
 			this.instancedMesh.instanceColor.needsUpdate = true;
@@ -114,9 +133,18 @@ export default class InstanceManager {
 	}
 
 	SetVisibility(entity: SpatialGameEntity, visible: boolean) {
+		// A freed instance is a no-op, not an error. Stale references are reachable in normal
+		// operation (an object re-instantiated mid-highlight, a selection surviving a respawn),
+		// and the old console.error fired PER CALL while also rescanning the whole instance
+		// array — a prefab with many entities turned one stale reference into a log flood that
+		// wedged the client. Failing quietly here is correct; the bookkeeping bug it hints at is
+		// worth fixing separately, but it must never be able to take the client down.
+		if (entity.deleted) {
+			return;
+		}
+
 		const n = this.entityIds.findIndex((el) => el === entity.instanceId);
 		if (n === -1) {
-			console.error("Tried to set visibility of an entity that hasn't been registered in InstanceManager");
 			return;
 		}
 		if (visible) {
