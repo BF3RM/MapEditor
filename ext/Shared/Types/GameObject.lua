@@ -402,11 +402,30 @@ function GameObject:SetOverrides(p_Overrides)
 	local s_Clone = GameObjectManager:GetInstanceClone(self.guid)
 
 	if s_Clone ~= nil then
-		if SharedUtils:IsClientModule() then
-			-- Debounced: the write above already landed on the clone; the respawn coalesces so a
-			-- slider drag rebuilds once instead of per tick (see OnReinstantiatePump).
-			GameObjectManager:RequestReinstantiate(self.guid, s_Clone)
-		end
+		-- Re-instantiate on BOTH realms.
+		--
+		-- Each realm deep-clones independently and spawns its own copy NON-networked. The reason a
+		-- NETWORKED spawn crashed the peer is specific and fixable: DeepClone is handed
+		-- GenerateGuid(), which is RANDOM, so the two realms' clones carry DIFFERENT instance
+		-- guids and neither side can resolve the other's. The server-side spawn itself is fine
+		-- (verified).
+		--
+		-- NEXT STEP toward keeping real networking: derive the clone guid deterministically from
+		-- the editor guid (identical on both realms) instead of GenerateGuid(), so both sides hold
+		-- a clone under the SAME guid. Then a networked spawn may resolve locally on each peer.
+		-- Unverified: whether replication resolves that guid per-peer or expects it in
+		-- ResourceManager, which a runtime DC is not in. Probe before relying on it. GH #391.
+		--
+		-- Doing it on both realms is what keeps them consistent. Client-only re-instantiation
+		-- left the client previewing a change the server had never applied, which silently
+		-- desynced exactly the objects where it matters (capture points, vehicle spawners) —
+		-- GH #391 (G2).
+		--
+		-- Trade-off, stated plainly: while edited, a needNetworkId object is running as a
+		-- non-networked local copy on each realm. Both sides SHOW the same thing, but the engine
+		-- is not replicating that entity's state until the level reloads and the override is
+		-- re-applied from the save. Consistent-and-unreplicated beats desynced.
+		GameObjectManager:RequestReinstantiate(self.guid, s_Clone)
 	else
 		self:Disable(true)
 		self:Enable(true)
