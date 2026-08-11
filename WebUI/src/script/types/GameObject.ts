@@ -35,6 +35,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	private _raycastEnabled: boolean = true;
 	public declare parent: GameObject;
 	public isUserModified: boolean;
+	/** Placed but deliberately not instantiated (GH #394): no engine entities behind it. */
+	public isPlaceholder = false;
 	public originalRef: CtrRef | undefined;
 	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
 	public overrides: { [path: string]: IEBXFieldData } = {};
@@ -67,7 +69,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		isUserModified: boolean = false,
 		originalRef: CtrRef | undefined = undefined,
 		realm: REALM = REALM.CLIENT_AND_SERVER,
-		overrides: { [path: string]: IEBXFieldData } = {}
+		overrides: { [path: string]: IEBXFieldData } = {},
+		isPlaceholder: boolean = false
 	) {
 		super();
 		this.guid = guid;
@@ -83,6 +86,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.matrixAutoUpdate = false;
 		this.visible = false;
 		this.isUserModified = isUserModified;
+		this.isPlaceholder = isPlaceholder;
 		this.originalRef = originalRef;
 		this.realm = realm;
 		// Carry per-instance EBX overrides through construction. The ext sends them in the
@@ -129,7 +133,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.isUserModified,
 			gameObjectTransferData.originalRef,
 			gameObjectTransferData.realm,
-			gameObjectTransferData.overrides as any
+			gameObjectTransferData.overrides as any,
+			gameObjectTransferData.isPlaceholder
 		);
 	}
 

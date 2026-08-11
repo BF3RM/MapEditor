@@ -7,3 +7,5 @@ node_modules/
 *.db
 .vu/
 .vscode
+tools/e2e/__pycache__/
+.powos-source

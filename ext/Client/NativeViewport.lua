@@ -19,6 +19,9 @@ local m_ColorX = Vec4(1.0, 0.0, 0.0, 1.0)
 local m_ColorY = Vec4(0.0, 1.0, 0.0, 1.0)
 local m_ColorZ = Vec4(0.0, 0.0, 1.0, 1.0)
 local m_ColorWhite = Vec4(1.0, 1.0, 1.0, 0.6)
+-- cyan: objects placed but deliberately not instantiated (GH #394). Distinct from selected
+-- (orange) and hover (white) so a marker is never mistaken for a selection.
+local m_ColorPlaceholder = Vec4(0.2, 0.9, 1.0, 0.9)
 
 -- Transparent plane-quad colours: in the original each plane square is coloured by
 -- the axis PERPENDICULAR to it (gizmoTranslate.XY = matBlueTransparent, YZ = red,
@@ -102,6 +105,45 @@ local function DrawBox(p_Center, p_H, p_Color)
 	for _, e in ipairs(s_Edges) do
 		DebugRenderer:DrawLine(s_Corners[e[1]], s_Corners[e[2]], p_Color, p_Color)
 	end
+end
+
+-- Marker for a placed-but-not-instantiated object (GH #394). These have no engine entities, so
+-- nothing would render them at all: without this they are invisible in the world and reachable
+-- only from the Scene Instances tree. Drawn ALWAYS (not just when selected), because the whole
+-- point is being able to find and position them.
+--
+-- Shows position AND facing: a person-sized wire box plus a forward arrow, since a capture point
+-- or vehicle spawn placed backwards is a real mistake that a dot alone would hide.
+local function DrawPlaceholderMarker(p_Transform, p_Color)
+	local c = p_Transform.trans
+	local s_Up = p_Transform.up
+	local s_Fwd = p_Transform.forward
+	local s_Left = p_Transform.left
+
+	-- Wire box, 1m across and 2m tall, sitting on the object's origin.
+	local h = 0.5
+	local s_Top = c + s_Up * 2.0
+	local s_Corners = {
+		c + s_Left * h + s_Fwd * h, c - s_Left * h + s_Fwd * h,
+		c - s_Left * h - s_Fwd * h, c + s_Left * h - s_Fwd * h,
+	}
+	local s_TopCorners = {
+		s_Top + s_Left * h + s_Fwd * h, s_Top - s_Left * h + s_Fwd * h,
+		s_Top - s_Left * h - s_Fwd * h, s_Top + s_Left * h - s_Fwd * h,
+	}
+	for i = 1, 4 do
+		local j = (i % 4) + 1
+		DebugRenderer:DrawLine(s_Corners[i], s_Corners[j], p_Color, p_Color)
+		DebugRenderer:DrawLine(s_TopCorners[i], s_TopCorners[j], p_Color, p_Color)
+		DebugRenderer:DrawLine(s_Corners[i], s_TopCorners[i], p_Color, p_Color)
+	end
+
+	-- Facing arrow along +forward, at waist height.
+	local s_Mid = c + s_Up * 1.0
+	local s_Tip = s_Mid + s_Fwd * 1.2
+	DebugRenderer:DrawLine(s_Mid, s_Tip, p_Color, p_Color)
+	DebugRenderer:DrawLine(s_Tip, s_Tip - s_Fwd * 0.3 + s_Left * 0.2, p_Color, p_Color)
+	DebugRenderer:DrawLine(s_Tip, s_Tip - s_Fwd * 0.3 - s_Left * 0.2, p_Color, p_Color)
 end
 
 -- Outline square in the plane spanned by p_VA, p_VB (the translate/scale plane
@@ -233,6 +275,16 @@ function NativeViewport:OnDraw()
 	end
 	if GameObjectManager == nil or GameObjectManager.m_GameObjects == nil then
 		return
+	end
+
+	-- Placed-but-not-instantiated objects (cyan), always visible — they have no entities, so
+	-- nothing else draws them. Iterates a dedicated table, not every tracked object.
+	if GameObjectManager.m_Placeholders ~= nil then
+		for _, l_GameObject in pairs(GameObjectManager.m_Placeholders) do
+			if l_GameObject ~= nil and l_GameObject.transform ~= nil and l_GameObject.isDeleted ~= true then
+				pcall(function() DrawPlaceholderMarker(l_GameObject.transform, m_ColorPlaceholder) end)
+			end
+		end
 	end
 
 	-- Selected objects (orange).

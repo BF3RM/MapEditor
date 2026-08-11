@@ -23,6 +23,8 @@ export class GameObjectTransferData {
 	public originalRef: CtrRef;
 	public overrides: IEBXFieldData[];
 	public realm: REALM;
+	/** Placed but deliberately not instantiated — see GH #394. */
+	public isPlaceholder: boolean;
 
 	constructor(args: any = {}) {
 		if (Object.keys(args).length !== 0 && args.guid === undefined) {
@@ -43,6 +45,7 @@ export class GameObjectTransferData {
 		this.originalRef = args.originalRef;
 		this.overrides = args.overrides;
 		this.realm = args.realm;
+		this.isPlaceholder = args.isPlaceholder === true;
 	}
 
 	public static FromTable(table: any) {

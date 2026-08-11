@@ -79,6 +79,10 @@ function GameObject:__init(arg)
 	self.variation = arg.variation
 	self.isDeleted = arg.isDeleted --> only vanilla objects, dont appear in the browser anymore. entities get disabled, because we cannot destroy them
 	self.isEnabled = arg.isEnabled
+	-- Placed but deliberately NOT instantiated: some gameplay prefabs (capture points) fault
+	-- natively inside CreateEntitiesFromBlueprint, so the editor represents them with a marker and
+	-- persists the real blueprint reference for the level loader. See GH #394.
+	self.isPlaceholder = arg.isPlaceholder or false
 
 	self:RegisterUserModifiableField("name", arg.name)
 	self:RegisterUserModifiableField("parentData", arg.parentData)
@@ -324,6 +328,7 @@ function GameObject:GetGameObjectTransferData()
 		realm = self.realm,
 		isUserModified = self.isUserModified,
 		overrides = self.overrides,
+		isPlaceholder = self.isPlaceholder,
 		originalRef = self.originalRef:GetTable()
 		-- entities have to be set externally
 	}

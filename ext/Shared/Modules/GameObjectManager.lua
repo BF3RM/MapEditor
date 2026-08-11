@@ -199,6 +199,10 @@ function GameObjectManager:RegisterVars()
 	-- Last timestamp handed out by NextTimeStamp (keeps creation stamps strictly increasing).
 	self.m_LastTimeStamp = 0
 
+	-- Objects placed as markers rather than instantiated (see IsPlaceholderBlueprint / GH #394),
+	-- kept separately so the viewport can draw them every frame without scanning every object.
+	self.m_Placeholders = {}
+
 	-- Set to the editor guid while one of OUR CreateEntitiesFromBlueprint calls is in flight.
 	-- The generic EntityFactory:Create hook fires for every entity the engine makes and carries no
 	-- indication of who asked for it, so this window is the only way to tell entities we own from
@@ -233,6 +237,111 @@ function GameObjectManager:GetGameObject(p_GameObjectGuid)
 	return self.m_GameObjects[tostring(p_GameObjectGuid)]
 end
 
+--- Blueprints that must NOT be handed to CreateEntitiesFromBlueprint.
+---
+--- Spawning these faults NATIVELY: the client dies ~3s later with no Lua error, no JS error and no
+--- crash dump — the log simply stops (GH #393). Established by controlled tests: an ordinary
+--- SpatialPrefabBlueprint spawns fine, a LogicPrefabBlueprint spawns fine, and CapturePointPrefab
+--- dies whether networked or not, so it is neither prefab type nor replication.
+---
+--- These objects don't need to work in the editor. They need to be placeable and saveable so the
+--- level loader emits a real one at generation time, which is what the placeholder path gives us.
+---
+--- Deliberately a conservative PATH match rather than an inferred rule: the principled candidate
+--- ("carries an InterfaceDescriptorData with connections") over-matches today, since logic prefabs
+--- have connections and spawn fine. Extend this list as more offenders are found; a false positive
+--- costs a live preview, a false negative costs the client.
+local PLACEHOLDER_NAME_PATTERNS = {
+	'^gameplay/level_setups/', -- capture points, gamemode components (verified: CapturePointPrefab_HQ)
+}
+
+---@param p_Name string blueprint name
+---@return boolean
+function GameObjectManager:IsPlaceholderBlueprint(p_Name)
+	if p_Name == nil then
+		return false
+	end
+
+	local s_Lower = tostring(p_Name):lower()
+
+	for _, l_Pattern in ipairs(PLACEHOLDER_NAME_PATTERNS) do
+		if string.find(s_Lower, l_Pattern) ~= nil then
+			return true
+		end
+	end
+
+	return false
+end
+
+--- Place an object WITHOUT instantiating it: build the GameObject by hand, give it one synthetic
+--- spatial entity so it stays visible and clickable, and register it exactly like a real spawn.
+--- Everything the level loader needs (blueprintCtrRef, transform, variation, overrides) is carried
+--- and saved, so the generated level contains the genuine prefab.
+function GameObjectManager:SpawnPlaceholder(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid,
+										   p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform,
+										   p_Variation, p_Overrides, p_TimeStamp, p_Blueprint, p_ObjectBlueprint)
+	local s_Guid = Guid(tostring(p_GameObjectGuid))
+
+	-- parentData arrives as a PLAIN table: it is JSON from the WebUI command, and
+	-- GameObjectParentData:GetRootParentData() returns a raw table too. GetGameObjectTransferData
+	-- calls parentData:GetTable(), so it has to be wrapped or that throws (and the throw happens
+	-- inside the GameObjectReady handler, where it is swallowed — the object then exists in Lua but
+	-- never reaches the WebUI). Wrapping an existing instance is harmless, so this is unconditional.
+	local s_ParentData = GameObjectParentData(p_ParentData or GameObjectParentData:GetRootParentData())
+
+	---@type GameObject
+	local s_GameObject = GameObject {
+		guid = s_Guid,
+		name = p_ObjectBlueprint.name,
+		parentData = s_ParentData,
+		transform = LinearTransform(p_LinearTransform),
+		variation = p_Variation or 0,
+		origin = GameObjectOriginType.Custom,
+		timeStamp = p_TimeStamp or self:NextTimeStamp(),
+		isDeleted = false,
+		isEnabled = true,
+		gameEntities = {},
+		children = {},
+		realm = Realm.Realm_ClientAndServer,
+		originalRef = CtrRef({}),
+		overrides = p_Overrides,
+		creatorName = p_SenderName,
+		isPlaceholder = true,
+	}
+
+	s_GameObject.blueprintCtrRef = CtrRef {
+		typeName = p_Blueprint.typeInfo.name,
+		name = p_ObjectBlueprint.name,
+		partitionGuid = tostring(p_BlueprintPartitionGuid),
+		instanceGuid = tostring(p_BlueprintInstanceGuid),
+	}
+
+	-- One synthetic spatial entity so the WebUI can build a selectable AABB for it. Without this
+	-- the object exists but can only be reached from the Scene Instances tree, never clicked in
+	-- the world — which defeats the point of placing it.
+	local s_Stub = PlaceholderEntity {
+		instanceId = self:NextPlaceholderInstanceId(),
+		typeName = p_Blueprint.typeInfo.name,
+	}
+	s_GameObject.gameEntities[s_Stub.instanceId] = s_Stub
+
+	self:AddGameObjectToTable(s_GameObject)
+	self.m_Placeholders[tostring(s_Guid)] = s_GameObject
+
+	m_Logger:Write('Placed (not instantiated) ' .. tostring(p_ObjectBlueprint.name))
+
+	Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+
+	return true
+end
+
+--- Instance ids for synthetic placeholder entities. Kept far above real engine instance ids so it
+--- can never collide with one (the WebUI keys its entity map by this).
+function GameObjectManager:NextPlaceholderInstanceId()
+	self.m_PlaceholderInstanceId = (self.m_PlaceholderInstanceId or 2000000000) + 1
+	return self.m_PlaceholderInstanceId
+end
+
 ---@param p_GameObjectGuid string|Guid
 ---@param p_SenderName string
 ---@param p_BlueprintPartitionGuid string|Guid
@@ -262,6 +371,21 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	end
 
 	local s_ObjectBlueprint = _G[s_Blueprint.typeInfo.name](s_Blueprint)
+
+	-- Some gameplay prefabs cannot be instantiated at all without killing the client (GH #393).
+	-- Place a marker instead and keep the real blueprint reference for the level loader (GH #394).
+	if self:IsPlaceholderBlueprint(s_ObjectBlueprint.name) then
+		if p_IsPreviewSpawn then
+			-- No drag-preview ghost for these: building the entities is precisely what kills the
+			-- client, so there is nothing safe to show. MessageActions:PreviewSpawn treats false as
+			-- "no preview" and carries on, which is the correct degradation here.
+			return false
+		end
+
+		return self:SpawnPlaceholder(p_GameObjectGuid, p_SenderName, p_BlueprintPartitionGuid,
+			p_BlueprintInstanceGuid, p_ParentData, p_LinearTransform, p_Variation, p_Overrides,
+			p_TimeStamp, s_Blueprint, s_ObjectBlueprint)
+	end
 
 	-- m_Logger:Write('Invoking spawning of blueprint: '.. s_ObjectBlueprint.name .. " | ".. s_Blueprint.typeInfo.name .. ", ID: " .. p_GameObjectGuid .. ", Instance: " .. tostring(p_BlueprintInstanceGuid) .. ", Variation: " .. p_Variation)
 	if p_IsPreviewSpawn == false then
@@ -848,6 +972,7 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 
 	-- The entities are gone, so the representative that kept them unique can go too.
 	self:ReleaseRepresentative(p_Guid)
+	self.m_Placeholders[tostring(p_Guid)] = nil
 
 	return true
 end
