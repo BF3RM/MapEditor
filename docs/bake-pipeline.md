@@ -58,7 +58,11 @@ chmod +x rime/RimeREPL.exe
 Then:
 
 ```bash
+# placement only (upstream generator)
 python3 LevelLoaderGen/generate.py rm-levelloader 0.1.0 -i ./in -o ./mods --rimepath ./rime
+
+# placement + per-instance EBX overrides (wraps the above, no upstream patch)
+tools/bake.py --project MyProject --generator /path/to/LevelLoaderGen --rimepath ./rime
 ```
 
 ---
@@ -89,8 +93,8 @@ generator renames `left` → `right`), and `blueprintCtrRef` already has the gui
 | Variations (via `VariationMap.json`) | ✅ |
 | Deleted vanilla objects | ✅ (recorded as excluded RODs in the generated Lua) |
 | Objects that cannot be instantiated (capture points — see #394) | ✅ placeholders bake into real RODs |
-| **Per-instance EBX overrides** | ⚠️ see §5 — needs `project_ebx` |
-| **Apply-to-blueprint** | ⚠️ see §5 — needs partition shadowing |
+| **Per-instance EBX overrides** | ✅ via `tools/bake.py` (see §5) |
+| **Apply-to-blueprint** | ❌ skipped — needs partition shadowing (§5) |
 | `origin == 3` (custom children) | ❌ skipped: *"custom children not supported"* |
 | Vanilla children of `PrefabBlueprint` / `SpatialPrefabBlueprint` | ❌ skipped: *"prefab system not yet implemented"* |
 
@@ -183,3 +187,30 @@ Rime instance (what `add_json_partition` compiles), per
 
 Note `$instances` is an **array** in one and `Instances` is a **guid-keyed map** in the other, and
 field names are PascalCase on both sides.
+
+---
+
+## 8. Converting clone partitions — three things Rime rejects
+
+Found by compiling real data; each produced an unhelpful error.
+
+**Do not put `$type` on inline struct members.** Rime resolves them from the field's declared array
+element type and rejects the key outright:
+`Could not find member '$type' on object of type 'EventConnection'`. `$type` belongs on instances
+only.
+
+**Omit null fields, never emit `null`.** Rime's generated types default struct-valued fields to
+`new()`, so an explicit null replaces a working default with nothing and the writer dereferences
+it — a bare `NullReferenceException` at `fb.OutputNodeData.Serialize` (audio graph ports).
+`PartitionSerializer` emits `{"$type":T,"$ref":true}` both for genuinely null references *and* as
+its fallback for any field it could not read, and the two are indistinguishable downstream, so
+omitting the key and letting Rime default it is correct for both.
+
+**Sound/voice instances come out empty.** `_SerializeFields` deliberately skips types whose names
+match `sound`/`voice` because reading their fields crashes the game, so they serialize with a
+`$type` and nothing else. They compile, but a cloned blueprint's audio sub-graph is therefore not
+faithfully reproduced. Not yet observed to misbehave at runtime — worth checking if a modified
+object loses its sounds.
+
+Building Rime from source pays for itself here: every one of these was diagnosed by reading the
+exact line in the stack trace, which a prebuilt binary would not have given.
