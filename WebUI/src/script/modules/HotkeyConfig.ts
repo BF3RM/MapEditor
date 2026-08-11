@@ -1,7 +1,12 @@
 import CameraControls from 'camera-controls';
+import { Vector3 } from 'three';
 import { GIZMO_MODE, KEYCODE } from '../types/Enums';
 import { Hotkey, HOTKEY_TYPE } from './Hotkey';
 import { signals } from './Signals';
+
+// World axes for the quick-rotate hotkeys below.
+const AXIS_X = new Vector3(1, 0, 0);
+const AXIS_Y = new Vector3(0, 1, 0);
 
 export const HOTKEYS: Hotkey[] = [
 	// KeyDown
@@ -241,6 +246,50 @@ export const HOTKEYS: Hotkey[] = [
 		},
 		HOTKEY_TYPE.CanvasOnlyDown,
 		'While moving gizmo to snap to grid.'
+	),
+	// Quick 90-degree rotations of the whole selection around the group pivot. The bracket keys
+	// are used because Q/W/E/R are already taken by the gizmo modes and the freecam. Repeated
+	// presses compose, so 180 / 270 need no bindings of their own. InputControls matches modifiers
+	// EXACTLY, so the plain and the Shift variants can't collide.
+	new Hotkey(
+		KEYCODE.OPEN_BRACKET,
+		false,
+		false,
+		() => {
+			editor.selectionGroup.rotateBy(AXIS_Y, -90);
+		},
+		HOTKEY_TYPE.CanvasOnlyDown,
+		'Rotate selection -90 degrees (yaw).'
+	),
+	new Hotkey(
+		KEYCODE.CLOSE_BRACKET,
+		false,
+		false,
+		() => {
+			editor.selectionGroup.rotateBy(AXIS_Y, 90);
+		},
+		HOTKEY_TYPE.CanvasOnlyDown,
+		'Rotate selection +90 degrees (yaw).'
+	),
+	new Hotkey(
+		KEYCODE.OPEN_BRACKET,
+		false,
+		true,
+		() => {
+			editor.selectionGroup.rotateBy(AXIS_X, -90);
+		},
+		HOTKEY_TYPE.CanvasOnlyDown,
+		'Rotate selection -90 degrees (pitch).'
+	),
+	new Hotkey(
+		KEYCODE.CLOSE_BRACKET,
+		false,
+		true,
+		() => {
+			editor.selectionGroup.rotateBy(AXIS_X, 90);
+		},
+		HOTKEY_TYPE.CanvasOnlyDown,
+		'Rotate selection +90 degrees (pitch).'
 	),
 	// Freecam
 	new Hotkey(KEYCODE.KEY_W, false, false, () => {}, HOTKEY_TYPE.Freecam, 'Move forward.'),

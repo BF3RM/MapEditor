@@ -31,9 +31,35 @@ export default class HistoryComponent extends EditorComponent {
 	undos: Command[] = [];
 	redos: Command[] = [];
 
+	// Tracked separately because `this.undos` is the SAME array instance as
+	// `window.editor.history.undos` (History pushes/pops it in place), so its length can't be
+	// diffed across the assignment below.
+	private lastUndoCount = 0;
+
 	onHistoryChanged() {
+		const newUndoCount = window.editor.history.undos.length;
+		// Only follow the list when a NEW action was appended. Undo/redo and clicking an older
+		// entry to time-travel also emit historyChanged; auto-scrolling on those would yank the
+		// view back to the bottom right after the user scrolled up to pick an entry.
+		const appended = newUndoCount > this.lastUndoCount;
+		this.lastUndoCount = newUndoCount;
+
 		this.undos = window.editor.history.undos;
 		this.redos = window.editor.history.redos.slice().reverse();
+
+		if (appended) {
+			this.$nextTick(() => this.scrollToLatest());
+		}
+	}
+
+	// Gameface: scrollIntoView is unreliable, so set scrollTop on the scrolling container
+	// (EditorComponent's .panel-body) directly.
+	private scrollToLatest() {
+		const body = this.$el ? (this.$el.querySelector('.panel-body') as HTMLElement | null) : null;
+
+		if (body) {
+			body.scrollTop = body.scrollHeight;
+		}
 	}
 
 	goToState(id: number) {

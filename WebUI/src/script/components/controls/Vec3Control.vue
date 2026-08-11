@@ -45,14 +45,9 @@
 			@dragstart="$emit('dragstart')"
 			@dragend="$emit('dragend')"
 		/>
-		<!--div class="actions">
-			<div class="copy-btn" @click="onCopy">
-				<img :src="require('@/icons/editor/new/copy.svg')" v-tooltip="'Copy values'" />
-			</div>
-			<div class="paste-btn" @click="onPaste">
-				<img :src="require('@/icons/editor/new/paste.svg')" v-tooltip="'Paste values'" />
-			</div>
-		</div-->
+		<!-- Copy/paste of a whole Position/Rotation/Scale row now lives one level up, in
+		     LinearTransformControl.vue: pasting has to emit `input` AND `dragend` on the full
+		     LinearTransform, which only that component owns. -->
 	</div>
 </template>
 
@@ -121,29 +116,9 @@ export default defineComponent({
             this.local = newVal;
             this.$emit('input', newVal.clone());
         }
-
-    /*
-	// TODO: Instead of localStorage we must use a state!
-	onCopy() {
-		localStorage.setItem('copy_' + this.label, JSON.stringify(this.value));
-	}
-
-	onPaste() {
-		let copied: any = localStorage.getItem('copy_' + this.label);
-		if (copied) {
-			try {
-				copied = JSON.parse(copied);
-				const newVal = this.value.clone();
-				newVal.x = copied.x;
-				newVal.y = copied.y;
-				newVal.z = copied.z;
-				this.$emit('input', newVal);
-			} catch (err: any) {
-				console.error(err);
-			}
-		}
-	}
-	*/
+        // The old commented-out localStorage copy/paste scaffolding (and its
+        // "TODO: Instead of localStorage we must use a state!") is resolved in
+        // LinearTransformControl.vue, which keeps the clipboard in module-scoped state.
     }
 });
 </script>
@@ -186,26 +161,6 @@ export default defineComponent({
 
 		&.z {
 			color: #037fff;
-		}
-	}
-
-	.actions {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-
-		.paste-btn,
-		.copy-btn {
-			display: inline-flex;
-			width: 14px;
-			height: 14px;
-			background: #037fff;
-			border-radius: 3px;
-			padding: 3px;
-		}
-
-		.copy-btn {
-			margin-right: 4px;
 		}
 	}
 

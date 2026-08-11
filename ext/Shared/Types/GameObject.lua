@@ -4,6 +4,55 @@ GameObject = class 'GameObject'
 local m_Logger = Logger("GameObject", false)
 local m_TraceableField_Suffix = "_original_value"
 
+local m_TransformComponents = { "trans", "left", "up", "forward" }
+local m_VectorAxes = { "x", "y", "z" }
+
+-- VALUE-compares two LinearTransform-shaped values (same style as m_ValuesEqual further down,
+-- which does the same job for override leaves).
+--
+-- Why: LinearTransform is VEXT userdata, so `==` on it is an IDENTITY compare, and SetTransform
+-- always hands SetField a FRESHLY constructed LinearTransform. That made the dirty check below
+-- always true for transforms, so moving a vanilla object and then undoing the move still saved it
+-- as user-modified (GH #376). Same story for localTransform.
+--
+-- Returns (isComparable, isEqual). isComparable is false for anything that isn't
+-- LinearTransform-shaped, so SetField can keep its original identity compare for every other field
+-- type. The probing runs inside a pcall because indexing an absent field on VEXT userdata throws
+-- rather than returning nil.
+local function m_TransformsEqual(p_A, p_B)
+	local s_Ok, s_Comparable, s_Equal = pcall(function()
+		for _, l_Component in ipairs(m_TransformComponents) do
+			local s_VecA = p_A[l_Component]
+			local s_VecB = p_B[l_Component]
+
+			if s_VecA == nil or s_VecB == nil then
+				return false, false -- not a LinearTransform: not comparable
+			end
+
+			for _, l_Axis in ipairs(m_VectorAxes) do
+				local s_AxisA = s_VecA[l_Axis]
+				local s_AxisB = s_VecB[l_Axis]
+
+				if type(s_AxisA) ~= "number" or type(s_AxisB) ~= "number" then
+					return false, false -- not a LinearTransform: not comparable
+				end
+
+				if s_AxisA ~= s_AxisB then
+					return true, false
+				end
+			end
+		end
+
+		return true, true
+	end)
+
+	if not s_Ok then
+		return false, false
+	end
+
+	return s_Comparable, s_Equal
+end
+
 function GameObject:__init(arg)
 	---@type Guid
 	self.guid = arg.guid
@@ -53,7 +102,15 @@ function GameObject:SetField(p_FieldName, p_NewValue, p_AutoModified)
 	local newValue = self[p_FieldName]
 
 	if not p_AutoModified then
-		self.userModifiedFields[p_FieldName] = newValue ~= originalValue
+		local s_Comparable, s_Equal = m_TransformsEqual(newValue, originalValue)
+
+		if s_Comparable then
+			-- Transforms: compare by VALUE (see m_TransformsEqual).
+			self.userModifiedFields[p_FieldName] = not s_Equal
+		else
+			-- Everything else keeps the original comparison unchanged.
+			self.userModifiedFields[p_FieldName] = newValue ~= originalValue
+		end
 	end
 end
 

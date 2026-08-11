@@ -34,7 +34,11 @@ export class SelectionGroup extends THREE.Object3D {
 		const commands = [];
 		for (const gameObject of this.selectedGameObjects) {
 			if (!gameObject.hasMoved()) {
-				return; // No position change
+				// `continue`, NOT `return`: this used to abort the WHOLE batch, so if the first
+				// object of a multi-selection happened not to move (e.g. it was already at the
+				// snapped position) no SetTransformCommand was created for ANY of the others and
+				// their moves were silently dropped.
+				continue; // No position change for this object
 			}
 			const transform = new LinearTransform().setFromMatrix(gameObject.matrixWorld);
 			const command = new SetTransformCommand(
@@ -55,6 +59,35 @@ export class SelectionGroup extends THREE.Object3D {
 		} else {
 			editor.execute(new BulkCommand(commands));
 		}
+	}
+
+	/**
+	 * Rotates the whole selection by `degrees` around `axis` (a world-space direction), pivoting on
+	 * the selection group's own origin — the same pivot the rotate gizmo uses.
+	 *
+	 * This deliberately mirrors the gizmo drag path (THREEManager.updateGizmoDrag ->
+	 * endGizmoDrag): premultiply the delta quaternion onto the group, push the result out to the
+	 * selected objects with onClientOnlyMove(), then commit with onClientOnlyMoveEnd() so the
+	 * result lands in the history as an undoable SetTransformCommand instead of a client-only nudge.
+	 */
+	public rotateBy(axis: THREE.Vector3, degrees: number) {
+		if (this.selectedGameObjects.length === 0) {
+			return;
+		}
+
+		const delta = new THREE.Quaternion().setFromAxisAngle(
+			axis.clone().normalize(),
+			THREE.MathUtils.degToRad(degrees)
+		);
+		this.quaternion.premultiply(delta).normalize();
+
+		this.onClientOnlyMove();
+		editor.editorCore.RequestUpdate();
+		this.onClientOnlyMoveEnd();
+
+		// Keep the natively-drawn gizmo on the (unchanged) pivot and repaint.
+		editor.threeManager.pushGizmoCenter();
+		editor.threeManager.setPendingRender();
 	}
 
 	/**
