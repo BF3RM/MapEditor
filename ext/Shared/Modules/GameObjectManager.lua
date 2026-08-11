@@ -199,6 +199,12 @@ function GameObjectManager:RegisterVars()
 	-- Last timestamp handed out by NextTimeStamp (keeps creation stamps strictly increasing).
 	self.m_LastTimeStamp = 0
 
+	-- Set to the editor guid while one of OUR CreateEntitiesFromBlueprint calls is in flight.
+	-- The generic EntityFactory:Create hook fires for every entity the engine makes and carries no
+	-- indication of who asked for it, so this window is the only way to tell entities we own from
+	-- the level's own geometry — and that distinction is what makes destroying them safe.
+	self.m_SpawningForGuid = nil
+
 	-- [#202] Per-spawn ReferenceObjectData handed to EntityCreationParams.parentRepresentative,
 	-- keyed by editor guid. Held here so the GC can't collect them while their entities live.
 	self.m_Representatives = {}
@@ -276,7 +282,17 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
 	s_Params.parentRepresentative = self:CreateRepresentative(p_GameObjectGuid, s_Blueprint, p_LinearTransform)
 
-	local s_EntityBus = EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
+	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
+	local s_BusOk, s_EntityBus = pcall(function()
+		return EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
+	end)
+	self.m_SpawningForGuid = nil
+
+	if not s_BusOk then
+		m_Logger:Error("CreateEntitiesFromBlueprint threw: " .. tostring(s_EntityBus))
+		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = nil
+		return false
+	end
 
 	if s_EntityBus == nil then
 		m_Logger:Error("Spawning failed")
@@ -1014,9 +1030,11 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	s_Params.networked = false
 	s_Params.parentRepresentative = self:CreateRepresentative(p_GameObjectGuid, p_CloneDC, p_LinearTransform)
 
+	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_Ok, s_EntityBus = pcall(function()
 		return EntityManager:CreateEntitiesFromBlueprint(p_CloneDC, s_Params)
 	end)
+	self.m_SpawningForGuid = nil
 
 	if not s_Ok or s_EntityBus == nil then
 		m_Logger:Error("Spawning from clone failed: " .. tostring(s_EntityBus))
@@ -1128,6 +1146,9 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		entity = s_Entity,
 		instanceId = s_Entity.instanceId,
 		typeName = s_Entity.typeInfo.name,
+		-- Created while one of our own spawns was in flight, so it's ours to free later.
+		-- Everything the level creates on its own falls outside the window and stays untagged.
+		isEditorSpawned = self.m_SpawningForGuid ~= nil,
 	}
 	local s_PartitionGuid = InstanceParser:GetPartition(p_EntityData.instanceGuid);
 	s_GameEntity.initiatorRef = CtrRef {
