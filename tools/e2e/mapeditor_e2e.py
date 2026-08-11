@@ -155,6 +155,7 @@ def t_reference(addr):
       var target=null;
       for(var i=0;i<vals.length && !target;i++){
         var p=vals[i]; if(!p||!p.instances) continue;
+        if(p.name && p.name.indexOf('e2e_probe_')===0) continue;  // skip harness probes
         for(var g in p.instances){
           var inst=p.instances[g];
           var bp = inst && inst.fields && inst.fields.blueprint && inst.fields.blueprint.value;
@@ -184,6 +185,277 @@ def t_reference(addr):
             return f"resolved {res.get('type')} name={res.get('name')}"
         time.sleep(1)
     raise AssertionError("reference resolve timed out")
+
+
+_FRESH_FETCH_JS = """
+// Re-fetch a partition from the SERVER, bypassing the WebUI cache, by registering it under a
+// unique key (each key builds a new FBPartition -> new request). The server serializes the LIVE
+// DataContainers, so this reads the real current state of the shared blueprint.
+window.__freshFetch = function(partGuid, cb){
+  var fm = window.editor.fbdMan;
+  window.__probeN = (window.__probeN || 0) + 1;
+  var key = String(partGuid).toLowerCase();
+  var prev = fm.partitionGuids.getValue(key);          // remember the editor's real mapping
+  var p = fm.registerPartition('e2e_probe_' + window.__probeN, partGuid);
+  if (prev) { fm.partitionGuids.setValue(key, prev); } // ...and restore it: probes must not
+                                                       // become what the editor resolves by guid
+  p.data.then(function(){ cb(p, null); }).catch(function(e){ cb(null, String(e)); });
+};
+"""
+
+
+def _poll(addr, js, key, tries=25, delay=1):
+    """Poll a window.<var> until it is non-null."""
+    for _ in range(tries):
+        r = cdp_eval(addr, js)
+        if isinstance(r, dict) and r.get(key) is not None:
+            return r
+        time.sleep(delay)
+    return None
+
+
+@test("per-instance override isolates the prefab; Apply writes the shared blueprint")
+def t_apply_to_blueprint(addr):
+    """The full Unity-prefab contract, verified against SERVER state (not just the UI):
+       edit one instance -> shared blueprint must be UNCHANGED (M1 isolation);
+       then Apply to Blueprint -> shared blueprint must now carry the value (M3)."""
+    # 1. Discover a multi-instance light prefab and read the shared blueprint's baseline.
+    cdp_eval(addr, "(function(){" + _FRESH_FETCH_JS + "return 'ok';})()")
+    setup = cdp_eval(addr, """(function(){
+      var e=window.editor, vals=e.gameObjects.values(), byBp={};
+      for(var i=0;i<vals.length;i++){
+        var go=vals[i]; if(!go||!go.blueprintCtrRef) continue;
+        if(!/light|lamp/i.test(go.name||'')) continue;
+        if(go.overrides && Object.keys(go.overrides).length) continue;  // untouched only
+        var k=go.blueprintCtrRef.instanceGuid.toString();
+        (byBp[k]=byBp[k]||[]).push(go);
+      }
+      var cands=[];
+      for(var k in byBp){
+        if(byBp[k].length>=2){
+          cands.push({a:byBp[k][0], b:byBp[k][1], bpPart:byBp[k][0].blueprintCtrRef.partitionGuid.toString(),
+                      name:byBp[k][0].name, siblings:byBp[k].length});
+        }
+      }
+      window.__cands=cands;
+      return JSON.stringify({count:cands.length, names:cands.slice(0,5).map(function(c){return c.name;})});
+    })()""")
+    if not (isinstance(setup, dict) and setup.get("count", 0) > 0):
+        return "SKIP: no light prefab with >=2 instances on this map"
+
+    # 2. Baseline: walk candidates until one exposes an editable Float32 under objects[], and read
+    #    that scalar straight from the shared blueprint on the SERVER.
+    cdp_eval(addr, """(function(){
+      var SCALARS=['radius','intensity','attenuationOffset','width','translucencyScale'];
+      window.__base=null;
+      var tryNext=function(i){
+        if(i>=window.__cands.length){ window.__base={err:'no candidate exposed a Float32 scalar'}; return; }
+        var c=window.__cands[i];
+        window.__freshFetch(c.bpPart, function(part, err){
+          if(!part || !part.primaryInstance || !part.primaryInstance.fields.objects){ tryNext(i+1); return; }
+          var arr=part.primaryInstance.fields.objects.value;
+          for(var j=0;j<arr.length;j++){
+            var ref=arr[j].value;
+            var inst=ref&&ref.instanceGuid? part.instances[ref.instanceGuid.toString().toLowerCase()]:null;
+            if(!inst) continue;
+            for(var s=0;s<SCALARS.length;s++){
+              var f=inst.fields[SCALARS[s]];
+              if(f && f.type==='Float32' && typeof f.value==='number'){
+                window.__ap={a:c.a,b:c.b,bpPart:c.bpPart,name:c.name,siblings:c.siblings,
+                             elemField:arr[j].name, scalar:SCALARS[s]};
+                window.__base={value:f.value, elem:arr[j].name, scalar:SCALARS[s], type:inst.typeName, name:c.name};
+                return;
+              }
+            }
+          }
+          tryNext(i+1);
+        });
+      };
+      tryNext(0);
+      return 'dispatched';
+    })()""")
+    base = _poll(addr, "(function(){return JSON.stringify(window.__base);})()", "value", tries=40)
+    if base is None:
+        r = cdp_eval(addr, "(function(){return JSON.stringify(window.__base);})()")
+        return f"SKIP: could not read blueprint baseline ({r})"
+    baseline = base["value"]
+    scalar = base["scalar"]
+    setup = {"name": base.get("name", "?"), "siblings": "?"}
+    new_value = round(baseline + 37.0, 3)
+
+    # 3. Edit ONE instance through the real inspector path (SetEBXFieldCommand).
+    edit = cdp_eval(addr, """(function(){
+      var e=window.editor, ap=window.__ap;
+      e.selectionGroup.select(ap.a, false, false);
+      var insp=document.querySelector('.inspector-component');
+      var vm=insp && insp.__vue__;
+      if(!vm || typeof vm.onEBXInput!=='function') return JSON.stringify({err:'inspector vm unavailable'});
+      vm.selectedGameObject = ap.a;
+      vm.onEBXInput({ field: ap.elemField, type:'GameObjectData',
+                      value:{ field: ap.scalar, type:'Float32', value:""" + str(new_value) + """,
+                              oldValue:""" + str(baseline) + """ } }, true);
+      return JSON.stringify({sent:true, path:'objects.'+ap.elemField+'.'+ap.scalar});
+    })()""")
+    assert isinstance(edit, dict) and edit.get("sent"), f"edit dispatch failed ({edit})"
+    time.sleep(4)  # debounce + re-instantiation
+
+    # 4. ISOLATION: the shared blueprint must still hold the baseline.
+    cdp_eval(addr, """(function(){
+      window.__iso=null;
+      window.__freshFetch(window.__ap.bpPart, function(part, err){
+        if(!part){ window.__iso={err:err}; return; }
+        var arr=part.primaryInstance.fields.objects.value;
+        for(var i=0;i<arr.length;i++){
+          if(arr[i].name!==window.__ap.elemField) continue;
+          var inst=part.instances[arr[i].value.instanceGuid.toString().toLowerCase()];
+          var f=inst && inst.fields[window.__ap.scalar]; window.__iso={value: f? f.value : null};
+          return;
+        }
+        window.__iso={err:'elem gone'};
+      });
+      return 'dispatched';
+    })()""")
+    iso = _poll(addr, "(function(){return JSON.stringify(window.__iso);})()", "value")
+    assert iso is not None, "isolation probe never resolved"
+    assert abs(iso["value"] - baseline) < 0.01, (
+        f"ISOLATION BROKEN: shared blueprint changed to {iso['value']} after a per-instance edit "
+        f"(expected baseline {baseline}) — the edit leaked to every instance")
+
+    # 5. Apply to Blueprint (same command the panel button sends).
+    cdp_eval(addr, """(function(){
+      window.vext.SendCommand({type:'ApplyBlueprintOverridesCommand', sender: window.editor.playerName,
+        gameObjectTransferData:{ guid: window.__ap.a.guid.toString(), overrides: [] }});
+      return 'applied';
+    })()""")
+    time.sleep(5)
+
+    # 6. APPLY: the shared blueprint must now carry the new value.
+    cdp_eval(addr, """(function(){
+      window.__post=null;
+      window.__freshFetch(window.__ap.bpPart, function(part, err){
+        if(!part){ window.__post={err:err}; return; }
+        var arr=part.primaryInstance.fields.objects.value;
+        for(var i=0;i<arr.length;i++){
+          if(arr[i].name!==window.__ap.elemField) continue;
+          var inst=part.instances[arr[i].value.instanceGuid.toString().toLowerCase()];
+          var f=inst && inst.fields[window.__ap.scalar]; window.__post={value: f? f.value : null};
+          return;
+        }
+        window.__post={err:'elem gone'};
+      });
+      return 'dispatched';
+    })()""")
+    post = _poll(addr, "(function(){return JSON.stringify(window.__post);})()", "value")
+    assert post is not None, "post-apply probe never resolved"
+    assert abs(post["value"] - new_value) < 0.01, (
+        f"APPLY FAILED: shared blueprint radius is {post['value']}, expected {new_value} "
+        f"(baseline was {baseline}) — Apply to Blueprint did not write the base")
+
+    return (f"{setup['name'].split('/')[-1]}.{scalar}: shared base stayed {baseline} during the "
+            f"per-instance edit, then Apply wrote {post['value']}")
+
+
+@test("repeated edits do not leak GameObjects")
+def t_no_leak(addr):
+    """Re-instantiating a prefab spawns fresh child GameObjects. If the previous incarnation's
+    children aren't untracked, every edit leaks one (they'd also be written into the save). Assert
+    the total tracked-object count is stable across several edits."""
+    probe = cdp_eval(addr, """(function(){
+      var ap=window.__ap;
+      if(!ap) return JSON.stringify({skip:'no target from the apply test'});
+      var e=window.editor, go=ap.b;
+      var insp=document.querySelector('.inspector-component'), vm=insp&&insp.__vue__;
+      if(!vm||typeof vm.onEBXInput!=='function') return JSON.stringify({skip:'inspector vm unavailable'});
+      e.selectionGroup.select(go,false,false); vm.selectedGameObject=go;
+      window.__leak={samples:[], done:false};
+      var snap=function(t){ window.__leak.samples.push({tag:t,total:e.gameObjects.size(),kids:go.children.length}); };
+      [0,1,2].forEach(function(i){
+        setTimeout(function(){
+          vm.onEBXInput({field:ap.elemField,type:'GameObjectData',
+            value:{field:ap.scalar,type:'Float32',value:300+i,oldValue:299+i}}, true);
+          setTimeout(function(){ snap('edit'+(i+1)); if(i===2) window.__leak.done=true; }, 1500);
+        }, i*2500);
+      });
+      return JSON.stringify({started:true});
+    })()""")
+    if isinstance(probe, dict) and probe.get("skip"):
+        return "SKIP: " + probe["skip"]
+    res = _poll(addr, "(function(){var l=window.__leak;return JSON.stringify(l&&l.done?"
+                      "{done:true,samples:l.samples}:{done:null});})()", "done", tries=20)
+    assert res is not None, "leak probe never finished"
+    totals = [s["total"] for s in res["samples"]]
+    kids = [s["kids"] for s in res["samples"]]
+    growth = totals[-1] - totals[0]
+    assert growth <= 0, (
+        f"LEAK: tracked objects grew {totals} across 3 edits (+{growth}) and children went {kids} — "
+        f"each re-instantiation is leaving its predecessor's children behind")
+    return f"objects stable across 3 edits ({totals}), children {kids}"
+
+
+@test("rapid edits coalesce into few respawns (drag debounce)")
+def t_debounce(addr):
+    """A slider drag fires an EBX edit per tick. Each one used to delete+respawn immediately (71
+    respawns in seconds froze the client). Every respawn rebuilds the object's child GameObjects
+    with fresh guids, so counting distinct child guids while spamming edits measures the real
+    respawn count."""
+    probe = cdp_eval(addr, """(function(){
+      var ap=window.__ap;
+      if(!ap) return JSON.stringify({skip:'apply test did not run (no target)'});
+      var go=ap.a, insp=document.querySelector('.inspector-component'), vm=insp&&insp.__vue__;
+      if(!vm||typeof vm.onEBXInput!=='function') return JSON.stringify({skip:'inspector vm unavailable'});
+      window.editor.selectionGroup.select(go,false,false);
+      vm.selectedGameObject=go;
+      // Count respawns at the REAL message boundary: Lua pushes UI updates via
+      // window.vext.WebUpdateBatch (resolved by name at call time, so wrapping works). Each
+      // re-instantiation sends a SpawnedGameObject CAR for this guid.
+      var TARGET=go.guid.toString().toLowerCase();
+      window.__churn={respawns:0, edits:0, done:false};
+      var origBatch=window.vext.WebUpdateBatch.bind(window.vext);
+      window.__origBatch=origBatch;
+      window.vext.WebUpdateBatch=function(updates){
+        try{
+          (updates||[]).forEach(function(u){
+            if(u && u.path==='HandleResponse' && u.payload && u.payload.length!==undefined){
+              for(var i=0;i<u.payload.length;i++){
+                var car=u.payload[i];
+                if(car && car.type==='SpawnedGameObject' && car.gameObjectTransferData &&
+                   String(car.gameObjectTransferData.guid).toLowerCase()===TARGET){ window.__churn.respawns++; }
+              }
+            }
+          });
+        }catch(e){}
+        return origBatch(updates);
+      };
+      var N=10;
+      for(var i=0;i<N;i++){
+        (function(k){ setTimeout(function(){
+          vm.onEBXInput({field:ap.elemField,type:'GameObjectData',
+            value:{field:ap.scalar,type:'Float32',value:60+k,oldValue:60+k-1}}, true);
+          window.__churn.edits++;
+        }, k*30); })(i);
+      }
+      setTimeout(function(){
+        window.vext.WebUpdateBatch=window.__origBatch;   // restore
+        window.__churn.done=true;
+      }, 4000);
+      return JSON.stringify({started:true, edits:N});
+    })()""")
+    if isinstance(probe, dict) and probe.get("skip"):
+        return "SKIP: " + probe["skip"]
+    assert isinstance(probe, dict) and probe.get("started"), f"churn probe failed ({probe})"
+
+    res = _poll(addr, "(function(){var c=window.__churn;return JSON.stringify("
+                      "c&&c.done?{done:true,edits:c.edits,respawns:c.respawns}:{done:null});})()",
+                "done", tries=15)
+    assert res is not None, "churn probe never finished"
+    edits, respawns = res["edits"], res["respawns"]
+    assert respawns > 0, (
+        f"probe measured 0 respawns for {edits} edits — the edits never reached the object, so this "
+        f"test proves nothing (check the target/inspector wiring)")
+    assert respawns < edits, (
+        f"NO DEBOUNCE: {edits} rapid edits caused {respawns} respawns (expected far fewer) — "
+        f"this is the churn that froze the client")
+    return f"{edits} rapid edits -> {respawns} respawn(s)"
 
 
 # ── Runner ────────────────────────────────────────────────────────────────────

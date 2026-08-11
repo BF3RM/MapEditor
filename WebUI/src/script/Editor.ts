@@ -441,19 +441,63 @@ export default class Editor {
 	}
 
 	// TODO: Move logic to GameContext
+	/**
+	 * Refresh an existing GameObject after the ext re-instantiated it under the SAME editor guid
+	 * (EBX override applied to a per-instance blueprint clone, or a variation change). The entity
+	 * instanceIds are new, so swap the SpatialGameEntity children for fresh ones (tearing the old
+	 * ones down through InstanceManager so AABB instances aren't leaked) and carry the updated
+	 * overrides. Keeps selection intact, so editing a field doesn't drop your selection.
+	 */
+	private refreshRespawnedGameObject(gameObject: GameObject, transferData: GameObjectTransferData) {
+		const wasSelected = gameObject.selected;
+
+		// Drop the stale AABB boxes (their entities no longer exist).
+		gameObject.children
+			.filter((child) => child instanceof SpatialGameEntity)
+			.forEach((child) => {
+				const spatial = child as SpatialGameEntity;
+				this.spatialGameEntities.delete(spatial.instanceId);
+				spatial.Delete();
+				gameObject.remove(spatial);
+			});
+
+		// Rebuild them from the new entity set.
+		gameObject.gameEntitiesData = transferData.gameEntities || [];
+		for (const entityData of gameObject.gameEntitiesData) {
+			if (entityData.isSpatial) {
+				const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.initiatorRef, entityData.aabb);
+				gameObject.add(gameEntity);
+				this.spatialGameEntities.set(entityData.instanceId, gameEntity);
+			}
+		}
+		gameObject.updateMatrixWorld();
+
+		if (transferData.overrides) {
+			gameObject.overrides = transferData.overrides as any;
+		}
+
+		if (wasSelected) {
+			gameObject.onSelect();
+		}
+	}
+
 	public onSpawnedGameObject(commandActionResult: CommandActionResult) {
 		return new Promise((resolve, reject) => {
 			const scope = this;
 			const gameObjectTransferData = commandActionResult.gameObjectTransferData;
 			const gameObjectGuid = gameObjectTransferData.guid;
 
-			if (this.gameObjects.getValue(gameObjectGuid)) {
-				console.error(
-					'Tried to create a GameObject that already exists. Guid: ' +
-						gameObjectGuid.toString() +
-						', name: ' +
-						gameObjectTransferData.name
-				);
+			const existing = this.gameObjects.getValue(gameObjectGuid);
+			if (existing) {
+				// A spawn for a guid we already track is a RE-INSTANTIATION, not a duplicate: the
+				// ext deletes + respawns an object under the same editor guid when an EBX override
+				// is applied (per-instance clone) or a variation changes. Treating it as an error
+				// left the WebUI holding stale SpatialGameEntities (the old entity instanceIds no
+				// longer exist) and spammed the console — 71 errors in seconds while dragging a
+				// field, which is what froze the client. Refresh in place instead.
+				this.refreshRespawnedGameObject(existing, gameObjectTransferData);
+				signals.spawnedGameObject.emit(commandActionResult);
+				resolve(existing);
 				return;
 			}
 

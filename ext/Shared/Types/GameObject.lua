@@ -323,7 +323,9 @@ function GameObject:SetOverrides(p_Overrides)
 
 	if s_Clone ~= nil then
 		if SharedUtils:IsClientModule() then
-			GameObjectManager:ReinstantiateFromClone(self.guid, s_Clone)
+			-- Debounced: the write above already landed on the clone; the respawn coalesces so a
+			-- slider drag rebuilds once instead of per tick (see OnReinstantiatePump).
+			GameObjectManager:RequestReinstantiate(self.guid, s_Clone)
 		end
 	else
 		self:Disable(true)

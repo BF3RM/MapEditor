@@ -20,6 +20,8 @@ function GameObjectManager:RegisterEvents()
 	-- (the objects already rendered NATIVELY with the level; this only makes them editable/appear
 	-- in the tree, and doing it all at once on a huge save froze/crashed the client).
 	Events:Subscribe("Engine:Update", self, self.OnInjectedReadyPump)
+	-- Coalesce re-instantiation requests (see OnReinstantiatePump).
+	Events:Subscribe("Engine:Update", self, self.OnReinstantiatePump)
 end
 
 ---@param p_GUID_To_Timestamps table
@@ -63,6 +65,47 @@ function GameObjectManager:OnInjectedReadyPump()
 	end
 end
 
+-- Debounce window for re-instantiating an edited object. Dragging a slider fires an EBX edit per
+-- tick; each one used to delete+respawn immediately (71 respawns in seconds froze the client), so
+-- coalesce them and rebuild once the edits stop. The DATA is written to the clone immediately —
+-- only the (expensive) respawn waits.
+local REINSTANTIATE_DEBOUNCE = 0.2
+
+--- Queue a re-instantiation for an edited object, restarting the debounce timer if one is already
+--- pending. Fired from OnReinstantiatePump once the edits settle.
+function GameObjectManager:RequestReinstantiate(p_Guid, p_CloneDC)
+	self.m_PendingReinstantiate[tostring(p_Guid)] = { dc = p_CloneDC, timer = REINSTANTIATE_DEBOUNCE }
+end
+
+--- Fire re-instantiations whose debounce window elapsed.
+function GameObjectManager:OnReinstantiatePump(p_Delta)
+	if self.m_PendingReinstantiate == nil or next(self.m_PendingReinstantiate) == nil then
+		return
+	end
+
+	local s_Due = nil
+
+	for l_Guid, l_Entry in pairs(self.m_PendingReinstantiate) do
+		l_Entry.timer = l_Entry.timer - (p_Delta or 0.016)
+
+		if l_Entry.timer <= 0 then
+			s_Due = s_Due or {}
+			s_Due[l_Guid] = l_Entry.dc
+		end
+	end
+
+	if s_Due == nil then
+		return
+	end
+
+	-- Remove before rebuilding: the respawn re-enters this manager, and a fresh edit arriving
+	-- mid-rebuild should queue a NEW request rather than be dropped.
+	for l_Guid, l_Dc in pairs(s_Due) do
+		self.m_PendingReinstantiate[l_Guid] = nil
+		self:ReinstantiateFromClone(l_Guid, l_Dc)
+	end
+end
+
 function GameObjectManager:RegisterVars()
 	---@type table<string, GameObject>
 	self.m_GameObjects = {}
@@ -74,6 +117,9 @@ function GameObjectManager:RegisterVars()
 	-- Lives on the MANAGER (not the GameObject) so it survives the delete+respawn that
 	-- re-instantiation performs — the rebuilt GameObject re-adopts its clone from here.
 	self.m_InstanceClones = {}
+
+	-- [M1] Debounced re-instantiation requests: guid -> { dc, timer } (see OnReinstantiatePump).
+	self.m_PendingReinstantiate = {}
 
 	self.m_ProcessedEntities = {}
 	self.m_PendingEntities = {}
@@ -809,7 +855,47 @@ function GameObjectManager:ReinstantiateFromClone(p_Guid, p_CloneDC)
 
 	local s_TransferData = s_GameObject:GetGameObjectTransferData()
 
+	-- Collect the CURRENT incarnation's descendants before we tear it down. Respawning a prefab
+	-- creates fresh child GameObjects with new guids, and GameObject:Destroy only disables child
+	-- ENTITIES — it never untracks the child GameObjects. Without this, every edit left its
+	-- predecessor's children behind: the tracked-object count grew by one per edit (and they'd be
+	-- saved into the project), on top of the WebUI keeping ghost tree entries.
+	local s_Stale = {}
+
+	local function s_Collect(p_Object)
+		if p_Object.children == nil then
+			return
+		end
+
+		for _, l_Child in pairs(p_Object.children) do
+			s_Collect(l_Child)
+			table.insert(s_Stale, tostring(l_Child.guid))
+		end
+	end
+
+	s_Collect(s_GameObject)
+
 	self:DeleteGameObject(p_Guid)
+
+	-- Untrack the stale children and tell the WebUI to drop them (the fresh spawn sends its own).
+	if #s_Stale > 0 then
+		local s_Removals = {}
+
+		for _, l_Guid in ipairs(s_Stale) do
+			self.m_GameObjects[l_Guid] = nil
+			table.insert(s_Removals, {
+				type = CARType.DeletedGameObject,
+				gameObjectTransferData = { guid = l_Guid },
+			})
+		end
+
+		if WebUpdater ~= nil then
+			WebUpdater:AddUpdate('HandleResponse', s_Removals)
+		end
+	end
+
+	s_GameObject.children = {}
+
 	self:InvokeBlueprintSpawnFromClone(p_Guid, "server", p_CloneDC, s_TransferData.parentData, s_TransferData.transform, s_TransferData.variation, s_TransferData.overrides, s_TransferData.timeStamp)
 	return true
 end
