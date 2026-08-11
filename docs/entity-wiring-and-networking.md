@@ -71,7 +71,21 @@ This distinction is why "I spawned a flag and nothing happens".
   **cross-partition**, into the world parts.
 
 **Consequence:** spawning a gameplay prefab at runtime reproduces its *internal* wiring and none of
-its *external* wiring. Nothing in the game mode knows the new object exists.
+its *external* wiring.
+
+**But this only breaks the objects whose behaviour IS external** — observed in practice:
+
+- **Intrinsic behaviour — works when spawned.** A `VehicleSpawnReferenceObjectData` spawns vehicles
+  because that is what the entity does; nothing has to tell it. Confirmed working. Consistent with
+  the data: it carries `isEventConnectionTarget = 2` (ClientAndServer) where plain props are `3`.
+- **Externally wired — does not work when spawned.** A capture-point prefab has no idea it is a
+  Conquest flag; that meaning is entirely in the level bus. Spawn one and the game mode never
+  sees it.
+
+So G1 is scoped to the wired class (capture points, MCOMs, gamemode logic), not "all gameplay
+objects". That also makes *duplicate-with-wiring* the natural first slice: for an object that is
+already wired, its level-bus connections reference it by guid, so cloning those connections and
+repointing them at the copy is far smaller than a general connection editor.
 
 ### 1.3 Realm, and the `isEventConnectionTarget` field
 
