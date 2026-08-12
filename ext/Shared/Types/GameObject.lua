@@ -354,7 +354,80 @@ function GameObject:GetEntities()
 	return s_Entities
 end
 
+local function m_ValuesEqual(a, b)
+	if a == b then
+		return true
+	end
+
+	if type(a) == "table" and type(b) == "table" then
+		for _, l_Key in ipairs({ "x", "y", "z", "w" }) do
+			if a[l_Key] ~= b[l_Key] then
+				return false
+			end
+		end
+
+		return true
+	end
+
+	return false
+end
+
+-- True when this edit sets the field back to its base value (a Revert, or manually matching the
+-- base) — such an override is a no-op and must NOT be tracked, or a "base -> base" row lingers in
+-- the Overrides panel and rides back in the transfer data on reselect.
+local function m_IsRevertToBase(p_Field)
+	local s_Leaf = p_Field
+
+	while s_Leaf ~= nil and type(s_Leaf) == "table" and not isPrintable(s_Leaf.type) do
+		s_Leaf = s_Leaf.value
+	end
+
+	if type(s_Leaf) ~= "table" or s_Leaf.oldValue == nil then
+		return false
+	end
+
+	return m_ValuesEqual(s_Leaf.value, s_Leaf.oldValue)
+end
+
+--- The dot-path EBXManager:SetField would have returned for this override chain, derived without
+--- touching a blueprint. Placeholders have none, so the path has to be computed rather than
+--- produced as a side effect of writing the value.
+---@param p_Field table override chain node
+---@return string
+local function m_OverridePath(p_Field)
+	local s_Path = ''
+	local s_Node = p_Field
+
+	while type(s_Node) == 'table' and s_Node.field ~= nil do
+		s_Path = s_Path .. '.' .. tostring(s_Node.field)
+		s_Node = s_Node.value
+	end
+
+	return s_Path
+end
+
 function GameObject:SetOverrides(p_Overrides)
+	-- A PLACEHOLDER has no engine entities and no instantiated blueprint by design (GH #394): the
+	-- blueprint faults natively if handed to CreateEntitiesFromBlueprint, which is the whole reason
+	-- it is a marker. Record the override so it still saves and bakes, but do not try to clone or
+	-- re-instantiate — that produced "No instance passed" and "Spawning from clone failed: nil"
+	-- on every edit, which read as failures when the object was behaving exactly as intended.
+	if self.isPlaceholder then
+		for _, l_Field in pairs(p_Overrides) do
+			local s_Path = m_OverridePath(l_Field)
+
+			if m_IsRevertToBase(l_Field) then
+				self.overrides[s_Path] = nil
+			else
+				self.overrides[s_Path] = l_Field
+			end
+		end
+
+		self:SetField('overrides', self.overrides)
+
+		return true, ''
+	end
+
 	-- Per-instance clone-on-first-edit (Unity prefab semantics). The FIRST EBX edit to an
 	-- instance deep-clones its blueprint so the change isolates to THIS instance; sibling
 	-- instances keep reading the shared prefab until they're edited too. The clone is
@@ -375,8 +448,33 @@ function GameObject:SetOverrides(p_Overrides)
 			-- guid per realm — the concrete reason a networked spawn couldn't be resolved by the
 			-- peer. With both realms holding a clone under the same guid, replication has a guid
 			-- each side can resolve locally. GH #391 (G2).
+			-- Copy only the path this edit touches, not the whole blueprint. DeepClone is DEEP:
+			-- editing one light's colour copied ~236 containers including the entire render chain
+			-- (StaticModelEntityData / CompositeMeshAsset / MeshLodGroup / RigidMeshAsset), each
+			-- under a fresh guid. That is both the allocation cost behind bulk-edit failures and
+			-- why a baked object referenced meshes the level had never seen.
+			--
+			-- DataContainerExt:DeepCopy already does exactly this and had no callers: it copies a
+			-- child only if its guid is in the map, and does not descend into unlisted ones — so
+			-- every container from the root down to the edited one must be listed, which is what
+			-- CollectPathContainers gathers. Unlisted children stay SHARED with the stock
+			-- blueprint, which is correct: they are unmodified and already registered.
+			local s_PathGuids = { [tostring(s_Shared.instanceGuid)] = Guid(tostring(self.guid)) }
+
+			for _, l_Field in pairs(p_Overrides) do
+				local s_Found = {}
+				pcall(function() EBXManager:CollectPathContainers(s_Shared, l_Field, s_Found) end)
+
+				for l_Guid, _ in pairs(s_Found) do
+					-- Child guids are minted per realm and never leave this blueprint, so they do
+					-- not need to agree across realms the way the ROOT guid does (that is the G2
+					-- fix, preserved above).
+					s_PathGuids[l_Guid] = s_PathGuids[l_Guid] or GenerateGuid()
+				end
+			end
+
 			local s_Ok, s_Clone = pcall(function()
-				return g_DataContainerExt:DeepClone(s_Shared, Guid(tostring(self.guid)))
+				return g_DataContainerExt:DeepCopy(s_Shared, s_PathGuids)
 			end)
 
 			if s_Ok and s_Clone ~= nil and (s_Shared == nil or s_Clone.instanceGuid ~= s_Shared.instanceGuid) then
@@ -455,40 +553,6 @@ end
 
 -- Compares an override leaf's new value against the base value it captured (oldValue). Handles
 -- scalars and vector tables (x/y/z/w).
-local function m_ValuesEqual(a, b)
-	if a == b then
-		return true
-	end
-
-	if type(a) == "table" and type(b) == "table" then
-		for _, l_Key in ipairs({ "x", "y", "z", "w" }) do
-			if a[l_Key] ~= b[l_Key] then
-				return false
-			end
-		end
-
-		return true
-	end
-
-	return false
-end
-
--- True when this edit sets the field back to its base value (a Revert, or manually matching the
--- base) — such an override is a no-op and must NOT be tracked, or a "base -> base" row lingers in
--- the Overrides panel and rides back in the transfer data on reselect.
-local function m_IsRevertToBase(p_Field)
-	local s_Leaf = p_Field
-
-	while s_Leaf ~= nil and type(s_Leaf) == "table" and not isPrintable(s_Leaf.type) do
-		s_Leaf = s_Leaf.value
-	end
-
-	if type(s_Leaf) ~= "table" or s_Leaf.oldValue == nil then
-		return false
-	end
-
-	return m_ValuesEqual(s_Leaf.value, s_Leaf.oldValue)
-end
 
 -- Applies a single edited field to this instance's (already-resolved) internalBlueprint and
 -- records it in self.overrides. The live re-instantiation is driven once by SetOverrides after

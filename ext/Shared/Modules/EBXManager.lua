@@ -19,6 +19,45 @@ function EBXManager:SetFields(p_Overrides)
 	end
 end
 
+--- Collect the DataContainers an override chain passes THROUGH, root first.
+---
+--- Mirrors SetField's descent without writing anything. Used to clone only the path an edit
+--- touches instead of the whole blueprint: DataContainerExt:DeepCopy takes a
+--- {originalGuid -> newGuid} map and copies a child ONLY if it is listed, so every container from
+--- the root down to the edited one has to be in that map or the copy is unreachable — an unlisted
+--- child is neither copied nor descended into.
+---@param p_Instance DataContainer
+---@param p_Field table override chain node
+---@param p_Out table accumulator, guid string -> true
+function EBXManager:CollectPathContainers(p_Instance, p_Field, p_Out)
+	if p_Instance == nil or p_Field == nil then
+		return
+	end
+
+	local s_Guid = nil
+	pcall(function() s_Guid = tostring(p_Instance.instanceGuid) end)
+
+	if s_Guid ~= nil and s_Guid ~= "nil" then
+		p_Out[s_Guid] = true
+	end
+
+	if isPrintable(p_Field.type) then
+		return
+	end
+
+	local s_Casted = p_Instance
+	pcall(function() s_Casted = _G[p_Instance.typeInfo.name](p_Instance) end)
+
+	local s_Next = nil
+	pcall(function() s_Next = s_Casted[p_Field.field] end)
+
+	if s_Next == nil then
+		return
+	end
+
+	self:CollectPathContainers(s_Next, p_Field.value, p_Out)
+end
+
 function EBXManager:SetField(p_Instance, p_Field, p_Path)
 	-- Guard a malformed override chain: a non-printable node whose nested `.value` is nil (e.g.
 	-- the edited path runs through a null/unresolved reference, as in some VisualEnvironment

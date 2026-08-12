@@ -330,6 +330,7 @@ end
 --- costs a live preview, a false negative costs the client.
 local PLACEHOLDER_NAME_PATTERNS = {
 	'^gameplay/level_setups/', -- capture points, gamemode components (verified: CapturePointPrefab_HQ)
+	'^weapons/',               -- SoldierWeaponBlueprint (verified: Weapons/SV98/SV98)
 }
 
 ---@param p_Name string blueprint name
