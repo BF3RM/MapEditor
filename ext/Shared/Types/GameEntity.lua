@@ -63,10 +63,21 @@ function GameEntity:Enable()
 end
 
 function GameEntity:Destroy()
-	m_Logger:Write("Destroying entity: " .. self.entity.typeInfo.name)
+	-- Read self.entity only after establishing it exists: the log line below used to dereference
+	-- it first, so a nil entity threw before the guard on the next line could do anything.
+	if self.entity ~= nil then
+		m_Logger:Write("Destroying entity: " .. tostring(self.entity.typeInfo.name))
 
-	if self.entity then
-		self.entity:Destroy()
+		-- Not every entity type exposes Destroy. Calling it blind throws "attempt to call a nil
+		-- value (method 'Destroy')", which GameObject:Destroy catches and downgrades to "disabling
+		-- instead" — so the object survived, but the level-destroy path logged an error per entity
+		-- on every project load. Disabling is the correct outcome for these; reach it deliberately
+		-- instead of via an exception.
+		if self.entity.Destroy ~= nil then
+			self.entity:Destroy()
+		elseif self.entity.FireEvent ~= nil then
+			self.entity:FireEvent("Disable")
+		end
 	end
 
 	GameObjectManager.m_PendingEntities[self.instanceId] = nil
