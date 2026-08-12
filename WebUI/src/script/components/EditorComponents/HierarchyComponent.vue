@@ -155,6 +155,17 @@ export default class HierarchyComponent extends EditorComponent {
 		// Don't add preview object to hierarchy.
 		if (gameObject.parentData.typeName === 'previewSpawn') return;
 
+		// A re-instantiation (any EBX override) re-emits spawnedGameObject for an object that is
+		// ALREADY in the tree, and this used to graft a second node on for the same guid. One edit
+		// looks harmless; recolouring a map's lights added a few hundred duplicates to a 7000-node
+		// tree, each one making every later getNodeById scan more, until the WebUI stopped
+		// responding and eventually tore itself down mid-run.
+		const existingNode = this.tree.getNodeById(gameObjectGuid.toString());
+		if (existingNode !== null) {
+			existingNode.name = gameObject.name;
+			return;
+		}
+
 		const currentEntry = this.createNode(gameObject);
 		this.queue.set(currentEntry.id, currentEntry);
 
@@ -173,7 +184,6 @@ export default class HierarchyComponent extends EditorComponent {
 					if (!this.existingParents.has(parentId)) {
 						this.existingParents.set(parentId, []);
 					}
-					console.log('Existing' + entry.name);
 					this.existingParents.get(parentId)!.push(entry);
 				} else {
 					// Entry does not have a parent.
