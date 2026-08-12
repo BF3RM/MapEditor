@@ -55,6 +55,21 @@ function ServerTransactionManager:OnRealmsSynced()
 	self.m_ReadyToProcess = true
 end
 
+--- True when at least one player is connected. Several gates below exist to keep the server in
+--- step with clients; with nobody connected they can never be satisfied and would stall the queue
+--- indefinitely rather than merely delay it.
+---@return boolean
+function ServerTransactionManager:_HasConnectedPlayers()
+	local s_Any = false
+
+	pcall(function()
+		local s_Players = PlayerManager:GetPlayers()
+		s_Any = s_Players ~= nil and #s_Players > 0
+	end)
+
+	return s_Any
+end
+
 ---@param p_Player Player
 function ServerTransactionManager:IsPlayerReady(p_Player)
 	return self.m_PlayersReady[p_Player.name]
@@ -211,8 +226,16 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		return
 	end
 
-	-- Wait until client/server only objects are synced to prevent errors
-	if not self.m_ReadyToProcess then
+	-- Wait until client/server only objects are synced to prevent errors.
+	--
+	-- EXCEPT with nobody connected: m_ReadyToProcess is only set by the client/server realm
+	-- handshake, so an empty server can never satisfy it — and loading a project RESTARTS the
+	-- level, which drops the client that asked for the load. The queued commands then sat forever
+	-- and the project silently applied nothing: it looked like "the load did nothing" rather than
+	-- "the load is waiting for a client that is never coming back". Applying server-side with no
+	-- players is also just correct on a dedicated server; a client that joins later syncs the
+	-- resulting state through the normal SyncClient path.
+	if not self.m_ReadyToProcess and self:_HasConnectedPlayers() then
 		return
 	end
 
@@ -222,12 +245,16 @@ function ServerTransactionManager:OnUpdatePass(p_DeltaTime, p_UpdatePass)
 		-- COMPLETION-GATED: don't send the next batch until the client reports it finished the
 		-- previous one (OnBatchDone), so batches never overlap/pile up. A safety timer keeps it
 		-- from deadlocking if an ACK is ever lost.
-		if self.m_WaitingForBatchAck then
+		-- Completion gating only makes sense while someone is there to ACK. With no players the
+		-- wait can never be satisfied, so don't stall the load behind it.
+		if self.m_WaitingForBatchAck and self:_HasConnectedPlayers() then
 			self.m_BatchAckSafety = self.m_BatchAckSafety - p_DeltaTime
 			if self.m_BatchAckSafety > 0 then
 				return
 			end
 			m_Logger:Warning('Batch ACK timed out, proceeding anyway')
+		elseif self.m_WaitingForBatchAck then
+			self.m_WaitingForBatchAck = false
 		end
 		s_BatchSize = ME_CONFIG.LOAD_BATCH_SIZE
 	else
