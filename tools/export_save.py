@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Export a MapEditor project from mod.db into the JSON file LevelLoaderGen bakes.
 
-MapEditor stores a project across two tables — `project_header` (name, map, gamemode,
-requiredBundles) and `project_data` (the object list as JSON). LevelLoaderGen wants one file
-shaped `{"header": {...}, "data": [...]}` in its `in/map_saves/` folder. This bridges the two;
-nothing about the save format itself has to change.
+MapEditor stores a project across three tables — `project_header` (name, map, gamemode,
+requiredBundles), `project_data` (the object list as JSON) and `project_ebx` (the cloned blueprint
+of every instance carrying EBX overrides). LevelLoaderGen wants ONE self-contained file in its
+`in/map_saves/` folder, shaped `{"header": {...}, "data": [...], "ebx": [...]}`.
+
+The `ebx` section is what makes per-instance overrides bakeable: an override means "this instance
+uses a modified blueprint", and that blueprint only exists at runtime, so it travels with the save
+or it is lost. LevelLoaderGen reads it (build_override_partitions) and repoints just that
+instance's ReferenceObjectData. Saves without the section bake exactly as before.
 
 Field names matter and are not all the same as the column names — the generator reads
 `header.mapName` and `header.gameModeName` (capital M), and iterates `data` as a LIST.
@@ -78,6 +83,23 @@ def load_project(con, pid):
     except (TypeError, ValueError):
         bundles = {}
 
+    # Cloned blueprints for instances with EBX overrides. Absent on projects saved before
+    # project_ebx existed, and on projects with no overrides — both bake fine without it.
+    ebx = []
+    try:
+        rows = con.execute(
+            "SELECT object_guid, partition_name, partition_json FROM project_ebx "
+            "WHERE project_header_id=? ORDER BY id", (pid,)
+        ).fetchall()
+        for object_guid, partition_name, partition_json in rows:
+            ebx.append({
+                "objectGuid": object_guid,
+                "name": partition_name,
+                "partition": json.loads(partition_json),
+            })
+    except sqlite3.OperationalError:
+        pass
+
     header = {
         "projectName": name,
         "timeStamp": timestamp,
@@ -87,7 +109,7 @@ def load_project(con, pid):
         "requiredBundles": bundles,
         "saveVersion": save_version,
     }
-    return {"header": header, "data": objects}
+    return {"header": header, "data": objects, "ebx": ebx}
 
 
 def resolve_id(con, args):
@@ -134,6 +156,7 @@ def main():
             f.write(text)
         h = payload["header"]
         print(f"wrote {args.out}: {len(payload['data'])} object(s), "
+              f"{len(payload['ebx'])} overridden blueprint(s), "
               f"map={h['mapName']} gamemode={h['gameModeName']} "
               f"bundles={len(h['requiredBundles'])}")
 

@@ -474,7 +474,16 @@ function ProjectManager:SaveClonedBlueprints(p_HeaderId)
 	for l_Guid, l_Entry in pairs(GameObjectManager.m_InstanceClones) do
 		local s_Dc = l_Entry ~= nil and l_Entry.dc or nil
 
-		if s_Dc ~= nil then
+		-- A clone with no overrides behind it is byte-identical to the blueprint it came from, so
+		-- baking it would pin the instance to today's blueprint for no benefit. This is not
+		-- hypothetical: Apply-to-Blueprint clears the applier's overrides and then rebuilds it,
+		-- and the rebuild path re-clones unconditionally — so the applying instance ended up with
+		-- its own baked partition instead of sharing the blueprint it had just written.
+		local s_GameObject = GameObjectManager.m_GameObjects[tostring(l_Guid)]
+		local s_HasOverrides = s_GameObject ~= nil and s_GameObject.overrides ~= nil
+			and next(s_GameObject.overrides) ~= nil
+
+		if s_Dc ~= nil and s_HasOverrides then
 			-- Partition names must be unique within the bundle and stable across saves, so key it
 			-- on the editor guid rather than the blueprint name (several instances of one prefab
 			-- can each carry different overrides).

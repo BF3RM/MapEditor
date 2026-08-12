@@ -173,62 +173,104 @@ function PartitionSerializer:_CollectRuntimeSubtree(p_Root)
 	return s_Collected
 end
 
---- Every DataContainer directly referenced by p_Dc's fields (scalar fields and array elements).
---- Mirrors the field walk in _SerializeFields so the two can never disagree about what a field is.
+--- Every DataContainer referenced by p_Dc's fields, INCLUDING ones reachable only through inline
+--- structs. Mirrors the recursion in _SerializeFields: that walk descends into structs, so a walk
+--- that only looked at top-level fields would miss containers the serialized output still
+--- references — dangling pointers in the emitted partition (observed: 5 of 371 refs on a real
+--- WallLamp clone).
 ---@param p_Dc DataContainer
 ---@return table[]
 function PartitionSerializer:_ChildDataContainers(p_Dc)
 	local s_Children = {}
+	self:_CollectFieldDataContainers(p_Dc, s_Children, 0)
+	return s_Children
+end
 
-	local s_TypeInfo = nil
-	pcall(function() s_TypeInfo = p_Dc.typeInfo end)
-
-	if s_TypeInfo == nil then
-		return s_Children
+--- Append every DataContainer referenced by p_Value's fields into p_Out, recursing through inline
+--- structs but NEVER through DataContainers (those are the graph edges the caller follows itself).
+---@param p_Value table instance or inline struct
+---@param p_Out table[] accumulator
+---@param p_Depth number
+function PartitionSerializer:_CollectFieldDataContainers(p_Value, p_Out, p_Depth)
+	if p_Value == nil or p_Depth > MAX_DEPTH then
+		return
 	end
 
-	local s_Casted = p_Dc
-	pcall(function() s_Casted = _G[s_TypeInfo.name](p_Dc) end)
+	local s_TypeInfo = nil
+	pcall(function() s_TypeInfo = p_Value.typeInfo end)
+
+	if s_TypeInfo == nil then
+		return
+	end
+
+	local s_Casted = p_Value
+	pcall(function() s_Casted = _G[s_TypeInfo.name](p_Value) end)
 
 	for _, l_Field in ipairs(getFields(s_TypeInfo)) do
 		if l_Field.typeInfo == nil or l_Field.typeInfo.enum or isPrintable(l_Field.typeInfo.name) then
 			goto continue
 		end
 
-		local s_Ok, s_Value = pcall(function() return s_Casted[firstToLower(l_Field.name)] end)
+		local s_Ok, s_FieldValue = pcall(function() return s_Casted[firstToLower(l_Field.name)] end)
 
-		if not s_Ok or s_Value == nil then
+		if not s_Ok or s_FieldValue == nil then
 			goto continue
 		end
 
 		if l_Field.typeInfo.array then
 			local s_Len = 0
-			pcall(function() s_Len = #s_Value end)
+			pcall(function() s_Len = #s_FieldValue end)
 
 			for i = 1, s_Len do
 				local s_Member = nil
-				pcall(function() s_Member = s_Value[i] end)
+				pcall(function() s_Member = s_FieldValue[i] end)
 
-				local s_MemberIsDc = false
-				pcall(function() s_MemberIsDc = (s_Member ~= nil and s_Member.instanceGuid ~= nil) end)
-
-				if s_MemberIsDc then
-					s_Children[#s_Children + 1] = s_Member
+				if s_Member ~= nil then
+					self:_TakeDataContainerOrRecurse(s_Member, p_Out, p_Depth)
 				end
 			end
 		else
-			local s_IsDc = false
-			pcall(function() s_IsDc = (s_Value.instanceGuid ~= nil) end)
-
-			if s_IsDc then
-				s_Children[#s_Children + 1] = s_Value
-			end
+			self:_TakeDataContainerOrRecurse(s_FieldValue, p_Out, p_Depth)
 		end
 
 		::continue::
 	end
+end
 
-	return s_Children
+--- A DataContainer is an edge (collect it, stop); anything else with fields is an inline struct
+--- whose own fields may still reference containers (descend).
+function PartitionSerializer:_TakeDataContainerOrRecurse(p_Value, p_Out, p_Depth)
+	local s_IsDc = false
+	pcall(function() s_IsDc = (p_Value.instanceGuid ~= nil) end)
+
+	if s_IsDc then
+		p_Out[#p_Out + 1] = p_Value
+		return
+	end
+
+	self:_CollectFieldDataContainers(p_Value, p_Out, p_Depth + 1)
+end
+
+--- Partition guid of a referenced container, as a string. A runtime container (a clone member)
+--- has none, and tostring(nil) would put the literal text "nil" in the JSON — emit the zero guid
+--- instead, which is what "belongs to no partition" means everywhere else in this file.
+---@param p_Value DataContainer
+---@return string
+function PartitionSerializer:_RefPartitionGuid(p_Value)
+	local s_Guid = nil
+	pcall(function() s_Guid = p_Value.partitionGuid end)
+
+	if s_Guid == nil then
+		return ZERO_GUID
+	end
+
+	local s_Str = tostring(s_Guid)
+
+	if s_Str == "" or s_Str == "nil" then
+		return ZERO_GUID
+	end
+
+	return s_Str
 end
 
 --- Serialize a runtime clone (and its runtime members) as a standalone partition table, in the
@@ -392,7 +434,7 @@ function PartitionSerializer:_EncodeField(p_TypeInfo, p_Value, p_Depth)
 			["$ref"] = true,
 			["$value"] = {
 				["$instanceGuid"] = tostring(p_Value.instanceGuid),
-				["$partitionGuid"] = tostring(p_Value.partitionGuid),
+				["$partitionGuid"] = self:_RefPartitionGuid(p_Value),
 			},
 		}
 	end
@@ -445,7 +487,7 @@ function PartitionSerializer:_EncodeArray(p_TypeInfo, p_Value, p_Depth)
 					s_IsRef = true
 					s_Values[#s_Values + 1] = {
 						["$instanceGuid"] = tostring(s_Member.instanceGuid),
-						["$partitionGuid"] = tostring(s_Member.partitionGuid),
+						["$partitionGuid"] = self:_RefPartitionGuid(s_Member),
 					}
 				else
 					-- Inline struct element: emit its field-map (parseValue wraps it back into a Field).
