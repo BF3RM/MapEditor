@@ -9,3 +9,4 @@ node_modules/
 .vscode
 tools/e2e/__pycache__/
 .powos-source
+tools/__pycache__/
