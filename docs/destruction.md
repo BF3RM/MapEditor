@@ -21,7 +21,10 @@ registry in `veniceext.dll`, and the [VU docs](https://docs.veniceunleashed.net/
 **"Make everything destructible like DICE did" is not a weekend project and not a year of work — it
 is impossible with the current toolchain.** The blocking fact:
 
-> **Rime cannot write mesh resources and cannot write Havok collision.** It can read them, export
+> **Rime cannot write mesh resources and cannot GENERATE Havok collision.** (It *can* patch existing
+> baked Havok — see `nohavok-subworlds.md` §8 for `RaiseWaterPhysicsCommand`, which shifts vertices,
+> MOPP origin and AABB together because the MOPP tree is relative. What is absent is hull generation
+> and MOPP compilation, which is what fracture needs.) It can read them, export
 > them to glTF for viewing, and package arbitrary bytes into bundles the game loads — but it cannot
 > *manufacture* the bytes. `RelocPtr.Serialize` — the pointer primitive every Frostbite mesh layout
 > is built from — is `throw new NotImplementedException()`

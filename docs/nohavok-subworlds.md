@@ -399,3 +399,64 @@ sb = open('Admin/Mods/NoHavok/sb/Win32/NoHavok/MP_001/MP_001.sb','rb').read()
 #   uuid.uuid3(og, member_guid.lower() + str(i)).bytes_le   must appear in sb
 # result: 3646/3646 found, 381/381 members hit. GUIDs are stored little-endian.
 ```
+
+---
+
+## 8. Moving a grouped object without converting it: patch the Havok
+
+**Observed in practice:** editing an entry in `InstanceTransforms` moves the *visual* instance and
+leaves its collision behind. So collision is not derived per-instance from the EBX at load — the
+group's collision is a baked compound, and those per-instance lists drive rendering only. This is
+the constraint that forces NoHavokGen's wholesale swap: it substitutes props whose *own*
+blueprints carry their own `HavokAsset`, sidestepping the compound entirely rather than editing it.
+
+That makes selective conversion ("convert only the objects a map actually edits, leave the other
+~3600 instanced") unavailable by the obvious route: removing one instance would delete the mesh and
+strand an invisible wall.
+
+### But baked Havok is patchable — there is a working precedent
+
+`docs/destruction.md` §3.2 states Rime cannot write Havok. That is **too broad and should be read
+as "cannot GENERATE"**. Rime ships a command that mutates baked Havok geometry today:
+
+```
+RimeLib.Cmd/Commands/BundleBuilding/RaiseWaterPhysicsCommand.cs:16
+"Raises or lowers a water HavokPhysicsData by a Y delta, shifting its vertices, MOPP origin
+ and AABB together. The MOPP tree is relative, so it needs no recompile."
+```
+
+So writing hull vertices, the MOPP origin and the AABB is proven and shipping. What is missing is
+hull *generation* and MOPP *compilation* — a different capability.
+
+### The pieces for "move the object and take its collision with it"
+
+`StaticModelGroupMemberData` supplies the instance → physics mapping:
+
+- `PhysicsPartRange : IndexRange` and `PhysicsPartCountPerInstance : uint`
+
+so instance *N*'s slice of the compound is addressable. Combined with the water command's
+technique, the sequence is:
+
+1. shift the instance's entry in `InstanceTransforms` (the visual move)
+2. resolve that instance's physics parts via `PhysicsPartRange` / `PhysicsPartCountPerInstance`
+3. apply the same delta to those parts' vertices, MOPP origin and AABB
+
+This would keep instancing intact for the whole group and avoid converting anything.
+
+### The boundary: translation yes, rotation and scale probably not
+
+The MOPP tree is a spatial subdivision, and a uniform translation preserves its relative structure —
+which is precisely why the water command needs no recompile. Rotating or rescaling a hull changes
+which geometry falls in which cell, and there is no MOPP compiler to rebuild the tree. So this
+plausibly buys **move**, not **rotate** or **resize**. "Delete" comes free: translate the parts far
+below the level.
+
+### Unverified — check before relying on it
+
+- That `PhysicsPartRange` / `PhysicsPartCountPerInstance` index the compound the way the names
+  imply, rather than some parallel structure.
+- That the water command's approach generalises from "one whole water body, Y only" to "one
+  member's parts, arbitrary XYZ".
+
+Both are cheap to settle: patch a single prop and walk into the space it used to occupy. Unlike the
+container-shape questions above, this one has an unambiguous physical test.
