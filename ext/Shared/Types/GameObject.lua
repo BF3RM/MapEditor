@@ -381,7 +381,16 @@ function GameObject:SetOverrides(p_Overrides)
 
 			if s_Ok and s_Clone ~= nil and (s_Shared == nil or s_Clone.instanceGuid ~= s_Shared.instanceGuid) then
 				self.internalBlueprint = s_Clone
-				GameObjectManager:RegisterInstanceClone(self.guid, s_Clone, self.blueprintCtrRef:GetTable())
+				-- Pass the vanilla ROD along too: the respawn below rebuilds this GameObject as
+				-- Custom and would otherwise drop it, leaving the baked level unable to exclude
+				-- the original.
+				local s_VanillaRef = nil
+
+				if self.originalRef ~= nil then
+					pcall(function() s_VanillaRef = self.originalRef:GetTable() end)
+				end
+
+				GameObjectManager:RegisterInstanceClone(self.guid, s_Clone, self.blueprintCtrRef:GetTable(), s_VanillaRef)
 			else
 				-- Clone bailed (lazy-load / error). Fall back to editing the SHARED blueprint
 				-- (old behavior: the edit leaks to all instances, but that beats doing nothing).

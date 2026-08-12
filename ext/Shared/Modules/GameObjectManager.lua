@@ -782,6 +782,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			s_GameObject.internalBlueprint = s_CloneEntry.dc
 			s_GameObject.blueprintCtrRef = CtrRef(s_CloneEntry.originalRef)
 			s_GameObject.isCloneRespawn = true
+
+			-- Keep pointing at the vanilla ROD we replaced, so the save can still tell the level
+			-- generator to exclude it.
+			if s_CloneEntry.vanillaRef ~= nil then
+				s_GameObject.originalRef = CtrRef(s_CloneEntry.vanillaRef)
+			end
 		end
 
 		if s_GameObject.guid ~= PREVIEW_GUID then
@@ -1063,8 +1069,19 @@ end
 -- [M1] Register a per-instance blueprint clone for an editor GameObject. p_OriginalRefTable is
 -- the object's ORIGINAL blueprintCtrRef (as a table) — the create hook restores it after a
 -- clone respawn, since the clone's own guid isn't registered in InstanceParser/ResourceManager.
-function GameObjectManager:RegisterInstanceClone(p_Guid, p_CloneDC, p_OriginalRefTable)
-	self.m_InstanceClones[tostring(p_Guid)] = { dc = p_CloneDC, originalRef = p_OriginalRefTable }
+function GameObjectManager:RegisterInstanceClone(p_Guid, p_CloneDC, p_OriginalRefTable, p_VanillaRef)
+	-- vanillaRef is the LEVEL's ReferenceObjectData this instance came from, not the blueprint.
+	-- Editing a vanilla object's EBX re-registers it as Custom, and the respawn built a fresh
+	-- GameObject with an empty originalRef — so the save no longer said which vanilla ROD to
+	-- exclude, the baked level kept the original AND added ours, and you saw the untouched
+	-- vanilla object sitting exactly where the edited one should be.
+	local s_Existing = self.m_InstanceClones[tostring(p_Guid)]
+
+	self.m_InstanceClones[tostring(p_Guid)] = {
+		dc = p_CloneDC,
+		originalRef = p_OriginalRefTable,
+		vanillaRef = p_VanillaRef or (s_Existing ~= nil and s_Existing.vanillaRef or nil),
+	}
 end
 
 -- Returns the cloned DataContainer for an editor GameObject, or nil if the instance hasn't been
