@@ -64,8 +64,17 @@ function PartitionSerializer:OnPartitionLoaded(p_Partition)
 end
 
 function PartitionSerializer:OnLevelDestroy()
-	-- Drop cached partition handles; they belong to the old level.
-	self.m_Partitions = {}
+	-- Do NOT drop the cached partition handles here.
+	--
+	-- Loading a project restarts the level, and on a restart the partitions stay MOUNTED so
+	-- Partition:Loaded never re-fires (the same behaviour LevelInjector documents). Clearing on
+	-- destroy therefore emptied this cache permanently: every inspector lookup afterwards returned
+	-- "Partition not loaded on server" until the server was fully restarted, which is exactly what
+	-- made the inspector go blank for every object after a project load (GH #390).
+	--
+	-- Stale handles are handled where it is safe to do so — _ResolvePartition validates a cached
+	-- entry before returning it and evicts it if the engine has torn it down. A genuinely new
+	-- level re-fires Partition:Loaded and overwrites these entries anyway.
 	self.m_SendQueue = nil
 end
 
@@ -933,21 +942,46 @@ function PartitionSerializer:_ResolvePartition(p_GuidOrName)
 	end
 
 	-- Direct GUID hit (the WebUI sends FBPartition.guid).
-	local s_ByGuid = self.m_Partitions[tostring(p_GuidOrName):lower()]
+	local s_Key = tostring(p_GuidOrName):lower()
+	local s_ByGuid = self.m_Partitions[s_Key]
+
 	if s_ByGuid ~= nil then
-		return s_ByGuid
+		if self:_IsPartitionAlive(s_ByGuid) then
+			return s_ByGuid
+		end
+
+		-- Handle belongs to a level that really did go away: evict rather than hand back a dead
+		-- pointer, and let the caller report a miss.
+		self.m_Partitions[s_Key] = nil
 	end
 
 	-- Fall back to a name match against the live partition name, if the engine exposes one.
-	for _, l_Partition in pairs(self.m_Partitions) do
+	for l_Key, l_Partition in pairs(self.m_Partitions) do
+		if not self:_IsPartitionAlive(l_Partition) then
+			self.m_Partitions[l_Key] = nil
+			goto continue
+		end
+
 		local s_Name = nil
 		pcall(function() s_Name = l_Partition.name end)
 		if s_Name ~= nil and tostring(s_Name):lower() == tostring(p_GuidOrName):lower() then
 			return l_Partition
 		end
+
+		::continue::
 	end
 
 	return nil
+end
+
+--- A cached partition handle is only usable while the engine still owns it. Reading a torn-down
+--- handle throws, so probe it rather than trusting the cache.
+---@param p_Partition DatabasePartition
+---@return boolean
+function PartitionSerializer:_IsPartitionAlive(p_Partition)
+	local s_Ok, s_Guid = pcall(function() return p_Partition.guid end)
+
+	return s_Ok and s_Guid ~= nil
 end
 
 function PartitionSerializer:_PartitionName(p_Partition, p_Fallback)

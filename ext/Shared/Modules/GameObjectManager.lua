@@ -22,11 +22,21 @@ function GameObjectManager:RegisterEvents()
 	Events:Subscribe("Engine:Update", self, self.OnInjectedReadyPump)
 	-- Coalesce re-instantiation requests (see OnReinstantiatePump).
 	Events:Subscribe("Engine:Update", self, self.OnReinstantiatePump)
+	-- Apply saved overrides to load-injected objects a few per frame (see OnPendingOverridesPump).
+	Events:Subscribe("Engine:Update", self, self.OnPendingOverridesPump)
 end
 
 ---@param p_GUID_To_Timestamps table
 function GameObjectManager:StoreTimeStamps(p_GUID_To_Timestamps)
-	self.m_GUID_To_Timestamps = p_GUID_To_Timestamps
+	-- MERGE, don't replace: the table arrives in chunks now (a whole-table broadcast blew past the
+	-- reliable NetEvent size limit on large saves), so replacing would leave only the final chunk.
+	if self.m_GUID_To_Timestamps == nil then
+		self.m_GUID_To_Timestamps = {}
+	end
+
+	for l_Guid, l_TimeStamp in pairs(p_GUID_To_Timestamps or {}) do
+		self.m_GUID_To_Timestamps[l_Guid] = l_TimeStamp
+	end
 end
 
 -- How many deferred injected objects to register into the editor/tree per frame.
@@ -70,6 +80,16 @@ end
 -- coalesce them and rebuild once the edits stop. The DATA is written to the clone immediately —
 -- only the (expensive) respawn waits.
 local REINSTANTIATE_DEBOUNCE = 0.2
+
+-- How many load-injected objects may have their saved overrides applied per frame. Each one is a
+-- clone plus a queued respawn, so this is deliberately small: loading a project is allowed to take
+-- a while, but it must not take the client down.
+local OVERRIDES_PER_TICK = 1
+
+-- How many objects may be re-instantiated in a single frame. Each one is a DeepClone plus a full
+-- delete/respawn of that object's entities, so this is the expensive path; spreading it keeps a
+-- bulk edit from spiking a frame badly enough to take the client down.
+local REINSTANTIATE_PER_TICK = 2
 
 --- Build a UNIQUE ReferenceObjectData to hand to EntityCreationParams.parentRepresentative.
 ---
@@ -173,11 +193,56 @@ function GameObjectManager:OnReinstantiatePump(p_Delta)
 		return
 	end
 
-	-- Remove before rebuilding: the respawn re-enters this manager, and a fresh edit arriving
-	-- mid-rebuild should queue a NEW request rather than be dropped.
+	-- Rebuild at most REINSTANTIATE_PER_TICK per frame. Firing every due object at once is fine
+	-- for one edit and fatal in bulk: recolouring a map's lights queued a dozen objects whose
+	-- debounce expired together, so a single frame did a dozen full delete+respawn cycles and
+	-- pushed a dozen GameObjectReady batches at the WebUI. The client died at ~96 objects, with
+	-- flat memory and flat handle counts beforehand — a burst, not a leak. Anything not taken this
+	-- tick simply stays pending with its timer already expired, so it goes next frame.
+	-- Same shape as INJ_READY_PER_TICK above, which exists for exactly this reason.
+	local s_Done = 0
+
 	for l_Guid, l_Dc in pairs(s_Due) do
+		if s_Done >= REINSTANTIATE_PER_TICK then
+			break
+		end
+
+		-- Remove before rebuilding: the respawn re-enters this manager, and a fresh edit arriving
+		-- mid-rebuild should queue a NEW request rather than be dropped.
 		self.m_PendingReinstantiate[l_Guid] = nil
 		self:ReinstantiateFromClone(l_Guid, l_Dc)
+		s_Done = s_Done + 1
+	end
+end
+
+--- Apply saved overrides to load-injected objects, a few per frame.
+function GameObjectManager:OnPendingOverridesPump()
+	local s_Queue = self.m_PendingOverrides
+
+	if s_Queue == nil or #s_Queue == 0 then
+		return
+	end
+
+	local s_Idx = self.m_PendingOverridesIdx or 1
+	local s_Done = 0
+
+	while s_Idx <= #s_Queue and s_Done < OVERRIDES_PER_TICK do
+		local s_GameObject = self.m_GameObjects[s_Queue[s_Idx]]
+
+		-- Skip anything deleted or already re-instantiated between queueing and now.
+		if s_GameObject ~= nil and not s_GameObject.isCloneRespawn and s_GameObject:HasOverrides() then
+			pcall(function() s_GameObject:SetOverrides(s_GameObject.overrides) end)
+		end
+
+		s_Idx = s_Idx + 1
+		s_Done = s_Done + 1
+	end
+
+	if s_Idx > #s_Queue then
+		self.m_PendingOverrides = {}
+		self.m_PendingOverridesIdx = 1
+	else
+		self.m_PendingOverridesIdx = s_Idx
 	end
 end
 
@@ -202,6 +267,11 @@ function GameObjectManager:RegisterVars()
 	-- Objects placed as markers rather than instantiated (see IsPlaceholderBlueprint / GH #394),
 	-- kept separately so the viewport can draw them every frame without scanning every object.
 	self.m_Placeholders = {}
+
+	-- Guids whose saved overrides still need applying after a load-time spawn (see the queue site
+	-- in ResolveRootObject). Drained a few per frame by OnPendingOverridesPump.
+	self.m_PendingOverrides = {}
+	self.m_PendingOverridesIdx = 1
 
 	-- Blueprints whose SHARED DataContainer has been permanently modified by Apply-to-Blueprint,
 	-- keyed by blueprint instance guid -> { partitionGuid, name }. Apply writes the stock,
@@ -804,9 +874,14 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	-- Re-apply saved overrides on a fresh spawn (e.g. load-injected objects). Skip clone
 	-- respawns: their overrides are already baked into the adopted clone, and re-applying would
 	-- clone-and-respawn again forever.
+	--
+	-- QUEUED, not applied inline: SetOverrides clones the blueprint AND schedules a delete/respawn,
+	-- so a project with many overridden objects fired that many clone+respawn cycles during level
+	-- load. Loading a save with 321 recoloured lights killed the client outright — the save could
+	-- be written but never reopened. Spreading them over frames is the same treatment the injected
+	-- -ready queue above already gets, and for the same reason.
 	if not s_GameObject.isCloneRespawn and s_GameObject:HasOverrides() then
-		m_Logger:Write("Patching GameObject: " .. tostring(s_GameObject.guid))
-		s_GameObject:SetOverrides(s_GameObject.overrides)
+		self.m_PendingOverrides[#self.m_PendingOverrides + 1] = tostring(s_GameObject.guid)
 	end
 end
 

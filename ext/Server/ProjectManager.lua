@@ -8,6 +8,10 @@ local m_Logger = Logger("ProjectManager", false)
 -- millisecond), so upgrading re-spaces them once — see RespaceDuplicateTimestamps.
 local SAVE_VERSION = "0.1.3"
 
+-- Guid+timestamp pairs per NetEvent. A guid string plus a number is ~50 bytes, so 100 keeps each
+-- message around 5KB — inside the reliable-channel limit that a whole-table broadcast blew past.
+local TIMESTAMP_CHUNK_SIZE = 100
+
 function ProjectManager:__init()
 	m_Logger:Write("Initializing ProjectManager")
 
@@ -308,11 +312,46 @@ function ProjectManager:OnUpdatePass(p_Delta, p_Pass)
 				self.m_GUID_To_Timestamps[l_Value.guid] = l_Value.timeStamp
 				-- print(l_Value.timeStamp)
 			end
-			NetEvents:BroadcastLocal("Shared:StoreTimeStamps", self.m_GUID_To_Timestamps)
+			self:BroadcastTimeStamps(self.m_GUID_To_Timestamps)
 		end
 
 		self:CreateAndExecuteImitationCommands(s_ProjectSave[DataBaseManager.m_ExportDataName])
 	end
+end
+
+--- Send the guid -> timestamp table to clients in chunks.
+---
+--- This used to be one BroadcastLocal of the whole table. A 624-object save makes that a 33.5KB
+--- reliable NetEvent — over four times the 8000-byte payload PartitionSerializer already chunks
+--- for, and the same limit LevelInjector ran into. The client was dropped mid-load and the load
+--- aborted before CreateAndExecuteImitationCommands ever ran, so neither the client NOR the server
+--- ended up with the project: loading a large save simply did nothing and kicked you.
+---
+--- Small saves fit in one event, which is why this only ever showed up on big ones.
+---@param p_TimeStamps table guid -> timestamp
+function ProjectManager:BroadcastTimeStamps(p_TimeStamps)
+	local s_Chunk = {}
+	local s_Count = 0
+	local s_Sent = 0
+
+	for l_Guid, l_TimeStamp in pairs(p_TimeStamps) do
+		s_Chunk[l_Guid] = l_TimeStamp
+		s_Count = s_Count + 1
+
+		if s_Count >= TIMESTAMP_CHUNK_SIZE then
+			NetEvents:BroadcastLocal("Shared:StoreTimeStamps", s_Chunk)
+			s_Sent = s_Sent + s_Count
+			s_Chunk = {}
+			s_Count = 0
+		end
+	end
+
+	if s_Count > 0 then
+		NetEvents:BroadcastLocal("Shared:StoreTimeStamps", s_Chunk)
+		s_Sent = s_Sent + s_Count
+	end
+
+	m_Logger:Write("Broadcast " .. tostring(s_Sent) .. " timestamps in chunks")
 end
 
 ---@param p_Player Player
