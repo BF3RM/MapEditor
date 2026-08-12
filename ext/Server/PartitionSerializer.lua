@@ -254,6 +254,32 @@ end
 --- Partition guid of a referenced container, as a string. A runtime container (a clone member)
 --- has none, and tostring(nil) would put the literal text "nil" in the JSON — emit the zero guid
 --- instead, which is what "belongs to no partition" means everywhere else in this file.
+--- The {instanceGuid, partitionGuid} a reference should be written as.
+---
+--- With a copy-on-write overlay in flight (m_RefMap), a reference to a container we did NOT copy is
+--- redirected to the STOCK original instead of the clone. That is what keeps the mesh chain
+--- pointing at content the level already has loaded and registered.
+---@param p_Value DataContainer
+---@return table
+function PartitionSerializer:_RefTarget(p_Value)
+	local s_Guid = nil
+	pcall(function() s_Guid = tostring(p_Value.instanceGuid) end)
+
+	if s_Guid ~= nil and self.m_RefMap ~= nil and self.m_RefMap[s_Guid] ~= nil then
+		local s_Mapped = self.m_RefMap[s_Guid]
+
+		return {
+			["$instanceGuid"] = s_Mapped.instanceGuid,
+			["$partitionGuid"] = s_Mapped.partitionGuid,
+		}
+	end
+
+	return {
+		["$instanceGuid"] = s_Guid,
+		["$partitionGuid"] = self:_RefPartitionGuid(p_Value),
+	}
+end
+
 ---@param p_Value DataContainer
 ---@return string
 function PartitionSerializer:_RefPartitionGuid(p_Value)
@@ -313,6 +339,293 @@ function PartitionSerializer:SerializeCloneSubtree(p_Root, p_Name)
 	end
 
 	return s_Result
+end
+
+--============================ Copy-on-write overlay partition ============================--
+
+--- Serialize ONLY what an override actually changed, referencing stock content for the rest.
+---
+--- SerializeCloneSubtree emits the whole clone, and DeepClone is deep — editing one light's colour
+--- on a wall lamp copies 239 containers including the entire render chain
+--- (StaticModelEntityData / CompositeMeshAsset / MeshLodGroup / RigidMeshAsset / MeshMaterial).
+--- Every copy gets a NEW instance guid, so the baked object references mesh assets the level has
+--- never seen: absent from the mesh-variation index, resources not in our bundle. The object is
+--- placed, correctly referenced, and draws nothing.
+---
+--- So don't copy what didn't change. The clone is structurally identical to the blueprint it came
+--- from, so the two can be walked in lockstep to pair every cloned container with its stock
+--- counterpart. Containers whose values actually differ are emitted; everything else is left as an
+--- EXTERNAL reference to the stock container, which is already registered and already renders.
+--- Dirtiness propagates upward because a parent pointing at a modified child must itself be a copy.
+---
+---@param p_CloneRoot DataContainer the per-instance clone
+---@param p_OriginalRoot DataContainer the shared blueprint it was cloned from
+---@param p_Name string partition name
+---@return table|nil partition, number emitted, number total
+function PartitionSerializer:SerializeOverlayPartition(p_CloneRoot, p_OriginalRoot, p_Name, p_OriginalPartitionGuid)
+	if p_CloneRoot == nil or p_OriginalRoot == nil then
+		return nil, 0, 0
+	end
+
+	local s_Pairs, s_Order, s_Parents = self:_PairSubtree(p_CloneRoot, p_OriginalRoot)
+	local s_Dirty = self:_ComputeDirty(s_Pairs, s_Order, s_Parents)
+
+	-- Clean containers become pointers at the stock originals. Dirty ones keep their clone guid and
+	-- resolve to this partition (their partitionGuid is empty, which the generator rewrites).
+	local s_RefMap = {}
+
+	for _, l_Guid in ipairs(s_Order) do
+		if not s_Dirty[l_Guid] then
+			local s_Entry = s_Pairs[l_Guid]
+			-- VEXT does not report partitionGuid on a container reached THROUGH another container,
+			-- so the child's own value comes back as the zero guid — which would make the reference
+			-- look local and defeat the whole point. Every clean node came from the original
+			-- blueprint, so that blueprint's partition is the correct home for all of them.
+			local s_Pg = self:_RefPartitionGuid(s_Entry.original)
+
+			if (s_Pg == ZERO_GUID or s_Pg == "") and p_OriginalPartitionGuid ~= nil then
+				s_Pg = tostring(p_OriginalPartitionGuid)
+			end
+
+			s_RefMap[l_Guid] = {
+				instanceGuid = tostring(s_Entry.original.instanceGuid),
+				partitionGuid = s_Pg,
+			}
+		end
+	end
+
+	self.m_RefMap = s_RefMap
+
+	local s_Result = {
+		["$guid"] = tostring(p_CloneRoot.instanceGuid),
+		["$name"] = p_Name,
+		["$primaryInstance"] = tostring(p_CloneRoot.instanceGuid),
+		["$instances"] = {},
+	}
+
+	local s_Emitted = 0
+
+	for _, l_Guid in ipairs(s_Order) do
+		if s_Dirty[l_Guid] then
+			local s_Ok, s_Table = pcall(function()
+				return self:_SerializeInstance(s_Pairs[l_Guid].clone)
+			end)
+
+			if s_Ok and s_Table ~= nil then
+				table.insert(s_Result["$instances"], s_Table)
+				s_Emitted = s_Emitted + 1
+			end
+		end
+	end
+
+	self.m_RefMap = nil
+
+	return s_Result, s_Emitted, #s_Order
+end
+
+--- Walk clone and original in lockstep, pairing containers by structural position.
+--- Guids are never compared — the clone's are new by construction.
+---@return table pairs guidLower -> { clone, original, parents = {guid...} }, table order
+function PartitionSerializer:_PairSubtree(p_CloneRoot, p_OriginalRoot)
+	local s_Pairs = {}
+	local s_Order = {}
+	local s_Parents = {}
+	local s_Queue = { { clone = p_CloneRoot, original = p_OriginalRoot } }
+
+	while #s_Queue > 0 do
+		local s_Item = table.remove(s_Queue, 1)
+		local s_Guid = nil
+		pcall(function() s_Guid = tostring(s_Item.clone.instanceGuid) end)
+
+		-- Parent links are tracked in their OWN table, never by pre-creating the pair entry: doing
+		-- that makes the "already visited" test below fire on a node's first dequeue, so it is
+		-- never descended into and the whole subtree collapses to the root.
+		if s_Guid ~= nil and s_Pairs[s_Guid] == nil then
+			s_Pairs[s_Guid] = { clone = s_Item.clone, original = s_Item.original }
+			s_Order[#s_Order + 1] = s_Guid
+
+			-- Only descend where BOTH sides still have a container; a shape mismatch (shouldn't
+			-- happen with DeepClone) simply stops the pairing there and leaves the node dirty.
+			for _, l_Child in ipairs(self:_PairedChildren(s_Item.clone, s_Item.original)) do
+				if self:_IsRuntimeDc(l_Child.clone) then
+					local s_ChildGuid = nil
+					pcall(function() s_ChildGuid = tostring(l_Child.clone.instanceGuid) end)
+
+					if s_ChildGuid ~= nil then
+						s_Parents[s_ChildGuid] = s_Parents[s_ChildGuid] or {}
+						table.insert(s_Parents[s_ChildGuid], s_Guid)
+					end
+
+					s_Queue[#s_Queue + 1] = l_Child
+				end
+			end
+		end
+	end
+
+	return s_Pairs, s_Order, s_Parents
+end
+
+--- Child DataContainers of both sides, paired by field name and array index.
+---@return table[] { {clone=, original=}, ... }
+function PartitionSerializer:_PairedChildren(p_Clone, p_Original)
+	local s_Children = {}
+
+	local s_TypeInfo = nil
+	pcall(function() s_TypeInfo = p_Clone.typeInfo end)
+
+	if s_TypeInfo == nil then
+		return s_Children
+	end
+
+	local s_CloneCast, s_OrigCast = p_Clone, p_Original
+	pcall(function() s_CloneCast = _G[s_TypeInfo.name](p_Clone) end)
+	pcall(function() s_OrigCast = _G[s_TypeInfo.name](p_Original) end)
+
+	for _, l_Field in ipairs(getFields(s_TypeInfo)) do
+		if l_Field.typeInfo == nil or l_Field.typeInfo.enum or isPrintable(l_Field.typeInfo.name) then
+			goto continue
+		end
+
+		local s_Name = firstToLower(l_Field.name)
+		local s_CloneVal, s_OrigVal
+
+		local s_Ok = pcall(function()
+			s_CloneVal = s_CloneCast[s_Name]
+			s_OrigVal = s_OrigCast[s_Name]
+		end)
+
+		if not s_Ok or s_CloneVal == nil or s_OrigVal == nil then
+			goto continue
+		end
+
+		if l_Field.typeInfo.array then
+			local s_LenC, s_LenO = 0, 0
+			pcall(function() s_LenC = #s_CloneVal end)
+			pcall(function() s_LenO = #s_OrigVal end)
+
+			if s_LenC == s_LenO then
+				for i = 1, s_LenC do
+					local s_C, s_O
+					pcall(function() s_C = s_CloneVal[i]; s_O = s_OrigVal[i] end)
+
+					local s_BothDc = false
+					pcall(function()
+						s_BothDc = s_C ~= nil and s_O ~= nil and
+							s_C.instanceGuid ~= nil and s_O.instanceGuid ~= nil
+					end)
+
+					if s_BothDc then
+						s_Children[#s_Children + 1] = { clone = s_C, original = s_O }
+					end
+				end
+			end
+		else
+			local s_BothDc = false
+			pcall(function()
+				s_BothDc = s_CloneVal.instanceGuid ~= nil and s_OrigVal.instanceGuid ~= nil
+			end)
+
+			if s_BothDc then
+				s_Children[#s_Children + 1] = { clone = s_CloneVal, original = s_OrigVal }
+			end
+		end
+
+		::continue::
+	end
+
+	return s_Children
+end
+
+--- Mark containers whose own values differ from their original, then propagate to ancestors.
+---@return table dirty guidLower -> true
+function PartitionSerializer:_ComputeDirty(p_Pairs, p_Order, p_Parents)
+	local s_Dirty = {}
+
+	for _, l_Guid in ipairs(p_Order) do
+		local s_Entry = p_Pairs[l_Guid]
+
+		if self:_ValuesDiffer(s_Entry.clone, s_Entry.original) then
+			s_Dirty[l_Guid] = true
+		end
+	end
+
+	-- The root is always emitted: the ReferenceObjectData has to point at a blueprint that is ours.
+	if p_Order[1] ~= nil then
+		s_Dirty[p_Order[1]] = true
+	end
+
+	-- A parent that references a modified child must itself be a copy, or nothing would point at
+	-- the new child. Repeat until stable — the graph is small and shallow.
+	local s_Changed = true
+
+	while s_Changed do
+		s_Changed = false
+
+		for _, l_Guid in ipairs(p_Order) do
+			if s_Dirty[l_Guid] then
+				for _, l_Parent in ipairs(p_Parents[l_Guid] or {}) do
+					if not s_Dirty[l_Parent] then
+						s_Dirty[l_Parent] = true
+						s_Changed = true
+					end
+				end
+			end
+		end
+	end
+
+	return s_Dirty
+end
+
+--- True when two paired containers differ in any NON-reference field. References are structural
+--- edges handled by the pairing, and their guids always differ on a clone, so comparing them would
+--- mark everything dirty.
+function PartitionSerializer:_ValuesDiffer(p_Clone, p_Original)
+	local s_TypeInfo = nil
+	pcall(function() s_TypeInfo = p_Clone.typeInfo end)
+
+	if s_TypeInfo == nil then
+		return true
+	end
+
+	local s_OrigType = nil
+	pcall(function() s_OrigType = p_Original.typeInfo end)
+
+	if s_OrigType == nil or s_OrigType.name ~= s_TypeInfo.name then
+		return true
+	end
+
+	local s_CloneCast, s_OrigCast = p_Clone, p_Original
+	pcall(function() s_CloneCast = _G[s_TypeInfo.name](p_Clone) end)
+	pcall(function() s_OrigCast = _G[s_TypeInfo.name](p_Original) end)
+
+	for _, l_Field in ipairs(getFields(s_TypeInfo)) do
+		if l_Field.typeInfo == nil or l_Field.name == "MaterialPairs" then
+			goto continue
+		end
+
+		-- Skip anything that is (or contains) a container reference.
+		if not (l_Field.typeInfo.enum or isPrintable(l_Field.typeInfo.name)) then
+			goto continue
+		end
+
+		local s_Name = firstToLower(l_Field.name)
+		local s_A, s_B
+
+		pcall(function() s_A = self:_EncodeField(l_Field.typeInfo, s_CloneCast[s_Name], 0) end)
+		pcall(function() s_B = self:_EncodeField(l_Field.typeInfo, s_OrigCast[s_Name], 0) end)
+
+		local s_JA, s_JB
+		pcall(function() s_JA = json.encode(s_A) end)
+		pcall(function() s_JB = json.encode(s_B) end)
+
+		if s_JA ~= s_JB then
+			return true
+		end
+
+		::continue::
+	end
+
+	return false
 end
 
 --============================ Instance / field walking ============================--
@@ -432,10 +745,7 @@ function PartitionSerializer:_EncodeField(p_TypeInfo, p_Value, p_Depth)
 		return {
 			["$type"] = p_TypeInfo.name,
 			["$ref"] = true,
-			["$value"] = {
-				["$instanceGuid"] = tostring(p_Value.instanceGuid),
-				["$partitionGuid"] = self:_RefPartitionGuid(p_Value),
-			},
+			["$value"] = self:_RefTarget(p_Value),
 		}
 	end
 
@@ -485,10 +795,7 @@ function PartitionSerializer:_EncodeArray(p_TypeInfo, p_Value, p_Depth)
 
 				if s_MemberIsRef then
 					s_IsRef = true
-					s_Values[#s_Values + 1] = {
-						["$instanceGuid"] = tostring(s_Member.instanceGuid),
-						["$partitionGuid"] = self:_RefPartitionGuid(s_Member),
-					}
+					s_Values[#s_Values + 1] = self:_RefTarget(s_Member)
 				else
 					-- Inline struct element: emit its field-map (parseValue wraps it back into a Field).
 					local s_MemberType = s_ElementType

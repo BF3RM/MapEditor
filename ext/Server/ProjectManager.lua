@@ -489,9 +489,36 @@ function ProjectManager:SaveClonedBlueprints(p_HeaderId)
 			-- can each carry different overrides).
 			local s_Name = "CustomBlueprints/" .. tostring(l_Guid):lower()
 
-			local s_Ok, s_Partition = pcall(function()
-				return PartitionSerializer:SerializeCloneSubtree(s_Dc, s_Name)
-			end)
+			-- Copy-on-write against the blueprint this clone came from: emit only what actually
+			-- changed and reference stock content for the rest. A full copy takes the whole render
+			-- chain with it under fresh guids, and the baked object then references meshes the
+			-- level has never seen — it is placed correctly and draws nothing.
+			local s_Original = nil
+
+			if l_Entry.originalRef ~= nil then
+				pcall(function() s_Original = CtrRef(l_Entry.originalRef):Get() end)
+			end
+
+			local s_Ok, s_Partition, s_Emitted, s_Total
+
+			if s_Original ~= nil then
+				s_Ok, s_Partition, s_Emitted, s_Total = pcall(function()
+					return PartitionSerializer:SerializeOverlayPartition(s_Dc, s_Original, s_Name,
+						l_Entry.originalRef and l_Entry.originalRef.partitionGuid or nil)
+				end)
+			end
+
+			if s_Ok and s_Partition ~= nil then
+				m_Logger:Write("Overlay for " .. tostring(l_Guid) .. ": emitted " ..
+					tostring(s_Emitted) .. " of " .. tostring(s_Total) .. " containers")
+			else
+				-- No resolvable original (or the pairing failed): fall back to the full copy, which
+				-- at least preserves the data even though such an object may not render.
+				m_Logger:Warning("Overlay failed for " .. tostring(l_Guid) .. "; emitting full clone")
+				s_Ok, s_Partition = pcall(function()
+					return PartitionSerializer:SerializeCloneSubtree(s_Dc, s_Name)
+				end)
+			end
 
 			if s_Ok and s_Partition ~= nil then
 				local s_JsonOk, s_Json = pcall(function() return json.encode(s_Partition) end)
