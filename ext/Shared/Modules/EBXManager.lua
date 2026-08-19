@@ -128,22 +128,47 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 						m_Logger:Error("SetField: refusing reference assignment to '" ..
 							tostring(p_Field.field) .. "': no declared field type to check against, " ..
 							"and a mismatched reference takes the client down.")
-						return p_Path .. '.' .. p_Field.field
+						-- nil, NOT a path: GameObject:SetOverride records an override for any path it gets back,
+						-- which would persist an edit that was refused and never applied.
+						return nil
 					end
 
+					-- Walk the inheritance chain, BOUNDED.
+					--
+					-- typeInfo.super does not reliably terminate: at the root it keeps returning a
+					-- non-nil typeInfo rather than nil, so an unbounded `while s_Info ~= nil` loop
+					-- never ends for a type that does NOT match. That hangs the game — no crash, no
+					-- dump, the editor simply disappears — and it only ever terminated before
+					-- because a MATCHING type breaks out early. Every mismatched reference hung,
+					-- which is precisely the case this guard exists to handle.
+					--
+					-- Bounded by depth and by self-reference; on exhaustion the type is treated as
+					-- NOT matching, so the refusal path runs rather than a blind assignment.
 					local s_Ok = false
 					local s_Info = nil
 					pcall(function() s_Info = s_Target.typeInfo end)
 
-					while s_Info ~= nil do
-						if s_Info.name == s_Want then
+					local s_Depth = 0
+
+					while s_Info ~= nil and s_Depth < 32 do
+						local s_Name = nil
+						pcall(function() s_Name = s_Info.name end)
+
+						if s_Name == s_Want then
 							s_Ok = true
 							break
 						end
 
 						local s_Super = nil
 						pcall(function() s_Super = s_Info.super end)
+
+						-- The chain is done when super stops moving, not only when it is nil.
+						if s_Super == nil or s_Super == s_Info then
+							break
+						end
+
 						s_Info = s_Super
+						s_Depth = s_Depth + 1
 					end
 
 					if not s_Ok then
@@ -152,7 +177,9 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 						m_Logger:Error("SetField: refusing to point '" .. tostring(p_Field.field) ..
 							"' at a " .. s_Got .. "; the field takes a " .. tostring(s_Want) ..
 							" and a mismatched reference crashes the client.")
-						return p_Path .. '.' .. p_Field.field
+						-- nil, NOT a path: GameObject:SetOverride records an override for any path it gets back,
+						-- which would persist an edit that was refused and never applied.
+						return nil
 					end
 				end
 
@@ -162,7 +189,9 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 					m_Logger:Error("SetField: could not resolve reference target " ..
 						tostring(s_Val.partitionGuid) .. "/" .. tostring(s_Val.instanceGuid) ..
 						" for '" .. tostring(p_Field.field) .. "'; leaving the field unchanged.")
-					return p_Path .. '.' .. p_Field.field
+					-- nil, NOT a path: GameObject:SetOverride records an override for any path it gets back,
+					-- which would persist an edit that was refused and never applied.
+					return nil
 				end
 			end
 
