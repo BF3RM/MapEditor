@@ -23,55 +23,6 @@
 					{{ referenceObjectBlueprint }}
 				</div>
 				<div class="path hint" v-if="notLoaded">not loaded</div>
-				<!-- Gameface has no :hover-only reveal worth relying on, so the affordance is
-				     always visible. stop, or the click also toggles the chip's expansion. -->
-				<div class="ref-actions">
-					<button class="ref-btn" @click.stop="openPicker" title="Point this field at another instance">
-						change
-					</button>
-				</div>
-			</div>
-			<div v-if="picking" class="ref-picker" @click.stop>
-				<input
-					class="ref-filter"
-					v-model="filter"
-					placeholder="filter by type, name or guid"
-					@click.stop
-				/>
-				<div class="ref-hint">
-					<span v-if="filter.trim().length < 2">
-						Type at least 2 characters to search
-						<span class="ref-type">{{ targetType || 'any type' }}</span> targets.
-					</span>
-					<span v-else>
-						{{ candidates.length }} match{{ candidates.length === 1 ? '' : 'es' }}<span
-							v-if="candidates.length >= 100"
-							>+</span
-						>
-						· must be a <span class="ref-type">{{ targetType || 'any' }}</span>
-					</span>
-				</div>
-				<div v-if="pickError" class="ref-error">{{ pickError }}</div>
-				<div class="ref-list">
-					<div
-						v-for="c in candidates"
-						:key="c.instanceGuid"
-						class="ref-row"
-						:class="{ current: c.instanceGuid === currentGuidLower }"
-						@click.stop="choose(c)"
-					>
-						<div class="ref-row-name">
-							{{ c.label }}<span v-if="checking === c.instanceGuid"> — checking…</span>
-						</div>
-						<div class="ref-row-guid">{{ c.instanceGuid }}</div>
-					</div>
-					<div v-if="candidates.length === 0 && filter.trim().length >= 2" class="ref-empty">
-						Nothing matches that search.
-					</div>
-				</div>
-				<div class="ref-foot">
-					<button class="ref-btn" @click.stop="picking = false">cancel</button>
-				</div>
 			</div>
 			<template v-if="expanded && partition && instance">
 				<InstanceProperty
@@ -97,7 +48,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import Partition from '@/script/types/ebx/Partition';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import Reference from '@/script/types/ebx/Reference';
 import { GameObject } from '@/script/types/GameObject';
 
@@ -130,12 +81,6 @@ export default class ReferenceComponent extends Vue {
 	type: string;
 
 	@Prop({
-		type: Object,
-		required: false
-	})
-	field: any;
-
-	@Prop({
 		type: Object as PropType<Reference>,
 		required: false
 	})
@@ -160,10 +105,6 @@ export default class ReferenceComponent extends Vue {
 	autoOpen: boolean;
 
 	data(): {
-		picking: boolean;
-		filter: string;
-		pickError: string;
-		checking: string;
 		loading: boolean;
 		notLoaded: boolean;
 		instance: any | null;
@@ -176,10 +117,6 @@ export default class ReferenceComponent extends Vue {
 		referenceName: string;
 	} {
 		return {
-			picking: false,
-			filter: '',
-			pickError: '',
-			checking: '',
 			loading: true,
 			notLoaded: false,
 			instance: null,
@@ -201,164 +138,161 @@ export default class ReferenceComponent extends Vue {
 		}
 	}
 
-	openPicker() {
-		this.$data.filter = '';
-		this.$data.picking = !this.$data.picking;
+	mounted() {
+		this.resolve();
 	}
 
-	get targetType(): string {
-		const declared = this.type || (this.field && (this.field as any).type);
-		return declared || (this.$data.instance && this.$data.instance.typeName) || '';
+	// The reference prop ARRIVES LATE.
+	//
+	// Resolution used to happen only in mounted(), which runs once. The inspector renders this chip
+	// before the partition it describes has finished loading, so `reference` is frequently
+	// undefined at mount: the component returned early and then sat at its initial state forever —
+	// loading:true (so the chip pulses) and instance:null (so toggle() refuses to expand). That is
+	// the "it blinks and won't open" symptom; nothing was broken, the chip was never told to look
+	// again once its data arrived.
+	@Watch('reference')
+	onReferenceChanged() {
+		this.$data.loading = true;
+		this.$data.notLoaded = false;
+		this.$data.instance = null;
+		this.$data.partition = null;
+		this.$data.expanded = false;
+		this.$data.referenceName = '';
+		this.$data.referenceObjectBlueprint = '';
+		this.resolve();
 	}
 
-	get currentGuidLower(): string {
-		return this.reference && this.reference.instanceGuid
-			? this.reference.instanceGuid.toString().toLowerCase()
-			: '';
-	}
-
-	// Candidates come from the partition INDEX (~70k entries), not from loaded partitions: the
-	// client fetches partitions on demand and keeps almost none, so enumerating loaded ones found
-	// exactly one instance and the picker was empty. The index carries name + guid +
-	// primaryInstanceGuid, but NO type — so filtering by type is impossible here and the type is
-	// instead checked on selection (see choose), which is also where a mismatch can be reported.
-	get candidates(): any[] {
-		const q = (this.$data.filter || '').trim().toLowerCase();
-		if (q.length < 2) {
-			return [];
+	resolve() {
+		if (!this.reference) {
+			// A null reference is a FINISHED state, not a pending one. Leaving loading true here is
+			// what made empty reference fields pulse indefinitely.
+			this.$data.loading = false;
+			return;
 		}
-		const out: any[] = [];
-		const partitions = window.editor.fbdMan.partitions.values();
-		for (const p of partitions) {
-			if (!p || !p.name || !p.primaryInstanceGuid) continue;
-			const name = String(p.name);
-			if (name.toLowerCase().indexOf(q) === -1) continue;
-			out.push({
-				label: name,
-				instanceGuid: String(p.primaryInstanceGuid).toLowerCase(),
-				partitionGuid: String(p.guid).toLowerCase()
+		// Frostbite INTERNAL references carry a ZERO partition guid
+		// (00000000-0000-0000-0000-000000000000): the target instance lives in the SAME
+		// partition as the field. Resolve those against the containing partition (whose
+		// name is currentPath) — a global getPartition(zero-guid) returns null, which is
+		// why every internal reference was wrongly rendering "not loaded". External refs
+		// (non-zero guid) still resolve by guid; if that partition isn't registered it
+		// genuinely isn't loaded client-side, so the placeholder is correct there.
+		const ZERO_GUID = '00000000-0000-0000-0000-000000000000';
+		const refPartitionGuid = this.reference.partitionGuid
+			? this.reference.partitionGuid.toString().toLowerCase()
+			: ZERO_GUID;
+		let partition =
+			refPartitionGuid === ZERO_GUID
+				? window.editor.fbdMan.getPartitionByName(this.currentPath)
+				: window.editor.fbdMan.getPartition(this.reference.partitionGuid);
+		// External reference (non-zero partition guid) not cached yet: REGISTER it so it fetches
+		// on demand from the game (getPartition is a pure lookup). Pass the target instance guid as
+		// a hint so the server can single-instance-resolve when the whole partition isn't cached.
+		if (!partition && refPartitionGuid !== ZERO_GUID) {
+			partition = window.editor.fbdMan.registerPartition(
+				refPartitionGuid,
+				this.reference.partitionGuid,
+				this.reference.instanceGuid.toString()
+			);
+		}
+		if (!partition) {
+			// No partition to try — resolve the instance globally by its guid instead of giving up.
+			this.resolveGlobally();
+			return;
+		}
+		// const so TS keeps it non-null inside the async closure below.
+		const resolved = partition;
+		this.$data.partition = resolved;
+		resolved.data
+			.then(() => {
+				const inst = resolved.instances[this.reference.instanceGuid.toString().toLowerCase()];
+				if (!inst) {
+					// Instance isn't in this partition. A ZERO partition guid does NOT always mean
+					// "same partition": Frostbite leaves it zero for IMPORTED blueprint references
+					// (e.g. VehicleSpawnReferenceObjectData.blueprint), which the engine resolves
+					// GLOBALLY by instance guid at load. Search across all loaded partitions instead
+					// of rendering "not loaded".
+					this.resolveGlobally();
+					return;
+				}
+				this.onInstanceResolved(inst, resolved);
+			})
+			.catch((e: any) => {
+				console.warn(
+					`Failed to resolve reference ${this.reference.partitionGuid}/${this.reference.instanceGuid}`,
+					e
+				);
+				this.resolveGlobally();
 			});
-			if (out.length >= 100) break; // Gameface renders long lists slowly
-		}
-		return out;
 	}
 
-	choose(c: any) {
-		const prev = this.reference
-			? {
-					partitionGuid: String(this.reference.partitionGuid).toLowerCase(),
-					instanceGuid: String(this.reference.instanceGuid).toLowerCase()
-			  }
-			: null;
-		this.$data.pickError = '';
-		this.$data.picking = false;
-		this.$emit('input', {
-			__ref: true,
-			partitionGuid: c.partitionGuid,
-			instanceGuid: c.instanceGuid,
-			__refOld: prev
-		});
+	// Resolve the reference target by its INSTANCE guid alone, across all loaded partitions —
+	// for imported/zero-partition references. Registers a synthetic partition keyed by the instance
+	// guid; the server's PartitionSerializer falls back to SearchForInstanceByGuid and returns a
+	// one-instance partition.
+	resolveGlobally() {
+		const instGuidStr = this.reference.instanceGuid.toString();
+		const p = window.editor.fbdMan.registerPartition(instGuidStr, this.reference.instanceGuid, instGuidStr);
+		this.$data.partition = p;
+		p.data
+			.then(() => {
+				const inst = p.instances[instGuidStr.toLowerCase()];
+				if (!inst) {
+					this.$data.loading = false;
+					this.$data.notLoaded = true;
+					return;
+				}
+				this.onInstanceResolved(inst, p);
+			})
+			.catch((e: any) => {
+				console.warn(`Global reference resolve failed ${instGuidStr}`, e);
+				this.$data.loading = false;
+				this.$data.notLoaded = true;
+			});
+	}
+
+	// Shared handling once the target instance is resolved (from either the partition or the global
+	// path): fill the chip label/path and, for a nested ReferenceObjectData, its blueprint name.
+	onInstanceResolved(instance: any, partition: any) {
+		this.$data.instance = instance;
+		this.$data.referencePath = partition.name;
+		this.$data.loading = false;
+		if (this.autoOpen) {
+			this.$data.expanded = true;
+		}
+		this.$data.cleanPath = './';
+		const regEx = new RegExp(this.currentPath.substring(0, this.currentPath.lastIndexOf('/')), 'ig');
+		if (partition.name && partition.name.toLowerCase() !== this.currentPath.toLowerCase()) {
+			const path = partition.name.replace(regEx, '');
+			this.$data.cleanPath = path.startsWith('/') ? '.' + path + '/' : path + '/';
+		}
+		this.$data.guid = instance.guid;
+
+		// Surface the target's own name/path so the chip says WHAT it points to (e.g. which
+		// vehicle blueprint), not just its type. Blueprints carry their asset path in `name`.
+		if (instance.fields && instance.fields.name && instance.fields.name.value != null) {
+			this.$data.referenceName = String(instance.fields.name.value);
+		}
+
+		if (instance.typeName === 'ReferenceObjectData') {
+			const blueprint = instance.fields.blueprint && instance.fields.blueprint.value;
+			const bpPartition = blueprint && blueprint.getPartition && blueprint.getPartition();
+			if (bpPartition) {
+				bpPartition.data
+					.then(() => {
+						const bpInstance = blueprint.getInstance && blueprint.getInstance();
+						if (bpInstance && bpInstance.fields.name) {
+							this.$data.referenceObjectBlueprint = String(bpInstance.fields.name.value).replace(regEx, '');
+						}
+					})
+					.catch(() => {
+						/* nested blueprint partition not loaded — leave label blank */
+					});
+			}
+		}
 	}
 }
 </script>
 <style lang="scss" scoped>
-/* Picker. Gameface (Cohtml): no CSS grid, no :not(), no dashed borders — plain flex and
-   explicit borders only. */
-.ref-actions {
-	margin-top: 5px;
-}
-
-.ref-btn {
-	background-color: rgba(3, 127, 255, 0.15);
-	border: 1px solid rgba(3, 127, 255, 0.5);
-	border-radius: 4px;
-	color: #7fbcff;
-	font-size: 10px;
-	padding: 2px 8px;
-	cursor: pointer;
-}
-
-.ref-btn:hover {
-	background-color: rgba(3, 127, 255, 0.3);
-	color: #cde4ff;
-}
-
-.ref-picker {
-	background-color: rgba(16, 19, 28, 0.98);
-	border: 1px solid rgba(3, 127, 255, 0.4);
-	border-top: 0;
-	border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
-	padding: 7px 9px 9px 9px;
-}
-
-.ref-filter {
-	width: 100%;
-	box-sizing: border-box;
-	background-color: rgba(8, 10, 16, 0.9);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	border-radius: 4px;
-	color: #cdd6e0;
-	font-size: 11px;
-	padding: 4px 6px;
-}
-
-.ref-hint {
-	color: #7a8797;
-	font-size: 10px;
-	margin-top: 5px;
-	margin-bottom: 4px;
-}
-
-.ref-type {
-	color: #4ea3ff;
-}
-
-.ref-list {
-	max-height: 190px;
-	overflow-y: auto;
-}
-
-.ref-row {
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-	cursor: pointer;
-	padding: 4px 3px;
-}
-
-.ref-row:hover {
-	background-color: rgba(3, 127, 255, 0.18);
-}
-
-.ref-row.current {
-	border-left: 2px solid #4ea3ff;
-	padding-left: 5px;
-}
-
-.ref-row-name {
-	color: #cdd6e0;
-	font-size: 11px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.ref-row-guid {
-	color: #5f6f80;
-	font-family: 'Consolas', 'Menlo', monospace;
-	font-size: 10px;
-}
-
-.ref-empty {
-	color: #7a8797;
-	font-size: 10px;
-	font-style: italic;
-	padding: 6px 2px;
-}
-
-.ref-foot {
-	margin-top: 6px;
-}
-
 /* Block root that fills its column, so the chip is a full-width header and its
    expanded fields stack beneath it. */
 .reference-property {
@@ -489,15 +423,5 @@ export default class ReferenceComponent extends Vue {
 	50% {
 		opacity: 0.85;
 	}
-}
-
-.ref-error {
-	background-color: rgba(255, 92, 92, 0.12);
-	border: 1px solid rgba(255, 92, 92, 0.45);
-	border-radius: 4px;
-	color: #ffb3b3;
-	font-size: 10px;
-	margin-bottom: 5px;
-	padding: 4px 6px;
 }
 </style>
