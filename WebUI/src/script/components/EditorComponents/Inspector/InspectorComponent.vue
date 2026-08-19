@@ -283,6 +283,29 @@ export default class InspectorComponent extends EditorComponent {
 		if (this.selectedGameObject) {
 			value.guid = this.selectedGameObject.guid;
 			const field = addObjectsField ? 'objects' : 'object';
+
+			// The blueprint ROOT reference (fields.object) renders a ReferenceProperty directly,
+			// bypassing Property, so its pick arrives here unwrapped. `object` IS the field being
+			// repointed in that case, so the ref marker belongs on this node rather than a nested
+			// one — otherwise the ext descends into a {partitionGuid, instanceGuid} table that has
+			// no `field` and the edit is dropped.
+			if ((value as any).__ref === true && !addObjectsField) {
+				window.editor.execute(
+					new SetEBXFieldCommand({
+						guid: this.selectedGameObject.guid,
+						reference: this.selectedGameObject.originalRef,
+						field,
+						type: 'GameObjectData',
+						ref: true,
+						value: {
+							partitionGuid: (value as any).partitionGuid,
+							instanceGuid: (value as any).instanceGuid
+						},
+						oldValue: (value as any).__refOld
+					} as any)
+				);
+				return;
+			}
 			const payload = {
 				guid: this.selectedGameObject.guid,
 				reference: this.selectedGameObject.originalRef,

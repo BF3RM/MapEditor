@@ -109,6 +109,53 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 					end)
 				end
 
+				-- Refuse a target whose type the field cannot hold.
+				--
+				-- This is a HARD requirement, not validation politeness: assigning a
+				-- type-mismatched DataContainer kills the client process outright — no Lua error,
+				-- nothing catchable, the same native failure mode as GH #202's parentRepresentative.
+				-- pcall does not help. Verified by driving the reference picker with an
+				-- ObjectBlueprint into a field that wanted something else.
+				--
+				-- p_Field.type is the field's DECLARED type as the inspector knows it. Walk the
+				-- target's inheritance chain so a subclass is still accepted; if the declared type
+				-- is unknown (older callers omit it) the assignment is refused rather than
+				-- attempted, because the failure is unrecoverable.
+				if s_Target ~= nil then
+					local s_Want = p_Field.type
+
+					if s_Want == nil or s_Want == '' then
+						m_Logger:Error("SetField: refusing reference assignment to '" ..
+							tostring(p_Field.field) .. "': no declared field type to check against, " ..
+							"and a mismatched reference takes the client down.")
+						return p_Path .. '.' .. p_Field.field
+					end
+
+					local s_Ok = false
+					local s_Info = nil
+					pcall(function() s_Info = s_Target.typeInfo end)
+
+					while s_Info ~= nil do
+						if s_Info.name == s_Want then
+							s_Ok = true
+							break
+						end
+
+						local s_Super = nil
+						pcall(function() s_Super = s_Info.super end)
+						s_Info = s_Super
+					end
+
+					if not s_Ok then
+						local s_Got = 'unknown'
+						pcall(function() s_Got = tostring(s_Target.typeInfo.name) end)
+						m_Logger:Error("SetField: refusing to point '" .. tostring(p_Field.field) ..
+							"' at a " .. s_Got .. "; the field takes a " .. tostring(s_Want) ..
+							" and a mismatched reference crashes the client.")
+						return p_Path .. '.' .. p_Field.field
+					end
+				end
+
 				-- Refuse to write a reference we could not resolve: assigning nil here would
 				-- silently NULL the field instead of reporting that the target is unavailable.
 				if s_Target == nil then

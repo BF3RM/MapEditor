@@ -9,6 +9,8 @@ export interface IEBXFieldData {
 	reference?: CtrRef | undefined;
 	field: string;
 	type: string;
+	/** Terminal "point this field at that instance"; value is {partitionGuid, instanceGuid}. */
+	ref?: boolean;
 	value?: any;
 	oldValue?: any | undefined;
 }
@@ -52,6 +54,7 @@ export default class SetEBXFieldCommand extends Command {
 					field: this.EBXFieldUpdateData.field,
 					value: this.EBXFieldUpdateData.value,
 					type: this.EBXFieldUpdateData.type,
+					ref: this.EBXFieldUpdateData.ref,
 					reference: this.EBXFieldUpdateData.reference
 				}
 			]
@@ -60,6 +63,10 @@ export default class SetEBXFieldCommand extends Command {
 	}
 
 	public undo() {
+		// A reference change has to be undone AS a reference change. Without `ref` the ext walks
+		// the node as a normal field chain, and oldValue is a {partitionGuid, instanceGuid} table
+		// rather than a scalar — so the undo would either do nothing or null the field. Both look
+		// like the picker half-worked.
 		const gameObjectTransferData = new GameObjectTransferData({
 			guid: this.EBXFieldUpdateData.guid,
 			overrides: [
@@ -67,6 +74,7 @@ export default class SetEBXFieldCommand extends Command {
 					field: this.EBXFieldUpdateData.field,
 					value: this.EBXFieldUpdateData.oldValue,
 					type: this.EBXFieldUpdateData.type,
+					ref: this.EBXFieldUpdateData.ref,
 					reference: this.EBXFieldUpdateData.reference
 				}
 			]

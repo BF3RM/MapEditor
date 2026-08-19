@@ -118,6 +118,26 @@ export default Vue.extend({
 	},
 	methods: {
 		onChangeValue(field: string, newValue: any) {
+			// A reference pick (ReferenceProperty) is not a value edit. The ext's edit grammar
+			// recurses on field names until the type is printable and then assigns a scalar, so
+			// "point this field at that instance" needs its own terminal: a `ref: true` node whose
+			// value is {partitionGuid, instanceGuid}. Mark it here, where the field NAME is known —
+			// the picker itself only knows the target.
+			if (newValue && newValue.__ref === true) {
+				const refOut: any = {
+					reference: new CtrRef(undefined, undefined, this.partition.guid, this.instance.guid),
+					field: field,
+					type: this.field.type,
+					ref: true,
+					value: {
+						partitionGuid: newValue.partitionGuid,
+						instanceGuid: newValue.instanceGuid
+					},
+					oldValue: newValue.__refOld
+				};
+				this.$emit('input', refOut);
+				return;
+			}
 			const out: IEBXFieldData = {
 				reference: new CtrRef(undefined, undefined, this.partition.guid, this.instance.guid),
 				field: field,
