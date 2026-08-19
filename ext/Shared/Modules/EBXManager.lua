@@ -41,7 +41,9 @@ function EBXManager:CollectPathContainers(p_Instance, p_Field, p_Out)
 		p_Out[s_Guid] = true
 	end
 
-	if isPrintable(p_Field.type) then
+	-- A reference assignment terminates here just like a printable leaf: its `value` is a
+	-- {partitionGuid, instanceGuid} descriptor, not another node to descend into.
+	if isPrintable(p_Field.type) or p_Field.ref == true then
 		return
 	end
 
@@ -75,6 +77,60 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 		if p_Instance.instanceGuid ~= nil then
 			p_Instance:MakeWritable()
 			p_Instance = _G[p_Instance.typeInfo.name](p_Instance)
+		end
+
+		-- Reference assignment -------------------------------------------------------------
+		--
+		-- A terminal, exactly like a printable leaf. The edit grammar otherwise has no verb but
+		-- "assign a scalar": every descriptor recurses on the field name until isPrintable() is
+		-- true, so there was no shape that could say "point this field at that instance" and the
+		-- inspector could browse a reference but never change one.
+		--
+		-- `value` is { partitionGuid, instanceGuid }; a nil/absent value clears the reference.
+		-- Resolution mirrors PartitionSerializer's fallback: try partition+instance first, then a
+		-- global search by instance guid, because Frostbite leaves partitionGuid ZERO for imported
+		-- references and resolves those globally at load.
+		if p_Field.ref == true then
+			local s_Target = nil
+			local s_Val = p_Field.value
+
+			if type(s_Val) == 'table' and s_Val.instanceGuid ~= nil then
+				local s_Part = s_Val.partitionGuid
+
+				if s_Part ~= nil and tostring(s_Part) ~= '00000000-0000-0000-0000-000000000000' then
+					pcall(function()
+						s_Target = ResourceManager:FindInstanceByGuid(Guid(tostring(s_Part)), Guid(tostring(s_Val.instanceGuid)))
+					end)
+				end
+
+				if s_Target == nil then
+					pcall(function()
+						s_Target = ResourceManager:SearchForInstanceByGuid(Guid(tostring(s_Val.instanceGuid)))
+					end)
+				end
+
+				-- Refuse to write a reference we could not resolve: assigning nil here would
+				-- silently NULL the field instead of reporting that the target is unavailable.
+				if s_Target == nil then
+					m_Logger:Error("SetField: could not resolve reference target " ..
+						tostring(s_Val.partitionGuid) .. "/" .. tostring(s_Val.instanceGuid) ..
+						" for '" .. tostring(p_Field.field) .. "'; leaving the field unchanged.")
+					return p_Path .. '.' .. p_Field.field
+				end
+			end
+
+			-- Assign the TYPED wrapper, not the raw DataContainer. A raw container is silently
+			-- rejected — the field reads back nil afterwards with no error — the same way every
+			-- other write in this file casts via _G[typeInfo.name] before touching a field.
+			local s_Assign = s_Target
+
+			if s_Target ~= nil then
+				pcall(function() s_Assign = _G[s_Target.typeInfo.name](s_Target) end)
+			end
+
+			p_Instance[p_Field.field] = s_Assign
+
+			return p_Path .. '.' .. p_Field.field
 		end
 
 		if isPrintable(p_Field.type) then -- Set value directly

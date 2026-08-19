@@ -38,8 +38,9 @@ function PartitionSerializer:__init()
 	m_Logger:Write("Initializing PartitionSerializer")
 	-- partitionGuidLower -> DatabasePartition (the live engine object)
 	self.m_Partitions = {}
-	-- outgoing chunk send-queue { player, msgs = {...}, idx }
-	self.m_SendQueue = nil
+	-- FIFO of outgoing responses, each { player, msgs = {...}, idx }. A list, not one slot: a
+	-- single slot meant a new request discarded whatever was still being sent.
+	self.m_SendQueue = {}
 	self:RegisterEvents()
 end
 
@@ -75,7 +76,7 @@ function PartitionSerializer:OnLevelDestroy()
 	-- Stale handles are handled where it is safe to do so — _ResolvePartition validates a cached
 	-- entry before returning it and evicts it if the engine has torn it down. A genuinely new
 	-- level re-fires Partition:Loaded and overwrites these entries anyway.
-	self.m_SendQueue = nil
+	self.m_SendQueue = {}
 end
 
 --============================ Public API ============================--
@@ -1117,26 +1118,40 @@ function PartitionSerializer:_QueueChunked(p_Player, p_RequestId, p_Json)
 		p = { requestId = p_RequestId },
 	}
 
-	-- One request at a time is fine for the inspector; a new request replaces any in-flight queue.
-	self.m_SendQueue = { player = p_Player, msgs = s_Msgs, idx = 1 }
+	-- Queue this response BEHIND any still in flight, never over the top of it.
+	--
+	-- This used to be a single slot ("one request at a time is fine for the inspector"), so a new
+	-- request silently discarded whatever was mid-send. That is fine for one fetch at a time and
+	-- wrong for real use: selecting an object fires a fetch per reference it renders, each one
+	-- wiping the last, and the client then sat out its 15s timeout for every dropped response.
+	-- Measured on a 40-object sweep: 8 partitions failed with "Partition request timed out", and
+	-- they were invisible because FBPartition swallowed the rejection and presented an empty
+	-- partition instead.
+	self.m_SendQueue[#self.m_SendQueue + 1] = { player = p_Player, msgs = s_Msgs, idx = 1 }
 end
 
 function PartitionSerializer:OnEngineUpdate()
-	local s_Q = self.m_SendQueue
-	if s_Q == nil then
-		return
-	end
-
 	local s_Sent = 0
-	while s_Q.idx <= #s_Q.msgs and s_Sent < MSGS_PER_TICK do
-		local s_M = s_Q.msgs[s_Q.idx]
-		NetEvents:SendToLocal(s_M.e, s_Q.player, s_M.p)
-		s_Q.idx = s_Q.idx + 1
-		s_Sent = s_Sent + 1
-	end
 
-	if s_Q.idx > #s_Q.msgs then
-		self.m_SendQueue = nil
+	-- Drain the head of the queue; when a response is fully sent, move on to the next one in the
+	-- same tick if there is budget left.
+	while s_Sent < MSGS_PER_TICK do
+		local s_Q = self.m_SendQueue[1]
+
+		if s_Q == nil then
+			return
+		end
+
+		while s_Q.idx <= #s_Q.msgs and s_Sent < MSGS_PER_TICK do
+			local s_M = s_Q.msgs[s_Q.idx]
+			NetEvents:SendToLocal(s_M.e, s_Q.player, s_M.p)
+			s_Q.idx = s_Q.idx + 1
+			s_Sent = s_Sent + 1
+		end
+
+		if s_Q.idx > #s_Q.msgs then
+			table.remove(self.m_SendQueue, 1)
+		end
 	end
 end
 
