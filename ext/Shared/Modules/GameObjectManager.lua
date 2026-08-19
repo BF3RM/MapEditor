@@ -91,61 +91,30 @@ local OVERRIDES_PER_TICK = 1
 -- bulk edit from spiking a frame badly enough to take the client down.
 local REINSTANTIATE_PER_TICK = 2
 
---- Build a UNIQUE ReferenceObjectData to hand to EntityCreationParams.parentRepresentative.
----
---- Every spawn used to go in with no representative at all, so entities created from the same
---- blueprint ended up sharing a representative and therefore data that is supposed to be
---- per-instance (GH #202, and the crashes traced to it: #296, #364, #2). Per the issue: the
---- representative must be a unique ReferenceObjectData, must define its `.blueprint`, and must be
---- STORED so the GC doesn't collect it while the entities are alive.
----
---- Mirrors how LevelInjector:AddCustomObject builds its RODs (EffectReferenceObjectData for
---- effects, autoStart set). Returns nil on any failure, which simply restores the previous
---- behaviour rather than breaking the spawn.
----@param p_Guid Guid|string editor GameObject guid (owns the representative's lifetime)
----@param p_Blueprint DataContainer raw blueprint being spawned
----@param p_Transform LinearTransform
----@return DataContainer|nil
-function GameObjectManager:CreateRepresentative(p_Guid, p_Blueprint, p_Transform)
-	local s_Ok, s_Rod = pcall(function()
-		local s_Reference
-
-		if p_Blueprint:Is("EffectBlueprint") then
-			s_Reference = EffectReferenceObjectData()
-			s_Reference.autoStart = true
-		else
-			s_Reference = ReferenceObjectData()
-		end
-
-		s_Reference.blueprint = Blueprint(p_Blueprint)
-		s_Reference.blueprintTransform = LinearTransform(p_Transform)
-		s_Reference.isEventConnectionTarget = Realm.Realm_None
-		s_Reference.isPropertyConnectionTarget = Realm.Realm_None
-		s_Reference.excluded = false
-
-		return s_Reference
-	end)
-
-	if not s_Ok or s_Rod == nil then
-		-- print(), not the logger: the logger is disabled by default, and silently degrading back
-		-- to the shared-representative behaviour is exactly the failure mode #202 describes.
-		print("[MapEditor] parentRepresentative could not be built for " .. tostring(p_Guid) ..
-			" (" .. tostring(s_Rod) .. "); spawning without one")
-		return nil
-	end
-
-
-	-- Keep it alive for as long as the object exists (released in ReleaseRepresentative).
-	self.m_Representatives[tostring(p_Guid)] = s_Rod
-
-	return s_Rod
-end
-
---- Drop the stored representative for an object (called when it's deleted/re-instantiated), so
---- the table doesn't grow without bound over a long editing session.
-function GameObjectManager:ReleaseRepresentative(p_Guid)
-	self.m_Representatives[tostring(p_Guid)] = nil
-end
+-- parentRepresentative is deliberately NOT set on spawns. See GH #202.
+--
+-- #202 asks for a unique ReferenceObjectData per spawn, handed to
+-- EntityCreationParams.parentRepresentative, so entities from the same blueprint stop sharing
+-- per-instance data. That was implemented and then removed again, because it kills the client:
+-- spawning a VehicleBlueprint (Vehicles/BMP2/BMP2) terminates the client PROCESS outright — no
+-- server error, no "left the server", no crash dump. Vehicle spawning worked before it and works
+-- again without it.
+--
+-- It is not one bad field. A representative populated exactly as #202 describes crashes, and so
+-- does a BARE ReferenceObjectData with nothing assigned at all, so it is the mere presence of a
+-- runtime-built representative that a vehicle spawn cannot survive. The pcall around the old
+-- builder never helped either: the failure is native, so Lua never sees it.
+--
+-- Nothing was proven lost by removing it. The commit that added it said plainly that it was NOT
+-- verified to fix anything — #296/#364 could not be reproduced with it in place — so it was a
+-- documented-correct change with no demonstrated benefit and a hard client crash attached.
+--
+-- If someone re-attempts this: a synthetic ROD whose `.blueprint` points at the very blueprint
+-- being spawned says "this entity is represented by a reference to itself", which is not what a
+-- representative means. The real representative of a level object is the ROD that references it
+-- in its parent — for a vanilla-derived object that is already tracked as `originalRef`, and for a
+-- vehicle it would be its spawn point. Reproduce #296/#364 FIRST, then verify a fix against them
+-- and against spawning a vehicle.
 
 --- Issue a strictly increasing creation timestamp.
 --- The timestamp is what orders objects in the Scene Instances list and in the save file
@@ -286,9 +255,6 @@ function GameObjectManager:RegisterVars()
 	-- the level's own geometry — and that distinction is what makes destroying them safe.
 	self.m_SpawningForGuid = nil
 
-	-- [#202] Per-spawn ReferenceObjectData handed to EntityCreationParams.parentRepresentative,
-	-- keyed by editor guid. Held here so the GC can't collect them while their entities live.
-	self.m_Representatives = {}
 
 	self.m_ProcessedEntities = {}
 	self.m_PendingEntities = {}
@@ -482,7 +448,6 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.transform = p_LinearTransform
 	s_Params.variationNameHash = p_Variation
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
-	s_Params.parentRepresentative = self:CreateRepresentative(p_GameObjectGuid, s_Blueprint, p_LinearTransform)
 
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_BusOk, s_EntityBus = pcall(function()
@@ -1059,8 +1024,6 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 		self.m_GameObjects[tostring(p_Guid)] = nil
 	end
 
-	-- The entities are gone, so the representative that kept them unique can go too.
-	self:ReleaseRepresentative(p_Guid)
 	self.m_Placeholders[tostring(p_Guid)] = nil
 
 	return true
@@ -1255,7 +1218,6 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	-- Now that both realms clone under the SAME (deterministic) instance guid, the peer can
 	-- resolve what we replicate, so honour the blueprint's needNetworkId instead of forcing false.
 	s_Params.networked = s_ObjectBlueprint.needNetworkId == true
-	s_Params.parentRepresentative = self:CreateRepresentative(p_GameObjectGuid, p_CloneDC, p_LinearTransform)
 
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_Ok, s_EntityBus = pcall(function()
