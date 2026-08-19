@@ -138,6 +138,39 @@ stock one.
 
 ---
 
+## 5b. Running it — three stages, verified end to end
+
+The pipeline is split so a failure says WHICH half broke; stage 2 needs no game running.
+
+```bash
+# 1. in game: make edits and save a project
+./.powos-e2e-run.sh bake_save_e2e.py --name BAKETEST
+
+# 2. host: export that project and bake it (needs the Rime shim, see §2)
+tools/bake_run.sh BAKETEST
+
+# 3. install the generated mod, enable it in ModList.txt, then verify in game
+./.powos-e2e-run.sh bake_verify_e2e.py
+```
+
+Verified 2026-08-19 on a 12-object save carrying 6 per-instance EBX overrides: with the generated
+mod enabled and **no project loaded**, the six edited lights read back `radius` 16,17,18,19,20,21
+against the vanilla 5. That is the whole chain — edit, save, export, Rime, install, load.
+
+The intermediate is worth knowing for debugging: `intermediate/ebx_json/<map>/<gamemode>.json` is
+the level partition, `<gamemode>.d/<editor-guid>.json` is one override partition per edited
+instance, and the generated `ext/Shared/Levels/<map>/<map>_<gamemode>.lua` is the list of vanilla
+ReferenceObjectDatas to EXCLUDE (the originals the overridden copies replace).
+
+**`--rimepath` must be absolute.** `bundles.py` runs Rime with `cwd=rime_path`, so a relative path
+is resolved against Rime's own directory and the run dies with `FileNotFoundError`. The same
+mechanism used to silently misplace the OUTPUT: a relative `-o` wrote the superbundle to
+`<rime>/mods/<name>/sb/` and shipped a mod with an empty `sb/`, with Rime still reporting
+"Superbundle successfully built!". Fixed in LevelLoaderGen 75c59a8; `bake_run.sh` fails loudly if
+the generated `sb/` ends up empty.
+
+---
+
 ## 6. Gotchas
 
 - **Request the running gamemode's subworld.** A server on `ConquestLarge0` loads
