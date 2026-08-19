@@ -27,9 +27,20 @@ function normalizeFieldName(name: string): string {
 }
 
 function parseValue(json: EBX.JSON.Field<any>): any {
-	if (Array.isArray(json.$value)) {
+	// `$array` is authoritative, NOT Array.isArray($value).
+	//
+	// An EMPTY Frostbite array serializes to JSON `{}` rather than `[]`, because Lua cannot tell an
+	// empty list from an empty map and the encoder picks the object form. Deciding array-ness from
+	// the value's shape therefore misreads every empty array as a struct: an empty Vec3[] reached
+	// Vec3.fromJSON({}), which reads json.x.$value and throws. One empty array anywhere in a
+	// partition aborted the whole ingest, so a BMP2 VehicleBlueprint (375 instances, four empty
+	// StaticCameraData curve arrays) always arrived as a completely blank inspector.
+	const isArray = json.$array === true || Array.isArray(json.$value);
+
+	if (isArray) {
+		const items: any[] = Array.isArray(json.$value) ? json.$value : [];
 		if (json.$ref) {
-			return json.$value.map((value: EBX.JSON.Reference, i: number) =>
+			return items.map((value: EBX.JSON.Reference, i: number) =>
 				Field.fromJSON(`${i + 1}`, {
 					$type: json.$type,
 					$ref: true,
@@ -37,7 +48,7 @@ function parseValue(json: EBX.JSON.Field<any>): any {
 				})
 			);
 		} else {
-			return json.$value.map((value: EBX.JSON.Field<any>, i: number) =>
+			return items.map((value: EBX.JSON.Field<any>, i: number) =>
 				Field.fromJSON(`${i + 1}`, {
 					$type: json.$type,
 					$value: value

@@ -64,6 +64,8 @@ export class FBPartition {
     public instanceCount: number;
     public _data: any = undefined;
     public isLoaded = false;
+    // Set when loading threw, so callers can distinguish a failure from a genuinely empty partition.
+    public loadError: Error | null = null;
     // Optional target-instance-guid hint for the server's single-instance fallback (set when this
     // partition is registered to resolve one external reference).
     public instanceHint: string | null = null;
@@ -111,6 +113,19 @@ export class FBPartition {
     // loaded. Shared by both the browser (webx/proxy) and in-game (live serializer) paths.
     // Instances are keyed lowercase to match getInstance()/primaryInstance lookups — the
     // server serializer returns uppercase GUIDs, so this can't be skipped.
+    // A failure here used to be swallowed by `.catch(e => console.error(e))`, which resolved the
+    // promise anyway. Callers then saw a partition that had simply loaded as empty, with no error
+    // and no way to tell "this partition has no instances" from "parsing it blew up". That is how a
+    // single empty Vec3[] array turned into a silently blank inspector for every vehicle. Surface
+    // it: identify the partition, keep it marked unloaded, and rethrow so the promise rejects.
+    private reportLoadFailure(e: any): Error {
+        const err = e instanceof Error ? e : new Error(String(e));
+        this.isLoaded = false;
+        this.loadError = err;
+        console.error(`[FBPartition] failed to load ${this.name} (${this.guid.toString()}):`, err);
+        return err;
+    }
+
     private ingest(json: EBX.JSON.Partition): Partition {
         const data = Partition.fromJSON(this.name, json);
         // register-on-demand partitions are created without a primary-instance guid;
@@ -136,18 +151,14 @@ export class FBPartition {
             this.promise = axios
                 .get((location.hostname === 'localhost' ? 'http://localhost:8899/' : 'https://webx.powback.com/Games/Venice/') + this.name + '.json')
                 .then((response: AxiosResponse<EBX.JSON.Partition>) => this.ingest(response.data))
-                .catch((e: any) => {
-                    console.error(e);
-                });
+                .catch((e: any) => { throw this.reportLoadFailure(e); });
         } else {
             // In-game: request live serialization from the server over the NetEvent bridge.
             // (Cast: the resolved value is ignored by the GameObject.partition getter, which
             // returns the FBPartition itself — same as the axios/any path above.)
             this.promise = requestPartitionFromGame(this.guid.toString(), this.name, this.instanceHint || undefined)
                 .then((json: EBX.JSON.Partition) => this.ingest(json))
-                .catch((e: any) => {
-                    console.error(e);
-                }) as unknown as Promise<AxiosResponse<EBX.JSON.Partition>>;
+                .catch((e: any) => { throw this.reportLoadFailure(e); }) as unknown as Promise<AxiosResponse<EBX.JSON.Partition>>;
         }
         return this.promise;
     }

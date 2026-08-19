@@ -99,8 +99,22 @@ function PartitionInspector:OnPartitionDataEnd(p_Info)
 		end
 	end
 
+	-- A missing chunk must not be papered over with "": that yields JSON which cannot parse, and
+	-- the failure then looks exactly like a partition that is merely empty. Say so instead.
+	local s_Missing = 0
+
 	for i = 1, (s_Max or 0) do
+		if s_Entry.chunks[i] == nil then
+			s_Missing = s_Missing + 1
+		end
+
 		s_Parts[#s_Parts + 1] = s_Entry.chunks[i] or ""
+	end
+
+	if s_Missing > 0 then
+		print("[MapEditor] partition request " .. tostring(s_RequestId) .. ": " .. tostring(s_Missing) ..
+			" of " .. tostring(s_Max) .. " chunks never arrived; not delivering a truncated partition")
+		return
 	end
 
 	local s_Json = table.concat(s_Parts)
