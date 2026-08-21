@@ -500,8 +500,37 @@ function GameObject:SetOverrides(p_Overrides)
 		end
 	end
 
+	-- Track whether ANY field actually wrote. SetOverride returns no path when EBXManager:SetField
+	-- could not descend the chain -- a malformed path, a nil node partway down, a refused
+	-- reference. That must abort the re-instantiation below, because the CLONE is built from the
+	-- SAME chain (CollectPathContainers walks it to decide which containers to copy): a chain that
+	-- dead-ends yields a half-built clone, and handing that to CreateEntitiesFromBlueprint is a
+	-- NATIVE crash that pcall cannot catch. Measured: one bad chain
+	-- (`No instance passed: vehicleConfig`) took the whole dedicated server down a fraction of a
+	-- second later.
+	--
+	-- This is the same protection the placeholder branch above already applies for the same two
+	-- symptoms ("No instance passed" + "Spawning from clone failed: nil") -- generalised from
+	-- "this object type can't be instantiated" to "this edit never landed, so there is nothing to
+	-- rebuild from".
+	local s_AnyApplied = false
+
 	for l_Key, l_Field in pairs(p_Overrides) do
-		self:SetOverride(l_Field)
+		local s_Ok, s_Path = self:SetOverride(l_Field)
+
+		if s_Ok and s_Path ~= nil and s_Path ~= '' then
+			s_AnyApplied = true
+		end
+	end
+
+	if not s_AnyApplied then
+		m_Logger:Error("SetOverrides: no field applied for '" .. tostring(self.name) ..
+			"' -- refusing to re-instantiate. Rebuilding from a chain that never resolved " ..
+			"produces a half-built clone, which crashes the realm natively.")
+
+		self:SetField('overrides', self.overrides)
+
+		return false, ''
 	end
 
 	self:SetField('overrides', self.overrides) -- Assigning to itself just to trigger the modified field.

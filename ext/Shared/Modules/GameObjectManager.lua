@@ -1234,7 +1234,11 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	-- hand the peer a blueprint guid it can't resolve. Each realm renders its own clone locally.
 	-- Now that both realms clone under the SAME (deterministic) instance guid, the peer can
 	-- resolve what we replicate, so honour the blueprint's needNetworkId instead of forcing false.
-	s_Params.networked = s_ObjectBlueprint.needNetworkId == true
+	-- DIAGNOSTIC A/B: the clone DC is not registered in ResourceManager, so a NETWORKED spawn
+	-- from it hands the peer a blueprint guid it cannot resolve. Vehicles are exactly the
+	-- blueprints with needNetworkId = true, and an override on one kills the client inside this
+	-- call (a native crash pcall cannot catch). Forcing false is what this arm tests.
+	s_Params.networked = false
 
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_Ok, s_EntityBus = pcall(function()
