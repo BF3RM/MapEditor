@@ -575,7 +575,20 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 
 	if s_PendingCustomBlueprintInfo ~= nil then
 		s_GameObject.creatorName = s_PendingCustomBlueprintInfo.creatorName
-		s_GameObject.overrides = s_PendingCustomBlueprintInfo.overrides
+
+		-- Adopt overrides ONLY if the spawn actually carried some. A plain spawn carries none, and
+		-- assigning that nil replaced the constructor's `arg.overrides or {}` with nil -- after
+		-- which the FIRST edit to that object threw
+		--     GameObject.lua:567: attempt to index a nil value (field 'overrides')
+		-- inside SetOverride, so the edit was never recorded, and the subsequent Apply correctly
+		-- reported "nothing to apply". Reported from the field as "changes to vehicles do nothing,
+		-- and I can't change gravity after the first time" -- level objects (which keep their {})
+		-- worked while spawned ones silently refused every edit.
+		--
+		-- The sibling adoption for injected objects a few lines below is already guarded this way.
+		if s_PendingCustomBlueprintInfo.overrides ~= nil then
+			s_GameObject.overrides = s_PendingCustomBlueprintInfo.overrides
+		end
 	end
 
 	s_GameObject.blueprintCtrRef = CtrRef {
@@ -1272,8 +1285,37 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 
 	local s_Applied = s_GameObject.overrides
 
-	for _, l_Field in pairs(s_Applied) do
-		EBXManager:SetField(s_Shared, l_Field, '')
+	-- Keep any override whose write to the SHARED blueprint did not land.
+	--
+	-- SetField returns nil (or '') when it refuses or fails a write -- a reference it could not
+	-- resolve, a type mismatch it refused rather than crash the client, or a chain that does not
+	-- traverse on the shared container the way it did on the per-instance clone. This loop used to
+	-- ignore that result while step 3 below cleared the instance's overrides unconditionally, so a
+	-- failed write SILENTLY DISCARDED the user's edit: the value snapped back to base on Apply with
+	-- nothing logged. Reported from the field as "changes to reference children get reverted when I
+	-- press apply".
+	--
+	-- A failed write is now kept as an instance override (it still applies to THIS object via its
+	-- own clone, which is where it was working before Apply) and reported. Losing the edit is the
+	-- one outcome that is never acceptable.
+	local s_Failed = {}
+	local s_FailedCount = 0
+
+	for l_Key, l_Field in pairs(s_Applied) do
+		local s_Path = EBXManager:SetField(s_Shared, l_Field, '')
+
+		if s_Path == nil or s_Path == '' then
+			s_Failed[l_Key] = l_Field
+			s_FailedCount = s_FailedCount + 1
+			m_Logger:Error("ApplyOverridesToBlueprint: could not write '" .. tostring(l_Key) ..
+				"' onto the shared blueprint " .. tostring(s_GameObject.blueprintCtrRef.name) ..
+				"; keeping it as an instance override instead of discarding the edit.")
+		end
+	end
+
+	if s_FailedCount > 0 then
+		m_Logger:Error("ApplyOverridesToBlueprint: " .. tostring(s_FailedCount) .. " of " ..
+			tostring(GetLength(s_Applied)) .. " override(s) did not apply to the shared blueprint.")
 	end
 
 	-- Remember that this blueprint's shared DC is no longer stock. The overrides are cleared from
@@ -1302,8 +1344,10 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 		if l_GO ~= nil then
 			local l_HadClone = self.m_InstanceClones[l_Guid] ~= nil
 			local l_IsApplier = (l_Guid == tostring(p_Guid))
-			-- The applier's overrides are now the base -> drop them. Siblings keep theirs.
-			local l_Remaining = l_IsApplier and {} or l_GO.overrides
+			-- The applier's overrides are now the base -> drop them, EXCEPT any that failed to
+			-- write onto the shared blueprint: those never became the base, so dropping them
+			-- would throw the edit away.
+			local l_Remaining = l_IsApplier and s_Failed or l_GO.overrides
 
 			-- Reset any per-instance clone so it re-clones from the MUTATED shared base.
 			self.m_InstanceClones[l_Guid] = nil

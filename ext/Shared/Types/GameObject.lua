@@ -558,6 +558,14 @@ end
 -- records it in self.overrides. The live re-instantiation is driven once by SetOverrides after
 -- the whole field loop, NOT per field.
 function GameObject:SetOverride(p_Field)
+	-- Never let a nil overrides table lose an edit. The constructor defaults it to {}, but any
+	-- code path that assigns it from an optional source can put nil back (that was the bug at
+	-- GameObjectManager's custom-spawn adoption). Indexing nil here throws, and a throw means the
+	-- user's edit is silently dropped -- so self-heal rather than fail.
+	if self.overrides == nil then
+		self.overrides = {}
+	end
+
 	local s_Path = EBXManager:SetField(self.internalBlueprint, p_Field, '')
 
 	if s_Path then

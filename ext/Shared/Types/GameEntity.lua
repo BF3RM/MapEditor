@@ -48,18 +48,37 @@ function GameEntity:GetGameEntityTransferData()
 	return s_GameEntityTransferData
 end
 
-function GameEntity:Disable()
-	if self.entity then
-		self.entity:FireEvent("Disable")
-		self.entity:FireEvent("Stop")
+-- `self.entity` staying non-nil does NOT mean the entity is still usable: the engine can destroy
+-- the underlying EntityBusPeer while our Lua handle lives on, and firing an event at that handle
+-- throws "tried accessing an invalid or destroyed EntityBusPeer". These run during every
+-- refresh (Disable/Enable is the override re-read path) and during transforms, so one stale
+-- handle in a group used to abort the whole operation mid-way -- leaving the object half
+-- refreshed. The server log was carrying 24+ of these per session.
+--
+-- pcall so a dead handle skips that entity instead of killing the operation, and drop the handle
+-- once it is known dead so we stop retrying it every refresh.
+local function _fire(p_GameEntity, p_Events)
+	if p_GameEntity.entity == nil then
+		return
+	end
+
+	for _, l_Event in ipairs(p_Events) do
+		local s_Ok = pcall(function() p_GameEntity.entity:FireEvent(l_Event) end)
+
+		if not s_Ok then
+			-- Destroyed out from under us: forget it rather than throwing on every later refresh.
+			p_GameEntity.entity = nil
+			return
+		end
 	end
 end
 
+function GameEntity:Disable()
+	_fire(self, { "Disable", "Stop" })
+end
+
 function GameEntity:Enable()
-	if self.entity then
-		self.entity:FireEvent("Enable")
-		self.entity:FireEvent("Start")
-	end
+	_fire(self, { "Enable", "Start" })
 end
 
 function GameEntity:Destroy()
