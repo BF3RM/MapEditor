@@ -473,7 +473,34 @@ function GameObject:SetOverrides(p_Overrides)
 				end
 			end
 
+			-- Path-only clone, EXCEPT for blueprints whose entity build needs to own their whole
+			-- graph.
+			--
+			-- DeepCopy copies only the containers listed in the map: anything off the edited path
+			-- is left pointing at the STOCK blueprint's containers. That is exactly the win from
+			-- 2ad600f -- editing one light used to copy ~236 containers (the whole render chain),
+			-- which is where the bulk-edit failures came from -- and it is correct for props,
+			-- lights and other passive geometry.
+			--
+			-- It is NOT correct for a vehicle. Measured on a spawned F18: setting
+			-- object.components.1.vehicleConfig.gravityModifier killed the CLIENT inside
+			-- CreateEntitiesFromBlueprint within a second, with the server accepting the identical
+			-- edit and logging nothing (only the client re-instantiates from the clone). The same
+			-- edit with a full DeepClone completes, and Apply afterwards runs clean.
+			--
+			-- needNetworkId is the engine's own marker for a networked gameplay entity, which is
+			-- what these heavier builds are; passive geometry does not carry it. Honest caveat:
+			-- this is an EMPIRICAL discriminator, not a proven rule about which containers the
+			-- build requires -- it is drawn from vehicles crashing and lights not. If another
+			-- blueprint type faults the same way, widen this rather than assuming it cannot.
+			local s_NeedsFullClone = false
+			pcall(function() s_NeedsFullClone = s_Shared.needNetworkId == true end)
+
 			local s_Ok, s_Clone = pcall(function()
+				if s_NeedsFullClone then
+					return g_DataContainerExt:DeepClone(s_Shared, Guid(tostring(self.guid)))
+				end
+
 				return g_DataContainerExt:DeepCopy(s_Shared, s_PathGuids)
 			end)
 
