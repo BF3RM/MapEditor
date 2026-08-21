@@ -62,6 +62,12 @@ def main():
       for(var i=0;i<vals.length;i++){ var go=vals[i];
         if(!go||!go.blueprintCtrRef) continue;
         if(go.overrides && Object.keys(go.overrides).length) continue;
+        // Skip vehicle prefabs. Measured on RealityMod's MP_007 with everything else held
+        // equal: one override on Vehicles/Common/LogicalPrefabs/ArmorSwitcher kills the
+        // client in ~1s, while the same override on Prefab_SmallFireWithDamage survives.
+        // An override triggers a respawn and the vehicle spawn path is the fragile one, so
+        // a test that picks a vehicle is measuring that bug instead of what it came to test.
+        if(/vehicle/i.test(go.name||'')) continue;
         var k=go.blueprintCtrRef.instanceGuid.toString(); (byBp[k]=byBp[k]||[]).push(go); }
       var c=[]; for(var k in byBp){ if(byBp[k].length>=2) c.push({list:byBp[k],
         bpPart:byBp[k][0].blueprintCtrRef.partitionGuid.toString(), name:byBp[k][0].name}); }
