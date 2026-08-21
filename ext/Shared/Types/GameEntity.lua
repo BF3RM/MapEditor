@@ -85,7 +85,20 @@ function GameEntity:Destroy()
 	-- Read self.entity only after establishing it exists: the log line below used to dereference
 	-- it first, so a nil entity threw before the guard on the next line could do anything.
 	if self.entity ~= nil then
-		m_Logger:Write("Destroying entity: " .. tostring(self.entity.typeInfo.name))
+		-- Reading typeInfo alone throws if the EntityBusPeer is already destroyed -- the same
+		-- dead-handle case Enable/Disable guard against. Four of these fired during a single
+		-- re-instantiate ("entity Destroy failed ... invalid or destroyed EntityBusPeer"), each
+		-- aborting one entity's teardown partway.
+		local s_TypeOk, s_TypeName = pcall(function() return self.entity.typeInfo.name end)
+
+		if not s_TypeOk then
+			self.entity = nil
+			GameObjectManager.m_PendingEntities[self.instanceId] = nil
+			GameObjectManager.m_ProcessedEntities[self.instanceId] = nil
+			return
+		end
+
+		m_Logger:Write("Destroying entity: " .. tostring(s_TypeName))
 
 		-- Not every entity type exposes Destroy. Calling it blind throws "attempt to call a nil
 		-- value (method 'Destroy')", which GameObject:Destroy catches and downgrades to "disabling

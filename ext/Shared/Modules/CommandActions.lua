@@ -318,7 +318,16 @@ function CommandActions:SetEBXField(p_Command)
 	end
 
 	if s_Result == false then
-		m_Logger:Error("Failed to set field: " .. p_Command.gameObjectTransferData.overrides.type .. p_Command.gameObjectTransferData.overrides.field)
+		-- tostring() every part. This branch was unreachable until SetOverrides began reporting a
+		-- refused edit, and the moment it fired this line threw
+		--     CommandActions.lua:321: attempt to concatenate a nil value (field 'type')
+		-- because an override chain node carries `type` only when it has one -- so the handler for
+		-- a failed edit became a SECOND, worse failure. An error path must never be able to throw.
+		local s_Ovr = p_Command.gameObjectTransferData.overrides
+
+		m_Logger:Error("Failed to set field: " ..
+			tostring(s_Ovr and s_Ovr.type) .. " " .. tostring(s_Ovr and s_Ovr.field))
+
 		return nil, CARResponseType.Failure
 	end
 
