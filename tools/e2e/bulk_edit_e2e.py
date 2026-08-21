@@ -67,7 +67,6 @@ def main():
       var e=window.editor, vals=e.gameObjects.values(), byBp={};
       for(var i=0;i<vals.length;i++){
         var go=vals[i]; if(!go||!go.blueprintCtrRef) continue;
-        if(!/light|lamp/i.test(go.name||'')) continue;
         if(go.overrides && Object.keys(go.overrides).length) continue;
         var k=go.blueprintCtrRef.instanceGuid.toString();
         (byBp[k]=byBp[k]||[]).push(go); }

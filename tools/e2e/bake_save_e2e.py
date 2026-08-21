@@ -61,12 +61,13 @@ def main():
       var vals=window.editor.gameObjects.values(), byBp={};
       for(var i=0;i<vals.length;i++){ var go=vals[i];
         if(!go||!go.blueprintCtrRef) continue;
-        if(!/light|lamp/i.test(go.name||'')) continue;
         if(go.overrides && Object.keys(go.overrides).length) continue;
         var k=go.blueprintCtrRef.instanceGuid.toString(); (byBp[k]=byBp[k]||[]).push(go); }
       var c=[]; for(var k in byBp){ if(byBp[k].length>=2) c.push({list:byBp[k],
         bpPart:byBp[k][0].blueprintCtrRef.partitionGuid.toString(), name:byBp[k][0].name}); }
-      c.sort(function(a,b){return b.list.length-a.list.length;}); window.__cands=c;
+      // Prefer light/lamp prefabs (known-safe cosmetic scalars), then larger groups.
+      c.sort(function(a,b){ var la=/light|lamp/i.test(a.name||'')?1:0, lb=/light|lamp/i.test(b.name||'')?1:0;
+        if(la!==lb) return lb-la; return b.list.length-a.list.length;}); window.__cands=c;
       return JSON.stringify({groups:c.length});})()""")
     cdp_eval(addr, """(function(){
       var SC=['radius','intensity','attenuationOffset','width','translucencyScale']; window.__sc=null;
@@ -79,10 +80,13 @@ def main():
           for(var j=0;j<arr.length;j++){ var ref=arr[j].value;
             var inst=ref&&ref.instanceGuid?part.instances[ref.instanceGuid.toString().toLowerCase()]:null;
             if(!inst) continue;
-            for(var s=0;s<SC.length;s++){ var f=inst.fields[SC[s]];
-              if(f&&f.type==='Float32'&&typeof f.value==='number'){
-                window.__list=c.list; window.__sc={ok:true, elem:arr[j].name, scalar:SC[s],
-                  base:f.value, name:c.name}; return; } } }
+            var pick=null;
+            for(var s=0;s<SC.length && !pick;s++){ var f=inst.fields[SC[s]];
+              if(f&&f.type==='Float32'&&typeof f.value==='number') pick=SC[s]; }
+            if(!pick){ for(var kf in inst.fields){ var g=inst.fields[kf];
+              if(g&&g.type==='Float32'&&typeof g.value==='number'){ pick=kf; break; } } }
+            if(pick){ window.__list=c.list; window.__sc={ok:true, elem:arr[j].name, scalar:pick,
+                base:inst.fields[pick].value, name:c.name}; return; } }
           tryNext(i+1); }); };
       tryNext(0); return 'dispatched';})()""")
     sc = poll(addr, "(function(){return JSON.stringify(window.__sc);})()", "ok", tries=60)
