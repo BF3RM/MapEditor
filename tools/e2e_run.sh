@@ -34,7 +34,7 @@ sleep 5
 
 tmux kill-session -t vusrv 2>/dev/null; rm -f "$I/logs/server.log"
 tmux new-session -d -s vusrv "cd '$I' && exec setsid script -qfec './.powos-server-launch.sh' logs/server.log"
-for i in $(seq 1 70); do
+for i in $(seq 1 ${VU_BOOT_TRIES:-70}); do
   [ -f "$I/logs/server.log" ] && grep -aq "accepting connections" "$I/logs/server.log" && break
   sleep 3
 done
@@ -43,7 +43,7 @@ if ! grep -aq "accepting connections" "$I/logs/server.log" 2>/dev/null; then
   echo "server did not come up; retrying once"
   tmux kill-session -t vusrv 2>/dev/null; rm -f "$I/logs/server.log"; sleep 10
   tmux new-session -d -s vusrv "cd '$I' && exec setsid script -qfec './.powos-server-launch.sh' logs/server.log"
-  for i in $(seq 1 70); do
+  for i in $(seq 1 ${VU_BOOT_TRIES:-70}); do
     [ -f "$I/logs/server.log" ] && grep -aq "accepting connections" "$I/logs/server.log" && break
     sleep 3
   done

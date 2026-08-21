@@ -676,7 +676,11 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	--For prefabs:
 	if s_Blueprint.objects ~= nil then
 		for _, l_Member in pairs(s_Blueprint.objects) do
-			if l_Member:Is('ReferenceObjectData') then
+			-- A Frostbite object array can hold NULL entries; pairs yields them as nil and the
+			-- :Is() below then dies with "attempt to index a nil value". This runs inside the
+			-- entity-creation hook during level load, so one null member used to take the whole
+			-- server down mid-map. RealityMod's reworked levels contain them.
+			if l_Member ~= nil and l_Member:Is('ReferenceObjectData') then
 				self.m_ReferenceObjectDatas[tostring(l_Member.instanceGuid)] = { parentGuid = s_GameObject.guid, typeName = l_Member.typeInfo.name }
 			end
 		end

@@ -138,7 +138,26 @@ function ToLocal(p_World, p_ParentWorld)
 		{ p_World.trans.x, p_World.trans.y, p_World.trans.z, 1 }
 	}
 
+	-- matrix.invert returns nil (plus a rank) for a SINGULAR matrix — it does not throw. Multiplying
+	-- by that nil does not fail cleanly either: the `*` metamethod sees a non-matrix right operand,
+	-- routes to matrix.mulnum, and dies inside the element loop with
+	--     Util/matrix.lua:260: attempt to perform arithmetic on a nil value (local 'num')
+	-- which is several frames away from the actual cause and reads like a matrix-library bug.
+	--
+	-- A degenerate parent basis is real level data, not corruption: RealityMod's reworked levels
+	-- contain entities whose parent transform has a zero basis vector, and hitting one during
+	-- OnEntityCreateFromBlueprint took the whole SERVER down mid level-load — one bad entity cost
+	-- the entire map.
+	--
+	-- There is no meaningful "local space" relative to a parent with no inverse, so treat that
+	-- parent as identity: local == world. That keeps the object at the correct world position (the
+	-- placement a user actually sees) instead of discarding the level over it.
 	local s_MatrixParent_Inv = matrix.invert(s_MatrixParent)
+
+	if s_MatrixParent_Inv == nil then
+		return SanitizeLT(p_World)
+	end
+
 	local s_MatrixLocal = s_MatrixWorld * s_MatrixParent_Inv
 
 

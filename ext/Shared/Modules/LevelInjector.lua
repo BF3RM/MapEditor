@@ -374,7 +374,9 @@ function LevelInjector:CreateWorldParts(p_PrimaryLevel, p_RegistryContainer)
 	-- Find the highest existing indexInBlueprint so our custom refs don't collide.
 	self.m_IndexCount = 0
 	for _, l_Object in pairs(p_PrimaryLevel.objects) do
-		if l_Object:Is("WorldPartReferenceObjectData") then
+		-- Null entries are legal in a Frostbite object array — see the matching guard in
+		-- GameObjectManager:OnEntityCreateFromBlueprint.
+		if l_Object ~= nil and l_Object:Is("WorldPartReferenceObjectData") then
 			local s_RefObjectData = WorldPartReferenceObjectData(l_Object)
 			if s_RefObjectData.blueprint ~= nil and s_RefObjectData.blueprint:Is("WorldPartData") then
 				local s_WorldPart = WorldPartData(s_RefObjectData.blueprint)

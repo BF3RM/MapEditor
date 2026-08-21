@@ -71,10 +71,19 @@ def enter_game(addr, timeout=180):
                 "return JSON.stringify({clicked:true,name:(t.textContent||'').trim().slice(0,20)});})()")
     deadline = time.time() + timeout
     clicked = False
+    warned_login = False
     while time.time() < deadline:
         # Already in the editor?
         if _has_mapeditor_target(addr):
             return True
+        # A logged-out client parks on webui://main/login and never reaches soldier-select, so the
+        # soldier click below silently matches nothing and the run burns the whole timeout before
+        # reporting the useless "no editor". Say what is actually wrong, once, and give up early:
+        # no amount of waiting logs a client in.
+        if not clicked and not warned_login and _at_login(addr):
+            print("[e2e] client is at the VU login screen — not signed in to a Venice Unleashed "
+                  "account. Log in once in the client UI; the session then persists.", flush=True)
+            return False
         if not clicked:
             r = cdp_eval(addr, click_js, target="main/players")
             if isinstance(r, dict) and r.get("clicked"):
@@ -82,6 +91,17 @@ def enter_game(addr, timeout=180):
                 clicked = True
         time.sleep(4)
     return _has_mapeditor_target(addr)
+
+
+def _at_login(addr):
+    """True when the client is sitting on the VU account login screen."""
+    try:
+        p = subprocess.run(["python3", VU_CDP_PY, "--addr", addr, "targets"],
+                           capture_output=True, text=True, timeout=15)
+        out = p.stdout or ""
+        return "webui://main/login" in out and "webui://main/players" not in out
+    except Exception:
+        return False
 
 
 def _has_mapeditor_target(addr):
