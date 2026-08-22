@@ -378,3 +378,58 @@ Two constraints this surfaced:
 * **A few field copies fail** (2 of 43 on the config, 4 of 88 on the object) -- probably read-only
   fields. Harmless in this test, but an implementation should enumerate them and decide whether any
   matter, rather than swallowing the failures as this harness does.
+
+### Field copying: what actually fails, and why (2026-08-22)
+
+The first pool simulation reported "ok=41 failed=2" / "ok=84 failed=4" and swallowed the details.
+Named, the failures were two different things and only one was real:
+
+    FAILED vehicleConfig.stabilizers    array=true   sol: cannot write to a readonly property
+    FAILED vehicleConfig.constantForce  array=true   sol: cannot write to a readonly property
+    FAILED object.components            array=true   sol: cannot write to a readonly property
+    FAILED object.fLIRValue    srcValue=nil   no defined new_index
+    FAILED object.fLIRKeyColor srcValue=nil   no defined new_index
+    FAILED object.mPMode       srcValue=nil   no defined new_index
+
+1. **Arrays are read-only PROPERTIES.** The whole array cannot be assigned; it must be mutated.
+   Available ops, probed: `clear`, `add`, `erase`, `insert`. Same length -> assign element-wise;
+   different length -> `clear()` then `add()` each element. Writing ONE slot
+   (`components[1] = <baked ref>`) also works.
+2. **The other three were a harness bug, not an engine limit.** VEXT lowercases the leading
+   ACRONYM RUN, not just the first character: `FLIRValue` -> `flirValue`, `MPMode` -> `mpMode`.
+   Lowercasing char 1 produced names that do not exist, so the READ returned nil too and those
+   fields were never copied at all.
+
+With both fixed: **vehicleConfig 43/43, object 88/88, zero failures.**
+
+### Why spares must be per CONCRETE type -- demonstrated
+
+Replacing a pool entry's primary instance only yields a distinct BLUEPRINT. `gravityModifier` lives
+three levels below it (`blueprint -> object -> components[1] -> vehicleConfig`), and each of those
+containers is still shared with the stock vehicle unless substituted. Substitutes cannot be created
+at runtime (provenance), so each must be a BAKED container of the same concrete type.
+
+Measured: BMP2's `components[1]` is `VehicleComponentData`; LAV25 has 47 components and not one of
+that type. A donor vehicle cannot be assumed to supply what an edit path needs -- the bake must
+produce spares for the concrete types that appear on edit paths.
+
+### Primitives, each measured
+
+| Operation | Result |
+|---|---|
+| Copy fields into a baked container | 43/43 and 88/88, zero failures |
+| Resize a baked array (`clear` + `add`) | ok, length 47 -> 29 |
+| Write one array slot with a baked ref | ok, took effect |
+| Rewire a baked reference to another baked container | ok, spawns |
+| Fill a nil'd reference from a baked container | ok, spawns |
+| Spawn the filled pool entry | entity bus returned |
+| Stock blueprint afterwards | untouched, still spawns |
+
+NOT yet demonstrated: a complete deep-edit with isolation, because MP_001 has only BMP2 and LAV25
+resident and neither can supply a `VehicleComponentData` spare. That is exactly what the pool bake
+would provide, and it is the first thing to verify once a baked pool exists.
+
+⚠️ The harness originally printed "POOL FLOW WORKS" on a run where the edit had been silently lost,
+because it only asserted that the STOCK blueprint was untouched. It now asserts that the edit landed
+on the pool entry as well. A test that only checks the negative half will pass while the feature
+does nothing.
