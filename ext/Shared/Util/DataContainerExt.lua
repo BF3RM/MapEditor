@@ -631,8 +631,40 @@ function isPrintable(p_Type)
 	return false
 end
 
+--- Field name as VEXT exposes it in Lua.
+---
+--- VEXT lowercases the leading ACRONYM RUN, not just the first character:
+---     Name -> name,  FLIRValue -> flirValue,  MPMode -> mpMode,  ID -> id
+---
+--- This used to be `gsub("^%L", string.lower)`, which lowercases only character 1 and so produced
+--- `fLIRValue` / `mPMode` -- names that do not exist. Reading them returned nil, so the deep-copy
+--- walkers below skipped those fields entirely and left their sub-containers SHARED with the
+--- original: a per-instance edit under any acronym-named field silently leaked to every instance.
+--- Values were unaffected (the copy itself is a native :Clone()); only traversal was.
+---
+--- Note the parentheses: gsub returns (string, count), and returning both would pass a stray
+--- integer to anything calling this inline.
 function firstToLower(p_String)
-	return p_String:gsub("^%L", string.lower)
+	if p_String == nil or p_String == '' then
+		return p_String
+	end
+
+	local s_Run = p_String:match('^%u+')
+
+	if s_Run == nil then
+		return p_String
+	end
+
+	if #s_Run == 1 then
+		return (p_String:sub(1, 1):lower() .. p_String:sub(2))
+	end
+
+	if #s_Run == #p_String then
+		return p_String:lower()
+	end
+
+	-- The last capital of the run starts the next word: FLIR|Value, MP|Mode.
+	return (s_Run:sub(1, #s_Run - 1):lower() .. p_String:sub(#s_Run))
 end
 
 function GenerateGuid()

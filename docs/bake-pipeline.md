@@ -475,3 +475,53 @@ The only thing that was ever missing is a baked blueprint to act as the per-inst
 * Never install a runtime clone via `ReplaceInstance` at the ROOT: it reports success and leaves
   the blueprint unspawnable. Wiring a clone into a baked root's FIELDS is a different operation and
   is fine (measured above).
+
+## 11. The shell pool does NOT work for networked objects (2026-08-22)
+
+§9/§10 proposed a pool of baked blueprint shells as per-instance spawn roots, and §10 claimed "only
+the spawn root must be baked". The pool was built (`tools/shells/generate_shells.py`, 256 shells,
+468 KB, ~0.35 s to bake) and it loads perfectly -- 256/256 every level, on both realms. It still
+cannot preview a networked object, and the reason is not any of the things §10 predicted.
+
+Measured in isolation (`Admin/Mods/MakeWritableRepro`, MODE `shell`, no editor involved):
+
+| Test | Result |
+|---|---|
+| shell + STATIC object, `networked = false` | **entity bus returned** -- shells DO work as spawn roots |
+| shell + STATIC object, `networked = true` | nil |
+| shell + VEHICLE object, `networked = true` | nil |
+| shell added to the level's `entityRegistry`, `networked = true` | nil (the add itself is safe) |
+| shell added to the level's `blueprintRegistry`, then spawned | CRASH |
+| stock `Vehicles/LAV25/LAV25`, `networked = true` | entity bus returned |
+
+Two conclusions, both contradicting what §10 assumed:
+
+1. **A shell is a perfectly good spawn root.** It builds entities for a non-networked spawn, and
+   with `networked = false` and a vehicle object it faults exactly as a stock vehicle blueprint
+   does -- the shell is well-formed data, not broken data. Field parity with a real
+   `VehicleBlueprint` was verified field by field (entity-bus flags, descriptor,
+   interfaceHasConnections all matched).
+2. **A networked spawn from a mod-mounted bundle never works**, whatever the object and whatever
+   registry it is added to. And it is NOT about registry membership: `LAV25` spawns networked while
+   being absent from the level's `blueprintRegistry` (146 entries, verified). So the thing that
+   marks a blueprint network-spawnable is established when the LEVEL's own content loads and is not
+   reachable from VEXT for a bundle a mod mounted.
+
+`RegistryContainer` has four registries (`entityRegistry`, `assetRegistry`, `blueprintRegistry`,
+`referenceObjectRegistry` -- from the server PDB). Two were tried; neither helps.
+
+### Status of the code
+
+`ShellPool` is committed with `SHELL_PREVIEW_ENABLED = false`, so MapEditor behaves exactly as it
+did before: vehicles refresh (Disable/Enable) rather than rebuild. The bake tooling, the manifest,
+the mount and the pool are all kept and verified -- what is missing is a way to give a mod-mounted
+blueprint whatever network marking the level's own content gets.
+
+### The only untested route left
+
+Bake the shells into the LEVEL's own content by shadowing the level partition, rather than shipping
+them in a separate superbundle. VU's custom-content guide says a later-loaded bundle takes priority
+by load order, and §5 already needs that mechanism for apply-to-blueprint. If shells arrive as part
+of the level's own resource set they may inherit whatever stock blueprints have. That is a per-level
+bake and a significantly bigger change; it is NOT verified, and nothing above should be read as
+evidence that it will work.

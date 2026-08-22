@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Boot a VU server + client cold, then run one e2e script from tools/e2e.
 #
+# Match the client as vu\.(com|exe): the launcher runs the GUI build (vu.exe) and vu.com is only
+# the console-subsystem variant. Matching vu\.com alone made every suite report
+# "FATAL: client would not start" while a perfectly healthy client was running -- 7/7 spurious
+# failures. The server is matched by -serverInstancePath, never by binary name, because both
+# binaries serve both roles.
+#
 #   VU_JOIN=vu://join/<server-guid> tools/e2e_run.sh vehicle_e2e.py [args...]
 #
 # Every run is a COLD boot on purpose: MapEditor ext changes are only picked up by a full server
@@ -21,13 +27,13 @@ kill_match() {
     kill -TERM "$p" 2>/dev/null
   done
 }
-kill_match "serverInstancePath.*-server"; kill_match "vu\.com.*dwebui"
+kill_match "serverInstancePath.*-server"; kill_match "vu\.(com|exe).*dwebui"
 
 # Wait for the OLD server to actually let go of its port before starting a new one. A fixed sleep
 # raced it: the replacement server would fail to bind, exit, and the run died as
 # "server never became ready" with no server.log at all.
 for i in $(seq 1 30); do
-  pgrep -f "^/home/powos/Games/VeniceUnleashed/client/vu\.com" >/dev/null || break
+  pgrep -f "^/home/powos/Games/VeniceUnleashed/client/vu\.(com|exe)" >/dev/null || break
   sleep 2
 done
 sleep 5
@@ -55,10 +61,10 @@ echo "server ready"
 for attempt in 1 2; do
   cd "$I" && nohup powos mods vu play -debuglog "$JOIN" -dwebui > /tmp/vu-client.log 2>&1 &
   sleep 40
-  if pgrep -f "vu\.com.*dwebui" >/dev/null; then break; fi
+  if pgrep -f "vu\.(com|exe).*dwebui" >/dev/null; then break; fi
   echo "client died on boot (attempt $attempt):"; grep -iE "assert|abort" /tmp/vu-client.log | tail -2
 done
-pgrep -f "vu\.com.*dwebui" >/dev/null || { echo "FATAL: client would not start"; exit 2; }
+pgrep -f "vu\.(com|exe).*dwebui" >/dev/null || { echo "FATAL: client would not start"; exit 2; }
 
 cd "$M/tools/e2e" && python3 "$SCRIPT" "$@"
 rc=$?

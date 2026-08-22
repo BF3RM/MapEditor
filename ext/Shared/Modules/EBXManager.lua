@@ -210,7 +210,19 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 		end
 
 		if isPrintable(p_Field.type) then -- Set value directly
-			p_Instance[p_Field.field] = ParseType(p_Field.type, p_Field.value)
+			-- ParseType returns nil when the value cannot be represented in the field's type --
+			-- e.g. "abc" typed into a float. Assigning that nil to a typed engine field takes the
+			-- realm down, so refuse the write and report failure instead. Callers treat a nil
+			-- return as "this override did not apply" and keep it rather than discarding it.
+			local s_Value = ParseType(p_Field.type, p_Field.value)
+
+			if s_Value == nil then
+				m_Logger:Error("Refusing to write " .. tostring(p_Field.field) .. ": '" ..
+					tostring(p_Field.value) .. "' is not a valid " .. tostring(p_Field.type))
+				return nil
+			end
+
+			p_Instance[p_Field.field] = s_Value
 			return p_Path .. '.' .. p_Field.field
 		else
 			local s_TypeInfo = p_Instance.typeInfo
@@ -219,7 +231,15 @@ function EBXManager:SetField(p_Instance, p_Field, p_Path)
 				if s_TypeInfo.array then -- Go to the array index
 					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field)
 				elseif s_TypeInfo.enum then
-					p_Instance[p_Field.field] = tonumber(p_Field.value)
+					local s_Enum = tonumber(p_Field.value)
+
+					if s_Enum == nil then
+						m_Logger:Error("Refusing to write enum " .. tostring(p_Field.field) ..
+							": '" .. tostring(p_Field.value) .. "' is not a number")
+						return nil
+					end
+
+					p_Instance[p_Field.field] = s_Enum
 					return p_Path .. '.' .. p_Field.field
 				else
 					return self:SetField(p_Instance[p_Field.field], p_Field.value, p_Path .. '.' .. p_Field.field)
@@ -248,12 +268,19 @@ local s_NumericTypes = {
 }
 local s_StringTypes = { String = true, CString = true }
 
+--- Coerce a WebUI value into the field's type.
+---
+--- Returns nil when the value cannot be represented -- that is the "invalid input" signal, and
+--- EVERY caller must check it before assigning. Writing nil into a typed engine field kills the
+--- realm, which is what a bad value in a numeric box used to do: tonumber("abc") is nil, and it
+--- went straight into the field.
 function ParseType(p_Type, p_Val)
 	if p_Type == "Boolean" then
 		return p_Val == true or p_Val == "true"
 	end
 
 	if s_NumericTypes[p_Type] then
+		-- nil for anything non-numeric, including "", "abc" and NaN/inf spellings.
 		return tonumber(p_Val)
 	end
 
@@ -261,24 +288,42 @@ function ParseType(p_Type, p_Val)
 		return tostring(p_Val)
 	end
 
-	if p_Type == "Vec2" then
-		return Vec2(tonumber(p_Val.x), tonumber(p_Val.y))
-	end
+	-- Vectors: one bad component used to reach the constructor as nil and throw there. Validate
+	-- every component first and report the whole value as invalid instead.
+	if p_Type == "Vec2" or p_Type == "Vec3" or p_Type == "Vec4" then
+		if type(p_Val) ~= "table" then
+			return nil
+		end
 
-	if p_Type == "Vec3" then
-		return Vec3(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z))
-	end
+		local s_Keys = { "x", "y" }
 
-	if p_Type == "Vec4" then
-		return Vec4(tonumber(p_Val.x), tonumber(p_Val.y), tonumber(p_Val.z), tonumber(p_Val.w))
+		if p_Type ~= "Vec2" then s_Keys[#s_Keys + 1] = "z" end
+		if p_Type == "Vec4" then s_Keys[#s_Keys + 1] = "w" end
+
+		local s_Parts = {}
+
+		for i, l_Key in ipairs(s_Keys) do
+			s_Parts[i] = tonumber(p_Val[l_Key])
+
+			if s_Parts[i] == nil then
+				return nil
+			end
+		end
+
+		if p_Type == "Vec2" then return Vec2(s_Parts[1], s_Parts[2]) end
+		if p_Type == "Vec3" then return Vec3(s_Parts[1], s_Parts[2], s_Parts[3]) end
+		return Vec4(s_Parts[1], s_Parts[2], s_Parts[3], s_Parts[4])
 	end
 
 	if p_Type == "Guid" then
-		return Guid(tostring(p_Val))
+		-- A malformed guid string throws inside the constructor.
+		local s_Ok, s_Guid = pcall(Guid, tostring(p_Val))
+		return s_Ok and s_Guid or nil
 	end
 
 	-- Fallback: an unlisted enum/number spelling -> number; otherwise the raw value.
-	-- NEVER return nil — assigning nil to a typed engine field throws and aborts the edit.
+	-- A nil from here means "not representable"; call sites refuse the write rather than assigning
+	-- it, since assigning nil to a typed engine field takes the realm down.
 	local s_Number = tonumber(p_Val)
 	if s_Number ~= nil then
 		return s_Number

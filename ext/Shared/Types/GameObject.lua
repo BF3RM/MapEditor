@@ -616,10 +616,15 @@ function GameObject:SetOverrides(p_Overrides)
 		s_PreferRefresh = s_SharedBp ~= nil and s_SharedBp.needNetworkId == true
 	end)
 
-	if s_Clone ~= nil and s_PreferRefresh then
-		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: a " ..
-			"networked blueprint cannot be rebuilt from a runtime clone (the clone builds nothing, " ..
-			"and registering it crashes the realm). Build-time-only fields need a reload or a bake.")
+	-- Rebuilding a networked blueprint is only possible when a baked SHELL is available to act as
+	-- the spawn root (docs/bake-pipeline.md §10); from a bare runtime clone the engine builds
+	-- nothing. With a pool we rebuild and the edit shows immediately; without one we fall back to
+	-- refreshing, where live-read fields still apply and build-time-only fields wait for a reload
+	-- or a bake.
+	if s_Clone ~= nil and s_PreferRefresh and not ShellPool:IsReady() then
+		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: no " ..
+			"baked shell is available, and a networked blueprint cannot be rebuilt from a runtime " ..
+			"clone. Build-time-only fields need a reload or a bake. (" .. ShellPool:GetStatus() .. ")")
 
 		self:Disable(true)
 		self:Enable(true)

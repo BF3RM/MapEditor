@@ -1,12 +1,21 @@
 {
 	"Name": "MapEditor",
-	"Authors": ["Powback", "FoolHen", "RealityMod Team"],
+	"Authors": [
+		"Powback",
+		"FoolHen",
+		"RealityMod Team"
+	],
 	"Description": "A powerful ingame editor",
 	"URL": "https://github.com/BF3RM/MapEditor",
 	"Version": "0.2.12",
 	"HasWebUI": true,
 	"HasVeniceEXT": true,
-	"Tags": ["mapeditor"],
+	"Tags": [
+		"mapeditor"
+	],
+	"Superbundles": [
+		"Win32/mapeditor/shells"
+	],
 	"Dependencies": {
 		"veniceext": "^1.0.0"
 	}

@@ -1043,6 +1043,9 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 
 	self.m_Placeholders[tostring(p_Guid)] = nil
 
+	-- Give the object's live-preview shell back, or the pool leaks a slot per deleted vehicle.
+	ShellPool:Release(p_Guid)
+
 	return true
 end
 
@@ -1223,7 +1226,32 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	p_Variation = p_Variation or 0
 
 	local s_ObjectBlueprint = _G[p_CloneDC.typeInfo.name](p_CloneDC)
-	local s_CloneGuid = tostring(p_CloneDC.instanceGuid)
+
+	-- Networked blueprints cannot be built from a runtime clone. The engine either builds nothing
+	-- (returns nil) or faults outright, and no amount of registering, partition-adding or renaming
+	-- the clone changes that -- seven configurations measured in docs/vehicle-edit-crash.md.
+	--
+	-- What does work: only the SPAWN ROOT has to be a baked resource; everything it references may
+	-- be synthesized (docs/bake-pipeline.md §10). So for these we spawn from a pooled baked SHELL
+	-- wired to this clone's data, instead of from the clone itself.
+	--
+	-- With no baked pool ShellPool:Acquire returns nil and we spawn the clone directly, exactly as
+	-- before: correct for static objects, and for networked ones simply no live preview (the edit
+	-- is still recorded and still bakes correctly).
+	local s_SpawnDC = p_CloneDC
+	local s_Shell = nil
+
+	if s_ObjectBlueprint.needNetworkId == true then
+		s_Shell = ShellPool:Acquire(p_GameObjectGuid, p_CloneDC)
+
+		if s_Shell ~= nil then
+			s_SpawnDC = s_Shell
+		end
+	end
+
+	-- Key the bookkeeping on whatever we actually spawn: OnEntityCreateFromBlueprint looks the
+	-- entity up by the guid of the blueprint it was built from.
+	local s_CloneGuid = tostring(s_SpawnDC.instanceGuid)
 
 	self.m_PendingCustomBlueprintGuids[s_CloneGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = p_ParentData, overrides = p_Overrides, timeStamp = p_TimeStamp }
 
@@ -1239,28 +1267,27 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	-- the FIRST spawn, while the identical call with networked = true succeeds. A leftover
 	-- diagnostic pinned this to false, which meant every post-edit respawn of a vehicle was doing
 	-- the fatal thing.
-	-- Read it off the ORIGINAL blueprint, not the clone.
-	--
-	-- s_ObjectBlueprint here is the CLONE, and a clone does not reliably carry needNetworkId --
-	-- if it reads false we spawn a vehicle non-networked, which the standalone repro proves kills
-	-- the realm on the spot. Fall back to true when the clone's own flag is missing/false but the
-	-- object is one we know must be networked.
-	local s_CloneFlag = s_ObjectBlueprint.needNetworkId
-	s_Params.networked = s_CloneFlag == true
-
-	m_Logger:Error("SPAWN-NET: clone needNetworkId=" .. tostring(s_CloneFlag) ..
-		" -> networked=" .. tostring(s_Params.networked))
+	-- Read the flag off whatever we are spawning: a shell carries needNetworkId = true from the
+	-- bake, and a static object's clone carries the original's value.
+	s_Params.networked = _G[s_SpawnDC.typeInfo.name](s_SpawnDC).needNetworkId == true
 
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_Ok, s_EntityBus = pcall(function()
-		return EntityManager:CreateEntitiesFromBlueprint(p_CloneDC, s_Params)
+		return EntityManager:CreateEntitiesFromBlueprint(s_SpawnDC, s_Params)
 	end)
 	self.m_SpawningForGuid = nil
 
 
 	if not s_Ok or s_EntityBus == nil then
-		m_Logger:Error("Spawning from clone failed: " .. tostring(s_EntityBus))
+		m_Logger:Error("Spawning from " .. (s_Shell ~= nil and "shell" or "clone") ..
+			" failed: " .. tostring(s_EntityBus))
 		self.m_PendingCustomBlueprintGuids[s_CloneGuid] = nil
+
+		-- Hand the shell back; holding it would leak a pool slot on every failed respawn.
+		if s_Shell ~= nil then
+			ShellPool:Release(p_GameObjectGuid)
+		end
+
 		return false
 	end
 
