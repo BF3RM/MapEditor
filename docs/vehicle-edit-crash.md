@@ -384,11 +384,35 @@ instance of nothing. Measured in the harness, one route per boot:
 | clone + level's `blueprintRegistry`, in LevelInjector's `Registering entity resources` window | CRASH |
 | clone + `Partition:AddInstance` into the blueprint's own partition | nil (no crash) |
 | clone + `AddInstance` **and** `AddRegistry` together | CRASH |
+| clone + `AddInstance` + unique name + the LEVEL's `blueprintRegistry`, in the load window | CRASH |
 | the stock blueprint (a real primary instance) | works, entity bus returned |
 
 Note the failure KINDS differ and are consistent: without a resource identity the engine declines
 (nil); given registry membership it proceeds and then faults on what it cannot resolve. Partition
 residency moves it back to a graceful nil — closer, but still not a resource.
+
+### What a clone actually lacks (measured, not inferred)
+
+Probed with reads only, so no fault could cost the data:
+
+    ORIGINAL  name=Vehicles/BMP2/BMP2  instanceGuid=AAE95907  partitionGuid=AAE95906
+    FindInstanceByGuid(ORIGINAL)                      -> found
+    CLONE     name=Vehicles/BMP2/BMP2 (collides)      instanceGuid=<fresh>  partitionGuid=NIL
+    FindInstanceByGuid(CLONE) before AddInstance      -> throws (no partition)
+    assigning partitionGuid                           -> REFUSED by the engine
+    FindInstanceByGuid(CLONE) after Partition:AddInstance -> FOUND
+    partition primaryInstance still the original      -> true
+    renaming the clone                                -> allowed
+
+So `Partition:AddInstance` DOES confer a partitionGuid and make the clone resolvable -- "the clone
+has no resource identity" was too strong. And the name collision is real but is not the blocker: a
+uniquely-named, registered clone crashes identically.
+
+After that, every attribute reachable from Lua matches the real blueprint -- partition-resident,
+resolvable, uniquely named, in the level's own registry, registered in the window where indices are
+assigned -- and the networked spawn still faults. The one remaining difference is that the original
+is its partition's PRIMARY INSTANCE and the clone is a secondary one. There is no runtime API to
+change that: partitionGuid is read-only and partitions are produced by an offline bundle build.
 
 Registration dominates: once the blueprint is registered the engine proceeds and faults, and giving
 it a partition home as well does not rescue it. Nothing in the matrix reaches a spawnable resource
