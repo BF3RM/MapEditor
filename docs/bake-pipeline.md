@@ -308,3 +308,44 @@ sub-container types to bake and for which fields; whether a fully EMPTY placehol
 can be wired up from scratch, or whether placeholders should be baked as structurally complete
 copies and only rewired where an edit lands; and mapping placeholders deterministically across a
 save/load so a baked project and a live session agree.
+
+### Measured 2026-08-22: an EMPTY placeholder can be filled at runtime
+
+Proxy for a baked empty placeholder, using only bundle-loaded content:
+
+    A = Vehicles/BMP2/BMP2, B = Vehicles/LAV25/LAV25
+    A.object = nil                    -> allowed (A is now a shell)
+    A.object = B.object (baked)       -> allowed
+    CreateEntitiesFromBlueprint(A)    -> entity bus returned
+
+So the pool can be GENERIC: empty typed blueprint shells, wired up at edit time. It does not need a
+baked copy of every vehicle.
+
+⚠️ Spawning a placeholder while it is still empty CRASHES the realm -- a nil `object` is
+dereferenced by the engine, measured. The pool must guarantee a placeholder is never spawnable
+until it is fully wired.
+
+### The pool, as measured
+
+Bake:
+* N **empty typed blueprint shells** (a `VehicleBlueprint` shell serves any vehicle -- shells are
+  per blueprint TYPE, not per vehicle);
+* M **spare sub-containers** per edited field's type (`vehicleConfig`, ...), since an edited value
+  needs a baked container of its own to live in.
+
+At edit time, per instance:
+1. claim a free shell;
+2. wire it to the stock subtree for everything the edit does not touch;
+3. wire the edited path to a claimed spare;
+4. write the edited values into that spare;
+5. spawn the instance from the shell.
+
+Release both back to the pool when the edit is reverted or the object is deselected.
+
+Every operation is measured: rewiring baked->baked and spawning (bus returned), filling an emptied
+reference and spawning (bus returned), writing a baked container and spawning (MODE `shared-write`,
+bus returned). Nothing synthesized ever enters the graph, which is the rule
+`vehicle-edit-crash.md` arrived at.
+
+Still open: pool sizing and exhaustion behaviour, which field types get spares, and deterministic
+placeholder mapping across save/load so a baked project and a live session agree.
