@@ -216,3 +216,44 @@ of the session. Options, none implemented:
 3. Establish whether MakeWritable is reversible (is there a way back to read-only, or a fresh
    handle from ResourceManager that is unaffected?) -- untested, and the only route that would
    allow live Apply on vehicles.
+
+## CORRECTION (2026-08-22, later): MakeWritable is NOT the cause
+
+The section above claiming MakeWritable makes a vehicle blueprint unspawnable is **wrong**, and is
+left in place only so the reasoning trail is honest.
+
+A standalone mod (`Admin/Mods/MakeWritableRepro`, no MapEditor loaded) runs the sequence in
+isolation and the bug does not reproduce:
+
+    STEP 1: CreateEntitiesFromBlueprint (networked=true) -> ok, survived
+    STEP 2: MakeWritable() -- no field written           -> ok
+    STEP 3: CreateEntitiesFromBlueprint (networked=true) -> ok, SURVIVED
+
+So making a resident vehicle blueprint writable, on its own, is harmless. The earlier
+"MakeWritable-only" test was run through MapEditor's Apply, which ALSO records
+m_AppliedBlueprints and then loops every instance of the blueprint clearing clones and refreshing
+them. The poison is somewhere in that remainder, not in MakeWritable.
+
+### What the repro DID establish
+
+**Spawning a vehicle with `networked = false` crashes the realm.** The first two versions of the
+repro forced `networked = false` and died on the very FIRST spawn, before touching anything. With
+`networked = s_ObjectBlueprint.needNetworkId` (true for vehicles) the identical spawn succeeds.
+
+That is worth knowing on its own, and it is directly relevant here: MapEditor's clone-spawn path
+carried a hardcoded `networked = false` for a long time (see the comment in
+InvokeBlueprintSpawnFromClone about a clone guid the peer cannot resolve), which is the path taken
+by every respawn after an edit.
+
+### Where that leaves the investigation
+
+Still true and measured:
+  * a per-instance (clone-only) edit is safe -- spawning afterwards works;
+  * Apply-to-blueprint makes the next spawn of that vehicle crash;
+  * the written VALUE is irrelevant (a benign gravityModifier = 2 crashes identically);
+  * refreshing instead of re-instantiating avoids the crash at edit time (c287ccf).
+
+Now unknown again: WHICH part of Apply poisons the blueprint. MakeWritable is excluded. The
+remaining candidates inside ApplyOverridesToBlueprint are the per-instance loop (clone clearing,
+SetOverrides, Disable/Enable on every instance) and the m_AppliedBlueprints bookkeeping -- neither
+tested.
