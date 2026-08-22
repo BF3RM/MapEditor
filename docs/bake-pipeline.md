@@ -349,3 +349,32 @@ bus returned). Nothing synthesized ever enters the graph, which is the rule
 
 Still open: pool sizing and exhaustion behaviour, which field types get spares, and deterministic
 placeholder mapping across save/load so a baked project and a live session agree.
+
+### Measured 2026-08-22: the whole pool flow, end to end
+
+Simulated with baked containers only -- LAV25 played the pool entry, BMP2 the edited vehicle:
+
+    copied vehicleConfig fields          ok=41 failed=2
+    type mismatch component              VehicleComponentData vs ChassisComponentData  (skipped)
+    copied object fields                 ok=84 failed=4
+    after fill: pool gravity=-1.0        stock BMP2 gravity=1.6      <- isolation holds
+    spawn filled pool entry              -> entity bus returned
+    spawn stock BMP2                     -> entity bus returned, untouched
+
+So the flow is:
+
+    spawn stock -> edit -> claim a pool entry -> COPY the edited values into its baked containers
+                -> spawn the pool entry
+
+⚠️ COPY, never REPLACE. Putting the runtime clone into the pool entry via `ReplaceInstance`
+succeeds and then silently leaves the blueprint unspawnable (see `vehicle-edit-crash.md`). Only
+values may cross into the pool; containers may not.
+
+Two constraints this surfaced:
+
+* **Spares must match the CONCRETE type.** BMP2's `components[1]` is `VehicleComponentData` while
+  LAV25's is `ChassisComponentData`, so that copy was skipped. The pool needs spares per concrete
+  container type appearing on edit paths, not one generic spare per level of the path.
+* **A few field copies fail** (2 of 43 on the config, 4 of 88 on the object) -- probably read-only
+  fields. Harmless in this test, but an implementation should enumerate them and decide whether any
+  matter, rather than swallowing the failures as this harness does.
