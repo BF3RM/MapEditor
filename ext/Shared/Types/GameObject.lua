@@ -585,8 +585,47 @@ function GameObject:SetOverrides(p_Overrides)
 	-- The shared-fallback path (clone bailed) keeps the cheap Disable/Enable on every realm.
 	local s_Clone = GameObjectManager:GetInstanceClone(self.guid)
 
+	-- Networked gameplay blueprints are REFRESHED, never rebuilt.
+	--
+	-- Rebuilding one from a runtime clone faults natively inside CreateEntitiesFromBlueprint: no
+	-- Lua error, no traceback, both realms gone inside that call. Measured on
+	-- Vehicles/BMP2/BMP2, with the trace ending on the line before the call every time.
+	--
+	-- What was ruled out first, so nobody repeats it:
+	--   * spawning the same vehicle twice from its STOCK blueprint is fine -- runtime spawning is
+	--     not the problem, building from a CLONE is;
+	--   * making the clone "known" does not help, in any available form, alone or combined --
+	--     Partition:AddInstance, level registryContainer.blueprintRegistry:add,
+	--     ResourceManager:AddRegistry (the runtime API), and giving the clone a unique name. All
+	--     reported success; all still crashed;
+	--   * it is not lazy loading, not the networked flag, not clone failure, and not full-vs-path
+	--     cloning (see docs/vehicle-edit-crash.md).
+	--
+	-- Skipping the rebuild and letting the existing Disable/Enable refresh run makes the same edit
+	-- apply with both realms alive -- and visibly so: a gravityModifier change flew the vehicle.
+	--
+	-- The trade, stated plainly: a refresh re-reads the DataContainer, so values the live entities
+	-- read as they run take effect immediately, while anything consumed only when an entity is
+	-- BUILT will not show until the level reloads or the project is baked (where injection happens
+	-- at load time -- the window in which this is supported at all). That is a real limitation,
+	-- and better than a crash that costs the edit and the session.
+	--
+	-- Static geometry is untouched and keeps rebuilding: bulk_edit_e2e stays 40/40.
+	local s_PreferRefresh = false
 
-	if s_Clone ~= nil then
+	pcall(function()
+		local s_SharedBp = self.blueprintCtrRef ~= nil and self.blueprintCtrRef:Get() or nil
+		s_PreferRefresh = s_SharedBp ~= nil and s_SharedBp.needNetworkId == true
+	end)
+
+	if s_Clone ~= nil and s_PreferRefresh then
+		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: " ..
+			"rebuilding a networked blueprint from a runtime clone crashes the realm. " ..
+			"Build-time-only fields need a level reload or a bake to appear.")
+
+		self:Disable(true)
+		self:Enable(true)
+	elseif s_Clone ~= nil then
 		-- Re-instantiate on BOTH realms.
 		--
 		-- Each realm deep-clones independently and spawns its own copy NON-networked. The reason a
