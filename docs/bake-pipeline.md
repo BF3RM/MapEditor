@@ -525,3 +525,29 @@ by load order, and §5 already needs that mechanism for apply-to-blueprint. If s
 of the level's own resource set they may inherit whatever stock blueprints have. That is a per-level
 bake and a significantly bigger change; it is NOT verified, and nothing above should be read as
 evidence that it will work.
+
+## 12. Live preview for networked blueprints, via a temporary shared write
+
+Since a networked entity cannot be built from anything a mod produces at runtime (§11), the live
+view is produced the only way that works: `VehiclePreview` writes the instance's overrides onto the
+SHARED blueprint and refreshes, then undoes that write.
+
+This is the same path Apply-to-Blueprint uses, and it is measured safe -- `MakeWritableRepro` MODE
+`shared-write`: write the shared blueprint, spawn a fresh vehicle afterwards, entity bus returned,
+realm alive.
+
+**The trade, which is visible to the user:** while an edit is previewed, EVERY instance of that
+vehicle shows it, not just the selected one. Nothing about the saved data changes -- the override
+stays per-instance and still bakes per-instance (§5).
+
+Restore points, all wired:
+
+* previewing another object restores the previous one (only one preview is ever active);
+* deleting the object (`GameObjectManager:DeleteGameObject`);
+* `Level:Destroy`;
+* **`ApplyOverridesToBlueprint`, before it writes** -- applying on top of a preview would record
+  preview values as the user's intent and serialize them into the bake.
+
+A field is only previewed if its override leaf carries `oldValue`, since that is what puts it back.
+Anything without one is left alone: a write we cannot undo would modify the blueprint permanently,
+which is worse than showing nothing.

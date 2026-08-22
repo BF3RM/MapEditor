@@ -1046,6 +1046,9 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 	-- Give the object's live-preview shell back, or the pool leaks a slot per deleted vehicle.
 	ShellPool:Release(p_Guid)
 
+	-- A deleted object must not leave its preview written into the shared blueprint.
+	VehiclePreview:ClearFor(p_Guid)
+
 	return true
 end
 
@@ -1317,6 +1320,11 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	end
 
 	local s_BpGuid = tostring(s_GameObject.blueprintCtrRef.instanceGuid)
+
+	-- Undo any live preview BEFORE touching the shared blueprint. A preview is a temporary write to
+	-- that same DC, and applying on top of one would record preview values as the user's intent and
+	-- serialize them into the bake.
+	VehiclePreview:Restore()
 
 	-- 1) Write the applying instance's overrides onto the SHARED registered blueprint DC.
 	local s_Shared = s_GameObject.blueprintCtrRef:Get()

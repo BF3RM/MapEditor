@@ -622,12 +622,18 @@ function GameObject:SetOverrides(p_Overrides)
 	-- refreshing, where live-read fields still apply and build-time-only fields wait for a reload
 	-- or a bake.
 	if s_Clone ~= nil and s_PreferRefresh and not ShellPool:IsReady() then
-		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: no " ..
-			"baked shell is available, and a networked blueprint cannot be rebuilt from a runtime " ..
-			"clone. Build-time-only fields need a reload or a bake. (" .. ShellPool:GetStatus() .. ")")
+		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: a " ..
+			"networked blueprint cannot be rebuilt from anything produced at runtime.")
 
-		self:Disable(true)
-		self:Enable(true)
+		-- A refresh alone shows nothing for these: the live entity reads the SHARED container while
+		-- the edit lives in this instance's clone. Mirror the edit onto the shared blueprint so it
+		-- is visible, temporarily -- VehiclePreview undoes it as soon as another object is
+		-- previewed, the object is deleted, the level ends, or Apply runs. The saved data is
+		-- untouched: the override stays per-instance and still bakes per-instance.
+		if not VehiclePreview:Show(self) then
+			self:Disable(true)
+			self:Enable(true)
+		end
 
 	elseif s_Clone ~= nil then
 		-- Re-instantiate on BOTH realms.
