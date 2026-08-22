@@ -278,6 +278,33 @@ exactly that: a real blueprint that happens to be ours to scribble on. The offli
 the FULL clone free, so a placeholder can own its whole subtree and edits cannot leak into shared
 containers -- the thing that made a runtime full clone unaffordable.
 
-Open questions before building it: pool sizing and exhaustion behaviour; whether placeholders must
-be per source blueprint (a BMP2 variant needs BMP2's structure) and how that scales; and mapping
-placeholders deterministically across a save/load so a baked project and a live session agree.
+### Measured 2026-08-22: runtime rewiring between BAKED containers works
+
+The pool does NOT need a full baked copy per variant. A baked blueprint can be re-pointed at a
+different baked container at runtime, and the result spawns:
+
+    A = Vehicles/BMP2/BMP2      A.vehicleConfig = C884BC5E-E669-4A92-975C-C7E14E03E6EE
+    B = Vehicles/LAV25/LAV25    B.vehicleConfig = E2ACA155-9AE9-471D-85F4-DC611CA7D690
+
+    MakeWritable(A.object.components[1]); A...vehicleConfig = B's config
+    -> tookEffect = true
+    -> CreateEntitiesFromBlueprint(A, networked) -> entity bus returned
+
+Nothing synthesized is involved: both sides are bundle-loaded content, which is exactly the
+provenance rule from `vehicle-edit-crash.md`. So the placeholder design is:
+
+* bake a pool of placeholder BLUEPRINT partitions (one claimed per edited instance -- an instance
+  needs its own blueprint to reference, or the edit is blueprint-wide), and
+* bake spare SUB-CONTAINER partitions for the types actually edited (`vehicleConfig`, etc.);
+* at edit time: claim a placeholder, rewire its subtree to a spare, write the edited values into
+  that spare, and spawn the instance from the placeholder.
+
+Both steps use only operations already measured safe -- rewiring baked->baked (above) and writing a
+baked container then spawning (MODE `shared-write`). No runtime partition creation, no synthesized
+containers.
+
+Open questions before building it: pool sizing and exhaustion behaviour; how many spare
+sub-container types to bake and for which fields; whether a fully EMPTY placeholder (nil `object`)
+can be wired up from scratch, or whether placeholders should be baked as structurally complete
+copies and only rewired where an edit lands; and mapping placeholders deterministically across a
+save/load so a baked project and a live session agree.
