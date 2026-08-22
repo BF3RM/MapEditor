@@ -257,3 +257,42 @@ Now unknown again: WHICH part of Apply poisons the blueprint. MakeWritable is ex
 remaining candidates inside ApplyOverridesToBlueprint are the per-instance loop (clone clearing,
 SetOverrides, Disable/Enable on every instance) and the m_AppliedBlueprints bookkeeping -- neither
 tested.
+
+## Isolated harness findings (2026-08-22)
+
+`Admin/Mods/MakeWritableRepro` is a standalone mod that pulls MapEditor's real `DataContainerExt`
+and drives spawn/clone/spawn from Lua with no editor, WebUI, CDP or client. A cycle is ~90s
+server-only instead of minutes through MapEditor.
+
+Established there:
+
+1. **A vehicle spawned with `networked = false` kills the realm.** First spawn, no clone, nothing
+   modified. With `networked = needNetworkId` (true) the identical call succeeds. This matters
+   because MapEditor's clone-spawn path carried a hardcoded `networked = false` (a leftover
+   diagnostic) for much of this investigation, so every post-edit respawn was doing the fatal
+   thing. Restored to `needNetworkId`.
+
+2. **MakeWritable on a resident vehicle blueprint is harmless.** Spawn, MakeWritable with no write,
+   spawn again: all three succeed. This DISPROVES the earlier "MakeWritable makes it unspawnable"
+   conclusion recorded above.
+
+3. **Spawning from a runtime clone does not crash — it returns nil.** Both a root-only clone and a
+   clone of the exact edited path (root, object, components[1], vehicleConfig) return
+   `CreateEntitiesFromBlueprint -> nil` (no entity bus) and the realm stays up. That nil is the
+   same `Spawning from clone failed: nil` MapEditor logs.
+
+### Limitation of these results
+
+The harness is SERVER-ONLY. MapEditor's crash kills the CLIENT (and sometimes both realms), so
+these findings rule out the server-side clone+spawn path, not the client one. A client-side
+equivalent would need the same sequence driven from `ext/Client`.
+
+### What is still unexplained
+
+MapEditor crashes on a vehicle edit; the isolated equivalent does not. The remaining differences,
+none yet tested in isolation:
+
+* the override WRITE into the clone before spawning (the harness clones but does not write);
+* the delete-then-respawn ordering (MapEditor deletes the original GameObject first);
+* the client realm (see limitation above);
+* MapEditor's entity-creation hooks (`OnEntityCreateFromBlueprint`) running during the spawn.
