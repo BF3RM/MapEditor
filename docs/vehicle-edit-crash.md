@@ -484,3 +484,42 @@ Two separate things worth raising upstream, with `Admin/Mods/MakeWritableRepro` 
 
 Vehicles keep the refresh path. Per-instance deep config on networked blueprints is not achievable
 from VEXT at all -- not with better override plumbing, not with registration, not with a clone pool.
+
+### What 0x18 probably is (hypothesis, from the server PDB layouts)
+
+`~/Downloads/pdb_dumps/BF.Main_Win32_Final_server.h` carries the engine's class layouts (no
+addresses, so it cannot name the faulting function). `fb::InternalDatabasePartition`:
+
+    struct fb::DatabasePartition { vfptr };                  // 4 bytes
+
+    struct fb::InternalDatabasePartition : fb::DatabasePartition
+    +0x00  vfptr
+    +0x04  m_name
+    +0x08  m_domain
+    +0x0C  m_partitionGuid          fb::Guid = 4+2+2+8 = 16 bytes, spans 0x0C..0x1B
+    +0x1C  m_instanceFastLookup
+           m_instances
+           m_primaryInstance        <- SmartRef<DataContainer>, a first-class field
+           ...
+
+`0x18` lands inside `m_partitionGuid`. So the fault reads as a NULL `InternalDatabasePartition`
+being dereferenced for its partition guid while building the entity.
+
+This also explains the one measurement that did not fit. `Partition:AddInstance` visibly works from
+VEXT -- the clone gains a partitionGuid and `FindInstanceByGuid` finds it -- because it populates
+the partition's own `m_instanceFastLookup` / `m_instances`. But the engine keeps a SEPARATE reverse
+map, `hash_map<fb::DataContainer const*, fb::InternalDatabasePartition*>`, and if the build path
+resolves a container's partition through that, a synthesized container is absent from it and the
+lookup yields null no matter what AddInstance did. Identical fault, as measured.
+
+Caveats, so this is not quoted later as fact:
+
+* the PDBs are for `BF.Main_Win32_Final_server`; VU hosts on the CLIENT binary, so layouts are
+  probably but not certainly identical;
+* the struct is inferred from offset arithmetic, not from the faulting function -- the dump has no
+  address map, and any other type with a pointer at +0x18 would fit equally well;
+* nothing here was executed. It is a reading of the layouts, not a measurement.
+
+For an upstream report the useful form is: build 20939, `c0000005` reading `0x18` at `005E490F`
+(module mapped at 0x00400000), on `CreateEntitiesFromBlueprint` with a runtime DataContainer that
+was added to a RegistryContainer -- possibly a null partition deref for `m_partitionGuid`.
