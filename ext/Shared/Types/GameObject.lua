@@ -516,10 +516,25 @@ function GameObject:SetOverrides(p_Overrides)
 				end
 
 				GameObjectManager:RegisterInstanceClone(self.guid, s_Clone, self.blueprintCtrRef:GetTable(), s_VanillaRef)
+			elseif s_NeedsFullClone then
+				-- A networked gameplay blueprint whose full clone bailed (DeepClone gives up on a
+				-- lazy-loaded container). Do NOT fall through to the shared-blueprint path: these
+				-- are the builds that fault natively, and the refresh that follows a shared edit
+				-- took BOTH realms down four seconds after this warning on Vehicles/BMP2/BMP2.
+				--
+				-- Refusing loses the edit, which is bad; crashing loses the session AND the edit,
+				-- which is worse, and it did so with only a warning to explain itself. Report it
+				-- clearly instead so the cause is obvious rather than looking like a random crash.
+				m_Logger:Error("Per-instance clone failed for '" .. tostring(self.name) ..
+					"' and it is a networked blueprint; refusing the edit. Falling back to the " ..
+					"shared blueprint crashes this class of object. Its blueprint most likely " ..
+					"still has lazy-loaded containers -- DeepClone cannot copy those.")
+
+				return false, ''
 			else
-				-- Clone bailed (lazy-load / error). Fall back to editing the SHARED blueprint
-				-- (old behavior: the edit leaks to all instances, but that beats doing nothing).
-				-- No respawn needed here — Disable/Enable re-reads the shared DC we just wrote.
+				-- Clone bailed (lazy-load / error) on passive geometry. Fall back to editing the
+				-- SHARED blueprint (old behavior: the edit leaks to all instances, but that beats
+				-- doing nothing). No respawn needed — Disable/Enable re-reads the shared DC.
 				m_Logger:Warning("Per-instance clone failed for '" .. tostring(self.name) ..
 					"'; editing the shared blueprint (this edit will affect ALL instances)")
 				self.internalBlueprint = s_Shared
