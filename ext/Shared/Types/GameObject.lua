@@ -585,30 +585,28 @@ function GameObject:SetOverrides(p_Overrides)
 	-- The shared-fallback path (clone bailed) keeps the cheap Disable/Enable on every realm.
 	local s_Clone = GameObjectManager:GetInstanceClone(self.guid)
 
-	-- Networked gameplay blueprints are REFRESHED, never rebuilt.
+	-- Networked gameplay blueprints (vehicles) are REFRESHED, never rebuilt from their clone.
 	--
-	-- Rebuilding one from a runtime clone faults natively inside CreateEntitiesFromBlueprint: no
-	-- Lua error, no traceback, both realms gone inside that call. Measured on
-	-- Vehicles/BMP2/BMP2, with the trace ending on the line before the call every time.
+	-- Measured in isolation, with no editor, WebUI or client involved -- a standalone mod that
+	-- spawns Vehicles/BMP2/BMP2 directly (Admin/Mods/MakeWritableRepro):
 	--
-	-- What was ruled out first, so nobody repeats it:
-	--   * spawning the same vehicle twice from its STOCK blueprint is fine -- runtime spawning is
-	--     not the problem, building from a CLONE is;
-	--   * making the clone "known" does not help, in any available form, alone or combined --
-	--     Partition:AddInstance, level registryContainer.blueprintRegistry:add,
-	--     ResourceManager:AddRegistry (the runtime API), and giving the clone a unique name. All
-	--     reported success; all still crashed;
-	--   * it is not lazy loading, not the networked flag, not clone failure, and not full-vs-path
-	--     cloning (see docs/vehicle-edit-crash.md).
+	--   write the SHARED blueprint, then spawn a fresh one   -> ok, entity bus returned
+	--   spawn from a runtime CLONE (edited or not)           -> returns NIL, nothing spawned
+	--   spawn from a clone a second time                     -> returns nil again, realm fine
+	--   REGISTER the clone (ResourceManager:AddRegistry),
+	--     root only or root + copied children, then spawn    -> CRASH, no Lua error, realm gone
 	--
-	-- Skipping the rebuild and letting the existing Disable/Enable refresh run makes the same edit
-	-- apply with both realms alive -- and visibly so: a gravityModifier change flew the vehicle.
+	-- So the rebuild cannot work for these, in either direction: an unregistered runtime clone is
+	-- unresolvable and builds nothing, and making it resolvable is what kills the realm. That is
+	-- the answer to the open question left in the comment below about whether replication expects
+	-- the guid in ResourceManager -- it does, and putting it there faults.
 	--
-	-- The trade, stated plainly: a refresh re-reads the DataContainer, so values the live entities
-	-- read as they run take effect immediately, while anything consumed only when an entity is
-	-- BUILT will not show until the level reloads or the project is baked (where injection happens
-	-- at load time -- the window in which this is supported at all). That is a real limitation,
-	-- and better than a crash that costs the edit and the session.
+	-- Refreshing re-reads the DataContainer instead, which is safe and visibly applies the edit.
+	--
+	-- The trade, stated plainly: values the live entities read as they RUN take effect at once
+	-- (a gravityModifier change flies the vehicle), while anything consumed only when an entity is
+	-- BUILT waits for a level reload or a bake -- where injection happens at load time, which is
+	-- the window in which custom blueprints are supported at all.
 	--
 	-- Static geometry is untouched and keeps rebuilding: bulk_edit_e2e stays 40/40.
 	local s_PreferRefresh = false
@@ -619,12 +617,13 @@ function GameObject:SetOverrides(p_Overrides)
 	end)
 
 	if s_Clone ~= nil and s_PreferRefresh then
-		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: " ..
-			"rebuilding a networked blueprint from a runtime clone crashes the realm. " ..
-			"Build-time-only fields need a level reload or a bake to appear.")
+		m_Logger:Write("Refreshing '" .. tostring(self.name) .. "' instead of rebuilding it: a " ..
+			"networked blueprint cannot be rebuilt from a runtime clone (the clone builds nothing, " ..
+			"and registering it crashes the realm). Build-time-only fields need a reload or a bake.")
 
 		self:Disable(true)
 		self:Enable(true)
+
 	elseif s_Clone ~= nil then
 		-- Re-instantiate on BOTH realms.
 		--

@@ -1234,11 +1234,22 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	-- hand the peer a blueprint guid it can't resolve. Each realm renders its own clone locally.
 	-- Now that both realms clone under the SAME (deterministic) instance guid, the peer can
 	-- resolve what we replicate, so honour the blueprint's needNetworkId instead of forcing false.
-	-- DIAGNOSTIC A/B: the clone DC is not registered in ResourceManager, so a NETWORKED spawn
-	-- from it hands the peer a blueprint guid it cannot resolve. Vehicles are exactly the
-	-- blueprints with needNetworkId = true, and an override on one kills the client inside this
-	-- call (a native crash pcall cannot catch). Forcing false is what this arm tests.
-	s_Params.networked = false
+	-- Vehicles MUST be spawned networked. Verified standalone (Admin/Mods/MakeWritableRepro):
+	-- CreateEntitiesFromBlueprint on Vehicles/BMP2/BMP2 with networked = false kills the realm on
+	-- the FIRST spawn, while the identical call with networked = true succeeds. A leftover
+	-- diagnostic pinned this to false, which meant every post-edit respawn of a vehicle was doing
+	-- the fatal thing.
+	-- Read it off the ORIGINAL blueprint, not the clone.
+	--
+	-- s_ObjectBlueprint here is the CLONE, and a clone does not reliably carry needNetworkId --
+	-- if it reads false we spawn a vehicle non-networked, which the standalone repro proves kills
+	-- the realm on the spot. Fall back to true when the clone's own flag is missing/false but the
+	-- object is one we know must be networked.
+	local s_CloneFlag = s_ObjectBlueprint.needNetworkId
+	s_Params.networked = s_CloneFlag == true
+
+	m_Logger:Error("SPAWN-NET: clone needNetworkId=" .. tostring(s_CloneFlag) ..
+		" -> networked=" .. tostring(s_Params.networked))
 
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_Ok, s_EntityBus = pcall(function()

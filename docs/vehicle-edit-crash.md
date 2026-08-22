@@ -296,3 +296,55 @@ none yet tested in isolation:
 * the delete-then-respawn ordering (MapEditor deletes the original GameObject first);
 * the client realm (see limitation above);
 * MapEditor's entity-creation hooks (`OnEntityCreateFromBlueprint`) running during the spawn.
+
+## RESOLVED (2026-08-22): it is the clone rebuild, not the blueprint write
+
+Everything above this line was measured through MapEditor, where several effects overlapped. The
+standalone harness (`Admin/Mods/MakeWritableRepro`, MODE selects one route per boot, ~90s a cycle,
+no editor/WebUI/CDP/client) separates them. Results, each from a clean server:
+
+| MODE | What it does | Result |
+|---|---|---|
+| `shared-write` | MakeWritable + write gravityModifier on the STOCK blueprint, then spawn a fresh vehicle | **ok — entity bus returned, realm alive** |
+| `none` | clone the edited path, write into the clone, spawn from it | nil bus, nothing spawned, realm alive |
+| `twice` | same, spawning the clone twice | nil both times, realm alive |
+| `reg-first` | AddRegistry(clone root), then spawn — no prior spawn attempt | **CRASH** (exit 0, no Lua error) |
+| `root` / `deep` | AddRegistry(root) / AddRegistry(root + copied children), then spawn | **CRASH** |
+
+### What this overturns
+
+**"A vehicle blueprint modified at runtime can no longer be spawned from" is WRONG.** `shared-write`
+does exactly that and the fresh spawn succeeds. That section is left above for the reasoning trail,
+but it should not be believed: the crash it attributed to the write was coming from the clone path
+that MapEditor ran alongside it.
+
+Both earlier "causes" in this document are now disproven by isolation — MakeWritable first, then
+the shared-blueprint write. In both cases the mistake was the same: concluding from a measurement
+taken through MapEditor, where the clone rebuild was also running.
+
+### The actual constraint
+
+A runtime clone of a networked blueprint cannot be built from, in either direction:
+
+* unregistered, it is unresolvable and `CreateEntitiesFromBlueprint` returns **nil** — silently
+  building nothing, which is what "the object vanished" looked like;
+* registered, `CreateEntitiesFromBlueprint` **faults natively** — measured for a root-only
+  registration and for root + copied children, and with no prior spawn attempt, so it is
+  registration itself and not a second build.
+
+That also answers the question left open in `GameObject.lua`'s re-instantiate comment (whether
+replication expects the clone guid in ResourceManager): it does, and putting it there is fatal.
+
+### The fix
+
+`GameObject:SetOverrides` now refreshes (Disable/Enable) instead of rebuilding when the shared
+blueprint has `needNetworkId`. Live-read fields apply immediately; build-time-only fields wait for
+a level reload or a bake, which is the window custom blueprints are supported in at all. Static
+geometry still rebuilds from its clone as before.
+
+### Confound worth remembering
+
+The first two crash runs had already attempted an unregistered spawn before registering, so
+"registration is fatal" and "the second build is fatal" fit the data equally. `reg-first` (register,
+spawn once, no prior attempt) and `twice` (two unregistered spawns, no registration) separate them.
+Both controls were needed; neither result was guessable from the first pair.
