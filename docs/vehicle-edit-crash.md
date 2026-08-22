@@ -129,3 +129,45 @@ measurement.
   the server. Distinguish a crash from a kill by exit code: `0` = crash, `143` = SIGTERM.
 * Array elements are addressed by their `.name`, which the WebUI emits **1-based as a string**
   ("1" for JS index 0). Passing a raw 0-based index makes `SetField` descend into nil.
+
+## The actual rule (established 2026-08-22)
+
+**A vehicle blueprint that has been modified at runtime can no longer be spawned from.**
+
+Reproduced deterministically, from a clean server, in this order:
+
+    STEP 1  spawn a BMP2 from the stock blueprint   -> alive   (baseline: spawning is fine)
+    STEP 2a edit gravityModifier on it              -> alive
+    STEP 2b Apply-to-blueprint (writes the SHARED blueprint) -> alive, and every vehicle flies
+    STEP 3  spawn ANOTHER BMP2 from that blueprint  -> DIED
+
+This is not about clones, which is where the investigation had been aimed. Step 3 spawns from the
+stock blueprint exactly as step 1 does; the only difference is that step 2b modified it.
+
+It also explains the ORIGINAL field report in one line: the elementType bug (c3337f9) made a
+per-instance edit fall back to writing the shared blueprint, so the gravity change applied and the
+vehicle flew -- and every later spawn of that vehicle crashed, with Apply never pressed.
+
+### What this means for the two paths
+
+* **Refresh (Disable/Enable)** -- what networked blueprints do now (c287ccf). Live entities re-read
+  the SHARED container, so a per-instance edit written to the CLONE is invisible; the change only
+  appears once Apply writes it to the shared blueprint. That matches the reported experience
+  exactly: "I don't see it apply until I press apply to blueprint".
+* **Apply-to-blueprint** -- works visibly (all instances of that vehicle pick the change up), but
+  leaves the blueprint unspawnable for the rest of the session.
+
+So a per-instance live preview of a vehicle edit is not currently possible: showing it requires a
+respawn from the clone (faults natively), and the only thing that does show it -- writing the
+shared blueprint -- poisons later spawns of it.
+
+### Not yet known
+
+Why a modified blueprint becomes unspawnable. Candidates, none tested:
+
+* MakeWritable on a partition-resident DataContainer leaves it in a copy-on-write state the
+  entity build cannot consume;
+* the write invalidates something the build reads (a cached layout, a size/offset table);
+* the modification is fine but the SECOND build from the same blueprint is what fails (i.e. it is
+  about re-entry rather than modification) -- distinguish by spawning twice with NO edit between,
+  which was measured clean earlier and argues against this.
