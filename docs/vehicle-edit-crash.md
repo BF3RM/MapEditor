@@ -523,3 +523,30 @@ Caveats, so this is not quoted later as fact:
 For an upstream report the useful form is: build 20939, `c0000005` reading `0x18` at `005E490F`
 (module mapped at 0x00400000), on `CreateEntitiesFromBlueprint` with a runtime DataContainer that
 was added to a RegistryContainer -- possibly a null partition deref for `m_partitionGuid`.
+
+### Corroboration from FrostEd (DICE's own editor API)
+
+The editor's Python automation states the same invariant from the authoring side:
+
+    def CreatePartitionWithPrimaryInstanceOfType(partitionPath, typeNameString):
+        partition = FB.Util.CreatePartition(partitionPath, typeEval)
+
+    rod = GameShared.VehicleSpawnReferenceObjectData.Create(levelPartition)
+    rod.Blueprint = blueprintPartition.PrimaryInstance      # always a PrimaryInstance
+
+Creating an asset IS creating a partition whose PrimaryInstance is the object, and a vehicle
+spawn's Blueprint is always set to a partition's PrimaryInstance -- never a loose container. Our
+crash is that invariant being enforced at runtime.
+
+`CreatePartition` is an authoring-time operation with no runtime counterpart, which is why every
+route we tried ends on a null partition.
+
+### The one path that fits the constraint
+
+Do it the way FrostEd does -- OFFLINE. Bake variant blueprints as real partitions into a bundle and
+mount it. Each variant then has a genuine primary instance and spawns networked like any stock
+blueprint. Precedent exists in this ecosystem (RMBundles ships custom assets; Wave_System refers to
+an offline "Rime bake").
+
+NOT verified: whether VU can mount custom EBX partitions this way, and what the authoring toolchain
+would be. Recorded as a direction, not a plan.
