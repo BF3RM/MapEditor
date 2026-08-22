@@ -348,3 +348,59 @@ The first two crash runs had already attempted an unregistered spawn before regi
 "registration is fatal" and "the second build is fatal" fit the data equally. `reg-first` (register,
 spawn once, no prior attempt) and `twice` (two unregistered spawns, no registration) separate them.
 Both controls were needed; neither result was guessable from the first pair.
+
+## Why per-instance vehicle edits are not possible (2026-08-22, closed)
+
+The reported behaviour — "blueprint details update instantly, vehicleConfig gravity waits for
+apply-to-blueprint" — is the engine's data model showing through, not a MapEditor bug.
+
+What a level actually places is a `VehicleSpawnReferenceObjectData` (from `Levels/MP_001/
+CQ_logic_RU`, via the EBX dump). Everything it can vary per placed instance:
+
+    BlueprintTransform     position / rotation
+    Blueprint              -> a REFERENCE to the one shared blueprint
+    ObjectVariation        *nullGuid*
+    StreamRealm, CastSunShadowEnable, Excluded, Enabled
+
+`vehicleConfig` is not among them. It lives in the blueprint, which every instance points at, so a
+change to it is blueprint-wide by construction. Transform- and reference-level fields are genuinely
+per-instance, which is why those apply immediately while a config field does not.
+
+### Why a per-instance blueprint cannot be fabricated at runtime
+
+A blueprint's identity is its partition: the EBX dump shows
+
+    partition    AAE95906-AFD4-11DD-84FB-9FA71F68ED5E
+    blueprint    AAE95907-...   <- "#primary instance"
+    entity data  AAE95908-...
+
+A networked spawn has to put that resource identity on the wire, and a runtime clone is the primary
+instance of nothing. Measured in the harness, one route per boot:
+
+| Attempt | Result |
+|---|---|
+| clone, unregistered | `CreateEntitiesFromBlueprint` -> nil |
+| clone + `ResourceManager:AddRegistry` (new container) | CRASH |
+| clone + level's `blueprintRegistry`, in LevelInjector's `Registering entity resources` window | CRASH |
+| clone + `Partition:AddInstance` into the blueprint's own partition | nil (no crash) |
+| the stock blueprint (a real primary instance) | works, entity bus returned |
+
+Note the failure KINDS differ and are consistent: without a resource identity the engine declines
+(nil); given registry membership it proceeds and then faults on what it cannot resolve. Partition
+residency moves it back to a graceful nil — closer, but still not a resource.
+
+Creating a partition is a bundle-build (offline) operation; there is no runtime API for it. So a
+per-instance vehicle config variant is not expressible, and no amount of override plumbing changes
+that.
+
+### What this means for MapEditor
+
+* Deep config edits on `needNetworkId` blueprints are blueprint-wide. Apply writes the shared
+  blueprint, every instance picks it up, and spawning afterwards is safe (measured).
+* Per-instance edits remain correct for everything the reference object owns — transform,
+  variation, enabled — and for all non-networked objects, which rebuild from their clone as before.
+* The refresh-instead-of-rebuild path stays: for these blueprints a rebuild can only ever produce
+  nil or a crash.
+* Remaining UX question, not a code question: whether a vehicleConfig edit should auto-write the
+  shared blueprint (live preview, but visibly affects every instance) or keep requiring Apply with
+  the panel saying why.
