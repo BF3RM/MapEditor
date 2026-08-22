@@ -323,10 +323,32 @@ function CommandActions:SetEBXField(p_Command)
 		--     CommandActions.lua:321: attempt to concatenate a nil value (field 'type')
 		-- because an override chain node carries `type` only when it has one -- so the handler for
 		-- a failed edit became a SECOND, worse failure. An error path must never be able to throw.
+		-- `overrides` is a COLLECTION of chains, so reading .type/.field off it yields "nil nil"
+		-- -- which is what this printed and told nobody anything. Name the object and the leaf of
+		-- each chain instead; SetOverrides has already logged the specific reason it refused.
 		local s_Ovr = p_Command.gameObjectTransferData.overrides
+		local s_Leaves = {}
 
-		m_Logger:Error("Failed to set field: " ..
-			tostring(s_Ovr and s_Ovr.type) .. " " .. tostring(s_Ovr and s_Ovr.field))
+		if type(s_Ovr) == 'table' then
+			for _, l_Chain in pairs(s_Ovr) do
+				local s_Node = l_Chain
+				local s_Path = ''
+
+				while type(s_Node) == 'table' and s_Node.field ~= nil do
+					s_Path = s_Path .. (s_Path == '' and '' or '.') .. tostring(s_Node.field)
+					s_Node = s_Node.value
+				end
+
+				if s_Path ~= '' then
+					table.insert(s_Leaves, s_Path)
+				end
+			end
+		end
+
+		m_Logger:Error("Failed to set field on '" ..
+			tostring(p_Command.gameObjectTransferData.guid) .. "': " ..
+			(#s_Leaves > 0 and table.concat(s_Leaves, ', ') or '<no readable chain>') ..
+			" (see the preceding line for why it was refused)")
 
 		return nil, CARResponseType.Failure
 	end
