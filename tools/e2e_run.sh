@@ -27,6 +27,12 @@ kill_match() {
     kill -TERM "$p" 2>/dev/null
   done
 }
+# Keep a copy of the VU login profile BEFORE killing the client. TERMing it mid-write empties
+# [Software\\VeniceUnleashed\\Profile] in the wine registry and logs the user out -- which this
+# script caused on 2026-08-22 by cold-booting the client on every suite. vuctl holds the backup and
+# can put it back (vuctl profile-restore).
+"${VUCTL:-$HOME/Projects/vu-debug/vuctl.sh}" profile-save >/dev/null 2>&1 || true
+
 kill_match "serverInstancePath.*-server"; kill_match "vu\.(com|exe).*dwebui"
 
 # Wait for the OLD server to actually let go of its port before starting a new one. A fixed sleep
