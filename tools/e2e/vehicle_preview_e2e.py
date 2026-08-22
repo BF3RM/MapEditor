@@ -35,13 +35,11 @@ SPAWN_GUID = 'ED170122-7777-0000-0000-100000000042'
 
 def spawn_vehicle(addr, bp_name):
     js = """(function(){try{
-      var e=window.editor, bp=null, vals=e.blueprintManager? e.blueprintManager.blueprints : null;
-      var want=%s;
-      if(e.blueprintManager && typeof e.blueprintManager.getBlueprintByName==='function'){
-        bp=e.blueprintManager.getBlueprintByName(want);
-      }
-      if(!bp && vals){ for(var k in vals){ if(vals[k] && vals[k].name===want){ bp=vals[k]; break; } } }
-      if(!bp) return JSON.stringify({err:'blueprint not found: '+want});
+      var e=window.editor, NAME=%s, bp=null;
+      // blueprints is a Dictionary-like with .values(), not a plain object -- vehicle_e2e.py
+      var all=e.blueprintManager.blueprints.values();
+      for(var i=0;i<all.length;i++){ if(String(all[i].name)===NAME){bp=all[i];break;} }
+      if(!bp) return JSON.stringify({err:'blueprint not in browser: '+NAME});
       var v=(typeof bp.getDefaultVariation==='function')?bp.getDefaultVariation():0;
       var pos=(e.freeCam&&e.freeCam.transform&&e.freeCam.transform.trans)?
               e.freeCam.transform.trans:{x:0,y:80,z:0};
@@ -150,6 +148,12 @@ def main():
     failures = []
 
     # --- edit the INSTANCE, no Apply -------------------------------------------------------
+    # onEBXInput PREPENDS the root field itself:
+    #     const field = addObjectsField ? 'objects' : 'object'
+    # so for a vehicle (whose partition has a singular `object`) we pass addObjectsField = FALSE
+    # and must NOT include 'object' in the chain ourselves. Passing true AND including 'object'
+    # builds objects.object.<scalar>, which resolves to nothing and the edit is dropped silently --
+    # no override, no preview, and a test that blames the feature.
     edit = cdp_eval(args.addr, """(function(){
       var e=window.editor, go=e.gameObjects.getValue? null : null;
       var vals=e.gameObjects.values(), target=null;
@@ -160,9 +164,8 @@ def main():
       var vm=insp && insp.__vue__;
       if(!vm || typeof vm.onEBXInput!=='function') return JSON.stringify({err:'inspector vm unavailable'});
       vm.selectedGameObject = target;
-      vm.onEBXInput({ field:'object', type:window.__vp.objType,
-                      value:{ field:window.__vp.scalar, type:'Float32',
-                              value:""" + str(new_value) + """, oldValue:""" + str(baseline) + """ } }, true);
+      vm.onEBXInput({ field:window.__vp.scalar, type:'Float32',
+                      value:""" + str(new_value) + """, oldValue:""" + str(baseline) + """ }, false);
       return JSON.stringify({sent:true});})()""")
     if not (isinstance(edit, dict) and edit.get("sent")):
         print("SETUP: edit dispatch failed:", edit); return 2

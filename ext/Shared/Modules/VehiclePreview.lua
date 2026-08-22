@@ -28,15 +28,61 @@ function VehiclePreview:__init()
 	self:RegisterEvents()
 end
 
+-- Ticks to wait before refreshing after an edit. Rapid edits (dragging a value) otherwise queue a
+-- destroy/recreate PER KEYSTROKE, which visibly destroys the vehicle -- the same reason the rebuild
+-- path has REINSTANTIATE_DEBOUNCE. Reported from the field as "the vehicle gets destroyed".
+local REFRESH_DEBOUNCE_TICKS = 12
+
 function VehiclePreview:RegisterVars()
 	---{ guid, bpGuid, restore = { [path] = <override leaf carrying the ORIGINAL value> } }
 	self.m_Active = nil
+	---guid awaiting a debounced refresh, and how long it has waited
+	self.m_PendingRefresh = nil
+	self.m_PendingTicks = 0
+	---set while Apply is running: previews must not write the shared blueprint underneath it
+	self.m_Suspended = false
 end
 
 function VehiclePreview:RegisterEvents()
 	-- A preview must never outlive the level: the shared DC goes away with it, and a stale record
 	-- would try to restore into nothing.
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
+end
+
+---Debounced refresh. Coalescing means one destroy/recreate per burst of edits, not one per edit.
+function VehiclePreview:OnEngineUpdate()
+	-- Watchdog. Suspend/Resume are paired around Apply, but Lua has no finally: a throw between them
+	-- would leave previews suspended for the rest of the session, silently. Time it out instead of
+	-- trusting the pairing.
+	if self.m_Suspended then
+		self.m_SuspendTicks = (self.m_SuspendTicks or 0) + 1
+
+		if self.m_SuspendTicks > 300 then
+			m_Logger:Warning('Previews were suspended for 300 ticks -- Apply probably threw. ' ..
+				'Resuming so previews do not stay dead for the session.')
+			self.m_Suspended = false
+			self.m_SuspendTicks = 0
+		end
+	else
+		self.m_SuspendTicks = 0
+	end
+
+	if self.m_PendingRefresh == nil then
+		return
+	end
+
+	self.m_PendingTicks = self.m_PendingTicks + 1
+
+	if self.m_PendingTicks < REFRESH_DEBOUNCE_TICKS then
+		return
+	end
+
+	local s_Guid = self.m_PendingRefresh
+	self.m_PendingRefresh = nil
+	self.m_PendingTicks = 0
+
+	self:_RefreshOne(s_Guid)
 end
 
 function VehiclePreview:OnLevelDestroy()
@@ -60,50 +106,75 @@ function VehiclePreview:AppliesTo(p_GameObject)
 	return s_Networked
 end
 
----Build the leaf that puts a field back the way it was.
+---Build the chain that puts a field back the way it was.
 ---
----`oldValue` is captured when the edit is first made, so it is the pre-edit base value. A field
----without one is NOT previewed: writing something we cannot undo would leave the blueprint
----permanently modified, which is far worse than no preview.
-local function RestoreLeaf(p_Field)
-	if type(p_Field) ~= 'table' or p_Field.oldValue == nil then
+---An override is a NESTED CHAIN, not a flat leaf:
+---    { field='object', type='GameObjectData',
+---      value = { field='gravityModifier', type='Float32', value=-1, oldValue=1.6 } }
+---so `oldValue` sits on the DEEPEST node. Checking it on the root (which was the first version of
+---this) rejected every override as un-restorable, so nothing was ever written and the preview
+---silently did nothing -- exactly what vehicle_preview_e2e caught.
+---
+---Returns a copy of the chain with the leaf's value replaced by its oldValue, or nil if the leaf
+---has no oldValue. A field we cannot undo is NOT previewed: leaving the blueprint permanently
+---modified is far worse than showing nothing.
+local function RestoreChain(p_Field)
+	if type(p_Field) ~= 'table' then
 		return nil
 	end
 
-	local s_Leaf = {}
+	local s_Copy = {}
 
 	for l_Key, l_Value in pairs(p_Field) do
-		s_Leaf[l_Key] = l_Value
+		s_Copy[l_Key] = l_Value
 	end
 
-	s_Leaf.value = p_Field.oldValue
+	-- Another link in the chain: a table value that itself names a field.
+	if type(p_Field.value) == 'table' and p_Field.value.field ~= nil then
+		local s_Child = RestoreChain(p_Field.value)
 
-	return s_Leaf
+		if s_Child == nil then
+			return nil
+		end
+
+		s_Copy.value = s_Child
+
+		return s_Copy
+	end
+
+	-- The leaf.
+	if p_Field.oldValue == nil then
+		return nil
+	end
+
+	s_Copy.value = p_Field.oldValue
+
+	return s_Copy
 end
 
----Refresh every live instance of a blueprint so it re-reads the shared container.
-function VehiclePreview:_RefreshInstances(p_BpGuid)
-	local s_Guids = {}
+---Refresh ONE object so it re-reads the shared container.
+---
+---Deliberately NOT every instance of the blueprint. The shared write is visible to all of them, but
+---refreshing all of them means a destroy/recreate each, on every edit -- which is what was
+---destroying vehicles. The edited object is the one the user is looking at; the rest pick the value
+---up whenever they are next rebuilt, or on reload.
+function VehiclePreview:_RefreshOne(p_Guid)
+	local s_GameObject = GameObjectManager.m_GameObjects[tostring(p_Guid)]
 
-	for l_Guid, l_GO in pairs(GameObjectManager.m_GameObjects or {}) do
-		if l_GO ~= nil and l_GO.blueprintCtrRef ~= nil and
-			tostring(l_GO.blueprintCtrRef.instanceGuid) == p_BpGuid then
-			s_Guids[#s_Guids + 1] = l_Guid
-		end
+	if s_GameObject == nil then
+		return false
 	end
 
-	for _, l_Guid in ipairs(s_Guids) do
-		local l_GO = GameObjectManager.m_GameObjects[l_Guid]
+	return pcall(function()
+		s_GameObject:Disable(true)
+		s_GameObject:Enable(true)
+	end)
+end
 
-		if l_GO ~= nil then
-			pcall(function()
-				l_GO:Disable(true)
-				l_GO:Enable(true)
-			end)
-		end
-	end
-
-	return #s_Guids
+---Queue a debounced refresh for one object.
+function VehiclePreview:_QueueRefresh(p_Guid)
+	self.m_PendingRefresh = tostring(p_Guid)
+	self.m_PendingTicks = 0
 end
 
 ---Show `p_GameObject`'s current overrides by writing them onto the shared blueprint.
@@ -111,7 +182,18 @@ end
 ---Safe to call repeatedly for the same object: each call restores what it previously wrote before
 ---writing the new values, so previews never stack.
 function VehiclePreview:Show(p_GameObject)
-	if p_GameObject == nil or not self:AppliesTo(p_GameObject) then
+	if p_GameObject == nil then
+		return false
+	end
+
+	-- Apply rebuilds every instance of the blueprint, and each rebuild re-enters SetOverrides. If a
+	-- preview wrote the shared blueprint during that, siblings with their own overrides would
+	-- scribble over the value Apply is in the middle of committing.
+	if self.m_Suspended then
+		return false
+	end
+
+	if not self:AppliesTo(p_GameObject) then
 		return false
 	end
 
@@ -136,7 +218,7 @@ function VehiclePreview:Show(p_GameObject)
 	local s_Written = 0
 
 	for l_Path, l_Field in pairs(s_Overrides) do
-		local s_RestoreLeaf = RestoreLeaf(l_Field)
+		local s_RestoreLeaf = RestoreChain(l_Field)
 
 		if s_RestoreLeaf ~= nil then
 			local s_Ok, s_Result = pcall(function()
@@ -151,6 +233,9 @@ function VehiclePreview:Show(p_GameObject)
 	end
 
 	if s_Written == 0 then
+		m_Logger:Warning('Nothing previewable on ' .. tostring(p_GameObject.name) ..
+			': none of the ' .. tostring(GetLength(s_Overrides)) .. ' override(s) could be ' ..
+			'written to the shared blueprint, or none carried an oldValue to restore from.')
 		return false
 	end
 
@@ -160,11 +245,10 @@ function VehiclePreview:Show(p_GameObject)
 		restore = s_Restore,
 	}
 
-	local s_Refreshed = self:_RefreshInstances(self.m_Active.bpGuid)
+	self:_QueueRefresh(self.m_Active.guid)
 
 	m_Logger:Write('Previewing ' .. tostring(s_Written) .. ' field(s) on ' ..
-		tostring(p_GameObject.name) .. ' via the shared blueprint (' .. tostring(s_Refreshed) ..
-		' instance(s) refreshed). Temporary: every instance shows it until the preview is cleared.')
+		tostring(p_GameObject.name) .. ' via the shared blueprint. Temporary; refresh is debounced.')
 
 	return true
 end
@@ -208,10 +292,39 @@ function VehiclePreview:Restore()
 		end
 	end
 
-	self:_RefreshInstances(s_Active.bpGuid)
+	self:_RefreshOne(s_Active.guid)
 	m_Logger:Write('Restored ' .. tostring(s_Restored) .. ' previewed field(s) on the shared blueprint.')
 
 	return true
+end
+
+---The selection moved to `p_Guid`. Anything previewed on a DIFFERENT object goes back.
+---
+---NOTHING CALLS THIS YET. Selection lives entirely in the WebUI -- it never sends a command to the
+---ext (the only selection-driven traffic is MapEditor:RequestPartitionData, which is also how the
+---inspector READS partitions, so hooking it would restore on ordinary reads including the previewed
+---object's own). Wiring this up needs a WebUI-side event on selection change.
+---
+---Until then a preview is undone by: editing another object, deleting it, Apply, or a level change.
+---It is NOT undone by simply clicking away, which vehicle_preview_e2e's restore check reports as a
+---failure -- correctly, because every instance of that vehicle keeps showing the edit until one of
+---those happens.
+function VehiclePreview:OnSelectionChanged(p_Guid)
+	if self.m_Active ~= nil and self.m_Active.guid ~= tostring(p_Guid) then
+		self:Restore()
+	end
+end
+
+---Suspend/resume previews around Apply.
+function VehiclePreview:Suspend()
+	self.m_Suspended = true
+	self.m_SuspendTicks = 0
+	self.m_PendingRefresh = nil
+end
+
+function VehiclePreview:Resume()
+	self.m_Suspended = false
+	self.m_SuspendTicks = 0
 end
 
 ---Drop the preview for one object if it is the active one (used when it is deleted).
