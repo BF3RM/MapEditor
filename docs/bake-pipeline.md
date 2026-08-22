@@ -433,3 +433,45 @@ would provide, and it is the first thing to verify once a baked pool exists.
 because it only asserted that the STOCK blueprint was untouched. It now asserts that the edit landed
 on the pool entry as well. A test that only checks the negative half will pass while the feature
 does nothing.
+
+## 10. CORRECTION: provenance applies to the SPAWN ROOT only (2026-08-22)
+
+Everything above about "spares per concrete type" is WRONG. It generalised from tests that always
+put a synthesized container at the spawn ROOT. Measured directly:
+
+    baked root      = Vehicles/LAV25/LAV25 (real primary instance, real partition)
+    runtime clone   = ShallowCopy of its vehicleConfig, partitionGuid = nil (synthesized)
+    gravityModifier = -1.0 written on the CLONE
+    baked component -> runtime clone            tookEffect = true
+    CreateEntitiesFromBlueprint(baked root)     -> ENTITY BUS RETURNED
+
+A runtime clone below a baked root is fine. The engine only requires the BLUEPRINT being spawned to
+be a genuine resource; everything it references may be synthesized.
+
+### What the pool actually needs
+
+Just **empty baked blueprint shells**. Nothing else.
+
+* No typed spares. No spare per concrete type. No spare `vehicleConfig`.
+* Shells are generic: an empty `VehicleBlueprint` serves any vehicle, because its `object` can be
+  wired to a RUNTIME clone of whatever vehicle is being edited.
+* MapEditor's existing per-instance clone machinery is reused unchanged -- it already produces
+  exactly the runtime clone this needs.
+
+Live preview becomes:
+
+    on first per-instance edit of a networked object:
+        claim a free baked shell
+        wire shell.object -> the existing runtime clone of the edited subtree
+        spawn the instance from the shell        (networked, both realms resolve the shell)
+    on revert / deselect:
+        release the shell back to the pool
+
+The only thing that was ever missing is a baked blueprint to act as the per-instance spawn root.
+
+### Still true
+
+* Never spawn a shell before it is wired -- a nil `object` is dereferenced and kills the realm.
+* Never install a runtime clone via `ReplaceInstance` at the ROOT: it reports success and leaves
+  the blueprint unspawnable. Wiring a clone into a baked root's FIELDS is a different operation and
+  is fine (measured above).

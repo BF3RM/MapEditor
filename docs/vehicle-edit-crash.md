@@ -596,3 +596,22 @@ does, whatever guid, name, partition or registry it is given.
 3. Because only field values can be written -- not structure -- placeholders must be pre-baked per
    source blueprint, so a BMP2 variant needs a baked BMP2 copy. Scalar edits like
    `gravityModifier` are exactly what this supports.
+
+
+## FINAL CORRECTION: only the spawn root needs to be baked (2026-08-22)
+
+This document repeatedly concluded that a runtime-synthesized container cannot be part of a
+networked spawn. That is too strong, and the narrower truth changes the outcome completely:
+
+**Only the blueprint being spawned must be a genuine baked resource. What it references may be
+synthesized.**
+
+Measured: a baked blueprint (LAV25) whose `object.components[1].vehicleConfig` was re-pointed at a
+runtime `ShallowCopy` carrying `gravityModifier = -1.0` spawned normally, entity bus returned.
+
+Every failure recorded above put the synthesized container at the spawn ROOT. None of them tested a
+baked root with a synthesized child, so none of them supported the general claim.
+
+Consequence: live per-instance preview needs only a pool of baked, empty blueprint shells to act as
+per-instance spawn roots. MapEditor's existing clone machinery supplies everything below them
+unchanged. See `docs/bake-pipeline.md` §10.
