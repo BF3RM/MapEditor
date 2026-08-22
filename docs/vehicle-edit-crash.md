@@ -383,11 +383,19 @@ instance of nothing. Measured in the harness, one route per boot:
 | clone + `ResourceManager:AddRegistry` (new container) | CRASH |
 | clone + level's `blueprintRegistry`, in LevelInjector's `Registering entity resources` window | CRASH |
 | clone + `Partition:AddInstance` into the blueprint's own partition | nil (no crash) |
+| clone + `AddInstance` **and** `AddRegistry` together | CRASH |
 | the stock blueprint (a real primary instance) | works, entity bus returned |
 
 Note the failure KINDS differ and are consistent: without a resource identity the engine declines
 (nil); given registry membership it proceeds and then faults on what it cannot resolve. Partition
 residency moves it back to a graceful nil — closer, but still not a resource.
+
+Registration dominates: once the blueprint is registered the engine proceeds and faults, and giving
+it a partition home as well does not rescue it. Nothing in the matrix reaches a spawnable resource
+except a genuine primary instance.
+
+A POOL of clones registered at level load is the same cell as `load-register`, which crashed --
+pooling changes when the clone is made, not what it is. It would fault on first spawn.
 
 Creating a partition is a bundle-build (offline) operation; there is no runtime API for it. So a
 per-instance vehicle config variant is not expressible, and no amount of override plumbing changes
