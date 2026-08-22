@@ -482,8 +482,18 @@ Two separate things worth raising upstream, with `Admin/Mods/MakeWritableRepro` 
 
 ### Bottom line for MapEditor
 
-Vehicles keep the refresh path. Per-instance deep config on networked blueprints is not achievable
-from VEXT at all -- not with better override plumbing, not with registration, not with a clone pool.
+Vehicles keep the refresh path.
+
+CORRECTION: an earlier version of this line said per-instance deep config on networked blueprints
+"is not achievable" full stop. That is too broad and wrong. It is not achievable AT RUNTIME -- but
+the bake already does it correctly: `docs/bake-pipeline.md` §5 gives every overridden instance its
+OWN partition, which is a genuine primary instance and spawns networked like stock content. So the
+feature works in the shipped level; what is missing is only the LIVE preview while editing.
+
+And even that has a route -- a pre-baked placeholder pool, see `docs/bake-pipeline.md` §9. A
+placeholder is a real partition-resident blueprint, and writing one at runtime then spawning from it
+is already measured safe (MODE `shared-write`). What was never possible was CREATING a partition at
+runtime; borrowing one that was baked offline is a different thing entirely.
 
 ### What 0x18 probably is (hypothesis, from the server PDB layouts)
 

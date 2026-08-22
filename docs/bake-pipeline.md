@@ -131,10 +131,17 @@ that blueprint which MapEditor never enumerates, so the only way to reach them i
 modified partition under the **original partition name** and let the custom bundle **shadow** the
 stock one.
 
-> ⚠️ **Unverified assumption.** That a later-loaded bundle can override a stock partition of the
-> same name has *not* been proven here. If it cannot, the apply path needs a different design.
-> Note also that `bundles.py` names partitions `CustomLevels/<map>/<file>`, so shadowing an
-> arbitrary stock partition name needs a change there.
+> ✅ **Resolved (2026-08-22).** VU's own custom-content guide
+> (https://docs.veniceunleashed.net/vext/guides/custom-content/) states shadowing works and is
+> decided by load order -- *"Whatever gets loaded first takes priority"* -- and its texture example
+> deliberately reuses a stock resource name to override it. The mechanism is a
+> `ResourceManager:LoadBundles` hook at priority 100 that rewrites the bundle list so the custom
+> bundle precedes `SharedUtils:GetLevelName()`, then calls `hook:Pass(bundles, compartment)`.
+>
+> Still to do here: `bundles.py` names partitions `CustomLevels/<map>/<file>`, so shadowing an
+> arbitrary stock partition name needs a change there, plus that LoadBundles hook. New partitions
+> must also carry fresh guids (the guide is explicit). Superbundle and bundle names must begin with
+> `Win32/`, though the runtime mount call omits that prefix.
 
 ---
 
@@ -247,3 +254,30 @@ object loses its sounds.
 
 Building Rime from source pays for itself here: every one of these was diagnosed by reading the
 exact line in the stack trace, which a prebuilt binary would not have given.
+
+## 9. Live per-instance editing of networked blueprints (design note, not built)
+
+Per-instance overrides already bake correctly (§5): each overridden instance gets its own partition,
+so the shipped level is right. What does NOT work is the **live preview** while editing, and only
+for `needNetworkId` blueprints (vehicles). `docs/vehicle-edit-crash.md` has the measurements: a
+runtime clone is nobody's primary instance, so a networked spawn from it either builds nothing or
+faults, and no VEXT call can fix that.
+
+A pre-baked **placeholder pool** would close the gap without needing runtime partition creation:
+
+* bake N spare partitions, each a full copy of a vehicle blueprint, into the mod's superbundle;
+* the client auto-downloads it from the server (per VU's guide), so both realms hold the SAME
+  partition guids -- which is precisely the resolvability a networked spawn needs;
+* on the first per-instance edit of a vehicle, claim a free placeholder, write the edited fields
+  into it, and point that instance at it.
+
+Why this should work, from measurements rather than hope: writing a real partition-resident
+blueprint at runtime and then spawning a fresh entity from it is already proven safe
+(`MakeWritableRepro` MODE `shared-write` -- entity bus returned, realm alive). A placeholder is
+exactly that: a real blueprint that happens to be ours to scribble on. The offline bake also makes
+the FULL clone free, so a placeholder can own its whole subtree and edits cannot leak into shared
+containers -- the thing that made a runtime full clone unaffordable.
+
+Open questions before building it: pool sizing and exhaustion behaviour; whether placeholders must
+be per source blueprint (a BMP2 variant needs BMP2's structure) and how that scales; and mapping
+placeholders deterministically across a save/load so a baked project and a live session agree.
