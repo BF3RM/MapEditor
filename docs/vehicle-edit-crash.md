@@ -171,3 +171,48 @@ Why a modified blueprint becomes unspawnable. Candidates, none tested:
 * the modification is fine but the SECOND build from the same blueprint is what fails (i.e. it is
   about re-entry rather than modification) -- distinguish by spawning twice with NO edit between,
   which was measured clean earlier and argues against this.
+
+## Cause found: MakeWritable is what makes the blueprint unspawnable (2026-08-22)
+
+Isolated by running Apply in a MakeWritable-ONLY mode -- `s_Shared:MakeWritable()` is called and
+the field write is skipped entirely:
+
+    APPLY-DIAG: MakeWritable-only on 'Vehicles/BMP2/BMP2' ok=true -- skipping the field write
+    STEP 3 spawn AFTER apply: DIED
+
+So **calling MakeWritable on a partition-resident vehicle blueprint leaves it in a state
+CreateEntitiesFromBlueprint cannot build from.** No modification is required; the write is
+irrelevant.
+
+Everything else in the chain is now ruled out by measurement:
+
+| Candidate | Verdict |
+|---|---|
+| The written VALUE (negative gravity) | ruled out -- a benign `gravityModifier = 2` died identically |
+| The per-instance CLONE | ruled out -- a clone-only edit (no Apply) spawns fine afterwards |
+| Registration (4 forms) | ruled out -- AddInstance, blueprintRegistry:add, AddRegistry, unique name; all succeeded, all still crashed |
+| Lazy loading | ruled out -- LAZY-BAIL never fired, rootLazy=false |
+| The networked flag | ruled out -- forcing networked=false still crashed |
+| Full vs path-only clone | ruled out -- full clone dies inside the audio graph without reaching the build |
+
+### Why the reported behaviour looks the way it does
+
+* A per-instance edit writes the CLONE, so live entities (built from the shared blueprint) do not
+  show it -- hence "I don't see it apply until I press apply to blueprint".
+* Apply calls MakeWritable on the shared blueprint and writes it. Existing vehicles are already
+  built and merely refresh, so they visibly pick the change up ("all the vehicles start flying
+  upwards as expected").
+* From that moment the blueprint cannot be built from, so the next spawn of that vehicle crashes.
+
+### What this implies for a fix
+
+Apply cannot make a vehicle blueprint writable in-place without giving up spawning it for the rest
+of the session. Options, none implemented:
+
+1. Apply to vehicles only via save/bake, where injection happens at level load -- the window in
+   which this is supported at all.
+2. Keep per-instance clones and never touch the shared blueprint for `needNetworkId` types,
+   accepting that the change shows only after a reload.
+3. Establish whether MakeWritable is reversible (is there a way back to read-only, or a fresh
+   handle from ResourceManager that is unaffected?) -- untested, and the only route that would
+   allow live Apply on vehicles.
