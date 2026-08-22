@@ -436,3 +436,51 @@ that.
 * Remaining UX question, not a code question: whether a vehicleConfig edit should auto-write the
   shared blueprint (live preview, but visibly affects every instance) or keep requiring Apply with
   the panel saying why.
+
+## The actual fault, captured (2026-08-22)
+
+Everything above inferred this crash from log positioning, because the server launch script sets
+`WINEDEBUG=-all` and suppresses wine's exception reporting. With `WINEDEBUG=+seh` (vuctl now
+propagates it) the fault is visible:
+
+    warn:seh:dispatch_exception backtrace: --- Exception 0xc0000005.
+    trace:seh:dispatch_exception code=c0000005 (EXCEPTION_ACCESS_VIOLATION) addr=005E490F
+    trace:seh:dispatch_exception  info[0]=00000000        <- READ
+    trace:seh:dispatch_exception  info[1]=00000018        <- faulting address 0x18
+    trace:seh:dispatch_exception eax=02080574 ebx=00000000 ecx=02353084
+    trace:seh:dispatch_exception esi=00000000 edi=06ecd8d8
+
+A null-pointer dereference reading a field at offset 0x18. Every SEH handler declines it
+(`returned 1`) until wine's last-resort handler terminates the process -- which is why the exit
+code is 0 and the log looked like a silent, clean exit. It is not a deliberate VU rejection.
+
+### The signature is identical in every configuration
+
+| Run | Clone state | addr | access | esi | ecx |
+|---|---|---|---|---|---|
+| `reg-first` | registered only, no partition | 005E490F | read 0x18 | 0 | 02353084 |
+| `full-load` | partition-resident + resolvable + unique name + level registry, in the load window | 005E490F | read 0x18 | 0 | 02353084 |
+
+Same instruction, same null, same registers. So the missing pointer is NOT `partitionGuid`, not
+registry membership, not the asset name -- none of which move the fault at all. It is an
+engine-internal field that gets populated when a blueprint comes from a loaded partition/bundle,
+and a DeepCopy product never has one. Nothing reachable from VEXT Lua can set it.
+
+That is why every "maybe if we ALSO do X" attempt failed: X was never the null.
+
+### This is a VU-level matter, not a MapEditor one
+
+Two separate things worth raising upstream, with `Admin/Mods/MakeWritableRepro` as the repro (a
+~60-line mod, clean server, ~90s):
+
+1. **A crash where a nil return exists.** The unregistered path already returns nil from
+   `CreateEntitiesFromBlueprint`. The registered path dereferences null and kills the realm. A
+   null check would turn a lost session into a recoverable failure.
+2. **No supported way to create a runtime blueprint.** If runtime blueprint variants are meant to
+   be possible, this is the missing API; if they are not, `AddRegistry` accepting a synthesized
+   container is a footgun that reads as support.
+
+### Bottom line for MapEditor
+
+Vehicles keep the refresh path. Per-instance deep config on networked blueprints is not achievable
+from VEXT at all -- not with better override plumbing, not with registration, not with a clone pool.
