@@ -47,7 +47,33 @@ function VehiclePreview:RegisterEvents()
 	-- A preview must never outlive the level: the shared DC goes away with it, and a stale record
 	-- would try to restore into nothing.
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+
+	-- The preview has to happen on the CLIENT too, because the client is what the user SEES.
+	-- Commands execute server-side only (CommandActions:SetEBXField -> SetOverrides never runs on
+	-- the client), so the server previewed alone and the edit was invisible -- which is exactly the
+	-- "I changed the value and nothing happened" report. The server therefore tells clients to
+	-- mirror it on their own realm.
+	if SharedUtils:IsClientModule() then
+		NetEvents:Subscribe('MapEditor:PreviewShow', self, self.OnRemoteShow)
+		NetEvents:Subscribe('MapEditor:PreviewRestore', self, self.OnRemoteRestore)
+	end
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
+end
+
+---Client: mirror the server's preview on this realm.
+function VehiclePreview:OnRemoteShow(p_Guid)
+	local s_GameObject = GameObjectManager.m_GameObjects[tostring(p_Guid)]
+
+	if s_GameObject == nil then
+		return
+	end
+
+	self:Show(s_GameObject)
+end
+
+---Client: undo the mirrored preview.
+function VehiclePreview:OnRemoteRestore()
+	self:Restore()
 end
 
 ---Debounced refresh. Coalescing means one destroy/recreate per burst of edits, not one per edit.
@@ -247,6 +273,13 @@ function VehiclePreview:Show(p_GameObject)
 
 	self:_QueueRefresh(self.m_Active.guid)
 
+	-- Tell the clients to do the same, or the edit is only visible on the server realm.
+	if not SharedUtils:IsClientModule() then
+		-- Broadcast, NOT BroadcastLocal: local dispatch never leaves the process, which is fine on a
+		-- listen server and silently delivers nothing when the client is a separate process.
+		NetEvents:Broadcast('MapEditor:PreviewShow', tostring(p_GameObject.guid))
+	end
+
 	m_Logger:Write('Previewing ' .. tostring(s_Written) .. ' field(s) on ' ..
 		tostring(p_GameObject.name) .. ' via the shared blueprint. Temporary; refresh is debounced.')
 
@@ -293,6 +326,11 @@ function VehiclePreview:Restore()
 	end
 
 	self:_RefreshOne(s_Active.guid)
+
+	if not SharedUtils:IsClientModule() then
+		NetEvents:Broadcast('MapEditor:PreviewRestore')
+	end
+
 	m_Logger:Write('Restored ' .. tostring(s_Restored) .. ' previewed field(s) on the shared blueprint.')
 
 	return true
