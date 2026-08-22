@@ -560,3 +560,39 @@ an offline "Rime bake").
 
 NOT verified: whether VU can mount custom EBX partitions this way, and what the authoring toolchain
 would be. Recorded as a direction, not a plan.
+
+## Identity is NOT the missing piece -- provenance is (2026-08-22)
+
+`DatabasePartition` exposes `ReplaceInstance(instance, replacement, replaceReferences)`, which swaps
+an instance inside a real partition and repoints every reference at the replacement. Used on the
+stock vehicle partition (destructive -- fine for a throwaway harness, NOT what an implementation
+should do):
+
+    primaryInstance assignment allowed = false          -- the property is read-only
+    ReplaceInstance                    ok = true
+    clone-is-primary after Replace     = true
+    re-resolved BY NAME -> guid=AAE95907 (the ORIGINAL's), sameObjectAsClone = true
+    its gravityModifier                = -1.0           -- our edit, on the real identity
+    spawn                              -> nil
+
+So the clone became the partition's primary instance, took over the original's guid AND name, and
+carried the edit -- and still does not spawn. Every identity attribute now matches the working
+blueprint exactly.
+
+**That kills the primary-instance theory** (recorded above) as well as the earlier registration and
+partition theories. What is left is PROVENANCE: a baked container lives in the bundle's loaded
+memory block (`InternalDatabasePartition::m_ownedMemoryBlock`), and a runtime-synthesized one never
+does, whatever guid, name, partition or registry it is given.
+
+### Consequences
+
+1. **Never use `ReplaceInstance` to install a runtime clone.** It succeeds, silently makes the
+   blueprint unspawnable, and the level keeps running until something tries to spawn one.
+2. **Live preview must MUTATE a baked container, not substitute a runtime one.** That is the
+   placeholder-pool design in `docs/bake-pipeline.md` §9, and this result sharpens it: a placeholder
+   is not a slot to swap a clone into, it is a real baked blueprint whose FIELDS we overwrite.
+   Writing a baked blueprint at runtime and spawning a fresh entity from it is already measured
+   safe (MODE `shared-write`).
+3. Because only field values can be written -- not structure -- placeholders must be pre-baked per
+   source blueprint, so a BMP2 variant needs a baked BMP2 copy. Scalar edits like
+   `gravityModifier` are exactly what this supports.
