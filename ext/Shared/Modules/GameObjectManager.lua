@@ -1246,6 +1246,7 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	end)
 	self.m_SpawningForGuid = nil
 
+
 	if not s_Ok or s_EntityBus == nil then
 		m_Logger:Error("Spawning from clone failed: " .. tostring(s_EntityBus))
 		self.m_PendingCustomBlueprintGuids[s_CloneGuid] = nil

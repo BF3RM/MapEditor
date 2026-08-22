@@ -1,0 +1,131 @@
+# Editing a vehicle crashes both realms — investigation
+
+Status: **root cause of the reported symptoms fixed; the re-instantiate crash is located but not
+explained.**
+
+## What was reported
+
+1. Edits to vehicles appeared to do nothing, and gravity could not be changed a second time.
+2. Edits to reference children were discarded when Apply was pressed.
+3. A gravity change on a BMP2 *did* work ("it flew up") — and then **spawning a new BMP crashed
+   the game, without Apply ever being pressed**.
+
+## What each turned out to be
+
+### 1. Spawned objects could not record any edit — FIXED (`c0d54d1`)
+
+`GameObjectManager` adopted `s_PendingCustomBlueprintInfo.overrides` over the constructor's
+`arg.overrides or {}` **without a nil guard**. A plain spawn carries no `overrides` field, so every
+spawned object got `overrides = nil`; the first edit then threw
+
+    GameObject.lua:567: attempt to index a nil value (field 'overrides')
+
+inside `SetOverride`, the edit was never recorded, and the following Apply correctly reported
+"nothing to apply". Level objects kept their `{}` and worked — which is exactly why editing the
+Tunguska succeeded while every spawned vehicle refused.
+
+### 2. Apply discarded edits whose write failed — FIXED (`c0d54d1`)
+
+`ApplyOverridesToBlueprint` ignored `SetField`'s return value while clearing the instance's
+overrides unconditionally. `SetField` returns nil when it refuses or cannot descend a chain, so a
+failed write took the edit with it, silently.
+
+### 3. Gravity applying globally, and new spawns crashing — FIXED (`c3337f9`)
+
+Both halves are one bug. Cloning a blueprint with an array field whose `typeInfo.elementType` is
+nil threw
+
+    DataContainerExt.lua:356: attempt to index a nil value (field 'elementType')
+
+which aborted the **entire** clone. The caller reads a failed clone as "fall back to editing the
+SHARED blueprint", so:
+
+* the gravity edit landed (on the shared blueprint) and the vehicle flew — hence "it worked";
+* every later spawn of that blueprint was built from the modified original — hence the crash,
+  with Apply never pressed.
+
+Both clone paths carried the same deref (`DeepClone` and the path-only `DeepCopy`). With no
+`elementType` we cannot tell whether the members are printable, so they are now left **shared**
+rather than failing the clone — the treatment unlisted members already get everywhere else.
+
+## The remaining crash
+
+Editing a vehicle still kills both realms. Located precisely by tracing:
+
+    SO-TRACE: clone returned ok=true nil=false
+    SO-TRACE: applying override fields to the clone
+    SO-TRACE:   field written ok=true path=.object.components.1.vehicleConfig.gravityModifier
+    SO-TRACE: writes done; respawn path = RequestReinstantiate
+    REINST-TRACE: about to CreateEntitiesFromBlueprint for 'Vehicles/BMP2/BMP2' networked=false variation=0
+    <process gone, same second>
+
+`CreateEntitiesFromBlueprint` on a **runtime clone** of a vehicle blueprint faults natively. It is
+not a Lua error, so `pcall` catches nothing and no traceback is produced. Both realms die because
+both realms clone.
+
+### Ruled out by measurement, not by argument
+
+| Hypothesis | How it died |
+|---|---|
+| Lazy-loaded containers | `LAZY-BAIL` never fired once; `rootLazy=false` throughout |
+| The `networked` flag on a clone spawn | A/B: forcing `networked=false` still crashed |
+| Clone failure | After `c3337f9`: `CLONE-DIAG: 0`, `shared-fallback: 0` |
+| The delete step of the respawn | `REINST-TRACE` reaches the spawn call, so the delete completed |
+| Vehicles need a FULL clone (`d3d3200`) | Reverted — see below |
+
+### `d3d3200` was wrong and is removed
+
+It routed `needNetworkId` blueprints through a full `DeepClone`. Measured on `Vehicles/BMP2/BMP2`,
+that copies **8,304 DataContainers** before the engine dies:
+
+| Container type | Count |
+|---|---|
+| `SoundWaveVariation` | 4,369 |
+| voice-over graph (`VoiceOverValue`, `VoiceOverValueConnection`, `VoiceOverCompareNode`, …) | 3,053 |
+| everything else | ~880 |
+
+About 90% audio and dialogue data, to change one float on `vehicleConfig`. It is the same cost
+problem `2ad600f` was written to solve (a light copying ~236 containers), two orders of magnitude
+worse. It only ever *appeared* to help because it routed around the `elementType` throw.
+
+### The one thing that avoids the crash
+
+Skipping `RequestReinstantiate` and letting the existing Disable/Enable refresh run:
+
+    overrides: ["object.components.1.vehicleConfig.gravityModifier"]
+    RESULT: edit APPLIED on attempt 1; both realms alive
+
+Same blueprint, same clone, same write. This also matches the field evidence: while the
+`elementType` throw was forcing the shared-blueprint fallback (which refreshes rather than
+rebuilds), the gravity edit applied and the vehicle flew, with no crash at that moment.
+
+Non-vehicle objects re-instantiate from path-only clones without trouble — `bulk_edit_e2e` passes
+40/40, and every one of those goes through clone + respawn.
+
+## Open question
+
+Why does the engine fault building entities from a runtime clone of a vehicle blueprint, when it
+builds the same vehicle from the stock blueprint happily (that is how it gets into the level, and
+how the editor spawns one)?
+
+Unverified idea, recorded as an idea only: a path-only clone leaves everything off the edited path
+pointing at the stock blueprint's containers, so the build sees a graph that is part fresh copies
+and part shared originals. That may be fine for a lamp and not for a vehicle. This has NOT been
+tested and should not be treated as the answer — four earlier hypotheses died on contact with
+measurement.
+
+## Investigation notes for whoever picks this up
+
+* A native fault kills the process instantly, so **the last log line written is the fatal step**.
+  `Logger:Error` prints unconditionally and flushes; `Logger:Write` is class-gated and will not
+  show.
+* The pre-existing comment "Clone bailed (lazy-load / error)" is misleading — in every measured
+  case here it was the *error* half. Chasing the lazy-load half cost hours.
+* Client liveness must be tested as "does `window.editor` still exist", not "does CDP answer". A
+  crashed client relaunches and CDP returns on a fresh page, which reports a dead client as
+  surviving.
+* `vu.com` is BOTH the client and the dedicated server binary. `pgrep -f vu\.com` matches the
+  server too; match `vu\.(com|exe).*-dwebui` for the client and `serverInstancePath.*-server` for
+  the server. Distinguish a crash from a kill by exit code: `0` = crash, `143` = SIGTERM.
+* Array elements are addressed by their `.name`, which the WebUI emits **1-based as a string**
+  ("1" for JS index 0). Passing a raw 0-based index makes `SetField` descend into nil.

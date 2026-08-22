@@ -298,10 +298,6 @@ function DataContainerExt:DeepClone(p_Instance, p_Guid, p_CurrentDepth)
 		return
 	end
 
-	if m_CopiedObjects == nil then
-		m_CopiedObjects = {}
-	end
-
 	local s_Clone = _G[p_Instance.typeInfo.name](p_Instance)
 	p_Instance = _G[p_Instance.typeInfo.name](p_Instance)
 

@@ -473,34 +473,21 @@ function GameObject:SetOverrides(p_Overrides)
 				end
 			end
 
-			-- Path-only clone, EXCEPT for blueprints whose entity build needs to own their whole
-			-- graph.
+			-- Always clone ONLY the edited path.
 			--
-			-- DeepCopy copies only the containers listed in the map: anything off the edited path
-			-- is left pointing at the STOCK blueprint's containers. That is exactly the win from
-			-- 2ad600f -- editing one light used to copy ~236 containers (the whole render chain),
-			-- which is where the bulk-edit failures came from -- and it is correct for props,
-			-- lights and other passive geometry.
+			-- d3d3200 routed needNetworkId blueprints through a full DeepClone, believing a
+			-- vehicle's entity build needed to own its whole graph. Measured on Vehicles/BMP2/BMP2:
+			-- that full clone copies 8,304 DataContainers before the engine dies -- 4,369
+			-- SoundWaveVariation and 3,053 voice-over nodes, about 90% of it audio and dialogue
+			-- data, to change one float on vehicleConfig. It is the same cost problem 2ad600f was
+			-- written to solve (a light copying ~236 containers), two orders of magnitude worse.
 			--
-			-- It is NOT correct for a vehicle. Measured on a spawned F18: setting
-			-- object.components.1.vehicleConfig.gravityModifier killed the CLIENT inside
-			-- CreateEntitiesFromBlueprint within a second, with the server accepting the identical
-			-- edit and logging nothing (only the client re-instantiates from the clone). The same
-			-- edit with a full DeepClone completes, and Apply afterwards runs clean.
-			--
-			-- needNetworkId is the engine's own marker for a networked gameplay entity, which is
-			-- what these heavier builds are; passive geometry does not carry it. Honest caveat:
-			-- this is an EMPIRICAL discriminator, not a proven rule about which containers the
-			-- build requires -- it is drawn from vehicles crashing and lights not. If another
-			-- blueprint type faults the same way, widen this rather than assuming it cannot.
-			local s_NeedsFullClone = false
-			pcall(function() s_NeedsFullClone = s_Shared.needNetworkId == true end)
-
+			-- The reason path-only appeared to crash the F18 -- the whole reason that heuristic was
+			-- added -- was almost certainly the nil-elementType throw fixed in c3337f9: the copy
+			-- threw, the caller read that as "clone failed", and fell back to editing the SHARED
+			-- blueprint, which is what actually crashed. With that guard in place the cheap copy
+			-- should serve both.
 			local s_Ok, s_Clone = pcall(function()
-				if s_NeedsFullClone then
-					return g_DataContainerExt:DeepClone(s_Shared, Guid(tostring(self.guid)))
-				end
-
 				return g_DataContainerExt:DeepCopy(s_Shared, s_PathGuids)
 			end)
 
@@ -517,6 +504,29 @@ function GameObject:SetOverrides(p_Overrides)
 
 				GameObjectManager:RegisterInstanceClone(self.guid, s_Clone, self.blueprintCtrRef:GetTable(), s_VanillaRef)
 			else
+				-- DIAGNOSTIC (logging only, no behaviour change): the comment below says
+				-- "lazy-load / error" without distinguishing them, so report which it actually was.
+				-- DeepClone/DeepCopy RETURN THE ORIGINAL when they bail on a lazy container, so a
+				-- clone whose guid matches the source is a bail, not a throw -- and that is the
+				-- case the success test above rejects.
+				local s_Why = 'unknown'
+
+				if not s_Ok then
+					s_Why = 'threw: ' .. tostring(s_Clone)
+				elseif s_Clone == nil then
+					s_Why = 'returned nil'
+				elseif s_Shared ~= nil and tostring(s_Clone.instanceGuid) == tostring(s_Shared.instanceGuid) then
+					s_Why = 'returned the ORIGINAL (same guid) -- a bail, typically lazy-loaded'
+				end
+
+				local s_RootLazy, s_RootReadOnly = nil, nil
+				pcall(function() s_RootLazy = s_Shared.isLazyLoaded end)
+				pcall(function() s_RootReadOnly = s_Shared.isReadOnly end)
+
+				m_Logger:Error("CLONE-DIAG '" .. tostring(self.name) .. "': " .. s_Why ..
+					" | rootLazy=" .. tostring(s_RootLazy) ..
+					" rootReadOnly=" .. tostring(s_RootReadOnly))
+
 				-- Clone bailed (lazy-load / error). Fall back to editing the SHARED blueprint
 				-- (old behavior: the edit leaks to all instances, but that beats doing nothing).
 				-- No respawn needed here — Disable/Enable re-reads the shared DC we just wrote.
@@ -541,6 +551,7 @@ function GameObject:SetOverrides(p_Overrides)
 	-- "this object type can't be instantiated" to "this edit never landed, so there is nothing to
 	-- rebuild from".
 	local s_AnyApplied = false
+
 
 	for l_Key, l_Field in pairs(p_Overrides) do
 		local s_Ok, s_Path = self:SetOverride(l_Field)
@@ -573,6 +584,7 @@ function GameObject:SetOverrides(p_Overrides)
 	-- change; the server just keeps the edit in its own clone + self.overrides for save/export.
 	-- The shared-fallback path (clone bailed) keeps the cheap Disable/Enable on every realm.
 	local s_Clone = GameObjectManager:GetInstanceClone(self.guid)
+
 
 	if s_Clone ~= nil then
 		-- Re-instantiate on BOTH realms.
