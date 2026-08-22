@@ -173,7 +173,13 @@ function DataContainerExt:DeepCopy(p_Instance, p_DeepCopiedChildrenGuids, p_Curr
 	-- Shallow copy p_Instance if it's a DataContainer, ignore if it's a structure
 	if p_Instance.instanceGuid ~= nil then
 		if p_Instance.isLazyLoaded then
-			m_Logger:Write("DC with guid "..tostring(p_Instance.instanceGuid).." is lazy loaded, please deepclone after everything is loaded. Type "..p_Instance.typeInfo.name)
+			-- Report this at ERROR level: it is the exact point a clone silently degrades into
+			-- "returned the original", which the caller then treats as a failed clone and answers
+			-- by editing the SHARED blueprint instead. Naming the container that bailed is the
+			-- difference between "a clone failed somewhere" and knowing what to preload.
+			m_Logger:Error("LAZY-BAIL: " .. tostring(p_Instance.typeInfo.name) ..
+				" guid=" .. tostring(p_Instance.instanceGuid) ..
+				" is lazy-loaded; cloning returns the ORIGINAL from here down.")
 			return p_Instance
 		end
 
@@ -218,12 +224,16 @@ function DataContainerExt:_deepCopyFields(p_Clone, p_DeepCopiedChildrenGuids, p_
 
 			if l_Field.typeInfo.array then
 				local s_Array = p_Clone[s_Name]
+				-- Same nil-elementType hazard as the DeepClone path below: indexing .name on a nil
+				-- elementType throws and kills the whole copy, which the caller then answers by
+				-- editing the SHARED blueprint. Leave such members shared instead.
+				local s_ElementType = l_Field.typeInfo.elementType
 
-				if s_Array ~= nil then
+				if s_Array ~= nil and s_ElementType ~= nil then
 					for i = #s_Array, 1, -1 do
 						local s_Member = s_Array[i]
 
-						if s_Member ~= nil and not isPrintable(l_Field.typeInfo.elementType.name) and not l_Field.typeInfo.elementType.enum then
+						if s_Member ~= nil and not isPrintable(s_ElementType.name) and not s_ElementType.enum then
 							self:_deepCopyStructOrDC(p_Clone, s_Name, i, p_DeepCopiedChildrenGuids, p_CurrentDepth)
 						end
 					end
@@ -298,7 +308,13 @@ function DataContainerExt:DeepClone(p_Instance, p_Guid, p_CurrentDepth)
 	-- Shallow copy p_Instance if it's a DataContainer, ignore if it's a structure
 	if p_Instance.instanceGuid ~= nil then
 		if p_Instance.isLazyLoaded then
-			m_Logger:Write("DC with guid "..tostring(p_Instance.instanceGuid).." is lazy loaded, please deepclone after everything is loaded. Type "..p_Instance.typeInfo.name)
+			-- Report this at ERROR level: it is the exact point a clone silently degrades into
+			-- "returned the original", which the caller then treats as a failed clone and answers
+			-- by editing the SHARED blueprint instead. Naming the container that bailed is the
+			-- difference between "a clone failed somewhere" and knowing what to preload.
+			m_Logger:Error("LAZY-BAIL: " .. tostring(p_Instance.typeInfo.name) ..
+				" guid=" .. tostring(p_Instance.instanceGuid) ..
+				" is lazy-loaded; cloning returns the ORIGINAL from here down.")
 			return p_Instance
 		end
 
@@ -337,14 +353,30 @@ function DataContainerExt:_deepCloneFields(p_Clone, p_CurrentDepth)
 
 			if l_Field.typeInfo.array then
 				local s_Array = p_Clone[s_Name]
+				-- elementType can be NIL on an array field. Indexing .name on it threw
+				--     DataContainerExt.lua:356: attempt to index a nil value (field 'elementType')
+				-- which killed the ENTIRE clone. The caller reads a failed clone as "fall back to
+				-- editing the SHARED blueprint", so one such array silently promoted a
+				-- per-instance edit into a permanent blueprint-wide one -- after which every new
+				-- spawn of that vehicle was built from the modified blueprint and crashed the game.
+				-- Measured on Vehicles/BMP2/BMP2; the F18 has no such field, which is why it cloned
+				-- fine and the BMP2 never did.
+				--
+				-- With no elementType we cannot tell whether the members are printable, so leave
+				-- them SHARED rather than throw: unlisted members stay pointing at the stock
+				-- blueprint, which is exactly what a path-only clone does everywhere else.
+				local s_ElementType = l_Field.typeInfo.elementType
 
-				if s_Array ~= nil then
+				if s_Array ~= nil and s_ElementType ~= nil then
 					for i = #s_Array, 1, -1 do
 						local s_Member = s_Array[i]
-						if s_Member ~= nil and not isPrintable(l_Field.typeInfo.elementType.name) and not l_Field.typeInfo.elementType.enum then
+						if s_Member ~= nil and not isPrintable(s_ElementType.name) and not s_ElementType.enum then
 							self:_deepCloneStructOrDC(p_Clone, s_Name, i, p_CurrentDepth)
 						end
 					end
+				elseif s_Array ~= nil and s_ElementType == nil then
+					m_Logger:Write("Array '" .. tostring(s_Name) .. "' has no elementType; leaving its " ..
+						tostring(#s_Array) .. " member(s) shared instead of failing the clone.")
 				end
 				-- It's an object or structure
 			elseif not isPrintable(l_Field.typeInfo.name) and not l_Field.typeInfo.enum then
@@ -513,7 +545,9 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 						goto continue1
 					end
 
-					if isPrintable(l_Field.typeInfo.elementType.name) then
+					if l_Field.typeInfo.elementType == nil then
+						m_Logger:Write(p_Padding .. "[" .. i .. "] (no elementType)")
+					elseif isPrintable(l_Field.typeInfo.elementType.name) then
 						m_Logger:Write(p_Padding .."[" .. i .. "] "..' ('..l_Field.typeInfo.elementType.name..') : '.. tostring(s_Member))
 					elseif l_Field.typeInfo.elementType.enum then
 						m_Logger:Write(p_Padding .."[" .. i .. "] "..' (Enum) : '.. tostring(s_Member))
