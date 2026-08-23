@@ -13,6 +13,9 @@
 	"Tags": [
 		"mapeditor"
 	],
+	"Superbundles": [
+		"Win32/mapeditor/shells"
+	],
 	"Dependencies": {
 		"veniceext": "^1.0.0"
 	}

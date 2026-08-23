@@ -16,6 +16,7 @@ Exit 0 = both spawns survived, 1 = the client died, 2 = could not set up.
 import argparse
 import json
 import os
+import subprocess
 import sys
 import time
 
@@ -24,6 +25,25 @@ from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor  # noqa: E402
 
 GUIDS = ['ED170122-7777-0000-0000-1000000000A1',
          'ED170122-7777-0000-0000-1000000000A2']
+
+
+def server_alive():
+    """Is the dedicated server still up?
+
+    window.editor disappearing does NOT mean the client died -- it also goes when the client merely
+    loses its server. Reporting "the client crashed" for a server crash sends you looking in the
+    wrong realm, which it already did once.
+    """
+    out = subprocess.run(["pgrep", "-f", "serverInstancePath.*-server"],
+                         capture_output=True, text=True).stdout.split()
+    for pid in out:
+        try:
+            comm = open("/proc/%s/comm" % pid).read().strip()
+        except OSError:
+            continue
+        if comm not in ("bash", "sh", "dash", "zsh"):
+            return True
+    return False
 
 
 def client_alive(addr):
@@ -153,7 +173,8 @@ def main():
             time.sleep(5)
 
             if not client_alive(args.addr):
-                print("FAIL: the client died on the EDIT itself"); return 1
+                print("FAIL: %s died on the EDIT itself"
+                      % ("the CLIENT" if server_alive() else "the SERVER")); return 1
 
     print("RESULT: both spawns survived with no edits — the preview is implicated, not plain spawning")
     return 0
