@@ -449,11 +449,25 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.variationNameHash = p_Variation
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
 
+	-- Spawn against a CLEAN blueprint.
+	--
+	-- A live preview is a temporary write to the shared blueprint, so with one active a brand-new
+	-- object would be built from another instance's edit -- and the spawn re-enters the override
+	-- path, which can trigger a preview Restore (a shared write plus a Disable/Enable) part-way
+	-- through building entities. Reported from the field as "changing gravity worked, then spawning
+	-- a new BMP crashed", with Apply never pressed.
+	--
+	-- Restore first, then keep previews off until the spawn finishes. The preview comes back on the
+	-- next edit, which is when the user is looking at it again.
+	VehiclePreview:Restore()
+	VehiclePreview:Suspend()
+
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_BusOk, s_EntityBus = pcall(function()
 		return EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 	end)
 	self.m_SpawningForGuid = nil
+	VehiclePreview:Resume()
 
 	if not s_BusOk then
 		m_Logger:Error("CreateEntitiesFromBlueprint threw: " .. tostring(s_EntityBus))
@@ -1274,11 +1288,16 @@ function GameObjectManager:InvokeBlueprintSpawnFromClone(p_GameObjectGuid, p_Sen
 	-- bake, and a static object's clone carries the original's value.
 	s_Params.networked = _G[s_SpawnDC.typeInfo.name](s_SpawnDC).needNetworkId == true
 
+	-- Same reasoning as InvokeBlueprintSpawn: never build entities while a preview is written into
+	-- the shared blueprint.
+	VehiclePreview:Suspend()
+
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_Ok, s_EntityBus = pcall(function()
 		return EntityManager:CreateEntitiesFromBlueprint(s_SpawnDC, s_Params)
 	end)
 	self.m_SpawningForGuid = nil
+	VehiclePreview:Resume()
 
 
 	if not s_Ok or s_EntityBus == nil then

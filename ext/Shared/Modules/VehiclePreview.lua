@@ -28,9 +28,20 @@ function VehiclePreview:__init()
 	self:RegisterEvents()
 end
 
--- Ticks to wait before refreshing after an edit. Rapid edits (dragging a value) otherwise queue a
--- destroy/recreate PER KEYSTROKE, which visibly destroys the vehicle -- the same reason the rebuild
--- path has REINSTANTIATE_DEBOUNCE. Reported from the field as "the vehicle gets destroyed".
+-- Refreshing after a preview write is DISABLED, and the machinery is kept only so re-enabling it is
+-- one flag.
+--
+-- A refresh is Disable/Enable -- a destroy and recreate of a networked vehicle -- which is the
+-- single operation this whole investigation found vehicle crashes clustered around. It also turns
+-- out not to be needed for what previews are for: a gravityModifier change applied INSTANTLY in
+-- game, so the physics reads the value live from the shared container rather than at build time.
+--
+-- Every crash reported against the preview involved this refresh: destroyed vehicles (one
+-- destroy/recreate per keystroke), a crash spawning a second BMP (refresh inline with
+-- CreateEntitiesFromBlueprint), and a crash on the SECOND edit (a refresh racing the next edit).
+-- So it is off. Live-read fields still preview; anything only read at build time will not show
+-- until a reload or a bake, which is the documented limit anyway.
+local PREVIEW_REFRESH_ENABLED = false
 local REFRESH_DEBOUNCE_TICKS = 12
 
 function VehiclePreview:RegisterVars()
@@ -48,32 +59,11 @@ function VehiclePreview:RegisterEvents()
 	-- would try to restore into nothing.
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
 
-	-- The preview has to happen on the CLIENT too, because the client is what the user SEES.
-	-- Commands execute server-side only (CommandActions:SetEBXField -> SetOverrides never runs on
-	-- the client), so the server previewed alone and the edit was invisible -- which is exactly the
-	-- "I changed the value and nothing happened" report. The server therefore tells clients to
-	-- mirror it on their own realm.
-	if SharedUtils:IsClientModule() then
-		NetEvents:Subscribe('MapEditor:PreviewShow', self, self.OnRemoteShow)
-		NetEvents:Subscribe('MapEditor:PreviewRestore', self, self.OnRemoteRestore)
-	end
+	-- No server->client broadcast here. The client runs SetOverrides itself -- per-instance light
+	-- edits are visible in game, which could not happen if edits were server-only -- so it reaches
+	-- this preview on its own realm. Broadcasting made the client preview a SECOND time: an extra
+	-- restore + rewrite + refresh per edit, on exactly the path that was destroying vehicles.
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
-end
-
----Client: mirror the server's preview on this realm.
-function VehiclePreview:OnRemoteShow(p_Guid)
-	local s_GameObject = GameObjectManager.m_GameObjects[tostring(p_Guid)]
-
-	if s_GameObject == nil then
-		return
-	end
-
-	self:Show(s_GameObject)
-end
-
----Client: undo the mirrored preview.
-function VehiclePreview:OnRemoteRestore()
-	self:Restore()
 end
 
 ---Debounced refresh. Coalescing means one destroy/recreate per burst of edits, not one per edit.
@@ -102,6 +92,10 @@ function VehiclePreview:OnEngineUpdate()
 
 	if self.m_PendingTicks < REFRESH_DEBOUNCE_TICKS then
 		return
+	end
+
+	if self.m_Suspended then
+		return                      -- a spawn or Apply is in flight; do not touch entities
 	end
 
 	local s_Guid = self.m_PendingRefresh
@@ -197,8 +191,12 @@ function VehiclePreview:_RefreshOne(p_Guid)
 	end)
 end
 
----Queue a debounced refresh for one object.
+---Queue a debounced refresh for one object. No-op while refreshing is disabled.
 function VehiclePreview:_QueueRefresh(p_Guid)
+	if not PREVIEW_REFRESH_ENABLED then
+		return
+	end
+
 	self.m_PendingRefresh = tostring(p_Guid)
 	self.m_PendingTicks = 0
 end
@@ -273,12 +271,6 @@ function VehiclePreview:Show(p_GameObject)
 
 	self:_QueueRefresh(self.m_Active.guid)
 
-	-- Tell the clients to do the same, or the edit is only visible on the server realm.
-	if not SharedUtils:IsClientModule() then
-		-- Broadcast, NOT BroadcastLocal: local dispatch never leaves the process, which is fine on a
-		-- listen server and silently delivers nothing when the client is a separate process.
-		NetEvents:Broadcast('MapEditor:PreviewShow', tostring(p_GameObject.guid))
-	end
 
 	m_Logger:Write('Previewing ' .. tostring(s_Written) .. ' field(s) on ' ..
 		tostring(p_GameObject.name) .. ' via the shared blueprint. Temporary; refresh is debounced.')
@@ -325,11 +317,13 @@ function VehiclePreview:Restore()
 		end
 	end
 
-	self:_RefreshOne(s_Active.guid)
-
-	if not SharedUtils:IsClientModule() then
-		NetEvents:Broadcast('MapEditor:PreviewRestore')
-	end
+	-- QUEUE the refresh, never run it inline.
+	--
+	-- Restore is called from the spawn guard, so an inline Disable/Enable would destroy and
+	-- recreate an entity in the same frame as CreateEntitiesFromBlueprint is building another one.
+	-- That is the "spawn a second BMP and I crash" report. Deferring costs nothing: the values are
+	-- already back, only the visual catch-up waits a few ticks.
+	self:_QueueRefresh(s_Active.guid)
 
 	m_Logger:Write('Restored ' .. tostring(s_Restored) .. ' previewed field(s) on the shared blueprint.')
 
@@ -357,7 +351,8 @@ end
 function VehiclePreview:Suspend()
 	self.m_Suspended = true
 	self.m_SuspendTicks = 0
-	self.m_PendingRefresh = nil
+	-- Keep any pending refresh: dropping it here meant a restore during a spawn never caught up
+	-- visually, leaving the entity showing a value the blueprint no longer holds.
 end
 
 function VehiclePreview:Resume()

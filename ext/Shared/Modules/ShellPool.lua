@@ -39,6 +39,8 @@ local function HashKey(p_Key, p_Count)
 	return (s_Hash % p_Count) + 1
 end
 
+local SHELL_PREVIEW_ENABLED = false
+
 function ShellPool:__init()
 	self:RegisterVars()
 	self:RegisterEvents()
@@ -56,6 +58,18 @@ function ShellPool:RegisterVars()
 end
 
 function ShellPool:RegisterEvents()
+	-- Do NOTHING while the pool is disabled -- no mount, and above all no LoadBundles hook.
+	--
+	-- The hook prepends our bundle to the LEVEL's bundle list, on the client as well as the server.
+	-- That is a real risk during a join for zero benefit while SHELL_PREVIEW_ENABLED is false: the
+	-- pool cannot hand out a shell, so mounting 256 partitions and injecting a bundle into the
+	-- client's level load buys nothing and can only cost. A client crashing instantly at join is
+	-- exactly the shape of failure that would produce.
+	if not SHELL_PREVIEW_ENABLED then
+		m_Logger:Write('Shell pool disabled; not mounting its superbundle.')
+		return
+	end
+
 	if m_Manifest == nil then
 		m_Logger:Write('No shell manifest baked; live preview of networked objects is disabled.')
 		return
@@ -149,7 +163,6 @@ end
 --- instead of rebuilding, exactly as before the pool existed. Everything else here -- the bake,
 --- the mount, the manifest, the 256 loaded shells -- is verified and kept, because the remaining
 ---problem is WHERE the shells are baked, not the pool itself. See docs/bake-pipeline.md §10.
-local SHELL_PREVIEW_ENABLED = false
 
 ---True when a shell could be handed out right now.
 function ShellPool:IsReady()
