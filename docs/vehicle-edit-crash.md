@@ -615,3 +615,48 @@ baked root with a synthesized child, so none of them supported the general claim
 Consequence: live per-instance preview needs only a pool of baked, empty blueprint shells to act as
 per-instance spawn roots. MapEditor's existing clone machinery supplies everything below them
 unchanged. See `docs/bake-pipeline.md` §10.
+
+## What actually governs this (2026-08-23)
+
+Bisected with `RawWriteProbe` -- a temporary probe that wrote a vehicle's shared blueprint DIRECTLY,
+with no GameObject, no clone and no overrides -- plus `tools/e2e/spawn_twice_e2e.py`, which spawns a
+vehicle, optionally modifies, then spawns another.
+
+| What was modified | Where | Then spawn another vehicle |
+|---|---|---|
+| nothing | -- | survives |
+| `vehicleConfig.gravityModifier` (raw) | server only | **client dies** |
+| `vehicleConfig.gravityModifier` (raw) | **both realms** | **survives** |
+| `object.exitDirectionSpeedThreshold` (raw) | **both realms** | **client dies** |
+| `object.exitDirectionSpeedThreshold` (editor) | both realms | client dies |
+| `vehicleConfig.gravityModifier` (editor) | both realms | client dies ON THE EDIT |
+
+Three things follow, and the first two are solid:
+
+**1. Both realms must hold identical data.** MapEditor spawns on BOTH realms, so modifying only the
+server's blueprint makes the server build a vehicle from one set of data and the client build one
+from another. That divergence kills the client. This is the rule RealityMod and rm-statics get for
+free by writing from shared code at load time, and it is what this preview was violating.
+
+**2. Restoring before a spawn CREATES that divergence.** The spawn guard called Restore() first, so
+each realm reverted when IT reached that line and the two disagreed for a window. It was making the
+exact problem it was meant to prevent.
+
+**3. Safety is FIELD-DEPENDENT, and that is not yet understood.** Writing `gravityModifier` raw on
+both realms is safe; writing `exitDirectionSpeedThreshold` raw on both realms is fatal. Both are
+Float32, both on the same blueprint. The plausible split is data read while an entity RUNS versus
+data consumed when one is BUILT, but that is a hypothesis, not a measurement.
+
+Unresolved: the editor's own gravity edit killed the client on the EDIT, while the identical raw
+write is safe -- so the editor path adds something fatal on top, at least for that field. Manual
+testing of the same edit worked repeatedly, so this is not deterministic either. Do not treat "the
+preview works for gravity" as established.
+
+`VehiclePreview` is therefore OFF. Vehicles behave exactly as before: edits record, save, and bake
+per-instance correctly.
+
+### Why the test kept disagreeing with manual testing
+
+`spawn_twice_e2e` picks the FIRST Float32 it finds on the object, which is usually one of the fatal
+ones, while manual testing used gravity. Two different fields, two different outcomes, read as
+flaky. A test that chooses its own subject can quietly test something other than what is reported.

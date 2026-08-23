@@ -43,39 +43,24 @@ end
 -- until a reload or a bake, which is the documented limit anyway.
 local PREVIEW_REFRESH_ENABLED = false
 
--- OFF.
+-- ON, and it MUST run on BOTH realms.
 --
--- Measured: editing a vehicle and then spawning another kills the CLIENT, and it does so even when
--- only the SERVER writes -- so this is not a dirty client blueprint, it is the two realms holding
--- DIFFERENT blueprint data while the engine replicates entities built from it. Restoring the value
--- before the spawn does not help, because the divergence already exists on the live entities.
+-- Measured with a raw blueprint write that bypasses the editor entirely (RawWriteProbe), spawning
+-- a vehicle afterwards:
+--     write on the SERVER only        -> the client DIES on the next spawn
+--     write on BOTH realms, identical -> both survive
 --
--- A stale preview also kills any client that JOINS afterwards, for the same reason.
+-- MapEditor spawns on both realms, so with only one side modified the server builds a vehicle from
+-- one set of data and the client builds one from another. That divergence is what kills it -- not
+-- the write, and not the editor's clone/override machinery (a raw write with none of it involved
+-- crashes exactly the same way).
 --
--- This is the difference from how mods normally edit EBX (RealityMod, rm-statics): they write at
--- Level:LoadResources / Partition:Loaded / RegisterInstanceLoadHandler -- before any entity is
--- built, identically on both realms. Editing live, after entities exist and while more spawn, is
--- what the engine will not tolerate.
---
--- Left off until there is a design that keeps both realms identical. The bake path already does
--- per-instance vehicle overrides correctly (docs/bake-pipeline.md §5).
+-- This is the same rule RealityMod and rm-statics follow by writing from shared code: both realms
+-- hold identical data. The earlier failures here were this preview effectively writing on the
+-- server alone.
 local PREVIEW_ENABLED = false
 
--- SERVER ONLY.
---
--- Measured A/B: with the preview on, editing a vehicle and then spawning a second one KILLS THE
--- CLIENT; with it off, the same sequence survives. Restoring the value before the spawn is not
--- enough, because what persists is not the value -- writing the field makes those shared containers
--- writable, and that is what the client's next entity build cannot survive.
---
--- The server is a different matter: MakeWritable plus a write, then spawning a fresh vehicle, is
--- measured safe there (MakeWritableRepro, MODE shared-write -- entity bus returned, realm alive).
---
--- And the client does not need the write: gravity is simulated server-side and replicated, which is
--- why the edit was visible in game at all. So write on the server, leave the client's blueprint
--- untouched, and the client's spawns stay safe. Fields the CLIENT renders from its own data
--- (visual/mesh) will not preview -- that is the cost, and it is smaller than crashing.
-local PREVIEW_SERVER_ONLY = true
+local PREVIEW_SERVER_ONLY = false
 local REFRESH_DEBOUNCE_TICKS = 12
 
 function VehiclePreview:RegisterVars()
@@ -98,6 +83,14 @@ function VehiclePreview:RegisterEvents()
 	-- this preview on its own realm. Broadcasting made the client preview a SECOND time: an extra
 	-- restore + rewrite + refresh per edit, on exactly the path that was destroying vehicles.
 	Events:Subscribe('Engine:Update', self, self.OnEngineUpdate)
+
+	if not SharedUtils:IsClientModule() then
+		NetEvents:Subscribe('MapEditor:PreviewReport', self, self.OnClientReport)
+	end
+end
+
+function VehiclePreview:OnClientReport(p_Player, p_Text)
+	m_Logger:Warning(tostring(p_Text))
 end
 
 ---Debounced refresh. Coalescing means one destroy/recreate per burst of edits, not one per edit.
@@ -172,6 +165,17 @@ end
 ---Returns a copy of the chain with the leaf's value replaced by its oldValue, or nil if the leaf
 ---has no oldValue. A field we cannot undo is NOT previewed: leaving the blueprint permanently
 ---modified is far worse than showing nothing.
+---Value at the leaf of an override chain, for logging.
+function m_LeafValue(p_Field)
+	local s_Node = p_Field
+
+	while type(s_Node) == 'table' and type(s_Node.value) == 'table' and s_Node.value.field ~= nil do
+		s_Node = s_Node.value
+	end
+
+	return type(s_Node) == 'table' and s_Node.value or s_Node
+end
+
 local function RestoreChain(p_Field)
 	if type(p_Field) ~= 'table' then
 		return nil
@@ -278,6 +282,7 @@ function VehiclePreview:Show(p_GameObject)
 
 	local s_Restore = {}
 	local s_Written = 0
+	local s_Detail = ''
 
 	for l_Path, l_Field in pairs(s_Overrides) do
 		local s_RestoreLeaf = RestoreChain(l_Field)
@@ -290,7 +295,14 @@ function VehiclePreview:Show(p_GameObject)
 			if s_Ok and s_Result ~= nil and s_Result ~= '' then
 				s_Restore[l_Path] = s_RestoreLeaf
 				s_Written = s_Written + 1
+				-- Record exactly WHAT was written, so the two realms can be compared. "Both
+				-- previewed 1 field" is not the same as "both wrote the same thing".
+				s_Detail = s_Detail .. tostring(s_Result) .. '=' .. tostring(m_LeafValue(l_Field)) .. ' '
+			else
+				s_Detail = s_Detail .. tostring(l_Path) .. ':FAILED '
 			end
+		else
+			s_Detail = s_Detail .. tostring(l_Path) .. ':NO-OLDVALUE '
 		end
 	end
 
@@ -310,8 +322,14 @@ function VehiclePreview:Show(p_GameObject)
 	self:_QueueRefresh(self.m_Active.guid)
 
 
-	m_Logger:Write('Previewing ' .. tostring(s_Written) .. ' field(s) on ' ..
-		tostring(p_GameObject.name) .. ' via the shared blueprint. Temporary; refresh is debounced.')
+	-- Client Lua output reaches no log readable from here, and "both realms must write" is the
+	-- whole correctness condition -- so the client says so out loud, on the server's log.
+	if SharedUtils:IsClientModule() then
+		NetEvents:SendLocal('MapEditor:PreviewReport',
+			'CLIENT wrote [' .. s_Detail .. '] on ' .. tostring(p_GameObject.name))
+	else
+		m_Logger:Warning('SERVER wrote [' .. s_Detail .. '] on ' .. tostring(p_GameObject.name))
+	end
 
 	return true
 end

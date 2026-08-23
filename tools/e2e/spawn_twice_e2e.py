@@ -89,6 +89,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--addr", default="localhost:8884")
     ap.add_argument("--blueprint", default="Vehicles/BMP2/BMP2")
+    ap.add_argument("--raw-write", action="store_true",
+                    help="between the spawns, write the shared blueprint DIRECTLY via the "
+                         "RawWriteProbe NetEvent -- no GameObject, no clone, no overrides")
+    ap.add_argument("--edit-gravity", action="store_true",
+                    help="edit vehicleConfig.gravityModifier (a RUNTIME-read field) rather than "
+                         "whatever Float32 happens to be first on the object")
     ap.add_argument("--edit", action="store_true",
                     help="edit a scalar on the first vehicle before spawning the second -- "
                          "this is the exact reported sequence")
@@ -118,8 +124,51 @@ def main():
             if n is not None and n >= index:
                 break
 
-        print("  spawn %d ok, %s objects registered, client alive" % (index, count_objects(args.addr, short)),
-              flush=True)
+        registered = count_objects(args.addr, short)
+
+        if not registered or registered < index:
+            print("SETUP: spawn %d never registered (%s objects) -- the editor is not spawning, so "
+                  "this run proves nothing. Check the server log for load errors." % (index, registered))
+            return 2
+
+        print("  spawn %d ok, %d objects registered, %s alive"
+              % (index, registered, "client" if client_alive(args.addr) else "?"), flush=True)
+
+        # Bisect: modify the blueprint with NONE of the editor's machinery involved.
+        if args.raw_write and index == 1:
+            r = cdp_eval(args.addr, """(function(){
+              window.vext.SendEvent('RawWrite', %s); return JSON.stringify({sent:true});})()"""
+              % json.dumps(args.blueprint))
+            print("  raw write dispatched:", r, flush=True)
+            time.sleep(5)
+            if not client_alive(args.addr):
+                print("FAIL: %s died on the RAW WRITE itself"
+                      % ("the CLIENT" if server_alive() else "the SERVER")); return 1
+
+        # Edit the field users actually care about: gravityModifier, which lives at
+        #   object -> components[1] -> vehicleConfig -> gravityModifier
+        # onEBXInput prepends 'object' itself, and array elements are addressed by their 1-BASED
+        # name as a string.
+        if args.edit_gravity and index == 1:
+            r = cdp_eval(args.addr, """(function(){
+              var e=window.editor, vals=e.gameObjects.values(), target=null;
+              for(var i=0;i<vals.length;i++){ if(String(vals[i].guid)===%s){ target=vals[i]; break; } }
+              if(!target) return JSON.stringify({err:'object gone'});
+              e.selectionGroup.select(target, false, false);
+              var vm=document.querySelector('.inspector-component').__vue__;
+              if(!vm) return JSON.stringify({err:'no inspector'});
+              vm.selectedGameObject = target;
+              vm.onEBXInput({ field:'components', type:'Array', value:{
+                                field:'1', type:'VehicleComponentData', value:{
+                                  field:'vehicleConfig', type:'ChassisConfigData', value:{
+                                    field:'gravityModifier', type:'Float32',
+                                    value:-4.0, oldValue:1.6 }}}}, false);
+              return JSON.stringify({sent:true});})()""" % json.dumps(guid))
+            print("  gravity edit dispatched:", r, flush=True)
+            time.sleep(6)
+            if not client_alive(args.addr):
+                print("FAIL: %s died on the GRAVITY EDIT itself"
+                      % ("the CLIENT" if server_alive() else "the SERVER")); return 1
 
         # The reported sequence edits between the two spawns.
         if args.edit and index == 1:

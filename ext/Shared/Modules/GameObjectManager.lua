@@ -449,25 +449,25 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 	s_Params.variationNameHash = p_Variation
 	s_Params.networked = s_ObjectBlueprint.needNetworkId
 
-	-- Spawn against a CLEAN blueprint.
+	-- Do NOT restore the preview here.
 	--
-	-- A live preview is a temporary write to the shared blueprint, so with one active a brand-new
-	-- object would be built from another instance's edit -- and the spawn re-enters the override
-	-- path, which can trigger a preview Restore (a shared write plus a Disable/Enable) part-way
-	-- through building entities. Reported from the field as "changing gravity worked, then spawning
-	-- a new BMP crashed", with Apply never pressed.
+	-- This used to call Restore() + Suspend() to spawn against a "clean" blueprint, and that was
+	-- backwards: it CREATED the divergence it meant to avoid. Each realm restores when IT reaches
+	-- this line, so for a window one realm holds baseline data while the other still holds the
+	-- preview -- and a vehicle built while the two disagree kills the client.
 	--
-	-- Restore first, then keep previews off until the spawn finishes. The preview comes back on the
-	-- next edit, which is when the user is looking at it again.
-	VehiclePreview:Restore()
-	VehiclePreview:Suspend()
+	-- Measured with a raw blueprint write (RawWriteProbe), spawning afterwards:
+	--     modified on the SERVER only        -> client dies
+	--     modified on BOTH realms, identical -> both survive
+	--
+	-- So the safe state is both realms modified in the same way, which is exactly what a preview
+	-- already establishes. Leave it alone and spawn.
 
 	self.m_SpawningForGuid = tostring(p_GameObjectGuid)
 	local s_BusOk, s_EntityBus = pcall(function()
 		return EntityManager:CreateEntitiesFromBlueprint(s_Blueprint, s_Params)
 	end)
 	self.m_SpawningForGuid = nil
-	VehiclePreview:Resume()
 
 	if not s_BusOk then
 		m_Logger:Error("CreateEntitiesFromBlueprint threw: " .. tostring(s_EntityBus))
