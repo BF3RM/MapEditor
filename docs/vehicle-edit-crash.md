@@ -660,3 +660,43 @@ per-instance correctly.
 `spawn_twice_e2e` picks the FIRST Float32 it finds on the object, which is usually one of the fatal
 ones, while manual testing used gravity. Two different fields, two different outcomes, read as
 flaky. A test that chooses its own subject can quietly test something other than what is reported.
+
+## RETRACTION: there is no safe field. Any live write breaks later spawns (2026-08-24)
+
+The field-safety table produced earlier is WRONG and should not be used. It reported
+`vehicleConfig.standStillLowSpeedTimeLimit` as SAFE and implied `gravityModifier` was too. Both are
+fatal.
+
+The error was the criterion: `field_safety_e2e` declared a field SAFE after ONE surviving spawn,
+and these crashes take one to three. The session that had just been marked SAFE died when a third
+vehicle was spawned into it.
+
+Re-measured properly:
+
+| Sequence | Result |
+|---|---|
+| spawn 8 vehicles, NO writes | all 8 fine -- vehicle count is not the problem |
+| write `gravityModifier` on BOTH realms (verified landed), then spawn | **client dies on the very next spawn** |
+| write `standStillLowSpeedTimeLimit`, spawn twice | survived twice, died on the third |
+
+So the rule is simple and has no exceptions we have found:
+
+**Writing a vehicle blueprint while the level is live breaks subsequent spawns of that vehicle.**
+
+Not field-dependent. Not about which realm (though one-sided writes also desync -- that is a second,
+independent failure). Not about vehicle count. The earlier "gravityModifier is safe" result came
+from a single run that happened to survive one spawn, and was contradicted the moment it was
+repeated.
+
+This matches the original field report exactly -- "changed gravity, then spawning a new BMP
+crashed" -- and it matches how every other mod here modifies EBX: at load time, before entities
+exist (RealityMod, rm-statics). MapEditor's BAKE does the same thing and is correct.
+
+### Consequences
+
+* `VehiclePreview` stays OFF. There is no subset of fields it could safely preview.
+* `tools/e2e/field_safety_e2e.py` and `tools/field_safety_sweep.sh` are kept, but their SAFE verdict
+  needs several spawns before it means anything. As written they produce false SAFEs.
+* Live preview of a networked blueprint would require either not spawning that blueprint again for
+  the rest of the session, or a way to restore the blueprint that the engine accepts -- restoring
+  the VALUE is not sufficient, which was measured earlier.
