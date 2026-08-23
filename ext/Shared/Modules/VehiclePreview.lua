@@ -42,6 +42,40 @@ end
 -- So it is off. Live-read fields still preview; anything only read at build time will not show
 -- until a reload or a bake, which is the documented limit anyway.
 local PREVIEW_REFRESH_ENABLED = false
+
+-- OFF.
+--
+-- Measured: editing a vehicle and then spawning another kills the CLIENT, and it does so even when
+-- only the SERVER writes -- so this is not a dirty client blueprint, it is the two realms holding
+-- DIFFERENT blueprint data while the engine replicates entities built from it. Restoring the value
+-- before the spawn does not help, because the divergence already exists on the live entities.
+--
+-- A stale preview also kills any client that JOINS afterwards, for the same reason.
+--
+-- This is the difference from how mods normally edit EBX (RealityMod, rm-statics): they write at
+-- Level:LoadResources / Partition:Loaded / RegisterInstanceLoadHandler -- before any entity is
+-- built, identically on both realms. Editing live, after entities exist and while more spawn, is
+-- what the engine will not tolerate.
+--
+-- Left off until there is a design that keeps both realms identical. The bake path already does
+-- per-instance vehicle overrides correctly (docs/bake-pipeline.md §5).
+local PREVIEW_ENABLED = false
+
+-- SERVER ONLY.
+--
+-- Measured A/B: with the preview on, editing a vehicle and then spawning a second one KILLS THE
+-- CLIENT; with it off, the same sequence survives. Restoring the value before the spawn is not
+-- enough, because what persists is not the value -- writing the field makes those shared containers
+-- writable, and that is what the client's next entity build cannot survive.
+--
+-- The server is a different matter: MakeWritable plus a write, then spawning a fresh vehicle, is
+-- measured safe there (MakeWritableRepro, MODE shared-write -- entity bus returned, realm alive).
+--
+-- And the client does not need the write: gravity is simulated server-side and replicated, which is
+-- why the edit was visible in game at all. So write on the server, leave the client's blueprint
+-- untouched, and the client's spawns stay safe. Fields the CLIENT renders from its own data
+-- (visual/mesh) will not preview -- that is the cost, and it is smaller than crashing.
+local PREVIEW_SERVER_ONLY = true
 local REFRESH_DEBOUNCE_TICKS = 12
 
 function VehiclePreview:RegisterVars()
@@ -206,7 +240,11 @@ end
 ---Safe to call repeatedly for the same object: each call restores what it previously wrote before
 ---writing the new values, so previews never stack.
 function VehiclePreview:Show(p_GameObject)
-	if p_GameObject == nil then
+	if not PREVIEW_ENABLED or p_GameObject == nil then
+		return false
+	end
+
+	if PREVIEW_SERVER_ONLY and SharedUtils:IsClientModule() then
 		return false
 	end
 
