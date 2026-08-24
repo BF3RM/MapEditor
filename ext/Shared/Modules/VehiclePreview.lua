@@ -303,6 +303,39 @@ local function ReplaceField(p_Container, p_Field, p_Value)
 	return p_Container
 end
 
+---Write one override chain onto a blueprint BY REPLACEMENT.
+---
+---Public because Apply-to-Blueprint needs it too: an in-place write makes the blueprint's
+---containers writable, and spawning that vehicle afterwards then kills the client (which is why
+---GameObjectManager had to refuse those spawns for the rest of the session). Replacement leaves the
+---blueprint spawnable.
+---@return boolean ok, string|nil reason
+function VehiclePreview:WriteChainByReplacement(p_Shared, p_Chain)
+	local s_Container, s_FieldName, s_Value, s_Type = ResolveTarget(p_Shared, p_Chain)
+
+	if s_Container == nil or s_FieldName == nil then
+		return false, 'could not resolve the chain'
+	end
+
+	if s_Type ~= nil then
+		local s_Coerced = ParseType(tostring(s_Type), s_Value)
+
+		if s_Coerced == nil then
+			return false, "'" .. tostring(s_Value) .. "' is not a valid " .. tostring(s_Type)
+		end
+
+		s_Value = s_Coerced
+	elseif type(s_Value) == 'table' then
+		return false, 'no type to coerce a table value by'
+	end
+
+	if ReplaceField(s_Container, s_FieldName, s_Value) == nil then
+		return false, 'ReplaceInstance failed'
+	end
+
+	return true, nil
+end
+
 ---Refresh ONE object so it re-reads the shared container.
 ---
 ---Deliberately NOT every instance of the blueprint. The shared write is visible to all of them, but

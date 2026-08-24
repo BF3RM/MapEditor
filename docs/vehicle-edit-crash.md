@@ -882,3 +882,29 @@ What is still unknown: what the entity has to be doing for a swap to kill it. Un
 understood, previewing a networked object is a coin flip, and the honest options are to gate it
 behind an explicit opt-in or to make the swap safe (e.g. take the entity out of simulation first --
 untested, and Disable/Enable has its own history here).
+
+## Apply-to-Blueprint by replacement too (2026-08-24)
+
+Three symptoms from one cause, all reported together: edits not applying, Apply reverting to
+default, and spawning a vehicle doing nothing.
+
+Apply wrote the shared blueprint IN PLACE. That:
+
+* made the blueprint's containers writable, so `m_WritableBlueprints` correctly marked it
+  unspawnable for the rest of the session -- and the refusal only reached the server log, so from
+  the editor a spawn silently did nothing;
+* meant `VehiclePreview:Restore()` (which Apply runs first, to avoid baking preview values) put the
+  stock value back, and if the per-instance override had not been recorded there was nothing left to
+  re-apply -- the blueprint sat at stock, which reads as "Apply reverted my change".
+
+Apply now uses the same replacement path as the preview
+(`VehiclePreview:WriteChainByReplacement`), so the blueprint's own containers are never made
+writable and it stays spawnable. The unspawnable marking is gone with it.
+
+Verified end to end:
+
+    spawn a BMP2                  -> 2 objects
+    edit gravityModifier = -5     -> applied
+    Apply to Blueprint            -> client alive
+    read the blueprint back       -> gravityModifier = -5   (it STUCK)
+    spawn another BMP2            -> alive, 3 objects       (no refusal)

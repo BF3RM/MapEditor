@@ -1413,7 +1413,19 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	local s_FailedCount = 0
 
 	for l_Key, l_Field in pairs(s_Applied) do
-		local s_Path = EBXManager:SetField(s_Shared, l_Field, '')
+		-- Write by REPLACEMENT, not in place.
+		--
+		-- An in-place write makes the shared blueprint's containers writable, and spawning that
+		-- vehicle afterwards kills the client -- which is why this used to poison the blueprint for
+		-- the rest of the session and spawns had to be refused. Replacement swaps in a modified copy
+		-- and leaves the original untouched, so the blueprint stays spawnable.
+		local s_Ok, s_Why = VehiclePreview:WriteChainByReplacement(s_Shared, l_Field)
+		local s_Path = s_Ok and l_Key or nil
+
+		if not s_Ok then
+			m_Logger:Error("ApplyOverridesToBlueprint: replacement write failed for '" ..
+				tostring(l_Key) .. "': " .. tostring(s_Why))
+		end
 
 		if s_Path == nil or s_Path == '' then
 			s_Failed[l_Key] = l_Field
@@ -1432,8 +1444,8 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	-- Remember that this blueprint's shared DC is no longer stock. The overrides are cleared from
 	-- the instance right after this, so this table is the ONLY remaining record that the baked
 	-- level has to ship a modified copy of the blueprint (GH #396).
-	-- Apply made this blueprint's containers writable, so it can no longer be spawned from.
-	self.m_WritableBlueprints[s_BpGuid] = tostring(s_GameObject.blueprintCtrRef.name)
+	-- NOT marked unspawnable any more: Apply writes by replacement above, so the blueprint's own
+	-- containers were never made writable and it stays safe to spawn.
 
 	self.m_AppliedBlueprints[s_BpGuid] = {
 		partitionGuid = tostring(s_GameObject.blueprintCtrRef.partitionGuid),
