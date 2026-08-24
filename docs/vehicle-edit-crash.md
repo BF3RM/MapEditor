@@ -811,3 +811,48 @@ Partition:Loaded, before anything is built from those blueprints.
 `m_WritableBlueprints` refuses to spawn a blueprint the session has written. That is exactly the
 dangerous set, and a reload clears it. It does not prevent the edit, which still saves and bakes
 correctly -- it prevents the crash that used to follow it.
+
+## SOLVED: modify by replacement, not in place (2026-08-24)
+
+The rule established above -- writing a blueprint that already has entities built from it breaks
+later spawns -- is about MUTATING the container those entities were built from. It says nothing
+about swapping in a different one.
+
+`DatabasePartition:ReplaceInstance(old, new, replaceReferences)` does exactly that: clone the
+container, set the field on the CLONE, swap it into the partition, and every reference is repointed.
+The original container is never made writable.
+
+Measured on BMP2, which has vanilla vehicles live from round start -- the worst case:
+
+| Approach | Result |
+|---|---|
+| in-place write (MakeWritable + assign) | client dies on the very next spawn |
+| **replacement** (clone, edit clone, ReplaceInstance) | **four further spawns, all alive** |
+
+And the edit is real, not a no-op: reading the blueprint back from the server afterwards gives
+`gravityModifier: -4`, against a stock 1.6.
+
+### VehiclePreview now uses it
+
+`ResolveTarget` walks an override chain to the container holding the edited field without making
+anything writable; `ReplaceField` clones that container, sets the value on the clone, and calls
+`ReplaceInstance`. Restore does the same in reverse, for the same reason -- writing the old value
+back would mutate the live container and reintroduce the crash.
+
+Verified on the exact sequence originally reported:
+
+    spawn a BMP2                     -> alive
+    edit gravityModifier             -> SERVER wrote -4.0, CLIENT wrote -4.0
+    spawn another BMP2               -> alive
+    blueprint reads gravityModifier  -> -4
+
+Both realms apply it, which is still required: one-sided data desyncs them independently of this.
+
+### Two traps worth keeping in mind
+
+* **Arrays must be indexed, never cast.** `components` is a field whose next chain node is a 1-based
+  element name. Casting the array throws on `.typeInfo`, and the preview then silently wrote nothing
+  while reporting success -- a run that "survived" purely because it had done nothing. That mistake
+  appeared three separate times in this work.
+* **A survival result means nothing unless the write is verified.** Every no-op run in this
+  investigation looked like a pass.

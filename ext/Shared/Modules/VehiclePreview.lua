@@ -43,25 +43,26 @@ end
 -- until a reload or a bake, which is the documented limit anyway.
 local PREVIEW_REFRESH_ENABLED = false
 
--- ON, and it MUST run on BOTH realms.
+-- ON. Previews modify by REPLACEMENT, never in place.
 --
--- Measured with a raw blueprint write that bypasses the editor entirely (RawWriteProbe), spawning
--- a vehicle afterwards:
---     write on the SERVER only        -> the client DIES on the next spawn
---     write on BOTH realms, identical -> both survive
+-- The crash this feature kept causing has a precise precondition: if entities already exist that
+-- were built from a blueprint, WRITING that blueprint and then spawning more of it kills the
+-- client. Previewing always meets it -- you are editing an instance that is on screen.
 --
--- MapEditor spawns on both realms, so with only one side modified the server builds a vehicle from
--- one set of data and the client builds one from another. That divergence is what kills it -- not
--- the write, and not the editor's clone/override machinery (a raw write with none of it involved
--- crashes exactly the same way).
+-- Replacement avoids it entirely. Clone the container holding the edited field, set the value on
+-- the CLONE, and swap it in with DatabasePartition:ReplaceInstance, which repoints every reference.
+-- The container the live entities were built from is never mutated.
 --
--- This is the same rule RealityMod and rm-statics follow by writing from shared code: both realms
--- hold identical data. The earlier failures here were this preview effectively writing on the
--- server alone.
-local PREVIEW_ENABLED = false
+-- Measured on BMP2, which has vanilla vehicles live from round start (the worst case):
+--     in-place write  -> client dies on the very next spawn
+--     replacement     -> four further spawns, all alive, and the blueprint reads the new value
+local PREVIEW_ENABLED = true
 
-local PREVIEW_SERVER_ONLY = false
+local PREVIEW_SERVER_ONLY = false  -- both realms; one-sided data desyncs them
 local REFRESH_DEBOUNCE_TICKS = 12
+
+--- Every loaded partition, so a container's owner can be found for ReplaceInstance.
+local m_Partitions = {}
 
 function VehiclePreview:RegisterVars()
 	---{ guid, bpGuid, restore = { [path] = <override leaf carrying the ORIGINAL value> } }
@@ -77,6 +78,7 @@ function VehiclePreview:RegisterEvents()
 	-- A preview must never outlive the level: the shared DC goes away with it, and a stale record
 	-- would try to restore into nothing.
 	Events:Subscribe('Level:Destroy', self, self.OnLevelDestroy)
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 
 	-- No server->client broadcast here. The client runs SetOverrides itself -- per-instance light
 	-- edits are visible in game, which could not happen if edits were server-only -- so it reaches
@@ -130,6 +132,12 @@ function VehiclePreview:OnEngineUpdate()
 	self.m_PendingTicks = 0
 
 	self:_RefreshOne(s_Guid)
+end
+
+function VehiclePreview:OnPartitionLoaded(p_Partition)
+	if p_Partition ~= nil then
+		m_Partitions[tostring(p_Partition.guid)] = p_Partition
+	end
 end
 
 function VehiclePreview:OnLevelDestroy()
@@ -208,6 +216,91 @@ local function RestoreChain(p_Field)
 	s_Copy.value = p_Field.oldValue
 
 	return s_Copy
+end
+
+---Resolve an override chain to the container that holds the edited field.
+---
+---A chain looks like {field='object', value={field='components', value={field='1', ...}}}. Array
+---elements are addressed by their 1-BASED name as a string. Nothing is made writable here -- that
+---is the entire point of the replacement approach.
+---@return DataContainer|nil container, string|nil fieldName, any value
+local function ResolveTarget(p_Shared, p_Chain)
+	local s_Node = _G[p_Shared.typeInfo.name](p_Shared)
+	local s_Chain = p_Chain
+
+	while type(s_Chain) == 'table' and s_Chain.field ~= nil do
+		local s_Key = tostring(s_Chain.field)
+		local s_Next = s_Chain.value
+
+		-- Leaf: this node names a field and its value is the new value.
+		if type(s_Next) ~= 'table' or s_Next.field == nil then
+			return s_Node, s_Key, s_Next
+		end
+
+		local s_Child = s_Node[s_Key]
+
+		if s_Child == nil then
+			return nil, nil, nil
+		end
+
+		-- An ARRAY is a field whose next chain node is a numeric element name ("1", 1-based). Index
+		-- it; never cast the array itself -- doing that throws on .typeInfo and the whole preview
+		-- silently wrote nothing while reporting success.
+		local s_Index = tonumber(tostring(s_Next.field))
+
+		if s_Index ~= nil then
+			s_Child = s_Child[s_Index]
+
+			if s_Child == nil then
+				return nil, nil, nil
+			end
+
+			s_Next = s_Next.value        -- consume the index node too
+
+			if type(s_Next) ~= 'table' or s_Next.field == nil then
+				-- The element itself is the target.
+				return _G[s_Child.typeInfo.name](s_Child), nil, s_Next
+			end
+		end
+
+		s_Node = _G[s_Child.typeInfo.name](s_Child)
+		s_Chain = s_Next
+	end
+
+	return nil, nil, nil
+end
+
+---Swap a modified copy of `p_Container` into its partition.
+---
+---Clones it, sets one field on the CLONE, then ReplaceInstance repoints every reference. The
+---original container -- the one live entities were built from -- is never mutated, which is what
+---keeps later spawns alive.
+---@return DataContainer|nil the ORIGINAL container, for restoring
+local function ReplaceField(p_Container, p_Field, p_Value)
+	local s_Partition = nil
+
+	for _, l_P in pairs(m_Partitions) do
+		if l_P:FindInstance(p_Container.instanceGuid) ~= nil then
+			s_Partition = l_P
+			break
+		end
+	end
+
+	if s_Partition == nil then
+		return nil
+	end
+
+	local s_Clone = g_DataContainerExt:ShallowCopy(p_Container, GenerateGuid())
+
+	if s_Clone == nil then
+		return nil
+	end
+
+	s_Clone:MakeWritable()          -- the CLONE, which nothing was built from
+	s_Clone[p_Field] = p_Value
+	s_Partition:ReplaceInstance(p_Container, s_Clone, true)
+
+	return p_Container
 end
 
 ---Refresh ONE object so it re-reads the shared container.
@@ -289,10 +382,26 @@ function VehiclePreview:Show(p_GameObject)
 
 		if s_RestoreLeaf ~= nil then
 			local s_Ok, s_Result = pcall(function()
-				return EBXManager:SetField(s_Shared, l_Field, '')
+				local s_Container, s_FieldName, s_Value = ResolveTarget(s_Shared, l_Field)
+
+				if s_Container == nil or s_FieldName == nil then
+					error('could not resolve ' .. tostring(l_Path))
+				end
+
+				local s_Original = ReplaceField(s_Container, s_FieldName, s_Value)
+
+				if s_Original == nil then
+					error('ReplaceInstance failed for ' .. tostring(l_Path))
+				end
+
+				return s_Original
 			end)
 
-			if s_Ok and s_Result ~= nil and s_Result ~= '' then
+			if not s_Ok then
+				m_Logger:Warning('preview: ' .. tostring(s_Result))
+			end
+
+			if s_Ok and s_Result ~= nil then
 				s_Restore[l_Path] = s_RestoreLeaf
 				s_Written = s_Written + 1
 				-- Record exactly WHAT was written, so the two realms can be compared. "Both
@@ -364,8 +473,14 @@ function VehiclePreview:Restore()
 	local s_Restored = 0
 
 	for _, l_Field in pairs(s_Active.restore) do
+		-- Restore by replacement too. Writing the value back would mutate the container the current
+		-- entities were built from -- exactly the thing that poisons later spawns.
 		local s_Ok = pcall(function()
-			EBXManager:SetField(s_Shared, l_Field, '')
+			local s_Container, s_FieldName, s_Value = ResolveTarget(s_Shared, l_Field)
+
+			if s_Container ~= nil then
+				ReplaceField(s_Container, s_FieldName, s_Value)
+			end
 		end)
 
 		if s_Ok then

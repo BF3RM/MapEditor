@@ -15,7 +15,12 @@ class 'RawWriteProbe'
 
 local m_Logger = Logger('RawWriteProbe', true)
 
+--- Every loaded partition, so ReplacePath can find the one owning a container.
+local m_Partitions = {}
+
 function RawWriteProbe:__init()
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+
 	if SharedUtils:IsClientModule() then
 		Events:Subscribe('MapEditor:RawWrite', self, self.OnClientRequest)
 	else
@@ -99,6 +104,73 @@ local function WritePath(p_Blueprint, p_Path, p_Value)
 	return s_Before, s_Node[s_Field]
 end
 
+---Modify by REPLACEMENT rather than in place.
+---
+---Walks to the container holding the final field WITHOUT making anything writable, clones that
+---container, sets the field on the clone, and swaps it into the partition. `ReplaceInstance`
+---repoints every reference to the old instance, so the blueprint ends up pointing at the modified
+---copy while the original container was never touched.
+---
+---The question this answers: the crash precondition is "entities exist that were built from this
+---blueprint" plus a write to it. If the damage comes from mutating the container those entities
+---were built from, replacing it instead may avoid the whole thing.
+local function ReplacePath(p_Blueprint, p_Path, p_Value)
+	local s_Root = _G[p_Blueprint.typeInfo.name](p_Blueprint)
+	local s_Node = _G[s_Root.object.typeInfo.name](s_Root.object)
+	local s_Parts = Segments(p_Path)
+	local i = 1
+
+	while i <= #s_Parts - 1 do
+		local l_Key = s_Parts[i]
+		local l_Index = tonumber(s_Parts[i + 1])
+		local l_Child
+
+		if l_Index ~= nil then
+			local l_Array = s_Node[l_Key]
+			if l_Array == nil then error('no array "' .. l_Key .. '"') end
+			l_Child = l_Array[l_Index]
+			i = i + 2
+		else
+			l_Child = s_Node[l_Key]
+			i = i + 1
+		end
+
+		if l_Child == nil then error('path stops at "' .. l_Key .. '"') end
+		s_Node = _G[l_Child.typeInfo.name](l_Child)
+	end
+
+	local s_Field = s_Parts[#s_Parts]
+	local s_Before = s_Node[s_Field]
+
+	if s_Before == nil then error('no field "' .. s_Field .. '"') end
+
+	-- Clone the container, edit the CLONE.
+	local s_Clone = g_DataContainerExt:ShallowCopy(s_Node, GenerateGuid())
+
+	if s_Clone == nil then error('ShallowCopy returned nil') end
+
+	s_Clone:MakeWritable()
+	s_Clone[s_Field] = p_Value
+
+	-- Swap it in. Find the partition that owns the original.
+	local s_Partition = nil
+
+	for _, l_P in pairs(m_Partitions) do
+		local l_Found = l_P:FindInstance(s_Node.instanceGuid)
+
+		if l_Found ~= nil then
+			s_Partition = l_P
+			break
+		end
+	end
+
+	if s_Partition == nil then error('owning partition not found') end
+
+	s_Partition:ReplaceInstance(s_Node, s_Clone, true)
+
+	return s_Before, s_Clone[s_Field]
+end
+
 ---payload: "<blueprint>|<path>|<value>"
 local function Parse(p_Payload)
 	local s_Text = tostring(p_Payload):gsub('^"(.*)"$', '%1')
@@ -106,10 +178,25 @@ local function Parse(p_Payload)
 
 	-- "touch" = make the path writable and change nothing.
 	if s_Value == 'touch' then
-		return s_Bp, s_Path, nil, true
+		return s_Bp, s_Path, nil, true, false
 	end
 
-	return s_Bp, s_Path, tonumber(s_Value), false
+	-- "replace:<n>" = do NOT modify the original container. Clone it, set the field on the CLONE,
+	-- and swap it into the partition with DatabasePartition:ReplaceInstance, which repoints every
+	-- reference. Nothing existing is ever made writable, which is the interesting part.
+	local s_Repl = s_Value:match('^replace:(-?[0-9.]+)$')
+
+	if s_Repl ~= nil then
+		return s_Bp, s_Path, tonumber(s_Repl), false, true
+	end
+
+	return s_Bp, s_Path, tonumber(s_Value), false, false
+end
+
+function RawWriteProbe:OnPartitionLoaded(p_Partition)
+	if p_Partition ~= nil then
+		m_Partitions[tostring(p_Partition.guid)] = p_Partition
+	end
 end
 
 function RawWriteProbe:OnClientRequest(p_Payload)
@@ -127,7 +214,7 @@ function RawWriteProbe:OnClientReport(p_Player, p_Text)
 end
 
 function RawWriteProbe:Write(p_Payload, p_IsClient)
-	local s_BpName, s_Path, s_Value, s_TouchOnly = Parse(p_Payload)
+	local s_BpName, s_Path, s_Value, s_TouchOnly, s_Replace = Parse(p_Payload)
 
 	if s_BpName == nil or s_Path == nil or (s_Value == nil and not s_TouchOnly) then
 		m_Logger:Warning('RAWWRITE bad payload: ' .. tostring(p_Payload))
@@ -141,9 +228,15 @@ function RawWriteProbe:Write(p_Payload, p_IsClient)
 		return
 	end
 
-	local s_Ok, s_Before, s_After = pcall(WritePath, s_Bp, s_Path, s_Value)
+	local s_Ok, s_Before, s_After
+
+	if s_Replace then
+		s_Ok, s_Before, s_After = pcall(ReplacePath, s_Bp, s_Path, s_Value)
+	else
+		s_Ok, s_Before, s_After = pcall(WritePath, s_Bp, s_Path, s_Value)
+	end
 	local s_Text = (p_IsClient and 'CLIENT' or 'SERVER') .. ' ' ..
-		(s_TouchOnly and '[touch-only] ' or '') .. s_Path ..
+		(s_TouchOnly and '[touch-only] ' or '') .. (s_Replace and '[replace] ' or '') .. s_Path ..
 		' ok=' .. tostring(s_Ok) ..
 		(s_Ok and (' ' .. tostring(s_Before) .. ' -> ' .. tostring(s_After))
 		      or (' err=' .. tostring(s_Before)))
