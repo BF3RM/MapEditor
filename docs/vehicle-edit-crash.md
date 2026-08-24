@@ -771,3 +771,43 @@ spawns killed it.
 
 This does not make live blueprint editing work; nothing can, short of not calling MakeWritable. It
 converts a dead session into a message that says what happened and what to do about it.
+
+## The precise rule (2026-08-24, supersedes the two statements above)
+
+Neither "any live write breaks later spawns" nor "MakeWritable is the poison" is quite right. Both
+were measured on blueprints that already had entities built from them.
+
+**If entities already exist that were built from a blueprint, writing that blueprint and then
+spawning more of it kills the client.**
+
+| Sequence | Result |
+|---|---|
+| LAV25 (nothing built from it yet): write, then spawn x3 | alive |
+| LAV25: spawn one FIRST, then write, then spawn | **client dies** |
+| BMP2: write, then spawn -- BMP2 has vanilla vehicles live on MP_001 | **client dies** |
+| BMP2: spawn, then write, then spawn | **client dies** |
+| anything: no write at all, 8 spawns | alive |
+
+The earlier "MakeWritable alone is fatal" measurement stands but is a special case: it was done on
+BMP2, which already had live entities. The touch-only run proves the VALUE is irrelevant; this pair
+of LAV25 runs proves the precondition is EXISTING ENTITIES, not the write.
+
+It also finally reconciles the isolated repro that started all the confusion. `MakeWritableRepro`
+MODE `shared-write` wrote BMP2 and spawned successfully -- server-only, with no client. The crash is
+the CLIENT reconciling entities whose blueprint changed underneath them, so a server with no client
+cannot show it.
+
+### Why this closes live preview for vehicles
+
+Previewing an edit means editing an instance that is on screen -- which is, by definition, an entity
+built from that blueprint. The precondition is always met. There is no ordering, field subset or
+realm arrangement that avoids it.
+
+The same rule is why RealityMod and rm-statics are safe: they write at Level:LoadResources /
+Partition:Loaded, before anything is built from those blueprints.
+
+### Why the guard is the right shape
+
+`m_WritableBlueprints` refuses to spawn a blueprint the session has written. That is exactly the
+dangerous set, and a reload clears it. It does not prevent the edit, which still saves and bakes
+correctly -- it prevents the crash that used to follow it.
