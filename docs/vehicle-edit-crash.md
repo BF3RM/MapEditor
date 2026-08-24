@@ -700,3 +700,57 @@ exist (RealityMod, rm-statics). MapEditor's BAKE does the same thing and is corr
 * Live preview of a networked blueprint would require either not spawning that blueprint again for
   the rest of the session, or a way to restore the blueprint that the engine accepts -- restoring
   the VALUE is not sufficient, which was measured earlier.
+
+## ROOT CAUSE: MakeWritable on a live vehicle blueprint (2026-08-24)
+
+Not the value. Not the field. Not the realm split. Not the vehicle count.
+
+**Calling `MakeWritable()` on a live vehicle blueprint's containers breaks every subsequent spawn of
+that vehicle.**
+
+Measured with the probe in "touch" mode -- it walks `object -> components[1] -> vehicleConfig`,
+calls `MakeWritable()` on each container, and assigns NOTHING:
+
+    touch result: path=components.1.vehicleConfig.gravityModifier
+                  before=1.6000000238419  after=1.6000000238419  ok=true
+    spawn 1 after TOUCH -> client DIED
+
+Before and after are identical, so no data changed. The next spawn still died. Compare:
+
+| Sequence | Result |
+|---|---|
+| spawn 8 vehicles, nothing touched | all fine |
+| MakeWritable the path, write NOTHING, spawn | **client dies on the next spawn** |
+| MakeWritable + write a value, spawn | client dies on the next spawn |
+
+### Why this took so long to find
+
+This was the FIRST hypothesis in this investigation, and it was discarded on a bad measurement. The
+isolated repro that "disproved" it was server-only, had no client connected, and spawned once. All
+three mattered:
+
+* server-only -- the crash lands on the CLIENT;
+* no client -- nothing replicates, so nothing reconciles the damaged blueprint;
+* one spawn -- these crashes take one to three.
+
+Every later theory (registration, partitions, primary-instance status, realm divergence, field
+safety) was built on top of that wrong retraction, and each one produced its own measurements that
+looked conclusive in isolation.
+
+### What follows
+
+* A live preview of a networked blueprint is not achievable. It has to write the shared container,
+  which requires MakeWritable, which is the poison. There is no subset of fields that avoids it and
+  no ordering that undoes it -- restoring the VALUE was already measured insufficient, which is
+  consistent: the value was never the problem.
+* The editor's per-instance clone path is unaffected: it makes the CLONE writable, not the shared
+  blueprint.
+* This is exactly why RealityMod and rm-statics write at Level:LoadResources / Partition:Loaded --
+  before any entity exists, so nothing is spawned from a blueprint afterwards in that state.
+* MapEditor's bake is correct for the same reason.
+
+### The one thing left to test
+
+Whether the damage is confined to the containers actually made writable. If MakeWritable on a
+DIFFERENT vehicle's blueprint leaves BMP2 spawnable, the editor could at least know which blueprints
+it has poisoned and refuse to spawn those, rather than the whole class.

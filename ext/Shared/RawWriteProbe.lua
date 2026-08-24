@@ -87,6 +87,13 @@ local function WritePath(p_Blueprint, p_Path, p_Value)
 		error('no field "' .. s_Field .. '" at the end of the path')
 	end
 
+	-- A nil value means TOUCH ONLY: walk the path and MakeWritable every container, but assign
+	-- nothing. That separates "the new value poisons later spawns" from "making these containers
+	-- writable does" -- and only one of those has a possible fix.
+	if p_Value == nil then
+		return s_Before, s_Before
+	end
+
 	s_Node[s_Field] = p_Value
 
 	return s_Before, s_Node[s_Field]
@@ -97,7 +104,12 @@ local function Parse(p_Payload)
 	local s_Text = tostring(p_Payload):gsub('^"(.*)"$', '%1')
 	local s_Bp, s_Path, s_Value = s_Text:match('^([^|]+)|([^|]+)|([^|]+)$')
 
-	return s_Bp, s_Path, tonumber(s_Value)
+	-- "touch" = make the path writable and change nothing.
+	if s_Value == 'touch' then
+		return s_Bp, s_Path, nil, true
+	end
+
+	return s_Bp, s_Path, tonumber(s_Value), false
 end
 
 function RawWriteProbe:OnClientRequest(p_Payload)
@@ -115,9 +127,9 @@ function RawWriteProbe:OnClientReport(p_Player, p_Text)
 end
 
 function RawWriteProbe:Write(p_Payload, p_IsClient)
-	local s_BpName, s_Path, s_Value = Parse(p_Payload)
+	local s_BpName, s_Path, s_Value, s_TouchOnly = Parse(p_Payload)
 
-	if s_BpName == nil or s_Path == nil or s_Value == nil then
+	if s_BpName == nil or s_Path == nil or (s_Value == nil and not s_TouchOnly) then
 		m_Logger:Warning('RAWWRITE bad payload: ' .. tostring(p_Payload))
 		return
 	end
@@ -130,7 +142,8 @@ function RawWriteProbe:Write(p_Payload, p_IsClient)
 	end
 
 	local s_Ok, s_Before, s_After = pcall(WritePath, s_Bp, s_Path, s_Value)
-	local s_Text = (p_IsClient and 'CLIENT' or 'SERVER') .. ' ' .. s_Path ..
+	local s_Text = (p_IsClient and 'CLIENT' or 'SERVER') .. ' ' ..
+		(s_TouchOnly and '[touch-only] ' or '') .. s_Path ..
 		' ok=' .. tostring(s_Ok) ..
 		(s_Ok and (' ' .. tostring(s_Before) .. ' -> ' .. tostring(s_After))
 		      or (' err=' .. tostring(s_Before)))
