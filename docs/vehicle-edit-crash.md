@@ -856,3 +856,29 @@ Both realms apply it, which is still required: one-sided data desyncs them indep
   appeared three separate times in this work.
 * **A survival result means nothing unless the write is verified.** Every no-op run in this
   investigation looked like a pass.
+
+### Replacement works, but is not yet RELIABLE (2026-08-24)
+
+Replacement is a genuine improvement over in-place writing -- the edit applies, both realms agree,
+and spawning afterwards is fine. It is not stable enough to leave on:
+
+| Run | Result |
+|---|---|
+| a real editing session | many edits fine, then the server died |
+| automated: 1 spawn + 6 edits (run A) | client died on edit 1 |
+| automated: 1 spawn + 6 edits (run B) | 6/6 edits fine |
+
+Same code, same sequence, opposite outcomes -- so this is a race, not a rule. `ReplaceInstance`
+repoints references out from under LIVE entities: the vehicle being edited was built from the
+container being swapped. `Types/GameEntity.lua:135` reports it directly when it loses:
+
+    tried accessing an invalid or destroyed EntityBusPeer
+
+Churn was reduced (a repeat edit on the same object no longer restores first, halving the
+ReplaceInstance traffic per keystroke) and run B passed afterwards, but run A had already failed on
+a FIRST edit, where that change makes no difference. So the churn was not the cause.
+
+What is still unknown: what the entity has to be doing for a swap to kill it. Until that is
+understood, previewing a networked object is a coin flip, and the honest options are to gate it
+behind an explicit opt-in or to make the swap safe (e.g. take the entity out of simulation first --
+untested, and Disable/Enable has its own history here).

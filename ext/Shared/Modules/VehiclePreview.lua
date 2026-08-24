@@ -356,8 +356,16 @@ function VehiclePreview:Show(p_GameObject)
 		return false
 	end
 
-	-- Whatever was previewed before -- this object or another -- goes back first.
-	self:Restore()
+	-- Restore only when moving to a DIFFERENT object.
+	--
+	-- Every ReplaceInstance repoints references out from under live entities -- that is what
+	-- produced "tried accessing an invalid or destroyed EntityBusPeer" and, with enough of them, a
+	-- dead server. Restoring before re-previewing the same object doubled that traffic for no
+	-- benefit: the next call is about to overwrite the same field anyway, and the ORIGINAL value is
+	-- already recorded from the first preview, so restore-on-exit still puts back the right thing.
+	if self.m_Active ~= nil and self.m_Active.guid ~= tostring(p_GameObject.guid) then
+		self:Restore()
+	end
 
 	local s_Overrides = p_GameObject.overrides
 
@@ -422,11 +430,21 @@ function VehiclePreview:Show(p_GameObject)
 		return false
 	end
 
-	self.m_Active = {
-		guid = tostring(p_GameObject.guid),
-		bpGuid = tostring(p_GameObject.blueprintCtrRef.instanceGuid),
-		restore = s_Restore,
-	}
+	-- Keep the FIRST preview's restore data. Later edits replace a container we already swapped in,
+	-- so their "original" is our own clone -- restoring that would leave the preview value in place.
+	if self.m_Active ~= nil and self.m_Active.guid == tostring(p_GameObject.guid) then
+		for l_Path, l_Leaf in pairs(s_Restore) do
+			if self.m_Active.restore[l_Path] == nil then
+				self.m_Active.restore[l_Path] = l_Leaf
+			end
+		end
+	else
+		self.m_Active = {
+			guid = tostring(p_GameObject.guid),
+			bpGuid = tostring(p_GameObject.blueprintCtrRef.instanceGuid),
+			restore = s_Restore,
+		}
+	end
 
 	self:_QueueRefresh(self.m_Active.guid)
 
