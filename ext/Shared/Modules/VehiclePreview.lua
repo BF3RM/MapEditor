@@ -28,20 +28,19 @@ function VehiclePreview:__init()
 	self:RegisterEvents()
 end
 
--- Refreshing after a preview write is DISABLED, and the machinery is kept only so re-enabling it is
--- one flag.
+-- Refresh the EDITED object after a preview write. Required, not optional.
 --
--- A refresh is Disable/Enable -- a destroy and recreate of a networked vehicle -- which is the
--- single operation this whole investigation found vehicle crashes clustered around. It also turns
--- out not to be needed for what previews are for: a gravityModifier change applied INSTANTLY in
--- game, so the physics reads the value live from the shared container rather than at build time.
+-- Replacement swaps the container the BLUEPRINT points at, so new spawns get the new value -- but a
+-- live entity still holds the container it was built from and never sees the edit. That is "I
+-- change gravity and nothing happens": the write lands, the vehicle in front of you ignores it.
+-- Refreshing (Disable/Enable) rebuilds the entity from the blueprint's CURRENT container.
 --
--- Every crash reported against the preview involved this refresh: destroyed vehicles (one
--- destroy/recreate per keystroke), a crash spawning a second BMP (refresh inline with
--- CreateEntitiesFromBlueprint), and a crash on the SECOND edit (a refresh racing the next edit).
--- So it is off. Live-read fields still preview; anything only read at build time will not show
--- until a reload or a bake, which is the documented limit anyway.
-local PREVIEW_REFRESH_ENABLED = false
+-- This was disabled while writes were IN PLACE, where the refresh was implicated in destroyed
+-- vehicles and spawn crashes. Those crashes came from mutating the container live entities were
+-- built from; replacement never does that, so the refresh is worth re-testing on its own terms.
+-- Still debounced and still single-object -- one destroy/recreate per burst of edits, not per
+-- keystroke.
+local PREVIEW_REFRESH_ENABLED = true
 
 -- ON. Previews modify by REPLACEMENT, never in place.
 --

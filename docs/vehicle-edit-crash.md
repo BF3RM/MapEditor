@@ -929,3 +929,30 @@ blueprint still reads -5.
 Also silenced a non-event: `SetOverrides` is called with an EMPTY override set on some paths (a
 re-instantiate after Apply has cleared the instance's overrides), and it logged "no field applied",
 which reads as a failure while describing nothing. It returns quietly now.
+
+### Replacement needs the refresh, or the preview is invisible (2026-08-24)
+
+Reported as: no crash any more, but changing gravity does nothing.
+
+Replacement swaps the container the BLUEPRINT points at. New spawns get the new value -- which is
+why a vehicle spawned after an edit flew -- but a LIVE entity still holds the container it was built
+from and never sees the edit. The write lands and the vehicle in front of you ignores it.
+
+The two mechanisms have opposite trades:
+
+| | live entity sees it | spawning afterwards |
+|---|---|---|
+| in-place write | yes | breaks (client dies) |
+| replacement | **no** | fine |
+| replacement + refresh the edited object | yes | fine (measured below) |
+
+So the refresh is required, not optional. It was disabled while writes were IN PLACE, where it was
+implicated in destroyed vehicles and spawn crashes -- but those came from mutating the container
+live entities were built from, which replacement never does.
+
+Re-enabled, still debounced and still single-object. Measured: spawn a BMP2, five gravity edits in a
+row, then spawn again -- everything alive, the new vehicle registers.
+
+Not yet established: whether this is stable across many sessions. The ReplaceInstance race that made
+previews intermittently fatal was observed BEFORE the refresh was re-enabled, so it is not resolved
+by this, merely not reproduced in this run.
