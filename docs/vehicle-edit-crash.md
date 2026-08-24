@@ -908,3 +908,24 @@ Verified end to end:
     Apply to Blueprint            -> client alive
     read the blueprint back       -> gravityModifier = -5   (it STUCK)
     spawn another BMP2            -> alive, 3 objects       (no refusal)
+
+### A later preview restore could undo an Apply (2026-08-24)
+
+Reported as: spawned a vehicle after Apply and it flew (so the value WAS applied), but the inspector
+read the stock 1.6, and editing again crashed.
+
+The 1.6 was a preview RESTORE. A preview records the pre-edit value as its "original"; Apply then
+makes the edited value the new baseline, but the preview's restore data still held the pre-Apply
+number. The next restore -- triggered by previewing a different object -- wrote that stale original
+back, silently undoing the Apply. The already-spawned vehicle kept flying because it was built from
+the applied container, so the world and the data disagreed, which is exactly how it looked.
+
+`VehiclePreview:ForgetBlueprint` is now called after a successful Apply, dropping restore data for
+that blueprint because its current value IS the baseline.
+
+Verified: Apply gravityModifier = -5 on BMP2, then edit a LAV25 (which triggers a restore). BMP2's
+blueprint still reads -5.
+
+Also silenced a non-event: `SetOverrides` is called with an EMPTY override set on some paths (a
+re-instantiate after Apply has cleared the instance's overrides), and it logged "no field applied",
+which reads as a failure while describing nothing. It returns quietly now.

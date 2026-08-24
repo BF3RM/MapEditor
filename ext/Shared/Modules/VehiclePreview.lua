@@ -600,6 +600,19 @@ function VehiclePreview:Resume()
 	self.m_SuspendTicks = 0
 end
 
+---Forget any restore data for a blueprint, because its CURRENT value is now the baseline.
+---
+---Apply-to-Blueprint makes the edited value the new stock value. A preview captured its "original"
+---BEFORE that, so a later restore would put the pre-Apply value back and silently undo the Apply --
+---seen in the field as an applied change reverting to default while the vehicle already spawned
+---from it kept flying.
+function VehiclePreview:ForgetBlueprint(p_BpGuid)
+	if self.m_Active ~= nil and self.m_Active.bpGuid == tostring(p_BpGuid) then
+		self.m_Active = nil
+		self.m_PendingRefresh = nil
+	end
+end
+
 ---Drop the preview for one object if it is the active one (used when it is deleted).
 function VehiclePreview:ClearFor(p_Guid)
 	if self.m_Active ~= nil and self.m_Active.guid == tostring(p_Guid) then

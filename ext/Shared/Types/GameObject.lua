@@ -550,6 +550,13 @@ function GameObject:SetOverrides(p_Overrides)
 	-- symptoms ("No instance passed" + "Spawning from clone failed: nil") -- generalised from
 	-- "this object type can't be instantiated" to "this edit never landed, so there is nothing to
 	-- rebuild from".
+	-- Nothing to do, and not an error. SetOverrides gets called with an empty set on some paths
+	-- (a re-instantiate after Apply has cleared the instance's overrides, for one), and reporting
+	-- that as "no field applied" put an alarming line in the log describing a non-event.
+	if p_Overrides == nil or next(p_Overrides) == nil then
+		return true, ''
+	end
+
 	local s_AnyApplied = false
 
 

@@ -1447,6 +1447,10 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	-- NOT marked unspawnable any more: Apply writes by replacement above, so the blueprint's own
 	-- containers were never made writable and it stays safe to spawn.
 
+	-- The applied value IS the baseline now, so any preview restore data for this blueprint is
+	-- stale. Left in place, the next restore would put the pre-Apply value back and undo this.
+	VehiclePreview:ForgetBlueprint(s_BpGuid)
+
 	self.m_AppliedBlueprints[s_BpGuid] = {
 		partitionGuid = tostring(s_GameObject.blueprintCtrRef.partitionGuid),
 		name = tostring(s_GameObject.blueprintCtrRef.name),
