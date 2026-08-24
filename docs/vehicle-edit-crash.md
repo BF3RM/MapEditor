@@ -754,3 +754,20 @@ looked conclusive in isolation.
 Whether the damage is confined to the containers actually made writable. If MakeWritable on a
 DIFFERENT vehicle's blueprint leaves BMP2 spawnable, the editor could at least know which blueprints
 it has poisoned and refuse to spawn those, rather than the whole class.
+
+### The fix that follows: refuse, do not crash
+
+The damage is per-blueprint, so the editor can name exactly which ones it has poisoned.
+`GameObjectManager` now records every blueprint made writable by Apply-to-Blueprint
+(`m_WritableBlueprints`, cleared on level load) and refuses to spawn those:
+
+    Refusing to spawn 'Vehicles/BMP2/BMP2': this blueprint was modified in place (Apply to
+    Blueprint) earlier this session, and spawning it again crashes the client. Reload the level to
+    spawn it again -- the edit itself is saved and bakes correctly.
+
+Verified end to end on the originally reported sequence -- spawn a BMP2, edit it, Apply, then spawn
+three more: every attempt is refused and the client stays alive. Before this, the first of those
+spawns killed it.
+
+This does not make live blueprint editing work; nothing can, short of not calling MakeWritable. It
+converts a dead session into a message that says what happened and what to do about it.

@@ -216,6 +216,14 @@ function GameObjectManager:OnPendingOverridesPump()
 end
 
 function GameObjectManager:RegisterVars()
+	--- Blueprints this session has made WRITABLE, keyed by instance guid.
+	---
+	--- Calling MakeWritable on a live vehicle blueprint breaks every later spawn of it -- measured
+	--- with a probe that made the containers writable and wrote NOTHING. The damage is confined to
+	--- that blueprint (touching LAV25 leaves BMP2 spawning fine), so we can name exactly which ones
+	--- are poisoned and refuse those instead of crashing the client.
+	self.m_WritableBlueprints = {}
+
 	---@type table<string, GameObject>
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
@@ -272,6 +280,9 @@ function GameObjectManager:RegisterVars()
 end
 
 function GameObjectManager:OnLevelDestroy()
+	-- A reload gives clean containers back, so nothing stays poisoned across levels.
+	self.m_WritableBlueprints = {}
+
 	self:RegisterVars()
 end
 
@@ -280,6 +291,14 @@ function GameObjectManager:GetGameObject(p_GameObjectGuid)
 	return self.m_GameObjects[tostring(p_GameObjectGuid)]
 end
 
+--- Blueprints this session has made WRITABLE, keyed by instance guid.
+---
+--- Calling MakeWritable on a live vehicle blueprint breaks every later spawn of it -- measured with
+--- a probe that made the containers writable and wrote NOTHING (docs/vehicle-edit-crash.md). The
+--- damage is confined to that blueprint: touching LAV25 leaves BMP2 spawning fine.
+---
+--- So we can know exactly which blueprints are poisoned and refuse to spawn them, which turns a
+--- client crash into a message. Cleared on level load, since a reload gives clean containers back.
 --- Blueprints that must NOT be handed to CreateEntitiesFromBlueprint.
 ---
 --- Spawning these faults NATIVELY: the client dies ~3s later with no Lua error, no JS error and no
@@ -442,6 +461,22 @@ function GameObjectManager:InvokeBlueprintSpawn(p_GameObjectGuid, p_SenderName, 
 		m_Logger:Write("Added s_PreviewSpawnParentData: " .. tostring(s_PreviewSpawnParentData.guid))
 		m_Logger:WriteTable(s_PreviewSpawnParentData)
 		self.m_PendingCustomBlueprintGuids[p_BlueprintInstanceGuid] = { customGuid = p_GameObjectGuid, creatorName = p_SenderName, parentData = s_PreviewSpawnParentData, overrides = p_Overrides, timeStamp = p_TimeStamp }
+	end
+
+	-- Refuse rather than crash.
+	--
+	-- Once a blueprint has been made writable this level, building entities from it kills the
+	-- client -- reliably, on the next spawn or the one after. Apply-to-Blueprint does exactly that,
+	-- which is why "I pressed apply, then spawned another BMP and crashed" was the original report.
+	-- A refusal the user can read beats a dead session.
+	local s_SpawnBpGuid = tostring(p_BlueprintInstanceGuid)
+
+	if self.m_WritableBlueprints[s_SpawnBpGuid] ~= nil then
+		m_Logger:Error("Refusing to spawn '" .. tostring(self.m_WritableBlueprints[s_SpawnBpGuid]) ..
+			"': this blueprint was modified in place (Apply to Blueprint) earlier this session, and " ..
+			"spawning it again crashes the client. Reload the level to spawn it again -- the edit " ..
+			"itself is saved and bakes correctly.")
+		return false
 	end
 
 	local s_Params = EntityCreationParams()
@@ -1397,6 +1432,9 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	-- Remember that this blueprint's shared DC is no longer stock. The overrides are cleared from
 	-- the instance right after this, so this table is the ONLY remaining record that the baked
 	-- level has to ship a modified copy of the blueprint (GH #396).
+	-- Apply made this blueprint's containers writable, so it can no longer be spawned from.
+	self.m_WritableBlueprints[s_BpGuid] = tostring(s_GameObject.blueprintCtrRef.name)
+
 	self.m_AppliedBlueprints[s_BpGuid] = {
 		partitionGuid = tostring(s_GameObject.blueprintCtrRef.partitionGuid),
 		name = tostring(s_GameObject.blueprintCtrRef.name),
