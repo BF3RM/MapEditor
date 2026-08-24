@@ -562,9 +562,21 @@ function GameObject:SetOverrides(p_Overrides)
 	end
 
 	if not s_AnyApplied then
+		-- Name the paths that failed. This used to say only that SOMETHING did not apply, which
+		-- left "my edit does nothing" with no way to find out why -- reported from the field
+		-- exactly that way. EBXManager logs the specific refusal per field; this ties them to the
+		-- object and the chain the user actually touched.
+		local s_Paths = {}
+
+		for _, l_Field in pairs(p_Overrides) do
+			s_Paths[#s_Paths + 1] = tostring(m_OverridePath(l_Field))
+		end
+
 		m_Logger:Error("SetOverrides: no field applied for '" .. tostring(self.name) ..
-			"' -- refusing to re-instantiate. Rebuilding from a chain that never resolved " ..
-			"produces a half-built clone, which crashes the realm natively.")
+			"' (" .. table.concat(s_Paths, ', ') .. ") -- refusing to re-instantiate. Rebuilding " ..
+			"from a chain that never resolved produces a half-built clone, which crashes the realm " ..
+			"natively. The edit was NOT recorded; see the EBXManager line above for the field that " ..
+			"could not be resolved.")
 
 		self:SetField('overrides', self.overrides)
 

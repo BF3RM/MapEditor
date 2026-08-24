@@ -234,7 +234,7 @@ local function ResolveTarget(p_Shared, p_Chain)
 
 		-- Leaf: this node names a field and its value is the new value.
 		if type(s_Next) ~= 'table' or s_Next.field == nil then
-			return s_Node, s_Key, s_Next
+			return s_Node, s_Key, s_Next, s_Chain.type
 		end
 
 		local s_Child = s_Node[s_Key]
@@ -259,7 +259,7 @@ local function ResolveTarget(p_Shared, p_Chain)
 
 			if type(s_Next) ~= 'table' or s_Next.field == nil then
 				-- The element itself is the target.
-				return _G[s_Child.typeInfo.name](s_Child), nil, s_Next
+				return _G[s_Child.typeInfo.name](s_Child), nil, s_Next, s_Chain.type
 			end
 		end
 
@@ -390,10 +390,28 @@ function VehiclePreview:Show(p_GameObject)
 
 		if s_RestoreLeaf ~= nil then
 			local s_Ok, s_Result = pcall(function()
-				local s_Container, s_FieldName, s_Value = ResolveTarget(s_Shared, l_Field)
+				local s_Container, s_FieldName, s_Value, s_Type = ResolveTarget(s_Shared, l_Field)
 
 				if s_Container == nil or s_FieldName == nil then
 					error('could not resolve ' .. tostring(l_Path))
+				end
+
+				-- Coerce exactly as the editor's own writer does. Without this a Vec2/3/4 override
+				-- arrives as a plain Lua table ({x,y,z}) and was assigned straight into the field --
+				-- the "=table: ..." seen in a real session's log. A wrong value written silently is
+				-- worse than a refused edit, so refuse when it cannot be represented.
+				if s_Type ~= nil then
+					local s_Coerced = ParseType(tostring(s_Type), s_Value)
+
+					if s_Coerced == nil then
+						error("'" .. tostring(s_Value) .. "' is not a valid " .. tostring(s_Type) ..
+							' for ' .. tostring(l_Path))
+					end
+
+					s_Value = s_Coerced
+				elseif type(s_Value) == 'table' then
+					error('refusing to write a table into ' .. tostring(l_Path) ..
+						' with no type to coerce it by')
 				end
 
 				local s_Original = ReplaceField(s_Container, s_FieldName, s_Value)
