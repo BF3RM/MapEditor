@@ -296,10 +296,24 @@ function CommandActions:SetVariation(p_Command, p_UpdatePass)
 	return s_CommandActionResult, CARResponseType.Success
 end
 
-function CommandActions:SetEBXField(p_Command)
+function CommandActions:SetEBXField(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
 		m_Logger:Error("The SetEBXFieldCommand needs to have a valid gameObjectTransferData set.")
 		return
+	end
+
+	-- Run only in PreSim, exactly like spawn/delete/undelete above.
+	--
+	-- Editing EBX swaps a DataContainer that LIVE entities read. That is the same class of
+	-- operation as creating or destroying an entity, and those are all gated to PreSim -- but this
+	-- handler never took p_UpdatePass at all, so an edit landed at whatever point in the frame the
+	-- command happened to arrive, including mid-simulation while a vehicle was reading its config.
+	--
+	-- Measured before this: ~1 in 3 first edits killed the client or server, almost always on the
+	-- FIRST swap, and neither disabling the entity first nor changing the refresh moved the rate.
+	-- A frame-timing race fits that shape exactly.
+	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
+		return nil, CARResponseType.Queue
 	end
 
 	local s_Result, s_Path = nil, nil
@@ -371,10 +385,24 @@ end
 -- "Apply to Blueprint" (Unity Apply-to-Prefab): promote one instance's per-instance overrides
 -- onto the shared base blueprint, then rebuild every instance of it so they pick up the new base
 -- (siblings keep their own not-yet-applied overrides on top). See GameObjectManager for details.
-function CommandActions:ApplyBlueprintOverrides(p_Command)
+function CommandActions:ApplyBlueprintOverrides(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil or p_Command.gameObjectTransferData.guid == nil then
 		m_Logger:Error("ApplyBlueprintOverridesCommand needs a gameObjectTransferData with a guid.")
 		return nil, CARResponseType.Failure
+	end
+
+	-- Run only in PreSim, exactly like spawn/delete/undelete above.
+	--
+	-- Editing EBX swaps a DataContainer that LIVE entities read. That is the same class of
+	-- operation as creating or destroying an entity, and those are all gated to PreSim -- but this
+	-- handler never took p_UpdatePass at all, so an edit landed at whatever point in the frame the
+	-- command happened to arrive, including mid-simulation while a vehicle was reading its config.
+	--
+	-- Measured before this: ~1 in 3 first edits killed the client or server, almost always on the
+	-- FIRST swap, and neither disabling the entity first nor changing the refresh moved the rate.
+	-- A frame-timing race fits that shape exactly.
+	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
+		return nil, CARResponseType.Queue
 	end
 
 	local s_Ok = GameObjectManager:ApplyOverridesToBlueprint(p_Command.gameObjectTransferData.guid)

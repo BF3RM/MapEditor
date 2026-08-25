@@ -956,3 +956,44 @@ row, then spawn again -- everything alive, the new vehicle registers.
 Not yet established: whether this is stable across many sessions. The ReplaceInstance race that made
 previews intermittently fatal was observed BEFORE the refresh was re-enabled, so it is not resolved
 by this, merely not reproduced in this run.
+
+## Where the problem actually lies (2026-08-25)
+
+Five attempts at the remaining race, each measured over cold-booted repetitions rather than single
+runs:
+
+| Configuration | Survived |
+|---|---|
+| replacement, no refresh | 1 of 4 |
+| + refresh the edited object | 2 of 3 |
+| + disable the entity before swapping | 2 of 3 |
+| + gate the edit to `UpdatePass_PreSim` | 2 of 6 |
+
+None of them moved the rate. It sits around half, and the death is almost always on the FIRST swap.
+
+So the problem is not any of: the value written, which field, which realm writes, whether the entity
+is refreshed afterwards, whether it is disabled first, or where in the frame the write happens.
+Every one of those was tested and eliminated.
+
+What remains is the operation itself: **swapping a DataContainer that live entities are currently
+using is not safe, and nothing available from VEXT makes it safe.** The precondition is only that
+entities exist which were built from that blueprint -- and previewing an edit always meets it,
+because the thing being edited is on screen.
+
+The `UpdatePass_PreSim` gate is KEPT despite not fixing this. Every other command that mutates the
+entity world (spawn, delete, undelete) is gated that way and these two were not, which was a real
+inconsistency; it is simply not the cause of this crash.
+
+### What is left
+
+Previews are opt-in, default off (`PREVIEW_ENABLED` in `VehiclePreview.lua`). Everything else works
+without them:
+
+* Apply to Blueprint writes by replacement, sticks, and leaves the blueprint spawnable;
+* spawning after edits is fine;
+* the edit records, saves and bakes per-instance.
+
+Untested ideas, in the order I would try them: whether a SERVER-ONLY replacement still kills the
+client (which would show the client is not dying from its own swap); and whether destroying the
+object's entities entirely, swapping, then respawning is survivable, since the crash needs live
+entities and that removes them.

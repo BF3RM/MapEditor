@@ -42,20 +42,29 @@ end
 -- keystroke.
 local PREVIEW_REFRESH_ENABLED = true
 
--- ON. Previews modify by REPLACEMENT, never in place.
+-- OFF by default. Set to true to opt in; everything below works, it is just not RELIABLE.
 --
--- The crash this feature kept causing has a precise precondition: if entities already exist that
--- were built from a blueprint, WRITING that blueprint and then spawning more of it kills the
--- client. Previewing always meets it -- you are editing an instance that is on screen.
+-- What works: the edit is visible on the vehicle you are editing, both realms agree, and spawning
+-- that vehicle afterwards is fine (replacement never mutates the container live entities were built
+-- from, which is what an in-place write does and why that path crashes deterministically).
 --
--- Replacement avoids it entirely. Clone the container holding the edited field, set the value on
--- the CLONE, and swap it in with DatabasePartition:ReplaceInstance, which repoints every reference.
--- The container the live entities were built from is never mutated.
+-- What does not: swapping a container that LIVE entities are using kills the realm roughly half the
+-- time, always on the FIRST swap. Measured crash rates over cold-booted repetitions, five separate
+-- attempts to fix it:
 --
--- Measured on BMP2, which has vanilla vehicles live from round start (the worst case):
---     in-place write  -> client dies on the very next spawn
---     replacement     -> four further spawns, all alive, and the blueprint reads the new value
-local PREVIEW_ENABLED = true
+--     replacement, no refresh                 1 of 4 survived
+--     + refresh the edited object             2 of 3 survived
+--     + disable the entity before swapping    2 of 3 survived
+--     + gate the edit to UpdatePass_PreSim    2 of 6 survived
+--
+-- None of those moved the rate. It does not depend on the value, the field, the realm split, the
+-- refresh, disabling the entity first, or the frame pass -- all measured. The precondition is only
+-- that entities exist which were built from that blueprint, and previewing always meets it.
+--
+-- Apply to Blueprint does NOT need this and is safe: it writes by replacement too, the value sticks,
+-- and the blueprint stays spawnable. Previews are the unreliable part, so they are the part that is
+-- off.
+local PREVIEW_ENABLED = false
 
 local PREVIEW_SERVER_ONLY = false  -- both realms; one-sided data desyncs them
 local REFRESH_DEBOUNCE_TICKS = 12
@@ -413,6 +422,22 @@ function VehiclePreview:Show(p_GameObject)
 		return false
 	end
 
+	-- Take the edited object OUT of simulation before swapping containers, and put it back after.
+	--
+	-- Measured crash rates over repeated cold-booted runs: with the post-write refresh OFF, 3 of 4
+	-- runs died; with it ON, 1 of 3. So the refresh is not the destabiliser -- the ReplaceInstance
+	-- itself is, and almost every death lands on the FIRST swap, while the live entity is actively
+	-- holding the container being replaced. Once a session survives that first swap it tends to
+	-- survive the rest.
+	--
+	-- So disable first: an entity that is not running cannot be mid-read when its data is swapped.
+	local s_Disabled = false
+
+	pcall(function()
+		p_GameObject:Disable(true)
+		s_Disabled = true
+	end)
+
 	local s_Restore = {}
 	local s_Written = 0
 	local s_Detail = ''
@@ -471,6 +496,10 @@ function VehiclePreview:Show(p_GameObject)
 		else
 			s_Detail = s_Detail .. tostring(l_Path) .. ':NO-OLDVALUE '
 		end
+	end
+
+	if s_Disabled then
+		pcall(function() p_GameObject:Enable(true) end)
 	end
 
 	if s_Written == 0 then
