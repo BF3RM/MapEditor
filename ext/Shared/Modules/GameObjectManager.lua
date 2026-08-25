@@ -1468,7 +1468,26 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	end
 
 	-- 3) Rebuild each instance against the new base.
-	for _, l_Guid in ipairs(s_InstanceGuids) do
+	--
+	-- SKIPPED for networked blueprints. Rebuilding an instance re-enters the spawn path, and doing
+	-- that for a vehicle right after its blueprint changed is what kills the realm -- measured:
+	-- edit + Apply + spawn survived one round and killed the server on the second, while a preview
+	-- alone (no Apply) survives 6 of 6. The instances do not need it: the value is already on the
+	-- shared blueprint, so anything spawned from here on carries it, and the live ones pick it up on
+	-- the next level load or bake.
+	local s_SkipRebuild = false
+
+	pcall(function()
+		s_SkipRebuild = s_Shared ~= nil and s_Shared.needNetworkId == true
+	end)
+
+	if s_SkipRebuild then
+		m_Logger:Write("ApplyOverridesToBlueprint: not rebuilding instances of '" ..
+			tostring(s_GameObject.blueprintCtrRef.name) .. "' -- rebuilding a networked blueprint's " ..
+			"instances crashes the realm. New spawns carry the value; existing ones need a reload.")
+	end
+
+	for _, l_Guid in ipairs(s_SkipRebuild and {} or s_InstanceGuids) do
 		local l_GO = self.m_GameObjects[l_Guid]
 
 		if l_GO ~= nil then

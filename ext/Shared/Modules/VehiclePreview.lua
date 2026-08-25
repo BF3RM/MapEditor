@@ -329,6 +329,19 @@ end
 ---blueprint spawnable.
 ---@return boolean ok, string|nil reason
 function VehiclePreview:WriteChainByReplacement(p_Shared, p_Chain)
+	-- SERVER ONLY, same as previews.
+	--
+	-- Apply-to-Blueprint runs on both realms and called this directly, so it still performed a
+	-- CLIENT-side swap -- the one operation measured to kill realms (6 of 6 runs survive when the
+	-- client does not swap, 2 of 6 when it does). Apply was reintroducing it after previews had
+	-- stopped.
+	--
+	-- Server-only is also sufficient for Apply: the server builds and replicates, so new spawns
+	-- carry the value, which is what applying is for.
+	if PREVIEW_SERVER_ONLY and SharedUtils:IsClientModule() then
+		return true, nil
+	end
+
 	local s_Container, s_FieldName, s_Value, s_Type = ResolveTarget(p_Shared, p_Chain)
 
 	if s_Container == nil or s_FieldName == nil then

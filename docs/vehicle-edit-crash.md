@@ -1025,3 +1025,24 @@ measure movement. Needs an eye on the game, or a server-side probe reading the v
 transform.
 
 Fields the CLIENT renders from its own data will not preview at all under this setting.
+
+## Current state: previews stable, Apply still not (2026-08-25)
+
+| Sequence | Result |
+|---|---|
+| preview edits + spawns, server-only swap | 6 of 6 runs survived |
+| edit + Apply + spawn, repeated | died on round 2 |
+| same, with Apply's instance-rebuild skipped for networked blueprints | died on round 3 |
+
+Previews are stable now that only the server swaps. Apply is not: repeating edit -> Apply -> spawn
+kills the realm after a round or two. Skipping Apply's rebuild of every instance (which re-enters
+the spawn path, and rebuilding a networked blueprint's instances is independently known-unsafe)
+bought one more round and is kept on its own merits, but it is not the cause.
+
+What Apply does beyond a preview, and therefore what remains suspect: it clears per-instance
+overrides and resets `internalBlueprint` on every instance, records `m_AppliedBlueprints`, and
+serializes the modified partition for the bake. One of those is still touching something the engine
+is using.
+
+Practical guidance until that is found: previews are safe to use; Apply works but should be treated
+as a once-per-session operation, and a level reload after applying is the safe way to continue.
