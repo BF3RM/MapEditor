@@ -64,9 +64,19 @@ local PREVIEW_REFRESH_ENABLED = true
 -- Apply to Blueprint does NOT need this and is safe: it writes by replacement too, the value sticks,
 -- and the blueprint stays spawnable. Previews are the unreliable part, so they are the part that is
 -- off.
-local PREVIEW_ENABLED = false
+local PREVIEW_ENABLED = true
 
-local PREVIEW_SERVER_ONLY = false  -- both realms; one-sided data desyncs them
+-- EXPERIMENT: swap on the SERVER only.
+--
+-- Every death so far is "CLIENT died on edit 1". If the client is dying from its OWN swap, not
+-- swapping there should stop it -- and gravity is simulated server-side and replicated, so the edit
+-- may still be visible. If the client dies anyway, it is dying from the server's swap and the
+-- problem is replication, not the local operation.
+--
+-- Note the earlier finding this has to be weighed against: with IN-PLACE writes, server-only was
+-- itself fatal (the realms held different data while entities replicated). Replacement may or may
+-- not behave the same way -- that is the question.
+local PREVIEW_SERVER_ONLY = true
 local REFRESH_DEBOUNCE_TICKS = 12
 
 --- Every loaded partition, so a container's owner can be found for ReplaceInstance.

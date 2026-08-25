@@ -997,3 +997,31 @@ Untested ideas, in the order I would try them: whether a SERVER-ONLY replacement
 client (which would show the client is not dying from its own swap); and whether destroying the
 object's entities entirely, swapping, then respawning is survivable, since the crash needs live
 entities and that removes them.
+
+## The client was dying from its OWN swap (2026-08-25)
+
+| Configuration | Survived |
+|---|---|
+| swap on BOTH realms | 2 of 6 |
+| **swap on the SERVER only** | **6 of 6** |
+
+Every death in every earlier sweep read "CLIENT died on edit 1". Not swapping on the client removes
+them completely -- so the client was killed by its own `ReplaceInstance`, not by the server's.
+
+That also explains why four previous attempts moved nothing: the refresh, disabling the entity
+first, and the `UpdatePass_PreSim` gate are all SERVER-side concerns. They were aimed at the wrong
+realm.
+
+Note this differs from IN-PLACE writes, where server-only was itself fatal (the realms held
+different data while entities replicated). Replacement never mutates the container live entities
+were built from, so the client keeping the original container is not the same hazard.
+
+### What is not yet verified
+
+That the edit remains VISIBLE with the client left alone. The server owns vehicle simulation and
+replicates it, so a physics field like `gravityModifier` should still show -- but the obvious probe
+(the editor's stored transform) reports the spawn position, not the live entity's, so it cannot
+measure movement. Needs an eye on the game, or a server-side probe reading the vehicle entity's
+transform.
+
+Fields the CLIENT renders from its own data will not preview at all under this setting.
