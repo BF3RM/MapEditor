@@ -2,7 +2,7 @@
 	<EditorComponent id="overrides-component" title="Overrides">
 		<div class="overrides-body">
 			<div v-if="!selectedGameObject" class="overrides-empty">Select an object to see its overrides.</div>
-			<div v-else-if="overrideList.length === 0" class="overrides-empty">
+			<div v-else-if="overrideList.length === 0 && appliedList.length === 0" class="overrides-empty">
 				No overrides on <span class="ov-name">{{ shortName }}</span> — edit a field to override it.
 			</div>
 			<template v-else>
@@ -26,6 +26,35 @@
 						</div>
 					</div>
 					<button class="ov-revert" @click="onRevert(o)" title="Revert this field to the blueprint value">⟲</button>
+				</div>
+			</template>
+
+			<!--
+				The BLUEPRINT layer. Applying moves an override here rather than deleting it: it is
+				still an override, it just belongs to every instance of the blueprint now. Showing
+				nothing after an apply is what made a successful apply look like a revert.
+			-->
+			<template v-if="selectedGameObject && appliedList.length > 0">
+				<div class="overrides-head applied-head">
+					<span class="ov-count">
+						{{ appliedList.length }} applied to blueprint {{ blueprintName }}
+					</span>
+					<button
+						class="ov-apply"
+						@click="onRevertAllApplied"
+						title="Revert every applied override on this blueprint back to the value the game shipped."
+					>
+						Revert to Vanilla
+					</button>
+				</div>
+				<div class="ov-row applied-row" v-for="o in appliedList" :key="'bp-' + o.path">
+					<div class="ov-info">
+						<div class="ov-path" :title="o.path">{{ o.path }}</div>
+						<div class="ov-values">
+							<span class="ov-badge">blueprint</span>
+							<span class="ov-new" :title="String(o.newValue)">{{ formatVal(o.newValue) }}</span>
+						</div>
+					</div>
 				</div>
 			</template>
 		</div>
@@ -71,6 +100,26 @@ export default class OverridesComponent extends EditorComponent {
 
 	get overrideList(): { path: string; label: string; newValue: any; oldValue: any }[] {
 		return this.selectedGameObject ? this.selectedGameObject.overrideSummary : [];
+	}
+
+	get appliedList(): { path: string; label: string; newValue: any }[] {
+		return this.selectedGameObject ? this.selectedGameObject.blueprintOverrideSummary : [];
+	}
+
+	get blueprintName(): string {
+		const ref = this.selectedGameObject ? this.selectedGameObject.blueprintCtrRef : null;
+		if (!ref || !ref.name) return '';
+		const parts = String(ref.name).split('/');
+		return parts[parts.length - 1];
+	}
+
+	onRevertAllApplied() {
+		if (!this.selectedGameObject) return;
+		window.vext.SendCommand({
+			type: 'RevertBlueprintOverridesCommand',
+			sender: '',
+			gameObjectTransferData: { guid: this.selectedGameObject.guid.toString(), overrides: [] }
+		} as any);
 	}
 
 	get shortName(): string {
@@ -258,5 +307,25 @@ export default class OverridesComponent extends EditorComponent {
 		border-color: #e05252;
 		color: #ff8c8c;
 	}
+}
+
+/* The blueprint layer reads as a distinct tier, not as more personal overrides. */
+.applied-head {
+	margin-top: 8px;
+	border-top: 1px solid rgba(255, 255, 255, 0.12);
+	padding-top: 6px;
+}
+.applied-row .ov-path {
+	opacity: 0.85;
+}
+.ov-badge {
+	font-size: 9px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 1px 4px;
+	margin-right: 6px;
+	border-radius: 2px;
+	background: rgba(120, 170, 255, 0.18);
+	color: #9ec5ff;
 }
 </style>

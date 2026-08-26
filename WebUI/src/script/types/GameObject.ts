@@ -386,6 +386,28 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		return out;
 	}
 
+	/**
+	 * The BLUEPRINT layer, in the same shape as overrideSummary.
+	 *
+	 * These are applied overrides: they belong to every instance of the blueprint rather than to
+	 * this object. Apply used to clear the personal override and show nothing in its place, so the
+	 * panel emptied and the change read as reverted.
+	 */
+	public get blueprintOverrideSummary(): { path: string; label: string; newValue: any }[] {
+		const out: { path: string; label: string; newValue: any }[] = [];
+		for (const [path, override] of Object.entries(this.blueprintOverrides || {})) {
+			let node: IEBXFieldData = override as IEBXFieldData;
+			while (node && !isPrintable(node.type)) {
+				node = node.value as IEBXFieldData;
+			}
+			if (node) {
+				const segments = path.split('.');
+				out.push({ path, label: segments[segments.length - 1] || path, newValue: node.value });
+			}
+		}
+		return out;
+	}
+
 	public setName(name: string) {
 		this.name = name;
 		signals.objectChanged.emit(this, 'name', name);

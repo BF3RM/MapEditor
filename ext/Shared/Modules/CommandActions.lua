@@ -17,6 +17,7 @@ function CommandActions:RegisterVars()
 	self.SpawnGameObjectCommand = self.SpawnGameObject
 	self.DeleteGameObjectCommand = self.DeleteGameObject
 	self.UndoApplyBlueprintOverridesCommand = self.UndoApplyBlueprintOverrides
+	self.RevertBlueprintOverridesCommand = self.RevertBlueprintOverrides
 	self.UndeleteGameObjectCommand = self.UndeleteGameObject
 	self.SetTransformCommand = self.SetTransform
 	self.SelectGameObjectCommand = self.SelectGameObject
@@ -386,6 +387,39 @@ end
 -- "Apply to Blueprint" (Unity Apply-to-Prefab): promote one instance's per-instance overrides
 -- onto the shared base blueprint, then rebuild every instance of it so they pick up the new base
 -- (siblings keep their own not-yet-applied overrides on top). See GameObjectManager for details.
+function CommandActions:RevertBlueprintOverrides(p_Command, p_UpdatePass)
+	if p_Command.gameObjectTransferData == nil then
+		m_Logger:Error("RevertBlueprintOverridesCommand needs a valid gameObjectTransferData.")
+		return nil, CARResponseType.Failure
+	end
+
+	-- Swaps DataContainers that live entities read, so PreSim, same as apply.
+	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
+		return nil, CARResponseType.Queue
+	end
+
+	local s_GameObject = GameObjectManager:GetGameObject(p_Command.gameObjectTransferData.guid)
+
+	if s_GameObject == nil or s_GameObject.blueprintCtrRef == nil then
+		m_Logger:Error("RevertBlueprintOverrides: object not found")
+		return nil, CARResponseType.Failure
+	end
+
+	local s_Done, s_Total = GameObjectManager:RevertAllBlueprintOverrides(
+		s_GameObject.blueprintCtrRef.instanceGuid)
+
+	m_Logger:Warning("RevertBlueprintOverrides: restored " .. tostring(s_Done) .. " of " ..
+		tostring(s_Total) .. " to vanilla")
+
+	-- Report honestly: a partial revert is not a success, and silently showing a cleared panel
+	-- while values stayed applied is the exact failure this whole layer exists to avoid.
+	if s_Done < s_Total then
+		return nil, CARResponseType.Failure
+	end
+
+	return nil, CARResponseType.Success
+end
+
 function CommandActions:UndoApplyBlueprintOverrides(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil then
 		m_Logger:Error("UndoApplyBlueprintOverridesCommand needs a valid gameObjectTransferData.")
