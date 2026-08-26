@@ -224,6 +224,24 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
 	self:SetField("isDeleted", false, p_AutoModified)
 end
 
+-- Free a vehicle's entities one frame later instead of leaking them?
+--
+-- Inline Destroy is a native crash; never destroying leaks an entity bus per deleted vehicle,
+-- which is what ran the game out of memory. Deferring is the hypothesis that the fault is about
+-- freeing an entity the CURRENT frame still holds. Measured by tools/e2e/delete_crash_e2e.py --
+-- if that starts dying again, this is why.
+-- MEASURED FALSE: deferring by a full second still killed the server on delete
+-- (tools/e2e/delete_crash_e2e.py --arm clean). So the fault is not about freeing an entity the
+-- current frame still holds -- a vehicle's entities cannot be freed from Lua at all. The leak has
+-- to be bounded by REUSING them instead, which is what the recycle pool below does.
+-- Log what each realm decides to do with each entity on delete. Off: it answered its question
+-- (the server frees 184 component entities and leaks only the ServerVehicleEntity; the client
+-- destroys nothing), and it fires per delete.
+local DESTROY_PLAN_DIAG = false
+
+local DEFER_VEHICLE_DESTROY = false
+local VEHICLE_DESTROY_DELAY = 1.0
+
 -- Entities that must never be Destroy()ed, even though the editor created them.
 --
 -- Freeing a networked VEHICLE entity takes the SERVER down with a native access violation: no Lua
@@ -271,10 +289,59 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
 	-- after its first EBX edit, so from the second edit on we're destroying an object whose
 	-- original entities came from level data. Those stay untagged and keep being disabled; only
 	-- the ones our respawn created get destroyed.
+	-- TEMP: what does each realm decide to do with each entity on delete? The CLIENT dies on
+	-- delete while the server lives, and client Lua output is unreadable from the host, so the
+	-- decision is relayed to the server log.
+	if self.gameEntities ~= nil then
+		local s_Destroy, s_Disable, s_Types = 0, 0, ''
+
+		for _, l_GE in pairs(self.gameEntities) do
+			if l_GE ~= nil then
+				if l_GE.isEditorSpawned and not MustNotDestroy(l_GE) then
+					s_Destroy = s_Destroy + 1
+
+					if s_Destroy <= 4 then
+						s_Types = s_Types .. ' D:' .. tostring(l_GE.typeName)
+					end
+				else
+					s_Disable = s_Disable + 1
+				end
+			end
+		end
+
+		local s_Line = 'DESTROY-PLAN ' .. (SharedUtils:IsClientModule() and 'CLIENT' or 'SERVER') ..
+			' obj=' .. tostring(self.guid):sub(-6) .. ' destroy=' .. s_Destroy ..
+			' disable=' .. s_Disable .. s_Types
+
+		if DESTROY_PLAN_DIAG then
+			if SharedUtils:IsClientModule() then
+				NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+			else
+				m_Logger:Error(s_Line)
+			end
+		end
+	end
+
 	if self.gameEntities ~= nil then
 		for _, l_GameEntity in pairs(self.gameEntities) do
 			if l_GameEntity ~= nil then
-				if l_GameEntity.isEditorSpawned and not MustNotDestroy(l_GameEntity) then
+				if l_GameEntity.isEditorSpawned and MustNotDestroy(l_GameEntity) and DEFER_VEHICLE_DESTROY then
+					-- Disable now, free on a LATER frame.
+					--
+					-- Freeing a vehicle entity inline is the native access violation that took the
+					-- server down (see MustNotDestroy). Never freeing it is the other half of that
+					-- trade, and it is what exhausted the game's memory when spawning freely --
+					-- every deleted vehicle left its entity bus behind. This tries the middle
+					-- ground: the entity is disabled immediately, and the free is attempted once
+					-- the frame that was using it is over.
+					local s_Entity = l_GameEntity
+
+					pcall(function() s_Entity:Disable() end)
+
+					Timer:Simple(VEHICLE_DESTROY_DELAY, function()
+						pcall(function() s_Entity:Destroy() end)
+					end)
+				elseif l_GameEntity.isEditorSpawned and not MustNotDestroy(l_GameEntity) then
 					local s_Ok, s_Err = pcall(function() l_GameEntity:Destroy() end)
 
 					if not s_Ok then

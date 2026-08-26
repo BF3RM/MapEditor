@@ -374,9 +374,51 @@ end
 --- have connections and spawn fine. Extend this list as more offenders are found; a false positive
 --- costs a live preview, a false negative costs the client.
 local PLACEHOLDER_NAME_PATTERNS = {
-	'^gameplay/level_setups/', -- capture points, gamemode components (verified: CapturePointPrefab_HQ)
-	'^weapons/',               -- SoldierWeaponBlueprint (verified: Weapons/SV98/SV98)
+	-- UNANCHORED on purpose. These were '^gameplay/level_setups/' and '^weapons/', which match
+	-- base-game paths only: map-pack content is prefixed ("XP5/Gameplay/Level_Setups/...",
+	-- "XP5/Weapons/..."), so every DLC copy of a blueprint known to fault sailed straight past the
+	-- guard and was instantiated anyway.
+	'gameplay/level_setups/',  -- capture points, gamemode components (verified: CapturePointPrefab_HQ)
+	'weapons/',                -- SoldierWeaponBlueprint (verified: Weapons/SV98/SV98)
+
+	-- Gamemode flags kill the SERVER when instantiated. Found by sweeping the blueprint catalog
+	-- one spawn at a time (tools/e2e/spawn_sweep_e2e.py): XP5/Gameplay/GameModes/Flags/
+	-- FlagConquestRussia took the server down, and nothing in the old list came close to matching
+	-- it. This is the same class as level_setups -- gameplay logic that expects a running gamemode
+	-- around it -- and it is why "I spawned some random stuff and it crashed" was so easy to hit.
+	'gameplay/gamemodes/',
+
+	-- Conquest flags, wherever they live. FlagConquestRussia killed the server from TWO different
+	-- paths -- XP5/Gameplay/GameModes/Flags/ and Objects/FlagpoleMobile_01/ -- so this matches the
+	-- blueprint itself rather than a directory. A flag expects a gamemode's capture-point logic
+	-- around it; instantiated on its own it takes the server with it.
+	'flagconquest',
 }
+
+---A level's own top-level GROUP prefab ("Levels/MP_001/Buildings"), as opposed to a prop inside
+---one ("Levels/MP_001/Props/MP001_Stair_Custom/...").
+---
+---Spawning a group means instantiating every building, road or tree in the map a second time.
+---Levels/MP_001/Buildings took the CLIENT down, and it is the best explanation for the "your game
+---has run out of memory" exit seen while spawning at random: this is one click in the blueprint
+---browser, and the level groups sit right at the top of the list.
+---
+---Depth is the discriminator, not a name list: every level has these groups under its own name, so
+---matching "levels/<level>/<group>" covers maps this build has never seen. Props live deeper and
+---spawn fine.
+local function IsLevelGroupBlueprint(p_Lower)
+	if p_Lower:sub(1, 7) ~= 'levels/' then
+		return false
+	end
+
+	local s_Segments = 0
+
+	for _ in p_Lower:gmatch('[^/]+') do
+		s_Segments = s_Segments + 1
+	end
+
+	return s_Segments == 3
+end
 
 ---@param p_Name string blueprint name
 ---@return boolean
@@ -386,6 +428,10 @@ function GameObjectManager:IsPlaceholderBlueprint(p_Name)
 	end
 
 	local s_Lower = tostring(p_Name):lower()
+
+	if IsLevelGroupBlueprint(s_Lower) then
+		return true
+	end
 
 	for _, l_Pattern in ipairs(PLACEHOLDER_NAME_PATTERNS) do
 		if string.find(s_Lower, l_Pattern) ~= nil then
@@ -1792,6 +1838,15 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 
 	self.m_Placeholders[tostring(p_Guid)] = nil
 
+	-- Forget this object's entities.
+	--
+	-- m_EntityOwners / m_ProcessedEntities / m_PendingEntities were written per entity and NEVER
+	-- pruned, so every entity the editor ever saw kept an entry -- and m_EntityOwners holds a
+	-- strong reference to the GameObject, which kept the whole object alive after deletion too.
+	-- Spawning freely for a couple of minutes was enough to exhaust the game's memory
+	-- ("Your game has run out of memory", exit code 8).
+	self:ForgetEntitiesOf(s_GameObject)
+
 	-- Give the object's live-preview shell back, or the pool leaks a slot per deleted vehicle.
 	ShellPool:Release(p_Guid)
 
@@ -1799,6 +1854,35 @@ function GameObjectManager:DeleteGameObject(p_Guid)
 	VehiclePreview:ClearFor(p_Guid)
 
 	return true
+end
+
+---Drop every per-entity bookkeeping entry belonging to an object, and its children.
+---
+---These tables are keyed by entity instanceId with no lifetime of their own, so without this they
+---grow for the whole level and pin their GameObjects in memory.
+function GameObjectManager:ForgetEntitiesOf(p_GameObject)
+	if p_GameObject == nil then
+		return 0
+	end
+
+	local s_Dropped = 0
+
+	if p_GameObject.gameEntities ~= nil then
+		for l_InstanceId, _ in pairs(p_GameObject.gameEntities) do
+			self.m_EntityOwners[l_InstanceId] = nil
+			self.m_ProcessedEntities[l_InstanceId] = nil
+			self.m_PendingEntities[l_InstanceId] = nil
+			s_Dropped = s_Dropped + 1
+		end
+	end
+
+	if p_GameObject.children ~= nil then
+		for _, l_Child in pairs(p_GameObject.children) do
+			s_Dropped = s_Dropped + self:ForgetEntitiesOf(l_Child)
+		end
+	end
+
+	return s_Dropped
 end
 
 function GameObjectManager:UndeleteGameObject(p_Guid)
