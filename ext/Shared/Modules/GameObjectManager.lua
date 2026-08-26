@@ -245,6 +245,12 @@ function GameObjectManager:RegisterVars()
 	-- taken back by the object whose entity bus actually contains it.
 	self.m_EntityOwners = {}
 
+	-- The object a just-spawned blueprint is still receiving entities for (client replication
+	-- arrives after the hooks return), and a token so a stale timer cannot clear a newer claim.
+	self.m_RecentSpawns = {}
+	self.m_LastMatchedSpawn = nil
+	self.m_AwaitingToken = 0
+
 	-- [M1] Per-instance blueprint clones, keyed by editor GameObject guid:
 	--   { dc = <cloned DataContainer>, originalRef = <blueprintCtrRef table> }
 	-- Lives on the MANAGER (not the GameObject) so it survives the delete+respawn that
@@ -604,6 +610,30 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		else
 			m_Logger:Error('ADOPT-DIAG SERVER ' .. s_Line)
 		end
+	end
+
+	-- On the CLIENT a networked vehicle's entity bus comes back EMPTY (measured: server 3 entities,
+	-- client 0) -- the entities are not created locally, they arrive by replication after every
+	-- hook has returned. So the client's only chance to attribute them is the late-entity path, and
+	-- the partition-keyed slot it used is stale: a vehicle's SUB-blueprints only fire this hook the
+	-- first time they are instantiated, so their slots point at the first vehicle ever spawned and
+	-- every later vehicle's entities pile onto it.
+	--
+	-- This names the object that is actually awaiting entities right now. Time-boxed, because
+	-- anything arriving later is level traffic that must keep using the partition slot.
+	if s_PendingCustomBlueprintInfo ~= nil then
+		self.m_AwaitingToken = (self.m_AwaitingToken or 0) + 1
+
+		local s_Token = self.m_AwaitingToken
+		self.m_RecentSpawns[s_Token] = s_GameObject
+
+		Timer:Simple(20.0, function()
+			self.m_RecentSpawns[s_Token] = nil
+
+			if next(self.m_RecentSpawns) == nil then
+				self.m_LastMatchedSpawn = nil
+			end
+		end)
 	end
 
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
@@ -1188,6 +1218,45 @@ function GameObjectManager:GetNoHavokGuid(p_ParentGuid, p_Name, p_Transform)
 	return s_NewGuid
 end
 
+---Which recently-spawned object does this entity belong to?
+---
+---Replication runs a full spawn behind: by the time the client builds vehicle N's entities, vehicle
+---N+1 has already been adopted. So "whoever spawned most recently" is wrong by exactly one -- every
+---object drew the PREVIOUS vehicle's outline and the newest drew none. Measured with three vehicles
+---20m apart (tools/e2e/spawn_spaced.py): object at x=20 had its box at x=0.
+---
+---Position is intrinsic to the entity and does not care about ordering, so match on it instead.
+---Non-spatial entities have no position and ride along with the last spatial decision, since they
+---arrive in the same batch. Out-of-range entities (level streaming) fall through to the caller's
+---partition-slot path.
+function GameObjectManager:MatchRecentSpawn(p_Entity)
+	if next(self.m_RecentSpawns) == nil then
+		return nil
+	end
+
+	-- MEASURED, and it rules position out as the discriminator: the client creates a replicated
+	-- vehicle's entities at the DEFAULT position and moves them to the spawn point afterwards, so
+	-- at this moment every vehicle's entities sit on top of each other near the origin. Matching on
+	-- position piled all three vehicles onto the first one (406 entities on one object, none on the
+	-- newest). It also means the AABB captured here is the box at the pre-move position -- correct
+	-- attribution alone will not put the outline in the right place.
+	--
+	-- Falling back to the newest claim, which at least gives each object one vehicle's worth.
+	local s_Best, s_BestToken = nil, -1
+
+	for l_Token, l_Object in pairs(self.m_RecentSpawns) do
+		if l_Token > s_BestToken then
+			s_BestToken, s_Best = l_Token, l_Object
+		end
+	end
+
+	if s_Best ~= nil then
+		self.m_LastMatchedSpawn = s_Best
+	end
+
+	return s_Best
+end
+
 ---Is p_Object p_Ancestor itself, or nested somewhere beneath it?
 function GameObjectManager:IsDescendantOf(p_Object, p_Ancestor)
 	local s_Node = p_Object
@@ -1704,6 +1773,10 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	local s_PendingGameObject = self.m_BlueprintStack[#self.m_BlueprintStack]
 
 	if s_PendingGameObject == nil then
+		s_PendingGameObject = self:MatchRecentSpawn(s_Entity)
+	end
+
+	if s_PendingGameObject == nil then
 		s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
 	end
 
@@ -1759,6 +1832,37 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		self.m_EntityOwners[s_Entity.instanceId] = s_PendingGameObject
 		self.m_PendingEntities[s_Entity.instanceId] = nil
 		self.m_ProcessedEntities[s_Entity.instanceId] = true
+
+		-- Tell the WebUI. GameObjectReady is dispatched when the spawn completes, but on the client
+		-- a networked vehicle's entities arrive AFTER that -- by replication, with an empty local
+		-- entity bus -- so the UI was handed gameEntitiesData = [] and had nothing to draw a
+		-- selection outline from. A second ready for a guid it already tracks is handled as a
+		-- refresh (Editor.ts refreshRespawnedGameObject), which is exactly what we want.
+		--
+		-- Debounced per object: a vehicle attaches its entities one hook call at a time, and one
+		-- dispatch per entity would push a full transfer at the UI dozens of times per spawn.
+		if SharedUtils:IsClientModule() and s_PendingGameObject.guid ~= nil then
+			local s_Guid = tostring(s_PendingGameObject.guid)
+
+			self.m_ReadyResendTokens = self.m_ReadyResendTokens or {}
+			self.m_ReadyResendTokens[s_Guid] = (self.m_ReadyResendTokens[s_Guid] or 0) + 1
+
+			local s_Token = self.m_ReadyResendTokens[s_Guid]
+			local s_Target = s_PendingGameObject
+
+			Timer:Simple(0.75, function()
+				-- Only the last attach for this object fires; earlier timers are stale.
+				if self.m_ReadyResendTokens[s_Guid] ~= s_Token then
+					return
+				end
+
+				if self.m_GameObjects[s_Guid] == nil then
+					return
+				end
+
+				Events:DispatchLocal('GameObjectManager:GameObjectReady', s_Target)
+			end)
+		end
 	else
 		self.m_PendingEntities[s_Entity.instanceId] = s_GameEntity
 
