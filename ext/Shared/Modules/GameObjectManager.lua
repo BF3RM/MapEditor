@@ -19,6 +19,10 @@ function GameObjectManager:RegisterEvents()
 		NetEvents:Subscribe('MapEditor:AabbDiag', self, self.OnAabbDiag)
 	end
 
+	if SharedUtils:IsClientModule() then
+		NetEvents:Subscribe('MapEditor:ReplicatedEntities', self, self.OnReplicatedEntities)
+	end
+
 	Events:Subscribe("Shared:StoreTimeStamps", self, self.StoreTimeStamps)
 	-- Drain the deferred "GameObjectReady" queue for load-injected objects a few per frame, so
 	-- registering thousands of injected objects into the editor/WebUI tree doesn't block the frame
@@ -247,9 +251,6 @@ function GameObjectManager:RegisterVars()
 
 	-- The object a just-spawned blueprint is still receiving entities for (client replication
 	-- arrives after the hooks return), and a token so a stale timer cannot clear a newer claim.
-	self.m_RecentSpawns = {}
-	self.m_LastMatchedSpawn = nil
-	self.m_AwaitingToken = 0
 
 	-- [M1] Per-instance blueprint clones, keyed by editor GameObject guid:
 	--   { dc = <cloned DataContainer>, originalRef = <blueprintCtrRef table> }
@@ -621,20 +622,6 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	--
 	-- This names the object that is actually awaiting entities right now. Time-boxed, because
 	-- anything arriving later is level traffic that must keep using the partition slot.
-	if s_PendingCustomBlueprintInfo ~= nil then
-		self.m_AwaitingToken = (self.m_AwaitingToken or 0) + 1
-
-		local s_Token = self.m_AwaitingToken
-		self.m_RecentSpawns[s_Token] = s_GameObject
-
-		Timer:Simple(20.0, function()
-			self.m_RecentSpawns[s_Token] = nil
-
-			if next(self.m_RecentSpawns) == nil then
-				self.m_LastMatchedSpawn = nil
-			end
-		end)
-	end
 
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
 	local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
@@ -1042,6 +1029,12 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 
 		if s_GameObject.guid ~= PREVIEW_GUID then
 			--m_Logger:Write("Spawning: " .. s_GameObject.guid)
+			-- A networked vehicle's entities exist only on the server as far as the editor can see, so
+			-- hand the client the boxes it needs to draw a selection outline.
+			if not SharedUtils:IsClientModule() then
+				self:ReplicateSpatialEntities(s_GameObject)
+			end
+
 			Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
 		end
 	end
@@ -1218,43 +1211,175 @@ function GameObjectManager:GetNoHavokGuid(p_ParentGuid, p_Name, p_Transform)
 	return s_NewGuid
 end
 
----Which recently-spawned object does this entity belong to?
----
----Replication runs a full spawn behind: by the time the client builds vehicle N's entities, vehicle
----N+1 has already been adopted. So "whoever spawned most recently" is wrong by exactly one -- every
----object drew the PREVIOUS vehicle's outline and the newest drew none. Measured with three vehicles
----20m apart (tools/e2e/spawn_spaced.py): object at x=20 had its box at x=0.
----
----Position is intrinsic to the entity and does not care about ordering, so match on it instead.
----Non-spatial entities have no position and ride along with the last spatial decision, since they
----arrive in the same batch. Out-of-range entities (level streaming) fall through to the caller's
----partition-slot path.
-function GameObjectManager:MatchRecentSpawn(p_Entity)
-	if next(self.m_RecentSpawns) == nil then
+---Vec3/LinearTransform do not survive a NetEvent, so flatten to plain numbers.
+local function PlainVec3(p_Vec)
+	if p_Vec == nil then
 		return nil
 	end
 
-	-- MEASURED, and it rules position out as the discriminator: the client creates a replicated
-	-- vehicle's entities at the DEFAULT position and moves them to the spawn point afterwards, so
-	-- at this moment every vehicle's entities sit on top of each other near the origin. Matching on
-	-- position piled all three vehicles onto the first one (406 entities on one object, none on the
-	-- newest). It also means the AABB captured here is the box at the pre-move position -- correct
-	-- attribution alone will not put the outline in the right place.
-	--
-	-- Falling back to the newest claim, which at least gives each object one vehicle's worth.
-	local s_Best, s_BestToken = nil, -1
+	return { x = p_Vec.x, y = p_Vec.y, z = p_Vec.z }
+end
 
-	for l_Token, l_Object in pairs(self.m_RecentSpawns) do
-		if l_Token > s_BestToken then
-			s_BestToken, s_Best = l_Token, l_Object
+local function PlainTransform(p_Transform)
+	if p_Transform == nil then
+		return nil
+	end
+
+	return {
+		left = PlainVec3(p_Transform.left),
+		up = PlainVec3(p_Transform.up),
+		forward = PlainVec3(p_Transform.forward),
+		trans = PlainVec3(p_Transform.trans),
+	}
+end
+
+---Send an object's spatial entities to the client so it can draw a selection outline.
+---
+---Only the server ever sees a networked vehicle's entities: the client's own entity bus for one
+---comes back EMPTY (measured: server 3, client 0) and the replicated entities never reach its
+---hooks either. A lone vehicle had zero entities on the client after 60s, so clicking it outlined
+---nothing while mis-filed scenery outlined a neighbour.
+function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
+	if p_GameObject == nil or p_GameObject.guid == nil then
+		return
+	end
+
+	if p_GameObject.origin ~= GameObjectOriginType.Custom and
+		p_GameObject.origin ~= GameObjectOriginType.CustomChild then
+		return
+	end
+
+	-- Level-injected objects are Custom too, and there are thousands of them. Only objects the user
+	-- actually spawned need this; blanket-broadcasting during load is a lot of traffic for nothing.
+	if p_GameObject.wasInjected then
+		return
+	end
+
+	local s_Entities = {}
+
+	for _, l_GameEntity in pairs(p_GameObject.gameEntities or {}) do
+		if l_GameEntity ~= nil and l_GameEntity.isSpatial and l_GameEntity.aabb ~= nil then
+			-- Recompute from the LIVE entity rather than trusting the stored box. The stored one is
+			-- captured in the create hook, before the engine has moved the entity to its final
+			-- position: a vehicle spawned at x=60 sent a box that drew at x=30. By the time this
+			-- runs the entity is placed, so the fresh reading is the correct one.
+			local s_Transform = l_GameEntity.transform
+			local s_Aabb = l_GameEntity.aabb
+
+			if l_GameEntity.entity ~= nil then
+				local s_Ok, s_Fresh = pcall(function()
+					local s_Spatial = SpatialEntity(l_GameEntity.entity)
+
+					return {
+						transform = ToLocal(s_Spatial.transform, p_GameObject.transform),
+						aabb = AABB {
+							min = SanitizeVec3(s_Spatial.aabb.min:Clone()),
+							max = SanitizeVec3(s_Spatial.aabb.max:Clone()),
+							transform = ToLocal(s_Spatial.aabbTransform, p_GameObject.transform),
+						},
+					}
+				end)
+
+				if s_Ok and s_Fresh ~= nil then
+					s_Transform, s_Aabb = s_Fresh.transform, s_Fresh.aabb
+				end
+			end
+
+			table.insert(s_Entities, {
+				instanceId = l_GameEntity.instanceId,
+				typeName = l_GameEntity.typeName,
+				indexInBlueprint = l_GameEntity.indexInBlueprint,
+				transform = PlainTransform(s_Transform),
+				aabb = {
+					min = PlainVec3(s_Aabb.min),
+					max = PlainVec3(s_Aabb.max),
+					transform = PlainTransform(s_Aabb.transform),
+				},
+			})
 		end
 	end
 
-	if s_Best ~= nil then
-		self.m_LastMatchedSpawn = s_Best
+	if #s_Entities == 0 then
+		return
 	end
 
-	return s_Best
+	local s_Detail = ''
+
+	for _, l_E in ipairs(s_Entities) do
+		local s_Wx = 'nil'
+
+		if l_E.aabb ~= nil and l_E.aabb.transform ~= nil and l_E.aabb.transform.trans ~= nil then
+			s_Wx = string.format('%.1f', l_E.aabb.transform.trans.x)
+		end
+
+		s_Detail = s_Detail .. ' [' .. tostring(l_E.typeName) .. ' localX=' .. s_Wx .. ']'
+	end
+
+	m_Logger:Error('REPL-SEND obj=' .. tostring(p_GameObject.guid):sub(-6) ..
+		' objX=' .. string.format('%.1f', p_GameObject.transform.trans.x) ..
+		' spatial=' .. #s_Entities .. s_Detail)
+
+	NetEvents:Broadcast('MapEditor:ReplicatedEntities', json.encode({
+		guid = tostring(p_GameObject.guid),
+		entities = s_Entities,
+	}))
+end
+
+---Client: adopt the spatial entities the server just sent, then refresh the WebUI.
+function GameObjectManager:OnReplicatedEntities(p_Payload)
+	local s_Ok, s_Data = pcall(function() return json.decode(p_Payload) end)
+
+	if not s_Ok or type(s_Data) ~= 'table' or s_Data.guid == nil then
+		return
+	end
+
+	local s_GameObject = self.m_GameObjects[tostring(s_Data.guid)]
+
+	if s_GameObject == nil then
+		-- The server finishes its spawn before the client registers its own GameObject, so this
+		-- payload routinely arrives early. Dropping it lost the vehicle's only source of AABB data
+		-- on this realm; retry briefly instead.
+		local s_Attempt = (self.m_ReplicaRetries and self.m_ReplicaRetries[tostring(s_Data.guid)] or 0) + 1
+
+		self.m_ReplicaRetries = self.m_ReplicaRetries or {}
+		self.m_ReplicaRetries[tostring(s_Data.guid)] = s_Attempt
+
+		if s_Attempt <= 20 then
+			Timer:Simple(0.5, function() self:OnReplicatedEntities(p_Payload) end)
+		else
+			NetEvents:SendLocal('MapEditor:AabbDiag',
+				'REPL-RECV obj=' .. tostring(s_Data.guid):sub(-6) .. ' GAVE UP: object never appeared')
+		end
+
+		return
+	end
+
+	self.m_ReplicaRetries = self.m_ReplicaRetries or {}
+	self.m_ReplicaRetries[tostring(s_Data.guid)] = nil
+
+	local s_Added = 0
+
+	for _, l_Entity in pairs(s_Data.entities or {}) do
+		-- Never clobber an entity the client genuinely owns; this only fills a gap.
+		if s_GameObject.gameEntities[l_Entity.instanceId] == nil then
+			s_GameObject.gameEntities[l_Entity.instanceId] = ReplicatedSpatialEntity {
+				instanceId = l_Entity.instanceId,
+				typeName = l_Entity.typeName,
+				indexInBlueprint = l_Entity.indexInBlueprint,
+				transform = l_Entity.transform,
+				aabb = l_Entity.aabb,
+			}
+			s_Added = s_Added + 1
+		end
+	end
+
+	NetEvents:SendLocal('MapEditor:AabbDiag',
+		'REPL-RECV obj=' .. tostring(s_Data.guid):sub(-6) .. ' added=' .. s_Added ..
+		' sent=' .. tostring(#(s_Data.entities or {})))
+
+	if s_Added > 0 then
+		Events:DispatchLocal('GameObjectManager:GameObjectReady', s_GameObject)
+	end
 end
 
 ---Is p_Object p_Ancestor itself, or nested somewhere beneath it?
@@ -1771,10 +1896,6 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 	-- is permanent -- the correct owner never gets the entity, and an object with no entities has
 	-- no AABB and therefore no selection outline.
 	local s_PendingGameObject = self.m_BlueprintStack[#self.m_BlueprintStack]
-
-	if s_PendingGameObject == nil then
-		s_PendingGameObject = self:MatchRecentSpawn(s_Entity)
-	end
 
 	if s_PendingGameObject == nil then
 		s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
