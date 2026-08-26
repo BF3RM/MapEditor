@@ -2051,7 +2051,17 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 		-- vehicle afterwards kills the client -- which is why this used to poison the blueprint for
 		-- the rest of the session and spawns had to be refused. Replacement swaps in a modified copy
 		-- and leaves the original untouched, so the blueprint stays spawnable.
-		local s_Ok, s_Why = VehiclePreview:WriteChainByReplacement(s_Shared, l_Field)
+		-- pcall because a single unresolvable path used to throw out of C++ and abort the WHOLE
+		-- apply: every other override in the same press was silently lost, and the instance's
+		-- overrides were cleared regardless, so the edit vanished with nothing written.
+		local s_Called, s_Ok, s_Why = pcall(function()
+			return VehiclePreview:WriteChainByReplacement(s_Shared, l_Field)
+		end)
+
+		if not s_Called then
+			s_Why = 'threw: ' .. tostring(s_Ok)
+			s_Ok = false
+		end
 		local s_Path = s_Ok and l_Key or nil
 
 		if not s_Ok then

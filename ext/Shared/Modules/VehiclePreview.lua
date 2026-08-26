@@ -295,10 +295,22 @@ end
 ---keeps later spawns alive.
 ---@return DataContainer|nil the ORIGINAL container, for restoring
 local function ReplaceField(p_Container, p_Field, p_Value)
+	-- Not everything a chain resolves to is a partition INSTANCE. A nested struct has no
+	-- instanceGuid, and FindInstance(nil) does not return nil -- it throws out of C++
+	-- ("expected userdata, received nil"), which took the whole apply down with it: the write
+	-- never happened, the instance's overrides were cleared anyway, and the inspector went back to
+	-- showing the original value. Reported as "I set it to 30, pressed apply, and it shows 1".
+	if p_Container == nil or p_Container.instanceGuid == nil then
+		return nil
+	end
+
 	local s_Partition = nil
 
 	for _, l_P in pairs(m_Partitions) do
-		if l_P:FindInstance(p_Container.instanceGuid) ~= nil then
+		-- Guard each probe too: a partition can be unloaded underneath us mid-walk.
+		local s_Ok, s_Found = pcall(function() return l_P:FindInstance(p_Container.instanceGuid) end)
+
+		if s_Ok and s_Found ~= nil then
 			s_Partition = l_P
 			break
 		end

@@ -371,8 +371,52 @@ function DataContainerExt:_deepCloneFields(p_Clone, p_CurrentDepth)
 						end
 					end
 				elseif s_Array ~= nil and s_ElementType == nil then
-					m_Logger:Write("Array '" .. tostring(s_Name) .. "' has no elementType; leaving its " ..
-						tostring(#s_Array) .. " member(s) shared instead of failing the clone.")
+					-- No elementType, but the MEMBERS still know what they are. Ask them.
+					--
+					-- Leaving these shared is not a harmless degradation: a shared member still
+					-- points at the STOCK blueprint, so writing anything beneath it edits the
+					-- blueprint itself. Vehicles/BMP2/BMP2 has exactly this shape --
+					-- `components` has no elementType, and gravityModifier lives at
+					-- components.1.vehicleConfig.gravityModifier -- so a per-instance gravity edit
+					-- silently became a blueprint-wide one and every vehicle spawned afterwards
+					-- inherited it without anyone pressing "apply to blueprint".
+					--
+					-- Per-member inspection keeps the property that mattered when this fallback
+					-- was written (never throw, never fail the whole clone) while cloning the ones
+					-- that actually need it.
+					local s_Cloned, s_Shared = 0, 0
+
+					for i = #s_Array, 1, -1 do
+						local s_Member = s_Array[i]
+						local s_MemberType = nil
+
+						if s_Member ~= nil then
+							pcall(function() s_MemberType = s_Member.typeInfo end)
+						end
+
+						if s_MemberType ~= nil and not isPrintable(s_MemberType.name) and
+							not s_MemberType.enum then
+							local s_Ok = pcall(function()
+								self:_deepCloneStructOrDC(p_Clone, s_Name, i, p_CurrentDepth)
+							end)
+
+							if s_Ok then
+								s_Cloned = s_Cloned + 1
+							else
+								s_Shared = s_Shared + 1
+							end
+						else
+							s_Shared = s_Shared + 1
+						end
+					end
+
+					if s_Shared > 0 then
+						-- Loud: anything still shared is a path where an edit can reach the stock
+						-- blueprint, and that used to be discoverable only by its side effects.
+						m_Logger:Error("Array '" .. tostring(s_Name) .. "' has no elementType: " ..
+							tostring(s_Cloned) .. " member(s) cloned, " .. tostring(s_Shared) ..
+							" left SHARED -- an edit under a shared member reaches the BLUEPRINT")
+					end
 				end
 				-- It's an object or structure
 			elseif not isPrintable(l_Field.typeInfo.name) and not l_Field.typeInfo.enum then
