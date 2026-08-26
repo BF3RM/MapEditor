@@ -4,6 +4,26 @@ GameObjectManager = class 'GameObjectManager'
 
 ---@type Logger
 local m_Logger = Logger("GameObjectManager", false)
+-- TEMP diagnostics from the vehicle-AABB / entity-attribution investigation.
+--
+-- Silenced rather than deleted: they answered real questions (they are how the empty client entity
+-- bus and the stale partition slot were found) and will be wanted again. But they fired PER ENTITY
+-- at ERROR level -- 16k+ in one session -- which is log noise in a hot path, so they are off.
+-- Flip DIAG_ENABLED to bring them back.
+local DIAG_ENABLED = false
+
+local function m_Diag(p_Text)
+	if DIAG_ENABLED then
+		m_Logger:Error(p_Text)
+	end
+end
+
+local function m_DiagNet(p_Event, p_Text)
+	if DIAG_ENABLED then
+		NetEvents:SendLocal(p_Event, p_Text)
+	end
+end
+
 
 ---@param p_Realm Realm
 function GameObjectManager:__init(p_Realm)
@@ -565,11 +585,11 @@ end
 ---@param p_Variation integer
 ---@param p_Parent DataContainer|nil
 function GameObjectManager:OnAabbDiag(p_Player, p_Text)
-	m_Logger:Error('AABB-DIAG CLIENT ' .. tostring(p_Text))
+	m_Diag('AABB-DIAG CLIENT ' .. tostring(p_Text))
 end
 
 function GameObjectManager:OnAdoptDiag(p_Player, p_Text)
-	m_Logger:Error('ADOPT-DIAG CLIENT ' .. tostring(p_Text))
+	m_Diag('ADOPT-DIAG CLIENT ' .. tostring(p_Text))
 end
 
 ---@param p_HookCtx HookContext
@@ -624,9 +644,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 				tostring(self.m_SpawningForGuid):sub(-6) or 'nil')
 
 		if SharedUtils:IsClientModule() then
-			NetEvents:SendLocal('MapEditor:AdoptDiag', s_Line)
+			m_DiagNet('MapEditor:AdoptDiag', s_Line)
 		else
-			m_Logger:Error('ADOPT-DIAG SERVER ' .. s_Line)
+			m_Diag('ADOPT-DIAG SERVER ' .. s_Line)
 		end
 	end
 
@@ -904,9 +924,9 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 				' entities=' .. s_Total .. ' preclaimed=' .. s_Claimed
 
 			if SharedUtils:IsClientModule() then
-				NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+				m_DiagNet('MapEditor:AabbDiag', s_Line)
 			else
-				m_Logger:Error('AABB-DIAG SERVER ' .. s_Line)
+				m_Diag('AABB-DIAG SERVER ' .. s_Line)
 			end
 		end
 	end
@@ -1378,7 +1398,7 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 		s_Detail = s_Detail .. ' [' .. tostring(l_E.typeName) .. ' localX=' .. s_Wx .. ']'
 	end
 
-	m_Logger:Error('REPL-SEND obj=' .. tostring(p_GameObject.guid):sub(-6) ..
+	m_Diag('REPL-SEND obj=' .. tostring(p_GameObject.guid):sub(-6) ..
 		' objX=' .. string.format('%.1f', p_GameObject.transform.trans.x) ..
 		' spatial=' .. #s_Entities .. s_Detail)
 
@@ -1685,7 +1705,7 @@ function GameObjectManager:OnReplicatedEntities(p_Payload)
 		if s_Attempt <= 20 then
 			Timer:Simple(0.5, function() self:OnReplicatedEntities(p_Payload) end)
 		else
-			NetEvents:SendLocal('MapEditor:AabbDiag',
+			m_DiagNet('MapEditor:AabbDiag',
 				'REPL-RECV obj=' .. tostring(s_Data.guid):sub(-6) .. ' GAVE UP: object never appeared')
 		end
 
@@ -1717,7 +1737,7 @@ function GameObjectManager:OnReplicatedEntities(p_Payload)
 		end
 	end
 
-	NetEvents:SendLocal('MapEditor:AabbDiag',
+	m_DiagNet('MapEditor:AabbDiag',
 		'REPL-RECV obj=' .. tostring(s_Data.guid):sub(-6) .. ' added=' .. s_Added ..
 		' sent=' .. tostring(#(s_Data.entities or {})))
 
@@ -2329,18 +2349,18 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 			' spawningFor=' .. tostring(self.m_SpawningForGuid):sub(-6)
 
 		if SharedUtils:IsClientModule() then
-			NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+			m_DiagNet('MapEditor:AabbDiag', s_Line)
 		else
-			m_Logger:Error('AABB-DIAG SERVER ' .. s_Line)
+			m_Diag('AABB-DIAG SERVER ' .. s_Line)
 		end
 	elseif s_PendingGameObject ~= nil and self.m_SpawningForGuid == nil then
 		local s_Line = 'LATE entity->object=' .. tostring(s_PendingGameObject.guid):sub(-6) ..
 			' (no spawn in flight)'
 
 		if SharedUtils:IsClientModule() then
-			NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+			m_DiagNet('MapEditor:AabbDiag', s_Line)
 		else
-			m_Logger:Error('AABB-DIAG SERVER ' .. s_Line)
+			m_Diag('AABB-DIAG SERVER ' .. s_Line)
 		end
 	end
 

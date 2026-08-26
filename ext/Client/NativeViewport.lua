@@ -14,6 +14,17 @@ NativeViewport = class 'NativeViewport'
 -- moving vehicle's box tracks it, slow enough to be nothing traffic-wise.
 local BOX_REFRESH_FRAMES = 15
 
+-- TEMP diagnostics from the vehicle-AABB investigation, silenced rather than deleted: they are how
+-- the empty client entity bus and the DrawOBB userdata rejection were found, and will be wanted
+-- again. They run inside the per-frame draw path, so they stay off unless flipped on.
+local DIAG_ENABLED = false
+
+local function m_DiagNet(p_Event, p_Text)
+	if DIAG_ENABLED then
+		NetEvents:SendLocal(p_Event, p_Text)
+	end
+end
+
 local m_ColorSelected  = Vec4(1.0, 0.45, 0.1, 1.0)  -- orange: selected
 local m_ColorHighlight = Vec4(0.95, 0.95, 0.95, 0.9) -- white: hover highlight
 
@@ -345,7 +356,7 @@ local function DrawGameObject(p_GameObject, p_Color)
 			end
 		end
 
-		NetEvents:SendLocal('MapEditor:AabbDiag', 'DRAW-OBJ called obj=' ..
+		m_DiagNet('MapEditor:AabbDiag', 'DRAW-OBJ called obj=' ..
 			(p_GameObject ~= nil and tostring(p_GameObject.guid):sub(-6) or 'NIL') ..
 			' entities=' .. s_N .. s_Detail)
 	end
@@ -389,7 +400,7 @@ local function DrawGameObject(p_GameObject, p_Color)
 					' transType=' .. type(s_Aabb.transform) ..
 					' objT=' .. tostring(p_GameObject.transform ~= nil)
 
-				NetEvents:SendLocal('MapEditor:AabbDiag', 'DRAW-REPL ' .. s_Desc)
+				m_DiagNet('MapEditor:AabbDiag', 'DRAW-REPL ' .. s_Desc)
 			end
 		end
 	end
@@ -413,7 +424,7 @@ function NativeViewport:OnDraw()
 	if not _G.__activeReported then
 		_G.__activeReported = true
 
-		NetEvents:SendLocal('MapEditor:AabbDiag', 'ONDRAW active=' .. tostring(self.m_Active))
+		m_DiagNet('MapEditor:AabbDiag', 'ONDRAW active=' .. tostring(self.m_Active))
 	end
 
 	if not self.m_Active then
@@ -477,7 +488,7 @@ function NativeViewport:OnDraw()
 			s_Count = s_Count + 1
 		end
 
-		NetEvents:SendLocal('MapEditor:AabbDiag', 'OVERLAY enabled=' .. tostring(s_Overlays.enabled) ..
+		m_DiagNet('MapEditor:AabbDiag', 'OVERLAY enabled=' .. tostring(s_Overlays.enabled) ..
 			' selection=' .. tostring(s_Overlays.selection) .. ' selectedGuids=' .. s_Count)
 	end
 

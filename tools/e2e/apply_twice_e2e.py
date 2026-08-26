@@ -48,9 +48,16 @@ def placements():
 
 
 def first_guid():
+    """The first vehicle THE TEST spawned, never one that shipped with the map.
+
+    Editor spawns use the ED170122- prefix. Returning "the first BMP2" instead handed back 977021 --
+    the map's own vehicle -- so edits and applies were aimed at an object the test never touched,
+    and the run reported a product failure that was entirely its own."""
     r = cdp_eval(ADDR, """(function(){var e=window.editor,v=e.gameObjects.values();
     for(var i=0;i<v.length;i++){var g=v[i];
-     if(g&&g.name&&String(g.name).indexOf("BMP2")!==-1) return JSON.stringify({g:g.guid.toString()});}
+     if(g&&g.name&&String(g.name).indexOf("BMP2")!==-1&&
+        g.guid.toString().toUpperCase().indexOf("ED170122")===0)
+       return JSON.stringify({g:g.guid.toString()});}
     return JSON.stringify({g:null});})()""")
     return r.get('g') if isinstance(r, dict) else None
 

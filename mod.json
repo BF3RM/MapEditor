@@ -7,7 +7,7 @@
 	],
 	"Description": "A powerful ingame editor",
 	"URL": "https://github.com/BF3RM/MapEditor",
-	"Version": "0.2.12",
+	"Version": "0.2.13",
 	"HasWebUI": true,
 	"HasVeniceEXT": true,
 	"Tags": [
