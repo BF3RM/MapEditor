@@ -10,3 +10,9 @@ node_modules/
 tools/e2e/__pycache__/
 .powos-source
 tools/__pycache__/
+
+# Recorded editor sessions (tools/e2e/record_session.py). These are capture data, not source: they
+# grow without bound while recording and one of them is only meaningful next to the crash it came
+# from. Keep a copy by hand when a recording matters.
+tools/e2e/session*.jsonl
+tools/e2e/spawn_sweep_progress.jsonl
