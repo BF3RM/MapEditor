@@ -1435,7 +1435,7 @@ end
 ---
 ---Costs an entity bus per call: delete means DISABLE for vehicles, because freeing one is a native
 ---crash. Belongs on apply/commit, never on a keystroke.
-function GameObjectManager:RespawnForLiveEdit(p_Guid)
+function GameObjectManager:RespawnForLiveEdit(p_Guid, p_BetweenFn, p_AfterFn)
 	local s_Guid = tostring(p_Guid)
 	local s_Object = self.m_GameObjects[s_Guid]
 
@@ -1459,11 +1459,34 @@ function GameObjectManager:RespawnForLiveEdit(p_Guid)
 		return false
 	end
 
+	-- The write happens HERE: after the old entities are gone, before the new ones exist.
+	--
+	-- Order is the whole game. Writing the blueprint while live entities are still built from it
+	-- and then spawning is the pattern that has killed a realm every time it has been measured --
+	-- including the first version of this function, which wrote first and took the server down
+	-- 5s later with no Lua error. With no entities alive in between there is nothing to repoint
+	-- underneath.
+	if p_BetweenFn ~= nil then
+		local s_WriteOk, s_WriteErr = pcall(p_BetweenFn)
+
+		if not s_WriteOk then
+			m_Logger:Error('RespawnForLiveEdit: the write threw (' .. tostring(s_WriteErr) ..
+				'); rebuilding stock so the object is not lost')
+		end
+	end
+
+	-- Spawn SYNCHRONOUSLY, inside the caller's frame pass.
+	--
+	-- A Timer:Simple deferral was tried and made things worse -- 2 crashes of 3 against 0 of 3 for
+	-- the synchronous version. Entity creation is gated to UpdatePass_PreSim throughout this
+	-- codebase for exactly this reason, and a timer callback fires at whatever point in the frame
+	-- it likes, outside that gate. The caller (SetEBXField) already runs in PreSim, so building
+	-- here inherits the gate.
 	local s_Ok = self:InvokeBlueprintSpawn(s_Guid, '', s_PartitionGuid, s_InstanceGuid,
 		s_ParentData, s_Transform, s_Variation, false, s_Overrides, nil)
 
 	if not s_Ok then
-		-- Loud: the object has been deleted and NOT rebuilt, so the user just lost a vehicle.
+		-- Loud: the object was deleted and NOT rebuilt, so the user just lost a vehicle.
 		m_Logger:Error('RespawnForLiveEdit: respawn FAILED for ' .. s_Guid ..
 			' -- the object was deleted and could not be rebuilt')
 		return false

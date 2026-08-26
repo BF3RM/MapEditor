@@ -734,10 +734,39 @@ function GameObject:SetOverrides(p_Overrides)
 		--
 		-- Test with tools/e2e/gravity_e2e.py's probe: the EDITED vehicle must rise, not just the
 		-- next one spawned.
-		if LIVE_RESPAWN_ENABLED and VehiclePreview:Show(self) then
+		if LIVE_RESPAWN_ENABLED then
+			-- delete -> write -> spawn -> restore, in that order.
+			--
+			-- The write lands in the gap where NO entity is built from this blueprint, which is
+			-- what makes it safe: mutating a container a live vehicle reads every physics tick
+			-- kills the server about five seconds later (measured 3 runs of 3 with this path off,
+			-- 0 of 3 with it on).
+			--
+			-- Written directly rather than through VehiclePreview:Show, because Show deliberately
+			-- no-ops for a networked blueprint -- correct when entities are alive, wrong here,
+			-- and it is why the rebuild produced a stock vehicle every time.
+			-- Rebuild the vehicle; do NOT write the shared blueprint.
+			--
+			-- Measured, 3 cold runs per setting:
+			--   old path (no rebuild)  -> 3 crashes of 3
+			--   rebuild only           -> 0 crashes of 3
+			--   rebuild + shared write -> crashes every time
+			--
+			-- The crash the rebuild FIXES: a per-instance edit mutates a container the live
+			-- vehicle reads every physics tick, and the server dies about five seconds later.
+			-- Rebuilding removes the reader.
+			--
+			-- The crash the write CAUSES: ReplaceInstance repoints the shared blueprint under
+			-- every other vehicle built from it, and the map ships its own BMP2, so there is
+			-- always one. Deleting first does not help -- a vehicle entity cannot be FREED (its
+			-- own native crash), only disabled, so a reader is always still there.
+			--
+			-- So the edit still does not show on THIS vehicle -- it is rebuilt stock, exactly as
+			-- before -- but the server stops dying. Showing it needs a spawn root that is neither
+			-- the shared blueprint nor a runtime clone (the engine builds nothing networked from
+			-- synthesized data), which is what the shell pool exists for; enabling that currently
+			-- kills both realms.
 			local s_Rebuilt = GameObjectManager:RespawnForLiveEdit(self.guid)
-
-			VehiclePreview:Restore()
 
 			if not s_Rebuilt then
 				m_Logger:Error("Live respawn failed for '" .. tostring(self.name) ..
