@@ -406,7 +406,14 @@ function VehiclePreview:Show(p_GameObject)
 	end
 
 	if PREVIEW_SERVER_ONLY and SharedUtils:IsClientModule() then
-		return false
+		-- HANDLED, deliberately as a no-op. Returning false here made the caller fall through to
+		-- its Disable/Enable fallback, so the client destroyed and recreated the vehicle on EVERY
+		-- edit -- undebounced. A run of edits then killed the client while the server stayed up,
+		-- which is exactly what was reported.
+		--
+		-- The client's copy of the blueprint is untouched by design, so there is nothing for it to
+		-- re-read and no reason to rebuild anything.
+		return true
 	end
 
 	-- Apply rebuilds every instance of the blueprint, and each rebuild re-enters SetOverrides. If a

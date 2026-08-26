@@ -1046,3 +1046,20 @@ is using.
 
 Practical guidance until that is found: previews are safe to use; Apply works but should be treated
 as a once-per-session operation, and a level reload after applying is the safe way to continue.
+
+### The client was rebuilding the vehicle on every edit (2026-08-26)
+
+With previews server-only, `VehiclePreview:Show` returned false on the client -- and `SetOverrides`
+treats false as "could not preview", falling through to:
+
+    self:Disable(true)
+    self:Enable(true)
+
+So the client destroyed and recreated the vehicle on EVERY edit, undebounced. A run of ~14 edits
+killed the client while the server stayed up, which is exactly how it was reported.
+
+`Show` now returns TRUE on the client: handled, deliberately as a no-op. The client's copy of the
+blueprint is untouched by design, so there is nothing to re-read and no reason to rebuild anything.
+
+Measured after: 15 consecutive gravity edits plus a spawn -- client and server both alive, the new
+vehicle registers. The same sequence previously died around edit 14.
