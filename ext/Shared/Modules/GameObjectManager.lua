@@ -22,6 +22,7 @@ function GameObjectManager:RegisterEvents()
 
 	if SharedUtils:IsClientModule() then
 		NetEvents:Subscribe('MapEditor:ReplicatedEntities', self, self.OnReplicatedEntities)
+		NetEvents:Subscribe('MapEditor:BlueprintOverrides', self, self.OnBlueprintOverrides)
 	end
 
 	Events:Subscribe("Shared:StoreTimeStamps", self, self.StoreTimeStamps)
@@ -249,6 +250,21 @@ function GameObjectManager:RegisterVars()
 	-- entity instanceId -> the GameObject it is currently filed under, so a mis-filed entity can be
 	-- taken back by the object whose entity bus actually contains it.
 	self.m_EntityOwners = {}
+
+	-- Three layers, Unity-style: VANILLA (what the game shipped) <- BLUEPRINT overrides (apply,
+	-- affects every instance) <- PERSONAL overrides (one instance).
+	--
+	-- Apply used to collapse all of it: it wrote the shared DC and deleted the instance's
+	-- overrides, so the applied value became invisible -- it looked like the edit had been
+	-- reverted, and a second apply looked like it did nothing. Worse, nothing remembered the
+	-- shipped value, so "revert to vanilla" had nothing to revert TO.
+	--
+	-- blueprintGuid -> path -> the override field chain that was applied.
+	self.m_BlueprintOverrides = {}
+	-- blueprintGuid -> path -> the value the blueprint held BEFORE anything ever wrote that path.
+	-- Written once and never overwritten: the second apply's "previous" value is the first
+	-- apply's value, not vanilla.
+	self.m_VanillaValues = {}
 
 	-- The object a just-spawned blueprint is still receiving entities for (client replication
 	-- arrives after the hooks return), and a token so a stale timer cannot clear a newer claim.
@@ -1378,6 +1394,119 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 	end
 end
 
+---Send a blueprint's applied-override set to every client so their inspectors can show it.
+function GameObjectManager:PublishBlueprintOverrides(p_BlueprintGuid)
+	local s_BpGuid = tostring(p_BlueprintGuid)
+
+	NetEvents:Broadcast('MapEditor:BlueprintOverrides', json.encode({
+		guid = s_BpGuid,
+		overrides = self.m_BlueprintOverrides[s_BpGuid] or {},
+	}))
+end
+
+---Client: adopt the blueprint layer the server just published.
+function GameObjectManager:OnBlueprintOverrides(p_Payload)
+	local s_Ok, s_Data = pcall(function() return json.decode(p_Payload) end)
+
+	if not s_Ok or type(s_Data) ~= 'table' or s_Data.guid == nil then
+		return
+	end
+
+	-- json.decode turns an empty Lua table into {} either way; storing it as-is is correct, since
+	-- an empty set is exactly what "everything was reverted to vanilla" looks like.
+	self.m_BlueprintOverrides[tostring(s_Data.guid)] = s_Data.overrides or {}
+end
+
+---The blueprint-layer overrides for a blueprint: applied, shared by every instance, revertible.
+function GameObjectManager:GetBlueprintOverrides(p_BlueprintGuid)
+	return self.m_BlueprintOverrides[tostring(p_BlueprintGuid)] or {}
+end
+
+---Revert ONE blueprint-layer override back to the value the game shipped.
+---
+---Vanilla is kept separately from the undo stack on purpose: undo walks back through applies in
+---order, while this jumps straight to the floor no matter how many applies have stacked up.
+function GameObjectManager:RevertBlueprintOverride(p_BlueprintGuid, p_Path)
+	local s_BpGuid = tostring(p_BlueprintGuid)
+	local s_Overrides = self.m_BlueprintOverrides[s_BpGuid]
+	local s_Vanilla = self.m_VanillaValues[s_BpGuid]
+
+	if s_Overrides == nil or s_Overrides[p_Path] == nil then
+		m_Logger:Warning('RevertBlueprintOverride: no blueprint override at ' .. tostring(p_Path))
+		return false
+	end
+
+	if s_Vanilla == nil or s_Vanilla[p_Path] == nil then
+		-- Never guess. Without a recorded shipped value there is nothing honest to revert to.
+		m_Logger:Error('RevertBlueprintOverride: no vanilla value recorded for ' ..
+			tostring(p_Path) .. ' -- refusing to invent one')
+		return false
+	end
+
+	local s_Shared = nil
+
+	for _, l_GO in pairs(self.m_GameObjects) do
+		if l_GO ~= nil and l_GO.blueprintCtrRef ~= nil and
+			tostring(l_GO.blueprintCtrRef.instanceGuid) == s_BpGuid then
+			s_Shared = l_GO.blueprintCtrRef:Get()
+			break
+		end
+	end
+
+	if s_Shared == nil then
+		m_Logger:Error('RevertBlueprintOverride: blueprint not resolvable (' .. s_BpGuid .. ')')
+		return false
+	end
+
+	VehiclePreview:Restore()
+	VehiclePreview:Suspend()
+
+	local s_Ok = VehiclePreview:WriteChainValueByReplacement(s_Shared, s_Overrides[p_Path],
+		s_Vanilla[p_Path])
+
+	VehiclePreview:ForgetBlueprint(s_BpGuid)
+	VehiclePreview:Resume()
+
+	if not s_Ok then
+		m_Logger:Error('RevertBlueprintOverride: the write failed for ' .. tostring(p_Path))
+		return false
+	end
+
+	s_Overrides[p_Path] = nil
+
+	if next(s_Overrides) == nil then
+		self.m_AppliedBlueprints[s_BpGuid] = nil
+	end
+
+	if not SharedUtils:IsClientModule() then
+		self:PublishBlueprintOverrides(s_BpGuid)
+	end
+
+	m_Logger:Warning('RevertBlueprintOverride: ' .. tostring(p_Path) .. ' back to vanilla')
+
+	return true
+end
+
+---Revert every blueprint-layer override on a blueprint. Reports how many actually went back.
+function GameObjectManager:RevertAllBlueprintOverrides(p_BlueprintGuid)
+	local s_BpGuid = tostring(p_BlueprintGuid)
+	local s_Paths = {}
+
+	for l_Path, _ in pairs(self.m_BlueprintOverrides[s_BpGuid] or {}) do
+		table.insert(s_Paths, l_Path)
+	end
+
+	local s_Done = 0
+
+	for _, l_Path in ipairs(s_Paths) do
+		if self:RevertBlueprintOverride(s_BpGuid, l_Path) then
+			s_Done = s_Done + 1
+		end
+	end
+
+	return s_Done, #s_Paths
+end
+
 ---Undo the most recent "apply to blueprint", restoring the values it overwrote.
 ---
 ---Apply mutates the SHARED blueprint, so undoing it has to write the old values back the same way
@@ -1899,6 +2028,15 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 
 		if s_Ok and s_Before ~= nil then
 			s_Previous[l_Key] = s_Before
+
+			-- Vanilla is whatever this path held the FIRST time anything applied to it. Only
+			-- record it once: on the second apply, "the previous value" is the first apply's
+			-- value, and treating that as vanilla would make the shipped value unreachable.
+			self.m_VanillaValues[s_BpGuid] = self.m_VanillaValues[s_BpGuid] or {}
+
+			if self.m_VanillaValues[s_BpGuid][l_Key] == nil then
+				self.m_VanillaValues[s_BpGuid][l_Key] = s_Before
+			end
 		end
 	end
 
@@ -1919,6 +2057,14 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 		if not s_Ok then
 			m_Logger:Error("ApplyOverridesToBlueprint: replacement write failed for '" ..
 				tostring(l_Key) .. "': " .. tostring(s_Why))
+		end
+
+		if s_Ok and s_Path ~= nil and s_Path ~= '' then
+			-- The applied value now lives on the BLUEPRINT layer. It is still an override -- just
+			-- one that belongs to every instance of this blueprint rather than to this object --
+			-- so it stays visible and stays revertible.
+			self.m_BlueprintOverrides[s_BpGuid] = self.m_BlueprintOverrides[s_BpGuid] or {}
+			self.m_BlueprintOverrides[s_BpGuid][l_Key] = l_Field
 		end
 
 		if s_Path == nil or s_Path == '' then
@@ -1949,6 +2095,16 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 		partitionGuid = tostring(s_GameObject.blueprintCtrRef.partitionGuid),
 		name = tostring(s_GameObject.blueprintCtrRef.name),
 	}
+
+	-- Mirror the blueprint layer to the client.
+	--
+	-- Apply runs on the SERVER, but the transfer data the inspector reads is built on the CLIENT,
+	-- against the client's own GameObjectManager. Without this the client's table stays empty and
+	-- every object reports zero blueprint overrides -- the applied value is invisible again, which
+	-- is the whole bug this layer exists to fix.
+	if not SharedUtils:IsClientModule() then
+		self:PublishBlueprintOverrides(s_BpGuid)
+	end
 
 	-- 2) Collect every instance of this blueprint BEFORE we start respawning (respawns mutate
 	--    m_GameObjects, so we can't iterate it live).

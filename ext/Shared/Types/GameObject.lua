@@ -351,6 +351,12 @@ function GameObject:GetGameObjectTransferData()
 		realm = self.realm,
 		isUserModified = self.isUserModified,
 		overrides = self.overrides,
+		-- The BLUEPRINT layer, sent alongside this instance's personal overrides so the inspector
+		-- can show both and tell them apart. Without this the applied value simply vanished from
+		-- the UI after apply, which reads as "my change was reverted" and makes a second apply look
+		-- like it did nothing.
+		blueprintOverrides = (GameObjectManager ~= nil and self.blueprintCtrRef ~= nil)
+			and GameObjectManager:GetBlueprintOverrides(self.blueprintCtrRef.instanceGuid) or nil,
 		isPlaceholder = self.isPlaceholder,
 		originalRef = self.originalRef:GetTable()
 		-- entities have to be set externally

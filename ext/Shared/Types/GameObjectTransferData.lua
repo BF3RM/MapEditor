@@ -18,6 +18,8 @@ function GameObjectTransferData:__init(arg)
 	self.origin = arg.origin
 	self.isUserModified = arg.isUserModified
 	self.overrides = arg.overrides
+	---Applied (blueprint-layer) overrides for this object's blueprint: shared by every instance.
+	self.blueprintOverrides = arg.blueprintOverrides
 	self.originalRef = arg.originalRef
 end
 
@@ -36,6 +38,7 @@ function GameObjectTransferData:GetGameObject()
 		realm = self.realm,
 		isUserModified = self.isUserModified,
 		overrides = self.overrides,
+		blueprintOverrides = self.blueprintOverrides,
 		originalRef = CtrRef(self.originalRef)
 	}
 

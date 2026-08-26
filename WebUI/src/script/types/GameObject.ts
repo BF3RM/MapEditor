@@ -40,6 +40,15 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public originalRef: CtrRef | undefined;
 	// public overrides = new Dictionary<string, IEBXFieldData>()// guid, field
 	public overrides: { [path: string]: IEBXFieldData } = {};
+	/**
+	 * Applied (BLUEPRINT-layer) overrides for this object's blueprint: shared by every instance of
+	 * it, and distinct from `overrides`, which belong to this instance alone.
+	 *
+	 * Apply used to delete the instance override and show nothing in its place, so an applied
+	 * change looked reverted and a second apply looked like a no-op. Keeping the layer visible is
+	 * the point: vanilla <- blueprint overrides <- personal overrides.
+	 */
+	public blueprintOverrides: { [path: string]: IEBXFieldData } = {};
 	public realm: REALM;
 
 	public get localTransform(): LinearTransform {
@@ -70,7 +79,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		originalRef: CtrRef | undefined = undefined,
 		realm: REALM = REALM.CLIENT_AND_SERVER,
 		overrides: { [path: string]: IEBXFieldData } = {},
-		isPlaceholder: boolean = false
+		isPlaceholder: boolean = false,
+		blueprintOverrides: { [path: string]: IEBXFieldData } = {}
 	) {
 		super();
 		this.guid = guid;
@@ -103,6 +113,17 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		} else {
 			this.overrides = overrides || {};
 		}
+		// Same normalization as above: the ext may send this as an array or a path-keyed map.
+		if (Array.isArray(blueprintOverrides)) {
+			const bpMap: { [path: string]: IEBXFieldData } = {};
+			for (const o of blueprintOverrides as IEBXFieldData[]) {
+				bpMap[this._GetPath(o, '')] = o;
+			}
+			this.blueprintOverrides = bpMap;
+		} else {
+			this.blueprintOverrides = blueprintOverrides || {};
+		}
+
 		this.setWorldMatrix(this.transform.toMatrix(), true);
 		// Update the matrix after initialization.
 		this.updateMatrix();
@@ -134,7 +155,8 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 			gameObjectTransferData.originalRef,
 			gameObjectTransferData.realm,
 			gameObjectTransferData.overrides as any,
-			gameObjectTransferData.isPlaceholder
+			gameObjectTransferData.isPlaceholder,
+			(gameObjectTransferData as any).blueprintOverrides
 		);
 	}
 

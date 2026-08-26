@@ -22,6 +22,8 @@ export class GameObjectTransferData {
 	public isUserModified: boolean;
 	public originalRef: CtrRef;
 	public overrides: IEBXFieldData[];
+	/** Applied blueprint-layer overrides: shared by every instance of this blueprint. */
+	public blueprintOverrides?: { [path: string]: IEBXFieldData } | IEBXFieldData[];
 	public realm: REALM;
 	/** Placed but deliberately not instantiated — see GH #394. */
 	public isPlaceholder: boolean;
@@ -44,6 +46,7 @@ export class GameObjectTransferData {
 		this.isUserModified = args.isUserModified;
 		this.originalRef = args.originalRef;
 		this.overrides = args.overrides;
+		this.blueprintOverrides = (args as any).blueprintOverrides;
 		this.realm = args.realm;
 		this.isPlaceholder = args.isPlaceholder === true;
 	}
