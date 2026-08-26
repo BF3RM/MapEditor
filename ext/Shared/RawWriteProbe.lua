@@ -257,3 +257,45 @@ function RawWriteProbe:Write(p_Payload, p_IsClient)
 end
 
 RawWriteProbe = RawWriteProbe()
+
+-- ---------------------------------------------------------------------------------------------
+-- TEMP: live vehicle positions, straight from the realm that owns the entities.
+--
+-- A networked vehicle's position cannot be read on the client (no entity handle), and the
+-- replicated AABB only refreshes while the native viewport is drawing -- which a scripted harness
+-- never turns on. So an automated test had no way to see a vehicle fall, let alone fly. This asks
+-- the server for the truth and publishes it to window.__probePos.
+-- ---------------------------------------------------------------------------------------------
+if SharedUtils:IsClientModule() then
+	Events:Subscribe('MapEditor:ProbePositions', function()
+		NetEvents:SendLocal('MapEditor:ProbePositionsReq')
+	end)
+
+	NetEvents:Subscribe('MapEditor:ProbePositionsResult', function(p_Payload)
+		WebUI:ExecuteJS('window.__probePos = ' .. tostring(p_Payload) .. ';')
+	end)
+else
+	NetEvents:Subscribe('MapEditor:ProbePositionsReq', function(p_Player)
+		local s_Out = {}
+
+		for l_Guid, l_Object in pairs(GameObjectManager.m_GameObjects or {}) do
+			if l_Object ~= nil and l_Object.gameEntities ~= nil and l_Object.name ~= nil and
+				string.find(tostring(l_Object.name), 'BMP2') ~= nil then
+				for _, l_GE in pairs(l_Object.gameEntities) do
+					if l_GE.entity ~= nil and l_GE.isSpatial then
+						local s_Ok, s_Y = pcall(function()
+							return SpatialEntity(l_GE.entity).transform.trans.y
+						end)
+
+						if s_Ok and s_Y ~= nil then
+							s_Out[tostring(l_Guid):sub(-6)] = math.floor(s_Y * 100) / 100
+							break
+						end
+					end
+				end
+			end
+		end
+
+		NetEvents:SendTo('MapEditor:ProbePositionsResult', p_Player, json.encode(s_Out))
+	end)
+end
