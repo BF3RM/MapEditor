@@ -1211,6 +1211,11 @@ function GameObjectManager:GetNoHavokGuid(p_ParentGuid, p_Name, p_Transform)
 	return s_NewGuid
 end
 
+-- How far from its object a spatial entity may sit and still be considered part of that object's
+-- silhouette, in metres. Generous next to a vehicle (~10m) and nowhere near the stray
+-- origin-parked entities this exists to reject (20m+ on the measured cases).
+local MAX_OUTLINE_OFFSET = 25.0
+
 ---Vec3/LinearTransform do not survive a NetEvent, so flatten to plain numbers.
 local function PlainVec3(p_Vec)
 	if p_Vec == nil then
@@ -1285,6 +1290,29 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
 				end
 			end
 
+			-- Skip entities that are not anywhere near their object. A vehicle carries a
+			-- ServerTargetEntity that sits at the WORLD ORIGIN: measured on vehicles at x=20 and
+			-- x=40, its box came through at local -20 and -40, i.e. world 0 both times, while the
+			-- ServerVehicleEntity's own box was exactly right. So the outline was correct AND there
+			-- was a second stray box parked at 0,0,0 -- which is what a user sees as "the outline
+			-- is on the wrong vehicle".
+			--
+			-- A silhouette box belongs to the thing it outlines; anything tens of metres away is
+			-- not part of it, whatever it is called.
+			local s_Offset = s_Aabb.transform ~= nil and s_Aabb.transform.trans or nil
+			local s_TooFar = false
+
+			if s_Offset ~= nil then
+				local s_DistSq = s_Offset.x * s_Offset.x + s_Offset.y * s_Offset.y +
+					s_Offset.z * s_Offset.z
+
+				s_TooFar = s_DistSq > (MAX_OUTLINE_OFFSET * MAX_OUTLINE_OFFSET)
+			end
+
+			if s_TooFar then
+				goto skip
+			end
+
 			table.insert(s_Entities, {
 				instanceId = l_GameEntity.instanceId,
 				typeName = l_GameEntity.typeName,
@@ -1296,6 +1324,8 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
 					transform = PlainTransform(s_Aabb.transform),
 				},
 			})
+
+			::skip::
 		end
 	end
 
@@ -1899,6 +1929,22 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 
 	if s_PendingGameObject == nil then
 		s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
+	end
+
+	-- Never file a late-arriving entity onto an editor-spawned object through the PARTITION slot.
+	-- That slot holds one object per partition, so it is stale the moment a blueprint has two
+	-- instances -- and worse, it keeps pointing at a user-spawned object while the level streams,
+	-- so the FIRST vehicle spawned quietly absorbed ~200 level entities. Their boxes are scattered
+	-- across the map, which is why clicking that vehicle outlined a completely different one.
+	--
+	-- Objects the editor spawned do not need this path: statics get their entities from the entity
+	-- bus, and vehicles get their boxes replicated from the server (the client never sees a
+	-- networked vehicle's entities at all). Level objects still rely on the slot, so they keep it.
+	if s_PendingGameObject ~= nil and self.m_BlueprintStack[#self.m_BlueprintStack] == nil and
+		not s_PendingGameObject.wasInjected and
+		(s_PendingGameObject.origin == GameObjectOriginType.Custom or
+			s_PendingGameObject.origin == GameObjectOriginType.CustomChild) then
+		return
 	end
 
 	-- TEMP DIAG (AABB mis-association, reported 2026-08-26): the outline follows the WRONG vehicle.
