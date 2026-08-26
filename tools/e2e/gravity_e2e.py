@@ -145,7 +145,16 @@ def main():
 
         Comparing against the settled GROUND height instead was wrong: a vehicle still on its way
         down reads several metres above the ground and scored as 'risen'."""
-        return key in live and key in place and (live[key] - place[key]) > RISE_M
+        # Coerce: CDP hands values back as strings on some paths, and "a" - "b" raises rather
+        # than comparing, which failed the run in the SCORING step after every measurement had
+        # already been taken correctly.
+        if key not in live or key not in place:
+            return False
+
+        try:
+            return (float(live[key]) - float(place[key])) > RISE_M
+        except (TypeError, ValueError):
+            return False
 
     def risen(before, after, key):
         return key in before and key in after and (after[key] - before[key]) > RISE_M
