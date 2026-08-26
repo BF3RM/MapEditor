@@ -667,6 +667,20 @@ function PartitionSerializer:_SerializeInstance(p_Instance)
 		return self:_FieldOrder(s_TypeInfo, s_Fields)
 	end)
 
+	-- Say so when it fails. Degrading to the flat list is the right behaviour, but doing it
+	-- SILENTLY meant the inspector simply looked unordered with no indication why -- reported as
+	-- "the ordering is still not right" when in fact no ordering was being sent at all. Reported
+	-- once per type so a bad chain does not flood a partition stream.
+	if not s_OrderOk then
+		self.m_OrderFailures = self.m_OrderFailures or {}
+
+		if not self.m_OrderFailures[s_TypeInfo.name] then
+			self.m_OrderFailures[s_TypeInfo.name] = true
+			m_Logger:Error("FIELD-ORDER failed for '" .. tostring(s_TypeInfo.name) ..
+				"': " .. tostring(s_Order) .. " -- inspector falls back to a flat list")
+		end
+	end
+
 	return {
 		["$guid"] = tostring(p_Instance.instanceGuid),
 		["$type"] = s_TypeInfo.name,

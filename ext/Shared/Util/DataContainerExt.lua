@@ -665,7 +665,13 @@ function getFieldGroups(p_TypeInfo, p_Depth)
 	local s_Own = {}
 
 	if p_TypeInfo.fields ~= nil then
-		for _, l_Field in pairs(p_TypeInfo.fields) do
+		-- ipairs, NOT pairs: fields must come out in DECLARATION order.
+		--
+		-- The groups were already base-most first, but pairs() iterates a Lua table in whatever
+		-- order it likes, so the fields WITHIN each type came out scrambled -- correct grouping,
+		-- arbitrary contents, which still reads as "the ordering is wrong". typeInfo.fields is a
+		-- sequence, so ipairs walks it in the order the type declares.
+		for _, l_Field in ipairs(p_TypeInfo.fields) do
 			table.insert(s_Own, l_Field)
 		end
 	end
