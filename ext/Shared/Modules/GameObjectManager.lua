@@ -1417,6 +1417,61 @@ function GameObjectManager:OnBlueprintOverrides(p_Payload)
 	self.m_BlueprintOverrides[tostring(s_Data.guid)] = s_Data.overrides or {}
 end
 
+---Rebuild ONE object from the shared blueprint, so an edit shows on the vehicle already standing
+---there instead of only on the next one spawned.
+---
+---Why this shape, and not the obvious ones:
+---  * Disable/Enable (the old refresh) toggles the SAME entities. They re-read nothing, which is
+---    why editing a vehicle never appeared to do anything.
+---  * Rebuilding from a runtime CLONE is impossible for a networked blueprint -- the engine builds
+---    nothing from synthesized data, which is what the shell pool exists to work around.
+---  * Swapping the blueprint's root container under live entities is what killed the client
+---    (see WriteChainByReplacement's refusal).
+---
+---Spawning from the SHARED blueprint is the one path proven to work: it is what every ordinary
+---spawn does. So the caller writes the edit into the shared blueprint, calls this, and restores
+---the blueprint afterwards -- the new entity keeps the data it was BUILT with, so the edit sticks
+---to this vehicle while the blueprint goes back to stock and later spawns are unaffected.
+---
+---Costs an entity bus per call: delete means DISABLE for vehicles, because freeing one is a native
+---crash. Belongs on apply/commit, never on a keystroke.
+function GameObjectManager:RespawnForLiveEdit(p_Guid)
+	local s_Guid = tostring(p_Guid)
+	local s_Object = self.m_GameObjects[s_Guid]
+
+	if s_Object == nil or s_Object.blueprintCtrRef == nil then
+		m_Logger:Error('RespawnForLiveEdit: no such object (' .. s_Guid .. ')')
+		return false
+	end
+
+	-- Everything needed to rebuild it, captured BEFORE the delete drops the object.
+	local s_PartitionGuid = tostring(s_Object.blueprintCtrRef.partitionGuid)
+	local s_InstanceGuid = tostring(s_Object.blueprintCtrRef.instanceGuid)
+	local s_ParentData = s_Object.parentData
+	local s_Transform = s_Object.transform
+	local s_Variation = s_Object.variation
+	local s_Overrides = s_Object.overrides
+
+	-- DeleteGameObject disables rather than frees a vehicle's entities (freeing one takes the
+	-- server down natively), which is exactly the behaviour wanted here.
+	if not self:DeleteGameObject(s_Guid) then
+		m_Logger:Error('RespawnForLiveEdit: delete refused for ' .. s_Guid)
+		return false
+	end
+
+	local s_Ok = self:InvokeBlueprintSpawn(s_Guid, '', s_PartitionGuid, s_InstanceGuid,
+		s_ParentData, s_Transform, s_Variation, false, s_Overrides, nil)
+
+	if not s_Ok then
+		-- Loud: the object has been deleted and NOT rebuilt, so the user just lost a vehicle.
+		m_Logger:Error('RespawnForLiveEdit: respawn FAILED for ' .. s_Guid ..
+			' -- the object was deleted and could not be rebuilt')
+		return false
+	end
+
+	return true
+end
+
 ---The blueprint-layer overrides for a blueprint: applied, shared by every instance, revertible.
 function GameObjectManager:GetBlueprintOverrides(p_BlueprintGuid)
 	return self.m_BlueprintOverrides[tostring(p_BlueprintGuid)] or {}

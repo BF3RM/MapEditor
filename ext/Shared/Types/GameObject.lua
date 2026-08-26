@@ -2,6 +2,15 @@
 GameObject = class 'GameObject'
 
 local m_Logger = Logger("GameObject", false)
+
+-- Rebuild an edited vehicle from the shared blueprint so the edit shows on it immediately, rather
+-- than only on the next spawn. See the block in SetOverrides for why the alternatives do not work.
+-- Unverified end to end -- leave false until the disabled-entity collision question is answered.
+local LIVE_RESPAWN_ENABLED = false
+
+-- Where an unfreeable entity goes when its object is deleted. Far below any playable geometry, so
+-- the collider we are not allowed to free cannot be collided with.
+local EXILE_Y = -10000.0
 local m_TraceableField_Suffix = "_original_value"
 
 local m_TransformComponents = { "trans", "left", "up", "forward" }
@@ -273,6 +282,24 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
 						print("[MapEditor] entity Destroy failed (" .. tostring(s_Err) .. "); disabling instead")
 						pcall(function() l_GameEntity:Disable() end)
 					end
+				elseif l_GameEntity.isEditorSpawned then
+					-- Ours, but unfreeable (a vehicle): disable it, then move it out of the world.
+					--
+					-- Disabled is INVISIBLE, not intangible. Measured: delete a BMP2, spawn another
+					-- on the same spot, and the new one settles 2.91m higher -- perched on the hull
+					-- of the one that was "deleted". So a delete left an invisible wall exactly
+					-- where the user removed a vehicle.
+					--
+					-- The entity cannot be freed (that is the native crash this whole branch exists
+					-- to avoid), so exile it instead: far below the map, where its collider can
+					-- occupy nothing anyone will drive into.
+					l_GameEntity:Disable()
+
+					pcall(function()
+						local s_Exile = LinearTransform()
+						s_Exile.trans = Vec3(0.0, EXILE_Y, 0.0)
+						l_GameEntity:SetTransform(s_Exile, false, false)
+					end)
 				else
 					l_GameEntity:Disable()
 				end
@@ -694,7 +721,29 @@ function GameObject:SetOverrides(p_Overrides)
 		-- is visible, temporarily -- VehiclePreview undoes it as soon as another object is
 		-- previewed, the object is deleted, the level ends, or Apply runs. The saved data is
 		-- untouched: the override stays per-instance and still bakes per-instance.
-		if not VehiclePreview:Show(self) then
+		-- LIVE_RESPAWN: write the edit into the shared blueprint, rebuild THIS object from it, then
+		-- put the blueprint back. The new entity keeps the data it was built with, so the edit
+		-- shows on the vehicle standing here while later spawns stay stock.
+		--
+		-- OFF by default: the sequence is sound on paper and assembled from pieces that are each
+		-- measured (replacement writes are safe for nested fields; spawning from the shared
+		-- blueprint is what every ordinary spawn does; delete disables rather than frees a
+		-- vehicle), but it has NOT been run end to end. Two things to settle before trusting it:
+		-- whether a disabled entity stops COLLIDING (if not, every edit leaves an invisible hull
+		-- behind), and whether the restore lands before anything else spawns.
+		--
+		-- Test with tools/e2e/gravity_e2e.py's probe: the EDITED vehicle must rise, not just the
+		-- next one spawned.
+		if LIVE_RESPAWN_ENABLED and VehiclePreview:Show(self) then
+			local s_Rebuilt = GameObjectManager:RespawnForLiveEdit(self.guid)
+
+			VehiclePreview:Restore()
+
+			if not s_Rebuilt then
+				m_Logger:Error("Live respawn failed for '" .. tostring(self.name) ..
+					"'; the edit is recorded but this vehicle was not rebuilt")
+			end
+		elseif not VehiclePreview:Show(self) then
 			self:Disable(true)
 			self:Enable(true)
 		end
