@@ -6,9 +6,12 @@
 --- This replaces the static webx dependency (https://webx.powback.com/Games/Venice/<name>.json) with
 --- live data from the running game.
 ---
---- Target shape (identical to webx):
+--- Target shape (webx-compatible):
 ---   { "$guid", "$name", "$primaryInstance",
 ---     "$instances": [ { "$guid", "$type", "$baseClass", "$fields": { "<Field>": <field>, ... } } ] }
+--- plus two keys webx never had, because a JSON object cannot carry field order (see _FieldOrder):
+---   "$fieldOrder"  : [ "<Field>", ... ]                 declaration order, base-most type first
+---   "$fieldGroups" : [ { "$type": "EntityData", "$count": 7 }, ... ]   slices of $fieldOrder
 --- where <field> is one of:
 ---   primitive : { "$type": "Single", "$value": 1.0 }
 ---   struct    : { "$type": "SomeStruct", "$value": { "<SubField>": <field>, ... } }
@@ -655,12 +658,80 @@ function PartitionSerializer:_SerializeInstance(p_Instance)
 		s_BaseClass = s_TypeInfo.super.name
 	end
 
+	local s_Fields = self:_SerializeFields(s_Casted, s_TypeInfo, 0)
+
+	-- Ordering is best-effort: if the type chain misbehaves the inspector falls back to its old
+	-- flat list, which is worse to read but still complete. Losing the whole instance over a
+	-- cosmetic detail would not be a trade worth making.
+	local s_OrderOk, s_Order, s_Groups = pcall(function()
+		return self:_FieldOrder(s_TypeInfo, s_Fields)
+	end)
+
 	return {
 		["$guid"] = tostring(p_Instance.instanceGuid),
 		["$type"] = s_TypeInfo.name,
 		["$baseClass"] = s_BaseClass,
-		["$fields"] = self:_SerializeFields(s_Casted, s_TypeInfo, 0),
+		["$fields"] = s_Fields,
+		["$fieldOrder"] = s_OrderOk and s_Order or nil,
+		["$fieldGroups"] = s_OrderOk and s_Groups or nil,
 	}
+end
+
+--- Declaration order for an instance's fields, grouped by the type that declares them.
+---
+--- The inspector shows fields in inheritance order (base-most type first) under a header per
+--- declaring type. It can derive NEITHER from `$fields`: that is a JSON object built from a Lua
+--- hash table, so its key order is whatever `pairs` happened to produce -- which is exactly why the
+--- inspector's field list read as arbitrary.
+---
+--- Encoded as a flat name list plus per-type COUNTS, rather than nesting the names inside the
+--- groups, because a partition is streamed to the client in 8KB chunks a few per tick (see
+--- _QueueChunked) and a third copy of every field name is bandwidth for nothing. sum(counts) ==
+--- #order, and the WebUI slices one from the other.
+---
+--- Only names actually present in p_Fields are listed, so a field the serializer skipped
+--- (MaterialPairs, a nil typeInfo, an entire "sound"/"voice" type) can never show up as a header
+--- with nothing underneath it.
+---@param p_TypeInfo TypeInfo
+---@param p_Fields table the emitted { FieldName -> field } map
+---@return table order, table groups
+function PartitionSerializer:_FieldOrder(p_TypeInfo, p_Fields)
+	local s_Chain = getFieldGroups(p_TypeInfo)
+
+	-- A derived type may redeclare an inherited field name. Only ONE entry survives in $fields (the
+	-- map is keyed by name), so listing the name once per declaration would render the row twice.
+	-- Keep the LAST declaration, since that is the one whose read produced the emitted value.
+	local s_LastGroup = {}
+
+	for l_G, l_Group in ipairs(s_Chain) do
+		for _, l_Field in ipairs(l_Group.fields) do
+			if l_Field.name ~= nil then
+				s_LastGroup[l_Field.name] = l_G
+			end
+		end
+	end
+
+	local s_Order = {}
+	local s_Groups = {}
+
+	for l_G, l_Group in ipairs(s_Chain) do
+		local s_Count = 0
+
+		for _, l_Field in ipairs(l_Group.fields) do
+			local s_Name = l_Field.name
+
+			if s_Name ~= nil and p_Fields[s_Name] ~= nil and s_LastGroup[s_Name] == l_G then
+				s_Order[#s_Order + 1] = s_Name
+				s_Count = s_Count + 1
+			end
+		end
+
+		if s_Count > 0 then
+			s_Groups[#s_Groups + 1] = { ["$type"] = l_Group.name, ["$count"] = s_Count }
+		end
+	end
+
+	return s_Order, s_Groups
 end
 
 --- Build the { FieldName = <field> } map for an instance or struct.

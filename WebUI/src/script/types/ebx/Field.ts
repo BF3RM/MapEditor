@@ -14,7 +14,9 @@ const customDeserializers: { [type: string]: (value: any) => any } = {
 	Vec4: Vec4.fromJSON
 };
 
-function normalizeFieldName(name: string): string {
+// Exported because $fieldOrder/$fieldGroups name fields as the ENGINE spells them, while the
+// fields they index are keyed by the normalised name. Two copies of these rules would drift.
+export function normalizeFieldName(name: string): string {
 	// FIXME Clean this up
 	name = name.replace('FLIR', 'flir');
 	name = name.replace('FOV', 'fov');

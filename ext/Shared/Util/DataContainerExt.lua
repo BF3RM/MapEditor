@@ -585,22 +585,65 @@ function DataContainerExt:_printFieldsInternal(p_Instance, p_TypeInfo, p_Padding
 	end
 end
 
-function getFields(p_TypeInfo)
-	local s_Super = {}
+--- Fields grouped by the type that DECLARES them, base-most group first.
+---
+--- getFields() is built on top of this, so the two can never disagree about order or membership:
+--- the inspector wants to show a header per declaring type, and deriving that from a SECOND walk
+--- would be a second chance to drift from the walk that produced the fields.
+---
+--- A type that declares no fields of its own contributes no group -- an empty header in the
+--- inspector is noise, and the flattened field list is identical either way.
+---@param p_TypeInfo TypeInfo
+---@param p_Depth number|nil recursion guard, see below
+---@return table { { name = <declaring type name>, fields = { <FieldInformation>, ... } }, ... }
+function getFieldGroups(p_TypeInfo, p_Depth)
+	local s_Groups = {}
 
-	if p_TypeInfo.super ~= nil then
+	if p_TypeInfo == nil then
+		return s_Groups
+	end
+
+	local s_Depth = p_Depth or 0
+
+	-- BOUNDED, unlike the walk this replaces. typeInfo.super does not reliably terminate: at the
+	-- root it can keep handing back a non-nil typeInfo rather than nil (see EBXManager:SetField,
+	-- where an unbounded version of exactly this loop hung the game with no crash and no dump).
+	-- The "stop above DataContainer" test below is the only reason the old recursion terminated,
+	-- which is fine for a DataContainer chain and nothing else -- structs go through here too.
+	if s_Depth < 32 and p_TypeInfo.super ~= nil and p_TypeInfo.super ~= p_TypeInfo then
 		if p_TypeInfo.super.name ~= "DataContainer" then
-			for _, l_SuperType in pairs(getFields(p_TypeInfo.super)) do
-				table.insert(s_Super, l_SuperType)
+			for _, l_Group in ipairs(getFieldGroups(p_TypeInfo.super, s_Depth + 1)) do
+				table.insert(s_Groups, l_Group)
 			end
 		end
 	end
 
-	for _, l_Field in pairs(p_TypeInfo.fields) do
-		table.insert(s_Super, l_Field)
+	local s_Own = {}
+
+	if p_TypeInfo.fields ~= nil then
+		for _, l_Field in pairs(p_TypeInfo.fields) do
+			table.insert(s_Own, l_Field)
+		end
 	end
 
-	return s_Super
+	if #s_Own > 0 then
+		table.insert(s_Groups, { name = p_TypeInfo.name, fields = s_Own })
+	end
+
+	return s_Groups
+end
+
+--- Every field of a type INCLUDING inherited ones, base-most declaration first.
+function getFields(p_TypeInfo)
+	local s_Fields = {}
+
+	for _, l_Group in ipairs(getFieldGroups(p_TypeInfo)) do
+		for _, l_Field in ipairs(l_Group.fields) do
+			table.insert(s_Fields, l_Field)
+		end
+	end
+
+	return s_Fields
 end
 
 function isPrintable(p_Type)

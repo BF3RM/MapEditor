@@ -13,6 +13,12 @@ declare namespace EBX {
 			$type: string;
 			$baseClass: string;
 			$fields: { [name: string]: Field<any> };
+			// Field DECLARATION order, base-most type in the inheritance chain first, and the
+			// slices of it that each type declares. `$fields` is an object, so it cannot carry
+			// order itself. Optional: the webx/emulator path never sends them, and an instance
+			// without them renders as a flat list (see Instance.fromJSON).
+			$fieldOrder?: string[];
+			$fieldGroups?: Array<{ $type: string; $count: number }>;
 		}
 		interface Partition {
 			$guid: string;
