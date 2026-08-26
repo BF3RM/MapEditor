@@ -553,8 +553,24 @@ function GameObject:SetOverrides(p_Overrides)
 				-- Clone bailed (lazy-load / error). Fall back to editing the SHARED blueprint
 				-- (old behavior: the edit leaks to all instances, but that beats doing nothing).
 				-- No respawn needed here — Disable/Enable re-reads the shared DC we just wrote.
-				m_Logger:Warning("Per-instance clone failed for '" .. tostring(self.name) ..
-					"'; editing the shared blueprint (this edit will affect ALL instances)")
+				-- LOUD, deliberately. This silently turned a per-instance edit into one that
+				-- changes every instance of the blueprint, including ones spawned later, and the
+				-- only way to notice was to trip over the side effects afterwards. A fallback that
+				-- changes the MEANING of the user's action has to announce itself.
+				m_Logger:Error("SHARED-EDIT FALLBACK: per-instance clone failed for '" ..
+					tostring(self.name) .. "' (" .. tostring(s_Why) ..
+					") -- this edit now affects ALL instances of this blueprint, including ones " ..
+					"spawned later, and 'apply to blueprint' was never pressed")
+
+				-- Surface it in the editor too; a server log nobody is tailing is not a warning.
+				if SharedUtils:IsClientModule() then
+					pcall(function()
+						WebUI:ExecuteJS('if(window.editor&&window.editor.vext&&window.editor.vext.' ..
+							'ShowMessage){window.editor.vext.ShowMessage(' ..
+							'"Per-instance edit failed - this change affects ALL instances of ' ..
+							tostring(self.name):gsub('"', '') .. '");}')
+					end)
+				end
 				self.internalBlueprint = s_Shared
 			end
 		end

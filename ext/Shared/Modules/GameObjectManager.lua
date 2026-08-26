@@ -1378,6 +1378,63 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 	end
 end
 
+---Undo the most recent "apply to blueprint", restoring the values it overwrote.
+---
+---Apply mutates the SHARED blueprint, so undoing it has to write the old values back the same way
+---(by replacement -- an in-place write is what makes a blueprint unspawnable). Returns how many
+---paths were restored so the caller can report honestly instead of implying success.
+function GameObjectManager:UndoApplyOverridesToBlueprint(p_Guid)
+	if self.m_AppliedUndo == nil or #self.m_AppliedUndo == 0 then
+		m_Logger:Warning('UndoApply: nothing on the apply-undo stack')
+		return false, 0
+	end
+
+	local s_Entry = table.remove(self.m_AppliedUndo)
+	local s_GameObject = self.m_GameObjects[tostring(s_Entry.guid)]
+
+	if s_GameObject == nil or s_GameObject.blueprintCtrRef == nil then
+		m_Logger:Error('UndoApply: the applying object is gone (' .. tostring(s_Entry.guid) .. ')')
+		return false, 0
+	end
+
+	local s_Shared = s_GameObject.blueprintCtrRef:Get()
+
+	if s_Shared == nil then
+		m_Logger:Error('UndoApply: shared blueprint not resolvable')
+		return false, 0
+	end
+
+	VehiclePreview:Restore()
+	VehiclePreview:Suspend()
+
+	local s_Restored = 0
+
+	for l_Key, l_Field in pairs(s_Entry.fields) do
+		local s_Before = s_Entry.previous[l_Key]
+
+		if s_Before ~= nil then
+			local s_Ok = VehiclePreview:WriteChainValueByReplacement(s_Shared, l_Field, s_Before)
+
+            if s_Ok then
+				s_Restored = s_Restored + 1
+			else
+				m_Logger:Error("UndoApply: could not restore '" .. tostring(l_Key) .. "'")
+			end
+		else
+			m_Logger:Error("UndoApply: no pre-apply value recorded for '" .. tostring(l_Key) ..
+				"' -- leaving it as applied rather than guessing")
+		end
+	end
+
+	VehiclePreview:ForgetBlueprint(tostring(s_Entry.blueprintGuid))
+	VehiclePreview:Resume()
+
+	m_Logger:Warning('UndoApply: restored ' .. s_Restored .. ' path(s) on ' ..
+		tostring(s_GameObject.name))
+
+	return s_Restored > 0, s_Restored
+end
+
 ---Server: a client is asking for up-to-date boxes for the objects it has selected.
 ---
 ---Only the selected ones, and only while they are selected: a vehicle under physics needs its box
@@ -1827,6 +1884,27 @@ function GameObjectManager:ApplyOverridesToBlueprint(p_Guid)
 	-- one outcome that is never acceptable.
 	local s_Failed = {}
 	local s_FailedCount = 0
+
+	-- Snapshot what the blueprint held BEFORE this apply, so undo has something to restore.
+	-- ApplyBlueprintOverridesCommand.undo() used to be an empty no-op: the entry still sat in the
+	-- history, so undoing it moved the pointer, reverted nothing, and every vehicle spawned
+	-- afterwards still carried the applied value. Reported as "I reverted my gravity change with
+	-- the history but newly spawned ones still get the gravity I set".
+	local s_Previous = {}
+
+	for l_Key, l_Field in pairs(s_Applied) do
+		local s_Ok, s_Before = pcall(function()
+			return VehiclePreview:ReadChain(s_Shared, l_Field)
+		end)
+
+		if s_Ok and s_Before ~= nil then
+			s_Previous[l_Key] = s_Before
+		end
+	end
+
+	self.m_AppliedUndo = self.m_AppliedUndo or {}
+	table.insert(self.m_AppliedUndo, { blueprintGuid = s_BpGuid, previous = s_Previous,
+		fields = s_Applied, guid = tostring(p_Guid) })
 
 	for l_Key, l_Field in pairs(s_Applied) do
 		-- Write by REPLACEMENT, not in place.

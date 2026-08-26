@@ -321,6 +321,41 @@ local function ReplaceField(p_Container, p_Field, p_Value)
 	return p_Container
 end
 
+---Read the value a chain currently points at, without touching anything.
+---
+---Used to snapshot a blueprint before "apply to blueprint" so the apply can be undone. Returns nil
+---when the chain cannot be resolved -- the caller must treat that as "no snapshot", never as nil
+---being the old value.
+function VehiclePreview:ReadChain(p_Shared, p_Chain)
+	local s_Container, s_Field = ResolveTarget(p_Shared, p_Chain)
+
+	if s_Container == nil or s_Field == nil then
+		return nil
+	end
+
+	local s_Ok, s_Value = pcall(function() return s_Container[s_Field] end)
+
+	if not s_Ok then
+		return nil
+	end
+
+	return s_Value
+end
+
+---Write an EXPLICIT value onto a chain by replacement, ignoring the value carried in the chain.
+---
+---WriteChainByReplacement writes what the override says; undoing an apply needs to write what the
+---blueprint said BEFORE it, which is a different value for the same path.
+function VehiclePreview:WriteChainValueByReplacement(p_Shared, p_Chain, p_Value)
+	local s_Container, s_Field = ResolveTarget(p_Shared, p_Chain)
+
+	if s_Container == nil or s_Field == nil then
+		return false
+	end
+
+	return ReplaceField(s_Container, s_Field, p_Value) ~= nil
+end
+
 ---Write one override chain onto a blueprint BY REPLACEMENT.
 ---
 ---Public because Apply-to-Blueprint needs it too: an in-place write makes the blueprint's

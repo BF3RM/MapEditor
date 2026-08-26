@@ -16,6 +16,7 @@ function CommandActions:RegisterVars()
 
 	self.SpawnGameObjectCommand = self.SpawnGameObject
 	self.DeleteGameObjectCommand = self.DeleteGameObject
+	self.UndoApplyBlueprintOverridesCommand = self.UndoApplyBlueprintOverrides
 	self.UndeleteGameObjectCommand = self.UndeleteGameObject
 	self.SetTransformCommand = self.SetTransform
 	self.SelectGameObjectCommand = self.SelectGameObject
@@ -385,6 +386,33 @@ end
 -- "Apply to Blueprint" (Unity Apply-to-Prefab): promote one instance's per-instance overrides
 -- onto the shared base blueprint, then rebuild every instance of it so they pick up the new base
 -- (siblings keep their own not-yet-applied overrides on top). See GameObjectManager for details.
+function CommandActions:UndoApplyBlueprintOverrides(p_Command, p_UpdatePass)
+	if p_Command.gameObjectTransferData == nil then
+		m_Logger:Error("UndoApplyBlueprintOverridesCommand needs a valid gameObjectTransferData.")
+		return nil, CARResponseType.Failure
+	end
+
+	-- Same frame-pass gate as the apply it reverses: this swaps DataContainers that live entities
+	-- read, which is only safe in PreSim.
+	if p_UpdatePass ~= UpdatePass.UpdatePass_PreSim then
+		return nil, CARResponseType.Queue
+	end
+
+	local s_Ok, s_Restored = GameObjectManager:UndoApplyOverridesToBlueprint(
+		p_Command.gameObjectTransferData.guid)
+
+	if not s_Ok then
+		-- Report the failure rather than letting the UI show a successful undo of nothing.
+		m_Logger:Error("UndoApplyBlueprintOverrides: restored nothing for " ..
+			tostring(p_Command.gameObjectTransferData.guid))
+		return nil, CARResponseType.Failure
+	end
+
+	m_Logger:Warning("UndoApplyBlueprintOverrides: restored " .. tostring(s_Restored) .. " path(s)")
+
+	return nil, CARResponseType.Success
+end
+
 function CommandActions:ApplyBlueprintOverrides(p_Command, p_UpdatePass)
 	if p_Command.gameObjectTransferData == nil or p_Command.gameObjectTransferData.guid == nil then
 		m_Logger:Error("ApplyBlueprintOverridesCommand needs a gameObjectTransferData with a guid.")

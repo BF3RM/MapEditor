@@ -31,7 +31,18 @@ export default class ApplyBlueprintOverridesCommand extends Command {
 		window.vext.SendCommand(new VextCommand(this.type, gameObjectTransferData));
 	}
 
-	// Not undoable in one shot (it mutates the shared blueprint + rebuilds every instance). A
-	// no-op keeps it out of the undo stack cleanly rather than doing something half-correct.
-	public undo() {}
+	// Undo asks the ext to put back the values this apply overwrote. It records them before
+	// writing, so this restores the blueprint rather than guessing.
+	//
+	// This used to be an empty no-op, justified as keeping the action "out of the undo stack
+	// cleanly" -- but the entry is on the stack regardless, so undoing it moved the history
+	// pointer and reverted nothing. The blueprint kept the applied value and every instance
+	// spawned afterwards still carried it, with the UI reporting the change as undone.
+	public undo() {
+		const gameObjectTransferData = new GameObjectTransferData({
+			guid: this.data.guid,
+			overrides: Object.values(this.data.overrides)
+		});
+		window.vext.SendCommand(new VextCommand('UndoApplyBlueprintOverridesCommand', gameObjectTransferData));
+	}
 }
