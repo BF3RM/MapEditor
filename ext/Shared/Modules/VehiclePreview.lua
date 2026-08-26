@@ -395,6 +395,30 @@ function VehiclePreview:WriteChainByReplacement(p_Shared, p_Chain)
 		return false, 'could not resolve the chain'
 	end
 
+	-- REFUSE to replace the blueprint's ROOT object container.
+	--
+	-- ReplaceInstance repoints every reference to that container -- and for a top-level field the
+	-- container IS the object the live entities were built from, so the swap happens underneath a
+	-- client that is actively using it. Two recorded crash sessions both died on apply here, and
+	-- both wrote top-level fields (object.exitAllowed; object.upsideDownDamage +
+	-- object.foregroundRenderCockpitMesh), while every test that wrote only NESTED paths
+	-- (components.1.vehicleConfig.gravityModifier) passed. It also matches the older field-safety
+	-- sweep exactly: exitDirectionSpeedThreshold, upsideDownDamage, armorMultiplier and
+	-- regenerationDelay were all FATAL, the nested vehicleConfig field SAFE.
+	--
+	-- Refusing loses the live write, which is the lesser harm: the override stays recorded on the
+	-- instance and still bakes, whereas the swap takes the client out entirely. The caller reports
+	-- the refusal rather than silently doing nothing.
+	local s_RootOk, s_RootGuid = pcall(function()
+		return p_Shared.object ~= nil and tostring(p_Shared.object.instanceGuid) or nil
+	end)
+
+	if s_RootOk and s_RootGuid ~= nil and tostring(s_Container.instanceGuid) == s_RootGuid then
+		return false, 'refusing to replace the blueprint root object (' .. tostring(s_FieldName) ..
+			' is a top-level field; replacing it swaps the container live entities were built ' ..
+			'from and kills the client) -- kept as an instance override'
+	end
+
 	if s_Type ~= nil then
 		local s_Coerced = ParseType(tostring(s_Type), s_Value)
 

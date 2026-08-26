@@ -1701,3 +1701,1284 @@
 {"t": 240679, "kind": "cmd", "payload": {"type": "SetEBXFieldCommand", "gameObjectTransferData": {"guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "overrides": [{"field": "object", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "field": "explosion", "type": "ExplosionEntityData", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}, "field": "shockwaveImpulse", "type": "Float32", "value": 15000, "oldValue": 150}, "oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}, "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822"}, "type": "GameObjectData", "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}], "isPlaceholder": false}, "sender": "Powback"}}
 {"t": 242034, "kind": "cmd", "payload": {"type": "ApplyBlueprintOverridesCommand", "gameObjectTransferData": {"guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "overrides": [{"field": "object", "type": "GameObjectData", "value": {"oldValue": 50, "value": 0, "field": "upsideDownDamage", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "Float32"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": true, "value": false, "field": "foregroundRenderCockpitMesh", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "Boolean"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E"}, "value": {"oldValue": 1, "value": 5, "field": "lodScale", "type": "Float32", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E"}}, "field": "mesh", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "CompositeMeshAsset"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E"}, "value": {"oldValue": true, "value": false, "field": "streamingEnable", "type": "Boolean", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E"}}, "field": "mesh", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "CompositeMeshAsset"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}, "value": {"oldValue": 100, "value": 100000, "field": "blastDamage", "type": "Float32", "reference": {"typeName": "", "name": "", "partitionGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}}, "field": "explosion", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "ExplosionEntityData"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}, "value": {"oldValue": 15, "value": 5000, "field": "shockwaveRadius", "type": "Float32", "reference": {"typeName": "", "name": "", "partitionGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}}, "field": "explosion", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "ExplosionEntityData"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}, "value": {"oldValue": 50, "value": 50000, "field": "cameraShockwaveRadius", "type": "Float32", "reference": {"typeName": "", "name": "", "partitionGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}}, "field": "explosion", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "ExplosionEntityData"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}, {"field": "object", "type": "GameObjectData", "value": {"oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}, "value": {"oldValue": 150, "value": 15000, "field": "shockwaveImpulse", "type": "Float32", "reference": {"typeName": "", "name": "", "partitionGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "instanceGuid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}}, "field": "explosion", "guid": "1B02ED1D-4B26-1ABE-771E-A6DC3E30D822", "reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "ExplosionEntityData"}, "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}], "isPlaceholder": false}, "sender": "Powback"}}
 {"t": 276343, "kind": "cmd", "payload": {"type": "SpawnGameObjectCommand", "sender": "Powback", "gameObjectTransferData": {"guid": "ED170122-7777-0000-0000-EAAB00000001", "name": "Vehicles/BMP2/BMP2", "blueprintCtrRef": {"typeName": "VehicleBlueprint", "name": "Vehicles/BMP2/BMP2", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95907-AFD4-11DD-84FB-9FA71F68ED5E"}, "parentData": {"guid": "00000000-0000-0000-0000-000000000000", "typeName": "custom_root", "primaryInstanceGuid": "00000000-0000-0000-0000-000000000000", "partitionGuid": "00000000-0000-0000-0000-000000000000"}, "transform": {"left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 0, "y": 83, "z": 0}}, "variation": 0, "isDeleted": false, "isEnabled": true}}}
+{"t": 1217796, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 0, "oy": 0, "oz": 0, "dx": -0.005555469823658133, "dy": 0, "dz": -0.99998456825845}}
+{"t": 1219083, "kind": "evt", "name": "controlStart"}
+{"t": 1219181, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 77.143119812012, "oy": 76.593223571777, "oz": 132.92608642578, "dx": -0.4739032602482348, "dy": -0.15430194336364314, "dz": 0.8669524843959425}}
+{"t": 1219263, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 77.143119812012, "oy": 76.593223571777, "oz": 132.92608642578, "dx": -0.502945836251837, "dy": 0.07595967795495685, "dz": 0.8609736425245083}}
+{"t": 1219358, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1220201, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8011149700449411, "dy": -0.59812490923902, "dz": -0.02148017033701176}}
+{"t": 1220229, "kind": "evt", "name": "controlStart"}
+{"t": 1220579, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5871436916039976, "dy": -0.5488746144253928, "dz": 0.594978102999603}}
+{"t": 1221988, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9815749170051539, "dy": -0.0702866848570699, "dz": 0.17768079310417337}}
+{"t": 1222128, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9812953084627637, "dy": -0.07316670359027336, "dz": 0.17806221124849145}}
+{"t": 1223585, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6114891471689807, "dy": -0.7148024340843475, "dz": -0.3393206494182821}}
+{"t": 1223669, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7262837029098468, "dy": -0.6727725793254375, "dz": -0.14102850561272756}}
+{"t": 1223767, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7150869331608406, "dy": -0.687801506820518, "dz": -0.12481892980653421}}
+{"t": 1223856, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7226178515550763, "dy": -0.683089525749963, "dz": -0.10588739502233666}}
+{"t": 1223939, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7256932433316021, "dy": -0.6803148028483151, "dz": -0.1026697891705159}}
+{"t": 1224019, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7374216047078808, "dy": -0.6684416509503401, "dz": -0.09692851069132084}}
+{"t": 1224182, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.41114221631838943, "dy": -0.8471194540154898, "dz": -0.33667596972356273}}
+{"t": 1226621, "kind": "cmd", "payload": {"type": "SpawnGameObjectCommand", "gameObjectTransferData": {"guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "name": "Vehicles/BMP2/BMP2", "parentData": {"guid": "00000000-0000-0000-0000-000000000000", "typeName": "custom_root", "primaryInstanceGuid": "00000000-0000-0000-0000-000000000000", "partitionGuid": "00000000-0000-0000-0000-000000000000"}, "blueprintCtrRef": {"typeName": "VehicleBlueprint", "name": "Vehicles/BMP2/BMP2", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95907-AFD4-11DD-84FB-9FA71F68ED5E"}, "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 63.565307617188, "y": 73.844871520996, "z": 140.75312805176}}, "variation": 0, "isDeleted": false, "isEnabled": true, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1226952, "kind": "evt", "name": "RequestPartitionData", "arg": {"requestId": 1, "guid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "name": "Vehicles/BMP2/BMP2"}}
+{"t": 1226952, "kind": "evt", "name": "SetSelection", "arg": ["47FDA74E-D15B-8962-8D7B-2DDE79B1D087"]}
+{"t": 1226953, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.844871520996, 140.75312805176]}
+{"t": 1226953, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1226994, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.4026440576583142, "dy": -0.7849588044204782, "dz": 0.4708688120859372}}
+{"t": 1227076, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6474038130357328, "dy": -0.7104944922101254, "dz": 0.2758004340204521}}
+{"t": 1227162, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8364651971353357, "dy": -0.5429854499389617, "dz": 0.0741132588402862}}
+{"t": 1227260, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8506033714711273, "dy": -0.5223895004955679, "dz": 0.05985911972241639}}
+{"t": 1227340, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8343357569846743, "dy": -0.4966740969944937, "dz": -0.23916246777350864}}
+{"t": 1227426, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8144631601021609, "dy": -0.49870242045820073, "dz": -0.2965563296669516}}
+{"t": 1227706, "kind": "evt", "name": "RequestPartitionData", "arg": {"requestId": 2, "guid": "221AD190-BB79-4248-AD52-4E16FF6460AE", "name": "221AD190-BB79-4248-AD52-4E16FF6460AE", "instance": "221AD190-BB79-4248-AD52-4E16FF6460AE"}}
+{"t": 1227708, "kind": "evt", "name": "RequestPartitionData", "arg": {"requestId": 3, "guid": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "name": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD", "instance": "3FDA5298-3CD9-452C-8A04-83D28F5F2DDD"}}
+{"t": 1227708, "kind": "evt", "name": "RequestPartitionData", "arg": {"requestId": 4, "guid": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E", "name": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E", "instance": "AAE95909-AFD4-11DD-84FB-9FA71F68ED5E"}}
+{"t": 1227708, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8174758408380439, "dy": -0.5003314782140239, "dz": -0.28530976421129184}}
+{"t": 1227746, "kind": "evt", "name": "RequestPartitionData", "arg": {"requestId": 5, "guid": "D6DF3282-0B9E-491E-824D-33011AD88FE6", "name": "D6DF3282-0B9E-491E-824D-33011AD88FE6", "instance": "D6DF3282-0B9E-491E-824D-33011AD88FE6"}}
+{"t": 1227790, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8273486274589315, "dy": -0.5271964239409133, "dz": -0.19379932720661144}}
+{"t": 1227930, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8705481452072744, "dy": -0.4907643518489536, "dz": -0.03600385854947794}}
+{"t": 1228056, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.870116191941966, "dy": -0.4917705226576897, "dz": -0.032550968732040816}}
+{"t": 1228207, "kind": "evt", "name": "controlStart"}
+{"t": 1228220, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.8448713821554, 140.75312805176]}
+{"t": 1228221, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228234, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.90256817187941, 140.75312805176]}
+{"t": 1228234, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228234, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.87374245738377, 140.75312805176]}
+{"t": 1228234, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228240, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.93134821790343, 140.75312805176]}
+{"t": 1228241, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228248, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.90256775667031, 140.75312805176]}
+{"t": 1228248, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228248, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.96008297983101, 140.75312805176]}
+{"t": 1228248, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228255, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 73.98877270220702, 140.75312805176]}
+{"t": 1228255, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228255, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.0174173533078, 140.75312805176]}
+{"t": 1228255, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228263, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.04601703925913, 140.75312805176]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.07457159164834, 140.75312805176]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.10308180166855, 140.75312805176]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.15996810601708, 140.75312805176]}
+{"t": 1228264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.2449645259573, 140.75312805176]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.21667665209847, 140.75312805176]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.44174981401794, 140.75312805176]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.35767577140518, 140.75312805176]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.44174981401794, 140.75312805176]}
+{"t": 1228271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.46968753479288, 140.75312805176]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.4975819440359, 140.75312805176]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.55324123017672, 140.75312805176]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.58100630742072, 140.75312805176]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.63640809460567, 140.75312805176]}
+{"t": 1228277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.7466993758237, 140.75312805176]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.8289731419523, 140.75312805176]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.85631354691385, 140.75312805176]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.9380840868052, 140.75312805176]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.96525708520187, 140.75312805176]}
+{"t": 1228284, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228291, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 74.99238879823362, 140.75312805176]}
+{"t": 1228291, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.07353560772626, 140.75312805176]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.04652796471967, 140.75312805176]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.12742748498584, 140.75312805176]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.15431203614965, 140.75312805176]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.2614417913175, 140.75312805176]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.31476320737443, 140.75312805176]}
+{"t": 1228292, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228297, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.44736305397709, 140.75312805176]}
+{"t": 1228297, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228297, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.44736280007304, 140.75312805176]}
+{"t": 1228297, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.4737626754995, 140.75312805176]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.65745279997472, 140.75312805176]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.60516730255858, 140.75312805176]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.70958214736989, 140.75312805176]}
+{"t": 1228298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.7615552951034, 140.75312805176]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.94224363634014, 140.75312805176]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.89081071130911, 140.75312805176]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 75.96790255728423, 140.75312805176]}
+{"t": 1228304, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.04465128544945, 140.75312805176]}
+{"t": 1228305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.14645361944747, 140.75312805176]}
+{"t": 1228305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.19712875371523, 140.75312805176]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.22241034798792, 140.75312805176]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.34826115291655, 140.75312805176]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.42332793143107, 140.75312805176]}
+{"t": 1228315, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.52290479387301, 140.75312805176]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.52290503241565, 140.75312805176]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.72032078981462, 140.75312805176]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.72032078981462, 140.75312805176]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.84254338656196, 140.75312805176]}
+{"t": 1228316, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228322, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.79376101102011, 140.75312805176]}
+{"t": 1228322, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.98804677918461, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 76.98804677918461, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.01217492377958, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.18010271341488, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.13229590448121, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.32270455680708, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.32270455680708, 140.75312805176]}
+{"t": 1228323, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.36996720944292, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.46408915868177, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.60427226184453, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.55767733811156, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.6275205979061, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.76632120795334, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.74326933884893, 140.75312805176]}
+{"t": 1228329, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228336, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.90395303837542, 140.75312805176]}
+{"t": 1228336, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.85820471341353, 140.75312805176]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 77.9495731343752, 140.75312805176]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.04043078995616, 140.75312805176]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.08566941726771, 140.75312805176]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.1982154774841, 140.75312805176]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.1982154774841, 140.75312805176]}
+{"t": 1228337, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.22063084134406, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.2876904079673, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.37667034630921, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.37667034630921, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.61884615493325, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.66248580813942, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.66248580813942, 140.75312805176]}
+{"t": 1228344, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.68426080201367, 140.75312805176]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.70600598922844, 140.75312805176]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.72772143094171, 140.75312805176]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.90038141082479, 140.75312805176]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.85739282963209, 140.75312805176]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.00734285829824, 140.75312805176]}
+{"t": 1228351, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228356, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 78.98600861790254, 140.75312805176]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.00734285829824, 140.75312805176]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.07117237474455, 140.75312805176]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.09239134048434, 140.75312805176]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.15587643377421, 140.75312805176]}
+{"t": 1228357, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228364, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.176981056631, 140.75312805176]}
+{"t": 1228364, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228364, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.19805723818052, 140.75312805176]}
+{"t": 1228364, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228364, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.21910503587524, 140.75312805176]}
+{"t": 1228364, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.24012450701623, 140.75312805176]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.3239202666362, 140.75312805176]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.30301353179482, 140.75312805176]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.36564966562223, 140.75312805176]}
+{"t": 1228365, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.3864724423807, 140.75312805176]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.42803443083363, 140.75312805176]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.44877375424014, 140.75312805176]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.46948537132488, 140.75312805176]}
+{"t": 1228371, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228378, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.53145453874961, 140.75312805176]}
+{"t": 1228378, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228378, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.53145453874961, 140.75312805176]}
+{"t": 1228378, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228378, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.55205588390767, 140.75312805176]}
+{"t": 1228378, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228385, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.5726297986876, 140.75312805176]}
+{"t": 1228385, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228385, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.59317633783617, 140.75312805176]}
+{"t": 1228385, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228385, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.5726299962789, 140.75312805176]}
+{"t": 1228385, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228393, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.65465234507342, 140.75312805176]}
+{"t": 1228394, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228394, "kind": "cmd", "payload": {"type": "SetTransformCommand", "gameObjectTransferData": {"guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 63.565307617188, "y": 79.65465234507342, "z": 140.75312805176}}, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1228394, "kind": "evt", "name": "controlEnd"}
+{"t": 1228396, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9648483251537167, "dy": -0.2562381799063906, "dz": -0.05839267596478443}}
+{"t": 1228481, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9645681361514713, "dy": -0.25520109811658415, "dz": -0.06693810754245968}}
+{"t": 1228570, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8932229062645565, "dy": -0.36163791978885923, "dz": -0.267153241970009}}
+{"t": 1228620, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.654655456543, 140.75312805176]}
+{"t": 1228620, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1228652, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6955360378382379, "dy": -0.43480349364336196, "dz": -0.5719926065814244}}
+{"t": 1228740, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5942929722345093, "dy": -0.4119309651246686, "dz": -0.6907450637710933}}
+{"t": 1228820, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5736256016132587, "dy": -0.4104600244383119, "dz": -0.7088555829729545}}
+{"t": 1230485, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5077338236127635, "dy": -0.4701354797845793, "dz": -0.7219272781986331}}
+{"t": 1230829, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5083662874991585, "dy": -0.4706775625573317, "dz": -0.7211285251877173}}
+{"t": 1230976, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5077338236127635, "dy": -0.4701354797845793, "dz": -0.7219272781986331}}
+{"t": 1231622, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5072208427530951, "dy": -0.47076486938879025, "dz": -0.7218777281688328}}
+{"t": 1231702, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6047299237023065, "dy": -0.5538540469855091, "dz": -0.5723175814325262}}
+{"t": 1231789, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7344342742026302, "dy": -0.6367391449068577, "dz": -0.23488200914446264}}
+{"t": 1231992, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7469154671506011, "dy": -0.6414769578142729, "dz": -0.1749988500663505}}
+{"t": 1232077, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.730138957668826, "dy": -0.632180014007257, "dz": -0.2593174355573971}}
+{"t": 1249101, "kind": "cmd", "payload": {"type": "SetEBXFieldCommand", "gameObjectTransferData": {"guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "overrides": [{"field": "object", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "field": "components", "type": "GameObjectData", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "field": "1", "type": "GameObjectData", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "B84077F3-B1AA-414F-AE53-694AD0B06522"}, "field": "vehicleConfig", "type": "VehicleConfigData", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "C884BC5E-E669-4A92-975C-C7E14E03E6EE"}, "field": "gravityModifier", "type": "Float32", "value": -1.6, "oldValue": 1.6000000238419}, "oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "C884BC5E-E669-4A92-975C-C7E14E03E6EE"}}, "oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "B84077F3-B1AA-414F-AE53-694AD0B06522"}}, "oldValue": [{"name": "1", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "B84077F3-B1AA-414F-AE53-694AD0B06522"}}, {"name": "2", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "F280BAE7-E6D9-436F-A49C-874C23DD2554"}}, {"name": "3", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "62144562-15E4-4B45-94B1-EBA5C84D6036"}}, {"name": "4", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "C2672815-75AD-4D32-B95B-C88713418F7F"}}, {"name": "5", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "440F7EE7-C39E-4FE4-98FC-F0B60F024086"}}, {"name": "6", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "E04D1BE9-9564-49F5-8068-568C59C215D4"}}, {"name": "7", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "76D51C5C-D795-43FE-9D1C-D8FBE79C9E49"}}, {"name": "8", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "D6FB4538-95B7-435F-B4DE-737240CD85F1"}}, {"name": "9", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "32F3FAC3-F770-4C9E-8B45-6124DE1372BD"}}, {"name": "10", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "4972A082-A729-48F0-B24B-1417F3E37A03"}}, {"name": "11", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "A5A82F01-1481-488C-827F-35082A51614C"}}, {"name": "12", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "F52CFCDB-5B4F-4B3A-B4A8-BD8864996B2A"}}, {"name": "13", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "5F84C947-1992-41DA-9379-F82F2C09D52C"}}, {"name": "14", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "53CE3157-7CAB-46C6-BBF7-92F22D1953EE"}}, {"name": "15", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "C9292602-C455-4CA6-891D-97A7CCBFC92C"}}, {"name": "16", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "98BB339F-E6A4-4A14-BDE5-030D3A11389E"}}, {"name": "17", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "41C73557-2938-4B72-8322-4954314B03AB"}}, {"name": "18", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "4D39015B-B07B-40B7-AEEB-7E23E2C56352"}}, {"name": "19", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "647D4A9F-5F83-43CA-A720-F0AAA1DE46F0"}}, {"name": "20", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "154E1680-55B0-4495-825B-FE3CF3E06C6F"}}, {"name": "21", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "8BB624BD-2994-4E31-80CA-70DFCDACC645"}}, {"name": "22", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "BA69D65D-9650-45DD-99C5-BB9C56CEF634"}}, {"name": "23", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "A29FE7CF-AA9D-448F-BC5C-03634D05597A"}}, {"name": "24", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "898435EB-73B5-4006-835D-07F68E4E94ED"}}, {"name": "25", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "455DC4E2-F517-4611-BDF0-FD0C6D4D6FB6"}}, {"name": "26", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "220C128E-3A2F-4AB5-826B-E8528B0ACEDB"}}, {"name": "27", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "5CC9AD4C-E6A1-4CE8-AF9C-A6DCD17FF6B6"}}, {"name": "28", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "FD8E7767-BB53-445B-A7E7-110BE19BC581"}}, {"name": "29", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "FB36196E-EABA-4984-A9AE-A1BC89CEC156"}}], "guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087"}, "type": "GameObjectData", "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}], "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1249676, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8026305532383395, "dy": -0.40149523795377084, "dz": -0.4411187696173923}}
+{"t": 1249776, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9599857728321791, "dy": -0.2158379286361365, "dz": -0.17844131954753564}}
+{"t": 1249856, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9320096351667165, "dy": -0.3258886154157591, "dz": -0.15860217621080525}}
+{"t": 1249940, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9310291896447018, "dy": -0.33211018069135934, "dz": -0.15128607308897396}}
+{"t": 1250020, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9247906294391137, "dy": -0.3786429711068859, "dz": -0.03730673039757989}}
+{"t": 1250101, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9275860118727557, "dy": -0.3716224009696418, "dz": -0.038483524728832805}}
+{"t": 1250186, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9350551714762548, "dy": -0.35262746520488275, "dz": -0.03641012329958477}}
+{"t": 1250268, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9380233061182153, "dy": -0.34464774384941227, "dz": -0.03647204187543056}}
+{"t": 1250416, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9409898774859858, "dy": -0.3366898186255738, "dz": -0.03432224501380311}}
+{"t": 1250544, "kind": "evt", "name": "controlStart"}
+{"t": 1250596, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.654655456543, 140.75312805176]}
+{"t": 1250596, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250617, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.67748150252233, 140.75312805176]}
+{"t": 1250617, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250618, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.72303769225395, 140.75312805176]}
+{"t": 1250618, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250625, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.74576797022162, 140.75312805176]}
+{"t": 1250625, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250625, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.76846645942193, 140.75312805176]}
+{"t": 1250625, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250625, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.79113322649279, 140.75312805176]}
+{"t": 1250625, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250630, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.8137683378885, 140.75312805176]}
+{"t": 1250630, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250630, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.83637185987584, 140.75312805176]}
+{"t": 1250630, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250630, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.90399354929933, 140.75312805176]}
+{"t": 1250630, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250637, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.90399354929933, 140.75312805176]}
+{"t": 1250637, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250637, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.92647137264451, 140.75312805176]}
+{"t": 1250637, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250637, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.97133330201571, 140.75312805176]}
+{"t": 1250638, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250638, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.99371753819744, 140.75312805176]}
+{"t": 1250638, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.01607070851155, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 79.99371775316887, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.03839309196186, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.1273730409627, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.1273730409627, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.17167867522441, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.19378584222558, 140.75312805176]}
+{"t": 1250646, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.30386440764516, 140.75312805176]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.25992390796415, 140.75312805176]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.30386440764516, 140.75312805176]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.32578936056558, 140.75312805176]}
+{"t": 1250654, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.36954919342436, 140.75312805176]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.41318885094502, 140.75312805176]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.47842448018571, 140.75312805176]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.45670903633084, 140.75312805176]}
+{"t": 1250659, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.50011023952837, 140.75312805176]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.54339294780972, 140.75312805176]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.56499001790156, 140.75312805176]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.58655764578906, 140.75312805176]}
+{"t": 1250666, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250673, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.62960481544212, 140.75312805176]}
+{"t": 1250674, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250674, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.65108447704625, 140.75312805176]}
+{"t": 1250674, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250674, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.67253493612364, 140.75312805176]}
+{"t": 1250674, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.6939562521863, 140.75312805176]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.71534848458445, 140.75312805176]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.73671169250986, 140.75312805176]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.75804593499053, 140.75312805176]}
+{"t": 1250681, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250687, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.77935127089737, 140.75312805176]}
+{"t": 1250687, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250687, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.80062775893899, 140.75312805176]}
+{"t": 1250687, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250693, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.82187545766838, 140.75312805176]}
+{"t": 1250693, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250694, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.84309442547693, 140.75312805176]}
+{"t": 1250694, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250701, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.86428472060089, 140.75312805176]}
+{"t": 1250701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250701, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.88544640111718, 140.75312805176]}
+{"t": 1250701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250701, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.92768414985684, 140.75312805176]}
+{"t": 1250701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250708, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.92768414985684, 140.75312805176]}
+{"t": 1250708, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250714, "kind": "cmd", "payload": {"type": "SetTransformCommand", "gameObjectTransferData": {"guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 63.565307617188, "y": 80.92768414985684, "z": 140.75312805176}}, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1250715, "kind": "evt", "name": "controlEnd"}
+{"t": 1250715, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9604142828395684, "dy": -0.27566969884674325, "dz": -0.0401325610384324}}
+{"t": 1250833, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9606923684033312, "dy": -0.27469854584240483, "dz": -0.04013579703539195}}
+{"t": 1250922, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.927680969238, 140.75312805176]}
+{"t": 1250922, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1250977, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9598545256375706, "dy": -0.2776133949719945, "dz": -0.040125958495689576}}
+{"t": 1251135, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9601350024670303, "dy": -0.2766413161470475, "dz": -0.04012928155430995}}
+{"t": 1251239, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9590494951843008, "dy": -0.28053599700698567, "dz": -0.03903357746907585}}
+{"t": 1251319, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9579012151081567, "dy": -0.2844343199966996, "dz": -0.039017684481934614}}
+{"t": 1251686, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9582326174410275, "dy": -0.283462410820968, "dz": -0.03793827254478071}}
+{"t": 1251796, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9579851669338117, "dy": -0.28444068770491, "dz": -0.036849899765872635}}
+{"t": 1251956, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.957774587748746, "dy": -0.28542144983511825, "dz": -0.034676145067447026}}
+{"t": 1252144, "kind": "evt", "name": "controlStart"}
+{"t": 1252218, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.99168375846997, 140.75312805176]}
+{"t": 1252218, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252218, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 80.97037821670081, 140.75312805176]}
+{"t": 1252218, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252224, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.01296014531344, 140.75312805176]}
+{"t": 1252224, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252228, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.03420784514775, 140.75312805176]}
+{"t": 1252228, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252232, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.05542681406031, 140.75312805176]}
+{"t": 1252232, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252237, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.03420764108762, 140.75312805176]}
+{"t": 1252237, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252237, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.0766170085303, 140.75312805176]}
+{"t": 1252237, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252243, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.11891181534715, 140.75312805176]}
+{"t": 1252243, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252243, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.14001644148792, 140.75312805176]}
+{"t": 1252243, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252250, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.16109262631343, 140.75312805176]}
+{"t": 1252250, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252251, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.18214042727905, 140.75312805176]}
+{"t": 1252251, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252251, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.20315990168262, 140.75312805176]}
+{"t": 1252251, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252251, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.18214022513742, 140.75312805176]}
+{"t": 1252251, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252256, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.2241510058724, 140.75312805176]}
+{"t": 1252256, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252256, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.2869555738975, 140.75312805176]}
+{"t": 1252256, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252256, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.26604883568469, 140.75312805176]}
+{"t": 1252256, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.30783426974482, 140.75312805176]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.32868497960744, 140.75312805176]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.37030266615689, 140.75312805176]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.37030266615689, 140.75312805176]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.3910697548548, 140.75312805176]}
+{"t": 1252264, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252270, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.43252070200275, 140.75312805176]}
+{"t": 1252270, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.41180868323353, 140.75312805176]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.49448968124344, 140.75312805176]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.47386084724275, 140.75312805176]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.55621149099646, 140.75312805176]}
+{"t": 1252271, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.55621149099646, 140.75312805176]}
+{"t": 1252277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252277, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.59722266774362, 140.75312805176]}
+{"t": 1252277, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252278, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.61768741056353, 140.75312805176]}
+{"t": 1252278, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252278, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.63812499528856, 140.75312805176]}
+{"t": 1252278, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.73990743335216, 140.75312805176]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.73990743335216, 140.75312805176]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.7601831990343, 140.75312805176]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.78043218180522, 140.75312805176]}
+{"t": 1252285, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.8410189622815, 140.75312805176]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.8410189622815, 140.75312805176]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.86116134233848, 140.75312805176]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.88127720325372, 140.75312805176]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.96147650017906, 140.75312805176]}
+{"t": 1252291, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 81.96147650017906, 140.75312805176]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.02135007274279, 140.75312805176]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.02135007274279, 140.75312805176]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.06113518056983, 140.75312805176]}
+{"t": 1252298, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252299, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.08098870606631, 140.75312805176]}
+{"t": 1252299, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.10081628063863, 140.75312805176]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.1601436169427, 140.75312805176]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.17986798993657, 140.75312805176]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.19956657008191, 140.75312805176]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.23888683697554, 140.75312805176]}
+{"t": 1252305, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.25850862371003, 140.75312805176]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.27810491240955, 140.75312805176]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.29767575274408, 140.75312805176]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.31722119425255, 140.75312805176]}
+{"t": 1252312, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.33674128634753, 140.75312805176]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.39514995834162, 140.75312805176]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.41456914433876, 140.75312805176]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.4339632260652, 140.75312805176]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.49199533148874, 140.75312805176]}
+{"t": 1252319, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252325, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.49199533148874, 140.75312805176]}
+{"t": 1252325, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252325, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.51128948137168, 140.75312805176]}
+{"t": 1252325, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252325, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.53055876897871, 140.75312805176]}
+{"t": 1252325, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252332, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.56902294933853, 140.75312805176]}
+{"t": 1252332, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252332, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.54980324233343, 140.75312805176]}
+{"t": 1252332, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252332, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.60738825528723, 140.75312805176]}
+{"t": 1252332, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252339, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.62653394941935, 140.75312805176]}
+{"t": 1252339, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252339, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.64565506757938, 140.75312805176]}
+{"t": 1252339, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252340, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.62653385747977, 140.75312805176]}
+{"t": 1252340, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252340, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.6647515653515, 140.75312805176]}
+{"t": 1252340, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252346, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.68382367343011, 140.75312805176]}
+{"t": 1252346, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252346, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.74089357844156, 140.75312805176]}
+{"t": 1252346, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252353, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.74089357844156, 140.75312805176]}
+{"t": 1252353, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252353, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.75986822972698, 140.75312805176]}
+{"t": 1252353, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252360, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.7788186335314, 140.75312805176]}
+{"t": 1252360, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252367, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.79774483630464, 140.75312805176]}
+{"t": 1252367, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252382, "kind": "cmd", "payload": {"type": "SetTransformCommand", "gameObjectTransferData": {"guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 63.565307617188, "y": 82.79774483630464, "z": 140.75312805176}}, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1252382, "kind": "evt", "name": "controlEnd"}
+{"t": 1252526, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9793377079349496, "dy": -0.2006017087851053, "dz": -0.025624368269584325}}
+{"t": 1252591, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.797744750977, 140.75312805176]}
+{"t": 1252591, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1252619, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9793377079349496, "dy": -0.2006017087851053, "dz": -0.025624368269584325}}
+{"t": 1252715, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9783759562372258, "dy": -0.2052452128920752, "dz": -0.02559083511300331}}
+{"t": 1252808, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9781804444843375, "dy": -0.2061758348062283, "dz": -0.025584041322255665}}
+{"t": 1252912, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9767821076982137, "dy": -0.21270788393263712, "dz": -0.025535665128109505}}
+{"t": 1252998, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.974016894396455, "dy": -0.2249196651936325, "dz": -0.026499691308944594}}
+{"t": 1253156, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9735794383921956, "dy": -0.22680737039964083, "dz": -0.026485729597971498}}
+{"t": 1253238, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8522268165593375, "dy": -0.47080708298979507, "dz": -0.22814500595844178}}
+{"t": 1253319, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7355398700740662, "dy": -0.5422352410433388, "dz": -0.40615519558673396}}
+{"t": 1254909, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.48593957186607756, "dy": -0.7705011268983886, "dz": -0.4125418111451568}}
+{"t": 1254991, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5149630906047361, "dy": -0.8456478648054038, "dz": 0.14033069537659948}}
+{"t": 1255073, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.4660004865607875, "dy": -0.8529808107020308, "dz": 0.23508994682719994}}
+{"t": 1255623, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.40613839478770003, "dy": -0.8012299007695586, "dz": 0.4394112542847232}}
+{"t": 1255716, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6739819429833974, "dy": -0.7225746286672575, "dz": 0.15373433753946902}}
+{"t": 1255758, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1256079, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6363953237443609, "dy": -0.7159021165984555, "dz": 0.28720228301000905}}
+{"t": 1256126, "kind": "evt", "name": "controlStart"}
+{"t": 1256164, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5316607008831699, "dy": -0.6902248887133301, "dz": 0.4908426449862398}}
+{"t": 1256244, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.27897116223253066, "dy": -0.7127034479179244, "dz": 0.6436061574973732}}
+{"t": 1256326, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.23014051613991346, "dy": -0.7467089131310785, "dz": 0.6240682189323999}}
+{"t": 1256707, "kind": "cmd", "payload": {"type": "SpawnGameObjectCommand", "gameObjectTransferData": {"guid": "71825654-579C-5017-D597-FF380BAE8968", "name": "Vehicles/BMP2/BMP2", "parentData": {"guid": "00000000-0000-0000-0000-000000000000", "typeName": "custom_root", "primaryInstanceGuid": "00000000-0000-0000-0000-000000000000", "partitionGuid": "00000000-0000-0000-0000-000000000000"}, "blueprintCtrRef": {"typeName": "VehicleBlueprint", "name": "Vehicles/BMP2/BMP2", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95907-AFD4-11DD-84FB-9FA71F68ED5E"}, "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 64.560775756836, "y": 73.844879150391, "z": 144.90092468262}}, "variation": 0, "isDeleted": false, "isEnabled": true, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1257081, "kind": "evt", "name": "SetSelection", "arg": ["71825654-579C-5017-D597-FF380BAE8968"]}
+{"t": 1257081, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 73.844879150391, 144.90092468262]}
+{"t": 1257081, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1257310, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.2804031960356251, "dy": -0.8025866271152126, "dz": 0.5265251690364227}}
+{"t": 1257395, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5770505192619277, "dy": -0.7531373422792139, "dz": 0.31590638151854666}}
+{"t": 1257481, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.740651401985634, "dy": -0.6480707365735935, "dz": 0.17731277769431883}}
+{"t": 1257563, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.814138117226253, "dy": -0.572119029219647, "dz": 0.09929220756968142}}
+{"t": 1257688, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8157637890856594, "dy": -0.5701441435237088, "dz": 0.09728872505190127}}
+{"t": 1257770, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8439690944012609, "dy": -0.520049184514545, "dz": 0.13139639790067523}}
+{"t": 1257871, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.841638881598644, "dy": -0.5221276262410972, "dz": 0.13793743109548132}}
+{"t": 1257966, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8388786783888658, "dy": -0.5251376410363785, "dz": 0.14322367440928735}}
+{"t": 1258114, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8306294291482057, "dy": -0.5349825695214195, "dz": 0.1544292774741429}}
+{"t": 1258266, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8263950903402743, "dy": -0.5417486150469601, "dz": 0.15355648067141392}}
+{"t": 1258360, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8263950903402743, "dy": -0.5417486150469601, "dz": 0.15355648067141392}}
+{"t": 1258442, "kind": "evt", "name": "controlStart"}
+{"t": 1258572, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 73.93520009011701, 144.90092468262]}
+{"t": 1258572, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258579, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 73.93520009011701, 144.90092468262]}
+{"t": 1258579, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258579, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 73.96520631521625, 144.90092468262]}
+{"t": 1258579, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 73.99516240442576, 144.90092468262]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 73.9652059431551, 144.90092468262]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.05492449185628, 144.90092468262]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.11448772260458, 144.90092468262]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.14419500756601, 144.90092468262]}
+{"t": 1258586, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.20346098332712, 144.90092468262]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.17385271981414, 144.90092468262]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.2625313046208, 144.90092468262]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.32140566222925, 144.90092468262]}
+{"t": 1258593, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.35076979567184, 144.90092468262]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.40935257501941, 144.90092468262]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.40935257501941, 144.90092468262]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.43857109870065, 144.90092468262]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.49686446171214, 144.90092468262]}
+{"t": 1258601, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.52593917585526, 144.90092468262]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.72812906469132, 144.90092468262]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.69938698727465, 144.90092468262]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.75682485157645, 144.90092468262]}
+{"t": 1258608, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.78547339394687, 144.90092468262]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.8140751630252, 144.90092468262]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.89960097318838, 144.90092468262]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.92801626139419, 144.90092468262]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 74.95638622601989, 144.90092468262]}
+{"t": 1258615, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258616, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.01298728640484, 144.90092468262]}
+{"t": 1258616, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258616, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.04121895862397, 144.90092468262]}
+{"t": 1258616, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.09754462127388, 144.90092468262]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.12563953207415, 144.90092468262]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.20965163616376, 144.90092468262]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.20965163616376, 144.90092468262]}
+{"t": 1258622, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.26543404778005, 144.90092468262]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.23756533495686, 144.90092468262]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.29325788329713, 144.90092468262]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.37646120738928, 144.90092468262]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.43170768005025, 144.90092468262]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.48677653954672, 144.90092468262]}
+{"t": 1258629, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.54167034133303, 144.90092468262]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.56905130450023, 144.90092468262]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.59638856287097, 144.90092468262]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.78653437811045, 144.90092468262]}
+{"t": 1258636, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.73242293062272, 144.90092468262]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.81352539964239, 144.90092468262]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.8404741478075, 144.90092468262]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.89424338853907, 144.90092468262]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.86738005456279, 144.90092468262]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 75.92106425069727, 144.90092468262]}
+{"t": 1258644, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.00127301112899, 144.90092468262]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.02792498929459, 144.90092468262]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.05453499569946, 144.90092468262]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.107629489193, 144.90092468262]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.16055728042483, 144.90092468262]}
+{"t": 1258651, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.16055728042483, 144.90092468262]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.18695890784332, 144.90092468262]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.26591588667118, 144.90092468262]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.26591588667118, 144.90092468262]}
+{"t": 1258658, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258665, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.29215256818235, 144.90092468262]}
+{"t": 1258665, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258665, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.34450304235885, 144.90092468262]}
+{"t": 1258665, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258665, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.39669030329286, 144.90092468262]}
+{"t": 1258665, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.39669030329286, 144.90092468262]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.42272296713244, 144.90092468262]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.39668965666819, 144.90092468262]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.47466651382993, 144.90092468262]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.52644906643907, 144.90092468262]}
+{"t": 1258673, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258680, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.52644906643907, 144.90092468262]}
+{"t": 1258680, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258680, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.55228008356204, 144.90092468262]}
+{"t": 1258680, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258686, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.57807105246341, 144.90092468262]}
+{"t": 1258686, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258686, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.60382206620794, 144.90092468262]}
+{"t": 1258686, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258694, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.62953289874685, 144.90092468262]}
+{"t": 1258694, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258701, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.65520443987516, 144.90092468262]}
+{"t": 1258701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258717, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.68083614389953, 144.90092468262]}
+{"t": 1258717, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258723, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.70642826215085, 144.90092468262]}
+{"t": 1258723, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1258730, "kind": "cmd", "payload": {"type": "SetTransformCommand", "gameObjectTransferData": {"guid": "71825654-579C-5017-D597-FF380BAE8968", "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 64.560775756836, "y": 76.70642826215085, "z": 144.90092468262}}, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1258731, "kind": "evt", "name": "controlEnd"}
+{"t": 1258894, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.706428527832, 144.90092468262]}
+{"t": 1258894, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1259139, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8775035604430372, "dy": -0.4434015251896578, "dz": 0.1827090278811588}}
+{"t": 1259696, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8779859164608642, "dy": -0.4424054426311633, "dz": 0.182806331473231}}
+{"t": 1259777, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8642748495921174, "dy": -0.46924970912557257, "dz": 0.18120070322183676}}
+{"t": 1259909, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8637574557387491, "dy": -0.4702416030538452, "dz": 0.18109636223036843}}
+{"t": 1260184, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8356560470062888, "dy": -0.5184756208845708, "dz": 0.18127879536830088}}
+{"t": 1260272, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8364355773972728, "dy": -0.5233676271311802, "dz": 0.16267099229785478}}
+{"t": 1260352, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8458931797045447, "dy": -0.5152799745599757, "dz": 0.13766363480166338}}
+{"t": 1260435, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7511719027198015, "dy": -0.3024204710989706, "dz": 0.5867560235946366}}
+{"t": 1261221, "kind": "evt", "name": "SetSelection", "arg": ["47FDA74E-D15B-8962-8D7B-2DDE79B1D087"]}
+{"t": 1261221, "kind": "evt", "name": "SetGizmoCenter", "arg": [63.565307617188, 82.797744750977, 140.75312805176]}
+{"t": 1261221, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1261632, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5570487278714564, "dy": -0.11342613737176578, "dz": 0.8226975301638589}}
+{"t": 1261718, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6993589210985683, "dy": -0.19715201606657778, "dz": 0.687043071459665}}
+{"t": 1261846, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6997434187122967, "dy": -0.19887464146467088, "dz": 0.686154519733803}}
+{"t": 1262944, "kind": "cmd", "payload": {"type": "ApplyBlueprintOverridesCommand", "gameObjectTransferData": {"guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "overrides": [{"reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}, "field": "object", "type": "GameObjectData", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "GameObjectData", "guid": "47FDA74E-D15B-8962-8D7B-2DDE79B1D087", "field": "components", "oldValue": [{"name": "1", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "B84077F3-B1AA-414F-AE53-694AD0B06522"}}, {"name": "2", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "F280BAE7-E6D9-436F-A49C-874C23DD2554"}}, {"name": "3", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "62144562-15E4-4B45-94B1-EBA5C84D6036"}}, {"name": "4", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "C2672815-75AD-4D32-B95B-C88713418F7F"}}, {"name": "5", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "440F7EE7-C39E-4FE4-98FC-F0B60F024086"}}, {"name": "6", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "E04D1BE9-9564-49F5-8068-568C59C215D4"}}, {"name": "7", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "76D51C5C-D795-43FE-9D1C-D8FBE79C9E49"}}, {"name": "8", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "D6FB4538-95B7-435F-B4DE-737240CD85F1"}}, {"name": "9", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "32F3FAC3-F770-4C9E-8B45-6124DE1372BD"}}, {"name": "10", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "4972A082-A729-48F0-B24B-1417F3E37A03"}}, {"name": "11", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "A5A82F01-1481-488C-827F-35082A51614C"}}, {"name": "12", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "F52CFCDB-5B4F-4B3A-B4A8-BD8864996B2A"}}, {"name": "13", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "5F84C947-1992-41DA-9379-F82F2C09D52C"}}, {"name": "14", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "53CE3157-7CAB-46C6-BBF7-92F22D1953EE"}}, {"name": "15", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "C9292602-C455-4CA6-891D-97A7CCBFC92C"}}, {"name": "16", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "98BB339F-E6A4-4A14-BDE5-030D3A11389E"}}, {"name": "17", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "41C73557-2938-4B72-8322-4954314B03AB"}}, {"name": "18", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "4D39015B-B07B-40B7-AEEB-7E23E2C56352"}}, {"name": "19", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "647D4A9F-5F83-43CA-A720-F0AAA1DE46F0"}}, {"name": "20", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "154E1680-55B0-4495-825B-FE3CF3E06C6F"}}, {"name": "21", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "8BB624BD-2994-4E31-80CA-70DFCDACC645"}}, {"name": "22", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "BA69D65D-9650-45DD-99C5-BB9C56CEF634"}}, {"name": "23", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "A29FE7CF-AA9D-448F-BC5C-03634D05597A"}}, {"name": "24", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "898435EB-73B5-4006-835D-07F68E4E94ED"}}, {"name": "25", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "455DC4E2-F517-4611-BDF0-FD0C6D4D6FB6"}}, {"name": "26", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "220C128E-3A2F-4AB5-826B-E8528B0ACEDB"}}, {"name": "27", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "5CC9AD4C-E6A1-4CE8-AF9C-A6DCD17FF6B6"}}, {"name": "28", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "FD8E7767-BB53-445B-A7E7-110BE19BC581"}}, {"name": "29", "type": "GameObjectData", "value": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "FB36196E-EABA-4984-A9AE-A1BC89CEC156"}}], "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "GameObjectData", "field": "1", "oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "B84077F3-B1AA-414F-AE53-694AD0B06522"}, "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "B84077F3-B1AA-414F-AE53-694AD0B06522"}, "type": "VehicleConfigData", "field": "vehicleConfig", "oldValue": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "C884BC5E-E669-4A92-975C-C7E14E03E6EE"}, "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "C884BC5E-E669-4A92-975C-C7E14E03E6EE"}, "type": "Float32", "field": "gravityModifier", "oldValue": 1.6000000238419, "value": -1.6}}}}}], "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1263474, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6784081748228689, "dy": -0.6756534710882611, "dz": -0.2885389667616631}}
+{"t": 1263563, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6815222758687898, "dy": -0.6800040132655736, "dz": -0.27041066812782927}}
+{"t": 1263647, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5814576816842618, "dy": -0.31002170167767606, "dz": 0.752192467988906}}
+{"t": 1263736, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.536050103305201, "dy": -0.22163136812370912, "dz": 0.8145733996455422}}
+{"t": 1264160, "kind": "evt", "name": "SetSelection", "arg": ["71825654-579C-5017-D597-FF380BAE8968"]}
+{"t": 1264160, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.706428527832, 144.90092468262]}
+{"t": 1264160, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1264480, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5509570325922827, "dy": -0.12755158751126608, "dz": 0.8247284042401245}}
+{"t": 1264560, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8637075626933566, "dy": -0.2701861259096655, "dz": 0.4254511764142017}}
+{"t": 1264645, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9369651552556344, "dy": -0.3448705295412525, "dz": 0.05621935334669919}}
+{"t": 1264727, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9247317160700821, "dy": -0.3664219321405857, "dz": 0.10298650853602556}}
+{"t": 1264823, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9068351238317953, "dy": -0.39813251335256805, "dz": 0.13834941270760656}}
+{"t": 1264911, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8901611008783684, "dy": -0.43120651622820105, "dz": 0.1472214483196983}}
+{"t": 1264996, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8856955176119737, "dy": -0.4382683315996184, "dz": 0.15318067632356477}}
+{"t": 1265111, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8815306535345057, "dy": -0.4452878769605518, "dz": 0.15691530680909413}}
+{"t": 1265268, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8773534639746382, "dy": -0.45131664265307586, "dz": 0.1629852364972324}}
+{"t": 1265453, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8778453738922591, "dy": -0.45032161269066445, "dz": 0.16308876319243806}}
+{"t": 1265596, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8761537930542668, "dy": -0.4533139073420008, "dz": 0.16389335656746107}}
+{"t": 1265635, "kind": "evt", "name": "controlStart"}
+{"t": 1265659, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.73262388676721, 144.90092468262]}
+{"t": 1265659, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265670, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.73262388676721, 144.90092468262]}
+{"t": 1265670, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265670, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.78489281611556, 144.90092468262]}
+{"t": 1265670, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265677, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.81096609014679, 144.90092468262]}
+{"t": 1265677, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265684, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.78489249229867, 144.90092468262]}
+{"t": 1265684, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265684, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.83699859006448, 144.90092468262]}
+{"t": 1265684, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.86299073374468, 144.90092468262]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.91485336325808, 144.90092468262]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.96655569524641, 144.90092468262]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 76.99234666191391, 144.90092468262]}
+{"t": 1265696, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265697, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.01809767343013, 144.90092468262]}
+{"t": 1265697, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265697, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.06948020182034, 144.90092468262]}
+{"t": 1265697, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265700, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.09511190338617, 144.90092468262]}
+{"t": 1265701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265701, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.1207040191835, 144.90092468262]}
+{"t": 1265701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265701, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.19724376689693, 144.90092468262]}
+{"t": 1265701, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.24807337915179, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.24807369406317, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.2987477761061, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.2987477761061, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.34926641567628, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.4247544813695, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.44984021956755, 144.90092468262]}
+{"t": 1265711, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265717, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.47488762954701, 144.90092468262]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.44983959742412, 144.90092468262]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.54980045740878, 144.90092468262]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.57469543006127, 144.90092468262]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.5995525107002, 144.90092468262]}
+{"t": 1265718, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265724, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.64915334145897, 144.90092468262]}
+{"t": 1265724, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265724, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.6738972636833, 144.90092468262]}
+{"t": 1265724, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.84605814518594, 144.90092468262]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.82157481709413, 144.90092468262]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.84605799338657, 144.90092468262]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.91928521189581, 144.90092468262]}
+{"t": 1265725, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265728, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.9436207631946, 144.90092468262]}
+{"t": 1265728, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265728, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 77.96791969202633, 144.90092468262]}
+{"t": 1265728, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265729, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.04059711861454, 144.90092468262]}
+{"t": 1265729, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265729, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.08886758271704, 144.90092468262]}
+{"t": 1265729, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.06475053160786, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.13699337447962, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.16100227715519, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.23281397940117, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.28050948613138, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.32806392714694, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.42274859326729, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.4698806619522, 144.90092468262]}
+{"t": 1265739, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.61044266947647, 144.90092468262]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.56372708395578, 144.90092468262]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.63374882362257, 144.90092468262]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.7959344766423, 144.90092468262]}
+{"t": 1265746, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265754, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.86493467065803, 144.90092468262]}
+{"t": 1265754, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.8419683763617, 144.90092468262]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.86493467065803, 144.90092468262]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.88786738839559, 144.90092468262]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 78.93363238829762, 144.90092468262]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.09276297293502, 144.90092468262]}
+{"t": 1265755, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265759, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.09276297293502, 144.90092468262]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.11536393675362, 144.90092468262]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.1379321216985, 144.90092468262]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.29499701354585, 144.90092468262]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.29499729058995, 144.90092468262]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.33958215050372, 144.90092468262]}
+{"t": 1265760, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.40621904678517, 144.90092468262]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.42836751690461, 144.90092468262]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.5825202329437, 144.90092468262]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.56059293089154, 144.90092468262]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.5825202329437, 144.90092468262]}
+{"t": 1265770, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.60441621018327, 144.90092468262]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.73513799548631, 144.90092468262]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.71342856518675, 144.90092468262]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.75681656651612, 144.90092468262]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.77846434402667, 144.90092468262]}
+{"t": 1265778, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265779, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.84322357016578, 144.90092468262]}
+{"t": 1265779, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265786, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.86474882739365, 144.90092468262]}
+{"t": 1265786, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265786, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.86474882739365, 144.90092468262]}
+{"t": 1265786, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265786, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.90770800384558, 144.90092468262]}
+{"t": 1265786, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265787, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.9505458263245, 144.90092468262]}
+{"t": 1265787, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265787, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.97191939040218, 144.90092468262]}
+{"t": 1265787, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265794, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 79.99326280831725, 144.90092468262]}
+{"t": 1265794, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265794, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.03585946041939, 144.90092468262]}
+{"t": 1265794, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265795, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.05711282153624, 144.90092468262]}
+{"t": 1265795, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265795, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.09952992989002, 144.90092468262]}
+{"t": 1265795, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265795, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.12069380298898, 144.90092468262]}
+{"t": 1265795, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265798, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.14182797231781, 144.90092468262]}
+{"t": 1265798, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265808, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.18400744944756, 144.90092468262]}
+{"t": 1265808, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1265808, "kind": "cmd", "payload": {"type": "SetTransformCommand", "gameObjectTransferData": {"guid": "71825654-579C-5017-D597-FF380BAE8968", "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 64.560775756836, "y": 80.18400744944756, "z": 144.90092468262}}, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1265808, "kind": "evt", "name": "controlEnd"}
+{"t": 1265809, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9298563900732131, "dy": -0.30961227938303165, "dz": 0.19876450964711048}}
+{"t": 1265897, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9318501593474676, "dy": -0.3047489113140812, "dz": 0.19693496788783213}}
+{"t": 1266025, "kind": "evt", "name": "SetGizmoCenter", "arg": [64.560775756836, 80.184005737305, 144.90092468262]}
+{"t": 1266025, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1266324, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9313193909513037, "dy": -0.30571936183395315, "dz": 0.19793904071186494}}
+{"t": 1266404, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.9186814027481964, "dy": -0.33998393990046155, "dz": 0.2010855560560359}}
+{"t": 1266486, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8807550102346305, "dy": -0.41501652016194773, "dz": 0.2281050195398239}}
+{"t": 1266567, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7958636592561603, "dy": -0.532906110570927, "dz": 0.287423230083376}}
+{"t": 1266637, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1267202, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6638945102074814, "dy": -0.7472361744075067, "dz": -0.029701497827595413}}
+{"t": 1267221, "kind": "evt", "name": "controlStart"}
+{"t": 1267286, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5690770403837231, "dy": -0.7946342134063804, "dz": 0.2114421646505856}}
+{"t": 1267368, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.3736026926717887, "dy": -0.7929226581517963, "dz": 0.4813467421909892}}
+{"t": 1268044, "kind": "cmd", "payload": {"type": "SpawnGameObjectCommand", "gameObjectTransferData": {"guid": "052F7F77-2F4B-2D2B-D17F-DAAD3875D7F2", "name": "Vehicles/BMP2/BMP2", "parentData": {"guid": "00000000-0000-0000-0000-000000000000", "typeName": "custom_root", "primaryInstanceGuid": "00000000-0000-0000-0000-000000000000", "partitionGuid": "00000000-0000-0000-0000-000000000000"}, "blueprintCtrRef": {"typeName": "VehicleBlueprint", "name": "Vehicles/BMP2/BMP2", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95907-AFD4-11DD-84FB-9FA71F68ED5E"}, "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 70.011833190918, "y": 73.844886779785, "z": 140.8511505127}}, "variation": 0, "isDeleted": false, "isEnabled": true, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1268285, "kind": "evt", "name": "SetSelection", "arg": ["052F7F77-2F4B-2D2B-D17F-DAAD3875D7F2"]}
+{"t": 1268285, "kind": "evt", "name": "SetGizmoCenter", "arg": [70.011833190918, 73.844886779785, 140.8511505127]}
+{"t": 1268285, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1268538, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.23861979671343586, "dy": -0.8094560518722507, "dz": 0.5365086138207166}}
+{"t": 1268622, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.5506558193954308, "dy": -0.7989165799117091, "dz": 0.24188936915070203}}
+{"t": 1268708, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7351002369594941, "dy": -0.6768752106762924, "dz": 0.038309147654583105}}
+{"t": 1268788, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7412842836302486, "dy": -0.6703022618653811, "dz": 0.03453242796189348}}
+{"t": 1268870, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.749644738979204, "dy": -0.6610215284485415, "dz": 0.03291358759471624}}
+{"t": 1268952, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.761557493363518, "dy": -0.6474573135089072, "dz": 0.02879603246463481}}
+{"t": 1269084, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7622911442117777, "dy": -0.6465953093059601, "dz": 0.028752694479452747}}
+{"t": 1269163, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6968469364978647, "dy": -0.6916647336022945, "dz": 0.18974784158036723}}
+{"t": 1269249, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6596840953349338, "dy": -0.713843714667788, "dz": 0.2350405186163093}}
+{"t": 1269403, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.6596840953349338, "dy": -0.713843714667788, "dz": 0.2350405186163093}}
+{"t": 1269444, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1270139, "kind": "evt", "name": "controlStart"}
+{"t": 1270270, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8488018172714218, "dy": -0.525479048043262, "dz": -0.05837161180127691}}
+{"t": 1270354, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8777629205941169, "dy": -0.45612485801614383, "dz": 0.14656864988747997}}
+{"t": 1270489, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8788080993757618, "dy": -0.4512788320356959, "dz": 0.15506044056450846}}
+{"t": 1270991, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8016375896418845, "dy": -0.1537563239215698, "dz": 0.5776990286708771}}
+{"t": 1271075, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8046420285909339, "dy": -0.19451598263438952, "dz": 0.5609944191565942}}
+{"t": 1271161, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.797226387602783, "dy": -0.4736015877128284, "dz": 0.37434158602231926}}
+{"t": 1271252, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7537920819166616, "dy": -0.652382735826594, "dz": 0.07870364181633195}}
+{"t": 1271334, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7525546017759369, "dy": -0.6548184004874548, "dz": 0.06981714494958936}}
+{"t": 1271417, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8102958837410403, "dy": -0.5570126085888608, "dz": -0.18209210489573413}}
+{"t": 1271499, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8255691485223193, "dy": -0.5340988427869724, "dz": -0.1821373304453254}}
+{"t": 1271582, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8369540920830931, "dy": -0.5215191034962199, "dz": -0.16590862676143184}}
+{"t": 1271665, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.8274329764353382, "dy": -0.5477164492005435, "dz": -0.12394095684036577}}
+{"t": 1271752, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7527100771798111, "dy": -0.6546306734909983, "dz": -0.06990150954510842}}
+{"t": 1271857, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 82.809860229492, "oy": 88.199851989746, "oz": 141.43487548828, "dx": -0.7264037018693567, "dy": -0.6861955194612798, "dz": -0.03838451486939775}}
+{"t": 1271930, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1273236, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6269943881556841, "dy": -0.5980826302987744, "dz": -0.49917452314413924}}
+{"t": 1273266, "kind": "evt", "name": "controlStart"}
+{"t": 1273317, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7602891389404242, "dy": -0.6069568037076427, "dz": -0.2314386822513264}}
+{"t": 1273777, "kind": "cmd", "payload": {"type": "SpawnGameObjectCommand", "gameObjectTransferData": {"guid": "818FA96F-6F5C-D6CB-EF72-A449E367FECA", "name": "Vehicles/BMP2/BMP2", "parentData": {"guid": "00000000-0000-0000-0000-000000000000", "typeName": "custom_root", "primaryInstanceGuid": "00000000-0000-0000-0000-000000000000", "partitionGuid": "00000000-0000-0000-0000-000000000000"}, "blueprintCtrRef": {"typeName": "VehicleBlueprint", "name": "Vehicles/BMP2/BMP2", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95907-AFD4-11DD-84FB-9FA71F68ED5E"}, "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 56.07861328125, "y": 73.844886779785, "z": 137.43359375}}, "variation": 0, "isDeleted": false, "isEnabled": true, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1274048, "kind": "evt", "name": "SetSelection", "arg": ["818FA96F-6F5C-D6CB-EF72-A449E367FECA"]}
+{"t": 1274048, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.844886779785, 137.43359375]}
+{"t": 1274048, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1274266, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7376425047896964, "dy": -0.6617587129714226, "dz": 0.13401097318499433}}
+{"t": 1274357, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7947008305686236, "dy": -0.6068598705215799, "dz": -0.01310295554716924}}
+{"t": 1274437, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.8204310627374776, "dy": -0.5381472750622706, "dz": -0.1931071765587855}}
+{"t": 1274522, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.8089377829688884, "dy": -0.4911195123269716, "dz": -0.32314282894270924}}
+{"t": 1274657, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.807101989533878, "dy": -0.49256109549346627, "dz": -0.3255302531205544}}
+{"t": 1274745, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6730252201203802, "dy": -0.39749668074048794, "dz": -0.6237254539316225}}
+{"t": 1274828, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6669156804156745, "dy": -0.4090514488211191, "dz": -0.6228164957939388}}
+{"t": 1274964, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6696155926962605, "dy": -0.4080101567291701, "dz": -0.6205986384321786}}
+{"t": 1275044, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.681577988885976, "dy": -0.39748516041505944, "dz": -0.6143752862184181}}
+{"t": 1275139, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6839015827052805, "dy": -0.39010727470540413, "dz": -0.6165184015056928}}
+{"t": 1275274, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6837845238947613, "dy": -0.38800032252861605, "dz": -0.6179761116739907}}
+{"t": 1275416, "kind": "evt", "name": "controlStart"}
+{"t": 1275417, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.8729951628265, 137.43359375]}
+{"t": 1275417, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275422, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.844886779785, 137.43359375]}
+{"t": 1275422, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275436, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.90107011294583, 137.43359375]}
+{"t": 1275436, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275443, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.92911168975772, 137.43359375]}
+{"t": 1275443, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275450, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.95711995273447, 137.43359375]}
+{"t": 1275450, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275450, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 73.98509496120558, 137.43359375]}
+{"t": 1275450, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275450, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.01303677436205, 137.43359375]}
+{"t": 1275450, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275457, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.04094545125301, 137.43359375]}
+{"t": 1275457, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275457, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.06882105078915, 137.43359375]}
+{"t": 1275457, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275458, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.09666363173895, 137.43359375]}
+{"t": 1275458, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275463, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.12447325273436, 137.43359375]}
+{"t": 1275463, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275463, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.1799938486922, 137.43359375]}
+{"t": 1275463, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275463, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.23538330494179, 137.43359375]}
+{"t": 1275463, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275469, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.23538330494179, 137.43359375]}
+{"t": 1275469, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275469, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.2630290007875, 137.43359375]}
+{"t": 1275469, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275469, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.29064208556458, 137.43359375]}
+{"t": 1275469, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.31822261694175, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.40076946532353, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.40076946532353, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.42822035707388, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.45563898173681, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.56499194468387, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.53770182111778, 137.43359375]}
+{"t": 1275479, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275486, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.72806298170899, 137.43359375]}
+{"t": 1275486, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.75513039191476, 137.43359375]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.78216620861373, 137.43359375]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.83614328249327, 137.43359375]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.80917048708847, 137.43359375]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.91687331989124, 137.43359375]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.94372073198254, 137.43359375]}
+{"t": 1275487, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 74.9973219828815, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.10415170999707, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.07749073994928, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.10415170999707, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.23699435933358, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.23699435933358, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.31633210796574, 137.43359375]}
+{"t": 1275494, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.36907155645541, 137.43359375]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.3427170354614, 137.43359375]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.44795320513711, 137.43359375]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.60490258074425, 137.43359375]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.60490258074425, 137.43359375]}
+{"t": 1275498, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.63095590610257, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.68297310228424, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.68297310228424, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.86409936986054, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.86409936986054, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.9155845690636, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 75.9155845690636, 137.43359375]}
+{"t": 1275507, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275514, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.09486311626839, 137.43359375]}
+{"t": 1275514, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.0437860703023, 137.43359375]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.14582443831755, 137.43359375]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.17126182570608, 137.43359375]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.22205029790595, 137.43359375]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.2727240249705, 137.43359375]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.47427922412477, 137.43359375]}
+{"t": 1275515, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.47427922412477, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.47427922412477, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.4993461993301, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.69887229854722, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.69887229854722, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.72368755384538, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.87199828165748, 137.43359375]}
+{"t": 1275522, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.82267169312209, 137.43359375]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.92121504073356, 137.43359375]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.97032233675687, 137.43359375]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 76.97032196371023, 137.43359375]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.04377846327714, 137.43359375]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.09261369486627, 137.43359375]}
+{"t": 1275527, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275538, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.23847166431902, 137.43359375]}
+{"t": 1275538, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275538, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.23847166431902, 137.43359375]}
+{"t": 1275538, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.26268733551844, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.31103851478076, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.35928310439121, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.38336553816205, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.43145090295279, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.47943019089445, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.52730447997708, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.62273835094655, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.5989191137966, 137.43359375]}
+{"t": 1275539, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.69403974077717, 137.43359375]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.88303791236183, 137.43359375]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.85950323912445, 137.43359375]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.90654696933957, 137.43359375]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.93003045185873, 137.43359375]}
+{"t": 1275546, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275547, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.97692086026427, 137.43359375]}
+{"t": 1275547, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275547, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 77.97692050404933, 137.43359375]}
+{"t": 1275547, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275554, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.02370911472507, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.09370188253013, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.14023744256872, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.18667235685072, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.20985217381336, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.25613673056712, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.30232145432333, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.30232110346591, 137.43359375]}
+{"t": 1275555, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.37141170878293, 137.43359375]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.41734825936445, 137.43359375]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.46318610016858, 137.43359375]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.48606810377863, 137.43359375]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.53175847541196, 137.43359375]}
+{"t": 1275560, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.57735092927658, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.600110535357, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.73615794283944, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.66824316763267, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.75874766381104, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.78131346694292, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.91620455244845, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.84886672269141, 137.43359375]}
+{"t": 1275571, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.89378248177371, 137.43359375]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.91620455244845, 137.43359375]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.96097726618748, 137.43359375]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 78.98332798505736, 137.43359375]}
+{"t": 1275579, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275580, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 79.05023804282042, 137.43359375]}
+{"t": 1275580, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275587, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 79.05023804282042, 137.43359375]}
+{"t": 1275587, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275587, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 79.07249415453401, 137.43359375]}
+{"t": 1275587, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275587, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 79.09472670831583, 137.43359375]}
+{"t": 1275587, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275592, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 79.11693574155075, 137.43359375]}
+{"t": 1275592, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275604, "kind": "cmd", "payload": {"type": "SetTransformCommand", "gameObjectTransferData": {"guid": "818FA96F-6F5C-D6CB-EF72-A449E367FECA", "transform": {"_rotation": {"isQuaternion": true, "_x": 0, "_y": 0, "_z": 0, "_w": 1}, "_scale": {"x": 1, "y": 1, "z": 1}, "left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 56.07861328125, "y": 79.11693574155075, "z": 137.43359375}}, "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1275604, "kind": "evt", "name": "controlEnd"}
+{"t": 1275778, "kind": "evt", "name": "SetGizmoCenter", "arg": [56.07861328125, 79.11693572998, 137.43359375]}
+{"t": 1275778, "kind": "evt", "name": "SetGizmoBasis", "arg": [1, 0, 0, 0, 1, 0, 0, 0, 1]}
+{"t": 1275943, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7389263393310553, "dy": -0.16691200749431798, "dz": -0.6527849927786507}}
+{"t": 1276047, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.738553950516983, "dy": -0.1699769187126618, "dz": -0.6524154422457419}}
+{"t": 1276139, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7388993915383697, "dy": -0.17304290389906202, "dz": -0.6512172007820486}}
+{"t": 1276219, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7389750729344591, "dy": -0.17816538276095464, "dz": -0.6497483651131054}}
+{"t": 1276304, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7378433036898905, "dy": -0.20707642915753957, "dz": -0.6424224557776219}}
+{"t": 1276385, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7147962669104898, "dy": -0.280752601802315, "dz": -0.6405031408135785}}
+{"t": 1276498, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6906816245518611, "dy": -0.33391828610502916, "dz": -0.6414495083099542}}
+{"t": 1276763, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.6931460332505185, "dy": -0.3562321270744238, "dz": -0.6266157101678048}}
+{"t": 1276843, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7144275489884667, "dy": -0.36859247713800253, "dz": -0.5947544560939438}}
+{"t": 1276940, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 71.440406799316, "oy": 85.16032409668, "oz": 151.54518127441, "dx": -0.7149828879189112, "dy": -0.37172757656438404, "dz": -0.5921301198256206}}
+{"t": 1276956, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1277876, "kind": "evt", "name": "controlStart"}
+{"t": 1277949, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.455317820915872, "dy": -0.30376322821346396, "dz": -0.8369071532384921}}
+{"t": 1278047, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.454468125098725, "dy": -0.3026619664525791, "dz": -0.8377675437329304}}
+{"t": 1278127, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.4669433793969903, "dy": -0.1554013843037636, "dz": -0.8705252955507911}}
+{"t": 1278210, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.4565812511767692, "dy": -0.04113756635475225, "dz": -0.888730139979659}}
+{"t": 1278320, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.4969321303070344, "dy": -0.01871130704247461, "dz": -0.8675876583131381}}
+{"t": 1278501, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.4998073716296298, "dy": -0.02083301001852768, "dz": -0.8658860069075197}}
+{"t": 1278594, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.5064879347443996, "dy": -0.028277832722727114, "dz": -0.861783230362983}}
+{"t": 1278724, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.5235464250710119, "dy": -0.042154803387719854, "dz": -0.8509536493527162}}
+{"t": 1278835, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.5235212241313638, "dy": -0.04537735375277818, "dz": -0.8508033989414908}}
+{"t": 1278925, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.5269800091663045, "dy": -0.12399306261910055, "dz": -0.8407840331270674}}
+{"t": 1279006, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.5014049026784456, "dy": -0.2679837713032114, "dz": -0.8226650727289488}}
+{"t": 1279057, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1279569, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.43838026124305496, "dy": -0.42584906063295713, "dz": -0.7915019419499227}}
+{"t": 1279591, "kind": "evt", "name": "controlStart"}
+{"t": 1279654, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.3381365201309308, "dy": -0.45714578827617014, "dz": -0.8226064806546952}}
+{"t": 1282531, "kind": "cmd", "payload": {"type": "SetEBXFieldCommand", "gameObjectTransferData": {"guid": "818FA96F-6F5C-D6CB-EF72-A449E367FECA", "overrides": [{"field": "object", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "field": "exitAllowed", "type": "Boolean", "value": false, "oldValue": true, "guid": "818FA96F-6F5C-D6CB-EF72-A449E367FECA"}, "type": "GameObjectData", "reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}}], "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1283504, "kind": "cmd", "payload": {"type": "ApplyBlueprintOverridesCommand", "gameObjectTransferData": {"guid": "818FA96F-6F5C-D6CB-EF72-A449E367FECA", "overrides": [{"reference": {"partitionGuid": "00000000-0000-0000-0000-000000000000", "instanceGuid": "00000000-0000-0000-0000-000000000000"}, "field": "object", "type": "GameObjectData", "value": {"reference": {"typeName": "", "name": "", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95908-AFD4-11DD-84FB-9FA71F68ED5E"}, "type": "Boolean", "guid": "818FA96F-6F5C-D6CB-EF72-A449E367FECA", "field": "exitAllowed", "oldValue": true, "value": false}}], "isPlaceholder": false}, "sender": "Powback"}}
+{"t": 1283793, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": 0.08408062434558745, "dy": -0.6656902685502732, "dz": -0.7414761728923738}}
+{"t": 1283887, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.6717884502388111, "dy": -0.5519223744195649, "dz": -0.4940465268988398}}
+{"t": 1283937, "kind": "evt", "name": "EnableFreeCamMovement"}
+{"t": 1284668, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": 0.09468472619859675, "dy": -0.6321080089605158, "dz": -0.7690736425288994}}
+{"t": 1284693, "kind": "evt", "name": "controlStart"}
+{"t": 1284754, "kind": "evt", "name": "NativeHighlight", "arg": {"ox": 75.441848754883, "oy": 87.54158782959, "oz": 155.95532226562, "dx": -0.03776296007904584, "dy": -0.7225096005205643, "dz": -0.6903287883332716}}
+{"t": 484, "kind": "cmd", "payload": {"type": "SpawnGameObjectCommand", "sender": "Powback", "gameObjectTransferData": {"guid": "ED170122-7777-0000-0000-FAAB00000001", "name": "Vehicles/BMP2/BMP2", "blueprintCtrRef": {"typeName": "VehicleBlueprint", "name": "Vehicles/BMP2/BMP2", "partitionGuid": "AAE95906-AFD4-11DD-84FB-9FA71F68ED5E", "instanceGuid": "AAE95907-AFD4-11DD-84FB-9FA71F68ED5E"}, "parentData": {"guid": "00000000-0000-0000-0000-000000000000", "typeName": "custom_root", "primaryInstanceGuid": "00000000-0000-0000-0000-000000000000", "partitionGuid": "00000000-0000-0000-0000-000000000000"}, "transform": {"left": {"x": 1, "y": 0, "z": 0}, "up": {"x": 0, "y": 1, "z": 0}, "forward": {"x": 0, "y": 0, "z": 1}, "trans": {"x": 0, "y": 83, "z": 0}}, "variation": 0, "isDeleted": false, "isEnabled": true}}}
+{"t": 12681, "kind": "cmd", "payload": {"type": "SetEBXFieldCommand", "sender": "Powback", "gameObjectTransferData": {"guid": "ED170122-7777-0000-0000-FAAB00000001", "overrides": [{"field": "object", "type": "GameObjectData", "value": {"field": "exitAllowed", "type": "Boolean", "value": false}}]}}}
+{"t": 17892, "kind": "cmd", "payload": {"type": "ApplyBlueprintOverridesCommand", "sender": "Powback", "gameObjectTransferData": {"guid": "ED170122-7777-0000-0000-FAAB00000001", "overrides": []}}}
