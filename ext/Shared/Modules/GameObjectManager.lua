@@ -14,6 +14,11 @@ function GameObjectManager:__init(p_Realm)
 end
 
 function GameObjectManager:RegisterEvents()
+	if not SharedUtils:IsClientModule() then
+		NetEvents:Subscribe('MapEditor:AdoptDiag', self, self.OnAdoptDiag)
+		NetEvents:Subscribe('MapEditor:AabbDiag', self, self.OnAabbDiag)
+	end
+
 	Events:Subscribe("Shared:StoreTimeStamps", self, self.StoreTimeStamps)
 	-- Drain the deferred "GameObjectReady" queue for load-injected objects a few per frame, so
 	-- registering thousands of injected objects into the editor/WebUI tree doesn't block the frame
@@ -228,6 +233,17 @@ function GameObjectManager:RegisterVars()
 	self.m_GameObjects = {}
 	self.m_PendingCustomBlueprintGuids = {} -- this table contains all user spawned blueprints that await resolving
 	self.m_PendingBlueprint = {}
+
+	-- Which GameObject owns the entities being created RIGHT NOW. A stack, not a single value,
+	-- because blueprints nest: a child blueprint pushes its own object and pops back to the parent.
+	--
+	-- This exists because m_PendingBlueprint is keyed by PARTITION, and two vehicles spawned from
+	-- the same blueprint share one partition -- so that slot is a single cell they fight over.
+	self.m_BlueprintStack = {}
+
+	-- entity instanceId -> the GameObject it is currently filed under, so a mis-filed entity can be
+	-- taken back by the object whose entity bus actually contains it.
+	self.m_EntityOwners = {}
 
 	-- [M1] Per-instance blueprint clones, keyed by editor GameObject guid:
 	--   { dc = <cloned DataContainer>, originalRef = <blueprintCtrRef table> }
@@ -524,6 +540,19 @@ end
 ---@param p_Transform LinearTransform
 ---@param p_Variation integer
 ---@param p_Parent DataContainer|nil
+function GameObjectManager:OnAabbDiag(p_Player, p_Text)
+	m_Logger:Error('AABB-DIAG CLIENT ' .. tostring(p_Text))
+end
+
+function GameObjectManager:OnAdoptDiag(p_Player, p_Text)
+	m_Logger:Error('ADOPT-DIAG CLIENT ' .. tostring(p_Text))
+end
+
+---@param p_HookCtx HookContext
+---@param p_Blueprint DataContainer
+---@param p_Transform LinearTransform
+---@param p_Variation integer
+---@param p_Parent DataContainer|nil
 function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p_Transform, p_Variation, p_Parent)
 	local s_PendingCustomBlueprintInfo = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)]
 
@@ -560,6 +589,21 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 
 	if p_Parent ~= nil and p_Parent.instanceGuid == HAVOK_GUID then
 		m_Logger:Write("Loading havok WorldPartData")
+	end
+
+	-- TEMP: who is adopting these entities? The CLIENT draws the outline, and client Lua output
+	-- reaches no readable log, so it reports to the server.
+	if s_PendingCustomBlueprintInfo ~= nil then
+		local s_Line = 'bp=' .. tostring(p_Blueprint.instanceGuid):sub(-6) ..
+			' -> object=' .. tostring(s_PendingCustomBlueprintInfo.customGuid):sub(-6) ..
+			' spawningFor=' .. tostring(self.m_SpawningForGuid ~= nil and
+				tostring(self.m_SpawningForGuid):sub(-6) or 'nil')
+
+		if SharedUtils:IsClientModule() then
+			NetEvents:SendLocal('MapEditor:AdoptDiag', s_Line)
+		else
+			m_Logger:Error('ADOPT-DIAG SERVER ' .. s_Line)
+		end
 	end
 
 	local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
@@ -781,8 +825,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 	end
 
 	---^^^^ This is parent to children / top to bottom ^^^^
+
+	-- Entities created inside this call belong to THIS object. Attribution keyed on the blueprint
+	-- hook is trustworthy -- it was instrumented over three-spawn runs and never once named the
+	-- wrong object -- whereas the partition-keyed slot below is stale as soon as a second instance
+	-- of the same blueprint exists.
+	table.insert(self.m_BlueprintStack, s_GameObject)
+
 	---@type EntityBus|nil
 	local s_EntityBus = p_HookCtx:Call()
+
+	table.remove(self.m_BlueprintStack)
 
 	if s_EntityBus == nil then
 		return
@@ -798,9 +851,52 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 	end
 
+	-- TEMP DIAG: how big is the bus, and how much of it does this object actually keep? A spawned
+	-- vehicle reaching the WebUI with gameEntitiesData = [] has to be one of: an empty bus, or a
+	-- bus whose entities were all pre-claimed elsewhere.
+	do
+		local s_Total, s_Claimed = 0, 0
+
+		for _, l_E in pairs(s_EntityBus.entities) do
+			s_Total = s_Total + 1
+
+			if self.m_ProcessedEntities[l_E.instanceId] then
+				s_Claimed = s_Claimed + 1
+			end
+		end
+
+		if s_PendingCustomBlueprintInfo ~= nil then
+			local s_Line = 'BUS obj=' .. tostring(s_GameObject.guid):sub(-6) ..
+				' entities=' .. s_Total .. ' preclaimed=' .. s_Claimed
+
+			if SharedUtils:IsClientModule() then
+				NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+			else
+				m_Logger:Error('AABB-DIAG SERVER ' .. s_Line)
+			end
+		end
+	end
+
 	for l_Index, l_Entity in pairs(s_EntityBus.entities) do
 		if self.m_ProcessedEntities[l_Entity.instanceId] then
-			goto continue
+			-- Already claimed -- but by WHOM. The per-entity hook attributes late-arriving entities
+			-- through a PARTITION-keyed slot, and every instance of one blueprint shares a
+			-- partition, so a second BMP2's entities get filed under the first one. That claim also
+			-- sets m_ProcessedEntities, so this loop used to skip them unconditionally and the real
+			-- owner was left with no entities -- no entities means no AABB, which means clicking the
+			-- vehicle draws no selection outline while the PREVIOUS vehicle draws two.
+			--
+			-- This bus belongs to s_GameObject, so it is the authority: take the entity back. A
+			-- nested child blueprint is the one legitimate other owner (its entities appear in the
+			-- parent's bus as well), so those are left alone.
+			local s_Owner = self.m_EntityOwners[l_Entity.instanceId]
+
+			if s_Owner == nil or s_Owner == s_GameObject or self:IsDescendantOf(s_Owner, s_GameObject) then
+				goto continue
+			end
+
+			s_Owner.gameEntities[l_Entity.instanceId] = nil
+			self.m_ProcessedEntities[l_Entity.instanceId] = nil
 		end
 
 		local s_GameEntity = s_GameObject.gameEntities[l_Entity.instanceId]
@@ -848,6 +944,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 
 		s_GameObject.gameEntities[l_Entity.instanceId] = s_GameEntity
+		self.m_EntityOwners[l_Entity.instanceId] = s_GameObject
 		self.m_PendingEntities[l_Entity.instanceId] = nil
 		self.m_ProcessedEntities[l_Entity.instanceId] = true
 
@@ -1089,6 +1186,30 @@ function GameObjectManager:GetNoHavokGuid(p_ParentGuid, p_Name, p_Transform)
 	end
 
 	return s_NewGuid
+end
+
+---Is p_Object p_Ancestor itself, or nested somewhere beneath it?
+function GameObjectManager:IsDescendantOf(p_Object, p_Ancestor)
+	local s_Node = p_Object
+	local s_Depth = 0
+
+	-- Depth-capped: a malformed parent chain must not hang the entity loop.
+	while s_Node ~= nil and s_Depth < 32 do
+		if s_Node == p_Ancestor then
+			return true
+		end
+
+		local s_ParentGuid = s_Node.parentData ~= nil and s_Node.parentData.guid or nil
+
+		if s_ParentGuid == nil then
+			return false
+		end
+
+		s_Node = self.m_GameObjects[tostring(s_ParentGuid)]
+		s_Depth = s_Depth + 1
+	end
+
+	return false
 end
 
 function GameObjectManager:DeleteGameObject(p_Guid)
@@ -1573,7 +1694,43 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		partitionGuid = s_PartitionGuid
 	}
 
-	local s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
+	-- Prefer the object whose blueprint is being built right now; fall back to the partition slot
+	-- for entities that arrive outside any blueprint creation (level load).
+	--
+	-- Getting this wrong is not a cosmetic miss: this hook marks the entity in m_ProcessedEntities,
+	-- and the authoritative entity-bus loop skips anything already processed. So a wrong guess here
+	-- is permanent -- the correct owner never gets the entity, and an object with no entities has
+	-- no AABB and therefore no selection outline.
+	local s_PendingGameObject = self.m_BlueprintStack[#self.m_BlueprintStack]
+
+	if s_PendingGameObject == nil then
+		s_PendingGameObject = self.m_PendingBlueprint[s_PartitionGuid]
+	end
+
+	-- TEMP DIAG (AABB mis-association, reported 2026-08-26): the outline follows the WRONG vehicle.
+	-- m_PendingBlueprint is keyed by PARTITION, and two BMP2s share one partition, so this slot is
+	-- a single cell two objects fight over. Log every time the entity we are about to attach lands
+	-- on an object other than the one being spawned. Silence here means this route is innocent.
+	if s_PendingGameObject ~= nil and self.m_SpawningForGuid ~= nil and
+		tostring(s_PendingGameObject.guid) ~= self.m_SpawningForGuid then
+		local s_Line = 'MISMATCH entity->object=' .. tostring(s_PendingGameObject.guid):sub(-6) ..
+			' spawningFor=' .. tostring(self.m_SpawningForGuid):sub(-6)
+
+		if SharedUtils:IsClientModule() then
+			NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+		else
+			m_Logger:Error('AABB-DIAG SERVER ' .. s_Line)
+		end
+	elseif s_PendingGameObject ~= nil and self.m_SpawningForGuid == nil then
+		local s_Line = 'LATE entity->object=' .. tostring(s_PendingGameObject.guid):sub(-6) ..
+			' (no spawn in flight)'
+
+		if SharedUtils:IsClientModule() then
+			NetEvents:SendLocal('MapEditor:AabbDiag', s_Line)
+		else
+			m_Logger:Error('AABB-DIAG SERVER ' .. s_Line)
+		end
+	end
 
 	if s_PendingGameObject then
 		if s_Entity:Is("SpatialEntity") and s_Entity.typeInfo.name ~= "OccluderVolumeEntity" then
@@ -1599,6 +1756,7 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		end
 
 		s_PendingGameObject.gameEntities[s_Entity.instanceId] = s_GameEntity
+		self.m_EntityOwners[s_Entity.instanceId] = s_PendingGameObject
 		self.m_PendingEntities[s_Entity.instanceId] = nil
 		self.m_ProcessedEntities[s_Entity.instanceId] = true
 	else
