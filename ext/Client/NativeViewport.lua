@@ -10,6 +10,10 @@
 
 NativeViewport = class 'NativeViewport'
 
+-- Frames between box-refresh requests for the selection (~4/second at 60fps). Fast enough that a
+-- moving vehicle's box tracks it, slow enough to be nothing traffic-wise.
+local BOX_REFRESH_FRAMES = 15
+
 local m_ColorSelected  = Vec4(1.0, 0.45, 0.1, 1.0)  -- orange: selected
 local m_ColorHighlight = Vec4(0.95, 0.95, 0.95, 0.9) -- white: hover highlight
 
@@ -291,8 +295,61 @@ function NativeViewport:SetSelection(p_GuidList)
 	end
 end
 
+-- Draw an axis-aligned box as 12 edges, given its extents and a world transform.
+--
+-- DebugRenderer:DrawOBB wants an engine AxisAlignedBox userdata, and a replicated box is a plain
+-- Lua table rebuilt from JSON -- passing it fails with "expected userdata, received table". The
+-- engine type is not constructible from Lua as far as this codebase knows, but DrawLine takes
+-- ordinary Vec3s, so the box is drawn edge by edge instead. Same picture, no userdata needed.
+local function DrawBoxEdges(p_Min, p_Max, p_Transform, p_Color)
+	local function Corner(p_X, p_Y, p_Z)
+		return Vec3(
+			p_Transform.trans.x + p_Transform.left.x * p_X + p_Transform.up.x * p_Y + p_Transform.forward.x * p_Z,
+			p_Transform.trans.y + p_Transform.left.y * p_X + p_Transform.up.y * p_Y + p_Transform.forward.y * p_Z,
+			p_Transform.trans.z + p_Transform.left.z * p_X + p_Transform.up.z * p_Y + p_Transform.forward.z * p_Z)
+	end
+
+	local c = {
+		Corner(p_Min.x, p_Min.y, p_Min.z), Corner(p_Max.x, p_Min.y, p_Min.z),
+		Corner(p_Max.x, p_Min.y, p_Max.z), Corner(p_Min.x, p_Min.y, p_Max.z),
+		Corner(p_Min.x, p_Max.y, p_Min.z), Corner(p_Max.x, p_Max.y, p_Min.z),
+		Corner(p_Max.x, p_Max.y, p_Max.z), Corner(p_Min.x, p_Max.y, p_Max.z),
+	}
+
+	-- bottom face, top face, then the four verticals
+	local s_Edges = { {1,2},{2,3},{3,4},{4,1}, {5,6},{6,7},{7,8},{8,5}, {1,5},{2,6},{3,7},{4,8} }
+
+	for _, l_E in ipairs(s_Edges) do
+		DebugRenderer:DrawLine(c[l_E[1]], c[l_E[2]], p_Color, p_Color)
+	end
+end
+
 -- Draw every spatial entity's OBB for one game object.
 local function DrawGameObject(p_GameObject, p_Color)
+	-- TEMP DIAG: reported once. Vehicles draw no box and the per-entity diagnostic never fired, so
+	-- establish whether this function runs at all and what it is looking at.
+	if not _G.__drawObjReported then
+		_G.__drawObjReported = true
+
+		local s_N, s_Detail = 0, ''
+
+		if p_GameObject ~= nil and p_GameObject.gameEntities ~= nil then
+			for _, l_GE in pairs(p_GameObject.gameEntities) do
+				s_N = s_N + 1
+
+				if s_N <= 3 then
+					s_Detail = s_Detail .. ' [ent=' .. tostring(l_GE.entity ~= nil) ..
+						' spatial=' .. tostring(l_GE.isSpatial) ..
+						' aabb=' .. tostring(l_GE.aabb ~= nil) .. ']'
+				end
+			end
+		end
+
+		NetEvents:SendLocal('MapEditor:AabbDiag', 'DRAW-OBJ called obj=' ..
+			(p_GameObject ~= nil and tostring(p_GameObject.guid):sub(-6) or 'NIL') ..
+			' entities=' .. s_N .. s_Detail)
+	end
+
 	if p_GameObject == nil or p_GameObject.gameEntities == nil then
 		return
 	end
@@ -304,6 +361,36 @@ local function DrawGameObject(p_GameObject, p_Color)
 					DebugRenderer:DrawOBB(s_Spatial.aabb, s_Spatial.aabbTransform, p_Color)
 				end
 			end)
+		elseif l_GameEntity.isSpatial and l_GameEntity.aabb ~= nil then
+			-- No engine entity in THIS realm. A networked vehicle is built by the server and the
+			-- client never gets a handle to its entities, so the branch above skips it and a
+			-- vehicle could never be outlined. The server sends its box instead
+			-- (ReplicatedSpatialEntity); it is stored relative to the object, so put it back into
+			-- world space before drawing.
+			local s_Ok, s_Err = pcall(function()
+				local s_Transform = l_GameEntity.aabb.transform
+
+				if p_GameObject.transform ~= nil then
+					s_Transform = ToWorld(s_Transform, p_GameObject.transform)
+				end
+
+				DrawBoxEdges(l_GameEntity.aabb.min, l_GameEntity.aabb.max, s_Transform, p_Color)
+			end)
+
+			-- TEMP DIAG: this runs per frame, so report only the first outcome. A pcall here would
+			-- otherwise hide a type rejection from DrawOBB completely, and client Lua output is not
+			-- readable from the host.
+			if not _G.__replDrawReported2 then
+				_G.__replDrawReported2 = true
+
+				local s_Aabb = l_GameEntity.aabb
+				local s_Desc = 'ok=' .. tostring(s_Ok) .. ' err=' .. tostring(s_Err) ..
+					' minType=' .. type(s_Aabb.min) ..
+					' transType=' .. type(s_Aabb.transform) ..
+					' objT=' .. tostring(p_GameObject.transform ~= nil)
+
+				NetEvents:SendLocal('MapEditor:AabbDiag', 'DRAW-REPL ' .. s_Desc)
+			end
 		end
 	end
 
@@ -321,6 +408,14 @@ end
 
 -- Called from UI:DrawHud each frame.
 function NativeViewport:OnDraw()
+	-- TEMP DIAG: above the guard on purpose. Nothing reported from below it, which cannot
+	-- distinguish "inactive" from "active but drawing nothing".
+	if not _G.__activeReported then
+		_G.__activeReported = true
+
+		NetEvents:SendLocal('MapEditor:AabbDiag', 'ONDRAW active=' .. tostring(self.m_Active))
+	end
+
 	if not self.m_Active then
 		return
 	end
@@ -342,7 +437,50 @@ function NativeViewport:OnDraw()
 		end
 	end
 
+	-- A replicated box is a snapshot: the vehicle drives off under physics and the box stays put,
+	-- because this realm has no entity handle to follow. Ask the server to re-measure what is
+	-- selected, a few times a second. Only the selection, only while the viewport is drawing, and
+	-- only when something selected actually carries a replicated box -- so a normal editing session
+	-- with statics selected sends nothing at all.
+	self.m_BoxRefreshTick = (self.m_BoxRefreshTick or 0) + 1
+
+	if self.m_BoxRefreshTick >= BOX_REFRESH_FRAMES then
+		self.m_BoxRefreshTick = 0
+
+		local s_Wanted = {}
+
+		for l_GuidStr, _ in pairs(self.m_SelectedGuids) do
+			local s_Object = GameObjectManager.m_GameObjects[l_GuidStr]
+
+			if s_Object ~= nil and s_Object.gameEntities ~= nil then
+				for _, l_GE in pairs(s_Object.gameEntities) do
+					if l_GE.isReplicated then
+						table.insert(s_Wanted, l_GuidStr)
+						break
+					end
+				end
+			end
+		end
+
+		if #s_Wanted > 0 then
+			NetEvents:SendLocal('MapEditor:RequestBoxes', json.encode(s_Wanted))
+		end
+	end
+
 	-- Selected objects (orange).
+	if not _G.__overlayReported then
+		_G.__overlayReported = true
+
+		local s_Count = 0
+
+		for _, _ in pairs(self.m_SelectedGuids) do
+			s_Count = s_Count + 1
+		end
+
+		NetEvents:SendLocal('MapEditor:AabbDiag', 'OVERLAY enabled=' .. tostring(s_Overlays.enabled) ..
+			' selection=' .. tostring(s_Overlays.selection) .. ' selectedGuids=' .. s_Count)
+	end
+
 	if s_Overlays.enabled and s_Overlays.selection then
 		for l_GuidStr, _ in pairs(self.m_SelectedGuids) do
 			DrawGameObject(GameObjectManager.m_GameObjects[l_GuidStr], m_ColorSelected)

@@ -17,6 +17,7 @@ function GameObjectManager:RegisterEvents()
 	if not SharedUtils:IsClientModule() then
 		NetEvents:Subscribe('MapEditor:AdoptDiag', self, self.OnAdoptDiag)
 		NetEvents:Subscribe('MapEditor:AabbDiag', self, self.OnAabbDiag)
+		NetEvents:Subscribe('MapEditor:RequestBoxes', self, self.OnRequestBoxes)
 	end
 
 	if SharedUtils:IsClientModule() then
@@ -1244,7 +1245,7 @@ end
 ---comes back EMPTY (measured: server 3, client 0) and the replicated entities never reach its
 ---hooks either. A lone vehicle had zero entities on the client after 60s, so clicking it outlined
 ---nothing while mis-filed scenery outlined a neighbour.
-function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
+function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 	if p_GameObject == nil or p_GameObject.guid == nil then
 		return
 	end
@@ -1260,6 +1261,12 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
 		return
 	end
 
+	-- A deleted object is not worth re-measuring, and its entities are exactly the ones most
+	-- likely to be mid-teardown.
+	if p_GameObject.isDeleted then
+		return
+	end
+
 	local s_Entities = {}
 
 	for _, l_GameEntity in pairs(p_GameObject.gameEntities or {}) do
@@ -1271,7 +1278,17 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
 			local s_Transform = l_GameEntity.transform
 			local s_Aabb = l_GameEntity.aabb
 
+			-- Is the handle still usable? This runs a few times a second while a vehicle is
+			-- selected, and a vehicle blowing up frees its entities underneath us. Reading a cheap
+			-- property first turns a dead handle into a catchable Lua error here, instead of
+			-- whatever SpatialEntity() would do to a freed one.
+			local s_Alive = false
+
 			if l_GameEntity.entity ~= nil then
+				s_Alive = pcall(function() return l_GameEntity.entity.typeInfo.name end)
+			end
+
+			if s_Alive then
 				local s_Ok, s_Fresh = pcall(function()
 					local s_Spatial = SpatialEntity(l_GameEntity.entity)
 
@@ -1349,10 +1366,37 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject)
 		' objX=' .. string.format('%.1f', p_GameObject.transform.trans.x) ..
 		' spatial=' .. #s_Entities .. s_Detail)
 
-	NetEvents:Broadcast('MapEditor:ReplicatedEntities', json.encode({
+	local s_Payload = json.encode({
 		guid = tostring(p_GameObject.guid),
 		entities = s_Entities,
-	}))
+	})
+
+	if p_Player ~= nil then
+		NetEvents:SendTo('MapEditor:ReplicatedEntities', p_Player, s_Payload)
+	else
+		NetEvents:Broadcast('MapEditor:ReplicatedEntities', s_Payload)
+	end
+end
+
+---Server: a client is asking for up-to-date boxes for the objects it has selected.
+---
+---Only the selected ones, and only while they are selected: a vehicle under physics needs its box
+---re-sent to stay on it, but doing that for every spawned object all the time is a lot of traffic
+---for boxes nobody is looking at.
+function GameObjectManager:OnRequestBoxes(p_Player, p_Payload)
+	local s_Ok, s_Guids = pcall(function() return json.decode(p_Payload) end)
+
+	if not s_Ok or type(s_Guids) ~= 'table' then
+		return
+	end
+
+	for _, l_Guid in ipairs(s_Guids) do
+		local s_GameObject = self.m_GameObjects[tostring(l_Guid)]
+
+		if s_GameObject ~= nil then
+			self:ReplicateSpatialEntities(s_GameObject, p_Player)
+		end
+	end
 end
 
 ---Client: adopt the spatial entities the server just sent, then refresh the WebUI.
@@ -1390,8 +1434,10 @@ function GameObjectManager:OnReplicatedEntities(p_Payload)
 	local s_Added = 0
 
 	for _, l_Entity in pairs(s_Data.entities or {}) do
-		-- Never clobber an entity the client genuinely owns; this only fills a gap.
-		if s_GameObject.gameEntities[l_Entity.instanceId] == nil then
+		local s_Existing = s_GameObject.gameEntities[l_Entity.instanceId]
+
+		if s_Existing == nil then
+			-- Never clobber an entity the client genuinely owns; this only fills a gap.
 			s_GameObject.gameEntities[l_Entity.instanceId] = ReplicatedSpatialEntity {
 				instanceId = l_Entity.instanceId,
 				typeName = l_Entity.typeName,
@@ -1400,6 +1446,10 @@ function GameObjectManager:OnReplicatedEntities(p_Payload)
 				aabb = l_Entity.aabb,
 			}
 			s_Added = s_Added + 1
+		elseif s_Existing.isReplicated then
+			-- A refresh: the vehicle drives away under physics and the box has to follow it. Only
+			-- ever update our OWN stub -- a real GameEntity is the client's and is left alone.
+			s_Existing:Update(l_Entity.transform, l_Entity.aabb)
 		end
 	end
 
