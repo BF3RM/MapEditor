@@ -400,6 +400,31 @@ end
 ---
 ---Safe to call repeatedly for the same object: each call restores what it previously wrote before
 ---writing the new values, so previews never stack.
+---Is this object's blueprint one the engine builds as a networked entity (vehicles)?
+---
+---Those are the ones a live preview cannot reach: the entity keeps the container it was built
+---from, so replacing the container in the partition only affects FUTURE spawns.
+function VehiclePreview:IsNetworkedBlueprint(p_GameObject)
+	local s_Ok, s_Networked = pcall(function()
+		local s_Ref = p_GameObject.blueprintCtrRef
+
+		if s_Ref == nil then
+			return false
+		end
+
+		local s_Blueprint = ResourceManager:FindInstanceByGuid(
+			Guid(tostring(s_Ref.partitionGuid)), Guid(tostring(s_Ref.instanceGuid)))
+
+		if s_Blueprint == nil then
+			return false
+		end
+
+		return _G[s_Blueprint.typeInfo.name](s_Blueprint).needNetworkId == true
+	end)
+
+	return s_Ok and s_Networked == true
+end
+
 function VehiclePreview:Show(p_GameObject)
 	if not PREVIEW_ENABLED or p_GameObject == nil then
 		return false
@@ -421,6 +446,23 @@ function VehiclePreview:Show(p_GameObject)
 	-- scribble over the value Apply is in the middle of committing.
 	if self.m_Suspended then
 		return false
+	end
+
+	-- A NETWORKED vehicle gets no preview at all, deliberately.
+	--
+	-- The preview works by ReplaceInstance on the SHARED blueprint. A vehicle already standing in
+	-- the world holds a pointer to the OLD container, so it never sees the change -- measured
+	-- repeatedly: editing gravity on a spawned vehicle does nothing to it. What the write DOES do
+	-- is change what the partition hands out, so the next vehicle spawned inherits an edit the
+	-- user never applied. That is a per-instance override silently leaking onto new instances,
+	-- which is the one thing "apply to blueprint" is supposed to decide.
+	--
+	-- So for vehicles the preview is pure cost: no live update, plus a leak. Skip it and let the
+	-- override be recorded; Apply still commits it explicitly (WriteChainByReplacement), and a
+	-- vehicle spawned after Apply picks it up. Returning true marks it HANDLED so the caller does
+	-- not fall through to Disable/Enable and bounce the vehicle's physics.
+	if self:IsNetworkedBlueprint(p_GameObject) then
+		return true
 	end
 
 	if not self:AppliesTo(p_GameObject) then
