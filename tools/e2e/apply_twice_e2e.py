@@ -20,7 +20,7 @@ import sys
 import time
 
 sys.path.insert(0, '.')
-from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor   # noqa: E402
+from mapeditor_e2e import fresh_guid, cdp_eval, enter_game, wait_for_editor   # noqa: E402
 from spawn_spaced import spawn_at                                 # noqa: E402
 
 ADDR = 'localhost:8884'
@@ -104,7 +104,7 @@ def main():
     if not enter_game(ADDR) or not wait_for_editor(ADDR):
         print('SETUP: could not reach the editor'); return 2
 
-    spawn_at(ADDR, BP, 'ED170122-7777-0000-0000-7AAB00000001', 0.0)
+    spawn_at(ADDR, BP, fresh_guid(0), 0.0)
     time.sleep(SETTLE)
     g = first_guid()
     if g is None:
@@ -113,12 +113,12 @@ def main():
     print('apply #1: gravity -4 (expect the next spawn to RISE)')
     set_gravity(g, -4.0); time.sleep(6)
     apply(g); time.sleep(8)
-    d1 = spawn_probe('after apply #1', '7AAB00000002', 10.0)
+    d1 = spawn_probe('after apply #1', fresh_guid(10)[-12:], 10.0)
 
     print('apply #2: gravity +6 (expect the next spawn to FALL)')
     set_gravity(g, 6.0); time.sleep(6)
     apply(g); time.sleep(8)
-    d2 = spawn_probe('after apply #2', '7AAB00000003', 20.0)
+    d2 = spawn_probe('after apply #2', fresh_guid(11)[-12:], 20.0)
 
     print()
     ok1 = d1 is not None and d1 > MARGIN

@@ -13,7 +13,7 @@ sys.path.insert(0, '.')
 import apply_twice_e2e as A                                        # noqa: E402
 from apply_from_new_e2e import guid_ending                         # noqa: E402
 from apply_sweep_e2e import chain, send                            # noqa: E402
-from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor    # noqa: E402
+from mapeditor_e2e import fresh_guid, cdp_eval, enter_game, wait_for_editor    # noqa: E402
 from spawn_spaced import spawn_at                                  # noqa: E402
 from field_safety_e2e import server_alive, client_alive            # noqa: E402
 
@@ -28,9 +28,10 @@ def main():
     if not enter_game(A.ADDR) or not wait_for_editor(A.ADDR):
         print('SETUP: could not reach the editor'); return 2
 
-    spawn_at(A.ADDR, A.BP, 'ED170122-7777-0000-0000-57E550000001', 0.0)
+    guid_a = fresh_guid(0)
+    spawn_at(A.ADDR, A.BP, guid_a, 0.0)
     time.sleep(A.SETTLE)
-    g = guid_ending('000001') or guid_ending('000001')
+    g = guid_ending(guid_a[-6:])
 
     if g is None:
         print('SETUP: vehicle did not register'); return 2
@@ -47,7 +48,7 @@ def main():
     steps.append(('apply', alive('after apply')))
 
     # 2. spawn AFTER the apply -- the earlier server-killer
-    spawn_at(A.ADDR, A.BP, 'ED170122-7777-0000-0000-57E550000002', 12.0)
+    spawn_at(A.ADDR, A.BP, fresh_guid(1), 12.0)
     time.sleep(A.SETTLE)
     steps.append(('spawn after apply', alive('after spawn')))
 

@@ -23,8 +23,8 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor  # noqa: E402
 
-GUIDS = ['ED170122-7777-0000-0000-1000000000A1',
-         'ED170122-7777-0000-0000-1000000000A2']
+GUIDS = [fresh_guid(0),
+         fresh_guid(1)]
 
 
 def server_alive():

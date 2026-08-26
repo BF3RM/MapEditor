@@ -18,7 +18,7 @@ import time
 sys.path.insert(0, '.')
 import apply_twice_e2e as A                                        # noqa: E402
 from apply_from_new_e2e import guid_ending                         # noqa: E402
-from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor    # noqa: E402
+from mapeditor_e2e import fresh_guid, cdp_eval, enter_game, wait_for_editor    # noqa: E402
 from spawn_spaced import spawn_at                                  # noqa: E402
 
 PROBE = """(function(){var e=window.editor,v=e.gameObjects.values(),o=[];
@@ -41,10 +41,11 @@ def main():
     if not enter_game(A.ADDR) or not wait_for_editor(A.ADDR):
         print('SETUP: could not reach the editor'); return 2
 
-    spawn_at(A.ADDR, A.BP, 'ED170122-7777-0000-0000-BAAB00000001', 0.0)
+    guid_a = fresh_guid(0)
+    spawn_at(A.ADDR, A.BP, guid_a, 0.0)
     time.sleep(12)
 
-    g = guid_ending('000001')
+    g = guid_ending(guid_a[-6:])
     if g is None:
         print('SETUP: the vehicle did not register'); return 2
 
@@ -56,12 +57,13 @@ def main():
     time.sleep(8)
     after_apply = probe('after apply')
 
-    spawn_at(A.ADDR, A.BP, 'ED170122-7777-0000-0000-BAAB00000002', 12.0)
+    guid_b = fresh_guid(1)
+    spawn_at(A.ADDR, A.BP, guid_b, 12.0)
     time.sleep(12)
     after_spawn = probe('after new spawn')
 
-    edited = [o for o in after_apply if o['guid'] == '000001']
-    fresh = [o for o in after_spawn if o['guid'] == '000002']
+    edited = [o for o in after_apply if o['guid'] == guid_a[-6:]]
+    fresh = [o for o in after_spawn if o['guid'] == guid_b[-6:]]
 
     ok_edited = bool(edited) and edited[0]['blueprint'] > 0
     ok_fresh = bool(fresh) and fresh[0]['blueprint'] > 0

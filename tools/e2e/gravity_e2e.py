@@ -19,7 +19,7 @@ import sys
 import time
 
 sys.path.insert(0, '.')
-from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor   # noqa: E402
+from mapeditor_e2e import fresh_guid, cdp_eval, enter_game, wait_for_editor   # noqa: E402
 from spawn_spaced import spawn_at                                 # noqa: E402
 
 ADDR = 'localhost:8884'
@@ -93,9 +93,9 @@ def main():
         print('SETUP: could not reach the editor'); return 2
 
     print('1. two vehicles, settling')
-    spawn_at(ADDR, BP, 'ED170122-7777-0000-0000-6AAB00000001', 0.0)
+    spawn_at(ADDR, BP, fresh_guid(0), 0.0)
     time.sleep(4)
-    spawn_at(ADDR, BP, 'ED170122-7777-0000-0000-6AAB00000002', 8.0)
+    spawn_at(ADDR, BP, fresh_guid(1), 8.0)
     time.sleep(SETTLE)
 
     g = guids_of_bmp2()

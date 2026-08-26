@@ -24,7 +24,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor, VU_CDP_PY  # noqa: E402
 
-SPAWN_GUID = 'ED170122-7777-0000-0000-100000000009'
+SPAWN_GUID = fresh_guid(0)
 
 
 def wait_for_cdp(addr, timeout=600):

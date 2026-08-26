@@ -12,7 +12,7 @@ import sys
 import time
 
 sys.path.insert(0, '.')
-from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor   # noqa: E402
+from mapeditor_e2e import fresh_guid, cdp_eval, enter_game, wait_for_editor   # noqa: E402
 from spawn_spaced import spawn_at                                 # noqa: E402
 
 OFFSET = 60.0
@@ -24,7 +24,7 @@ def main():
         print("SETUP: could not reach the editor")
         return 2
 
-    spawn_at(addr, 'Vehicles/BMP2/BMP2', 'ED170122-7777-0000-0000-51A61E000000', OFFSET)
+    spawn_at(addr, 'Vehicles/BMP2/BMP2', fresh_guid(0), OFFSET)
 
     js = """(function(){var e=window.editor,out=[],vals=e.gameObjects.values();
     for(var i=0;i<vals.length;i++){var o=vals[i];

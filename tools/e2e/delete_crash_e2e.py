@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor          # noqa: E402
 from field_safety_e2e import spawn, count, server_alive, client_alive    # noqa: E402
 
-GUID = 'ED170122-7777-0000-0000-DE1E7E000001'
+GUID = fresh_guid(0)
 
 
 def delete(addr, guid):

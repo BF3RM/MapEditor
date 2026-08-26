@@ -57,6 +57,28 @@ def cdp_eval(addr, js, timeout=30, target="mapeditor"):
     return {"__error": err or "no output"}
 
 
+# Guids must be UNIQUE PER RUN.
+#
+# Spawning a guid that already exists is silently refused -- measured: spawn the same guid twice,
+# one object exists afterwards, no error anywhere. Every test used FIXED guids, so the moment a
+# harness reused one server across runs (crash_rate2.sh, or simply running a test twice), the
+# second run's spawn vanished and the test reported "the vehicle did not register" as though the
+# product were broken. That contaminated a whole session's worth of results.
+#
+# The last group must be exactly 12 hex characters; a malformed guid is refused the same silent
+# way, which has cost several runs of its own.
+_RUN_TAG = '%08X' % (int(time.time()) & 0xFFFFFFFF)
+
+
+def fresh_guid(index=0):
+    """A guid no earlier run can have used, valid by construction."""
+    return 'ED170122-7777-0000-0000-%s%04X' % (_RUN_TAG, index & 0xFFFF)
+
+
+# How long to wait for the editor after a soldier click before pressing it again.
+RECLICK_AFTER = 30.0
+
+
 def enter_game(addr, timeout=180):
     """From the soldier-select screen, click the first real soldier (which triggers the server
     join); the ext then auto-enters the editor (DEV_AUTO_ENTER_EDITOR) a few seconds after
@@ -70,7 +92,9 @@ def enter_game(addr, timeout=180):
                 "t.dispatchEvent(new MouseEvent(e,{bubbles:true,cancelable:true,view:window,clientX:cx,clientY:cy,button:0}));});"
                 "return JSON.stringify({clicked:true,name:(t.textContent||'').trim().slice(0,20)});})()")
     deadline = time.time() + timeout
+    start = time.time()
     clicked = False
+    last_click = 0.0
     warned_login = False
     while time.time() < deadline:
         # Already in the editor?
@@ -84,12 +108,26 @@ def enter_game(addr, timeout=180):
             print("[e2e] client is at the VU login screen — not signed in to a Venice Unleashed "
                   "account. Log in once in the client UI; the session then persists.", flush=True)
             return False
-        if not clicked:
+        # RETRY the click, do not fire it once and hope.
+        #
+        # A click that lands before the soldier list is interactive reports clicked:true and does
+        # nothing, and the old code then sat out the entire timeout without pressing again -- the
+        # first run after a cold boot failed this way while runs 2 and 3 on the same client passed.
+        if not clicked or (time.time() - last_click) > RECLICK_AFTER:
             r = cdp_eval(addr, click_js, target="main/players")
             if isinstance(r, dict) and r.get("clicked"):
-                print(f"[e2e] clicked soldier '{r.get('name')}' — joining + auto-enter…")
+                if not clicked:
+                    print(f"[e2e] clicked soldier '{r.get('name')}' — joining + auto-enter…")
+                else:
+                    print(f"[e2e] no editor yet after {int(time.time() - start)}s — clicking again",
+                          flush=True)
                 clicked = True
+                last_click = time.time()
         time.sleep(4)
+
+    # Say what was actually seen, so a failure is diagnosable without a rerun.
+    print("[e2e] gave up after %ds: mapeditor target=%s, at login=%s"
+          % (timeout, _has_mapeditor_target(addr), _at_login(addr)), flush=True)
     return _has_mapeditor_target(addr)
 
 

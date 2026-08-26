@@ -30,7 +30,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mapeditor_e2e import cdp_eval, enter_game, wait_for_editor, _FRESH_FETCH_JS, _poll  # noqa: E402
 
-SPAWN_GUID = 'ED170122-7777-0000-0000-100000000042'
+SPAWN_GUID = fresh_guid(0)
 
 
 def spawn_vehicle(addr, bp_name):
