@@ -527,6 +527,27 @@ end
 function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p_Transform, p_Variation, p_Parent)
 	local s_PendingCustomBlueprintInfo = self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)]
 
+	-- The pending table is keyed by BLUEPRINT guid, so two objects spawned from the same blueprint
+	-- share one entry and the second overwrites the first. The entities then get adopted by whichever
+	-- object the entry happens to name -- so a freshly spawned vehicle has no AABB while the
+	-- PREVIOUS one shows the new object's outline. (The gizmo stays correct because it comes from the
+	-- GameObject's own transform, not from entities, which is exactly how this presents.)
+	--
+	-- When WE are doing the spawning, m_SpawningForGuid names the object unambiguously -- it is set
+	-- immediately around our own CreateEntitiesFromBlueprint call and this hook fires inside it. Use
+	-- it, and leave the table lookup as the fallback for load-time and vanilla spawns.
+	if self.m_SpawningForGuid ~= nil and s_PendingCustomBlueprintInfo ~= nil and
+		tostring(s_PendingCustomBlueprintInfo.customGuid) ~= self.m_SpawningForGuid then
+		local s_Corrected = {}
+
+		for l_Key, l_Value in pairs(s_PendingCustomBlueprintInfo) do
+			s_Corrected[l_Key] = l_Value
+		end
+
+		s_Corrected.customGuid = self.m_SpawningForGuid
+		s_PendingCustomBlueprintInfo = s_Corrected
+	end
+
 	if SharedUtils:IsServerModule() and s_PendingCustomBlueprintInfo and Guid(s_PendingCustomBlueprintInfo.customGuid) == PREVIEW_GUID then
 		m_Logger:Error('Tried to spawn the preview object on server, something went wrong.')
 		p_HookCtx:Return()

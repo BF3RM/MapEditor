@@ -1063,3 +1063,23 @@ blueprint is untouched by design, so there is nothing to re-read and no reason t
 
 Measured after: 15 consecutive gravity edits plus a spawn -- client and server both alive, the new
 vehicle registers. The same sequence previously died around edit 14.
+
+## Entities adopted by the WRONG object (2026-08-26)
+
+Reported: spawn a vehicle and it has no outline; select the PREVIOUS vehicle and you see the new
+one's outline instead. The gizmo stays on the correct object.
+
+`m_PendingCustomBlueprintGuids` is keyed by BLUEPRINT instance guid, and consumed the same way in
+`OnEntityCreateFromBlueprint`. Two objects spawned from one blueprint therefore share a single entry
+and the second overwrites the first, so entities are adopted by whichever object the surviving entry
+names. The gizmo is unaffected because it comes from the GameObject's own transform rather than from
+entities -- which is precisely how the symptom presents.
+
+`m_SpawningForGuid` already names the object unambiguously: it is set immediately around our own
+`CreateEntitiesFromBlueprint` call and the hook fires inside it. The hook now prefers it, falling
+back to the table for load-time and vanilla spawns.
+
+NOT verified from here: the client-side AABB. `gameEntitiesData` reads 0 for every vehicle object
+including ones that clearly render, so that is not where the outlines come from and the probe proves
+nothing. The fix rests on the mis-keying being demonstrable in the code, not on a measurement --
+needs an eye on the editor.
