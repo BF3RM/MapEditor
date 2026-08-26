@@ -23,6 +23,45 @@
 					{{ referenceObjectBlueprint }}
 				</div>
 				<div class="path hint" v-if="notLoaded">not loaded</div>
+				<!-- stop: clicking Replace must not also expand the chip -->
+				<button class="ref-replace" @click.stop="togglePicker" title="Point this field at a different instance">
+					{{ picking ? '×' : 'Replace' }}
+				</button>
+			</div>
+
+			<!-- Picker. Compatible candidates only by default, because a reference pointed at the
+			     wrong type is not an edit the engine can use -- but the filter is a guess based on
+			     the declared type name, so it can be switched off rather than hiding the one entry
+			     someone actually needs. -->
+			<div class="ref-picker" v-if="picking" @click.stop>
+				<input
+					ref="refSearch"
+					class="ref-search"
+					v-model="query"
+					type="text"
+					:placeholder="'Search ' + (expectedType || 'instances') + '…'"
+				/>
+				<label class="ref-compat">
+					<input type="checkbox" v-model="compatibleOnly" />
+					compatible only ({{ expectedType || 'any' }})
+				</label>
+				<div class="ref-results">
+					<div v-if="candidates.length === 0" class="ref-empty">
+						no matches{{ compatibleOnly ? ' — try turning off the type filter' : '' }}
+					</div>
+					<div
+						v-for="c in candidates"
+						:key="c.partitionGuid + '/' + c.instanceGuid"
+						class="ref-result"
+						:class="{ current: c.instanceGuid === currentInstanceGuid }"
+						@click="pick(c)"
+						:title="c.name"
+					>
+						<span class="ref-r-type">{{ c.typeName }}</span>
+						<span class="ref-r-name">{{ c.name }}</span>
+					</div>
+					<div v-if="truncated" class="ref-empty">…refine the search to see more</div>
+				</div>
 			</div>
 			<template v-if="expanded && partition && instance">
 				<InstanceProperty
@@ -68,6 +107,10 @@ import { GameObject } from '@/script/types/GameObject';
 	}
 })
 export default class ReferenceComponent extends Vue {
+	// A level holds tens of thousands of instances; Gameface renders a list that long slowly
+	// enough to read as a hang. Searching is how you get past this, and the list says so.
+	static MAX_RESULTS = 60;
+
 	@Prop({
 		type: Object as PropType<GameObject>,
 		required: false
@@ -104,6 +147,11 @@ export default class ReferenceComponent extends Vue {
 	})
 	autoOpen: boolean;
 
+	// Picker state. Deliberately local: a half-typed search should not survive reselecting.
+	picking = false;
+	query = '';
+	compatibleOnly = true;
+
 	data(): {
 		loading: boolean;
 		notLoaded: boolean;
@@ -136,6 +184,120 @@ export default class ReferenceComponent extends Vue {
 		if (this.$data.instance) {
 			this.$data.expanded = !this.$data.expanded;
 		}
+	}
+
+	togglePicker() {
+		this.picking = !this.picking;
+
+		if (this.picking) {
+			this.query = '';
+			// Focus after the panel exists, or the input is not in the DOM yet.
+			this.$nextTick(() => {
+				const el = this.$refs.refSearch as HTMLInputElement | undefined;
+				if (el && el.focus) el.focus();
+			});
+		}
+	}
+
+	/** The type this field wants, used to filter candidates. */
+	get expectedType(): string {
+		const inst = this.$data.instance;
+		return (inst && inst.typeName) || this.type || '';
+	}
+
+	get currentInstanceGuid(): string {
+		return this.reference ? String(this.reference.instanceGuid) : '';
+	}
+
+	/**
+	 * Candidates to point this reference at.
+	 *
+	 * Two sources, because a reference can target either: BLUEPRINTS (what the browser lists, and
+	 * what a ReferenceObjectData.blueprint wants) and INSTANCES already loaded in partitions. The
+	 * ext accepts {partitionGuid, instanceGuid} either way -- it does not care which list the user
+	 * found it in.
+	 *
+	 * Capped, because a level holds tens of thousands of instances and Gameface renders a long list
+	 * slowly enough to look hung. Refining the search is the way to see past the cap; the list says
+	 * so rather than silently stopping.
+	 */
+	get candidates(): { partitionGuid: string; instanceGuid: string; typeName: string; name: string }[] {
+		const q = (this.query || '').toLowerCase().trim();
+		const want = (this.expectedType || '').toLowerCase();
+		const out: { partitionGuid: string; instanceGuid: string; typeName: string; name: string }[] = [];
+
+		const matches = (typeName: string, name: string) => {
+			if (this.compatibleOnly && want && String(typeName).toLowerCase() !== want) return false;
+			if (!q) return true;
+			return String(name).toLowerCase().indexOf(q) !== -1 ||
+				String(typeName).toLowerCase().indexOf(q) !== -1;
+		};
+
+		try {
+			const bm = (window as any).editor && (window as any).editor.blueprintManager;
+			const bps = bm && bm.getBlueprints ? bm.getBlueprints() : (bm ? bm.blueprints.values() : []);
+			for (const bp of bps || []) {
+				if (out.length >= ReferenceComponent.MAX_RESULTS + 1) break;
+				if (!bp || !matches(bp.typeName, bp.name)) continue;
+				out.push({
+					partitionGuid: String(bp.partitionGuid),
+					instanceGuid: String(bp.instanceGuid),
+					typeName: String(bp.typeName),
+					name: String(bp.name)
+				});
+			}
+		} catch (e) {
+			// A missing browser must not take the inspector down; instances below may still serve.
+		}
+
+		try {
+			const partition = (this as any).$props.partition;
+			const insts = partition && partition.instances ? partition.instances : {};
+			for (const guid of Object.keys(insts)) {
+				if (out.length >= ReferenceComponent.MAX_RESULTS + 1) break;
+				const inst = insts[guid];
+				if (!inst) continue;
+				const name = inst.name || inst.typeName || guid;
+				if (!matches(inst.typeName, name)) continue;
+				if (String(guid) === this.currentInstanceGuid) continue;
+				out.push({
+					partitionGuid: String(partition.guid),
+					instanceGuid: String(guid),
+					typeName: String(inst.typeName),
+					name: String(name)
+				});
+			}
+		} catch (e) {
+			// same rationale as above
+		}
+
+		return out.slice(0, ReferenceComponent.MAX_RESULTS);
+	}
+
+	get truncated(): boolean {
+		return this.candidates.length >= ReferenceComponent.MAX_RESULTS;
+	}
+
+	/**
+	 * Point the field at `c`.
+	 *
+	 * Emits the `__ref` shape Property.onChangeValue already understands -- it wraps this into the
+	 * ext's edit grammar (a `ref: true` terminal whose value is {partitionGuid, instanceGuid}),
+	 * because the field NAME is known there and not here.
+	 */
+	pick(c: { partitionGuid: string; instanceGuid: string }) {
+		const old = this.reference
+			? { partitionGuid: String(this.reference.partitionGuid), instanceGuid: String(this.reference.instanceGuid) }
+			: undefined;
+
+		this.$emit('input', {
+			__ref: true,
+			partitionGuid: c.partitionGuid,
+			instanceGuid: c.instanceGuid,
+			__refOld: old
+		});
+
+		this.picking = false;
 	}
 
 	mounted() {
@@ -423,5 +585,78 @@ export default class ReferenceComponent extends Vue {
 	50% {
 		opacity: 0.85;
 	}
+}
+
+/* Reference picker. Kept inside the chip's own block so it scrolls with the inspector rather
+   than floating over it — Gameface has no portal/overlay layer to rely on. */
+.ref-replace {
+	float: right;
+	font-size: 9px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 1px 5px;
+	margin-left: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 2px;
+	background: rgba(255, 255, 255, 0.06);
+	color: #cfd6e4;
+	cursor: pointer;
+}
+.ref-replace:hover {
+	background: rgba(120, 170, 255, 0.22);
+}
+.ref-picker {
+	padding: 6px;
+	border: 1px solid rgba(120, 170, 255, 0.25);
+	border-top: none;
+	background: rgba(0, 0, 0, 0.22);
+}
+.ref-search {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 3px 5px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	color: #e8edf5;
+	font-size: 11px;
+}
+.ref-compat {
+	display: block;
+	font-size: 10px;
+	opacity: 0.75;
+	margin: 4px 0;
+}
+.ref-results {
+	max-height: 180px;
+	overflow-y: auto;
+}
+.ref-result {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 2px 4px;
+	font-size: 11px;
+	cursor: pointer;
+}
+.ref-result:hover {
+	background: rgba(120, 170, 255, 0.18);
+}
+.ref-result.current {
+	opacity: 0.5;
+}
+.ref-r-type {
+	color: #9ec5ff;
+	flex: 0 0 auto;
+}
+.ref-r-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	opacity: 0.85;
+}
+.ref-empty {
+	font-size: 10px;
+	opacity: 0.6;
+	padding: 4px;
 }
 </style>
