@@ -42,6 +42,38 @@ export default class Instance {
 		return new Instance(new Guid(json.$guid), json.$type, json.$baseClass, fields, this.groupFields(json, fields));
 	}
 
+	/**
+	 * Take one group's worth of fields off $fieldOrder, skipping names with nothing behind them.
+	 *
+	 * Split out of groupFields so that method stays a flat walk over the groups: inlined, the two
+	 * nested loops and their guards scored 12 on cyclomatic complexity.
+	 *
+	 * A named field with no entry in `fields` means the two halves disagree; drop the name rather
+	 * than render an empty row. `used` guards the reverse too: two engine names can normalise to
+	 * the SAME key, and both would otherwise point at the one surviving entry and render twice.
+	 */
+	private static takeGroupMembers(
+		order: string[],
+		start: number,
+		count: number,
+		fields: Fields,
+		used: Set<string>
+	): Field<any>[] {
+		const members: Field<any>[] = [];
+
+		for (let i = 0; i < count && start + i < order.length; i++) {
+			const name = normalizeFieldName(order[start + i]);
+			const field = fields[name];
+
+			if (field && !used.has(name)) {
+				members.push(field);
+				used.add(name);
+			}
+		}
+
+		return members;
+	}
+
 	// Slice $fieldOrder into one group per declaring type using $fieldGroups' counts (the wire
 	// format keeps names in ONE flat list instead of nesting them per group — see
 	// PartitionSerializer:_FieldOrder for why).
@@ -55,22 +87,8 @@ export default class Instance {
 		let cursor = 0;
 
 		for (const group of json.$fieldGroups) {
-			const members: Field<any>[] = [];
-
-			for (let i = 0; i < group.$count && cursor < json.$fieldOrder.length; i++, cursor++) {
-				const name = normalizeFieldName(json.$fieldOrder[cursor]);
-				const field = fields[name];
-
-				// A named field with nothing behind it means the two halves disagree; drop the name
-				// rather than rendering an empty row. `used` also guards the reverse: two engine
-				// field names can normalise to the SAME key (normalizeFieldName rewrites acronyms),
-				// and both would then point at the one surviving entry in `fields` and render the
-				// row twice.
-				if (field && !used.has(name)) {
-					members.push(field);
-					used.add(name);
-				}
-			}
+			const members = Instance.takeGroupMembers(json.$fieldOrder, cursor, group.$count, fields, used);
+			cursor += Math.min(group.$count, Math.max(0, json.$fieldOrder.length - cursor));
 
 			if (members.length > 0) {
 				groups.push({ typeName: group.$type, fields: members });

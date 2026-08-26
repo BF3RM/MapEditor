@@ -20,29 +20,26 @@ export function getFilename(path: string) {
 		})
 		.reverse()[0];
 }
+/**
+ * The EBX types that render as a plain value rather than as a nested instance.
+ *
+ * A Set, not a chain of comparisons: the chain was 20 `||` branches, scoring 21 on cyclomatic
+ * complexity -- the metric counts every one as a decision point -- and adding a type meant adding
+ * another branch. Same answer, same case-insensitivity, complexity 1.
+ */
+const PRINTABLE_TYPES = new Set([
+	'cstring',
+	'single',
+	'float8', 'float16', 'float32', 'float64',
+	'int8', 'int16', 'int32', 'int64',
+	'uint8', 'uint16', 'uint32', 'uint64',
+	'lineartransform',
+	'vec2', 'vec3', 'vec4',
+	'boolean',
+	'guid',
+	'sbyte'
+]);
+
 export function isPrintable(type: string) {
-	type = type.toLowerCase();
-	return (
-		type === 'cstring' ||
-		type === 'single' ||
-		type === 'float8' ||
-		type === 'float16' ||
-		type === 'float32' ||
-		type === 'float64' ||
-		type === 'int8' ||
-		type === 'int16' ||
-		type === 'int32' ||
-		type === 'int64' ||
-		type === 'uint8' ||
-		type === 'uint16' ||
-		type === 'uint32' ||
-		type === 'uint64' ||
-		type === 'lineartransform' ||
-		type === 'vec2' ||
-		type === 'vec3' ||
-		type === 'vec4' ||
-		type === 'boolean' ||
-		type === 'guid' ||
-		type === 'sbyte'
-	);
+	return PRINTABLE_TYPES.has(String(type).toLowerCase());
 }
