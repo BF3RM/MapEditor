@@ -215,6 +215,29 @@ function GameObject:MarkAsUndeleted(p_AutoModified)
 	self:SetField("isDeleted", false, p_AutoModified)
 end
 
+-- Entities that must never be Destroy()ed, even though the editor created them.
+--
+-- Freeing a networked VEHICLE entity takes the SERVER down with a native access violation: no Lua
+-- error, no stack, the log simply stops. Measured 2026-08-26 -- spawn a BMP2, press delete, server
+-- gone ~2s later, with no edit anywhere in the run (tools/e2e/delete_crash_e2e.py --arm clean).
+--
+-- The pcall around Destroy() below cannot help here and never could: it catches Lua errors, and
+-- this fault is native, so it walks straight through it.
+--
+-- Disable is exactly what the vanilla path already does for entities we are not allowed to free,
+-- so vehicles just join that side of the same fork. It leaks the entity bus, which is the price of
+-- not crashing; the object still disappears, which is what delete has to mean to the user.
+local function MustNotDestroy(p_GameEntity)
+	local s_TypeName = p_GameEntity.typeName
+
+	if type(s_TypeName) ~= 'string' then
+		return false
+	end
+
+	-- Server/Client/plain variants all exist depending on realm.
+	return s_TypeName:find('Vehicle') ~= nil
+end
+
 function GameObject:Destroy() -- this will effectively destroy all entities and childentities. the gameobject becomes useless and needs to be dereferenced
 	if self.origin == GameObjectOriginType.Vanilla or self.origin == GameObjectOriginType.NoHavok then
 		m_Logger:Error("Cant destroy vanilla object, use disable instead")
@@ -242,7 +265,7 @@ function GameObject:Destroy() -- this will effectively destroy all entities and 
 	if self.gameEntities ~= nil then
 		for _, l_GameEntity in pairs(self.gameEntities) do
 			if l_GameEntity ~= nil then
-				if l_GameEntity.isEditorSpawned then
+				if l_GameEntity.isEditorSpawned and not MustNotDestroy(l_GameEntity) then
 					local s_Ok, s_Err = pcall(function() l_GameEntity:Destroy() end)
 
 					if not s_Ok then
