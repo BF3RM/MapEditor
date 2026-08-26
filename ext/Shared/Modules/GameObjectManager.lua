@@ -2128,36 +2128,16 @@ function GameObjectManager:OnEntityCreate(p_Hook, p_EntityData, p_Transform)
 		self.m_PendingEntities[s_Entity.instanceId] = nil
 		self.m_ProcessedEntities[s_Entity.instanceId] = true
 
-		-- Tell the WebUI. GameObjectReady is dispatched when the spawn completes, but on the client
-		-- a networked vehicle's entities arrive AFTER that -- by replication, with an empty local
-		-- entity bus -- so the UI was handed gameEntitiesData = [] and had nothing to draw a
-		-- selection outline from. A second ready for a guid it already tracks is handled as a
-		-- refresh (Editor.ts refreshRespawnedGameObject), which is exactly what we want.
+
+		-- No GameObjectReady re-dispatch here, deliberately.
 		--
-		-- Debounced per object: a vehicle attaches its entities one hook call at a time, and one
-		-- dispatch per entity would push a full transfer at the UI dozens of times per spawn.
-		if SharedUtils:IsClientModule() and s_PendingGameObject.guid ~= nil then
-			local s_Guid = tostring(s_PendingGameObject.guid)
-
-			self.m_ReadyResendTokens = self.m_ReadyResendTokens or {}
-			self.m_ReadyResendTokens[s_Guid] = (self.m_ReadyResendTokens[s_Guid] or 0) + 1
-
-			local s_Token = self.m_ReadyResendTokens[s_Guid]
-			local s_Target = s_PendingGameObject
-
-			Timer:Simple(0.75, function()
-				-- Only the last attach for this object fires; earlier timers are stale.
-				if self.m_ReadyResendTokens[s_Guid] ~= s_Token then
-					return
-				end
-
-				if self.m_GameObjects[s_Guid] == nil then
-					return
-				end
-
-				Events:DispatchLocal('GameObjectManager:GameObjectReady', s_Target)
-			end)
-		end
+		-- It was added so a vehicle's entity data would reach the WebUI, but it fired on EVERY late
+		-- attach, including level objects streaming in. Each dispatch makes the UI tear down and
+		-- rebuild that object's spatial children, and inspector_sweep_e2e caught the result: 199
+		-- "Entity with id ... already exists" errors across a 40-blueprint sweep.
+		--
+		-- It is redundant now anyway: a vehicle's boxes arrive through OnReplicatedEntities, which
+		-- dispatches once, for the one object that actually changed.
 	else
 		self.m_PendingEntities[s_Entity.instanceId] = s_GameEntity
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run every e2e script back to back, one cold boot each, and summarise.
-#   VU_JOIN=vu://join/<server-guid> tools/e2e_all.sh
+#   tools/e2e_all.sh                                 # join URL read from the server log
+#   VU_JOIN=vu://join/<guid> tools/e2e_all.sh        # or point it somewhere else
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 I="${VU_INSTANCE:-$HOME/Games/VeniceUnleashed/instance}"

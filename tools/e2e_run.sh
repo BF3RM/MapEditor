@@ -7,17 +7,39 @@
 # failures. The server is matched by -serverInstancePath, never by binary name, because both
 # binaries serve both roles.
 #
-#   VU_JOIN=vu://join/<server-guid> tools/e2e_run.sh vehicle_e2e.py [args...]
+#   tools/e2e_run.sh vehicle_e2e.py [args...]        # join URL read from the server log
+#   VU_JOIN=vu://join/<guid> tools/e2e_run.sh ...   # or point it somewhere else
 #
 # Every run is a COLD boot on purpose: MapEditor ext changes are only picked up by a full server
 # restart, not by a reload, so reusing a live server silently tests the old code.
 #
-# Env: VU_JOIN (required)  VU_INSTANCE (default ~/Games/VeniceUnleashed/instance)
+# Env: VU_JOIN (optional -- derived from the server log if unset)
+#      VU_INSTANCE (default ~/Games/VeniceUnleashed/instance)
 set -u
 I="${VU_INSTANCE:-$HOME/Games/VeniceUnleashed/instance}"
 M="$I/Admin/Mods/MapEditor"
 SCRIPT="${1:?usage: e2e_run.sh <script.py> [args]}"; shift || true
-JOIN="${VU_JOIN:?set VU_JOIN=vu://join/<server-guid>}"
+# The join URL is derivable: the server prints its GUID to its own log on every boot, and that log
+# is right there. Requiring it as an env var meant forgetting it failed all 7 suites in the same
+# second with an error that looks nothing like "you forgot a variable".
+#
+# An explicit VU_JOIN still wins, for pointing a run at some other server.
+JOIN="${VU_JOIN:-}"
+
+if [ -z "$JOIN" ]; then
+  for L in "$I/logs/server.log" $(ls -t "$I"/logs/server-*.log 2>/dev/null | head -4); do
+    [ -f "$L" ] || continue
+    G="$(grep -a 'Server GUID:' "$L" 2>/dev/null | tail -1 | sed -E 's/.*Server GUID: ([0-9a-f]{32}).*/\1/')"
+    case "$G" in
+      [0-9a-f]*) [ ${#G} -eq 32 ] && JOIN="vu://join/$G" && echo "[e2e_run] join from $(basename "$L"): $G" && break ;;
+    esac
+  done
+fi
+
+if [ -z "$JOIN" ]; then
+  echo "[e2e_run] FATAL: no server GUID in $I/logs (has the server ever booted?), and VU_JOIN unset" >&2
+  exit 2
+fi
 
 # pgrep -f matches THIS shell (its argv contains the pattern); killing that aborts the run.
 kill_match() {
