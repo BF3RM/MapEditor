@@ -1626,13 +1626,20 @@ function GameObjectManager:OnRequestBoxes(p_Player, p_Payload)
 		return
 	end
 
+	local s_Hit, s_Miss = 0, 0
+
 	for _, l_Guid in ipairs(s_Guids) do
 		local s_GameObject = self.m_GameObjects[tostring(l_Guid)]
 
 		if s_GameObject ~= nil then
+			s_Hit = s_Hit + 1
 			self:ReplicateSpatialEntities(s_GameObject, p_Player)
+		else
+			s_Miss = s_Miss + 1
 		end
 	end
+
+	m_Diag('REQ-BOXES asked=' .. #s_Guids .. ' found=' .. s_Hit .. ' missing=' .. s_Miss)
 end
 
 ---Client: adopt the spatial entities the server just sent, then refresh the WebUI.
