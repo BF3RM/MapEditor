@@ -1315,15 +1315,25 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 		return
 	end
 
-	if p_GameObject.origin ~= GameObjectOriginType.Custom and
-		p_GameObject.origin ~= GameObjectOriginType.CustomChild then
-		return
-	end
+	-- Origin gating belongs to the BROADCAST path only.
+	--
+	-- Unsolicited (p_Player == nil) this is called for every spawn, so it stays limited to objects
+	-- the user actually placed: level-injected objects are Custom too and there are thousands of
+	-- them, and broadcasting all of those during load is a lot of traffic for nothing.
+	--
+	-- A targeted reply (p_Player ~= nil) is different: the client asked for THIS object because it
+	-- has nothing to draw it with. Vanilla objects are exactly the ones that need it -- the client's
+	-- blueprint hook never fires, so it holds no entities of its own for them -- and refusing them
+	-- here is why selecting a vanilla LAV outlined nothing while the server sat on its 14 entities.
+	if p_Player == nil then
+		if p_GameObject.origin ~= GameObjectOriginType.Custom and
+			p_GameObject.origin ~= GameObjectOriginType.CustomChild then
+			return
+		end
 
-	-- Level-injected objects are Custom too, and there are thousands of them. Only objects the user
-	-- actually spawned need this; blanket-broadcasting during load is a lot of traffic for nothing.
-	if p_GameObject.wasInjected then
-		return
+		if p_GameObject.wasInjected then
+			return
+		end
 	end
 
 	-- A deleted object is not worth re-measuring, and its entities are exactly the ones most
