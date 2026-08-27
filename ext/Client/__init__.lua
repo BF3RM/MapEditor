@@ -46,6 +46,7 @@ function MapEditorClient:RegisterEvents()
 
 	Events:Subscribe('MapEditor:SetHighlight', self, self.OnSetHighlight)
 	Events:Subscribe('MapEditor:SetSelection', self, self.OnSetSelection)
+	Events:Subscribe('MapEditor:BoxReport', self, self.OnBoxReport)
 	Events:Subscribe('MapEditor:SetGizmoMode', self, self.OnSetGizmoMode)
 	Events:Subscribe('MapEditor:SetWorldSpace', self, self.OnSetWorldSpace)
 	Events:Subscribe('MapEditor:SetGizmoCenter', self, self.OnSetGizmoCenter)
@@ -151,6 +152,26 @@ function MapEditorClient:OnSetHighlight(p_Json)
 end
 
 ---@param p_Json string
+--- Ask the viewport to publish what it can outline (window.__boxReport). Test/support hook.
+function MapEditorClient:OnBoxReport()
+	-- Carry the editor state too: "no box" and "the editor never entered" look identical from
+	-- the WebUI otherwise, and the reason entry fails is logged client-side where nothing reads it.
+	local s_Soldier = false
+	local s_Player = false
+
+	pcall(function()
+		local s_LocalPlayer = PlayerManager:GetLocalPlayer()
+		s_Player = s_LocalPlayer ~= nil
+		s_Soldier = s_LocalPlayer ~= nil and s_LocalPlayer.soldier ~= nil
+	end)
+
+	m_NativeViewport:SelectionBoxReport({
+		mode = tostring(UIManager.m_ActiveMode),
+		hasPlayer = s_Player,
+		hasSoldier = s_Soldier,
+	})
+end
+
 function MapEditorClient:OnSetSelection(p_Json)
 	local s_Ok, s_List = pcall(function() return json.decode(p_Json) end)
 	m_NativeViewport:SetSelection((s_Ok and type(s_List) == 'table') and s_List or {})

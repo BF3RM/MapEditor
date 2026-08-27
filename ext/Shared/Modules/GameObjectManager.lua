@@ -1367,9 +1367,26 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 			-- selected, and a vehicle blowing up frees its entities underneath us. Reading a cheap
 			-- property first turns a dead handle into a catchable Lua error here, instead of
 			-- whatever SpatialEntity() would do to a freed one.
+			-- Only RE-MEASURE something the editor spawned.
+			--
+			-- The fresh read exists because a spawn-time box is captured in the create hook,
+			-- before the engine has placed the entity: a vehicle spawned at x=60 sent a box that
+			-- drew at x=30. That is a property of spawning, and it does not apply to a vanilla
+			-- object, which the level placed before anyone asked about it -- its stored box is
+			-- already correct.
+			--
+			-- And the read is not free: SpatialEntity() on a live vanilla BMP2, whose entities the
+			-- server steps every physics tick, takes the server down when called from this
+			-- NetEvent handler ("crashes when I select BMP2"). The pcall below does NOT cover
+			-- that -- a native fault is not a Lua error, as deleting vehicle entities established
+			-- earlier on this branch. So for anything we did not spawn, trust what was captured
+			-- at create time and touch nothing live.
+			local s_MayMeasure = p_GameObject.origin == GameObjectOriginType.Custom or
+				p_GameObject.origin == GameObjectOriginType.CustomChild
+
 			local s_Alive = false
 
-			if l_GameEntity.entity ~= nil then
+			if s_MayMeasure and l_GameEntity.entity ~= nil then
 				s_Alive = pcall(function() return l_GameEntity.entity.typeInfo.name end)
 			end
 

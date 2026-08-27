@@ -299,6 +299,40 @@ function NativeViewport:SetHighlight(p_Guid)
 	end
 end
 
+--- Report, per selected object, whether this realm has anything to outline it with.
+--- Exposed to the WebUI so a test (or a bug report) can tell "no box" from "not selected".
+function NativeViewport:SelectionBoxReport(p_Extra)
+	local s_Rows = {}
+
+	for l_GuidStr, _ in pairs(self.m_SelectedGuids) do
+		local s_Object = GameObjectManager.m_GameObjects[l_GuidStr]
+		local s_Entities, s_Boxes = 0, 0
+
+		if s_Object ~= nil and s_Object.gameEntities ~= nil then
+			for _, l_GE in pairs(s_Object.gameEntities) do
+				s_Entities = s_Entities + 1
+
+				if l_GE.aabb ~= nil or (l_GE.entity ~= nil and l_GE.isSpatial) then
+					s_Boxes = s_Boxes + 1
+				end
+			end
+		end
+
+		table.insert(s_Rows, {
+			guid = l_GuidStr,
+			name = s_Object ~= nil and tostring(s_Object.name) or 'MISSING',
+			entities = s_Entities,
+			boxes = s_Boxes,
+		})
+	end
+
+	local s_Report = p_Extra or {}
+	s_Report.active = self.m_Active == true
+	s_Report.rows = s_Rows
+
+	WebUI:ExecuteJS('window.__boxReport = ' .. json.encode(s_Report) .. ';')
+end
+
 function NativeViewport:SetSelection(p_GuidList)
 	self.m_SelectedGuids = {}
 	if type(p_GuidList) == 'table' then
