@@ -13,8 +13,6 @@ NativeViewport = class 'NativeViewport'
 -- Frames between box-refresh requests for the selection (~4/second at 60fps). Fast enough that a
 -- moving vehicle's box tracks it, slow enough to be nothing traffic-wise.
 local BOX_REFRESH_FRAMES = 15
--- Most guids asked for in one RequestBoxes message; the server measures each one it is sent.
-local BOX_REQUEST_LIMIT = 64
 
 -- TEMP diagnostics from the vehicle-AABB investigation, silenced rather than deleted: they are how
 -- the empty client entity bus and the DrawOBB userdata rejection were found, and will be wanted
@@ -462,75 +460,17 @@ function NativeViewport:OnDraw()
 
 		local s_Wanted = {}
 
-		self.m_BoxAsked = self.m_BoxAsked or {}
-
-		-- Forget objects that are no longer selected, so reselecting one asks again (and this
-		-- table cannot grow for the whole session).
-		for l_GuidStr, _ in pairs(self.m_BoxAsked) do
-			if self.m_SelectedGuids[l_GuidStr] == nil then
-				self.m_BoxAsked[l_GuidStr] = nil
-			end
-		end
-
-		local s_Fresh = {}
-
 		for l_GuidStr, _ in pairs(self.m_SelectedGuids) do
 			local s_Object = GameObjectManager.m_GameObjects[l_GuidStr]
 
-			if s_Object ~= nil then
-				-- Three cases, and only the first two are worth a message:
-				--
-				--   mover    - a replicated box for something physics-driven. It goes stale the
-				--              moment the vehicle moves, so re-measure it every refresh.
-				--   no box   - nothing drawable on this realm at all. Since the client's
-				--              blueprint hook never fires, EVERY vanilla object arrives as
-				--              server-only transfer data carrying no entities, so selecting a
-				--              vanilla LAV outlined nothing: the old condition required an
-				--              already-replicated entity, which such an object can never have.
-				--              Ask ONCE -- a static does not move, and the reply gives it a box.
-				--   local    - a real client entity; it draws itself, so ask for nothing.
-				local s_Mover, s_Drawable = false, false
-
-				-- Only something the EDITOR spawned is re-measured continuously. A vanilla vehicle
-				-- is not being dragged by anyone, so one box is enough -- and re-measuring every
-				-- vanilla selection ran the server out of memory (exit 8) after a handful of
-				-- vehicles: each refresh made it walk the object's entities and build a payload,
-				-- four times a second, for objects that were never moving in the first place.
-				-- If a vanilla vehicle does drive off, reselecting it measures again.
-				local s_IsSpawned = s_Object.origin == GameObjectOriginType.Custom or
-					s_Object.origin == GameObjectOriginType.CustomChild
-
-				if s_Object.gameEntities ~= nil then
-					for _, l_GE in pairs(s_Object.gameEntities) do
-						if l_GE.isReplicated then
-							s_Drawable = s_Drawable or l_GE.aabb ~= nil
-
-							if s_IsSpawned and string.find(tostring(l_GE.typeName), 'Vehicle') ~= nil then
-								s_Mover = true
-							end
-						elseif l_GE.entity ~= nil and l_GE.isSpatial then
-							s_Drawable = true
-						end
+			if s_Object ~= nil and s_Object.gameEntities ~= nil then
+				for _, l_GE in pairs(s_Object.gameEntities) do
+					if l_GE.isReplicated then
+						table.insert(s_Wanted, l_GuidStr)
+						break
 					end
 				end
-
-				if s_Mover then
-					table.insert(s_Wanted, l_GuidStr)
-				elseif not s_Drawable and self.m_BoxAsked[l_GuidStr] == nil then
-					table.insert(s_Fresh, l_GuidStr)
-				end
 			end
-		end
-
-		-- Bound the message: selecting a whole level would otherwise ask for everything at once.
-		-- Only what is actually sent is marked as asked, so the remainder comes on later refreshes.
-		for _, l_GuidStr in ipairs(s_Fresh) do
-			if #s_Wanted >= BOX_REQUEST_LIMIT then
-				break
-			end
-
-			self.m_BoxAsked[l_GuidStr] = true
-			table.insert(s_Wanted, l_GuidStr)
 		end
 
 		if #s_Wanted > 0 then

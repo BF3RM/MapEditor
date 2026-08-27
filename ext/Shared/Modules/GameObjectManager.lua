@@ -373,9 +373,6 @@ end
 --- ("carries an InterfaceDescriptorData with connections") over-matches today, since logic prefabs
 --- have connections and spawn fine. Extend this list as more offenders are found; a false positive
 --- costs a live preview, a false negative costs the client.
--- Most entity boxes replicated for one object's outline.
-local MAX_OUTLINE_ENTITIES = 32
-
 local PLACEHOLDER_NAME_PATTERNS = {
 	-- UNANCHORED on purpose. These were '^gameplay/level_setups/' and '^weapons/', which match
 	-- base-game paths only: map-pack content is prefixed ("XP5/Gameplay/Level_Setups/...",
@@ -1318,25 +1315,15 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 		return
 	end
 
-	-- Origin gating belongs to the BROADCAST path only.
-	--
-	-- Unsolicited (p_Player == nil) this is called for every spawn, so it stays limited to objects
-	-- the user actually placed: level-injected objects are Custom too and there are thousands of
-	-- them, and broadcasting all of those during load is a lot of traffic for nothing.
-	--
-	-- A targeted reply (p_Player ~= nil) is different: the client asked for THIS object because it
-	-- has nothing to draw it with. Vanilla objects are exactly the ones that need it -- the client's
-	-- blueprint hook never fires, so it holds no entities of its own for them -- and refusing them
-	-- here is why selecting a vanilla LAV outlined nothing while the server sat on its 14 entities.
-	if p_Player == nil then
-		if p_GameObject.origin ~= GameObjectOriginType.Custom and
-			p_GameObject.origin ~= GameObjectOriginType.CustomChild then
-			return
-		end
+	if p_GameObject.origin ~= GameObjectOriginType.Custom and
+		p_GameObject.origin ~= GameObjectOriginType.CustomChild then
+		return
+	end
 
-		if p_GameObject.wasInjected then
-			return
-		end
+	-- Level-injected objects are Custom too, and there are thousands of them. Only objects the user
+	-- actually spawned need this; blanket-broadcasting during load is a lot of traffic for nothing.
+	if p_GameObject.wasInjected then
+		return
 	end
 
 	-- A deleted object is not worth re-measuring, and its entities are exactly the ones most
@@ -1348,13 +1335,6 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 	local s_Entities = {}
 
 	for _, l_GameEntity in pairs(p_GameObject.gameEntities or {}) do
-		-- Bound the payload. An outline needs a handful of boxes, not every entity a big prefab
-		-- carries, and each one measured here allocates (SpatialEntity, Clone, ToLocal) before
-		-- being JSON-encoded.
-		if #s_Entities >= MAX_OUTLINE_ENTITIES then
-			break
-		end
-
 		if l_GameEntity ~= nil and l_GameEntity.isSpatial and l_GameEntity.aabb ~= nil then
 			-- Recompute from the LIVE entity rather than trusting the stored box. The stored one is
 			-- captured in the create hook, before the engine has moved the entity to its final
@@ -1646,20 +1626,13 @@ function GameObjectManager:OnRequestBoxes(p_Player, p_Payload)
 		return
 	end
 
-	local s_Hit, s_Miss = 0, 0
-
 	for _, l_Guid in ipairs(s_Guids) do
 		local s_GameObject = self.m_GameObjects[tostring(l_Guid)]
 
 		if s_GameObject ~= nil then
-			s_Hit = s_Hit + 1
 			self:ReplicateSpatialEntities(s_GameObject, p_Player)
-		else
-			s_Miss = s_Miss + 1
 		end
 	end
-
-	m_Diag('REQ-BOXES asked=' .. #s_Guids .. ' found=' .. s_Hit .. ' missing=' .. s_Miss)
 end
 
 ---Client: adopt the spatial entities the server just sent, then refresh the WebUI.
