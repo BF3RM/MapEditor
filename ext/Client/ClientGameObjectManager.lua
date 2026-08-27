@@ -26,6 +26,8 @@ end
 
 function ClientGameObjectManager:ResetVars()
 	self.m_UnresolvedServerOnlyChildren = {}
+	-- Guids linked into a parent's children during the batch being processed.
+	self.m_LinkedToParent = {}
 end
 
 --- Called when this client is done loading. We compare server and client guids to check which objects are client or server
@@ -60,9 +62,41 @@ end
 function ClientGameObjectManager:OnServerOnlyGameObjectsTransferData(p_TransferDatas)
 	m_Logger:Write("Received ".. #p_TransferDatas .." server-only GameObjects")
 
+	-- Build the whole batch BEFORE telling the WebUI about any of it, then announce only the
+	-- objects that are roots *of this batch*.
+	--
+	-- The client's EntityFactory:CreateFromBlueprint hook never fires (measured: 0 calls against
+	-- 19169 EntityFactory:Create calls), so the client resolves no hierarchy of its own and the
+	-- server classifies EVERY object as server-only -- ~2950 of them, in the arbitrary order a
+	-- table iteration produced. Announcing them one at a time made each object its own WebUI
+	-- batch, and the tree builder can only attach a node whose parent is already in the tree or
+	-- in the same batch: a child announced before its parent has neither, so it fell back to the
+	-- 'vanilla_root' bucket. That is why subworlds and worldparts stopped being parents and the
+	-- whole level appeared as one flat list under Vanilla.
+	--
+	-- Announcing roots only puts each subtree in ONE batch, children first and root last, which
+	-- is exactly the order the tree builder's flush expects (it flushes on the batch's last
+	-- element). Objects whose parent came from an earlier batch are announced individually --
+	-- their parent node already exists, so the tree finds it.
+	local s_Objects = {}
+
 	for _, l_TransferData in pairs(p_TransferDatas) do
-		self:ProcessServerOnlyGameObject(l_TransferData)
+		local s_GameObject = self:ProcessServerOnlyGameObject(l_TransferData)
+
+		if s_GameObject ~= nil then
+			table.insert(s_Objects, s_GameObject)
+		end
 	end
+
+	for _, l_GameObject in ipairs(s_Objects) do
+		-- Linked children ride along inside their parent's subtree; announcing them again would
+		-- add a second node for the same guid.
+		if self.m_LinkedToParent[tostring(l_GameObject.guid)] == nil then
+			Events:DispatchLocal("GameObjectManager:GameObjectReady", l_GameObject)
+		end
+	end
+
+	self.m_LinkedToParent = {}
 end
 
 function ClientGameObjectManager:ProcessServerOnlyGameObject(p_TransferData)
@@ -71,7 +105,7 @@ function ClientGameObjectManager:ProcessServerOnlyGameObject(p_TransferData)
 
 	if GameObjectManager:GetGameObject(s_GuidString) ~= nil then
 		m_Logger:Warning("Already had a server-only object received with the same guid")
-		return
+		return nil
 	end
 
 	if s_GameObject.parentData ~= nil then
@@ -82,6 +116,7 @@ function ClientGameObjectManager:ProcessServerOnlyGameObject(p_TransferData)
 			--m_Logger:Write("Resolved child " .. tostring(s_GameObject.guid) .. " with parent " .. tostring(parent.guid))
 
 			table.insert(s_Parent.children, s_GameObject)
+			self.m_LinkedToParent[s_GuidString] = true
 		else
 			if self.m_UnresolvedServerOnlyChildren[s_ParentGuidString] == nil then
 				self.m_UnresolvedServerOnlyChildren[s_ParentGuidString] = { }
@@ -95,6 +130,7 @@ function ClientGameObjectManager:ProcessServerOnlyGameObject(p_TransferData)
 	-- Current GameObject is some previous server-only GameObject's parent
 		for _, l_ChildGameObjectGuidString in pairs(self.m_UnresolvedServerOnlyChildren[s_GuidString]) do
 			table.insert(s_GameObject.children, GameObjectManager:GetGameObject(l_ChildGameObjectGuidString))
+			self.m_LinkedToParent[l_ChildGameObjectGuidString] = true
 			--m_Logger:Write("Resolved child " .. childGameObjectGuidString .. " with parent " .. s_GuidString)
 		end
 
@@ -102,8 +138,10 @@ function ClientGameObjectManager:ProcessServerOnlyGameObject(p_TransferData)
 	end
 
 	GameObjectManager:AddGameObjectToTable(s_GameObject)
-	-- Call GameObjectReady so it's sent to UI
-	Events:DispatchLocal("GameObjectManager:GameObjectReady", s_GameObject)
+
+	-- The caller announces this batch's roots once the whole batch is linked up; a subtree has to
+	-- reach the WebUI in one piece or its children lose their parent.
+	return s_GameObject
 end
 
 function ClientGameObjectManager:OnClientOnlyGuidsReceived(p_ClientOnlyGuids)
