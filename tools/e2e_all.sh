@@ -7,7 +7,8 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 I="${VU_INSTANCE:-$HOME/Games/VeniceUnleashed/instance}"
 SUITES=(mapeditor_e2e.py vehicle_e2e.py weapon_e2e.py reference_edit_e2e.py
         inspector_sweep_e2e.py bulk_edit_e2e.py inspector_chips_e2e.py
-        inspector_order_e2e.py no_leak_e2e.py apply_sweep_e2e.py stress_e2e.py)
+        inspector_order_e2e.py no_leak_e2e.py apply_sweep_e2e.py stress_e2e.py
+        hierarchy_e2e.py)
 declare -A RC
 mkdir -p "$I/logs"
 for s in "${SUITES[@]}"; do

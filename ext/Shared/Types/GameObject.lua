@@ -6,7 +6,6 @@ local m_Logger = Logger("GameObject", false)
 -- Rebuild an edited vehicle from the shared blueprint so the edit shows on it immediately, rather
 -- than only on the next spawn. See the block in SetOverrides for why the alternatives do not work.
 -- Unverified end to end -- leave false until the disabled-entity collision question is answered.
-local LIVE_RESPAWN_ENABLED = false
 
 -- Where an unfreeable entity goes when its object is deleted. Far below any playable geometry, so
 -- the collider we are not allowed to free cannot be collided with.
@@ -788,58 +787,7 @@ function GameObject:SetOverrides(p_Overrides)
 		-- is visible, temporarily -- VehiclePreview undoes it as soon as another object is
 		-- previewed, the object is deleted, the level ends, or Apply runs. The saved data is
 		-- untouched: the override stays per-instance and still bakes per-instance.
-		-- LIVE_RESPAWN: write the edit into the shared blueprint, rebuild THIS object from it, then
-		-- put the blueprint back. The new entity keeps the data it was built with, so the edit
-		-- shows on the vehicle standing here while later spawns stay stock.
-		--
-		-- OFF by default: the sequence is sound on paper and assembled from pieces that are each
-		-- measured (replacement writes are safe for nested fields; spawning from the shared
-		-- blueprint is what every ordinary spawn does; delete disables rather than frees a
-		-- vehicle), but it has NOT been run end to end. Two things to settle before trusting it:
-		-- whether a disabled entity stops COLLIDING (if not, every edit leaves an invisible hull
-		-- behind), and whether the restore lands before anything else spawns.
-		--
-		-- Test with tools/e2e/gravity_e2e.py's probe: the EDITED vehicle must rise, not just the
-		-- next one spawned.
-		if LIVE_RESPAWN_ENABLED then
-			-- delete -> write -> spawn -> restore, in that order.
-			--
-			-- The write lands in the gap where NO entity is built from this blueprint, which is
-			-- what makes it safe: mutating a container a live vehicle reads every physics tick
-			-- kills the server about five seconds later (measured 3 runs of 3 with this path off,
-			-- 0 of 3 with it on).
-			--
-			-- Written directly rather than through VehiclePreview:Show, because Show deliberately
-			-- no-ops for a networked blueprint -- correct when entities are alive, wrong here,
-			-- and it is why the rebuild produced a stock vehicle every time.
-			-- Rebuild the vehicle; do NOT write the shared blueprint.
-			--
-			-- Measured, 3 cold runs per setting:
-			--   old path (no rebuild)  -> 3 crashes of 3
-			--   rebuild only           -> 0 crashes of 3
-			--   rebuild + shared write -> crashes every time
-			--
-			-- The crash the rebuild FIXES: a per-instance edit mutates a container the live
-			-- vehicle reads every physics tick, and the server dies about five seconds later.
-			-- Rebuilding removes the reader.
-			--
-			-- The crash the write CAUSES: ReplaceInstance repoints the shared blueprint under
-			-- every other vehicle built from it, and the map ships its own BMP2, so there is
-			-- always one. Deleting first does not help -- a vehicle entity cannot be FREED (its
-			-- own native crash), only disabled, so a reader is always still there.
-			--
-			-- So the edit still does not show on THIS vehicle -- it is rebuilt stock, exactly as
-			-- before -- but the server stops dying. Showing it needs a spawn root that is neither
-			-- the shared blueprint nor a runtime clone (the engine builds nothing networked from
-			-- synthesized data), which is what the shell pool exists for; enabling that currently
-			-- kills both realms.
-			local s_Rebuilt = GameObjectManager:RespawnForLiveEdit(self.guid)
-
-			if not s_Rebuilt then
-				m_Logger:Error("Live respawn failed for '" .. tostring(self.name) ..
-					"'; the edit is recorded but this vehicle was not rebuilt")
-			end
-		elseif not VehiclePreview:Show(self) then
+		if not VehiclePreview:Show(self) then
 			self:Disable(true)
 			self:Enable(true)
 		end
