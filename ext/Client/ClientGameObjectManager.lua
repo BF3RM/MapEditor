@@ -96,6 +96,7 @@ function ClientGameObjectManager:OnServerOnlyGameObjectsTransferData(p_TransferD
 		end
 	end
 
+
 	self.m_LinkedToParent = {}
 end
 

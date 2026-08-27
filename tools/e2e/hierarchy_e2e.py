@@ -38,8 +38,11 @@ READ_TREE = r"""
   var top = vanilla.children || [];
   var deep = count(vanilla, 0);
   var named = [];
-  for (var i = 0; i < Math.min(top.length, 6); i++) {
-    named.push({name: top[i].name, kids: (top[i].children || []).length});
+  for (var i = 0; i < top.length; i++) {
+    var go = null;
+    try { go = window.editor.getGameObjectByGuid(top[i].id); } catch (e) {}
+    named.push({name: top[i].name, kids: (top[i].children || []).length,
+                realm: go ? go.realm : null, origin: go ? go.origin : null});
   }
   return JSON.stringify({
     topLevel: top.length,       // direct children of Vanilla

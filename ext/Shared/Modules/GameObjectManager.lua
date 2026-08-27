@@ -621,6 +621,7 @@ function GameObjectManager:OnAabbDiag(p_Player, p_Text)
 end
 
 function GameObjectManager:OnAdoptDiag(p_Player, p_Text)
+
 	m_Diag('ADOPT-DIAG CLIENT ' .. tostring(p_Text))
 end
 
@@ -862,7 +863,20 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 		end
 		-- Root object
 		if s_ReferenceObjectData == nil or s_ParentGameObjectGuid == nil or s_ParentGameObject == nil then
-			self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
+			-- An unknown ROD does not mean no parent. A vehicle's sub-blueprints carry a parent
+			-- the editor never registered a ReferenceObjectData for, and they are built INSIDE
+			-- the vehicle's own CreateFromBlueprint call -- so the blueprint stack, pushed around
+			-- p_HookCtx:Call(), names the blueprint enclosing this one. Prefer that over calling
+			-- it a root, which is what put one DefaultTankHUD / Tank1pFX / TeamRadioVehicleVO per
+			-- vehicle at the top of the tree next to the level's world groups.
+			local s_StackParent = self.m_BlueprintStack[#self.m_BlueprintStack]
+
+			if s_StackParent ~= nil and s_StackParent ~= s_GameObject and
+				s_PendingCustomBlueprintInfo == nil then
+				self:ResolveChildObject(s_GameObject, s_StackParent)
+			else
+				self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
+			end
 		else
 			-- Child object
 			m_Logger:Write("ResolveChildObject")
@@ -872,7 +886,23 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			self.m_ReferenceObjectDatas[tostring(p_Parent.instanceGuid)] = nil
 		end
 	else
-		if s_PendingCustomBlueprintInfo == nil then
+		-- No parent ReferenceObjectData -- but that does not mean no parent.
+		--
+		-- A vehicle's own sub-blueprints (DefaultTankHUD, Tank1pFX, LandVehicle_DamageState_FX,
+		-- DisabledInputBehavior_Tank, TeamRadioVehicleVO, ...) are built INSIDE the vehicle's
+		-- CreateFromBlueprint call and arrive with p_Parent nil, so they used to land at the top
+		-- of the tree, one copy per vehicle on the map, sitting next to the level's world groups.
+		--
+		-- We already know what is being built: the blueprint stack is pushed around
+		-- p_HookCtx:Call(), so while a nested blueprint resolves, the top of the stack is the
+		-- blueprint that encloses it. That is the parent. The stack is empty for genuine
+		-- top-level objects, which keeps them roots.
+		local s_StackParent = self.m_BlueprintStack[#self.m_BlueprintStack]
+
+		if s_PendingCustomBlueprintInfo == nil and s_StackParent ~= nil and
+			s_StackParent ~= s_GameObject then
+			self:ResolveChildObject(s_GameObject, s_StackParent)
+		elseif s_PendingCustomBlueprintInfo == nil then
 			m_Logger:Write('Found vanilla object without parent. Name: ' .. tostring(s_Blueprint.name) .. ', Guid: ' .. tostring(s_Blueprint.instanceGuid)) -- TODO: do we need to add these objects?
 			-- Ignore, these are usually weapons and soldier entities, which we dont support (at least for now)
 			self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
@@ -1055,7 +1085,17 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 				-- end
 			end
 
-			self.m_ReferenceObjectDatas = {}
+			-- Do NOT wipe the table here.
+			--
+			-- An entry is removed the moment it is used (see the resolve above), so what is left
+			-- is precisely the parent links nothing has claimed YET -- children that had not been
+			-- created when their parent's root finished. Wiping on every root threw those away,
+			-- and each such child then resolved as a ROOT of its own: a vehicle's components
+			-- landed beside the vehicle instead of under it, and the tree filled up with objects
+			-- that plainly have parents.
+			--
+			-- Keeping them costs a {parentGuid, typeName} pair per unclaimed reference, and
+			-- OnLevelDestroy -> RegisterVars clears the whole table between levels.
 		end
 
 		if s_GameObject.guid ~= PREVIEW_GUID then
