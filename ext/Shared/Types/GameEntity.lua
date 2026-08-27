@@ -136,7 +136,25 @@ function GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, p_Enabled
 
 	if s_Entity ~= nil then
 		if s_Entity.typeInfo.name == "ServerVehicleEntity" then
+			-- Take the vehicle out of the physics step before writing its transform.
+			--
+			-- A live vehicle is simulated every tick, so a bare write is overwritten again before
+			-- anything renders -- which is why dragging a parked vanilla vehicle moved the gizmo
+			-- and the outline while the vehicle itself stayed put. Disabling first is the same move
+			-- the delete path relies on to exile a hull it is not allowed to free, and that one
+			-- demonstrably moves a vehicle.
+			--
+			-- Only cycle it if it was actually enabled: the exile path calls in with p_Enabled
+			-- false precisely because the entity is already disabled and must stay that way.
+			if p_Enabled then
+				self:Disable()
+			end
+
 			s_Entity.transform = LinearTransform(p_LinearTransform)
+
+			if p_Enabled then
+				self:Enable()
+			end
 		else
 			s_Entity.transform = ToWorld(self.transform, LinearTransform(p_LinearTransform))
 			if p_UpdateCollision and p_Enabled then
