@@ -373,6 +373,9 @@ end
 --- ("carries an InterfaceDescriptorData with connections") over-matches today, since logic prefabs
 --- have connections and spawn fine. Extend this list as more offenders are found; a false positive
 --- costs a live preview, a false negative costs the client.
+-- Most entity boxes replicated for one object's outline.
+local MAX_OUTLINE_ENTITIES = 32
+
 local PLACEHOLDER_NAME_PATTERNS = {
 	-- UNANCHORED on purpose. These were '^gameplay/level_setups/' and '^weapons/', which match
 	-- base-game paths only: map-pack content is prefixed ("XP5/Gameplay/Level_Setups/...",
@@ -1345,6 +1348,13 @@ function GameObjectManager:ReplicateSpatialEntities(p_GameObject, p_Player)
 	local s_Entities = {}
 
 	for _, l_GameEntity in pairs(p_GameObject.gameEntities or {}) do
+		-- Bound the payload. An outline needs a handful of boxes, not every entity a big prefab
+		-- carries, and each one measured here allocates (SpatialEntity, Clone, ToLocal) before
+		-- being JSON-encoded.
+		if #s_Entities >= MAX_OUTLINE_ENTITIES then
+			break
+		end
+
 		if l_GameEntity ~= nil and l_GameEntity.isSpatial and l_GameEntity.aabb ~= nil then
 			-- Recompute from the LIVE entity rather than trusting the stored box. The stored one is
 			-- captured in the create hook, before the engine has moved the entity to its final

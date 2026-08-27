@@ -491,12 +491,21 @@ function NativeViewport:OnDraw()
 				--   local    - a real client entity; it draws itself, so ask for nothing.
 				local s_Mover, s_Drawable = false, false
 
+				-- Only something the EDITOR spawned is re-measured continuously. A vanilla vehicle
+				-- is not being dragged by anyone, so one box is enough -- and re-measuring every
+				-- vanilla selection ran the server out of memory (exit 8) after a handful of
+				-- vehicles: each refresh made it walk the object's entities and build a payload,
+				-- four times a second, for objects that were never moving in the first place.
+				-- If a vanilla vehicle does drive off, reselecting it measures again.
+				local s_IsSpawned = s_Object.origin == GameObjectOriginType.Custom or
+					s_Object.origin == GameObjectOriginType.CustomChild
+
 				if s_Object.gameEntities ~= nil then
 					for _, l_GE in pairs(s_Object.gameEntities) do
 						if l_GE.isReplicated then
 							s_Drawable = s_Drawable or l_GE.aabb ~= nil
 
-							if string.find(tostring(l_GE.typeName), 'Vehicle') ~= nil then
+							if s_IsSpawned and string.find(tostring(l_GE.typeName), 'Vehicle') ~= nil then
 								s_Mover = true
 							end
 						elseif l_GE.entity ~= nil and l_GE.isSpatial then
