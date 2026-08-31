@@ -163,6 +163,11 @@ class Rime:
     def alive(self):
         return self.proc is not None and self.proc.poll() is None
 
+    def terrain(self, streamingtree, destination, timeout=900):
+        """A level's heightfield quadtree: node bounds plus their height samples."""
+        return self._command('dump_terrain_nodes %s "%s"' % (streamingtree.lower(), destination),
+                             destination, timeout)
+
     def shader_textures(self, shaderdb, destination, timeout=900):
         """Each shader's own StreamableTextures -- the surface of every mesh whose material carries
         no texture parameters of its own."""
@@ -449,6 +454,43 @@ class Meshes:
 
         threading.Thread(target=run, daemon=True).start()
 
+    def terrain(self, map_name):
+        """The level's terrain surface. Nothing in EBX describes it -- the heightfield lives in a
+        streaming-tree resource, whose name is not derivable, so the mounted resources are searched
+        for the one belonging to this level."""
+        path = os.path.join(CACHE, map_name + '.terrain.json')
+
+        if not os.path.exists(path):
+            with self.lock:
+                resource = self._terrain_resource(map_name)
+
+                if resource is None or not self.rime.terrain(resource, path):
+                    return None
+
+        return open(path, 'rb').read()
+
+    def _terrain_resource(self, map_name):
+        cached = self.kinds.get('terrain:' + map_name.lower())
+
+        if cached is not None:
+            return cached or None
+
+        # levels/<map>/... .streamingtree, whatever the artist called the directory under it.
+        for path in self.ebx.paths.values():
+            lowered = path.lower()
+
+            if lowered.startswith('levels/' + map_name.lower() + '/') and lowered.endswith('.streamingtree'):
+                self.kinds['terrain:' + map_name.lower()] = path
+                return path
+
+        # The streaming tree is a RESOURCE, and resources are not all in the EBX dictionary. Fall
+        # back to the shape BF3 uses in practice.
+        guess = 'levels/%s/terrain/%s_terrain/%s_terrain.streamingtree' % (
+            map_name.lower(), map_name.lower().replace('_', ''), map_name.lower().replace('_', ''))
+        self.kinds['terrain:' + map_name.lower()] = guess
+
+        return guess
+
     def texture_map(self, map_name):
         """mesh -> per-subset texture bindings for a level, from its MeshVariationDatabase."""
         path = os.path.join(CACHE, map_name + '.textures.json')
@@ -628,6 +670,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         name = self.path.split('?')[0].lstrip('/')
+
+        if name.startswith('terrain/'):
+            body = Handler.meshes.terrain(name[len('terrain/'):-5])
+
+            if body is None:
+                return self.send_error(404, 'no terrain for that level')
+
+            return self._send(body, 'application/json')
 
         if name.startswith('textures/'):
             body = Handler.meshes.texture_map(name[len('textures/'):-5])

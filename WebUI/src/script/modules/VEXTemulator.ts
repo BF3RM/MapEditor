@@ -10,6 +10,7 @@ import { WebXSource } from '@/script/modules/WebXSource';
 import { LevelLoader } from '@/script/modules/LevelLoader';
 import { MeshManager } from '@/script/modules/MeshManager';
 import { StaticModels } from '@/script/modules/StaticModels';
+import { Terrain } from '@/script/modules/Terrain';
 import {
 	StandaloneUI, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
 } from '@/script/modules/StandaloneUI';
@@ -489,6 +490,14 @@ export class VEXTemulator {
 			console.log('Rime: ' + statics + ' baked statics placed');
 			ui.setStatus(level.split('/')[1] + ': ' + (loaded + statics) + ' objects');
 			frameLevel();
+		}
+
+		// The ground. Objects sit on it, so a level without it reads as floating.
+		const patches = await new Terrain(level).load(meshes.groundMaterial);
+
+		if (patches > 0) {
+			console.log('Rime: terrain built from ' + patches + ' heightfield patches');
+			(window as any).editor.threeManager.setPendingRender();
 		}
 
 		// Fill in geometry as the server finishes extracting it. Nothing is lost if this never

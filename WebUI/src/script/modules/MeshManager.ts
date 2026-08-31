@@ -165,6 +165,25 @@ export class MeshManager {
 		}
 	}
 
+	/** A named map for one subset, whatever the shader happens to call it. */
+	private textureFor(meshPath: string, subset: number, names: string[]): string | null {
+		const subsets = this.textures[meshPath.toLowerCase()];
+
+		if (subsets === undefined || subsets.length === 0) {
+			return null;
+		}
+
+		const bindings = subsets[Math.min(subset, subsets.length - 1)] || {};
+
+		for (const name of names) {
+			if (bindings[name] !== undefined) {
+				return bindings[name];
+			}
+		}
+
+		return null;
+	}
+
 	/** The diffuse texture for one subset, whatever the shader happens to call it. */
 	private diffuseFor(meshPath: string, subset: number): string | null {
 		const subsets = this.textures[meshPath.toLowerCase()];
@@ -184,7 +203,7 @@ export class MeshManager {
 		return null;
 	}
 
-	private async texture(resource: string): Promise<THREE.Texture | null> {
+	private async texture(resource: string, colour = true): Promise<THREE.Texture | null> {
 		let pending = this.loadedTextures.get(resource);
 
 		if (pending === undefined) {
@@ -194,9 +213,25 @@ export class MeshManager {
 				this.ddsLoader.load(
 					this.base + '/texture/' + resource + '.dds',
 					(map) => {
+						// A format the loader cannot decode (BF3's normal maps are BC5) still comes
+						// back as a texture, just with no image behind it -- and handing that to the
+						// GPU throws inside uploadTexture and takes the whole render down. Only
+						// accept one that actually carries pixels.
+						const mipmaps = (map as any).mipmaps;
+
+						if (!Array.isArray(mipmaps) || mipmaps.length === 0 ||
+							!mipmaps[0] || !mipmaps[0].width) {
+							resolve(null);
+							return;
+						}
+
 						map.wrapS = THREE.RepeatWrapping;
 						map.wrapT = THREE.RepeatWrapping;
-						(map as any).encoding = 3001; // sRGB: colour maps are authored in gamma space
+						// sRGB for colour maps only; a normal map holds vectors, not colour, and
+						// gamma-correcting it bends the lighting.
+						if (colour) {
+							(map as any).encoding = 3001;
+						}
 						resolve(map);
 					},
 					undefined,
@@ -225,7 +260,9 @@ export class MeshManager {
 				continue;
 			}
 
-			const material = await this.materialFor(resource);
+			const normal = this.textureFor(meshPath, subset,
+				['Normal', 'MainNormal', 'TileNormal', 'Normalmap', 'NormalMap', 'TileNormalTexCoord1']);
+			const material = await this.materialFor(resource, normal);
 
 			if (material !== this.material) {
 				parts[subset].material = material;
@@ -234,21 +271,38 @@ export class MeshManager {
 		}
 	}
 
-	private async materialFor(resource: string): Promise<THREE.Material> {
-		const held = this.materials.get(resource);
+	private async materialFor(resource: string, normalResource: string | null = null): Promise<THREE.Material> {
+		const key = resource + '|' + (normalResource || '');
+		const held = this.materials.get(key);
 
 		if (held !== undefined) {
 			return held;
 		}
 
 		const map = await this.texture(resource);
-		const material = map === null
-			? this.material
-			: new THREE.MeshStandardMaterial({ map, roughness: 0.95, metalness: 0.0 });
 
-		this.materials.set(resource, material);
+		if (map === null) {
+			this.materials.set(key, this.material);
+			return this.material;
+		}
+
+		// The normal map is a bonus, not a requirement: BF3 stores some of them in formats the DDS
+		// loader will not take, and a missing one only costs surface detail.
+		const normalMap = normalResource === null ? null : await this.texture(normalResource, false);
+		const material = new THREE.MeshStandardMaterial({ map, roughness: 0.95, metalness: 0.0 });
+
+		if (normalMap !== null) {
+			material.normalMap = normalMap;
+		}
+
+		this.materials.set(key, material);
 
 		return material;
+	}
+
+	/** Material for surfaces with no texture of their own, such as the terrain. */
+	public get groundMaterial(): THREE.Material {
+		return this.material;
 	}
 
 	/** Teach the layer where a mesh's geometry lives, for objects not covered by the manifest. */
