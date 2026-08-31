@@ -9,7 +9,9 @@ import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { WebXSource } from '@/script/modules/WebXSource';
 import { LevelLoader } from '@/script/modules/LevelLoader';
 import { MeshManager } from '@/script/modules/MeshManager';
-import { StandaloneUI, enableCameraControls, frameLevel, requestedLevel } from '@/script/modules/StandaloneUI';
+import {
+	StandaloneUI, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
+} from '@/script/modules/StandaloneUI';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
@@ -448,6 +450,7 @@ export class VEXTemulator {
 		// The camera starts at (10,10,10) looking at the origin and a BF3 map is nowhere near it,
 		// so without framing the level the viewport shows empty space and reads as a failed load.
 		enableCameraControls();
+		enableMeshPicking();
 		frameLevel();
 
 		ui.setStatus(level.split('/')[1] + ': ' + loaded + ' objects');

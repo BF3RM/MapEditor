@@ -479,18 +479,31 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		return this._enabled;
 	}
 
+	/**
+	 * Children that take part in selection and highlighting.
+	 *
+	 * Standalone, a GameObject also carries its rendered geometry as a child, and a glTF Group is
+	 * not an IGameEntity -- calling onSelect on it throws ("go.onUnhighlight is not a function"),
+	 * which took selection out entirely. In-game every child is an entity and this filters nothing.
+	 */
+	private entityChildren(): IGameEntity[] {
+		return this.children.filter(
+			(child) => typeof (child as unknown as IGameEntity).onSelect === 'function'
+		) as unknown as IGameEntity[];
+	}
+
 	onSelect() {
 		this.selected = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach((go) => (go as unknown as IGameEntity).onSelect());
+		this.entityChildren().forEach((go) => go.onSelect());
 	}
 
 	onDeselect() {
 		this.selected = false;
 		this.visible = GameObject.renderGeometry;
 		this.makeParentsInvisible();
-		this.children.forEach((go) => (go as unknown as IGameEntity).onDeselect());
+		this.entityChildren().forEach((go) => go.onDeselect());
 	}
 
 	onHighlight() {
@@ -498,7 +511,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = true;
 		this.visible = true;
 		this.makeParentsVisible();
-		this.children.forEach((go) => (go as unknown as IGameEntity).onHighlight());
+		this.entityChildren().forEach((go) => go.onHighlight());
 	}
 
 	onUnhighlight() {
@@ -506,7 +519,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.highlighted = false;
 		this.visible = GameObject.renderGeometry;
 		this.makeParentsInvisible();
-		this.children.forEach((go) => (go as unknown as IGameEntity).onUnhighlight());
+		this.entityChildren().forEach((go) => go.onUnhighlight());
 	}
 
 	makeParentsInvisible() {

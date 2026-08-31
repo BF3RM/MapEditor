@@ -8,7 +8,9 @@
  * keeping it out of the shared components means it cannot affect the in-game UI.
  */
 
+import * as THREE from 'three';
 import { WebXSource } from '@/script/modules/WebXSource';
+import { GameObject } from '@/script/types/GameObject';
 
 /** Games WebX publishes. Venice is BF3; the others are here because WebX serves them. */
 const GAMES = ['Venice', 'Warsaw', 'Tunguska', 'Casablanca'];
@@ -228,4 +230,49 @@ export function enableCameraControls(): void {
 	controls.truckSpeed = 3.0;
 	controls.minDistance = 1;
 	controls.maxDistance = 20000;
+}
+
+
+/**
+ * Make clicking in the viewport select the object under the cursor.
+ *
+ * The editor picks by raycasting an InstancedMesh of the AABBs that the ext sends with every
+ * object. Standalone there are no entities and so no AABBs, and every click resolved to nothing.
+ * Here the geometry itself is the pick target: raycast the meshes, then walk up to the GameObject
+ * that owns the one that was hit.
+ *
+ * Wrapped around the existing method rather than edited into THREEManager, to keep standalone-only
+ * behaviour out of the shared renderer -- and it still falls through to the original, so nothing
+ * is lost if AABBs ever do exist.
+ */
+export function enableMeshPicking(): void {
+	const editor = (window as any).editor;
+	const three = editor === undefined ? undefined : editor.threeManager;
+
+	if (three === undefined || three.__standalonePicking === true) {
+		return;
+	}
+
+	three.__standalonePicking = true;
+
+	const raycaster = new THREE.Raycaster();
+	const original = three.raycastSelection.bind(three);
+
+	three.raycastSelection = async (mousePos: any) => {
+		raycaster.setFromCamera(mousePos, three.camera);
+
+		for (const hit of raycaster.intersectObjects(three.scene.children, true)) {
+			let node: any = hit.object;
+
+			while (node !== null && node !== undefined) {
+				if (node instanceof GameObject && node.isSelectableWithRaycast()) {
+					return node.guid;
+				}
+
+				node = node.parent;
+			}
+		}
+
+		return original(mousePos);
+	};
 }
