@@ -59,6 +59,7 @@ class Rime:
         self.lock = threading.Lock()
         self.ready = threading.Event()
         self.done = threading.Event()
+        self.failed = False
         self.tail = []
 
     def _drain(self):
@@ -104,7 +105,9 @@ class Rime:
                 # does whatever the outcome. Matching on result text instead means every command
                 # with its own wording (dump_texture says "successfully converted and dumped")
                 # silently waits out the full timeout, stalling everything behind it.
-                if 'frostbite2_0]' in lowered:
+                if ('failed' in lowered or 'could not' in lowered
+                        or 'command not found' in lowered):
+                    self.failed = True
                     self.done.set()
 
         print('[mesh] Rime exited; last output:', flush=True)
@@ -188,6 +191,7 @@ class Rime:
                 return False
 
             self.done.clear()
+            self.failed = False
 
             try:
                 os.write(self.master, (command + '\r').encode())
@@ -195,14 +199,16 @@ class Rime:
                 print('[mesh] write to Rime failed: %s' % e, flush=True)
                 return False
 
-            if not self.done.wait(timeout):
-                print('[mesh] timed out running: %s' % command, flush=True)
-                return False
-
-            # Wait for the file rather than parse the REPL's prose: a failed dump reports in words,
-            # and a zero-byte file is that same failure.
-            # The REPL says it is done before the file is fully flushed, so settle on a stable size.
-            deadline = time.time() + 20
+            # Wait for the FILE, not for the prompt.
+            #
+            # Prompt detection looked cleaner but is unreliable: the REPL redraws its banner with
+            # cursor moves rather than plain lines, so the marker is often never seen on its own
+            # line and a perfectly good extraction reports a timeout. (Measured: three textures that
+            # this reported as hanging extract in seconds when driven by hand.) Watching for the
+            # file is what actually tracks the work; `done` is kept only as an early exit when the
+            # REPL says outright that it failed, and the type guards upstream keep us from asking
+            # for things that never produce a file at all.
+            deadline = time.time() + timeout
             size = -1
 
             while time.time() < deadline:
@@ -213,10 +219,21 @@ class Rime:
                         return True
 
                     size = current
+                elif self.done.is_set() and self.failed:
+                    return False
 
-                time.sleep(0.05)
+                if not self.alive():
+                    return False
 
-            return os.path.exists(destination) and os.path.getsize(destination) > 0
+                time.sleep(0.1)
+
+            print('[mesh] timed out running: %s' % command, flush=True)
+
+            return False
+
+            # Wait for the file rather than parse the REPL's prose: a failed dump reports in words,
+            # and a zero-byte file is that same failure.
+
 
 
 class Meshes:
