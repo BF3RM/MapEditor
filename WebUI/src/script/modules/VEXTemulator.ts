@@ -9,6 +9,7 @@ import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { WebXSource } from '@/script/modules/WebXSource';
 import { LevelLoader } from '@/script/modules/LevelLoader';
 import { MeshManager } from '@/script/modules/MeshManager';
+import { StandaloneUI, enableCameraControls, frameLevel, requestedLevel } from '@/script/modules/StandaloneUI';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
@@ -407,13 +408,18 @@ export class VEXTemulator {
 	 * Exposed on `window.loadLevel(path, game)` so a level can be swapped from the console before
 	 * there is a picker in the UI.
 	 */
-	public static async LoadWebXLevel(levelPath = 'Levels/MP_001/MP_001', game = 'Venice'): Promise<number> {
+	public static async LoadWebXLevel(levelPath?: string, game?: string): Promise<number> {
+		const requested = requestedLevel();
+		const level = levelPath === undefined ? requested.level : levelPath;
+		const forGame = game === undefined ? requested.game : game;
+
 		const started = performance.now();
-		const source = new WebXSource(game);
+		const source = new WebXSource(forGame);
+		const ui = new StandaloneUI();
 
 		// Start the meshes BEFORE loading, so geometry attaches to objects as they arrive rather
 		// than needing a second pass over the level.
-		const meshes = new MeshManager();
+		const meshes = new MeshManager(level);
 		const haveMeshes = await meshes.start();
 
 		if (!haveMeshes) {
@@ -424,17 +430,27 @@ export class VEXTemulator {
 
 		await source.open();
 
-		console.log('WebX: ' + source.size + ' partitions indexed for ' + game);
+		ui.mount(source, { game: forGame, level: level });
+		ui.setStatus('loading ' + level.split('/')[1] + '…');
 
-		const loaded = await new LevelLoader(source).load(levelPath, (batch) => {
+		console.log('WebX: ' + source.size + ' partitions indexed for ' + forGame);
+
+		const loaded = await new LevelLoader(source).load(level, (batch) => {
 			// One subtree per call: HandleResponse flushes the hierarchy queue on the batch's last
 			// element, and the root is last.
 			(window as any).vext.HandleResponse(batch, true);
 		});
 
 		console.log(
-			'WebX: ' + levelPath + ' -> ' + loaded + ' objects in ' + Math.round(performance.now() - started) + 'ms'
+			'WebX: ' + level + ' -> ' + loaded + ' objects in ' + Math.round(performance.now() - started) + 'ms'
 		);
+
+		// The camera starts at (10,10,10) looking at the origin and a BF3 map is nowhere near it,
+		// so without framing the level the viewport shows empty space and reads as a failed load.
+		enableCameraControls();
+		frameLevel();
+
+		ui.setStatus(level.split('/')[1] + ': ' + loaded + ' objects');
 
 		if (haveMeshes) {
 			const stats = meshes.stats;

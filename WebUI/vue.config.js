@@ -24,6 +24,14 @@ module.exports = {
 	// a same-origin deployment use identical URLs and nothing on the WebX host has to change.
 	devServer: {
 		proxy: {
+			// Level geometry, extracted from the game on demand by tools/meshes/mesh_server.py
+			// (which keeps Rime mounted so a cache miss costs a fraction of a second, not the ~30s
+			// a fresh mount would). Without it running, the editor simply draws no meshes.
+			'/meshes': {
+				target: 'http://127.0.0.1:8091',
+				changeOrigin: false,
+				pathRewrite: { '^/meshes': '' }
+			},
 			'/webx': {
 				target: 'https://webx.powback.com',
 				changeOrigin: true,

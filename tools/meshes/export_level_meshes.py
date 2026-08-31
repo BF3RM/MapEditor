@@ -28,7 +28,9 @@ from concurrent.futures import ThreadPoolExecutor
 DEFAULT_GAME_PATH = os.path.expanduser('~/.local/share/Steam/steamapps/common/Battlefield 3')
 DEFAULT_RIME = os.path.expanduser('~/Projects/Rime/bin/Release')
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_OUT = os.path.abspath(os.path.join(HERE, '..', '..', 'WebUI', 'public', 'meshes'))
+# Deliberately NOT under WebUI/public: the dev server serves that statically, which would shadow
+# the /meshes proxy and turn a cache miss into a 404 instead of an on-demand extraction.
+DEFAULT_OUT = os.path.abspath(os.path.join(HERE, '..', '..', '.mesh-cache'))
 
 
 class Ebx:
@@ -194,6 +196,19 @@ def resolve_meshes(ebx, blueprint_guids):
     return mapping
 
 
+def level_roots(ebx):
+    """Every Levels/<Map>/<Map> partition -- a level names its root after its own directory."""
+    found = []
+
+    for path in ebx.paths.values():
+        parts = path.split('/')
+
+        if len(parts) == 3 and parts[0] == 'Levels' and parts[1] == parts[2]:
+            found.append(path)
+
+    return sorted(found)
+
+
 def file_name_for(mesh_path):
     return mesh_path.replace('/', '_').lower() + '.glb'
 
@@ -227,7 +242,9 @@ def run_rime(rime_dir, game_path, mesh_paths, out_dir, quiet=False):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--level', default='Levels/MP_001/MP_001')
+    ap.add_argument('--level', action='append', default=None,
+                    help='level path; repeat for several (they share one Rime session)')
+    ap.add_argument('--all', action='store_true', help='every level root the game ships')
     ap.add_argument('--game', default='Venice')
     ap.add_argument('--out', default=DEFAULT_OUT)
     ap.add_argument('--rime', default=DEFAULT_RIME)
@@ -243,35 +260,72 @@ def main():
     ebx.open(args.dict_cache)
     print('  %d partitions' % len(ebx.paths))
 
-    print('walking %s...' % args.level)
-    blueprints = collect_blueprints(ebx, args.level)
-    print('  %d placed blueprints' % len(blueprints))
+    levels = args.level or []
 
-    mapping = resolve_meshes(ebx, blueprints)
-    meshes = sorted(set(mapping.values()))
-    print('  %d name a mesh, %d unique mesh assets' % (len(mapping), len(meshes)))
+    if args.all:
+        levels = level_roots(ebx)
 
-    if not args.skip_rime:
+    if not levels:
+        levels = ['Levels/MP_001/MP_001']
+
+    # Resolve every level FIRST, then extract once. Mounting the game is the slow part of a Rime
+    # run, so doing it per level would pay that cost 49 times over for a full export, and maps
+    # share a lot of props -- the union is far smaller than the sum.
+    per_level = {}
+    wanted = set()
+
+    for level in levels:
+        try:
+            blueprints = collect_blueprints(ebx, level)
+        except SystemExit as e:
+            print('%s: %s' % (level, e))
+            continue
+
+        mapping = resolve_meshes(ebx, blueprints)
+        per_level[level] = mapping
+        wanted.update(mapping.values())
+        print('  %-34s %4d blueprints, %3d meshes' % (level, len(blueprints), len(mapping)))
+
+    meshes = sorted(wanted)
+    print('%d level(s), %d unique mesh assets' % (len(per_level), len(meshes)))
+
+    if not args.skip_rime and meshes:
         if not os.path.exists(os.path.join(args.rime, 'RimeREPL')):
             raise SystemExit('no RimeREPL at %s -- see docs/bake-pipeline.md 2' % args.rime)
 
-        print('extracting meshes with Rime (mounts the game once, then dumps each)...')
-        run_rime(args.rime, args.gamepath, meshes, args.out)
+        # Skip what is already on disk: re-running for one more level should not redo the rest.
+        todo = [m for m in meshes if not os.path.exists(os.path.join(args.out, file_name_for(m)))]
+        print('extracting %d mesh(es) with Rime (%d already present)...' % (len(todo), len(meshes) - len(todo)))
 
-    written = {}
+        if todo:
+            run_rime(args.rime, args.gamepath, todo, args.out, quiet=len(todo) > 40)
 
-    for guid, mesh in mapping.items():
-        name = file_name_for(mesh)
+    total = 0
 
-        if os.path.exists(os.path.join(args.out, name)):
-            written[guid] = name
+    for level, mapping in per_level.items():
+        written = {}
 
-    manifest = {'game': args.game, 'level': args.level, 'blueprints': written}
-    json.dump(manifest, open(os.path.join(args.out, 'manifest.json'), 'w'), indent=1)
+        for guid, mesh in mapping.items():
+            name = file_name_for(mesh)
 
-    print('%d/%d meshes on disk -> %s' % (len(written), len(mapping), args.out))
+            if os.path.exists(os.path.join(args.out, name)):
+                written[guid] = name
 
-    return 0 if written else 1
+        # Named for the map, not "manifest", so every exported level can sit in the same directory
+        # -- a single manifest.json meant loading a second level silently reused the first's meshes.
+        # `meshes` records which resource each file came from. Recovering that from the file name
+        # is not possible -- '/' becomes '_' and mesh paths contain underscores of their own -- and
+        # the on-demand server needs it to extract a file that is missing from the cache.
+        manifest = {'game': args.game, 'level': level, 'blueprints': written,
+                    'meshes': {file_name_for(m): m for m in set(mapping.values())}}
+        name = level.rstrip('/').split('/')[-1]
+        json.dump(manifest, open(os.path.join(args.out, name + '.json'), 'w'), indent=1)
+        total += len(written)
+        print('  %-34s %d meshes' % (level, len(written)))
+
+    print('%d mesh references across %d level(s) -> %s' % (total, len(per_level), args.out))
+
+    return 0 if total else 1
 
 
 if __name__ == '__main__':

@@ -43,7 +43,11 @@ export class MeshManager {
 	private attached = 0;
 	private missing = 0;
 
-	public constructor(base = '/meshes') {
+	private level: string;
+
+	public constructor(level: string, base = '/meshes') {
+		// Manifests are named for the map, so several exported levels can live side by side.
+		this.level = level.replace(/\/$/, '').split('/').pop() as string;
 		this.base = base;
 	}
 
@@ -51,7 +55,7 @@ export class MeshManager {
 	 * without them, it just draws nothing. */
 	public async start(): Promise<boolean> {
 		try {
-			const response = await fetch(this.base + '/manifest.json');
+			const response = await fetch(this.base + '/' + this.level + '.json');
 
 			if (!response.ok) {
 				return false;

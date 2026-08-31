@@ -7,7 +7,7 @@ node_modules/
 *.db
 .vu/
 .vscode
-tools/e2e/__pycache__/
+__pycache__/
 .powos-source
 tools/__pycache__/
 
@@ -18,4 +18,4 @@ tools/e2e/session*.jsonl
 tools/e2e/spawn_sweep_progress.jsonl
 # Geometry extracted from the game by tools/meshes/export_level_meshes.py.
 # Generated, large, and game assets -- not source.
-WebUI/public/meshes/
+.mesh-cache/
