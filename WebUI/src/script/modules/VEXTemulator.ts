@@ -8,6 +8,7 @@ import {
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { WebXSource } from '@/script/modules/WebXSource';
 import { LevelLoader } from '@/script/modules/LevelLoader';
+import { MeshManager } from '@/script/modules/MeshManager';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
@@ -410,6 +411,17 @@ export class VEXTemulator {
 		const started = performance.now();
 		const source = new WebXSource(game);
 
+		// Start the meshes BEFORE loading, so geometry attaches to objects as they arrive rather
+		// than needing a second pass over the level.
+		const meshes = new MeshManager();
+		const haveMeshes = await meshes.start();
+
+		if (!haveMeshes) {
+			console.log('WebX: no exported meshes -- run tools/meshes/export_level_meshes.py to draw geometry');
+		}
+
+		(window as any).meshes = meshes;
+
 		await source.open();
 
 		console.log('WebX: ' + source.size + ' partitions indexed for ' + game);
@@ -423,6 +435,11 @@ export class VEXTemulator {
 		console.log(
 			'WebX: ' + levelPath + ' -> ' + loaded + ' objects in ' + Math.round(performance.now() - started) + 'ms'
 		);
+
+		if (haveMeshes) {
+			const stats = meshes.stats;
+			console.log('WebX: ' + stats.attached + ' meshes attached (' + stats.meshes + ' in the manifest)');
+		}
 
 		return loaded;
 	}

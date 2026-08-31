@@ -20,6 +20,17 @@ import { SpatialGameEntity } from './SpatialGameEntity';
 	when the parent is hidden. Renderer ignores an object if its visible flag is false, so it would ignore their children.
  */
 export class GameObject extends THREE.Object3D implements IGameEntity {
+	/**
+	 * True when THREE is the only renderer (the standalone browser editor), so objects carry real
+	 * geometry and must stay visible.
+	 *
+	 * In-game `visible` does not mean "draw this object" -- objects have no geometry there, the
+	 * engine draws the world, and the flag gates the AABB outline that marks a selection. So the
+	 * default is false and deselecting hides it again. With meshes attached, that same flag would
+	 * blank the level, and hiding a parent would blank its children with it.
+	 */
+	public static renderGeometry = false;
+
 	public guid: Guid;
 
 	// Holds the transform of the last client update. It doesn't update if its a web-only move (like moving before releasing left-click)
@@ -94,7 +105,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		this.origin = origin;
 
 		this.matrixAutoUpdate = false;
-		this.visible = false;
+		this.visible = GameObject.renderGeometry;
 		this.isUserModified = isUserModified;
 		this.isPlaceholder = isPlaceholder;
 		this.originalRef = originalRef;
@@ -132,7 +143,10 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	public get partition(): Promise<FBPartition> | null {
 		// registerPartition = get-or-create: returns the preloaded partition, or lazily
 		// registers one so its data still loads. Avoids the null -> stuck-loading path.
-		const partition = window.editor.fbdMan.registerPartition(this.blueprintCtrRef.name, this.blueprintCtrRef.partitionGuid);
+		const partition = window.editor.fbdMan.registerPartition(
+			this.blueprintCtrRef.name,
+			this.blueprintCtrRef.partitionGuid
+		);
 		if (!partition) {
 			return null;
 		}
@@ -474,7 +488,7 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 
 	onDeselect() {
 		this.selected = false;
-		this.visible = false;
+		this.visible = GameObject.renderGeometry;
 		this.makeParentsInvisible();
 		this.children.forEach((go) => (go as unknown as IGameEntity).onDeselect());
 	}
@@ -490,14 +504,14 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 	onUnhighlight() {
 		if (this.selected) return;
 		this.highlighted = false;
-		this.visible = false;
+		this.visible = GameObject.renderGeometry;
 		this.makeParentsInvisible();
 		this.children.forEach((go) => (go as unknown as IGameEntity).onUnhighlight());
 	}
 
 	makeParentsInvisible() {
 		if (this.parent !== null && this.parent.constructor === GameObject) {
-			this.parent.visible = false;
+			this.parent.visible = GameObject.renderGeometry;
 			this.parent.makeParentsInvisible();
 		}
 		editor.selectionGroup.makeParentsVisible();

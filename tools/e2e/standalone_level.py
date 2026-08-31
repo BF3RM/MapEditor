@@ -80,6 +80,21 @@ def main():
 
         print(json.dumps(best, indent=2))
 
+        # Meshes are optional -- the editor works without them -- but if a manifest was exported,
+        # geometry must actually reach the scene, and it must actually be drawn. Silhouettes and an
+        # empty scene look identical in a headless screenshot, so assert triangles, not visibility.
+        stats = cdp("JSON.stringify(window.meshes ? {s: window.meshes.stats, t: (function(){"
+                    "var tm=window.editor.threeManager; tm.renderer.info.autoReset=false;"
+                    "tm.renderer.info.reset(); tm.renderer.render(tm.scene, tm.camera);"
+                    "return tm.renderer.info.render.triangles;})()} : null)")
+
+        if isinstance(stats, dict) and stats.get("s"):
+            print("meshes: %s, triangles drawn: %s" % (json.dumps(stats["s"]), stats.get("t")))
+
+            if stats["s"].get("meshes", 0) > 0 and stats["s"].get("attached", 0) < 1:
+                print("FAIL: a mesh manifest exists but nothing attached")
+                return 1
+
         if best.get("maxDepth", 0) < 2 or best.get("totalUnder", 0) < 500:
             print("FAIL: level did not load as a nested hierarchy")
             return 1
