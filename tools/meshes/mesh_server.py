@@ -163,6 +163,12 @@ class Rime:
     def alive(self):
         return self.proc is not None and self.proc.poll() is None
 
+    def shader_textures(self, shaderdb, destination, timeout=900):
+        """Each shader's own StreamableTextures -- the surface of every mesh whose material carries
+        no texture parameters of its own."""
+        return self._command('dump_shader_textures %s "%s"' % (shaderdb.lower(), destination),
+                             destination, timeout)
+
     def textures(self, mvdb, destination, timeout=900):
         """Which texture each mesh subset is painted with. The bindings live in the level's
         MeshVariationDatabase, not on the materials in a mesh's own partition."""
@@ -477,10 +483,92 @@ class Meshes:
                         # authoritative for meshes it knows.
                         merged.setdefault(mesh, materials)
 
+                self._fill_from_shaders(map_name, level, merged)
                 json.dump({'meshes': merged}, open(path, 'w'))
                 print('[mesh] textures for %s: %d meshes' % (map_name, len(merged)), flush=True)
 
         return open(path, 'rb').read()
+
+    def _fill_from_shaders(self, map_name, level, merged):
+        """Give the meshes with no material textures the ones their SHADER streams.
+
+        A MeshVariationDatabase entry with no texture parameters does not mean an untextured mesh:
+        its surface comes from the shader, which names what it streams. Nothing in EBX carries that
+        list -- only the shaderdb does.
+        """
+        shaders = {}
+
+        for source in self._shaderdb_names(level):
+            part = os.path.join(CACHE, map_name + '.' + source.split('/')[-2] + '.shaders.json')
+
+            if not os.path.exists(part) and not self.rime.shader_textures(source, part):
+                continue
+
+            try:
+                found = json.load(open(part)).get('shaders', {})
+            except Exception:
+                continue
+
+            for name, textures in found.items():
+                shaders.setdefault(name.lower(), textures)
+
+        if not shaders:
+            return
+
+        filled = 0
+
+        for mesh, materials in merged.items():
+            if any(materials):
+                continue
+
+            for index, shader in enumerate(self._shaders_of(mesh)):
+                textures = shaders.get(shader.lower())
+
+                if not textures:
+                    continue
+
+                # _D is the diffuse by convention throughout BF3's naming; first entry otherwise.
+                diffuse = next((t for t in textures if t.lower().endswith('_d')), textures[0])
+
+                while len(materials) <= index:
+                    materials.append({})
+
+                materials[index]['Diffuse'] = diffuse
+                filled += 1
+
+        print('[mesh] shader textures filled %d material(s)' % filled, flush=True)
+
+    def _shaders_of(self, mesh):
+        """The shader each of a mesh's materials uses, in material order."""
+        partition = self.ebx.partition_by_path(mesh)
+
+        if partition is None:
+            return []
+
+        names = []
+
+        for instance in partition['$instances']:
+            if instance['$type'] != 'MeshMaterial':
+                continue
+
+            shader = instance['$fields'].get('Shader', {}).get('$value') or {}
+            reference = (shader.get('Shader') or {}).get('$value')
+
+            if reference is None:
+                names.append('')
+                continue
+
+            names.append(self.ebx.path_of(reference['$partitionGuid']) or '')
+
+        return names
+
+    def _shaderdb_names(self, level):
+        names = [level.lower() + '/shaderdb']
+
+        for mvdb in self._mvdb_names(level)[1:]:
+            names.append(mvdb.replace('/meshvariationdb_win32', '/shaderdb'))
+
+        return names
 
     def _mvdb_names(self, level):
         """The level's own MeshVariationDatabase, then each subworld's."""

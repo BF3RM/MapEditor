@@ -54,6 +54,15 @@ export class MeshManager {
 
 	private ddsLoader = new DDSLoader();
 
+	/**
+	 * Meshes the engine never draws.
+	 *
+	 * Collision hulls, lighting volumes and occluders exist for the engine, not the eye -- the game
+	 * shows none of them. They also carry no texture, so drawing them put big white boxes through
+	 * the middle of a level that is otherwise faithful. Hiding them is what matches the game.
+	 */
+	private static readonly INVISIBLE = /invisiblecollision|charactercollision|_collision|lightpoly|_dimmer|occluder|volumemesh/i;
+
 	/** One load per texture resource, shared by every material using it. */
 	private loadedTextures = new Map<string, Promise<THREE.Texture | null>>();
 
@@ -65,6 +74,7 @@ export class MeshManager {
 
 	private attached = 0;
 	private missing = 0;
+	private hidden = 0;
 
 	/** file|x|y|z of everything already placed, so the baked statics can skip duplicates. */
 	private placed = new Set<string>();
@@ -165,7 +175,7 @@ export class MeshManager {
 
 		const bindings = subsets[Math.min(subset, subsets.length - 1)] || {};
 
-		for (const name of ['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture']) {
+		for (const name of ['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas']) {
 			if (bindings[name] !== undefined) {
 				return bindings[name];
 			}
@@ -332,10 +342,11 @@ export class MeshManager {
 		return retried;
 	}
 
-	public get stats(): { attached: number; missing: number; meshes: number } {
+	public get stats(): { attached: number; missing: number; hidden: number; meshes: number } {
 		return {
 			attached: this.attached,
 			missing: this.missing,
+			hidden: this.hidden,
 			meshes: this.manifest === null ? 0 : Object.keys(this.manifest.blueprints).length
 		};
 	}
@@ -354,6 +365,11 @@ export class MeshManager {
 
 		const partitionGuid = commandActionResult.gameObjectTransferData.blueprintCtrRef.partitionGuid.toString();
 		const file = this.manifest.blueprints[partitionGuid.toLowerCase()];
+
+		if (file !== undefined && MeshManager.INVISIBLE.test(this.meshKeys.get(file) || file)) {
+			this.hidden++;
+			return;
+		}
 
 		if (file === undefined) {
 			// Groups (worldparts, subworlds) and prefabs whose mesh sits deeper than a direct
