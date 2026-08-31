@@ -10,6 +10,7 @@ import './style/types.scss';
 import { Log, LogError } from '@/script/modules/Logger';
 import VEXTInterface from '@/script/modules/VEXT';
 import Editor from '@/script/Editor';
+import { VEXTemulator } from '@/script/modules/VEXTemulator';
 import TypeDocumentationLink from '@/script/components/EditorComponents/Inspector/EBXComponents/TypeDocumentationLink.vue';
 import Property from '@/script/components/EditorComponents/Inspector/EBXComponents/Property.vue';
 import Reference from '@/script/components/EditorComponents/Inspector/EBXComponents/ReferenceProperty.vue';
@@ -45,6 +46,10 @@ if (inEngine) {
 
 window.debug = debugMode;
 window.editor = new Editor(debugMode);
+// Standalone: swap levels without a rebuild, e.g. loadLevel('Levels/MP_007/MP_007').
+if (debugMode) {
+	(window as any).loadLevel = (path?: string, game?: string) => VEXTemulator.LoadWebXLevel(path, game);
+}
 window.vext = new VEXTInterface(debugMode);
 
 window.Log = Log;

@@ -18,6 +18,19 @@ module.exports = {
 			return args;
 		});
 	},
+	// WebX (webx.powback.com) serves the EBX the standalone editor loads levels from, and sends no
+	// Access-Control-Allow-Origin, so the browser refuses to fetch it cross-origin from the dev
+	// server. Proxy it under a prefix instead -- WebXSource always requests `/webx/...`, so dev and
+	// a same-origin deployment use identical URLs and nothing on the WebX host has to change.
+	devServer: {
+		proxy: {
+			'/webx': {
+				target: 'https://webx.powback.com',
+				changeOrigin: true,
+				pathRewrite: { '^/webx': '' }
+			}
+		}
+	},
 	configureWebpack: {
 		plugins: [
 			new VextPackPlugin({

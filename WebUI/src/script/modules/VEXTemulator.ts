@@ -6,6 +6,8 @@ import {
 	RequestDeleteProjectMessage
 } from '@/script/messages/MessagesIndex';
 import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
+import { WebXSource } from '@/script/modules/WebXSource';
+import { LevelLoader } from '@/script/modules/LevelLoader';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
 
@@ -386,10 +388,42 @@ export class VEXTemulator {
 	}
 
 	private UIReloaded() {
-		(window as any).vext.HandleResponse(JSON.parse(XP2SKybar));
-		(window as any).vext.RegisterBlueprints(XP2SKybarBlueprints);
-		setTimeout(() => {
-			editor.Select(new Guid('ED170122-0000-0000-0000-001325353053'), false, true, true);
-		}, 1);
+		// Real level from WebX, falling back to the canned XP2SKybar sample if it cannot be
+		// reached -- so the UI still boots offline, which is what this debug data was for.
+		void VEXTemulator.LoadWebXLevel().catch((e: any) => {
+			console.warn('WebX unavailable (' + e.message + '); falling back to sample data');
+			(window as any).vext.HandleResponse(JSON.parse(XP2SKybar));
+			(window as any).vext.RegisterBlueprints(XP2SKybarBlueprints);
+			setTimeout(() => {
+				editor.Select(new Guid('ED170122-0000-0000-0000-001325353053'), false, true, true);
+			}, 1);
+		});
+	}
+
+	/**
+	 * Load a real level into the standalone editor.
+	 *
+	 * Exposed on `window.loadLevel(path, game)` so a level can be swapped from the console before
+	 * there is a picker in the UI.
+	 */
+	public static async LoadWebXLevel(levelPath = 'Levels/MP_001/MP_001', game = 'Venice'): Promise<number> {
+		const started = performance.now();
+		const source = new WebXSource(game);
+
+		await source.open();
+
+		console.log('WebX: ' + source.size + ' partitions indexed for ' + game);
+
+		const loaded = await new LevelLoader(source).load(levelPath, (batch) => {
+			// One subtree per call: HandleResponse flushes the hierarchy queue on the batch's last
+			// element, and the root is last.
+			(window as any).vext.HandleResponse(batch, true);
+		});
+
+		console.log(
+			'WebX: ' + levelPath + ' -> ' + loaded + ' objects in ' + Math.round(performance.now() - started) + 'ms'
+		);
+
+		return loaded;
 	}
 }
