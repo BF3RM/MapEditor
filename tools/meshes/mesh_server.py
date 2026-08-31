@@ -57,6 +57,7 @@ class Rime:
         self.master = None
         self.lock = threading.Lock()
         self.ready = threading.Event()
+        self.done = threading.Event()
         self.tail = []
 
     def _drain(self):
@@ -93,8 +94,19 @@ class Rime:
                     self.tail.append(line)
                     del self.tail[:-40]
 
-                if 'successfully mounted' in line.lower():
+                lowered = line.lower()
+
+                if 'successfully mounted' in lowered:
                     self.ready.set()
+
+                # Recognise the end of a command from what the REPL says, rather than waiting for a
+                # file that may never appear. Plenty of resources named in a level are not MeshSets
+                # at all (FX, for one), and dump_mesh reports that in prose -- waiting out the
+                # timeout on each of those stalled every later request behind it.
+                if ('extracted ' in lowered or 'placements for ' in lowered
+                        or 'failed' in lowered or 'could not' in lowered
+                        or 'command not found' in lowered or 'error' in lowered):
+                    self.done.set()
 
         print('[mesh] Rime exited; last output:', flush=True)
 
@@ -149,44 +161,53 @@ class Rime:
     def alive(self):
         return self.proc is not None and self.proc.poll() is None
 
-    def dump(self, mesh_path, destination, timeout=180):
+    def placements(self, level_path, destination, timeout=900):
+        """Resolve where every mesh in a level sits, including the baked StaticModelGroup
+        instances whose transforms live in the level's Havok physics data rather than EBX."""
+        return self._command('dump_level_placements %s "%s"' % (level_path.lower(), destination),
+                             destination, timeout)
+
+    def dump(self, mesh_path, destination, timeout=120):
         """Extract one mesh. Serialised: one REPL, one command at a time."""
+        return self._command('dump_mesh Glb %s "%s"' % (mesh_path.lower(), destination),
+                             destination, timeout)
+
+    def _command(self, command, destination, timeout):
         with self.lock:
             if not self.alive():
-                print('[mesh] Rime is not running; cannot extract', flush=True)
+                print('[mesh] Rime is not running; cannot run: %s' % command, flush=True)
                 return False
 
-            command = 'dump_mesh Glb %s "%s"\r' % (mesh_path.lower(), destination)
+            self.done.clear()
 
             try:
-                os.write(self.master, command.encode())
+                os.write(self.master, (command + '\r').encode())
             except OSError as e:
                 print('[mesh] write to Rime failed: %s' % e, flush=True)
                 return False
 
+            if not self.done.wait(timeout):
+                print('[mesh] timed out running: %s' % command, flush=True)
+                return False
+
             # Wait for the file rather than parse the REPL's prose: a failed dump reports in words,
             # and a zero-byte file is that same failure.
-            deadline = time.time() + timeout
+            # The REPL says it is done before the file is fully flushed, so settle on a stable size.
+            deadline = time.time() + 20
             size = -1
 
             while time.time() < deadline:
                 if os.path.exists(destination):
                     current = os.path.getsize(destination)
 
-                    # Stable and non-empty means the writer is done.
                     if current > 0 and current == size:
                         return True
 
                     size = current
 
-                if not self.alive():
-                    return False
+                time.sleep(0.05)
 
-                time.sleep(0.1)
-
-            print('[mesh] timed out extracting %s' % mesh_path, flush=True)
-
-            return False
+            return os.path.exists(destination) and os.path.getsize(destination) > 0
 
 
 class Meshes:
@@ -198,6 +219,8 @@ class Meshes:
         self.ebx.open(os.path.join('/tmp', 'webx-guiddict.json'))
         self.levels = {p.split('/')[-1].lower(): p for p in level_roots(self.ebx)}
         self.by_file = {}
+        self.unavailable = set()
+        self.warming = False
         self.lock = threading.Lock()
         self._load_cached_manifests()
         print('[mesh] %d partitions, %d levels, %d meshes known'
@@ -258,6 +281,67 @@ class Meshes:
         for name, mesh in manifest.get('meshes', {}).items():
             self.by_file[name] = mesh
 
+    def placements(self, map_name):
+        """Every mesh placement in a level, resolved by Rime -- the only source for the baked
+        statics, whose per-instance transforms are in the Havok data and not in EBX."""
+        path = os.path.join(CACHE, map_name + '.placements.json')
+
+        if not os.path.exists(path):
+            level = self.levels.get(map_name.lower())
+
+            if level is None:
+                return None
+
+            with self.lock:
+                print('[mesh] resolving placements for %s (walks the level in Rime)...' % level, flush=True)
+
+                if not self.rime.placements(level, path):
+                    return None
+
+        raw = open(path, 'rb').read()
+
+        # Learn the meshes it names, so their .glb files can be extracted on request too.
+        try:
+            named = list(json.loads(raw).get('meshes', {}))
+        except Exception:
+            named = []
+
+        for mesh in named:
+            self.by_file.setdefault(file_name_for(mesh), mesh)
+
+        # Warm the cache in the background. A level names hundreds of meshes and Rime extracts them
+        # one at a time, so leaving it to demand means hundreds of browser requests queueing behind
+        # one lock -- the first few succeed and the rest are still waiting when the page has given
+        # up on them. Warming keeps that work off the request path entirely.
+        self._warm(named)
+
+        return raw
+
+    def _warm(self, meshes):
+        if self.warming:
+            return
+
+        self.warming = True
+
+        def run():
+            done = 0
+
+            for mesh in meshes:
+                name = file_name_for(mesh)
+
+                if os.path.exists(os.path.join(CACHE, name)) or name in self.unavailable:
+                    continue
+
+                if self.rime.dump(mesh, os.path.join(CACHE, name)):
+                    done += 1
+                else:
+                    self.unavailable.add(name)
+
+            print('[mesh] warm-up done: %d extracted, %d unavailable' % (done, len(self.unavailable)), flush=True)
+            self.warming = False
+
+        threading.Thread(target=run, daemon=True).start()
+
     def glb(self, name):
         path = os.path.join(CACHE, name)
 
@@ -266,12 +350,19 @@ class Meshes:
 
         mesh = self.by_file.get(name)
 
-        if mesh is None:
+        if mesh is None or name in self.unavailable:
             return None
 
         print('[mesh] extracting %s' % mesh, flush=True)
 
-        return path if self.rime.dump(mesh, path) else None
+        if self.rime.dump(mesh, path):
+            return path
+
+        # Remember the miss. A level names plenty of resources that are not MeshSets, and every
+        # instance of one would otherwise ask Rime again.
+        self.unavailable.add(name)
+
+        return None
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -279,6 +370,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         name = self.path.split('?')[0].lstrip('/')
+
+        if name.startswith('placements/'):
+            body = Handler.meshes.placements(name[len('placements/'):-5])
+
+            if body is None:
+                return self.send_error(404, 'no placements for that level')
+
+            return self._send(body, 'application/json')
 
         if name.endswith('.json'):
             manifest = Handler.meshes.manifest(name[:-5])

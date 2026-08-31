@@ -9,6 +9,7 @@ import { XP2SKybar, XP2SKybarBlueprints } from '@/data/DebugData';
 import { WebXSource } from '@/script/modules/WebXSource';
 import { LevelLoader } from '@/script/modules/LevelLoader';
 import { MeshManager } from '@/script/modules/MeshManager';
+import { StaticModels } from '@/script/modules/StaticModels';
 import {
 	StandaloneUI, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
 } from '@/script/modules/StandaloneUI';
@@ -404,6 +405,22 @@ export class VEXTemulator {
 		});
 	}
 
+	/** Keep asking for geometry that was not extracted yet, backing off as it converges. */
+	private static async FillPendingMeshes(meshes: MeshManager, ui: any, level: string, objects: number): Promise<void> {
+		for (let attempt = 0; attempt < 40 && meshes.pendingCount > 0; attempt++) {
+			await new Promise((resolve) => setTimeout(resolve, 4000));
+
+			const filled = await meshes.retryPending();
+
+			if (filled > 0) {
+				ui.setStatus(level.split('/')[1] + ': ' + objects + ' objects, ' + meshes.stats.attached + ' meshes');
+			}
+		}
+
+		console.log('WebX: geometry settled at ' + meshes.stats.attached + ' meshes (' +
+			meshes.pendingCount + ' without one)');
+	}
+
 	/**
 	 * Load a real level into the standalone editor.
 	 *
@@ -458,6 +475,24 @@ export class VEXTemulator {
 		if (haveMeshes) {
 			const stats = meshes.stats;
 			console.log('WebX: ' + stats.attached + ' meshes attached (' + stats.meshes + ' in the manifest)');
+		}
+
+		// The baked statics, whose transforms live in the level's Havok data rather than EBX. Runs
+		// after the EBX walk so duplicates can be recognised and skipped.
+		const statics = await new StaticModels(source, meshes).load(level, (batch) => {
+			(window as any).vext.HandleResponse(batch, true);
+		});
+
+		if (statics > 0) {
+			console.log('Rime: ' + statics + ' baked statics placed');
+			ui.setStatus(level.split('/')[1] + ': ' + (loaded + statics) + ' objects');
+			frameLevel();
+		}
+
+		// Fill in geometry as the server finishes extracting it. Nothing is lost if this never
+		// converges -- the objects are all there, some just have no mesh yet.
+		if (haveMeshes) {
+			void VEXTemulator.FillPendingMeshes(meshes, ui, level, loaded + statics);
 		}
 
 		return loaded;

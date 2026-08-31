@@ -43,6 +43,12 @@ export class MeshManager {
 	private attached = 0;
 	private missing = 0;
 
+	/** file|x|y|z of everything already placed, so the baked statics can skip duplicates. */
+	private placed = new Set<string>();
+
+	/** Objects still waiting on geometry that was not extracted yet. */
+	private pending = new Map<any, string>();
+
 	private level: string;
 
 	public constructor(level: string, base = '/meshes') {
@@ -104,6 +110,66 @@ export class MeshManager {
 		scene.add(rig);
 	}
 
+	/** Teach the layer where a mesh's geometry lives, for objects not covered by the manifest. */
+	public register(partitionGuid: string, file: string): void {
+		if (this.manifest === null) {
+			this.manifest = { game: '', level: '', blueprints: {} };
+		}
+
+		const key = partitionGuid.toLowerCase();
+
+		if (this.manifest.blueprints[key] === undefined) {
+			this.manifest.blueprints[key] = file;
+		}
+	}
+
+	public isPlaced(file: string, x: number, y: number, z: number): boolean {
+		return this.placed.has(MeshManager.placementKey(file, x, y, z));
+	}
+
+	private static placementKey(file: string, x: number, y: number, z: number): string {
+		// Tenth of a metre: the same instance resolved through two paths lands on the same spot,
+		// and nothing distinct in a BF3 map shares a mesh AND a position this closely.
+		return file + '|' + x.toFixed(1) + '|' + y.toFixed(1) + '|' + z.toFixed(1);
+	}
+
+	/**
+	 * Re-try objects whose geometry was not ready. Returns how many were filled in.
+	 *
+	 * A level's meshes are extracted from the game one at a time, so the first pass over a big
+	 * level asks for plenty that do not exist yet.
+	 */
+	public async retryPending(): Promise<number> {
+		const waiting = Array.from(this.pending.entries());
+		let filled = 0;
+
+		for (const [gameObject, file] of waiting) {
+			this.loaded.delete(file);
+
+			const model = await this.instance(file);
+
+			if (model === null) {
+				continue;
+			}
+
+			gameObject.add(model);
+			this.showInScene(gameObject);
+			this.pending.delete(gameObject);
+			this.attached++;
+			filled++;
+		}
+
+		if (filled > 0) {
+			(window as any).editor.threeManager.setPendingRender();
+		}
+
+		return filled;
+	}
+
+	public get pendingCount(): number {
+		return this.pending.size;
+	}
+
 	public get stats(): { attached: number; missing: number; meshes: number } {
 		return {
 			attached: this.attached,
@@ -134,8 +200,14 @@ export class MeshManager {
 			return;
 		}
 
+		const position = commandActionResult.gameObjectTransferData.transform.trans;
+		this.placed.add(MeshManager.placementKey(file, position.x, position.y, position.z));
+
 		void this.instance(file).then((model) => {
 			if (model === null) {
+				// Its geometry was not ready yet. The server extracts a level's meshes in the
+				// background, so ask again later rather than leaving the object bare forever.
+				this.pending.set(gameObject, file);
 				return;
 			}
 
