@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from export_level_meshes import (  # noqa: E402
     DEFAULT_GAME_PATH, DEFAULT_OUT, DEFAULT_RIME, Ebx, collect_blueprints, file_name_for,
-    level_roots, primary as primary_instance, resolve_meshes,
+    level_roots, primary as primary_instance, ref, refs, resolve_meshes, text,
 )
 
 PORT = int(os.environ.get('MESH_PORT', '8091'))
@@ -253,7 +253,12 @@ class Meshes:
         # origin, so one slow dump holding a response starves every other fetch -- geometry included.
         # Requests answer from cache or say "not yet"; this queue does the work behind them.
         self.queue = queue.Queue()
+        self.lock = threading.Lock()
         threading.Thread(target=self._worker, daemon=True).start()
+
+        self._load_cached_manifests()
+        print('[mesh] %d partitions, %d levels, %d meshes known'
+              % (len(self.ebx.paths), len(self.levels), len(self.by_file)), flush=True)
 
     def _worker(self):
         while True:
@@ -288,10 +293,6 @@ class Meshes:
         self.queue.put((kind, resource, path))
 
         return None
-        self.lock = threading.Lock()
-        self._load_cached_manifests()
-        print('[mesh] %d partitions, %d levels, %d meshes known'
-              % (len(self.ebx.paths), len(self.levels), len(self.by_file)), flush=True)
 
     def _load_cached_manifests(self):
         """Learn every cached level's meshes up front, so a .glb can be extracted without the
@@ -453,13 +454,61 @@ class Meshes:
                 return None
 
             with self.lock:
-                mvdb = level.lower() + '/meshvariationdb_win32'
-                print('[mesh] resolving textures for %s...' % mvdb, flush=True)
+                merged = {}
 
-                if not self.rime.textures(mvdb, path):
-                    return None
+                # A level has more than one MeshVariationDatabase: the root's, plus one per
+                # subworld. Reading only the root leaves whole building sets untextured, because
+                # their entries live in the gamemode subworld that places them.
+                for source in self._mvdb_names(level):
+                    part = os.path.join(CACHE, map_name + '.' + source.split('/')[-2] + '.mvdb.json')
+
+                    if not os.path.exists(part) and not self.rime.textures(source, part):
+                        continue
+
+                    try:
+                        found = json.load(open(part)).get('meshes', {})
+                    except Exception:
+                        continue
+
+                    print('[mesh] %s: %d meshes' % (source, len(found)), flush=True)
+
+                    for mesh, materials in found.items():
+                        # First database wins: the level's own is asked for first and is the most
+                        # authoritative for meshes it knows.
+                        merged.setdefault(mesh, materials)
+
+                json.dump({'meshes': merged}, open(path, 'w'))
+                print('[mesh] textures for %s: %d meshes' % (map_name, len(merged)), flush=True)
 
         return open(path, 'rb').read()
+
+    def _mvdb_names(self, level):
+        """The level's own MeshVariationDatabase, then each subworld's."""
+        names = [level.lower() + '/meshvariationdb_win32']
+        partition = self.ebx.partition_by_path(level)
+
+        if partition is None:
+            return names
+
+        root = primary_instance(partition)
+
+        if root is None:
+            return names
+
+        instances = {i['$guid'].lower(): i for i in partition['$instances']}
+
+        for reference in refs(root, 'Objects'):
+            child = instances.get(reference['$instanceGuid'].lower())
+
+            if child is None or child['$type'] != 'SubWorldReferenceObjectData':
+                continue
+
+            bundle = text(child, 'BundleName')
+
+            if bundle:
+                names.append(bundle.lower() + '/meshvariationdb_win32')
+
+        return names
 
     def dds(self, resource):
         """One texture, extracted on demand. Served as DDS: three.js reads it directly, so there
