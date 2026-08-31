@@ -77,7 +77,7 @@ export class StaticModels {
 
 			// Teach the mesh layer where this one's geometry lives; the manifest only covers
 			// meshes reached through a blueprint.
-			this.meshes.register(partitionGuid, file);
+			this.meshes.register(partitionGuid, file, meshPath);
 
 			for (const transform of placements.meshes[meshPath]) {
 				index++;

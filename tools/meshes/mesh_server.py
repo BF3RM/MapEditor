@@ -16,6 +16,7 @@ one origin.
 """
 import json
 import os
+import queue
 import fcntl
 import pty
 import struct
@@ -30,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from export_level_meshes import (  # noqa: E402
     DEFAULT_GAME_PATH, DEFAULT_OUT, DEFAULT_RIME, Ebx, collect_blueprints, file_name_for,
-    level_roots, resolve_meshes,
+    level_roots, primary as primary_instance, resolve_meshes,
 )
 
 PORT = int(os.environ.get('MESH_PORT', '8091'))
@@ -99,13 +100,11 @@ class Rime:
                 if 'successfully mounted' in lowered:
                     self.ready.set()
 
-                # Recognise the end of a command from what the REPL says, rather than waiting for a
-                # file that may never appear. Plenty of resources named in a level are not MeshSets
-                # at all (FX, for one), and dump_mesh reports that in prose -- waiting out the
-                # timeout on each of those stalled every later request behind it.
-                if ('extracted ' in lowered or 'placements for ' in lowered
-                        or 'failed' in lowered or 'could not' in lowered
-                        or 'command not found' in lowered or 'error' in lowered):
+                # A command is finished when the REPL prints its prompt banner again -- which it
+                # does whatever the outcome. Matching on result text instead means every command
+                # with its own wording (dump_texture says "successfully converted and dumped")
+                # silently waits out the full timeout, stalling everything behind it.
+                if 'frostbite2_0]' in lowered:
                     self.done.set()
 
         print('[mesh] Rime exited; last output:', flush=True)
@@ -161,13 +160,23 @@ class Rime:
     def alive(self):
         return self.proc is not None and self.proc.poll() is None
 
+    def textures(self, mvdb, destination, timeout=900):
+        """Which texture each mesh subset is painted with. The bindings live in the level's
+        MeshVariationDatabase, not on the materials in a mesh's own partition."""
+        return self._command('dump_mesh_textures %s "%s"' % (mvdb.lower(), destination),
+                             destination, timeout)
+
+    def texture(self, resource, destination, timeout=60):
+        return self._command('dump_texture %s "%s"' % (resource.lower(), destination),
+                             destination, timeout)
+
     def placements(self, level_path, destination, timeout=900):
         """Resolve where every mesh in a level sits, including the baked StaticModelGroup
         instances whose transforms live in the level's Havok physics data rather than EBX."""
         return self._command('dump_level_placements %s "%s"' % (level_path.lower(), destination),
                              destination, timeout)
 
-    def dump(self, mesh_path, destination, timeout=120):
+    def dump(self, mesh_path, destination, timeout=60):
         """Extract one mesh. Serialised: one REPL, one command at a time."""
         return self._command('dump_mesh Glb %s "%s"' % (mesh_path.lower(), destination),
                              destination, timeout)
@@ -220,7 +229,48 @@ class Meshes:
         self.levels = {p.split('/')[-1].lower(): p for p in level_roots(self.ebx)}
         self.by_file = {}
         self.unavailable = set()
+        self.queued = set()
+        self.kinds = {}
         self.warming = False
+        # Extraction never happens on a request thread: a browser opens about six connections per
+        # origin, so one slow dump holding a response starves every other fetch -- geometry included.
+        # Requests answer from cache or say "not yet"; this queue does the work behind them.
+        self.queue = queue.Queue()
+        threading.Thread(target=self._worker, daemon=True).start()
+
+    def _worker(self):
+        while True:
+            kind, resource, path = self.queue.get()
+
+            try:
+                if os.path.exists(path):
+                    continue
+
+                if kind == 'mesh':
+                    if not self.is_mesh(resource) or not self.rime.dump(resource, path):
+                        self.unavailable.add(os.path.basename(path))
+                elif kind == 'texture':
+                    if not self.is_texture(resource) or not self.rime.texture(resource, path):
+                        self.unavailable.add(os.path.basename(path))
+            except Exception as e:
+                print('[mesh] worker error on %s: %s' % (resource, e), flush=True)
+            finally:
+                self.queue.task_done()
+
+    def _request(self, kind, resource, path):
+        """Ask for something to be extracted, without waiting for it."""
+        name = os.path.basename(path)
+
+        if os.path.exists(path):
+            return path
+
+        if name in self.unavailable or name in self.queued:
+            return None
+
+        self.queued.add(name)
+        self.queue.put((kind, resource, path))
+
+        return None
         self.lock = threading.Lock()
         self._load_cached_manifests()
         print('[mesh] %d partitions, %d levels, %d meshes known'
@@ -317,6 +367,48 @@ class Meshes:
 
         return raw
 
+    def is_mesh(self, resource):
+        """Is this resource actually a MeshSet?
+
+        A level names plenty of things that are not -- FX entities especially -- and asking Rime to
+        dump one does not fail, it HANGS: 120s of a single mounted REPL, per resource, blocking
+        every other request behind it. The EBX says what a partition is, so ask that first.
+        """
+        cached = self.kinds.get(resource.lower())
+
+        if cached is not None:
+            return cached
+
+        partition = self.ebx.partition_by_path(resource)
+        kind = False
+
+        if partition is not None:
+            primary = primary_instance(partition)
+            kind = primary is not None and primary['$type'].endswith('MeshAsset')
+
+        self.kinds[resource.lower()] = kind
+
+        return kind
+
+    def is_texture(self, resource):
+        """Same guard as is_mesh: a MVDB can name a texture this dump does not carry, and
+        dump_texture on a missing resource hangs the REPL rather than failing."""
+        cached = self.kinds.get('tex:' + resource.lower())
+
+        if cached is not None:
+            return cached
+
+        partition = self.ebx.partition_by_path(resource)
+        kind = False
+
+        if partition is not None:
+            primary = primary_instance(partition)
+            kind = primary is not None and primary['$type'].endswith('TextureAsset')
+
+        self.kinds['tex:' + resource.lower()] = kind
+
+        return kind
+
     def _warm(self, meshes):
         if self.warming:
             return
@@ -324,23 +416,44 @@ class Meshes:
         self.warming = True
 
         def run():
-            done = 0
-
             for mesh in meshes:
-                name = file_name_for(mesh)
+                self._request('mesh', mesh, os.path.join(CACHE, file_name_for(mesh)))
 
-                if os.path.exists(os.path.join(CACHE, name)) or name in self.unavailable:
-                    continue
-
-                if self.rime.dump(mesh, os.path.join(CACHE, name)):
-                    done += 1
-                else:
-                    self.unavailable.add(name)
-
-            print('[mesh] warm-up done: %d extracted, %d unavailable' % (done, len(self.unavailable)), flush=True)
+            self.queue.join()
+            print('[mesh] warm-up done: %d unavailable' % len(self.unavailable), flush=True)
             self.warming = False
 
         threading.Thread(target=run, daemon=True).start()
+
+    def texture_map(self, map_name):
+        """mesh -> per-subset texture bindings for a level, from its MeshVariationDatabase."""
+        path = os.path.join(CACHE, map_name + '.textures.json')
+
+        if not os.path.exists(path):
+            level = self.levels.get(map_name.lower())
+
+            if level is None:
+                return None
+
+            with self.lock:
+                mvdb = level.lower() + '/meshvariationdb_win32'
+                print('[mesh] resolving textures for %s...' % mvdb, flush=True)
+
+                if not self.rime.textures(mvdb, path):
+                    return None
+
+        return open(path, 'rb').read()
+
+    def dds(self, resource):
+        """One texture, extracted on demand. Served as DDS: three.js reads it directly, so there
+        is no decode step and the GPU keeps it compressed."""
+        name = resource.replace('/', '_').lower() + '.dds'
+        path = os.path.join(CACHE, name)
+
+        if os.path.exists(path):
+            return path
+
+        return self._request('texture', resource, path)
 
     def glb(self, name):
         path = os.path.join(CACHE, name)
@@ -353,16 +466,7 @@ class Meshes:
         if mesh is None or name in self.unavailable:
             return None
 
-        print('[mesh] extracting %s' % mesh, flush=True)
-
-        if self.rime.dump(mesh, path):
-            return path
-
-        # Remember the miss. A level names plenty of resources that are not MeshSets, and every
-        # instance of one would otherwise ask Rime again.
-        self.unavailable.add(name)
-
-        return None
+        return self._request('mesh', mesh, path)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -370,6 +474,24 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         name = self.path.split('?')[0].lstrip('/')
+
+        if name.startswith('textures/'):
+            body = Handler.meshes.texture_map(name[len('textures/'):-5])
+
+            if body is None:
+                return self.send_error(404, 'no texture map for that level')
+
+            return self._send(body, 'application/json')
+
+        # Slashes are kept in the URL: Rime needs the resource PATH, and a flattened file name
+        # cannot be turned back into one (mesh and texture names contain underscores of their own).
+        if name.startswith('texture/') and name.endswith('.dds'):
+            path = Handler.meshes.dds(name[len('texture/'):-4])
+
+            if path is None:
+                return self.send_error(404, 'texture not available')
+
+            return self._send(open(path, 'rb').read(), 'image/vnd-ms.dds')
 
         if name.startswith('placements/'):
             body = Handler.meshes.placements(name[len('placements/'):-5])

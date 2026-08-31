@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader';
 import { signals } from '@/script/modules/Signals';
 import { GameObject } from '@/script/types/GameObject';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
@@ -20,6 +21,8 @@ interface MeshManifest {
 	game: string;
 	level: string;
 	blueprints: Record<string, string>;
+	/** file -> the mesh resource it was extracted from. */
+	meshes?: Record<string, string>;
 }
 
 export class MeshManager {
@@ -40,6 +43,26 @@ export class MeshManager {
 	 */
 	private material = new THREE.MeshStandardMaterial({ color: 0x9fa3a6, roughness: 0.9, metalness: 0.0 });
 
+	/**
+	 * mesh resource -> its subsets' texture bindings.
+	 *
+	 * A MeshMaterial in a mesh's own partition names a shader but carries no textures; Frostbite
+	 * binds them in the level's MeshVariationDatabase, one entry per mesh and one material per
+	 * subset. Rime reads that (dump_mesh_textures) and the server serves it per level.
+	 */
+	private textures: Record<string, Array<Record<string, string>>> = {};
+
+	private ddsLoader = new DDSLoader();
+
+	/** One load per texture resource, shared by every material using it. */
+	private loadedTextures = new Map<string, Promise<THREE.Texture | null>>();
+
+	/** Textured materials, keyed by texture resource, so meshes sharing one share the material. */
+	private materials = new Map<string, THREE.Material>();
+
+	/** file -> its subsets, so a later pass can paint what was not ready the first time. */
+	private painted = new Map<string, any[]>();
+
 	private attached = 0;
 	private missing = 0;
 
@@ -48,6 +71,10 @@ export class MeshManager {
 
 	/** Objects still waiting on geometry that was not extracted yet. */
 	private pending = new Map<any, string>();
+
+	/** file -> the mesh resource it came from. A file name cannot be turned back into a path:
+	 * '/' became '_' and mesh names contain underscores of their own. */
+	private meshKeys = new Map<string, string>();
 
 	private level: string;
 
@@ -68,6 +95,10 @@ export class MeshManager {
 			}
 
 			this.manifest = (await response.json()) as MeshManifest;
+
+			for (const [file, mesh] of Object.entries(this.manifest.meshes || {})) {
+				this.meshKeys.set(file, mesh);
+			}
 		} catch (e) {
 			return false;
 		}
@@ -79,6 +110,7 @@ export class MeshManager {
 			go.visible = true;
 		});
 
+		await this.loadTextureMap();
 		this.addLighting();
 		signals.spawnedGameObject.connect(this.onSpawnedGameObject.bind(this));
 
@@ -110,8 +142,111 @@ export class MeshManager {
 		scene.add(rig);
 	}
 
+	/** The level's mesh -> texture bindings. Missing is fine: everything renders untextured. */
+	private async loadTextureMap(): Promise<void> {
+		try {
+			const response = await fetch(this.base + '/textures/' + this.level + '.json');
+
+			if (response.ok) {
+				this.textures = ((await response.json()) as any).meshes || {};
+			}
+		} catch (e) {
+			this.textures = {};
+		}
+	}
+
+	/** The diffuse texture for one subset, whatever the shader happens to call it. */
+	private diffuseFor(meshPath: string, subset: number): string | null {
+		const subsets = this.textures[meshPath.toLowerCase()];
+
+		if (subsets === undefined || subsets.length === 0) {
+			return null;
+		}
+
+		const bindings = subsets[Math.min(subset, subsets.length - 1)] || {};
+
+		for (const name of ['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture']) {
+			if (bindings[name] !== undefined) {
+				return bindings[name];
+			}
+		}
+
+		return null;
+	}
+
+	private async texture(resource: string): Promise<THREE.Texture | null> {
+		let pending = this.loadedTextures.get(resource);
+
+		if (pending === undefined) {
+			pending = new Promise<THREE.Texture | null>((resolve) => {
+				// Served as DDS and handed straight to the GPU still compressed -- no decode step,
+				// and a level's textures are hundreds of megabytes uncompressed.
+				this.ddsLoader.load(
+					this.base + '/texture/' + resource + '.dds',
+					(map) => {
+						map.wrapS = THREE.RepeatWrapping;
+						map.wrapT = THREE.RepeatWrapping;
+						(map as any).encoding = 3001; // sRGB: colour maps are authored in gamma space
+						resolve(map);
+					},
+					undefined,
+					() => resolve(null)
+				);
+			});
+
+			this.loadedTextures.set(resource, pending);
+		}
+
+		return pending;
+	}
+
+	/** Swap in textured materials as they arrive, subset by subset. */
+	private async paint(file: string, parts: any[]): Promise<void> {
+		const meshPath = this.meshKeys.get(file);
+
+		if (meshPath === undefined || parts.length === 0) {
+			return;
+		}
+
+		for (let subset = 0; subset < parts.length; subset++) {
+			const resource = this.diffuseFor(meshPath, subset);
+
+			if (resource === null) {
+				continue;
+			}
+
+			const material = await this.materialFor(resource);
+
+			if (material !== this.material) {
+				parts[subset].material = material;
+				(window as any).editor.threeManager.setPendingRender();
+			}
+		}
+	}
+
+	private async materialFor(resource: string): Promise<THREE.Material> {
+		const held = this.materials.get(resource);
+
+		if (held !== undefined) {
+			return held;
+		}
+
+		const map = await this.texture(resource);
+		const material = map === null
+			? this.material
+			: new THREE.MeshStandardMaterial({ map, roughness: 0.95, metalness: 0.0 });
+
+		this.materials.set(resource, material);
+
+		return material;
+	}
+
 	/** Teach the layer where a mesh's geometry lives, for objects not covered by the manifest. */
-	public register(partitionGuid: string, file: string): void {
+	public register(partitionGuid: string, file: string, meshPath?: string): void {
+		if (meshPath !== undefined) {
+			this.meshKeys.set(file, meshPath);
+		}
+
 		if (this.manifest === null) {
 			this.manifest = { game: '', level: '', blueprints: {} };
 		}
@@ -168,6 +303,33 @@ export class MeshManager {
 
 	public get pendingCount(): number {
 		return this.pending.size;
+	}
+
+	/**
+	 * Re-try textures that were not extracted yet.
+	 *
+	 * Geometry never waits for a texture, so the first paint of a level runs while most of them are
+	 * still being extracted. Dropping the failed loads lets the next pass ask again.
+	 */
+	public repaint(): number {
+		let retried = 0;
+
+		for (const [resource, pending] of Array.from(this.loadedTextures.entries())) {
+			void pending.then((map) => {
+				if (map === null) {
+					this.loadedTextures.delete(resource);
+					this.materials.delete(resource);
+				}
+			});
+
+			retried++;
+		}
+
+		for (const [file, parts] of Array.from(this.painted.entries())) {
+			void this.paint(file, parts);
+		}
+
+		return retried;
 	}
 
 	public get stats(): { attached: number; missing: number; meshes: number } {
@@ -253,12 +415,26 @@ export class MeshManager {
 		}
 
 		const copy = original.clone(true);
+		const parts: any[] = [];
 
 		copy.traverse((child: any) => {
 			if (child.isMesh) {
-				child.material = this.material;
+				parts.push(child);
 			}
 		});
+
+		// Neutral material now, texture later.
+		//
+		// Textures are extracted from the game one at a time, so awaiting them here would hold the
+		// geometry back behind every texture in the level -- one slow extraction stalled the whole
+		// map at eight meshes. Geometry is never gated on them: the object appears, and its surface
+		// improves when the texture turns up.
+		for (const part of parts) {
+			part.material = this.material;
+		}
+
+		this.painted.set(file, parts);
+		void this.paint(file, parts);
 
 		return copy;
 	}

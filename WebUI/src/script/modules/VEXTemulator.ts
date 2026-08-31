@@ -407,10 +407,12 @@ export class VEXTemulator {
 
 	/** Keep asking for geometry that was not extracted yet, backing off as it converges. */
 	private static async FillPendingMeshes(meshes: MeshManager, ui: any, level: string, objects: number): Promise<void> {
-		for (let attempt = 0; attempt < 40 && meshes.pendingCount > 0; attempt++) {
+		// Keep going past the point where geometry is complete: textures land later still.
+		for (let attempt = 0; attempt < 60; attempt++) {
 			await new Promise((resolve) => setTimeout(resolve, 4000));
 
 			const filled = await meshes.retryPending();
+			meshes.repaint();
 
 			if (filled > 0) {
 				ui.setStatus(level.split('/')[1] + ': ' + objects + ' objects, ' + meshes.stats.attached + ' meshes');
