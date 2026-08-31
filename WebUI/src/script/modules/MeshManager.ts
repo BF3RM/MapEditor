@@ -53,6 +53,7 @@ export class MeshManager {
 	private textures: Record<string, Array<Record<string, string>>> = {};
 
 	private ddsLoader = new DDSLoader();
+	private pngLoader = new THREE.TextureLoader();
 
 	/**
 	 * Meshes the engine never draws.
@@ -271,6 +272,36 @@ export class MeshManager {
 		}
 	}
 
+	/**
+	 * A normal map, as PNG.
+	 *
+	 * BF3 stores them as BC5 inside a DX10-header DDS, which the DDS loader handles in neither
+	 * respect, so the server decodes them and serves PNG instead.
+	 */
+	private async normal(resource: string): Promise<THREE.Texture | null> {
+		const key = 'normal:' + resource;
+		let pending = this.loadedTextures.get(key);
+
+		if (pending === undefined) {
+			pending = new Promise<THREE.Texture | null>((resolve) => {
+				this.pngLoader.load(
+					this.base + '/normal/' + resource + '.png',
+					(map) => {
+						map.wrapS = THREE.RepeatWrapping;
+						map.wrapT = THREE.RepeatWrapping;
+						resolve(map);
+					},
+					undefined,
+					() => resolve(null)
+				);
+			});
+
+			this.loadedTextures.set(key, pending);
+		}
+
+		return pending;
+	}
+
 	private async materialFor(resource: string, normalResource: string | null = null): Promise<THREE.Material> {
 		const key = resource + '|' + (normalResource || '');
 		const held = this.materials.get(key);
@@ -288,7 +319,7 @@ export class MeshManager {
 
 		// The normal map is a bonus, not a requirement: BF3 stores some of them in formats the DDS
 		// loader will not take, and a missing one only costs surface detail.
-		const normalMap = normalResource === null ? null : await this.texture(normalResource, false);
+		const normalMap = normalResource === null ? null : await this.normal(normalResource);
 		const material = new THREE.MeshStandardMaterial({ map, roughness: 0.95, metalness: 0.0 });
 
 		if (normalMap !== null) {

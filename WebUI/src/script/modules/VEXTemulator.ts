@@ -11,6 +11,7 @@ import { LevelLoader } from '@/script/modules/LevelLoader';
 import { MeshManager } from '@/script/modules/MeshManager';
 import { StaticModels } from '@/script/modules/StaticModels';
 import { Terrain } from '@/script/modules/Terrain';
+import { Lighting } from '@/script/modules/Lighting';
 import {
 	StandaloneUI, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
 } from '@/script/modules/StandaloneUI';
@@ -490,6 +491,11 @@ export class VEXTemulator {
 			console.log('Rime: ' + statics + ' baked statics placed');
 			ui.setStatus(level.split('/')[1] + ': ' + (loaded + statics) + ' objects');
 			frameLevel();
+		}
+
+		// The level's own sun and sky, rather than a rig invented here.
+		if (await new Lighting(source).apply(level)) {
+			console.log('WebX: lit from the level\'s VisualEnvironment');
 		}
 
 		// The ground. Objects sit on it, so a level without it reads as floating.

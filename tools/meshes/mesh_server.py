@@ -640,6 +640,29 @@ class Meshes:
 
         return names
 
+    def normal(self, resource):
+        """A normal map as PNG, converting the BC5 the browser cannot read."""
+        png = os.path.join(CACHE, resource.replace('/', '_').lower() + '.png')
+
+        if os.path.exists(png):
+            return png
+
+        source = self.dds(resource)
+
+        if source is None:
+            return None
+
+        try:
+            from dds_convert import to_png
+
+            if to_png(source, png):
+                return png
+        except Exception as e:
+            print('[mesh] normal conversion failed for %s: %s' % (resource, e), flush=True)
+
+        # Not a format that needs converting: hand back the DDS and let the client try it.
+        return None
+
     def dds(self, resource):
         """One texture, extracted on demand. Served as DDS: three.js reads it directly, so there
         is no decode step and the GPU keeps it compressed."""
@@ -670,6 +693,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         name = self.path.split('?')[0].lstrip('/')
+
+        # Normal maps are BC5 in a DX10-header DDS, which the browser's DDS loader reads as an
+        # empty texture. Converted here rather than lost.
+        if name.startswith('normal/') and name.endswith('.png'):
+            path = Handler.meshes.normal(name[len('normal/'):-4])
+
+            if path is None:
+                return self.send_error(404, 'normal map not available')
+
+            return self._send(open(path, 'rb').read(), 'image/png')
 
         if name.startswith('terrain/'):
             body = Handler.meshes.terrain(name[len('terrain/'):-5])
