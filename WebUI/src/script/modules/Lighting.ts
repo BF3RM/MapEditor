@@ -69,19 +69,35 @@ export class Lighting {
 		// One sun casting over the whole level. The ortho box is sized from the map rather than
 		// guessed: BF3 levels are a kilometre across and a default shadow camera covers metres.
 		light.castShadow = true;
-		light.shadow.mapSize.set(2048, 2048);
+		light.shadow.mapSize.set(4096, 4096);
 		light.shadow.camera.near = 1;
-		light.shadow.camera.far = 2000;
-		light.shadow.camera.left = -400;
-		light.shadow.camera.right = 400;
-		light.shadow.camera.top = 400;
-		light.shadow.camera.bottom = -400;
-		light.shadow.bias = -0.0006;
+		light.shadow.camera.far = 12000;
+		// Big enough for the whole map, which is the point.
+		//
+		// At 400 metres this covered a fraction of MP_017's 8 km of ground, and everything past the
+		// box sampled the shadow map's clamped edge texels -- drawing the edge's light-and-dark
+		// pattern across the hillsides as stripes that looked like broken terrain LOD. Trading
+		// shadow resolution for covering the level is the right way round: the stripes were the
+		// most visible thing on the map.
+		const extent = 4200;
 
+		light.shadow.camera.left = -extent;
+		light.shadow.camera.right = extent;
+		light.shadow.camera.top = extent;
+		light.shadow.camera.bottom = -extent;
+		light.shadow.bias = -0.0006;
+		// Depth bias alone is measured in the shadow map's own units, so on ground that spans
+		// kilometres per texel it leaves the surface striped with its own shadow -- which is what
+		// banded MP_017's hillsides. normalBias offsets along the surface normal in WORLD units,
+		// which is the scale the error actually has here.
+		light.shadow.normalBias = 1.5;
+
+		// Far enough out that the shadow camera's near plane clears the terrain: a BF3 map is
+		// kilometres across, and a sun 500 m away sits inside the level it is meant to light.
 		light.position.set(
-			Math.cos(elevation) * Math.sin(azimuth) * 500,
-			Math.sin(elevation) * 500,
-			Math.cos(elevation) * Math.cos(azimuth) * 500
+			Math.cos(elevation) * Math.sin(azimuth) * 5000,
+			Math.sin(elevation) * 5000,
+			Math.cos(elevation) * Math.cos(azimuth) * 5000
 		);
 
 		rig.add(light);

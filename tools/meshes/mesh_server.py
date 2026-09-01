@@ -190,6 +190,12 @@ class Rime:
         return self._command('dump_texture %s "%s"' % (resource.lower(), destination),
                              destination, timeout)
 
+    def chunk(self, guid, destination, timeout=120):
+        """One streamed chunk. A terrain tile's height samples live in one of these rather than in
+        the tree, on every level whose heightfield tree carries no samples of its own."""
+        return self._command('dump_chunk %s "%s"' % (guid.lower(), destination),
+                             destination, timeout)
+
     def placements(self, level_path, destination, timeout=900):
         """Resolve where every mesh in a level sits, including the baked StaticModelGroup
         instances whose transforms live in the level's Havok physics data rather than EBX."""
@@ -256,8 +262,11 @@ class Rime:
 class Meshes:
     """Resolves levels to meshes, and caches both the manifests and the .glb files."""
 
-    def __init__(self, rime):
+    def __init__(self, rime, streamer=None):
         self.rime = rime
+        # Tiles come off their own instance so they are not stuck behind a level's opening work.
+        self.streamer = streamer or rime
+        self.stream_lock = threading.Lock() if streamer else None
         self.ebx = Ebx(GAME)
         self.ebx.open(os.path.join('/tmp', 'webx-guiddict.json'))
         self.levels = {p.split('/')[-1].lower(): p for p in level_roots(self.ebx)}
@@ -487,6 +496,33 @@ class Meshes:
                 self._decode_materials(path)
 
         return open(path, 'rb').read()
+
+    def terrain_tile(self, guid, samples):
+        """One terrain tile's height samples, as raw UInt16.
+
+        A level's heightfield tree may carry no samples at all -- MP_017 embeds only its root and
+        streams the other 272 tiles -- so each leaf names a chunk instead. The chunk holds the same
+        grid the embedded nodes do, samples first, followed by data this does not use.
+        """
+        if not all(c in '0123456789abcdef-' for c in guid.lower()) or len(guid) > 40:
+            return None
+
+        cached = os.path.join(CACHE, 'chunk_' + guid.lower() + '.bin')
+
+        if not os.path.exists(cached):
+            with (self.stream_lock or self.lock):
+                # Re-check: several tiles can be asked for at once, and the wait may have been for
+                # the very one that was being extracted.
+                if not os.path.exists(cached) and not self.streamer.chunk(guid, cached):
+                    return None
+
+        body = open(cached, 'rb').read()
+        wanted = samples * samples * 2
+
+        if len(body) < wanted:
+            return None
+
+        return body[:wanted]
 
     @staticmethod
     def _decode_materials(path):
@@ -913,6 +949,21 @@ class Handler(BaseHTTPRequestHandler):
 
             return self._send(open(path, 'rb').read(), 'image/png')
 
+        # One streamed tile, asked for by the chunk its node names. Kept separate from the tree so
+        # the client pulls only the tiles it is drawing.
+        if name.startswith('tile/') and name.endswith('.bin'):
+            parts = name[len('tile/'):-4].split('/')
+
+            if len(parts) != 2 or not parts[1].isdigit():
+                return self.send_error(400, 'expected tile/<guid>/<samplesPerSide>.bin')
+
+            body = Handler.meshes.terrain_tile(parts[0], int(parts[1]))
+
+            if body is None:
+                return self.send_error(404, 'tile not available')
+
+            return self._send(body, 'application/octet-stream')
+
         if name.startswith('terrain/'):
             body = Handler.meshes.terrain(name[len('terrain/'):-5])
 
@@ -984,7 +1035,20 @@ def main():
     if not rime.start():
         return 1
 
-    Handler.meshes = Meshes(rime)
+    # A SECOND mounted Rime, for streaming only.
+    #
+    # One REPL runs one command at a time, and a level's opening work -- walking it for placements,
+    # extracting meshes -- holds it for minutes. Terrain tiles queued behind that arrived at a rate
+    # of one per six minutes, which is not streaming by any definition. Tiles are small and
+    # constant-cost, so they get their own instance and land in seconds no matter what the main one
+    # is busy with. Mounting costs about 30s once, at startup.
+    streamer = Rime(DEFAULT_RIME, DEFAULT_GAME_PATH)
+
+    if not streamer.start():
+        print('[mesh] no streaming instance; tiles will queue behind extraction', flush=True)
+        streamer = None
+
+    Handler.meshes = Meshes(rime, streamer)
     print('[mesh] serving on http://localhost:%d (cache: %s)' % (PORT, CACHE), flush=True)
     ThreadingHTTPServer(('127.0.0.1', PORT), Handler).serve_forever()
 

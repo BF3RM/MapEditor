@@ -481,6 +481,19 @@ export class VEXTemulator {
 
 		(window as any).meshes = meshes;
 
+		// The ground depends on nothing else in this function, and streaming it takes minutes on a
+		// level whose tiles are chunked, so it starts HERE rather than at the end. Waiting until
+		// after the EBX walk, the statics and the instancing left the first tile a minute out; from
+		// here the coarse levels are down while the objects are still arriving.
+		const terrain = new Terrain(level).load(meshes.groundMaterial)
+			.then((patches) => {
+				if (patches > 0) {
+					console.log('Rime: terrain built from ' + patches + ' heightfield patches');
+					(window as any).editor.threeManager.setPendingRender();
+				}
+			})
+			.catch(() => { /* a level without terrain is not a failed load */ });
+
 		await source.open();
 
 		new MobileLayout().install();
@@ -545,13 +558,9 @@ export class VEXTemulator {
 			console.log('WebX: lit from the level\'s VisualEnvironment');
 		}
 
-		// The ground. Objects sit on it, so a level without it reads as floating.
-		const patches = await new Terrain(level).load(meshes.groundMaterial);
-
-		if (patches > 0) {
-			console.log('Rime: terrain built from ' + patches + ' heightfield patches');
-			(window as any).editor.threeManager.setPendingRender();
-		}
+		// Started before the level walk; joined here so a caller awaiting the load knows the ground
+		// is accounted for.
+		void terrain;
 
 		// The sky doubles as the environment distant surfaces are painted from. Off the critical
 		// path: the texture may still be extracting, and nothing below it should wait on that.
