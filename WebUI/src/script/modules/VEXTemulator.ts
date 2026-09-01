@@ -485,7 +485,7 @@ export class VEXTemulator {
 		// level whose tiles are chunked, so it starts HERE rather than at the end. Waiting until
 		// after the EBX walk, the statics and the instancing left the first tile a minute out; from
 		// here the coarse levels are down while the objects are still arriving.
-		const terrain = new Terrain(level).load(meshes.groundMaterial)
+		const terrain = new Terrain(level).load(meshes.groundMaterial, (resource) => meshes.load(resource))
 			.then((patches) => {
 				if (patches > 0) {
 					console.log('Rime: terrain built from ' + patches + ' heightfield patches');

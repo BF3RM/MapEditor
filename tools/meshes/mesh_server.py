@@ -190,6 +190,12 @@ class Rime:
         return self._command('dump_texture %s "%s"' % (resource.lower(), destination),
                              destination, timeout)
 
+    def visual_terrain(self, resource, destination, timeout=300):
+        """What a level's ground is painted with: its terrain layers and the shaders that blend
+        them. The layer textures are not in EBX; this is the only thing that names them."""
+        return self._command('dump_visual_terrain %s "%s"' % (resource.lower(), destination),
+                             destination, timeout)
+
     def chunk(self, guid, destination, timeout=120):
         """One streamed chunk. A terrain tile's height samples live in one of these rather than in
         the tree, on every level whose heightfield tree carries no samples of its own."""
@@ -494,6 +500,67 @@ class Meshes:
                     return None
 
                 self._decode_materials(path)
+
+        return open(path, 'rb').read()
+
+    def terrain_layers(self, map_name):
+        """The level's terrain layers, and the textures they are painted with.
+
+        Two halves. The VisualTerrain resource says how many layers there are and which shader
+        blends each combination of them -- MP_017 has seven, all virtual-textured, over 148 draws.
+        The textures themselves are not named anywhere that resolves, but every level keeps them in
+        one place, `Levels/<Map>/Terrain/Textures`, so they are listed from there: diffuse (_D),
+        normal (_N) and the masks (_RGB, _M) kept apart by suffix.
+        """
+        path = os.path.join(CACHE, map_name + '.layers.json')
+
+        if not os.path.exists(path):
+            info = {}
+            resource = self._terrain_resource(map_name)
+
+            if resource is not None:
+                visual = os.path.join(CACHE, map_name + '.visual.json')
+                # The two resources sit side by side, differing only in extension.
+                name = resource.rsplit('.', 1)[0] + '.visual'
+
+                if os.path.exists(visual) or (
+                        self.rime.visual_terrain(name, visual) and os.path.exists(visual)):
+                    try:
+                        with open(visual) as handle:
+                            info = json.load(handle)
+                    except ValueError:
+                        info = {}
+
+            prefix = 'levels/%s/terrain/textures/' % map_name.lower()
+            diffuse, normal, masks = [], [], []
+
+            for texture in self.ebx.paths.values():
+                lowered = texture.lower()
+
+                if not lowered.startswith(prefix):
+                    continue
+
+                if lowered.endswith('_n'):
+                    normal.append(texture)
+                elif lowered.endswith('_rgb') or lowered.endswith('_m') or 'mask' in lowered:
+                    masks.append(texture)
+                else:
+                    diffuse.append(texture)
+
+            layers = {
+                'layerCount': info.get('LayerCount', 0),
+                'surfaceShader': info.get('SurfaceShader', ''),
+                'draws': info.get('Draws', []),
+                'diffuse': sorted(diffuse),
+                'normal': sorted(normal),
+                'masks': sorted(masks),
+            }
+
+            with open(path, 'w') as handle:
+                json.dump(layers, handle)
+
+            print('[mesh] terrain layers for %s: %d declared, %d diffuse textures found'
+                  % (map_name, layers['layerCount'], len(diffuse)), flush=True)
 
         return open(path, 'rb').read()
 
@@ -963,6 +1030,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_error(404, 'tile not available')
 
             return self._send(body, 'application/octet-stream')
+
+        if name.startswith('terrainlayers/'):
+            body = Handler.meshes.terrain_layers(name[len('terrainlayers/'):-5])
+
+            if body is None:
+                return self.send_error(404, 'no terrain layers for that level')
+
+            return self._send(body, 'application/json')
 
         if name.startswith('terrain/'):
             body = Handler.meshes.terrain(name[len('terrain/'):-5])

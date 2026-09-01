@@ -24,6 +24,7 @@
  */
 
 import * as THREE from 'three';
+import { TerrainMaterial } from '@/script/modules/TerrainMaterial';
 
 const BORDER = 2;
 
@@ -73,7 +74,8 @@ export class Terrain {
 	 * Streamed levels keep going after this resolves: the tiles arrive over the following seconds
 	 * and each is added as it lands, so the ground fills in rather than appearing all at once.
 	 */
-	public async load(material: THREE.Material): Promise<number> {
+	public async load(material: THREE.Material,
+		load?: (resource: string) => Promise<THREE.Texture | null>): Promise<number> {
 		let terrain: TerrainData;
 
 		try {
@@ -86,6 +88,17 @@ export class Terrain {
 			terrain = (await response.json()) as TerrainData;
 		} catch (e) {
 			return 0;
+		}
+
+		// The level's own terrain textures, where it has any. Falls back to the neutral ground the
+		// caller passed, which is what a level with no terrain textures gets.
+		if (load !== undefined) {
+			const painted = await new TerrainMaterial(this.level, this.base)
+				.build(Terrain.extent(terrain), load);
+
+			if (painted !== null) {
+				material = painted;
+			}
 		}
 
 		// Whatever the tree carries inline goes down first: it cost nothing beyond the tree itself
@@ -284,6 +297,36 @@ export class Terrain {
 			' tiles, ' + meshes.size + ' drawn after coarser levels were replaced');
 
 		return built;
+	}
+
+	/** The terrain's world bounds as [minX, minZ, sizeX, sizeZ], for stretching a level-wide mask. */
+	private static extent(terrain: TerrainData): number[] {
+		let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
+
+		const consider = (min: number[] | null, max: number[] | null): void => {
+			if (min === null || max === null) {
+				return;
+			}
+
+			minX = Math.min(minX, min[0]);
+			minZ = Math.min(minZ, min[2]);
+			maxX = Math.max(maxX, max[0]);
+			maxZ = Math.max(maxZ, max[2]);
+		};
+
+		for (const node of terrain.nodes) {
+			consider(node.min, node.max);
+		}
+
+		for (const node of terrain.streamNodes || []) {
+			consider(node.min, node.max);
+		}
+
+		if (!isFinite(minX) || maxX <= minX) {
+			return [-2048, -2048, 4096, 4096];
+		}
+
+		return [minX, minZ, maxX - minX, maxZ - minZ];
 	}
 
 	private static key(depth: number, x: number, y: number): string {

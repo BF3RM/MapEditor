@@ -33,6 +33,16 @@ def main(argv):
         print('Rime did not mount', file=sys.stderr)
         return 1
 
+    # Commands that answer on the console rather than by writing a file -- list_resources_of_type
+    # and friends. The driver normally waits for a file, so those need their own path.
+    if argv[0] == '--tail':
+        import time
+
+        os.write(rime.master, (argv[1] + '\r').encode())
+        time.sleep(int(os.environ.get('PROBE_WAIT', '20')))
+        print('\n'.join(rime.tail))
+        return 0
+
     if argv[0] == '--list-commands':
         # No file to wait for, so ask and read the tail the drain thread collects.
         import time
