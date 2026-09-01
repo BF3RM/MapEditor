@@ -26,6 +26,10 @@ interface Placements {
 	meshes: Record<string, number[][]>;
 }
 
+function nameOf(meshPath: string): string {
+	return (meshPath.split('/').pop() as string).replace(/_Mesh$/i, '');
+}
+
 function fileFor(meshPath: string): string {
 	return meshPath.replace(/\//g, '_').toLowerCase() + '.glb';
 }
@@ -35,6 +39,15 @@ function staticGuid(index: number): string {
 	const hex = (index + 1).toString(16).padStart(12, '0');
 
 	return '5747d000-0000-4000-8000-' + hex;
+}
+
+/** The group all baked statics hang under, and one group per mesh below it. */
+const GROUP_GUID = '5747d000-0000-4000-8000-ffffffffffff';
+
+function meshGroupGuid(index: number): string {
+	const hex = (index + 1).toString(16).padStart(12, '0');
+
+	return '5747d000-0000-4000-8001-' + hex;
 }
 
 export class StaticModels {
@@ -63,13 +76,20 @@ export class StaticModels {
 			return 0;
 		}
 
-		const batch: any[] = [];
+		// One group for the baked statics, and one per mesh beneath it -- the shape the engine
+		// itself uses (a StaticModelGroup of members). Emitting thousands of instances at the root
+		// instead buries the level's real worldparts: 45 meaningful nodes among 5000 loose ones.
+		emit([this.group(GROUP_GUID, EMPTY_GUID, 'StaticModelGroup')]);
+
 		let index = 0;
+		let meshIndex = 0;
 		let added = 0;
 
 		for (const meshPath of Object.keys(placements.meshes)) {
 			const file = fileFor(meshPath);
 			const partitionGuid = this.source.guidForPath(meshPath);
+
+			meshIndex++;
 
 			if (partitionGuid === undefined) {
 				continue;
@@ -79,6 +99,9 @@ export class StaticModels {
 			// meshes reached through a blueprint.
 			this.meshes.register(partitionGuid, file, meshPath);
 
+			const groupGuid = meshGroupGuid(meshIndex);
+			const batch: any[] = [];
+
 			for (const transform of placements.meshes[meshPath]) {
 				index++;
 
@@ -86,23 +109,61 @@ export class StaticModels {
 					continue;
 				}
 
-				batch.push(this.toResult(staticGuid(index), meshPath, partitionGuid, transform));
+				batch.push(this.toResult(staticGuid(index), meshPath, partitionGuid, transform, groupGuid));
 				added++;
-
-				if (batch.length >= BATCH) {
-					emit(batch.splice(0, batch.length));
-				}
 			}
-		}
 
-		if (batch.length > 0) {
+			if (batch.length === 0) {
+				continue;
+			}
+
+			// The group goes LAST: the tree builder flushes on a batch's final element and attaches
+			// children to a parent found in the same batch, so the parent has to be in it.
+			batch.push(this.group(groupGuid, GROUP_GUID, nameOf(meshPath)));
 			emit(batch);
 		}
 
 		return added;
 	}
 
-	private toResult(guid: string, meshPath: string, partitionGuid: string, t: number[]): any {
+	/** A parent node with no geometry of its own. */
+	private group(guid: string, parentGuid: string, name: string): any {
+		const ctrRef = { typeName: 'WorldPartData', name, partitionGuid: EMPTY_GUID, instanceGuid: EMPTY_GUID };
+
+		return {
+			sender: 'Rime',
+			type: 'SpawnedGameObject',
+			gameObjectTransferData: {
+				guid,
+				name,
+				parentData: {
+					guid: parentGuid,
+					typeName: 'StaticModelGroup',
+					primaryInstanceGuid: EMPTY_GUID,
+					partitionGuid: EMPTY_GUID
+				},
+				blueprintCtrRef: ctrRef,
+				originalRef: ctrRef,
+				transform: {
+					left: { x: 1, y: 0, z: 0 },
+					up: { x: 0, y: 1, z: 0 },
+					forward: { x: 0, y: 0, z: 1 },
+					trans: { x: 0, y: 0, z: 0 }
+				},
+				variation: 0,
+				gameEntities: [],
+				isDeleted: false,
+				isEnabled: true,
+				isUserModified: false,
+				origin: GAMEOBJECT_ORIGIN.VANILLA,
+				overrides: [],
+				realm: REALM.CLIENT_AND_SERVER,
+				isPlaceholder: false
+			}
+		};
+	}
+
+	private toResult(guid: string, meshPath: string, partitionGuid: string, t: number[], parentGuid: string): any {
 		const ctrRef = {
 			typeName: 'ObjectBlueprint',
 			name: meshPath,
@@ -115,10 +176,9 @@ export class StaticModels {
 			type: 'SpawnedGameObject',
 			gameObjectTransferData: {
 				guid,
-				name: (meshPath.split('/').pop() as string).replace(/_Mesh$/i, ''),
-				// Root-level: these are baked instances, with no parent object of their own.
+				name: nameOf(meshPath),
 				parentData: {
-					guid: EMPTY_GUID,
+					guid: parentGuid,
 					typeName: 'StaticModelGroup',
 					primaryInstanceGuid: EMPTY_GUID,
 					partitionGuid: EMPTY_GUID
