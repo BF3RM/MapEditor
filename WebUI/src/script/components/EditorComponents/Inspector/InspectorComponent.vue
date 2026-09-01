@@ -2,158 +2,182 @@
 	<div class="EditorComponent panel inspector-component scrollable">
 		<div class="panel-header">Inspector</div>
 		<div class="panel-body">
-		<div class="header" style="display:flex; flex-direction:column; gap:10px; padding:12px;">
-			<div id="IconAndEnable" :class="enabled ? 'enabled' : ''" style="flex:0 0 auto; width:48px; height:48px;">
-				<div class="icon-wrapper" style="width:48px; height:48px; padding:6px; box-sizing:border-box;">
-					<img :class="'Large Icon Icon-' + objectType" alt="" v-if="!multiSelection" />
-					<img :class="'Large Icon Icon-MultiSelection'" alt="" v-else />
+			<div class="header" style="display: flex; flex-direction: column; gap: 10px; padding: 12px">
+				<div
+					id="IconAndEnable"
+					:class="enabled ? 'enabled' : ''"
+					style="flex: 0 0 auto; width: 48px; height: 48px"
+				>
+					<div class="icon-wrapper" style="width: 48px; height: 48px; padding: 6px; box-sizing: border-box">
+						<img :class="'Large Icon Icon-' + objectType" alt="" v-if="!multiSelection" />
+						<img :class="'Large Icon Icon-MultiSelection'" alt="" v-else />
+					</div>
+				</div>
+				<div id="NameAndVariation" style="width: 100%; min-width: 0">
+					<div>
+						<input
+							style="width: 100%; box-sizing: border-box"
+							class="name-input"
+							:class="{ disabled: multiSelection }"
+							:value="displayName"
+							:disabled="multiSelection"
+							id="name"
+							@blur="onNameChange"
+						/>
+					</div>
+					<span class="blueprint-type" v-if="!multiSelection">
+						{{ blueprintType ? blueprintType : 'No type' }}
+					</span>
+					<span class="blueprint-type" v-else> Multiselection </span>
+					<!-- Gameface port: native checkbox doesn't toggle reliably -> plain
+				     clickable div (same enable()/disable() path). -->
+					<div class="fx-checkbox" :class="{ checked: enabled, disabled: multiSelection }">
+						<span class="fx-checkbox-box" @click="onToggleEnable">
+							<span class="fx-check"></span>
+						</span>
+						<span class="fx-checkbox-label">Enable / Disable</span>
+					</div>
+				</div>
+				<div
+					v-if="!multiSelection"
+					class="details"
+					:class="{ collapsed: toggleState.info }"
+					style="width: 100%; min-width: 0"
+				>
+					<div @click="toggleState.info = !toggleState.info" class="toggle">
+						<span class="fx-caret" :class="{ open: !toggleState.info }"></span>
+						Details
+					</div>
+					<div class="details-grid">
+						<div>
+							<label for="bp-instance-guid">Instance Guid</label>
+							<input
+								id="bp-instance-guid"
+								:value="blueprintGuid"
+								readonly
+								@click="$event.target.select()"
+							/>
+						</div>
+						<div>
+							<label for="bp-partition-guid">Partition Guid</label>
+							<input
+								id="bp-partition-guid"
+								:value="blueprintPartitionGuid"
+								readonly
+								@click="$event.target.select()"
+							/>
+						</div>
+						<div>
+							<label for="bp-guid">Guid</label>
+							<input id="bp-guid" :value="gameObjectGuid" readonly @click="$event.target.select()" />
+						</div>
+						<div>
+							<label for="bp-partition-type">Type</label>
+							<input id="bp-type" :value="blueprintType" readonly @click="$event.target.select()" />
+						</div>
+						<div class="block">
+							<label for="bp-name">Full name</label>
+							<input id="bp-name" :value="blueprintName" readonly @click="$event.target.select()" />
+						</div>
+					</div>
+				</div>
+				<div
+					v-if="!multiSelection"
+					class="variations"
+					:class="{ collapsed: toggleState.variations }"
+					style="width: 100%; min-width: 0"
+				>
+					<div @click="toggleState.variations = !toggleState.variations" class="toggle">
+						<span class="fx-caret" :class="{ open: !toggleState.variations }"></span>
+						Variations
+					</div>
+					<div class="variations-grid">
+						<div id="Variation" class="variation" v-if="!multiSelection">
+							<!-- Gameface port: variation options listed directly (no dropdown). -->
+							<div class="variation-list">
+								<div
+									v-for="variation of blueprintVariations"
+									:key="variation.hash"
+									class="variation-option"
+									:class="{ active: selectedVariation === variation.hash }"
+									@click="onVariationClick(variation.hash)"
+								>
+									{{ variation.name ? variation.name : 'Default variation' }}
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div id="NameAndVariation" style="width:100%; min-width:0;">
-				<div>
-					<input
-						style="width:100%; box-sizing:border-box;"
-						class="name-input"
-						:class="{ disabled: multiSelection }"
-						:value="displayName"
-						:disabled="multiSelection"
-						id="name"
-						@blur="onNameChange"
+			<div class="inner">
+				<div class="transform-container">
+					<linear-transform-control
+						v-if="worldSpace === 'local'"
+						class="lt-control"
+						:hideLabel="false"
+						:value="localTransform"
+						@input="onLocalInput"
+						@dragend="onEndDrag"
+						@blur="onEndDrag"
+					/>
+					<linear-transform-control
+						v-else
+						class="lt-control"
+						:hideLabel="false"
+						:value="transform"
+						@input="onInput"
+						@dragend="onEndDrag"
+						@blur="onEndDrag"
 					/>
 				</div>
-				<span class="blueprint-type" v-if="!multiSelection">
-					{{ blueprintType ? blueprintType : 'No type' }}
-				</span>
-				<span class="blueprint-type" v-else> Multiselection </span>
-				<!-- Gameface port: native checkbox doesn't toggle reliably -> plain
-				     clickable div (same enable()/disable() path). -->
-				<div class="fx-checkbox" :class="{ checked: enabled, disabled: multiSelection }">
-					<span class="fx-checkbox-box" @click="onToggleEnable">
-						<span class="fx-check"></span>
-					</span>
-					<span class="fx-checkbox-label">Enable / Disable</span>
-				</div>
-			</div>
-			<div v-if="!multiSelection" class="details" :class="{ collapsed: toggleState.info }" style="width:100%; min-width:0;">
-				<div @click="toggleState.info = !toggleState.info" class="toggle">
-					<span class="fx-caret" :class="{ open: !toggleState.info }"></span>
-					Details
-				</div>
-				<div class="details-grid">
-					<div>
-						<label for="bp-instance-guid">Instance Guid</label>
-						<input id="bp-instance-guid" :value="blueprintGuid" readonly @click="$event.target.select()" />
-					</div>
-					<div>
-						<label for="bp-partition-guid">Partition Guid</label>
-						<input id="bp-partition-guid" :value="blueprintPartitionGuid" readonly @click="$event.target.select()" />
-					</div>
-					<div>
-						<label for="bp-guid">Guid</label>
-						<input id="bp-guid" :value="gameObjectGuid" readonly @click="$event.target.select()" />
-					</div>
-					<div>
-						<label for="bp-partition-type">Type</label>
-						<input id="bp-type" :value="blueprintType" readonly @click="$event.target.select()" />
-					</div>
-					<div class="block">
-						<label for="bp-name">Full name</label>
-						<input id="bp-name" :value="blueprintName" readonly @click="$event.target.select()" />
-					</div>
-				</div>
-			</div>
-			<div v-if="!multiSelection" class="variations" :class="{ collapsed: toggleState.variations }" style="width:100%; min-width:0;">
-				<div @click="toggleState.variations = !toggleState.variations" class="toggle">
-					<span class="fx-caret" :class="{ open: !toggleState.variations }"></span>
-					Variations
-				</div>
-				<div class="variations-grid">
-					<div id="Variation" class="variation" v-if="!multiSelection">
-						<!-- Gameface port: variation options listed directly (no dropdown). -->
-						<div class="variation-list">
-							<div
-								v-for="variation of blueprintVariations"
-								:key="variation.hash"
-								class="variation-option"
-								:class="{ active: selectedVariation === variation.hash }"
-								@click="onVariationClick(variation.hash)"
-							>
-								{{ variation.name ? variation.name : 'Default variation' }}
+				<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
+					<div class="alert">Experimental features, use with caution!</div>
+					<Promised :promise="partition">
+						<template v-slot:pending>
+							<div class="loading">Loading...</div>
+						</template>
+						<template v-slot="data">
+							<div class="ebx-wrapper">
+								<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
+									<reference-property
+										:overrides="selectedGameObject.EBXOverrides"
+										:gameObject="selectedGameObject"
+										@input="onEBXInput($event)"
+										:autoOpen="true"
+										:currentPath="data.name"
+										:field="data.primaryInstance && data.primaryInstance.fields.object"
+										:reference="data.primaryInstance.fields.object.value"
+										:partition="data"
+									></reference-property>
+								</div>
+								<div
+									v-else-if="
+										data &&
+										data.primaryInstance &&
+										data.primaryInstance.fields &&
+										data.primaryInstance.fields.objects
+									"
+								>
+									<array-property
+										:overrides="selectedGameObject.EBXOverrides"
+										:gameObject="selectedGameObject"
+										@input="onEBXInput($event, true)"
+										:autoOpen="data.primaryInstance.fields.objects.value.length < 6"
+										:currentPath="data.name"
+										:field="data.primaryInstance.fields.objects"
+										:instance="data.primaryInstance"
+										:reference="data.primaryInstance"
+										:partition="data"
+									></array-property>
+								</div>
 							</div>
-						</div>
-					</div>
+						</template>
+						<template v-slot:rejected="error">
+							<div class="alert">Error: {{ error.message }}</div>
+						</template>
+					</Promised>
 				</div>
 			</div>
-		</div>
-		<div class="inner">
-			<div class="transform-container">
-				<linear-transform-control
-					v-if="worldSpace === 'local'"
-					class="lt-control"
-					:hideLabel="false"
-					:value="localTransform"
-					@input="onLocalInput"
-					@dragend="onEndDrag"
-					@blur="onEndDrag"
-				/>
-				<linear-transform-control
-					v-else
-					class="lt-control"
-					:hideLabel="false"
-					:value="transform"
-					@input="onInput"
-					@dragend="onEndDrag"
-					@blur="onEndDrag"
-				/>
-			</div>
-			<div class="container ebx-container" v-if="selectedGameObject && !multiSelection">
-				<div class="alert">Experimental features, use with caution!</div>
-				<Promised :promise="partition">
-					<template v-slot:pending>
-						<div class="loading">Loading...</div>
-					</template>
-					<template v-slot="data">
-						<div class="ebx-wrapper">
-							<div v-if="data && data.primaryInstance && data.primaryInstance.fields.object">
-								<reference-property
-									:overrides="selectedGameObject.EBXOverrides"
-									:gameObject="selectedGameObject"
-									@input="onEBXInput($event)"
-									:autoOpen="true"
-									:currentPath="data.name"
-									:field="data.primaryInstance && data.primaryInstance.fields.object"
-									:reference="data.primaryInstance.fields.object.value"
-									:partition="data"
-								></reference-property>
-							</div>
-							<div
-								v-else-if="
-									data &&
-									data.primaryInstance &&
-									data.primaryInstance.fields &&
-									data.primaryInstance.fields.objects
-								"
-							>
-								<array-property
-									:overrides="selectedGameObject.EBXOverrides"
-									:gameObject="selectedGameObject"
-									@input="onEBXInput($event, true)"
-									:autoOpen="data.primaryInstance.fields.objects.value.length < 6"
-									:currentPath="data.name"
-									:field="data.primaryInstance.fields.objects"
-									:instance="data.primaryInstance"
-									:reference="data.primaryInstance"
-									:partition="data"
-								></array-property>
-							</div>
-						</div>
-					</template>
-					<template v-slot:rejected="error">
-						<div class="alert">Error: {{ error.message }}</div>
-					</template>
-				</Promised>
-			</div>
-		</div>
 		</div>
 	</div>
 </template>

@@ -12,12 +12,7 @@
 			</li>
 		</ul>
 		<ul class="redos">
-			<li
-				v-for="redoEntry in redos"
-				:key="redoEntry.id"
-				class="history-entry"
-				@click="goToState(redoEntry.id)"
-			>
+			<li v-for="redoEntry in redos" :key="redoEntry.id" class="history-entry" @click="goToState(redoEntry.id)">
 				{{ FormatTime(redoEntry.timeStamp) }} - {{ redoEntry.name }}
 			</li>
 		</ul>

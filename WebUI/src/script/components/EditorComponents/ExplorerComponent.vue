@@ -62,7 +62,9 @@
 						<template v-slot:list="{ item }">
 							<img class="Icon" :src="iconSrc(item.typeName)" />
 							<div v-if="!search" class="td name">{{ cleanPath(item.name) }}</div>
-							<div v-else><Highlighter class="td name" :text="cleanPath(item.name)" :search="search" /></div>
+							<div v-else>
+								<Highlighter class="td name" :text="cleanPath(item.name)" :search="search" />
+							</div>
 							<div class="td type">{{ item.typeName }}</div>
 						</template>
 					</GridComponent>

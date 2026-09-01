@@ -318,7 +318,10 @@ export default class InfiniteTreeComponent extends Vue {
 	}
 
 	get endIndex(): number {
-		return Math.min(this.filteredNodes.length, Math.ceil((this.scrollTop + this.viewportH) / this.rh) + this.BUFFER);
+		return Math.min(
+			this.filteredNodes.length,
+			Math.ceil((this.scrollTop + this.viewportH) / this.rh) + this.BUFFER
+		);
 	}
 
 	get visibleNodes(): { node: Node; index: number }[] {

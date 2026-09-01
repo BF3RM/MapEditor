@@ -465,7 +465,11 @@ export default class Editor {
 		gameObject.gameEntitiesData = transferData.gameEntities || [];
 		for (const entityData of gameObject.gameEntitiesData) {
 			if (entityData.isSpatial) {
-				const gameEntity = new SpatialGameEntity(entityData.instanceId, entityData.initiatorRef, entityData.aabb);
+				const gameEntity = new SpatialGameEntity(
+					entityData.instanceId,
+					entityData.initiatorRef,
+					entityData.aabb
+				);
 				gameObject.add(gameEntity);
 				this.spatialGameEntities.set(entityData.instanceId, gameEntity);
 			}

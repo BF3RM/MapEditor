@@ -7,7 +7,10 @@
 			</div>
 			<template v-else>
 				<div class="overrides-head">
-					<span class="ov-count">{{ overrideList.length }} overridden {{ overrideList.length === 1 ? 'field' : 'fields' }} on {{ shortName }}</span>
+					<span class="ov-count"
+						>{{ overrideList.length }} overridden {{ overrideList.length === 1 ? 'field' : 'fields' }} on
+						{{ shortName }}</span
+					>
 					<button
 						class="ov-apply"
 						@click="onApply"
@@ -25,7 +28,9 @@
 							<span class="ov-new" :title="String(o.newValue)">{{ formatVal(o.newValue) }}</span>
 						</div>
 					</div>
-					<button class="ov-revert" @click="onRevert(o)" title="Revert this field to the blueprint value">⟲</button>
+					<button class="ov-revert" @click="onRevert(o)" title="Revert this field to the blueprint value">
+						⟲
+					</button>
 				</div>
 			</template>
 
@@ -36,9 +41,7 @@
 			-->
 			<template v-if="selectedGameObject && appliedList.length > 0">
 				<div class="overrides-head applied-head">
-					<span class="ov-count">
-						{{ appliedList.length }} applied to blueprint {{ blueprintName }}
-					</span>
+					<span class="ov-count"> {{ appliedList.length }} applied to blueprint {{ blueprintName }} </span>
 					<button
 						class="ov-apply"
 						@click="onRevertAllApplied"
@@ -89,8 +92,7 @@ export default class OverridesComponent extends EditorComponent {
 
 	onSelectionChanged() {
 		const group = window.editor.selectionGroup;
-		this.selectedGameObject =
-			group && group.selectedGameObjects.length === 1 ? group.selectedGameObjects[0] : null;
+		this.selectedGameObject = group && group.selectedGameObjects.length === 1 ? group.selectedGameObjects[0] : null;
 	}
 
 	// overrides is a plain map mutated in place, so nudge Vue to recompute the list.

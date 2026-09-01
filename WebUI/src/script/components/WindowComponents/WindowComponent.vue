@@ -16,30 +16,30 @@
 import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
-    name: 'WindowComponent',
-    props: {
-        showHeader: {
-            type: Boolean,
-            default: true
-        },
-        isDestructible: {
-            type: Boolean,
-            default: false
-        },
-        title: {
-            type: String,
-            default: 'WindowComponent'
-        },
-        visible: {
-            type: Boolean,
-            default: true
-        },
-    },
-    methods: {
-        onClose() {
-            this.$emit('update:visible', false);
-        }
-    }
+	name: 'WindowComponent',
+	props: {
+		showHeader: {
+			type: Boolean,
+			default: true
+		},
+		isDestructible: {
+			type: Boolean,
+			default: false
+		},
+		title: {
+			type: String,
+			default: 'WindowComponent'
+		},
+		visible: {
+			type: Boolean,
+			default: true
+		}
+	},
+	methods: {
+		onClose() {
+			this.$emit('update:visible', false);
+		}
+	}
 });
 </script>
 <style lang="scss" scoped>

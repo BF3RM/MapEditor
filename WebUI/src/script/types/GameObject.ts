@@ -256,7 +256,19 @@ export class GameObject extends THREE.Object3D implements IGameEntity {
 		}
 
 		for (const child of this.children) {
-			(child as any).updateChildrenMatrices();
+			// children is THREE's list, so it holds this object's entity meshes as well as its
+			// child GameObjects, and only a GameObject has this method. Guarding it matches
+			// descendantOf() above; without it the render loop threw
+			// "child.updateChildrenMatrices is not a function" on every frame for any object that
+			// actually has children -- which became every parent once the scene tree started
+			// nesting again instead of listing everything flat under Vanilla.
+			if (child.constructor !== GameObject) continue;
+
+			// NOTE: deliberately called with no argument, exactly as before -- so a descendant does
+			// not refresh its own transform from its matrix. That looks wrong (a child's world
+			// matrix did change) but changing it alters what gets saved, so it is left alone here
+			// and kept separate from the crash fix.
+			(child as GameObject).updateChildrenMatrices(undefined as any);
 		}
 	}
 

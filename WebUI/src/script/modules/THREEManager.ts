@@ -35,7 +35,10 @@ function createRenderer(): THREE.WebGLRenderer {
 		WEBGL_AVAILABLE = true;
 		return r;
 	} catch (e) {
-		console.warn('[MapEditor] WebGL unavailable (Gameface) - using headless renderer, drawing via native DebugRenderer.', e);
+		console.warn(
+			'[MapEditor] WebGL unavailable (Gameface) - using headless renderer, drawing via native DebugRenderer.',
+			e
+		);
 		WEBGL_AVAILABLE = false;
 		const canvas = document.createElement('canvas');
 		// The headless canvas renders nothing (no WebGL) but is still appended to
@@ -545,6 +548,20 @@ export class THREEManager {
 	}
 
 	public enableFreecamMovement() {
+		// Browser/emulator: there is no Lua to hand the camera to, and no way back.
+		//
+		// This hands control to the Lua freecam and disables selection until Lua calls
+		// mouseEnabled() again. In the emulator that call never comes, so the FIRST right-click
+		// permanently killed click-to-select, right-drag look, and every other control -- while
+		// the real camera-controls library is sitting right there, fully functional, because the
+		// browser does have WebGL (only Gameface gets the stub).
+		//
+		// So in debug mode: change nothing, and let camera-controls drive the camera as it did
+		// before the Gameface port introduced the handoff.
+		if (editor.debug) {
+			return;
+		}
+
 		this.highlightingEnabled = false;
 		editor.editorCore.unhighlight();
 		window.vext.SendEvent('EnableFreeCamMovement');
@@ -599,7 +616,11 @@ export class THREEManager {
 				for (let sx = -1; sx <= 1; sx += 2) {
 					for (let sy = -1; sy <= 1; sy += 2) {
 						for (let sz = -1; sz <= 1; sz += 2) {
-							corner.set(localCenter.x + sx * half.x, localCenter.y + sy * half.y, localCenter.z + sz * half.z);
+							corner.set(
+								localCenter.x + sx * half.x,
+								localCenter.y + sy * half.y,
+								localCenter.z + sz * half.z
+							);
 							corner.applyMatrix4(child.matrixWorld);
 							box.expandByPoint(corner);
 							has = true;
@@ -1209,9 +1230,15 @@ export class THREEManager {
 		}
 		window.vext.SendEvent('SetGizmoCenter', [p.x, p.y, p.z]);
 		window.vext.SendEvent('SetGizmoBasis', [
-			this.gizmoBasisX.x, this.gizmoBasisX.y, this.gizmoBasisX.z,
-			this.gizmoBasisY.x, this.gizmoBasisY.y, this.gizmoBasisY.z,
-			this.gizmoBasisZ.x, this.gizmoBasisZ.y, this.gizmoBasisZ.z
+			this.gizmoBasisX.x,
+			this.gizmoBasisX.y,
+			this.gizmoBasisX.z,
+			this.gizmoBasisY.x,
+			this.gizmoBasisY.y,
+			this.gizmoBasisY.z,
+			this.gizmoBasisZ.x,
+			this.gizmoBasisZ.y,
+			this.gizmoBasisZ.z
 		]);
 	}
 

@@ -229,13 +229,12 @@ export default class ReferenceComponent extends Vue {
 		const matches = (typeName: string, name: string) => {
 			if (this.compatibleOnly && want && String(typeName).toLowerCase() !== want) return false;
 			if (!q) return true;
-			return String(name).toLowerCase().indexOf(q) !== -1 ||
-				String(typeName).toLowerCase().indexOf(q) !== -1;
+			return String(name).toLowerCase().indexOf(q) !== -1 || String(typeName).toLowerCase().indexOf(q) !== -1;
 		};
 
 		try {
 			const bm = (window as any).editor && (window as any).editor.blueprintManager;
-			const bps = bm && bm.getBlueprints ? bm.getBlueprints() : (bm ? bm.blueprints.values() : []);
+			const bps = bm && bm.getBlueprints ? bm.getBlueprints() : bm ? bm.blueprints.values() : [];
 			for (const bp of bps || []) {
 				if (out.length >= ReferenceComponent.MAX_RESULTS + 1) break;
 				if (!bp || !matches(bp.typeName, bp.name)) continue;
@@ -443,7 +442,10 @@ export default class ReferenceComponent extends Vue {
 					.then(() => {
 						const bpInstance = blueprint.getInstance && blueprint.getInstance();
 						if (bpInstance && bpInstance.fields.name) {
-							this.$data.referenceObjectBlueprint = String(bpInstance.fields.name.value).replace(regEx, '');
+							this.$data.referenceObjectBlueprint = String(bpInstance.fields.name.value).replace(
+								regEx,
+								''
+							);
 						}
 					})
 					.catch(() => {

@@ -19,7 +19,7 @@ export enum GAMEOBJECT_ORIGIN {
 	VANILLA = 1,
 	CUSTOM = 2,
 	CUSTOM_CHILD = 3,
-    NOHAVOK = 4,
+	NOHAVOK = 4
 }
 
 export enum KEYCODE {

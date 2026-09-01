@@ -27,7 +27,9 @@
 					<span class="sep" />
 					<span class="row slider-row" :class="{ muted: !settings.enabled }">
 						<span class="label">Draw distance</span>
-						<span class="value">{{ settings.maxDistance === 0 ? 'unlimited' : settings.maxDistance + 'm' }}</span>
+						<span class="value">{{
+							settings.maxDistance === 0 ? 'unlimited' : settings.maxDistance + 'm'
+						}}</span>
 					</span>
 					<input
 						class="overlay-slider"

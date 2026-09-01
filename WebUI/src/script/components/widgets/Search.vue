@@ -43,7 +43,7 @@ export default defineComponent({
 		value: {
 			type: String,
 			required: false
-		},
+		}
 	}
 });
 </script>
