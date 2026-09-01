@@ -34,6 +34,11 @@ from export_level_meshes import (  # noqa: E402
     level_roots, primary as primary_instance, ref, refs, resolve_meshes, text,
 )
 
+def _params(materials):
+    """How many texture parameters an entry actually carries."""
+    return sum(len(m) for m in materials)
+
+
 PORT = int(os.environ.get('MESH_PORT', '8091'))
 CACHE = os.environ.get('MESH_CACHE', DEFAULT_OUT)
 GAME = os.environ.get('MESH_GAME', 'Venice')
@@ -259,6 +264,7 @@ class Meshes:
         self.unavailable = set()
         self.queued = set()
         self.kinds = {}
+        self.catalogue = None
         self.warming = False
         # Extraction never happens on a request thread: a browser opens about six connections per
         # origin, so one slow dump holding a response starves every other fetch -- geometry included.
@@ -531,14 +537,20 @@ class Meshes:
                     print('[mesh] %s: %d meshes' % (source, len(found)), flush=True)
 
                     for mesh, variations in found.items():
-                        # First database wins per VARIATION, not per mesh: a gamemode database can
-                        # carry a variation the level root never mentions.
                         target = merged.setdefault(mesh, {})
 
                         for hash_key, materials in variations.items():
-                            target.setdefault(hash_key, materials)
+                            # The RICHEST entry wins, not the first one seen. Databases disagree:
+                            # the level root can carry an entry with no texture parameters at all
+                            # while a gamemode database has the real bindings, and taking whichever
+                            # came first threw those away.
+                            existing = target.get(hash_key)
+
+                            if existing is None or _params(materials) > _params(existing):
+                                target[hash_key] = materials
 
                 self._fill_from_shaders(map_name, level, merged)
+                self._fill_by_name(merged)
                 json.dump({'meshes': merged}, open(path, 'w'))
                 print('[mesh] textures for %s: %d meshes' % (map_name, len(merged)), flush=True)
 
@@ -597,6 +609,112 @@ class Meshes:
                 filled += 1
 
         print('[mesh] shader textures filled %d material(s)' % filled, flush=True)
+
+    def _fill_by_name(self, merged):
+        """Last resort: match a mesh's own material NAME against the texture catalogue.
+
+        Some bindings exist nowhere we can read them -- MP_001's backdrop houses carry a material
+        called BackdropHouses_material, no texture parameters, and a shader with no streamable
+        textures, yet the game paints them from props/backdropprops/me_backdrophouse_01/
+        me_backdrophouse_d_01. The engine binds those externally. The mesh does name its material
+        though, and BF3 names textures after the thing they cover with a _d suffix, so the catalogue
+        can be searched for it.
+
+        This is inference, not a binding, and it only runs where nothing else produced a texture.
+        """
+        catalogue = self._texture_catalogue()
+
+        if not catalogue:
+            return
+
+        filled = 0
+
+        for mesh, variations in merged.items():
+            if any(any(m) for m in variations.values()):
+                continue
+
+            for name in self._material_names(mesh):
+                match = self._match_texture(name, catalogue)
+
+                if match is None:
+                    continue
+
+                materials = variations.setdefault('0', [])
+
+                if not materials:
+                    materials.append({})
+
+                materials[0]['Diffuse'] = match
+                filled += 1
+                break
+
+        if filled:
+            print('[mesh] matched %d mesh(es) to a texture by material name' % filled, flush=True)
+
+    def _texture_catalogue(self):
+        if self.catalogue is not None:
+            return self.catalogue
+
+        path = os.path.join(CACHE, 'textures.list')
+        self.catalogue = []
+
+        if os.path.exists(path):
+            for line in open(path):
+                line = line.strip().lstrip('- ').strip()
+
+                if line:
+                    self.catalogue.append(line)
+
+        return self.catalogue
+
+    def _material_names(self, mesh):
+        """The material names inside a mesh's .glb, which Rime carries over from the game."""
+        path = os.path.join(CACHE, file_name_for(mesh))
+
+        if not os.path.exists(path):
+            return []
+
+        try:
+            with open(path, 'rb') as handle:
+                data = handle.read()
+
+            offset = 12
+
+            while offset < len(data):
+                length, kind = struct.unpack_from('<II', data, offset)
+
+                if kind == 0x4E4F534A:  # JSON chunk
+                    gltf = json.loads(data[offset + 8:offset + 8 + length].decode('utf-8', 'replace'))
+                    return [m.get('name', '') for m in gltf.get('materials', []) if m.get('name')]
+
+                offset += 8 + length
+        except Exception:
+            pass
+
+        return []
+
+    def _match_texture(self, material_name, catalogue):
+        token = material_name.lower().replace('_material', '').replace('material', '').strip('_')
+
+        if len(token) < 4:
+            return None
+
+        best = None
+
+        for resource in catalogue:
+            base = resource.rsplit('/', 1)[-1].lower()
+
+            if token not in base and token.rstrip('s') not in base:
+                continue
+
+            # Prefer the diffuse; BF3 suffixes it _d, sometimes _d_01.
+            if base.endswith('_d') or '_d_' in base:
+                return resource
+
+            if best is None:
+                best = resource
+
+        return best
 
     def _shaders_of(self, mesh):
         """The shader each of a mesh's materials uses, in material order."""
