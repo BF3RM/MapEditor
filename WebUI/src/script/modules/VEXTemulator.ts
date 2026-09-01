@@ -12,6 +12,7 @@ import { MeshManager } from '@/script/modules/MeshManager';
 import { StaticModels } from '@/script/modules/StaticModels';
 import { Terrain } from '@/script/modules/Terrain';
 import { Lighting } from '@/script/modules/Lighting';
+import { MobileLayout } from '@/script/modules/MobileLayout';
 import {
 	StandaloneUI, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
 } from '@/script/modules/StandaloneUI';
@@ -480,6 +481,7 @@ export class VEXTemulator {
 
 		await source.open();
 
+		new MobileLayout().install();
 		ui.mount(source, { game: forGame, level: level });
 		ui.setStatus('loading ' + level.split('/')[1] + '…');
 
