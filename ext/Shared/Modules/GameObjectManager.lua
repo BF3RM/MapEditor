@@ -16,7 +16,7 @@ local DIAG_ENABLED = false
 -- wait before announcing them where they are, and the most that may be held at once.
 local ADOPT_EVERY_FRAMES = 30
 local ADOPT_GIVE_UP_FRAMES = 900
-local ADOPT_MAX_HELD = 64
+local ADOPT_MAX_HELD = 512
 
 
 local function m_Diag(p_Text)
@@ -764,6 +764,7 @@ end
 
 function GameObjectManager:OnAdoptDiag(p_Player, p_Text)
 
+
 	m_Diag('ADOPT-DIAG CLIENT ' .. tostring(p_Text))
 end
 
@@ -1252,7 +1253,13 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 			-- (selectable via the engine raycast) and rendered natively; this only makes it appear
 			-- and become tree-editable a few frames later. User spawns go through the immediate
 			-- pending-custom path below, so interactive placement still feels instant.
-			table.insert(self.m_PendingInjectedReady, s_GameObject)
+			-- An object waiting for its owner is announced by AdoptPendingParented instead, so it
+			-- enters the tree already parented. The tree cannot move a node it already holds
+			-- (onSpawnedGameObject returns early on a known id), so arriving in the right place
+			-- the first time is the only thing that works.
+			if s_GameObject.pendingParentPrimary == nil then
+				table.insert(self.m_PendingInjectedReady, s_GameObject)
+			end
 		end
 	end
 
