@@ -12,6 +12,13 @@ local m_Logger = Logger("GameObjectManager", false)
 -- Flip DIAG_ENABLED to bring them back.
 local DIAG_ENABLED = false
 
+-- Adoption of prefabs whose owning blueprint has not arrived yet: how often to retry, how long to
+-- wait before announcing them where they are, and the most that may be held at once.
+local ADOPT_EVERY_FRAMES = 30
+local ADOPT_GIVE_UP_FRAMES = 900
+local ADOPT_MAX_HELD = 64
+
+
 local function m_Diag(p_Text)
 	if DIAG_ENABLED then
 		m_Logger:Error(p_Text)
@@ -75,7 +82,142 @@ local INJ_READY_PER_TICK = 25
 
 --- Drain the deferred injected-object ready queue a few per frame (spread the editor/tree
 --- registration so a huge save doesn't freeze the client all at once).
+--- Note the blueprint that owns an object we could not otherwise place, so it can be adopted later.
+---
+--- A ReferenceObjectData lives in the partition of the blueprint that declares it, so that
+--- partition's primary instance is the owner. For the level's own structure that owner is a
+--- LevelData -- a real root. For a vehicle's logical prefabs (Tank1pFX, TeamRadioVehicleVO,
+--- DefaultRemoteGunHUD) it is the VEHICLE blueprint, and the vehicle is networked, so the client
+--- has not received it yet. Those are the ones that used to pile up beside the level's world
+--- groups, one set per vehicle.
+---
+--- Nothing is withheld from the tree on the strength of this. Two earlier attempts held objects
+--- back until their owner appeared and both collapsed the tree (3272 objects -> 22, then -> 10):
+--- this path is the NORMAL one for genuine roots, and no cheap test separates them reliably --
+--- LevelData only indexes levels, so every subworld/worldpart-owned root looked adoptable too.
+--- Objects are announced immediately as before; adoption moves the node afterwards.
+function GameObjectManager:HoldForOwner(p_GameObject, p_Parent)
+	if p_Parent == nil then
+		return
+	end
+
+	self.m_PendingParented = self.m_PendingParented or {}
+
+	if #self.m_PendingParented >= ADOPT_MAX_HELD then
+		return
+	end
+
+	local s_Owner = nil
+
+	pcall(function()
+		local s_Part = InstanceParser:GetPartition(tostring(p_Parent.instanceGuid))
+
+		if s_Part ~= nil then
+			s_Owner = InstanceParser:GetPrimaryInstance(s_Part)
+		end
+	end)
+
+	if s_Owner == nil then
+		return
+	end
+
+	-- Owned by a level: nothing to adopt it to.
+	if InstanceParser:GetLevelData(tostring(s_Owner)) ~= nil then
+		return
+	end
+
+	p_GameObject.pendingParentPrimary = tostring(s_Owner)
+	table.insert(self.m_PendingParented, p_GameObject)
+end
+
+--- Announce held objects once the blueprint that owns them exists on this realm.
+function GameObjectManager:AdoptPendingParented()
+	local s_Queue = self.m_PendingParented
+
+	if s_Queue == nil or #s_Queue == 0 then
+		return
+	end
+
+	self.m_AdoptTicks = (self.m_AdoptTicks or 0) + 1
+
+	if self.m_AdoptTicks % ADOPT_EVERY_FRAMES ~= 0 then
+		return
+	end
+
+	local s_GiveUp = self.m_AdoptTicks > ADOPT_GIVE_UP_FRAMES
+	local s_Remaining = {}
+
+	-- One pass over the objects, indexed by blueprint, instead of a scan per held object.
+	local s_ByBlueprint = {}
+
+    for _, l_Candidate in pairs(self.m_GameObjects) do
+		if l_Candidate.blueprintCtrRef ~= nil then
+			s_ByBlueprint[tostring(l_Candidate.blueprintCtrRef.instanceGuid)] = l_Candidate
+		end
+	end
+
+	for _, l_Object in ipairs(s_Queue) do
+		local s_Parent = s_ByBlueprint[tostring(l_Object.pendingParentPrimary)]
+
+		if s_Parent ~= nil and s_Parent ~= l_Object then
+			l_Object.pendingParentPrimary = nil
+
+			-- Re-parent WITHOUT ResolveChildObject: that assigns a fresh guid and re-keys
+			-- m_GameObjects, which is right while an object is being created and destructive
+			-- afterwards. Measured: doing it here collapsed the tree to twelve objects.
+			l_Object.parentData = GameObjectParentData {
+				guid = s_Parent.guid,
+				typeName = s_Parent.blueprintCtrRef.typeName,
+				primaryInstanceGuid = s_Parent.blueprintCtrRef.instanceGuid,
+				partitionGuid = s_Parent.blueprintCtrRef.partitionGuid
+			}
+
+			table.insert(s_Parent.children, l_Object)
+
+			-- MOVE the node: the tree ignores a node id it already holds, so re-announcing alone
+			-- does nothing. Remove it first, then announce it again -- it comes back under its
+			-- new parent, carrying its own subtree (CreateCommandActionResultsRecursively walks
+			-- children), which is why this cannot strand descendants.
+			if SharedUtils:IsClientModule() then
+				pcall(function()
+					WebUpdater:AddUpdate('HandleResponse', { {
+						sender = l_Object.creatorName,
+						type = CARType.DeletedGameObject,
+						gameObjectTransferData = l_Object:GetGameObjectTransferData(),
+					} })
+				end)
+			end
+
+			Events:DispatchLocal('GameObjectManager:GameObjectReady', l_Object)
+		elseif s_GiveUp then
+			-- Out of patience: announce it where it is, so a held object never goes missing
+			-- because its owner never arrived.
+			l_Object.pendingParentPrimary = nil
+			Events:DispatchLocal('GameObjectManager:GameObjectReady', l_Object)
+		else
+			table.insert(s_Remaining, l_Object)
+		end
+	end
+
+	self.m_PendingParented = s_Remaining
+end
+
 function GameObjectManager:OnInjectedReadyPump()
+	-- Guarded: this pump also drains the WebUI registration queue, and a throw in adoption would
+	-- take that down with it -- the tree would come up nearly empty rather than merely unparented.
+	local s_Ok, s_Err = pcall(function() self:AdoptPendingParented() end)
+
+	if not s_Ok then
+		m_Logger:Error('AdoptPendingParented threw, releasing the queue: ' .. tostring(s_Err))
+
+		for _, l_Object in ipairs(self.m_PendingParented or {}) do
+			l_Object.pendingParentPrimary = nil
+			pcall(function() Events:DispatchLocal('GameObjectManager:GameObjectReady', l_Object) end)
+		end
+
+		self.m_PendingParented = {}
+	end
+
 	local s_Queue = self.m_PendingInjectedReady
 	if s_Queue == nil then
 		return
@@ -875,6 +1017,10 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_HookCtx, p_Blueprint, p
 				s_PendingCustomBlueprintInfo == nil then
 				self:ResolveChildObject(s_GameObject, s_StackParent)
 			else
+				if s_PendingCustomBlueprintInfo == nil then
+					self:HoldForOwner(s_GameObject, p_Parent)
+				end
+
 				self:ResolveRootObject(s_GameObject, s_PendingCustomBlueprintInfo)
 			end
 		else
