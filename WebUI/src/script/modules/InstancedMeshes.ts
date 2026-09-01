@@ -54,7 +54,10 @@ export class InstancedMeshes {
 	 * `load` returns the geometry for a file once; the caller owns loading and texturing, so this
 	 * module stays about instancing alone.
 	 */
-	public async build(load: (file: string) => Promise<THREE.Object3D | null>): Promise<number> {
+	public async build(
+		load: (file: string) => Promise<THREE.Object3D | null>,
+		adopt?: (file: string, parts: any[]) => void
+	): Promise<number> {
 		const scene = (window as any).editor.threeManager.scene;
 
 		for (const batch of this.batches.values()) {
@@ -71,6 +74,8 @@ export class InstancedMeshes {
 					subsets.push(child);
 				}
 			});
+
+			const built: THREE.InstancedMesh[] = [];
 
 			for (const subset of subsets) {
 				const mesh = new THREE.InstancedMesh(subset.geometry, subset.material, batch.matrices.length);
@@ -90,7 +95,14 @@ export class InstancedMeshes {
 				mesh.name = batch.file;
 
 				this.group.add(mesh);
+				built.push(mesh);
 				this.built++;
+			}
+
+			// Hand the batch to the mesh layer so a texture arriving later repaints it too. Without
+			// this the instanced copies keep whatever material the original held at build time.
+			if (adopt !== undefined && built.length > 0) {
+				adopt(batch.file, built);
 			}
 
 			this.instances += batch.matrices.length;

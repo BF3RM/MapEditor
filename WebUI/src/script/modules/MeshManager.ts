@@ -206,6 +206,20 @@ export class MeshManager {
 			}
 		}
 
+		// Fall back to another subset's texture rather than leaving this one bare.
+		//
+		// A mesh's subsets do not each carry a full set: me_house01_large_destruction has five
+		// materials and ONE diffuse between them, so four of its surfaces came out plain grey --
+		// a white building in the middle of a textured street. Borrowing from a sibling subset is
+		// wrong in detail and much closer than no texture at all.
+		for (const other of subsets) {
+			for (const name of names) {
+				if (other !== undefined && other[name] !== undefined) {
+					return other[name];
+				}
+			}
+		}
+
 		return null;
 	}
 
@@ -372,6 +386,18 @@ export class MeshManager {
 	/** Material for surfaces with no texture of their own, such as the terrain. */
 	public get groundMaterial(): THREE.Material {
 		return this.material;
+	}
+
+	/**
+	 * Adopt meshes built elsewhere so they are repainted like any other copy.
+	 *
+	 * An instanced batch copies whatever material the original holds when it is built, and a
+	 * texture that arrives afterwards repaints the original -- never the batch. Handing the batch
+	 * over here puts it in the same tracking every clone uses.
+	 */
+	public adopt(file: string, parts: any[]): void {
+		this.track(file, parts);
+		void this.paint(file, parts);
 	}
 
 	/** Say that an object's geometry is drawn by an instanced batch. */

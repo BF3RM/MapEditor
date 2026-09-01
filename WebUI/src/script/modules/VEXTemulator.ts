@@ -519,7 +519,10 @@ export class VEXTemulator {
 		});
 
 		// One draw per mesh subset instead of one per placement.
-		const drawn = await models.instanced.build((file) => meshes.source(file));
+		const drawn = await models.instanced.build(
+			(file) => meshes.source(file),
+			(file, parts) => meshes.adopt(file, parts)
+		);
 
 		if (drawn > 0) {
 			const batched = models.instanced.stats;
