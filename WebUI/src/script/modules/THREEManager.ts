@@ -231,6 +231,13 @@ export class THREEManager {
 		this.gizmoControls = WEBGL_AVAILABLE
 			? new GizmoWrapper(this.camera, this.renderer.domElement, GIZMO_MODE.select)
 			: makeGizmoStub();
+		// Standalone (browser/emulator): there is no Lua freecam to hand the camera to, so let the
+		// library drive it with the mouse. In game this stays off -- the freecam is authoritative
+		// and pushes its transform in through updateCameraTransform.
+		if (debugMode && WEBGL_AVAILABLE) {
+			this.cameraControls.enableStandaloneMouse();
+		}
+
 		this.inputControls = new InputControls(this.renderer.domElement);
 		this.selectionWrapper = WEBGL_AVAILABLE
 			? new BoxSelectionWrapper(this.renderer.domElement, this.scene, this.camera, this.renderer)

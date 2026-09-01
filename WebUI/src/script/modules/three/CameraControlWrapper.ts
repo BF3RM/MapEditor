@@ -38,6 +38,24 @@ export default class CameraControlWrapper extends CameraControls {
 		this.updateVextCamera = enable;
 	}
 
+	/**
+	 * Drive the camera from the mouse, for the browser/emulator.
+	 *
+	 * In game the camera is authoritatively the Lua freecam: right-click hands over to it and it
+	 * pushes transforms back through updateCameraTransform, which is why the library's own left
+	 * and right actions are set to NONE in the constructor. Standalone there is no Lua, so that
+	 * handoff goes nowhere and the camera cannot be moved at all.
+	 *
+	 * Right = orbit/look and left stays NONE so left-click keeps selecting objects.
+	 */
+	public enableStandaloneMouse() {
+		this.mouseButtons.right = CameraControls.ACTION.ROTATE;
+		this.mouseButtons.middle = CameraControls.ACTION.TRUCK;
+		this.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
+		this.updateVextCamera = false;
+		this.enabled = true;
+	}
+
 	public updateCameraTransform(transform: ILinearTransform) {
 		const linearTransform = LinearTransform.setFromTable(transform);
 		const distance = 10;
