@@ -14,6 +14,7 @@ server keeps one RimeREPL alive (a commands file that mounts and then DROPs to t
 The dev server proxies /meshes here (see WebUI/vue.config.js), so the browser only ever talks to
 one origin.
 """
+import base64
 import json
 import os
 import queue
@@ -483,7 +484,79 @@ class Meshes:
                 if resource is None or not self.rime.terrain(resource, path):
                     return None
 
+                self._decode_materials(path)
+
         return open(path, 'rb').read()
+
+    @staticmethod
+    def _decode_materials(path):
+        """Turn the material tree's run-length lines into a flat grid of material indices.
+
+        Which material covers which patch of ground is the only place that is written down, and it
+        arrives encoded: two equal bytes in a row are a run, and the byte after them says how many
+        MORE of that byte follow; anything else is a single sample. Each decoded byte then holds
+        two 4-bit material indices, high nibble first, so a node of N samples per side decodes to
+        N lines of N/2 bytes.
+
+        Verified on MP_001: all 4096 lines decode to exactly 128 bytes, giving the 256x256 samples
+        per node the tree declares.
+        """
+        try:
+            with open(path) as handle:
+                terrain = json.load(handle)
+        except (OSError, ValueError):
+            return
+
+        nodes = terrain.get('materialNodes') or []
+
+        if not nodes:
+            return
+
+        side = int(terrain.get('materialSamplesPerSide') or 0)
+        decoded = 0
+
+        for node in nodes:
+            rle = base64.b64decode(node.pop('rle', '') or '')
+            sizes = node.pop('lineSizes', []) or []
+            samples = bytearray()
+            offset = 0
+
+            for size in sizes:
+                end = offset + size
+
+                if end > len(rle):
+                    break
+
+                i = offset
+
+                while i < end:
+                    value = rle[i]
+
+                    # A run needs its marker, its twin and a count, all inside the line: two equal
+                    # bytes at the very end are two samples, not a truncated run.
+                    if i + 2 < end and rle[i + 1] == value:
+                        samples.extend(bytes([value]) * (rle[i + 2] + 1))
+                        i += 3
+                    else:
+                        samples.append(value)
+                        i += 1
+
+                offset = end
+
+            # Only keep what decoded to the size the tree promised; a short node means the format
+            # is not what we think it is, and half a grid painted over the terrain is worse than
+            # none at all.
+            if side and len(samples) * 2 == side * side:
+                node['samples'] = base64.b64encode(bytes(samples)).decode('ascii')
+                decoded += 1
+
+        terrain['materialNodesDecoded'] = decoded
+
+        with open(path, 'w') as handle:
+            json.dump(terrain, handle)
+
+        print('[mesh] terrain materials: %d/%d nodes decoded (%d samples per side)'
+              % (decoded, len(nodes), side), flush=True)
 
     def _terrain_resource(self, map_name):
         cached = self.kinds.get('terrain:' + map_name.lower())
