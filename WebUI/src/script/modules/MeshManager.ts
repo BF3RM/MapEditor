@@ -322,10 +322,27 @@ export class MeshManager {
 			return this.material;
 		}
 
+		// Alpha-tested where the texture carries alpha.
+		//
+		// BF3 masks foliage, fences and decals in the diffuse's alpha channel, so without this a
+		// leaf card renders as a solid rectangle -- which is why the trees read as black blobs.
+		// The compressed format says whether there is an alpha channel at all: DXT1 has none unless
+		// it is the 1-bit variant, DXT5 always does. Testing at 0.5 is a no-op on a texture whose
+		// alpha is solid, so this is safe to apply wherever alpha exists.
+		const format = (map as any).format;
+		const hasAlpha = format === 33777 || format === 33779; // RGBA_S3TC_DXT1 / DXT5
+
 		// The normal map is a bonus, not a requirement: BF3 stores some of them in formats the DDS
 		// loader will not take, and a missing one only costs surface detail.
 		const normalMap = normalResource === null ? null : await this.normal(normalResource);
-		const material = new THREE.MeshStandardMaterial({ map, roughness: 0.95, metalness: 0.0 });
+		const material = new THREE.MeshStandardMaterial({
+			map,
+			roughness: 0.95,
+			metalness: 0.0,
+			alphaTest: hasAlpha ? 0.5 : 0,
+			// A masked card is meant to be seen from both sides.
+			side: hasAlpha ? THREE.DoubleSide : THREE.FrontSide
+		});
 
 		if (normalMap !== null) {
 			material.normalMap = normalMap;
@@ -477,6 +494,13 @@ export class MeshManager {
 				this.pending.set(gameObject, file);
 				return;
 			}
+
+			model.traverse((child: any) => {
+				if (child.isMesh) {
+					child.castShadow = true;
+					child.receiveShadow = true;
+				}
+			});
 
 			gameObject.add(model);
 			this.showInScene(gameObject);

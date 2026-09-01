@@ -114,6 +114,7 @@ export class Terrain {
 		geometry.computeVertexNormals();
 
 		const mesh = new THREE.Mesh(geometry, material);
+		mesh.receiveShadow = true;
 		mesh.position.set((node.min[0] + node.max[0]) / 2, 0, (node.min[2] + node.max[2]) / 2);
 
 		return mesh;

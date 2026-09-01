@@ -42,7 +42,11 @@ export class Lighting {
 			return false;
 		}
 
-		const scene = (window as any).editor.threeManager.scene;
+		const three = (window as any).editor.threeManager;
+		const scene = three.scene;
+
+		three.renderer.shadowMap.enabled = true;
+		three.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 		const existing = scene.getObjectByName('standalone-lighting');
 
 		if (existing !== undefined) {
@@ -61,6 +65,19 @@ export class Lighting {
 		rig.name = 'standalone-lighting';
 
 		const light = new THREE.DirectionalLight(sun, 2.2);
+
+		// One sun casting over the whole level. The ortho box is sized from the map rather than
+		// guessed: BF3 levels are a kilometre across and a default shadow camera covers metres.
+		light.castShadow = true;
+		light.shadow.mapSize.set(2048, 2048);
+		light.shadow.camera.near = 1;
+		light.shadow.camera.far = 2000;
+		light.shadow.camera.left = -400;
+		light.shadow.camera.right = 400;
+		light.shadow.camera.top = 400;
+		light.shadow.camera.bottom = -400;
+		light.shadow.bias = -0.0006;
+
 		light.position.set(
 			Math.cos(elevation) * Math.sin(azimuth) * 500,
 			Math.sin(elevation) * 500,
