@@ -537,7 +537,9 @@ export class VEXTemulator {
 		}
 
 		// The level's own sun and sky, rather than a rig invented here.
-		if (await new Lighting(source).apply(level)) {
+		const lighting = new Lighting(source);
+
+		if (await lighting.apply(level)) {
 			console.log('WebX: lit from the level\'s VisualEnvironment');
 		}
 
@@ -548,6 +550,16 @@ export class VEXTemulator {
 			console.log('Rime: terrain built from ' + patches + ' heightfield patches');
 			(window as any).editor.threeManager.setPendingRender();
 		}
+
+		// The sky doubles as the environment distant surfaces are painted from. Off the critical
+		// path: the texture may still be extracting, and nothing below it should wait on that.
+		void lighting.environment(level, (resource) => meshes.load(resource))
+			.then((bound) => {
+				if (bound) {
+					console.log('WebX: sky bound as the scene environment');
+				}
+			})
+			.catch(() => { /* no sky is not a failure worth stopping the level for */ });
 
 		// Fill in geometry as the server finishes extracting it. Nothing is lost if this never
 		// converges -- the objects are all there, some just have no mesh yet.

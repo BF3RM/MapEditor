@@ -93,8 +93,57 @@ export class Lighting {
 		return true;
 	}
 
+	/**
+	 * The level's sky, as an environment map.
+	 *
+	 * Distant geometry -- backdrop houses above all -- carries no texture binding anywhere: no
+	 * MeshVariationDatabase parameters, no material parameters, and a shader (MP001_SS_BBox_01_WET)
+	 * that declares neither streamable nor external textures. "SS_BBox" is a box-projected shader,
+	 * and the VisualEnvironment is what holds its pixels: PanoramicTexture and StaticEnvmapTexture.
+	 * Binding the panorama as the scene environment is what stops those surfaces rendering white.
+	 */
+	public async environment(levelPath: string, load: (resource: string) => Promise<any>): Promise<boolean> {
+		const sky = await this.component(levelPath, 'SkyComponentData');
+
+		if (sky === null) {
+			return false;
+		}
+
+		for (const name of ['PanoramicTexture', 'SkyGradientTexture']) {
+			const reference = (sky.$fields[name] || {}).$value;
+
+			if (reference === null || reference === undefined || reference.$partitionGuid === undefined) {
+				continue;
+			}
+
+			const resource = this.source.pathForPartition(reference.$partitionGuid);
+
+			if (resource === undefined) {
+				continue;
+			}
+
+			const texture = await load(resource);
+
+			if (texture !== null && texture !== undefined) {
+				const three = (window as any).editor.threeManager;
+
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+				three.scene.environment = texture;
+				three.setPendingRender();
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/** The level's OutdoorLightComponentData, found through its VisualEnvironment objects. */
 	private async outdoorLight(levelPath: string): Promise<any | null> {
+		return this.component(levelPath, 'OutdoorLightComponentData');
+	}
+
+	private async component(levelPath: string, type: string): Promise<any | null> {
 		const partition = await this.source.partitionByPath(levelPath);
 
 		if (partition === null) {
@@ -131,7 +180,7 @@ export class Lighting {
 			// A level carries several environments (indoor, rain); the first outdoor one is the
 			// daylight the map is lit by.
 			for (const candidate of target.$instances) {
-				if (candidate.$type === 'OutdoorLightComponentData') {
+				if (candidate.$type === type) {
 					return candidate;
 				}
 			}

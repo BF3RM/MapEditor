@@ -77,6 +77,7 @@ export class MeshManager {
 
 	/** One load per texture resource, shared by every material using it. */
 	private loadedTextures = new Map<string, Promise<THREE.Texture | null>>();
+	private dx10 = new Map<string, Promise<boolean>>();
 
 	/** Textured materials, keyed by texture resource, so meshes sharing one share the material. */
 	private materials = new Map<string, THREE.Material>();
@@ -229,6 +230,11 @@ export class MeshManager {
 			['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas']);
 	}
 
+	/** A level texture by resource path, for callers outside the mesh pipeline (the sky). */
+	public load(resource: string): Promise<THREE.Texture | null> {
+		return this.texture(resource);
+	}
+
 	private async texture(resource: string, colour = true): Promise<THREE.Texture | null> {
 		let pending = this.loadedTextures.get(resource);
 
@@ -308,12 +314,23 @@ export class MeshManager {
 	}
 
 	/**
-	 * A normal map, as PNG.
+	 * A normal map.
 	 *
-	 * BF3 stores them as BC5 inside a DX10-header DDS, which the DDS loader handles in neither
-	 * respect, so the server decodes them and serves PNG instead.
+	 * Most are plain DXT and load straight off the DDS. The rest are BC5 inside a DX10-header DDS,
+	 * which the DDS loader handles in neither respect, so the server decodes those to PNG.
 	 */
 	private async normal(resource: string): Promise<THREE.Texture | null> {
+		// Plain DXT loads straight off the DDS -- vectors, not colour, so no sRGB. Asking the DDS
+		// loader to try a BC5 one instead would work by falling through, but it complains to the
+		// console for every miss, so read the four-CC first and route on it.
+		if (!await this.isDx10(resource)) {
+			const direct = await this.texture(resource, false);
+
+			if (direct !== null) {
+				return direct;
+			}
+		}
+
 		const key = 'normal:' + resource;
 		let pending = this.loadedTextures.get(key);
 
@@ -332,6 +349,41 @@ export class MeshManager {
 			});
 
 			this.loadedTextures.set(key, pending);
+		}
+
+		return pending;
+	}
+
+	/** Whether a DDS carries a DX10 header, whose BC5 payload the loader cannot read. */
+	private async isDx10(resource: string): Promise<boolean> {
+		let pending = this.dx10.get(resource);
+
+		if (pending === undefined) {
+			pending = (async () => {
+				try {
+					// Range-served if the server supports it, whole file if not; either way the
+					// four-CC sits at byte 84 and the body is discarded.
+					const response = await fetch(this.base + '/texture/' + resource + '.dds',
+						{ headers: { Range: 'bytes=0-127' } });
+
+					if (!response.ok) {
+						return true;
+					}
+
+					const bytes = new Uint8Array(await response.arrayBuffer());
+
+					if (bytes.length < 88) {
+						return true;
+					}
+
+					return String.fromCharCode(bytes[84], bytes[85], bytes[86], bytes[87]) === 'DX10';
+				} catch (e) {
+					// Unknown: let the server's PNG path answer for it.
+					return true;
+				}
+			})();
+
+			this.dx10.set(resource, pending);
 		}
 
 		return pending;
