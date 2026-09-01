@@ -513,9 +513,19 @@ export class VEXTemulator {
 
 		// The baked statics, whose transforms live in the level's Havok data rather than EBX. Runs
 		// after the EBX walk so duplicates can be recognised and skipped.
-		const statics = await new StaticModels(source, meshes).load(level, (batch) => {
+		const models = new StaticModels(source, meshes);
+		const statics = await models.load(level, (batch) => {
 			(window as any).vext.HandleResponse(batch, true);
 		});
+
+		// One draw per mesh subset instead of one per placement.
+		const drawn = await models.instanced.build((file) => meshes.source(file));
+
+		if (drawn > 0) {
+			const batched = models.instanced.stats;
+			console.log('Rime: ' + batched.instances + ' placements drawn as ' + drawn +
+				' instanced meshes (' + batched.meshes + ' unique)');
+		}
 
 		if (statics > 0) {
 			console.log('Rime: ' + statics + ' baked statics placed');

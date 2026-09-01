@@ -17,10 +17,16 @@ import { signals } from '@/script/modules/Signals';
 import { GameObject } from '@/script/types/GameObject';
 import { CommandActionResult } from '@/script/types/CommandActionResult';
 
+/** A blueprint's geometry: one entry per part, with where it sits inside the prefab. */
+interface MeshPart {
+	file: string;
+	transform?: number[];
+}
+
 interface MeshManifest {
 	game: string;
 	level: string;
-	blueprints: Record<string, string>;
+	blueprints: Record<string, MeshPart[]>;
 	/** file -> the mesh resource it was extracted from. */
 	meshes?: Record<string, string>;
 }
@@ -75,8 +81,13 @@ export class MeshManager {
 	/** Textured materials, keyed by texture resource, so meshes sharing one share the material. */
 	private materials = new Map<string, THREE.Material>();
 
-	/** file -> its subsets, so a later pass can paint what was not ready the first time. */
-	private painted = new Map<string, any[]>();
+	/** Objects whose geometry is drawn by an instanced batch rather than cloned here. */
+	private instanced = new Set<string>();
+
+	/** file -> EVERY copy's subsets. A repaint has to reach each one: a clone copies the material
+	 * reference it finds at the moment it is made, so copies taken before a texture arrived are not
+	 * fixed by painting the original again. */
+	private painted = new Map<string, any[][]>();
 
 	private attached = 0;
 	private missing = 0;
@@ -87,7 +98,7 @@ export class MeshManager {
 	private placed = new Set<string>();
 
 	/** Objects still waiting on geometry that was not extracted yet. */
-	private pending = new Map<any, string>();
+	private pending = new Map<any, MeshPart[]>();
 
 	/** file -> the mesh resource it came from. A file name cannot be turned back into a path:
 	 * '/' became '_' and mesh names contain underscores of their own. */
@@ -247,6 +258,16 @@ export class MeshManager {
 	}
 
 	/** Swap in textured materials as they arrive, subset by subset. */
+	private track(file: string, parts: any[]): void {
+		const copies = this.painted.get(file);
+
+		if (copies === undefined) {
+			this.painted.set(file, [parts]);
+		} else {
+			copies.push(parts);
+		}
+	}
+
 	private async paint(file: string, parts: any[]): Promise<void> {
 		const meshPath = this.meshKeys.get(file);
 
@@ -353,6 +374,11 @@ export class MeshManager {
 		return this.material;
 	}
 
+	/** Say that an object's geometry is drawn by an instanced batch. */
+	public markInstanced(guid: string): void {
+		this.instanced.add(guid.toLowerCase());
+	}
+
 	/** Teach the layer where a mesh's geometry lives, for objects not covered by the manifest. */
 	public register(partitionGuid: string, file: string, meshPath?: string): void {
 		if (meshPath !== undefined) {
@@ -366,7 +392,7 @@ export class MeshManager {
 		const key = partitionGuid.toLowerCase();
 
 		if (this.manifest.blueprints[key] === undefined) {
-			this.manifest.blueprints[key] = file;
+			this.manifest.blueprints[key] = [{ file }];
 		}
 	}
 
@@ -390,10 +416,12 @@ export class MeshManager {
 		const waiting = Array.from(this.pending.entries());
 		let filled = 0;
 
-		for (const [gameObject, file] of waiting) {
-			this.loaded.delete(file);
+		for (const [gameObject, parts] of waiting) {
+			for (const part of parts) {
+				this.loaded.delete(part.file);
+			}
 
-			const model = await this.instance(file);
+			const model = await this.assemble(parts);
 
 			if (model === null) {
 				continue;
@@ -437,8 +465,10 @@ export class MeshManager {
 			retried++;
 		}
 
-		for (const [file, parts] of Array.from(this.painted.entries())) {
-			void this.paint(file, parts);
+		for (const [file, copies] of Array.from(this.painted.entries())) {
+			for (const parts of copies) {
+				void this.paint(file, parts);
+			}
 		}
 
 		return retried;
@@ -466,27 +496,32 @@ export class MeshManager {
 		}
 
 		const partitionGuid = commandActionResult.gameObjectTransferData.blueprintCtrRef.partitionGuid.toString();
-		const file = this.manifest.blueprints[partitionGuid.toLowerCase()];
-
-		if (file !== undefined && MeshManager.VOLUME.test(this.meshKeys.get(file) || file)) {
-			this.volumes++;
+		// Instanced statics carry their geometry through InstancedMeshes; cloning it here too drew
+		// the whole baked layer twice.
+		if (this.instanced.has(guid.toString().toLowerCase())) {
+			return;
 		}
 
-		if (file === undefined) {
-			// Groups (worldparts, subworlds) and prefabs whose mesh sits deeper than a direct
-			// Mesh field. Expected, and not worth a console line per object.
+		const parts = this.manifest.blueprints[partitionGuid.toLowerCase()];
+
+		if (parts === undefined || parts.length === 0) {
+			// Groups (worldparts, subworlds) and wrappers whose geometry is placed separately.
 			this.missing++;
 			return;
 		}
 
-		const position = commandActionResult.gameObjectTransferData.transform.trans;
-		this.placed.add(MeshManager.placementKey(file, position.x, position.y, position.z));
+		if (MeshManager.VOLUME.test(this.meshKeys.get(parts[0].file) || parts[0].file)) {
+			this.volumes++;
+		}
 
-		void this.instance(file).then((model) => {
+		const position = commandActionResult.gameObjectTransferData.transform.trans;
+		this.placed.add(MeshManager.placementKey(parts[0].file, position.x, position.y, position.z));
+
+		void this.assemble(parts).then((model) => {
 			if (model === null) {
 				// Its geometry was not ready yet. The server extracts a level's meshes in the
 				// background, so ask again later rather than leaving the object bare forever.
-				this.pending.set(gameObject, file);
+				this.pending.set(gameObject, parts);
 				return;
 			}
 
@@ -504,8 +539,76 @@ export class MeshManager {
 		});
 	}
 
+	/**
+	 * A prefab's geometry: every part, each at the offset it holds inside the blueprint.
+	 *
+	 * A single-part blueprint is returned as-is; anything else becomes a group, so a facade cluster
+	 * or a lamp arrives whole instead of as whichever piece happened to be first.
+	 */
+	private async assemble(parts: MeshPart[]): Promise<THREE.Object3D | null> {
+		if (parts.length === 1 && parts[0].transform === undefined) {
+			return this.instance(parts[0].file);
+		}
+
+		const group = new THREE.Group();
+
+		for (const part of parts) {
+			const model = await this.instance(part.file);
+
+			if (model === null) {
+				continue;
+			}
+
+			if (part.transform !== undefined && part.transform.length === 12) {
+				const t = part.transform;
+				// right, up, forward, translation -- the same basis order the editor's own
+				// LinearTransform uses.
+				model.applyMatrix4(new THREE.Matrix4().set(
+					t[0], t[3], t[6], t[9],
+					t[1], t[4], t[7], t[10],
+					t[2], t[5], t[8], t[11],
+					0, 0, 0, 1
+				));
+			}
+
+			group.add(model);
+		}
+
+		return group.children.length > 0 ? group : null;
+	}
+
+	/** The loaded original for a file, painted, for the instanced batches to build from. */
+	public async source(file: string): Promise<THREE.Object3D | null> {
+		return this.original(file);
+	}
+
 	/** A cloned copy of a mesh, loading the file at most once. */
 	private async instance(file: string): Promise<THREE.Object3D | null> {
+		const original = await this.original(file);
+
+		if (original === null) {
+			return null;
+		}
+
+		// Geometry is never gated on textures. The clone inherits whatever the original holds now,
+		// and is tracked so a later pass can paint it if that was still the neutral material.
+		const copy = original.clone(true);
+		const parts: any[] = [];
+
+		copy.traverse((child: any) => {
+			if (child.isMesh) {
+				parts.push(child);
+			}
+		});
+
+		this.track(file, parts);
+		void this.paint(file, parts);
+
+		return copy;
+	}
+
+	/** The loaded, painted original for a file. Loaded at most once. */
+	private async original(file: string): Promise<THREE.Object3D | null> {
 		let pending = this.loaded.get(file);
 
 		if (pending === undefined) {
@@ -522,6 +625,24 @@ export class MeshManager {
 							}
 						});
 
+						// Paint the ORIGINAL, not each clone.
+						//
+						// Clones copy the material reference they find at the moment they are made,
+						// so painting a clone leaves every copy taken before its texture arrived
+						// stuck on the neutral material -- 1238 meshes were sitting like that. The
+						// original is painted once and every clone, past and future, points at the
+						// same textured material.
+						const parts: any[] = [];
+						gltf.scene.traverse((child: any) => {
+							if (child.isMesh) {
+								child.material = this.material;
+								parts.push(child);
+							}
+						});
+
+						this.track(file, parts);
+						void this.paint(file, parts);
+
 						resolve(gltf.scene);
 					},
 					undefined,
@@ -532,35 +653,7 @@ export class MeshManager {
 			this.loaded.set(file, pending);
 		}
 
-		const original = await pending;
-
-		if (original === null) {
-			return null;
-		}
-
-		const copy = original.clone(true);
-		const parts: any[] = [];
-
-		copy.traverse((child: any) => {
-			if (child.isMesh) {
-				parts.push(child);
-			}
-		});
-
-		// Neutral material now, texture later.
-		//
-		// Textures are extracted from the game one at a time, so awaiting them here would hold the
-		// geometry back behind every texture in the level -- one slow extraction stalled the whole
-		// map at eight meshes. Geometry is never gated on them: the object appears, and its surface
-		// improves when the texture turns up.
-		for (const part of parts) {
-			part.material = this.material;
-		}
-
-		this.painted.set(file, parts);
-		void this.paint(file, parts);
-
-		return copy;
+		return pending;
 	}
 
 	/**

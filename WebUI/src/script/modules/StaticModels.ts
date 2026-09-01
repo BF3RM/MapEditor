@@ -14,6 +14,7 @@
 
 import { WebXSource } from '@/script/modules/WebXSource';
 import { MeshManager } from '@/script/modules/MeshManager';
+import { InstancedMeshes } from '@/script/modules/InstancedMeshes';
 import { GAMEOBJECT_ORIGIN, REALM } from '@/script/types/Enums';
 
 const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
@@ -53,6 +54,9 @@ function meshGroupGuid(index: number): string {
 export class StaticModels {
 	private source: WebXSource;
 	private meshes: MeshManager;
+
+	/** The baked statics are drawn instanced: thousands of copies of a few hundred meshes. */
+	public readonly instanced = new InstancedMeshes();
 
 	public constructor(source: WebXSource, meshes: MeshManager) {
 		this.source = source;
@@ -109,7 +113,13 @@ export class StaticModels {
 					continue;
 				}
 
-				batch.push(this.toResult(staticGuid(index), meshPath, partitionGuid, transform, groupGuid));
+				// The object exists in the editor -- hierarchy, selection, inspector -- while its
+				// geometry is drawn by the instanced batch rather than a clone of its own.
+				const guid = staticGuid(index);
+
+				this.instanced.add(file, transform);
+				this.meshes.markInstanced(guid);
+				batch.push(this.toResult(guid, meshPath, partitionGuid, transform, groupGuid));
 				added++;
 			}
 
