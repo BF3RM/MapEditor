@@ -236,6 +236,10 @@ export class THREEManager {
 		// and pushes its transform in through updateCameraTransform.
 		if (debugMode && WEBGL_AVAILABLE) {
 			this.cameraControls.enableStandaloneMouse();
+			console.log('[MapEditor] standalone camera: right = look, middle = pan, wheel = zoom');
+		} else if (debugMode) {
+			// Says WHY there is no camera, instead of leaving a dead viewport to guess at.
+			console.warn('[MapEditor] standalone camera unavailable: WebGL did not initialise');
 		}
 
 		this.inputControls = new InputControls(this.renderer.domElement);

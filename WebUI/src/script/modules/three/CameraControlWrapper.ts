@@ -5,11 +5,18 @@ import { Vec3 } from '@/script/types/primitives/Vec3';
 
 CameraControls.install({ THREE });
 
+/** Metres ahead of the camera to orbit about in standalone mode (see enableStandaloneMouse). */
+const ORBIT_AHEAD = 12;
+
 export default class CameraControlWrapper extends CameraControls {
 	private updateVextCamera = true;
 
+	/** Kept for standalone mode: the orbit point is derived from where the camera is looking. */
+	private ownCamera: THREE.PerspectiveCamera;
+
 	constructor(camera: THREE.PerspectiveCamera, element: HTMLCanvasElement) {
 		super(camera, element);
+		this.ownCamera = camera;
 
 		this.mouseButtons.left = CameraControls.ACTION.NONE;
 		this.mouseButtons.right = CameraControls.ACTION.NONE;
@@ -54,6 +61,23 @@ export default class CameraControlWrapper extends CameraControls {
 		this.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
 		this.updateVextCamera = false;
 		this.enabled = true;
+
+		// Orbit about a point just AHEAD of the camera, refreshed as each drag starts.
+		//
+		// ROTATE swings the camera around its target, and the target is wherever it was last set --
+		// the origin at boot. On a 1km level that means right-drag hurls the camera around a point
+		// hundreds of metres away and reads as "the camera is broken" rather than "I am looking
+		// around". Re-anchoring per drag makes it behave like a look control.
+		this.addEventListener('controlstart', () => {
+			const s_Dir = new THREE.Vector3();
+			this.ownCamera.getWorldDirection(s_Dir);
+			const s_Pos = this.ownCamera.position;
+			this.setOrbitPoint(
+				s_Pos.x + s_Dir.x * ORBIT_AHEAD,
+				s_Pos.y + s_Dir.y * ORBIT_AHEAD,
+				s_Pos.z + s_Dir.z * ORBIT_AHEAD
+			);
+		});
 	}
 
 	public updateCameraTransform(transform: ILinearTransform) {

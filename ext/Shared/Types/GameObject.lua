@@ -403,7 +403,14 @@ function GameObject:SetTransform(p_LinearTransform, p_UpdateCollision, p_AutoMod
 				return false
 			end
 
-			local s_Response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, self.isEnabled)
+			-- The drag PREVIEW is a ghost that follows the cursor: it is re-transformed constantly
+			-- while dragging, and it must not be cycled through the physics enable/disable that a
+			-- real vehicle move needs (GameEntity:SetTransform). Firing Disable/Stop/Enable/Start
+			-- on a just-created preview vehicle, every update, is both pointless and the kind of
+			-- thing that takes the realm down mid-drag.
+			local s_CycleAllowed = self.isEnabled and self.guid ~= PREVIEW_GUID
+
+			local s_Response = l_GameEntity:SetTransform(p_LinearTransform, p_UpdateCollision, s_CycleAllowed)
 
 			if not s_Response then
 				return false

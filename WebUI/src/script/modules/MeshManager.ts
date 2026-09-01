@@ -59,10 +59,14 @@ export class MeshManager {
 	 * Meshes the engine never draws.
 	 *
 	 * Collision hulls, lighting volumes and occluders exist for the engine, not the eye -- the game
-	 * shows none of them. They also carry no texture, so drawing them put big white boxes through
+	 * shows none of them. FX meshes are the same case from the other direction: they are particle
+	 * emitters (rain mist, fire, damage states), drawn by the effect system and not as geometry, so
+	 * nothing exports them -- every one was a guaranteed 404 ("mesh not available") and they are
+	 * the bulk of the network noise on a level load. They also carry no texture, so drawing them put big white boxes through
 	 * the middle of a level that is otherwise faithful. Hiding them is what matches the game.
 	 */
-	private static readonly INVISIBLE = /invisiblecollision|charactercollision|_collision|lightpoly|_dimmer|occluder|volumemesh/i;
+	private static readonly INVISIBLE =
+		/invisiblecollision|charactercollision|_collision|lightpoly|_dimmer|occluder|volumemesh|^fx\/|^fx_/i;
 
 	/** One load per texture resource, shared by every material using it. */
 	private loadedTextures = new Map<string, Promise<THREE.Texture | null>>();
