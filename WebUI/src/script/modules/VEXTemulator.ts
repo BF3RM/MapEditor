@@ -47,6 +47,33 @@ export class VEXTemulator {
 		this.events.UIReloaded = this.UIReloaded;
 		this.events.controlUpdate = () => {};
 		this.events.controlStart = () => {};
+
+		// Everything else the WebUI sends is a message to the NATIVE side: it draws the selection
+		// boxes and the gizmo through VEXT's DebugRenderer, restricts input, flies the freecam.
+		// Standalone there is no native side, and three.js already draws all of it in the
+		// viewport, so these are genuinely nothing to do here -- but going through the
+		// unimplemented path logged console.error on every mouse move (NativeHighlight) and every
+		// selection change, which buries real errors.
+		//
+		// Accept them silently. Add a real handler above if one ever needs to do something.
+		const s_NativeOnly = [
+			'controlEnd',
+			'DisableEditorMode',
+			'EnableFreeCamMovement',
+			'FocusCamera',
+			'NativeHighlight',
+			'NativePick',
+			'SetGizmoBasis',
+			'SetGizmoCenter',
+			'SetGizmoMode',
+			'SetOverlaySettings',
+			'SetSelection',
+			'SetWorldSpace'
+		];
+
+		s_NativeOnly.forEach((l_Name: string) => {
+			this.events[l_Name] = () => {};
+		});
 	}
 
 	public Receive(commands: any[]) {
