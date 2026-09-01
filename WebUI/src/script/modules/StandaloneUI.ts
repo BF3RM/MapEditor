@@ -197,6 +197,45 @@ export function frameLevel(): boolean {
 }
 
 /**
+ * Stop drag-to-box-select fighting the camera.
+ *
+ * three's SelectionHelper attaches its OWN pointer listeners to the canvas, so once the viewport
+ * started receiving input every camera drag also drew a selection box -- and then threw on release
+ * ("can't access property removeChild, this.element.parentElement is null") because it tears down
+ * an element it never attached.
+ *
+ * In-game the engine owns the camera and a drag genuinely IS a box select, so this is standalone
+ * only. Clicking still selects: that goes through the raycast picking installed above.
+ */
+export function disableDragSelection(): void {
+	const editor = (window as any).editor;
+	const wrapper = editor === undefined ? undefined : editor.threeManager.selectionWrapper;
+	const helper = wrapper === undefined ? undefined : (wrapper as any).helper;
+
+	if (helper === undefined) {
+		return;
+	}
+
+	if (typeof helper.dispose === 'function') {
+		helper.dispose();
+	}
+
+	// Belt and braces: whatever else calls it, the teardown must not throw on an element that was
+	// never in the document.
+	helper.onSelectOver = () => {
+		const element = helper.element;
+
+		if (element !== undefined && element !== null && element.parentElement !== null) {
+			element.parentElement.removeChild(element);
+		}
+	};
+
+	if (helper.element !== undefined && helper.element !== null) {
+		helper.element.style.display = 'none';
+	}
+}
+
+/**
  * Give the mouse control of the camera.
  *
  * In-game left and right drag are deliberately dead (CameraControlWrapper sets them to NONE): the

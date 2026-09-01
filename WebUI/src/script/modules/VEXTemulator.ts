@@ -14,7 +14,7 @@ import { Terrain } from '@/script/modules/Terrain';
 import { Lighting } from '@/script/modules/Lighting';
 import { MobileLayout } from '@/script/modules/MobileLayout';
 import {
-	StandaloneUI, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
+	StandaloneUI, disableDragSelection, enableCameraControls, enableMeshPicking, frameLevel, requestedLevel
 } from '@/script/modules/StandaloneUI';
 import { Guid } from '@/script/types/Guid';
 import { IEBXFieldData } from '@/script/commands/SetEBXFieldCommand';
@@ -501,6 +501,7 @@ export class VEXTemulator {
 		// so without framing the level the viewport shows empty space and reads as a failed load.
 		enableCameraControls();
 		enableMeshPicking();
+		disableDragSelection();
 		frameLevel();
 
 		ui.setStatus(level.split('/')[1] + ': ' + loaded + ' objects');
