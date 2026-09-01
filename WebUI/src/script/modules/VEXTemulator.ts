@@ -449,8 +449,10 @@ export class VEXTemulator {
 			}
 		}
 
-		console.log('WebX: geometry settled at ' + meshes.stats.attached + ' meshes (' +
-			meshes.pendingCount + ' without one)');
+		const settled = meshes.stats;
+		console.log('WebX: geometry settled at ' + settled.attached + ' meshes (' +
+			meshes.pendingCount + ' still extracting, ' + settled.missing +
+			' blueprints with no geometry, ' + settled.containers + ' containers)');
 	}
 
 	/**

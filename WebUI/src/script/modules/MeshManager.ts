@@ -92,6 +92,7 @@ export class MeshManager {
 
 	private attached = 0;
 	private missing = 0;
+	private containers = 0;
 	/** Volumes and collision hulls: drawn, but counted so their share is visible. */
 	private volumes = 0;
 
@@ -552,10 +553,11 @@ export class MeshManager {
 		return retried;
 	}
 
-	public get stats(): { attached: number; missing: number; volumes: number; meshes: number } {
+	public get stats(): { attached: number; missing: number; containers: number; volumes: number; meshes: number } {
 		return {
 			attached: this.attached,
 			missing: this.missing,
+			containers: this.containers,
 			volumes: this.volumes,
 			meshes: this.manifest === null ? 0 : Object.keys(this.manifest.blueprints).length
 		};
@@ -583,8 +585,17 @@ export class MeshManager {
 		const parts = this.manifest.blueprints[partitionGuid.toLowerCase()];
 
 		if (parts === undefined || parts.length === 0) {
-			// Groups (worldparts, subworlds) and wrappers whose geometry is placed separately.
-			this.missing++;
+			// Worldparts and subworlds are containers -- their geometry belongs to what they hold,
+			// so counting them as missing overstates the gap by an order of magnitude. Only a
+			// blueprint that should have drawn something is a real miss.
+			const typeName = commandActionResult.gameObjectTransferData.blueprintCtrRef.typeName;
+
+			if (typeName === 'WorldPartData' || typeName === 'SubWorldData') {
+				this.containers++;
+			} else {
+				this.missing++;
+			}
+
 			return;
 		}
 
