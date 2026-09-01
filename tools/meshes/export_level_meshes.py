@@ -170,28 +170,119 @@ def collect_blueprints(ebx, level_path):
     return sorted(found)
 
 
-def resolve_meshes(ebx, blueprint_guids):
-    """blueprint partition guid -> mesh resource path, for those that name a mesh directly."""
+IDENTITY = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+
+
+def transform_of(instance):
+    """A ReferenceObjectData's BlueprintTransform as a flat float[12], or identity."""
+    field = instance['$fields'].get('BlueprintTransform')
+    value = field.get('$value') if field else None
+
+    if not isinstance(value, dict):
+        return list(IDENTITY)
+
+    out = []
+
+    for axis in ('right', 'up', 'forward', 'trans'):
+        vec = (value.get(axis) or {}).get('$value') or {}
+
+        for component in ('x', 'y', 'z'):
+            entry = vec.get(component)
+            out.append(float(entry.get('$value', 0.0)) if isinstance(entry, dict) else 0.0)
+
+    return out if len(out) == 12 else list(IDENTITY)
+
+
+def compose(parent, child):
+    """child applied within parent: a 3x3 basis multiply plus the rotated offset."""
+    out = [0.0] * 12
+
+    for row in range(3):
+        for col in range(3):
+            out[row * 3 + col] = sum(child[row * 3 + k] * parent[k * 3 + col] for k in range(3))
+
+    for col in range(3):
+        out[9 + col] = parent[9 + col] + sum(child[9 + k] * parent[k * 3 + col] for k in range(3))
+
+    return out
+
+
+def resolve_meshes(ebx, blueprint_guids, depth=3):
+    """blueprint partition guid -> its meshes, each with the transform it sits at inside the prefab.
+
+    A blueprint is not always one mesh. Plenty are PREFABS -- a facade cluster, a lamp, a market
+    stall -- whose geometry lives in child reference objects, each with its own offset. Taking only
+    a direct Mesh field drew one part of those, or nothing at all: 771 of the 1303 meshes MP_001
+    describes were never placed, including whole families like architecture/facadeclusters.
+    """
     ebx.prefetch(blueprint_guids)
     mapping = {}
 
-    for guid in blueprint_guids:
+    def collect(guid, instance_guid, transform, level, out, seen):
         partition = ebx.partition(guid)
 
-        if partition is None:
-            continue
+        if partition is None or level > depth:
+            return
 
-        for instance in partition['$instances']:
-            mesh = ref(instance, 'Mesh')
+        instances = instances_of(partition)
+        instance = instances.get(instance_guid.lower()) if instance_guid else None
 
-            if mesh is None:
-                continue
+        if instance is None:
+            instance = primary(partition)
 
+        if instance is None:
+            return
+
+        key = (guid.lower(), instance['$guid'].lower())
+
+        if key in seen:
+            return
+
+        seen.add(key)
+
+        mesh = ref(instance, 'Mesh')
+
+        if mesh is not None:
             path = ebx.path_of(mesh['$partitionGuid'])
 
             if path is not None:
-                mapping[guid] = path
-                break
+                out.append({'mesh': path, 'transform': transform})
+
+        # An ObjectBlueprint points at its object; a prefab lists children, each placed itself.
+        target = ref(instance, 'Object')
+
+        if target is not None:
+            collect(target['$partitionGuid'], target['$instanceGuid'], transform, level + 1, out, seen)
+
+        for child_ref in refs(instance, 'Objects'):
+            child = instances.get(child_ref['$instanceGuid'].lower())
+
+            if child is None:
+                child = ebx.instance(child_ref)
+
+            if child is None:
+                continue
+
+            local = compose(transform, transform_of(child))
+            blueprint = ref(child, 'Blueprint')
+
+            if blueprint is not None:
+                collect(blueprint['$partitionGuid'], blueprint['$instanceGuid'], local, level + 1, out, seen)
+            else:
+                child_mesh = ref(child, 'Mesh')
+
+                if child_mesh is not None:
+                    path = ebx.path_of(child_mesh['$partitionGuid'])
+
+                    if path is not None:
+                        out.append({'mesh': path, 'transform': local})
+
+    for guid in blueprint_guids:
+        parts = []
+        collect(guid, None, list(IDENTITY), 0, parts, set())
+
+        if parts:
+            mapping[guid] = parts
 
     return mapping
 
@@ -283,7 +374,9 @@ def main():
 
         mapping = resolve_meshes(ebx, blueprints)
         per_level[level] = mapping
-        wanted.update(mapping.values())
+
+        for parts in mapping.values():
+            wanted.update(part['mesh'] for part in parts)
         print('  %-34s %4d blueprints, %3d meshes' % (level, len(blueprints), len(mapping)))
 
     meshes = sorted(wanted)
@@ -305,11 +398,12 @@ def main():
     for level, mapping in per_level.items():
         written = {}
 
-        for guid, mesh in mapping.items():
-            name = file_name_for(mesh)
+        for guid, parts in mapping.items():
+            kept = [dict(part, file=file_name_for(part['mesh'])) for part in parts
+                    if os.path.exists(os.path.join(args.out, file_name_for(part['mesh'])))]
 
-            if os.path.exists(os.path.join(args.out, name)):
-                written[guid] = name
+            if kept:
+                written[guid] = kept
 
         # Named for the map, not "manifest", so every exported level can sit in the same directory
         # -- a single manifest.json meant loading a second level silently reused the first's meshes.
@@ -317,7 +411,8 @@ def main():
         # is not possible -- '/' becomes '_' and mesh paths contain underscores of their own -- and
         # the on-demand server needs it to extract a file that is missing from the cache.
         manifest = {'game': args.game, 'level': level, 'blueprints': written,
-                    'meshes': {file_name_for(m): m for m in set(mapping.values())}}
+                    'meshes': {file_name_for(p['mesh']): p['mesh']
+                               for parts in mapping.values() for p in parts}}
         name = level.rstrip('/').split('/')[-1]
         json.dump(manifest, open(os.path.join(args.out, name + '.json'), 'w'), indent=1)
         total += len(written)

@@ -343,12 +343,22 @@ class Meshes:
         with self.lock:
             print('[mesh] resolving %s...' % level, flush=True)
             mapping = resolve_meshes(self.ebx, collect_blueprints(self.ebx, level))
-            manifest = {'game': GAME, 'level': level,
-                        'blueprints': {g: file_name_for(m) for g, m in mapping.items()},
-                        'meshes': {file_name_for(m): m for m in set(mapping.values())}}
 
-            for guid, mesh in mapping.items():
-                self.by_file[file_name_for(mesh)] = mesh
+            # A blueprint is a LIST of parts now, each with its offset inside the prefab.
+            blueprints = {}
+            meshes = {}
+
+            for guid, parts in mapping.items():
+                blueprints[guid] = [
+                    {'file': file_name_for(p['mesh']), 'transform': p['transform']} for p in parts
+                ]
+
+                for part in parts:
+                    name = file_name_for(part['mesh'])
+                    meshes[name] = part['mesh']
+                    self.by_file[name] = part['mesh']
+
+            manifest = {'game': GAME, 'level': level, 'blueprints': blueprints, 'meshes': meshes}
 
             json.dump(manifest, open(path, 'w'), indent=1)
             print('[mesh] %s: %d meshes' % (map_name, len(mapping)), flush=True)
@@ -520,10 +530,13 @@ class Meshes:
 
                     print('[mesh] %s: %d meshes' % (source, len(found)), flush=True)
 
-                    for mesh, materials in found.items():
-                        # First database wins: the level's own is asked for first and is the most
-                        # authoritative for meshes it knows.
-                        merged.setdefault(mesh, materials)
+                    for mesh, variations in found.items():
+                        # First database wins per VARIATION, not per mesh: a gamemode database can
+                        # carry a variation the level root never mentions.
+                        target = merged.setdefault(mesh, {})
+
+                        for hash_key, materials in variations.items():
+                            target.setdefault(hash_key, materials)
 
                 self._fill_from_shaders(map_name, level, merged)
                 json.dump({'meshes': merged}, open(path, 'w'))
@@ -559,9 +572,14 @@ class Meshes:
 
         filled = 0
 
-        for mesh, materials in merged.items():
+        for mesh, variations in merged.items():
+            materials = variations.get('0') or next(iter(variations.values()), [])
+
             if any(materials):
                 continue
+
+            variations.setdefault('0', materials)
+            materials = variations['0']
 
             for index, shader in enumerate(self._shaders_of(mesh)):
                 textures = shaders.get(shader.lower())

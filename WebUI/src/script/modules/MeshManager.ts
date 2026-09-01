@@ -50,7 +50,8 @@ export class MeshManager {
 	 * binds them in the level's MeshVariationDatabase, one entry per mesh and one material per
 	 * subset. Rime reads that (dump_mesh_textures) and the server serves it per level.
 	 */
-	private textures: Record<string, Array<Record<string, string>>> = {};
+	/** mesh -> variation hash -> its subsets' bindings. '0' is the base appearance. */
+	private textures: Record<string, Record<string, Array<Record<string, string>>>> = {};
 
 	private ddsLoader = new DDSLoader();
 	private pngLoader = new THREE.TextureLoader();
@@ -173,7 +174,14 @@ export class MeshManager {
 
 	/** A named map for one subset, whatever the shader happens to call it. */
 	private textureFor(meshPath: string, subset: number, names: string[]): string | null {
-		const subsets = this.textures[meshPath.toLowerCase()];
+		const variations = this.textures[meshPath.toLowerCase()];
+
+		if (variations === undefined) {
+			return null;
+		}
+
+		// The base appearance, or whatever the mesh does have if it ships none.
+		const subsets = variations['0'] || Object.values(variations)[0];
 
 		if (subsets === undefined || subsets.length === 0) {
 			return null;
@@ -192,21 +200,8 @@ export class MeshManager {
 
 	/** The diffuse texture for one subset, whatever the shader happens to call it. */
 	private diffuseFor(meshPath: string, subset: number): string | null {
-		const subsets = this.textures[meshPath.toLowerCase()];
-
-		if (subsets === undefined || subsets.length === 0) {
-			return null;
-		}
-
-		const bindings = subsets[Math.min(subset, subsets.length - 1)] || {};
-
-		for (const name of ['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas']) {
-			if (bindings[name] !== undefined) {
-				return bindings[name];
-			}
-		}
-
-		return null;
+		return this.textureFor(meshPath, subset,
+			['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas']);
 	}
 
 	private async texture(resource: string, colour = true): Promise<THREE.Texture | null> {
