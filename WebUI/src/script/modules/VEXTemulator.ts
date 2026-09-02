@@ -508,8 +508,55 @@ export class VEXTemulator {
 		// level's own road surface where it has one; the shader binding is cross-partition and the
 		// guid dictionary does not resolve partition guids, so it is matched by name.
 		void (async () => {
-			const surface = await meshes.load('levels/' + level.split('/').pop() +
-				'/props/textures/mp001roadasphalt_02_d').catch(() => null);
+			// The road's real material is Shader2d, a cross-partition reference nothing here can
+			// resolve yet. Until it can, ask the level's OWN texture catalogue for a road surface
+			// rather than naming one: the previous line hardcoded MP_001's asphalt and would have
+			// painted every other level's roads with Grand Bazaar's tarmac.
+			//
+			// No match means no texture -- a plain surface, not a borrowed one.
+			const surface = await (async () => {
+				try {
+					const response = await fetch('/meshes/textures/' +
+						level.split('/').pop() + '.json');
+
+					if (!response.ok) {
+						return null;
+					}
+
+					const catalogue = (await response.json()).meshes || {};
+					const counts = new Map<string, number>();
+
+					for (const mesh of Object.keys(catalogue)) {
+						if (!/road|asphalt/i.test(mesh)) {
+							continue;
+						}
+
+						for (const subsets of Object.values(catalogue[mesh] as any)) {
+							for (const subset of (subsets as any[]) || []) {
+								const diffuse = subset && subset.Diffuse;
+
+								if (diffuse) {
+									counts.set(diffuse, (counts.get(diffuse) || 0) + 1);
+								}
+							}
+						}
+					}
+
+					let best: string | null = null;
+					let bestCount = 0;
+
+					for (const [name, count] of counts) {
+						if (count > bestCount) {
+							best = name;
+							bestCount = count;
+						}
+					}
+
+					return best === null ? null : await meshes.load(best);
+				} catch (e) {
+					return null;
+				}
+			})();
 
 			const material = new THREE.MeshStandardMaterial({
 				color: surface === null ? 0x5a5754 : 0xffffff,
