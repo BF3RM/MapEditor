@@ -14,6 +14,7 @@
 import * as THREE from 'three';
 
 interface Ribbon {
+	texture?: string;
 	points: number[][];
 	widths: number[][];
 	uvTile: number;
@@ -35,7 +36,10 @@ export class RoadRibbons {
 	}
 
 	/** Returns how many roads were drawn. */
-	public async load(material: THREE.Material): Promise<number> {
+	public async load(
+		fallback: THREE.Material,
+		load?: (resource: string) => Promise<THREE.Texture | null>
+	): Promise<number> {
 		let ribbons: Ribbon[];
 
 		try {
@@ -60,7 +64,43 @@ export class RoadRibbons {
 
 		// Drawn back to front by the order the level gives them, so an overlapping road covers the
 		// one it is meant to cover rather than fighting it.
+		// One material per TEXTURE, and each ribbon names its own: the shader a road points at
+		// binds it, so a level's lines and its crossings are different textures and must not share
+		// a material.
+		const byTexture = new Map<string, THREE.Material>();
+
 		for (const ribbon of ribbons.slice().sort((a, b) => (a.order || 0) - (b.order || 0))) {
+			let material = fallback;
+
+			if (ribbon.texture !== undefined && load !== undefined) {
+				let held = byTexture.get(ribbon.texture);
+
+				if (held === undefined) {
+					const map = await load(ribbon.texture).catch(() => null);
+
+					if (map !== null) {
+						map.wrapS = THREE.RepeatWrapping;
+						map.wrapT = THREE.RepeatWrapping;
+					}
+
+					held = map === null ? fallback : new THREE.MeshStandardMaterial({
+						color: 0xffffff,
+						map,
+						roughness: 1.0,
+						side: THREE.DoubleSide,
+						transparent: true,
+						alphaTest: 0.15,
+						polygonOffset: true,
+						polygonOffsetFactor: -2,
+						polygonOffsetUnits: -2
+					});
+
+					byTexture.set(ribbon.texture, held);
+				}
+
+				material = held;
+			}
+
 			const mesh = RoadRibbons.build(ribbon, material);
 
 			if (mesh !== null) {

@@ -576,7 +576,10 @@ export class VEXTemulator {
 				surface.wrapT = THREE.RepeatWrapping;
 			}
 
-			const drawn = await new RoadRibbons(level).load(material);
+			// Each ribbon carries the texture ITS shader binds, so the material above is only the
+			// fallback for one that resolved none.
+			const drawn = await new RoadRibbons(level).load(material,
+				(resource: string) => meshes.load(resource));
 
 			if (drawn > 0) {
 				console.log('Rime: ' + drawn + ' road ribbon(s) drawn');

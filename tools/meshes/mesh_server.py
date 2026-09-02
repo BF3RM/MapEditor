@@ -192,6 +192,13 @@ class Rime:
         return self._command('dump_texture %s "%s"' % (resource.lower(), destination),
                              destination, timeout)
 
+    def partition_json_by_guid(self, guid, destination, timeout=180):
+        """Any partition, by its guid, as JSON. The only way to follow a cross-partition
+        reference: a CtrRef carries a partition guid, and nothing else here turns that into the
+        thing it points at."""
+        return self._command('dump_partition_json_by_guid %s "%s"' % (guid, destination),
+                             destination, timeout)
+
     def visual_terrain(self, resource, destination, timeout=300):
         """What a level's ground is painted with: its terrain layers and the shaders that blend
         them. The layer textures are not in EBX; this is the only thing that names them."""
@@ -662,6 +669,7 @@ class Meshes:
             if partition is not None:
                 roads = self._roads_from(partition)
 
+            self._resolve_road_shaders(map_name, roads)
             payload = {'level': map_name, 'roads': roads}
 
             with open(path, 'w') as handle:
@@ -670,6 +678,63 @@ class Meshes:
             print('[mesh] roads for %s: %d ribbon(s)' % (map_name, len(roads)), flush=True)
 
         return open(path, 'rb').read()
+
+    def _resolve_road_shaders(self, map_name, roads):
+        """Give each ribbon the texture its OWN shader binds.
+
+        A road names its material as Shader2d, a cross-partition reference. Following it needs the
+        partition behind the guid (dump_partition_json_by_guid), which yields the shader's NAME --
+        and the name resolves in the shaderdb registers, exactly as the terrain layers do. MP_001's
+        roads come out as SP_Earthquake's parkingLines01, which is what the game paints them with;
+        matching a road-ish texture by name inside the level gave asphalt instead.
+        """
+        registers = {}
+
+        for part in glob.glob(os.path.join(CACHE, '*.shaders.json')):
+            try:
+                for name, by_register in (json.load(open(part)).get('registers') or {}).items():
+                    registers.setdefault(name.lower(), by_register)
+            except Exception:
+                continue
+
+        if not registers:
+            return
+
+        names = {}
+
+        for road in roads:
+            guid = road.pop('shaderGuid', None)
+
+            if not guid:
+                continue
+
+            if guid not in names:
+                path = os.path.join(CACHE, 'partition_' + guid + '.json')
+
+                if not os.path.exists(path):
+                    self.rime.partition_json_by_guid(guid, path)
+
+                names[guid] = ''
+
+                try:
+                    names[guid] = (json.load(open(path)).get('Name') or '').lower()
+                except Exception:
+                    pass
+
+            by_register = registers.get(names[guid]) or {}
+
+            for register in sorted(by_register, key=lambda k: int(k)):
+                candidate = by_register[register]
+                low = candidate.lower()
+
+                if low.endswith('_n') or low.endswith('_m') or 'mask' in low:
+                    continue
+
+                road['texture'] = candidate
+                break
+
+        print('[mesh] roads for %s: %d of %d ribbons resolved a texture'
+              % (map_name, sum(1 for r in roads if r.get('texture')), len(roads)), flush=True)
 
     @staticmethod
     def _single(node):
@@ -715,7 +780,10 @@ class Meshes:
                     self._single(entry.get('Right')) or 0.0,
                 ])
 
+            shader = ((fields.get('Shader2d', {}) or {}).get('$value') or {})
+
             roads.append({
+                'shaderGuid': (shader or {}).get('$partitionGuid'),
                 'points': points,
                 'widths': widths,
                 'uvTile': self._single(fields.get('UvTileFactor')) or 1.0,
