@@ -77,6 +77,9 @@ export class MeshManager {
 
 	/** One load per texture resource, shared by every material using it. */
 	private loadedTextures = new Map<string, Promise<THREE.Texture | null>>();
+
+	/** Resources whose load came back empty, so repaint() knows exactly what to retry. */
+	private failedTextures = new Set<string>();
 	private dx10 = new Map<string, Promise<boolean>>();
 
 	/** Textured materials, keyed by texture resource, so meshes sharing one share the material. */
@@ -277,6 +280,15 @@ export class MeshManager {
 					undefined,
 					() => resolve(null)
 				);
+			});
+
+			// Record an empty load so repaint() knows precisely what to retry, instead of walking
+			// every cached promise and deciding asynchronously (which repainted before it had
+			// finished deciding).
+			void pending.then((map) => {
+				if (map === null) {
+					this.failedTextures.add(resource);
+				}
 			});
 
 			this.loadedTextures.set(resource, pending);
@@ -540,16 +552,30 @@ export class MeshManager {
 	public repaint(): number {
 		let retried = 0;
 
-		for (const [resource, pending] of Array.from(this.loadedTextures.entries())) {
-			void pending.then((map) => {
-				if (map === null) {
-					this.loadedTextures.delete(resource);
-					this.materials.delete(resource);
+		// Drop the failures BEFORE repainting, and drop them properly.
+		//
+		// Two bugs lived here. The materials cache is keyed `resource|normal`, so
+		// materials.delete(resource) never matched and a material that fell back to the neutral one
+		// stayed cached forever -- no later pass could fix it however many times the texture
+		// arrived. And the deletion ran inside a .then(), so even a correct key was dropped AFTER
+		// the repaint below had already asked for the same stale entries.
+		//
+		// Failures are recorded as they happen now (see texture()), so this is synchronous and the
+		// repaint that follows sees a clean cache. This is what left MP_001's backdrop houses white
+		// after their texture was resolved, found and cached.
+		for (const resource of Array.from(this.failedTextures)) {
+			this.loadedTextures.delete(resource);
+
+			for (const key of Array.from(this.materials.keys())) {
+				if (key === resource || key.startsWith(resource + '|')) {
+					this.materials.delete(key);
 				}
-			});
+			}
 
 			retried++;
 		}
+
+		this.failedTextures.clear();
 
 		for (const [file, copies] of Array.from(this.painted.entries())) {
 			for (const parts of copies) {
