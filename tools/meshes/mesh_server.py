@@ -952,7 +952,14 @@ class Meshes:
         for mesh, variations in merged.items():
             materials = variations.get('0') or next(iter(variations.values()), [])
 
-            if any(materials):
+            # A subset counts as bound only if it actually names a DIFFUSE.
+            #
+            # This used to be `any(materials)`, i.e. "the dict is non-empty" -- and once the dump
+            # started reporting metadata ($material, and $unresolved:<slot> for a binding it could
+            # not resolve), every subset became non-empty and the shader fallback stopped running
+            # for meshes that still had no texture at all. Diffuse coverage fell from 67% to 59%
+            # while the data underneath had strictly improved.
+            if any((material or {}).get('Diffuse') for material in materials):
                 continue
 
             variations.setdefault('0', materials)
