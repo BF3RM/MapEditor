@@ -903,7 +903,19 @@ class Meshes:
                                 target[hash_key] = materials
 
                 self._fill_from_shaders(map_name, level, merged)
-                self._fill_by_name(merged)
+
+                # NOT _fill_by_name. Searching the texture catalogue for a material's NAME invents
+                # bindings: MP_001's crane carries seven subsets with no texture parameters at all
+                # ({"0": [{}, {}, {}, {}, {}, {}, {}]} in the MeshVariationDatabase), and name
+                # matching dressed it in CraneAlphaMask_D four times over, plus a generic window and
+                # a shop's logo. A mask painted as an opaque diffuse is the green lattice that
+                # occludes what is behind it -- and being DXT1 it has no alpha channel, so nothing
+                # downstream can cut it out. A guessed binding and a real one look identical from
+                # the outside, which is how that survived.
+                #
+                # An unbound subset now stays on the neutral material and is COUNTED, so it reads as
+                # "no binding" rather than as the wrong texture.
+                self._count_unbound(map_name, merged)
                 json.dump({'meshes': merged}, open(path, 'w'))
                 print('[mesh] textures for %s: %d meshes' % (map_name, len(merged)), flush=True)
 
@@ -962,6 +974,26 @@ class Meshes:
                 filled += 1
 
         print('[mesh] shader textures filled %d material(s)' % filled, flush=True)
+
+    def _count_unbound(self, map_name, merged):
+        """How many subsets ended with no texture binding, so a gap is visible rather than filled."""
+        meshes = 0
+        subsets = 0
+
+        for variations in merged.values():
+            materials = variations.get('0') or next(iter(variations.values()), [])
+            empty = sum(1 for material in materials if not (material or {}).get('Diffuse'))
+
+            if empty:
+                meshes += 1
+                subsets += empty
+
+        if subsets:
+            print('[mesh] %s: %d subset(s) across %d mesh(es) have NO texture binding -- left '
+                  'untextured on purpose (no name guessing)' % (map_name, subsets, meshes),
+                  flush=True)
+
+        return subsets
 
     def _fill_by_name(self, merged):
         """Last resort: match a mesh's own material NAME against the texture catalogue.
