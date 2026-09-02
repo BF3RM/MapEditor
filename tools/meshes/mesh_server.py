@@ -996,6 +996,16 @@ class Meshes:
 
         return open(path, 'rb').read()
 
+    # The parameter names a colour map actually arrives under. MeshManager.diffuseFor accepts the
+    # same list: BF3 shaders bind Diffuse, MainDiffuse (the base) and TileDiffuse (the detail tile)
+    # depending on the surface, and an architecture material routinely has MainDiffuse + TileDiffuse
+    # and no plain "Diffuse" at all.
+    DIFFUSE_SLOTS = ('Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas')
+
+    @classmethod
+    def _has_diffuse(cls, material):
+        return any((material or {}).get(slot) for slot in cls.DIFFUSE_SLOTS)
+
     def _fill_from_shaders(self, map_name, level, merged):
         """Give the meshes with no material textures the ones their SHADER streams.
 
@@ -1005,6 +1015,7 @@ class Meshes:
         """
         shaders = {}
         slots = {}
+        registers = {}
 
         for source in self._shaderdb_names(level):
             # Key the cache on the WHOLE source name.
@@ -1033,6 +1044,9 @@ class Meshes:
             for name, bound in (json.load(open(part)).get('slots', {}) or {}).items():
                 slots.setdefault(name.lower(), bound)
 
+            for name, by_register in (json.load(open(part)).get('registers', {}) or {}).items():
+                registers.setdefault(name.lower(), by_register)
+
         if not shaders:
             return
 
@@ -1058,7 +1072,11 @@ class Meshes:
                 # one bound subset and six unbound ones got nothing for the six -- and a level's
                 # meshes are mostly mixed like that. It is why filling 556 materials instead of 345
                 # moved the bound count by exactly zero.
-                if index < len(materials) and (materials[index] or {}).get('Diffuse'):
+                # Only where the material named NO colour map under any of its slots. Writing a
+                # 'Diffuse' next to an existing 'MainDiffuse' is worse than doing nothing: the
+                # client prefers 'Diffuse', so a shader-derived guess would override the material's
+                # own binding.
+                if index < len(materials) and self._has_diffuse(materials[index]):
                     continue
 
                 textures = shaders.get(shader.lower())
@@ -1072,6 +1090,21 @@ class Meshes:
                 # CraneAlphaMask_D -- a cutout mask that BF3 happens to name with a _D suffix.
                 bound = slots.get(shader.lower(), {})
                 diffuse = bound.get('Diffuse') or bound.get('DiffuseTexture')
+
+                # The shader's own sampler REGISTERS, which is how the GPU binds them: the colour
+                # map is bound before the normal and mask that accompany it. Same source that gives
+                # the terrain its layers, and the same discipline -- take the first register,
+                # stepping over maps that are demonstrably not colour.
+                if diffuse is None:
+                    for register in sorted(registers.get(shader.lower(), {}), key=int):
+                        candidate = registers[shader.lower()][register]
+                        low = candidate.lower()
+
+                        if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
+                            continue
+
+                        diffuse = candidate
+                        break
 
                 if diffuse is None:
                     # NEVER textures[0].
@@ -1103,7 +1136,7 @@ class Meshes:
 
         for variations in merged.values():
             materials = variations.get('0') or next(iter(variations.values()), [])
-            empty = sum(1 for material in materials if not (material or {}).get('Diffuse'))
+            empty = sum(1 for material in materials if not self._has_diffuse(material))
 
             if empty:
                 meshes += 1
