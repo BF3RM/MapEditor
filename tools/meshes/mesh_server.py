@@ -929,6 +929,7 @@ class Meshes:
         list -- only the shaderdb does.
         """
         shaders = {}
+        slots = {}
 
         for source in self._shaderdb_names(level):
             part = os.path.join(CACHE, map_name + '.' + source.split('/')[-2] + '.shaders.json')
@@ -943,6 +944,13 @@ class Meshes:
 
             for name, textures in found.items():
                 shaders.setdefault(name.lower(), textures)
+
+            # 'slots' is only present if a dump ever carries slot-labelled bindings. It does not
+            # today: a shader's internal textures are listed with a register index and their own
+            # resource name, never a semantic slot ("Diffuse"). Only EXTERNAL textures name a
+            # parameter. Read it when it appears; never require it.
+            for name, bound in (json.load(open(part)).get('slots', {}) or {}).items():
+                slots.setdefault(name.lower(), bound)
 
         if not shaders:
             return
@@ -971,8 +979,15 @@ class Meshes:
                 if not textures:
                     continue
 
-                # _D is the diffuse by convention throughout BF3's naming; first entry otherwise.
-                diffuse = next((t for t in textures if t.lower().endswith('_d')), textures[0])
+                # The shader says which of its textures is the diffuse; use that.
+                #
+                # Falling back to "the filename ends in _d" is what painted the crane with
+                # CraneAlphaMask_D -- a cutout mask that BF3 happens to name with a _D suffix.
+                bound = slots.get(shader.lower(), {})
+                diffuse = bound.get('Diffuse') or bound.get('DiffuseTexture')
+
+                if diffuse is None:
+                    diffuse = next((t for t in textures if t.lower().endswith('_d')), textures[0])
 
                 while len(materials) <= index:
                     materials.append({})
