@@ -52,6 +52,17 @@ interface StreamNode {
 	max: number[] | null;
 }
 
+/** A node of the tree, with its samples from wherever they are kept. */
+interface Tile {
+	depth: number;
+	indexX: number;
+	indexY: number;
+	min: number[];
+	max: number[];
+	data: string | null | undefined;
+	chunk: string | null;
+}
+
 interface TerrainData {
 	samplesPerSide: number;
 	worldScaleY: number;
@@ -97,151 +108,71 @@ export class Terrain {
 		// caller passed, which is what a level with no terrain textures gets.
 		if (load !== undefined) {
 			const painted = await new TerrainMaterial(this.level, this.base)
-				.build(Terrain.extent(terrain), load);
+				.build(Terrain.extent(terrain), terrain as any, load);
 
 			if (painted !== null) {
 				material = painted;
 			}
 		}
 
-		// Whatever the tree carries inline goes down first: it cost nothing beyond the tree itself
-		// and puts ground under the level immediately. On MP_001 that is the whole surface. On
-		// MP_017 it is one tile covering the entire map, which is exactly the base layer the
-		// streamed levels then refine.
-		const base = this.embedded(terrain, material);
-		const streamed = await this.streamed(terrain, material);
-
-		return streamed > 0 ? streamed : base;
-	}
-
-	/** The surface as carried in the tree itself. */
-	private embedded(terrain: TerrainData, material: THREE.Material): number {
-		const withData = terrain.nodes.filter((node) => node.data !== null && node.data !== undefined);
-
-		if (withData.length === 0) {
-			return 0;
-		}
-
-		// The LEAVES, not the deepest level.
-		//
-		// This tree is adaptive exactly like the streaming tree beside it: MP_001 has one node at
-		// depth 0, four at 1, five at 2 and twenty at 3. Drawing its deepest level drew twenty
-		// tiles of the sixty-four a full depth-3 grid would need, so two thirds of the map had no
-		// ground under it at all -- the level read as floating over a void.
-		const drawn = Terrain.covering(withData);
-		let built = 0;
-
-		for (const node of drawn) {
-
-			const samples = Terrain.decode(node.data as string, terrain.samplesPerSide);
-			const mesh = samples === null ? null : this.patch(node.min, node.max, samples, terrain, material);
-
-			if (mesh !== null) {
-				this.hold().add(mesh);
-				this.baseTiles.push(mesh);
-				built++;
-			}
-		}
-
-		if (built > 0) {
-			(window as any).editor.threeManager.setPendingRender();
-		}
-
-		return built;
+		return this.surface(terrain, material);
 	}
 
 	/**
-	 * The surface as streamed tiles, coarsest level first.
+	 * The ground, from whichever place each node keeps its samples.
 	 *
-	 * Every level of the tree covers the whole map -- that is what a LOD pyramid is for -- so the
-	 * four tiles at depth 1 are a complete, if blocky, ground. Those are fetched first and the
-	 * level appears with ground under it in about a second; the finer levels then replace them as
-	 * they arrive, and a coarse tile is dropped only once all four of its children have landed, so
-	 * the surface is never left with a hole in it.
-	 *
-	 * A node that stops early keeps its tile, which is exactly what the adaptive tree is saying:
-	 * flat water needs no subdivision.
+	 * A level is not one or the other. MP_001 has 41 nodes and 31 leaves, and only its 20 deepest
+	 * leaves carry samples inline -- the other 11 name a chunk, exactly as MP_017's do. Treating
+	 * the two as separate trees drew 31% of MP_001 and called it done.
 	 */
-	private async streamed(terrain: TerrainData, material: THREE.Material): Promise<number> {
-		const usable = (terrain.streamNodes || []).filter(
-			(node) => node.lod0Size > 0 && node.min !== null && node.max !== null);
+	private async surface(terrain: TerrainData, material: THREE.Material): Promise<number> {
+		const merged = new Map<string, Tile>();
 
-		if (usable.length === 0) {
-			return 0;
+		for (const node of terrain.nodes) {
+			merged.set(Terrain.key(node.depth, node.indexX, node.indexY), {
+				depth: node.depth,
+				indexX: node.indexX,
+				indexY: node.indexY,
+				min: node.min,
+				max: node.max,
+				data: node.data,
+				chunk: null
+			});
 		}
-
-		// Which nodes to draw, and which coarse ones may be dropped once refined.
-		//
-		// Neither obvious rule works on its own. Retiring a parent after four children leaves it
-		// sitting on top of its children forever wherever the tree gives it fewer, and retiring it
-		// after however many children turned up punches a hole wherever one of them has no chunk.
-		// Both were visible on MP_017 as stripes across the hillsides -- overlap in the first case,
-		// bare background showing through in the second.
-		//
-		// So a node hands over to its children only when EVERY child can cover its own quarter,
-		// recursively. Anything else keeps its own tile.
-		const all = new Map<string, StreamNode>();
-		const drawable = new Set<string>();
 
 		for (const node of terrain.streamNodes || []) {
 			const key = Terrain.key(node.depth, node.indexX, node.indexY);
+			const existing = merged.get(key);
 
-			all.set(key, node);
-
-			if (node.lod0Size > 0 && node.min !== null && node.max !== null) {
-				drawable.add(key);
-			}
-		}
-
-		const children = (node: StreamNode): StreamNode[] => {
-			const found: StreamNode[] = [];
-
-			for (let i = 0; i < 4; i++) {
-				const child = all.get(Terrain.key(
-					node.depth + 1, node.indexX * 2 + (i & 1), node.indexY * 2 + (i >> 1)));
-
-				if (child !== undefined) {
-					found.push(child);
+			if (existing !== undefined) {
+				if (node.lod0Size > 0) {
+					existing.chunk = node.lod0Chunk;
 				}
+
+				continue;
 			}
 
-			return found;
-		};
-
-		const refines = new Map<string, StreamNode[]>();
-
-		const covers = (node: StreamNode): boolean => {
-			const key = Terrain.key(node.depth, node.indexX, node.indexY);
-			const kids = children(node);
-
-			if (kids.length === 4 && kids.every(covers)) {
-				refines.set(key, kids);
-				return true;
+			if (node.min === null || node.max === null) {
+				continue;
 			}
 
-			return drawable.has(key);
-		};
-
-		for (const node of usable) {
-			if (node.depth === usable[0].depth) {
-				covers(node);
-			}
+			merged.set(key, {
+				depth: node.depth,
+				indexX: node.indexX,
+				indexY: node.indexY,
+				min: node.min,
+				max: node.max,
+				data: null,
+				chunk: node.lod0Size > 0 ? node.lod0Chunk : null
+			});
 		}
 
-		// Every node on the way down to the tiles that will finally be drawn: the coarse ones are
-		// worth drawing first even though they are replaced, because they are what puts ground
-		// under the level in the first second.
-		const ordered = usable
-			.filter((node) => drawable.has(Terrain.key(node.depth, node.indexX, node.indexY)))
-			.sort((a, b) => a.depth - b.depth);
+		const tiles = Array.from(merged.values());
+		const drawn = Terrain.covering(tiles).sort((a, b) => a.depth - b.depth);
 
-		const shallowest = ordered.length === 0 ? 0 : ordered[0].depth;
-		const coarsest = ordered.filter((node) => node.depth === shallowest).length;
-		const meshes = new Map<string, THREE.Mesh>();
-		const arrived = new Map<string, number>();
-		const expected = new Map<string, number>();
-
-		refines.forEach((kids, key) => expected.set(key, kids.length));
+		if (drawn.length === 0) {
+			return 0;
+		}
 
 		let next = 0;
 		let built = 0;
@@ -250,163 +181,42 @@ export class Terrain {
 			for (;;) {
 				const index = next++;
 
-				if (index >= ordered.length) {
+				if (index >= drawn.length) {
 					return;
 				}
 
-				const node = ordered[index];
-				const samples = await this.tile(node.lod0Chunk, terrain.samplesPerSide);
+				const tile = drawn[index];
+				const samples = tile.data !== null && tile.data !== undefined
+					? Terrain.decode(tile.data, terrain.samplesPerSide)
+					: await this.tile(tile.chunk as string, terrain.samplesPerSide);
 
 				if (samples === null) {
 					continue;
 				}
 
-				const mesh = this.patch(
-					node.min as number[], node.max as number[], samples, terrain, material);
+				const mesh = this.patch(tile.min, tile.max, samples, terrain, material);
 
-				if (mesh === null) {
-					continue;
+				if (mesh !== null) {
+					this.hold().add(mesh);
+					built++;
+					// Each tile shows up as it lands rather than the ground appearing at once.
+					(window as any).editor.threeManager.setPendingRender();
 				}
-
-				this.hold().add(mesh);
-				meshes.set(Terrain.key(node.depth, node.indexX, node.indexY), mesh);
-				built++;
-
-				this.retire(node, meshes, arrived, expected);
-
-				// The inline base was only ever scaffolding: once a whole streamed level is down,
-				// it is covered everywhere and would otherwise z-fight with the real surface.
-				if (this.baseTiles.length > 0 && built >= coarsest) {
-					for (const tile of this.baseTiles) {
-						this.hold().remove(tile);
-						tile.geometry.dispose();
-					}
-
-					this.baseTiles = [];
-				}
-
-				// Each tile shows up as it lands rather than the ground appearing all at once.
-				(window as any).editor.threeManager.setPendingRender();
 			}
 		};
 
 		const workers = [];
 
-		for (let i = 0; i < Math.min(MAX_IN_FLIGHT, ordered.length); i++) {
+		for (let i = 0; i < Math.min(MAX_IN_FLIGHT, drawn.length); i++) {
 			workers.push(worker());
 		}
 
 		await Promise.all(workers);
 
-		console.log('Rime: terrain streamed ' + built + ' of ' + ordered.length +
-			' tiles, ' + meshes.size + ' drawn after coarser levels were replaced');
+		console.log('Rime: terrain built from ' + built + ' of ' + drawn.length + ' tiles (' +
+			tiles.length + ' in the tree)');
 
 		return built;
-	}
-
-	/**
-	 * The nodes that tile the map exactly once.
-	 *
-	 * A node hands over to its children only when all four of them are present and can cover their
-	 * own quarter, recursively; otherwise it keeps its own tile. That is the same rule the streamed
-	 * tiles use, and for the same reason: taking the deepest level leaves holes where the tree
-	 * stopped early, and taking every node draws coarse tiles on top of fine ones.
-	 */
-	private static covering(nodes: TerrainNode[]): TerrainNode[] {
-		const all = new Map<string, TerrainNode>();
-
-		for (const node of nodes) {
-			all.set(Terrain.key(node.depth, node.indexX, node.indexY), node);
-		}
-
-		const children = (node: TerrainNode): TerrainNode[] => {
-			const found: TerrainNode[] = [];
-
-			for (let i = 0; i < 4; i++) {
-				const child = all.get(Terrain.key(
-					node.depth + 1, node.indexX * 2 + (i & 1), node.indexY * 2 + (i >> 1)));
-
-				if (child !== undefined) {
-					found.push(child);
-				}
-			}
-
-			return found;
-		};
-
-		const chosen: TerrainNode[] = [];
-
-		const walk = (node: TerrainNode): boolean => {
-			const kids = children(node);
-
-			if (kids.length === 4) {
-				const covered: TerrainNode[] = [];
-				let complete = true;
-
-				for (const kid of kids) {
-					const before = chosen.length;
-
-					if (!walk(kid)) {
-						complete = false;
-					}
-
-					covered.push(...chosen.slice(before));
-				}
-
-				if (complete) {
-					return true;
-				}
-
-				// One quarter cannot cover itself, so this node draws instead and its descendants
-				// are dropped again.
-				chosen.length -= covered.length;
-			}
-
-			chosen.push(node);
-
-			return true;
-		};
-
-		// Whatever the shallowest nodes are, they are the roots to walk from.
-		const shallowest = Math.min(...nodes.map((node) => node.depth));
-
-		for (const node of nodes) {
-			if (node.depth === shallowest) {
-				walk(node);
-			}
-		}
-
-		return chosen;
-	}
-
-	/** The terrain's world bounds as [minX, minZ, sizeX, sizeZ], for stretching a level-wide mask. */
-	private static extent(terrain: TerrainData): number[] {
-		let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
-
-		const consider = (min: number[] | null, max: number[] | null): void => {
-			if (min === null || max === null) {
-				return;
-			}
-
-			minX = Math.min(minX, min[0]);
-			minZ = Math.min(minZ, min[2]);
-			maxX = Math.max(maxX, max[0]);
-			maxZ = Math.max(maxZ, max[2]);
-		};
-
-		for (const node of terrain.nodes) {
-			consider(node.min, node.max);
-		}
-
-		for (const node of terrain.streamNodes || []) {
-			consider(node.min, node.max);
-		}
-
-		if (!isFinite(minX) || maxX <= minX) {
-			return [-2048, -2048, 4096, 4096];
-		}
-
-		return [minX, minZ, maxX - minX, maxZ - minZ];
 	}
 
 	private static key(depth: number, x: number, y: number): string {
@@ -572,4 +382,112 @@ export class Terrain {
 
 		return mesh;
 	}
+
+	// Restored from HEAD to unblock the build.
+	//
+	// The in-progress terrain refactor in the working tree dropped these two statics but kept
+	// calling them, so the dev server failed to compile ("Property 'extent' does not exist on type
+	// 'typeof Terrain'") and served a stale bundle -- which is its own class of confusion, because
+	// the editor then runs code that is not on disk.
+	//
+	// covering() is generic now: the refactor's node shape is no longer TerrainNode, and the only
+	// thing either method needs is depth/indexX/indexY.
+	private static covering<T extends { depth: number; indexX: number; indexY: number }>(
+		nodes: T[]
+	): T[] {
+		const all = new Map<string, T>();
+
+		for (const node of nodes) {
+			all.set(Terrain.key(node.depth, node.indexX, node.indexY), node);
+		}
+
+		const children = (node: T): T[] => {
+			const found: T[] = [];
+
+			for (let i = 0; i < 4; i++) {
+				const child = all.get(Terrain.key(
+					node.depth + 1, node.indexX * 2 + (i & 1), node.indexY * 2 + (i >> 1)));
+
+				if (child !== undefined) {
+					found.push(child);
+				}
+			}
+
+			return found;
+		};
+
+		const chosen: T[] = [];
+
+		const walk = (node: T): boolean => {
+			const kids = children(node);
+
+			if (kids.length === 4) {
+				const covered: T[] = [];
+				let complete = true;
+
+				for (const kid of kids) {
+					const before = chosen.length;
+
+					if (!walk(kid)) {
+						complete = false;
+					}
+
+					covered.push(...chosen.slice(before));
+				}
+
+				if (complete) {
+					return true;
+				}
+
+				// One quarter cannot cover itself, so this node draws instead and its descendants
+				// are dropped again.
+				chosen.length -= covered.length;
+			}
+
+			chosen.push(node);
+
+			return true;
+		};
+
+		// Whatever the shallowest nodes are, they are the roots to walk from.
+		const shallowest = Math.min(...nodes.map((node) => node.depth));
+
+		for (const node of nodes) {
+			if (node.depth === shallowest) {
+				walk(node);
+			}
+		}
+
+		return chosen;
+	}
+
+	private static extent(terrain: TerrainData): number[] {
+		let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
+
+		const consider = (min: number[] | null, max: number[] | null): void => {
+			if (min === null || max === null) {
+				return;
+			}
+
+			minX = Math.min(minX, min[0]);
+			minZ = Math.min(minZ, min[2]);
+			maxX = Math.max(maxX, max[0]);
+			maxZ = Math.max(maxZ, max[2]);
+		};
+
+		for (const node of terrain.nodes) {
+			consider(node.min, node.max);
+		}
+
+		for (const node of terrain.streamNodes || []) {
+			consider(node.min, node.max);
+		}
+
+		if (!isFinite(minX) || maxX <= minX) {
+			return [-2048, -2048, 4096, 4096];
+		}
+
+		return [minX, minZ, maxX - minX, maxZ - minZ];
+	}
+
 }

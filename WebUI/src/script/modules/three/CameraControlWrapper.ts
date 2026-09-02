@@ -56,6 +56,8 @@ export default class CameraControlWrapper extends CameraControls {
 	 * Right = orbit/look and left stays NONE so left-click keeps selecting objects.
 	 */
 	public enableStandaloneMouse() {
+		// left stays NONE so left-drag is selection and box-select, not camera.
+		this.mouseButtons.left = CameraControls.ACTION.NONE;
 		this.mouseButtons.right = CameraControls.ACTION.ROTATE;
 		this.mouseButtons.middle = CameraControls.ACTION.TRUCK;
 		this.mouseButtons.wheel = CameraControls.ACTION.DOLLY;

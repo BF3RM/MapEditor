@@ -251,17 +251,17 @@ export function enableCameraControls(): void {
 		return;
 	}
 
-	const CameraControls = controls.constructor as any;
-	const action = CameraControls.ACTION;
-
-	if (action !== undefined) {
-		controls.mouseButtons.left = action.ROTATE;
-		controls.mouseButtons.right = action.TRUCK;
-		controls.mouseButtons.wheel = action.DOLLY;
-	}
-
-	// Nothing is listening on the other side, and every drag would post an event per frame.
-	if (controls.enableVextCameraUpdates !== undefined) {
+	// ONE owner for the standalone scheme.
+	//
+	// This used to set the buttons itself, which quietly fought CameraControlWrapper's own
+	// standalone setup: both ran, this one ran last, and the result was left = orbit and
+	// right = pan -- so right-drag panned instead of looking, and left-drag fought selection.
+	// The wrapper owns it now (left = NONE/select, right = look, middle = pan, wheel = zoom) and
+	// also re-anchors the orbit point per drag, which this never did.
+	if (controls.enableStandaloneMouse !== undefined) {
+		controls.enableStandaloneMouse();
+	} else if (controls.enableVextCameraUpdates !== undefined) {
+		// Older wrapper without the standalone path: at least stop posting to an absent VEXT.
 		controls.enableVextCameraUpdates(false);
 	}
 
