@@ -12,6 +12,7 @@ import { MeshManager } from '@/script/modules/MeshManager';
 import { StaticModels } from '@/script/modules/StaticModels';
 import * as THREE from 'three';
 import { RoadRibbons } from '@/script/modules/RoadRibbons';
+import { StandaloneProgress } from '@/script/modules/StandaloneProgress';
 import { Terrain } from '@/script/modules/Terrain';
 import { Lighting } from '@/script/modules/Lighting';
 import { MobileLayout } from '@/script/modules/MobileLayout';
@@ -482,6 +483,12 @@ export class VEXTemulator {
 		}
 
 		(window as any).meshes = meshes;
+
+		// Say what is happening while it happens: a cold level is minutes of white geometry
+		// otherwise, which looks broken rather than busy.
+		const progress = new StandaloneProgress();
+		progress.start(level);
+		(window as any).standaloneProgress = progress;
 
 		// The ground depends on nothing else in this function, and streaming it takes minutes on a
 		// level whose tiles are chunked, so it starts HERE rather than at the end. Waiting until
