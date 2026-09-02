@@ -1100,9 +1100,16 @@ class Meshes:
             if index < len(materials) and self._has_diffuse(materials[index]):
                 continue
 
-            textures = shaders.get(shader.lower())
+            textures = shaders.get(shader.lower()) or []
+            by_register = registers.get(shader.lower()) or {}
 
-            if not textures:
+            # A shader with no STREAMABLE textures is not a shader with no textures.
+            #
+            # MP001_SS_BBox_01_WET -- what MP_001's backdrop houses are drawn with -- streams
+            # nothing and binds mp01_box_02_D straight to a sampler register. Gating on the
+            # streamable list bailed before ever looking at the registers, so those houses
+            # rendered as white blocks with their texture sitting right there.
+            if not textures and not by_register:
                 continue
 
             # The shader says which of its textures is the diffuse; use that.
@@ -1117,8 +1124,8 @@ class Meshes:
             # the terrain its layers, and the same discipline -- take the first register,
             # stepping over maps that are demonstrably not colour.
             if diffuse is None:
-                for register in sorted(registers.get(shader.lower(), {}), key=int):
-                    candidate = registers[shader.lower()][register]
+                for register in sorted(by_register, key=int):
+                    candidate = by_register[register]
                     low = candidate.lower()
 
                     if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
