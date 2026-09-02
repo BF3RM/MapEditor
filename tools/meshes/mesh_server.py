@@ -15,6 +15,7 @@ The dev server proxies /meshes here (see WebUI/vue.config.js), so the browser on
 one origin.
 """
 import base64
+import glob
 import json
 import os
 import queue
@@ -547,6 +548,21 @@ class Meshes:
                 else:
                     diffuse.append(texture)
 
+            # MP_001 keeps no terrain texture directory -- its whole EBX tree holds two terrain
+            # paths and no textures, so the scan above returns nothing, the WebUI gets diffuse: []
+            # and every tile falls back to flat grey ("the terrain is all white").
+            #
+            # Traced: the terrain is a RESOURCE, not EBX (Levels/MP_001/Terrain is a WorldPartData);
+            # its visual dump carries LayerCount/Draws/SurfaceShader but names no textures anywhere.
+            # They are bound by the compiled surface shader, which only dump_shader_textures can
+            # read.
+            #
+            # That dump is NOT run from here: over a level shaderdb it ran past fifteen minutes,
+            # and this call is what the browser waits on for terrain. If one has been produced
+            # out-of-band it is used; otherwise this behaves exactly as before.
+            if not diffuse:
+                diffuse, normal, masks = self._terrain_shader_textures(map_name)
+
             layers = {
                 'layerCount': info.get('LayerCount', 0),
                 'surfaceShader': info.get('SurfaceShader', ''),
@@ -563,6 +579,38 @@ class Meshes:
                   % (map_name, layers['layerCount'], len(diffuse)), flush=True)
 
         return open(path, 'rb').read()
+
+    def _terrain_shader_textures(self, map_name):
+        """Terrain layer textures from an ALREADY-DUMPED shader database. Never dumps."""
+        diffuse, normal, masks = set(), set(), set()
+
+        for part in glob.glob(os.path.join(CACHE, map_name + '.*.shaders.json')):
+            try:
+                found = json.load(open(part)).get('shaders', {})
+            except Exception:
+                continue
+
+            for name, textures in found.items():
+                # Only the terrain's own shaders: a shaderdb covers every surface in the level, and
+                # painting the ground with a building's texture is worse than leaving it grey.
+                if 'terrain' not in name.lower():
+                    continue
+
+                for texture in textures or []:
+                    lowered = texture.lower()
+
+                    if lowered.endswith('_n'):
+                        normal.add(texture)
+                    elif lowered.endswith('_rgb') or lowered.endswith('_m') or 'mask' in lowered:
+                        masks.add(texture)
+                    else:
+                        diffuse.add(texture)
+
+        if diffuse:
+            print('[mesh] terrain textures from shader dump for %s: %d diffuse'
+                  % (map_name, len(diffuse)), flush=True)
+
+        return sorted(diffuse), sorted(normal), sorted(masks)
 
     def terrain_tile(self, guid, samples):
         """One terrain tile's height samples, as raw UInt16.

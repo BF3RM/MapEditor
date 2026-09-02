@@ -104,15 +104,37 @@ export class Terrain {
 			return 0;
 		}
 
-		// The level's own terrain textures, where it has any. Falls back to the neutral ground the
-		// caller passed, which is what a level with no terrain textures gets.
-		if (load !== undefined) {
-			const painted = await new TerrainMaterial(this.level, this.base)
-				.build(Terrain.extent(terrain), terrain as any, load);
+		// The level's own terrain textures, where it has any.
+		let painted: THREE.Material | null = null;
 
-			if (painted !== null) {
-				material = painted;
-			}
+		if (load !== undefined) {
+			painted = await new TerrainMaterial(this.level, this.base)
+				.build(Terrain.extent(terrain), terrain as any, load);
+		}
+
+		if (painted !== null) {
+			material = painted;
+		} else {
+			// No layer textures for this level, so the ground is a greybox -- but it must not be
+			// the SAME grey as an untextured prop, which is what made it read as a white sheet
+			// under the sky light with no horizon and no relief.
+			//
+			// Traced for MP_001, which is the case this hits: its terrain layer textures are not
+			// obtainable. They are not in EBX (Levels/MP_001/Terrain is a WorldPartData), the level
+			// has no Terrain/Textures directory (only 22 levels do), there is no shared pool, and
+			// the level's shaderdb dumps 349 shaders without one terrain shader among them -- the
+			// terrain's own shaders are generated (MP001_Terrain__5MV__2d__0) and Rime's
+			// dump_shader_textures does not expose them.
+			//
+			// So: an earth tone rather than the prop grey, fully rough so it takes the light like
+			// ground instead of a highlight sheet, and flat-shaded so slopes separate and the
+			// terrain reads as terrain.
+			material = new THREE.MeshStandardMaterial({
+				color: 0x8a7c66,
+				roughness: 1.0,
+				metalness: 0.0,
+				flatShading: true
+			});
 		}
 
 		return this.surface(terrain, material);
