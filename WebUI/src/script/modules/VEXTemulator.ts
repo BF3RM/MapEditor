@@ -10,6 +10,8 @@ import { WebXSource } from '@/script/modules/WebXSource';
 import { LevelLoader } from '@/script/modules/LevelLoader';
 import { MeshManager } from '@/script/modules/MeshManager';
 import { StaticModels } from '@/script/modules/StaticModels';
+import * as THREE from 'three';
+import { RoadRibbons } from '@/script/modules/RoadRibbons';
 import { Terrain } from '@/script/modules/Terrain';
 import { Lighting } from '@/script/modules/Lighting';
 import { MobileLayout } from '@/script/modules/MobileLayout';
@@ -493,6 +495,36 @@ export class VEXTemulator {
 				}
 			})
 			.catch(() => { /* a level without terrain is not a failed load */ });
+
+		// Roads are ribbons painted on the terrain, not meshes, so nothing else in this function
+		// draws them -- and on a city level that is most of the ground. The material texture is the
+		// level's own road surface where it has one; the shader binding is cross-partition and the
+		// guid dictionary does not resolve partition guids, so it is matched by name.
+		void (async () => {
+			const surface = await meshes.load('levels/' + level.split('/').pop() +
+				'/props/textures/mp001roadasphalt_02_d').catch(() => null);
+
+			const material = new THREE.MeshStandardMaterial({
+				color: surface === null ? 0x5a5754 : 0xffffff,
+				map: surface,
+				roughness: 1.0,
+				polygonOffset: true,
+				polygonOffsetFactor: -2,
+				polygonOffsetUnits: -2
+			});
+
+			if (surface !== null) {
+				surface.wrapS = THREE.RepeatWrapping;
+				surface.wrapT = THREE.RepeatWrapping;
+			}
+
+			const drawn = await new RoadRibbons(level).load(material);
+
+			if (drawn > 0) {
+				console.log('Rime: ' + drawn + ' road ribbon(s) drawn');
+				(window as any).editor.threeManager.setPendingRender();
+			}
+		})();
 
 		await source.open();
 

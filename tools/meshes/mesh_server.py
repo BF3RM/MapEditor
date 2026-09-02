@@ -625,6 +625,90 @@ class Meshes:
 
         return sorted(diffuse), sorted(normal), sorted(masks)
 
+    def roads(self, map_name):
+        """The level's roads, as ribbons ready to build geometry from.
+
+        BF3 paints roads onto the terrain as RibbonData decals, not as meshes: Levels/<Map>/
+        TerrainDecals holds one RoadData per road with a centreline (Points), a per-point half
+        width either side (RibbonPoints Left/Right), and how often its texture repeats along the
+        run (UvTileFactor). That is everything geometry needs, and it is plain EBX -- no Rime.
+
+        The material is a cross-partition reference and the local guid dictionary does not resolve
+        partition guids, so the texture is matched by NAME against the level's own road textures.
+        Stated in the payload as `textureSource` so the client is not guessing about it.
+        """
+        path = os.path.join(CACHE, map_name + '.roads.json')
+
+        if not os.path.exists(path):
+            partition = self.ebx.partition_by_path('levels/%s/terraindecals' % map_name.lower())
+            roads = []
+
+            if partition is not None:
+                roads = self._roads_from(partition)
+
+            payload = {'level': map_name, 'roads': roads}
+
+            with open(path, 'w') as handle:
+                json.dump(payload, handle)
+
+            print('[mesh] roads for %s: %d ribbon(s)' % (map_name, len(roads)), flush=True)
+
+        return open(path, 'rb').read()
+
+    @staticmethod
+    def _single(node):
+        return None if node is None else node.get('$value')
+
+    @staticmethod
+    def _vec3(node):
+        v = node or {}
+        get = lambda k: ((v.get(k) or {}).get('$value'))
+        return [get('x'), get('y'), get('z')]
+
+    def _roads_from(self, partition):
+        found = []
+
+        def walk(node):
+            if isinstance(node, dict):
+                if node.get('$type') == 'RoadData':
+                    found.append(node)
+                for value in node.values():
+                    walk(value)
+            elif isinstance(node, list):
+                for value in node:
+                    walk(value)
+
+        walk(partition.get('$instances', []))
+
+        roads = []
+
+        for road in found:
+            fields = road.get('$fields', {})
+            points = [self._vec3(p.get('$value') if isinstance(p, dict) and '$value' in p else p)
+                      for p in (fields.get('Points', {}).get('$value') or [])]
+            points = [p for p in points if None not in p]
+
+            if len(points) < 2:
+                continue
+
+            widths = []
+
+            for entry in (fields.get('RibbonPoints', {}).get('$value') or []):
+                widths.append([
+                    self._single(entry.get('Left')) or 0.0,
+                    self._single(entry.get('Right')) or 0.0,
+                ])
+
+            roads.append({
+                'points': points,
+                'widths': widths,
+                'uvTile': self._single(fields.get('UvTileFactor')) or 1.0,
+                'stick': bool(self._single(fields.get('StickToTerrain'))),
+                'order': self._single(fields.get('DrawOrderIndex')) or 0,
+            })
+
+        return roads
+
     def _terrain_shader_textures(self, map_name):
         """Terrain layer textures from an ALREADY-DUMPED shader database. Never dumps."""
         diffuse, normal, masks = set(), set(), set()
@@ -1157,6 +1241,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_error(404, 'texture not available')
 
             return self._send(open(path, 'rb').read(), 'image/vnd-ms.dds')
+
+        if name.startswith('roads/') and name.endswith('.json'):
+            body = Handler.meshes.roads(name[len('roads/'):-5])
+
+            if body is None:
+                return self.send_error(404, 'no roads for that level')
+
+            return self._send(body, 'application/json')
 
         if name.startswith('placements/'):
             body = Handler.meshes.placements(name[len('placements/'):-5])
