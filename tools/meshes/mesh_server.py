@@ -17,6 +17,7 @@ one origin.
 import base64
 import glob
 import json
+import re
 import os
 import queue
 import fcntl
@@ -335,6 +336,17 @@ class Meshes:
             if not name.endswith('.json'):
                 continue
 
+            # ONLY a level manifest, which is '<Map>.json' and nothing else.
+            #
+            # This walked every .json in the cache and deleted any that had no 'meshes' key,
+            # which is every other kind of cached JSON in here: the shader dumps
+            # (<Map>.<shaderdb>.shaders.json), the layer lists, the mvdb dumps, the visual
+            # terrain. So a shader dump that took minutes to produce was deleted on the NEXT
+            # startup, silently, and the textures it resolved went with it -- terrain layers
+            # resolving one run and coming back empty the next, for no visible reason.
+            if name.count('.') != 1:
+                continue
+
             path = os.path.join(CACHE, name)
 
             try:
@@ -560,11 +572,15 @@ class Meshes:
             # That dump is NOT run from here: over a level shaderdb it ran past fifteen minutes,
             # and this call is what the browser waits on for terrain. If one has been produced
             # out-of-band it is used; otherwise this behaves exactly as before.
-            if not diffuse:
-                diffuse, normal, masks = self._terrain_shader_textures(map_name)
+            # The terrain's own shaders name its layer textures, and the layer index is in the
+            # shader's name. That is the binding -- read it before any scan or inference.
+            s_ByLayer = self._terrain_layer_textures(map_name, info)
 
-            if not diffuse:
-                diffuse, normal, masks = self._ground_textures(map_name)
+            if s_ByLayer:
+                diffuse = [s_ByLayer[i] for i in sorted(s_ByLayer)]
+                normal, masks = [], []
+            elif not diffuse:
+                diffuse, normal, masks = self._terrain_shader_textures(map_name)
 
             layers = {
                 'layerCount': info.get('LayerCount', 0),
@@ -708,6 +724,65 @@ class Meshes:
             })
 
         return roads
+
+    def _terrain_layer_textures(self, map_name, info):
+        """Layer index -> diffuse texture, read from the terrain's own shaders.
+
+        A level's terrain is drawn by generated shaders, one per layer combination, named
+        <terrain>__<layers><flags>__<kind>__<lod>. Each binds its textures to sampler registers, and
+        dump_shader_textures reports register -> texture. So the shader name gives the LAYER and the
+        registers give what that layer is painted with -- the actual binding, ordered.
+
+        This matters twice over. MP_001 keeps no terrain textures of its own: it draws with
+        SP_Sniper's and SP_Earthquake's (Asphalt_01_D, Rubble_01_D, parkingLines01). A scan of
+        Levels/<Map>/Terrain/Textures can never find those, and matching ground-ish names in the
+        level picked road props instead -- right-looking, wrong textures, and in alphabetical order
+        rather than layer order, so the splat map indexed into the wrong ones.
+        """
+        shader = (info.get('SurfaceShader') or '').rsplit('/', 1)[0].lower()
+
+        if not shader:
+            return {}
+
+        by_layer = {}
+
+        for part in glob.glob(os.path.join(CACHE, map_name + '.*.shaders.json')):
+            try:
+                registers = json.load(open(part)).get('registers', {}) or {}
+            except Exception:
+                continue
+
+            for name, by_register in registers.items():
+                lowered = name.lower()
+
+                if not lowered.startswith(shader):
+                    continue
+
+                match = re.search(r'__(\d+)[a-z]*__', lowered)
+
+                if match is None:
+                    continue
+
+                layer = int(match.group(1))
+
+                # Lowest register first: a terrain layer shader binds its colour map before the
+                # normal and mask that go with it.
+                for register in sorted(by_register, key=lambda k: int(k)):
+                    texture = by_register[register]
+                    low = texture.lower()
+
+                    if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
+                        continue
+
+                    by_layer.setdefault(layer, texture)
+                    break
+
+        if by_layer:
+            print('[mesh] terrain layers for %s from shader registers: %s'
+                  % (map_name, ', '.join('%d=%s' % (k, v.rsplit('/', 1)[-1])
+                                         for k, v in sorted(by_layer.items()))), flush=True)
+
+        return by_layer
 
     def _terrain_shader_textures(self, map_name):
         """Terrain layer textures from an ALREADY-DUMPED shader database. Never dumps."""
@@ -932,7 +1007,13 @@ class Meshes:
         slots = {}
 
         for source in self._shaderdb_names(level):
-            part = os.path.join(CACHE, map_name + '.' + source.split('/')[-2] + '.shaders.json')
+            # Key the cache on the WHOLE source name.
+            #
+            # split('/')[-2] collapses 'levels/mp_001/shaderdb' and
+            # 'levels/mp_001/mp_001/shaderdb' onto the same file -- and the first of those does
+            # not exist, so its failed dump wiped the good one on every run. The shader textures
+            # then vanished between one request and the next for no visible reason.
+            part = os.path.join(CACHE, map_name + '.' + source.replace('/', '_') + '.shaders.json')
 
             if not os.path.exists(part) and not self.rime.shader_textures(source, part):
                 continue

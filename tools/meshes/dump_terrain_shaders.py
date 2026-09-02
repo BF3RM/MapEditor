@@ -46,7 +46,9 @@ for s_Name in sources:
     print('        ' + s_Name, flush=True)
 
 for source in sources:
-    out = os.path.join(mesh_server.CACHE, '%s.%s.shaders.json' % (MAP, source.split('/')[-2]))
+    # Whole source name: two shaderdb names otherwise collapse onto one file and a failed dump
+    # deletes a good one (see mesh_server._fill_from_shaders).
+    out = os.path.join(mesh_server.CACHE, '%s.%s.shaders.json' % (MAP, source.replace('/', '_')))
 
     if os.path.exists(out):
         print('[dump] already have %s' % os.path.basename(out), flush=True)
