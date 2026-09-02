@@ -227,8 +227,15 @@ export class MeshManager {
 
 	/** The diffuse texture for one subset, whatever the shader happens to call it. */
 	private diffuseFor(meshPath: string, subset: number): string | null {
-		return this.textureFor(meshPath, subset,
-			['Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas']);
+		// Every slot a colour map arrives under, most specific first -- the shader's own parameter
+		// names, taken from the material. A storefront binds DetailTexture rather than Diffuse, a
+		// shop sign binds Background/Logo/BrandTexture, a window frame binds Frame_D. Kept in step
+		// with mesh_server.DIFFUSE_SLOTS.
+		return this.textureFor(meshPath, subset, [
+			'Diffuse', 'MainDiffuse', 'TileDiffuse', 'DetailDiffuse', 'DetailTexture',
+			'Background', 'Frame_D', 'BrandTexture', 'Logo', 'ColorTexture', 'diffuseAtlas',
+			'Texture3'
+		]);
 	}
 
 	/** A level texture by resource path, for callers outside the mesh pipeline (the sky). */

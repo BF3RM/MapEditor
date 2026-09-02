@@ -1000,7 +1000,13 @@ class Meshes:
     # same list: BF3 shaders bind Diffuse, MainDiffuse (the base) and TileDiffuse (the detail tile)
     # depending on the surface, and an architecture material routinely has MainDiffuse + TileDiffuse
     # and no plain "Diffuse" at all.
-    DIFFUSE_SLOTS = ('Diffuse', 'MainDiffuse', 'TileDiffuse', 'ColorTexture', 'diffuseAtlas')
+    # Every slot a colour map actually arrives under, most specific first. These are the shader's
+    # OWN parameter names, read out of the material -- not filename patterns. A storefront binds
+    # DetailTexture, a shop sign binds Background/Logo/BrandTexture, a window frame binds Frame_D.
+    DIFFUSE_SLOTS = ('Diffuse', 'MainDiffuse', 'MainTexture', 'TileDiffuse', 'DetailDiffuse',
+                      'DetailTexture', 'DiffuseBark', 'DiffuseLeaves', 'AwningTexture',
+                      'Background', 'Frame_D', 'BrandTexture', 'Logo', 'InteriorTexture',
+                      'EngineTexture', 'ColorTexture', 'diffuseAtlas', 'Texture3')
 
     @classmethod
     def _has_diffuse(cls, material):
@@ -1053,81 +1059,96 @@ class Meshes:
         filled = 0
 
         for mesh, variations in merged.items():
-            materials = variations.get('0') or next(iter(variations.values()), [])
+            shader_names = self._shaders_of(mesh)
 
-            # A subset counts as bound only if it actually names a DIFFUSE.
+            # EVERY variation, not just the base.
             #
-            # This used to be `any(materials)`, i.e. "the dict is non-empty" -- and once the dump
-            # started reporting metadata ($material, and $unresolved:<slot> for a binding it could
-            # not resolve), every subset became non-empty and the shader fallback stopped running
-            # for meshes that still had no texture at all. Diffuse coverage fell from 67% to 59%
-            # while the data underneath had strictly improved.
-            variations.setdefault('0', materials)
-            materials = variations['0']
-
-            for index, shader in enumerate(self._shaders_of(mesh)):
-                # PER SUBSET, not per mesh.
-                #
-                # This skipped the whole mesh when ANY of its subsets had a diffuse, so a mesh with
-                # one bound subset and six unbound ones got nothing for the six -- and a level's
-                # meshes are mostly mixed like that. It is why filling 556 materials instead of 345
-                # moved the bound count by exactly zero.
-                # Only where the material named NO colour map under any of its slots. Writing a
-                # 'Diffuse' next to an existing 'MainDiffuse' is worse than doing nothing: the
-                # client prefers 'Diffuse', so a shader-derived guess would override the material's
-                # own binding.
-                if index < len(materials) and self._has_diffuse(materials[index]):
-                    continue
-
-                textures = shaders.get(shader.lower())
-
-                if not textures:
-                    continue
-
-                # The shader says which of its textures is the diffuse; use that.
-                #
-                # Falling back to "the filename ends in _d" is what painted the crane with
-                # CraneAlphaMask_D -- a cutout mask that BF3 happens to name with a _D suffix.
-                bound = slots.get(shader.lower(), {})
-                diffuse = bound.get('Diffuse') or bound.get('DiffuseTexture')
-
-                # The shader's own sampler REGISTERS, which is how the GPU binds them: the colour
-                # map is bound before the normal and mask that accompany it. Same source that gives
-                # the terrain its layers, and the same discipline -- take the first register,
-                # stepping over maps that are demonstrably not colour.
-                if diffuse is None:
-                    for register in sorted(registers.get(shader.lower(), {}), key=int):
-                        candidate = registers[shader.lower()][register]
-                        low = candidate.lower()
-
-                        if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
-                            continue
-
-                        diffuse = candidate
-                        break
-
-                if diffuse is None:
-                    # NEVER textures[0].
-                    #
-                    # A shader streams its normal and specular maps alongside the diffuse, and the
-                    # list is unordered as far as we can tell, so "take the first" paints buildings
-                    # with their NORMAL map -- an entire level rendered bright blue, with the
-                    # coverage number going UP while the picture got worse.
-                    #
-                    # If nothing here identifies a diffuse, leave the subset unbound. Untextured is
-                    # honest; blue is not.
-                    diffuse = next((t for t in textures if t.lower().endswith('_d')), None)
-
-                if diffuse is None:
-                    continue
-
-                while len(materials) <= index:
-                    materials.append({})
-
-                materials[index]['Diffuse'] = diffuse
-                filled += 1
+            # An object placed with a variation (a camo, a dirty pass, a damaged state) is drawn
+            # from THAT entry, and only variation '0' was ever filled -- so a car's base looked
+            # right while its three variations rendered untextured.
+            for materials in variations.values():
+                filled += self._fill_one(mesh, materials, shader_names, shaders, slots, registers)
 
         print('[mesh] shader textures filled %d material(s)' % filled, flush=True)
+        return
+
+    def _fill_one(self, mesh, materials, shader_names, shaders, slots, registers):
+        """Bind one variation's subsets, using the mesh's shaders in material order.
+
+        Returns how many subsets it bound.
+        """
+        filled = 0
+
+        # A subset counts as bound only if it actually names a DIFFUSE.
+        #
+        # This used to be `any(materials)`, i.e. "the dict is non-empty" -- and once the dump
+        # started reporting metadata ($material, and $unresolved:<slot> for a binding it could
+        # not resolve), every subset became non-empty and the shader fallback stopped running
+        # for meshes that still had no texture at all. Diffuse coverage fell from 67% to 59%
+        # while the data underneath had strictly improved.
+        for index, shader in enumerate(shader_names):
+            # PER SUBSET, not per mesh.
+            #
+            # This skipped the whole mesh when ANY of its subsets had a diffuse, so a mesh with
+            # one bound subset and six unbound ones got nothing for the six -- and a level's
+            # meshes are mostly mixed like that. It is why filling 556 materials instead of 345
+            # moved the bound count by exactly zero.
+            # Only where the material named NO colour map under any of its slots. Writing a
+            # 'Diffuse' next to an existing 'MainDiffuse' is worse than doing nothing: the
+            # client prefers 'Diffuse', so a shader-derived guess would override the material's
+            # own binding.
+            if index < len(materials) and self._has_diffuse(materials[index]):
+                continue
+
+            textures = shaders.get(shader.lower())
+
+            if not textures:
+                continue
+
+            # The shader says which of its textures is the diffuse; use that.
+            #
+            # Falling back to "the filename ends in _d" is what painted the crane with
+            # CraneAlphaMask_D -- a cutout mask that BF3 happens to name with a _D suffix.
+            bound = slots.get(shader.lower(), {})
+            diffuse = bound.get('Diffuse') or bound.get('DiffuseTexture')
+
+            # The shader's own sampler REGISTERS, which is how the GPU binds them: the colour
+            # map is bound before the normal and mask that accompany it. Same source that gives
+            # the terrain its layers, and the same discipline -- take the first register,
+            # stepping over maps that are demonstrably not colour.
+            if diffuse is None:
+                for register in sorted(registers.get(shader.lower(), {}), key=int):
+                    candidate = registers[shader.lower()][register]
+                    low = candidate.lower()
+
+                    if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
+                        continue
+
+                    diffuse = candidate
+                    break
+
+            if diffuse is None:
+                # NEVER textures[0].
+                #
+                # A shader streams its normal and specular maps alongside the diffuse, and the
+                # list is unordered as far as we can tell, so "take the first" paints buildings
+                # with their NORMAL map -- an entire level rendered bright blue, with the
+                # coverage number going UP while the picture got worse.
+                #
+                # If nothing here identifies a diffuse, leave the subset unbound. Untextured is
+                # honest; blue is not.
+                diffuse = next((t for t in textures if t.lower().endswith('_d')), None)
+
+            if diffuse is None:
+                continue
+
+            while len(materials) <= index:
+                materials.append({})
+
+            materials[index]['Diffuse'] = diffuse
+            filled += 1
+
+        return filled
 
     def _count_unbound(self, map_name, merged):
         """How many subsets ended with no texture binding, so a gap is visible rather than filled."""
