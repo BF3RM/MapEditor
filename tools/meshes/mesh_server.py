@@ -1023,6 +1023,24 @@ class Meshes:
         slots = {}
         registers = {}
 
+        # Every shaderdb dump on disk, not just this level's.
+        #
+        # A level draws with other levels' assets -- MP_001's wire lights are COOP_009's mesh and
+        # its terrain is SP_Sniper's -- and those shaders live in THEIR level's shaderdb. Shader
+        # names are full asset paths, so a dump from any level is usable by any other; looking only
+        # at this map's dump meant a cross-level asset could never resolve.
+        for other in sorted(glob.glob(os.path.join(CACHE, '*.shaders.json'))):
+            try:
+                dumped = json.load(open(other))
+            except Exception:
+                continue
+
+            for name, textures in (dumped.get('shaders') or {}).items():
+                shaders.setdefault(name.lower(), textures)
+
+            for name, by_reg in (dumped.get('registers') or {}).items():
+                registers.setdefault(name.lower(), by_reg)
+
         for source in self._shaderdb_names(level):
             # Key the cache on the WHOLE source name.
             #
