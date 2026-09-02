@@ -24,15 +24,26 @@ if not rime.start():
 
 print('[dump] Rime up; dumping shader databases for %s' % MAP, flush=True)
 
-# A shaderdb sits beside each MeshVariationDatabase, one per subworld -- the plain
-# '<level>/shaderdb' name Rime rejects outright. The cached mvdb dumps name the subworlds, so
-# derive the candidates from those (mesh_server._shaderdb_names does the same from EBX).
-import glob as _glob
+# The shaderdb names come from the level's own EBX, not from a guess.
+#
+# Each MeshVariationDatabase has a shaderdb beside it, one per subworld, and mesh_server already
+# derives that list by walking the level partition's Objects (Meshes._shaderdb_names). Guessing
+# them from cached filenames found exactly one of nine and reported the rest as FAILED, which reads
+# as "Rime cannot dump these" when the names were simply wrong.
+meshes = mesh_server.Meshes(rime)
 
-subs = sorted({os.path.basename(f).split('.')[1]
-               for f in _glob.glob(os.path.join(mesh_server.CACHE, MAP + '.*.mvdb.json'))})
-sources = [LEVEL + '/' + sub + '/shaderdb' for sub in subs] + [LEVEL + '/shaderdb']
-print('[dump] candidates: %s' % ', '.join(sources), flush=True)
+# The level's PARTITION path, not its directory: 'Levels/MP_001/MP_001', which is what the EBX walk
+# needs. Passing 'levels/mp_001' resolves to no partition, so the walk finds no subworlds and only
+# the base shaderdb name comes back -- which is exactly what made eight of nine names look like
+# Rime failures.
+level_partition = meshes.levels.get(MAP.lower()) or LEVEL
+print('[dump] level partition: %s' % level_partition, flush=True)
+sources = meshes._shaderdb_names(level_partition)
+
+print('[dump] %d shaderdb name(s) from the level EBX:' % len(sources), flush=True)
+
+for s_Name in sources:
+    print('        ' + s_Name, flush=True)
 
 for source in sources:
     out = os.path.join(mesh_server.CACHE, '%s.%s.shaders.json' % (MAP, source.split('/')[-2]))

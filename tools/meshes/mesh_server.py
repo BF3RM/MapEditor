@@ -967,13 +967,19 @@ class Meshes:
             # not resolve), every subset became non-empty and the shader fallback stopped running
             # for meshes that still had no texture at all. Diffuse coverage fell from 67% to 59%
             # while the data underneath had strictly improved.
-            if any((material or {}).get('Diffuse') for material in materials):
-                continue
-
             variations.setdefault('0', materials)
             materials = variations['0']
 
             for index, shader in enumerate(self._shaders_of(mesh)):
+                # PER SUBSET, not per mesh.
+                #
+                # This skipped the whole mesh when ANY of its subsets had a diffuse, so a mesh with
+                # one bound subset and six unbound ones got nothing for the six -- and a level's
+                # meshes are mostly mixed like that. It is why filling 556 materials instead of 345
+                # moved the bound count by exactly zero.
+                if index < len(materials) and (materials[index] or {}).get('Diffuse'):
+                    continue
+
                 textures = shaders.get(shader.lower())
 
                 if not textures:
