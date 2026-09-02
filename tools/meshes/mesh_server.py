@@ -993,7 +993,19 @@ class Meshes:
                 diffuse = bound.get('Diffuse') or bound.get('DiffuseTexture')
 
                 if diffuse is None:
-                    diffuse = next((t for t in textures if t.lower().endswith('_d')), textures[0])
+                    # NEVER textures[0].
+                    #
+                    # A shader streams its normal and specular maps alongside the diffuse, and the
+                    # list is unordered as far as we can tell, so "take the first" paints buildings
+                    # with their NORMAL map -- an entire level rendered bright blue, with the
+                    # coverage number going UP while the picture got worse.
+                    #
+                    # If nothing here identifies a diffuse, leave the subset unbound. Untextured is
+                    # honest; blue is not.
+                    diffuse = next((t for t in textures if t.lower().endswith('_d')), None)
+
+                if diffuse is None:
+                    continue
 
                 while len(materials) <= index:
                     materials.append({})
