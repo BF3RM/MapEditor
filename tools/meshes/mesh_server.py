@@ -563,6 +563,9 @@ class Meshes:
             if not diffuse:
                 diffuse, normal, masks = self._terrain_shader_textures(map_name)
 
+            if not diffuse:
+                diffuse, normal, masks = self._ground_textures(map_name)
+
             layers = {
                 'layerCount': info.get('LayerCount', 0),
                 'surfaceShader': info.get('SurfaceShader', ''),
@@ -579,6 +582,48 @@ class Meshes:
                   % (map_name, layers['layerCount'], len(diffuse)), flush=True)
 
         return open(path, 'rb').read()
+
+    # Ground materials a terrain layer is plausibly painted with, by BF3's own naming.
+    GROUND_WORDS = ('dirt', 'ground', 'sand', 'gravel', 'asphalt', 'concrete', 'rubble',
+                    'slab', 'mud', 'grass', 'rock', 'sidewalk')
+
+    def _ground_textures(self, map_name):
+        """The level's own ground textures, for levels that keep no Terrain/Textures directory.
+
+        MP_001 is the case: its terrain declares seven layers, and its ground textures sit under
+        Levels/MP_001/Props/Textures (MP001Road_Dirt_01..04_D, ConcreteFloor_01_D,
+        MP001RoadAsphalt_02_D, MP001RoadSideWalk_01a_D) rather than under Terrain/Textures, which
+        is the only place the scan above looks. So the terrain came back with no layers at all and
+        rendered as flat colour, while the textures it is painted with were sitting in the level.
+
+        This is inference, and narrower than it looks: only the level's OWN textures, and only ones
+        whose names say ground. Levels with a real terrain texture directory never reach here.
+        """
+        prefix = 'levels/%s/' % map_name.lower()
+        diffuse, normal, masks = [], [], []
+
+        for texture in self.ebx.paths.values():
+            lowered = texture.replace('\\', '/').lower()
+
+            if not lowered.startswith(prefix):
+                continue
+
+            name = lowered.rsplit('/', 1)[-1]
+
+            if not any(word in name for word in self.GROUND_WORDS):
+                continue
+
+            if name.endswith('_n'):
+                normal.append(texture)
+            elif name.endswith('_rgb') or name.endswith('_m') or 'mask' in name:
+                masks.append(texture)
+            elif name.endswith('_d') or '_d_' in name:
+                diffuse.append(texture)
+
+        print('[mesh] ground textures for %s: %d diffuse, %d normal (no terrain texture dir)'
+              % (map_name, len(diffuse), len(normal)), flush=True)
+
+        return sorted(diffuse), sorted(normal), sorted(masks)
 
     def _terrain_shader_textures(self, map_name):
         """Terrain layer textures from an ALREADY-DUMPED shader database. Never dumps."""
