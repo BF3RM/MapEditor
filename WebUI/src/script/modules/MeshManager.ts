@@ -692,9 +692,21 @@ export class MeshManager {
 		const parts: any[] = [];
 
 		copy.traverse((child: any) => {
-			if (child.isMesh) {
-				parts.push(child);
+			if (!child.isMesh) {
+				return;
 			}
+
+			// A .glb carries the mesh's SUB-meshes, and some of those are things the engine never
+			// draws: light volumes (lightpoly), occluders, collision. The VOLUME check above
+			// only sees the FILE, so a lightpoly sitting inside an otherwise ordinary mesh came
+			// through -- and with no texture of its own it renders as a big white block over the
+			// level. Judged on the sub-mesh's own name, which is the game's.
+			if (MeshManager.VOLUME.test(child.name || '')) {
+				child.visible = false;
+				return;
+			}
+
+			parts.push(child);
 		});
 
 		this.track(file, parts);
