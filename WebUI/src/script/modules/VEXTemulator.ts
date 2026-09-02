@@ -508,6 +508,10 @@ export class VEXTemulator {
 				color: surface === null ? 0x5a5754 : 0xffffff,
 				map: surface,
 				roughness: 1.0,
+				// A ribbon is a flat strip and its winding follows the road's direction, so half of
+				// them face down and vanish under backface culling. Nothing about a road decal
+				// wants one-sidedness.
+				side: THREE.DoubleSide,
 				polygonOffset: true,
 				polygonOffsetFactor: -2,
 				polygonOffsetUnits: -2
