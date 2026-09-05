@@ -71,6 +71,18 @@ interface TerrainData {
 }
 
 export class Terrain {
+	/**
+	 * The decoded surface, kept so that things laid ON the ground can ask how high it is.
+	 *
+	 * A road spline carries two control points and a StickToTerrain flag: the engine drapes it over
+	 * the terrain, so drawing the straight chord between those points buries most of the road under
+	 * any ground that rises between them. Sampled here instead, off the same numbers the surface
+	 * itself is built from.
+	 */
+	private decoded: Array<{ min: number[]; max: number[]; samples: Uint16Array }> = [];
+	private side = 0;
+	private scaleY = 0;
+
 	private level: string;
 	private base: string;
 	private group: THREE.Group | null = null;
@@ -89,7 +101,7 @@ export class Terrain {
 	 * and each is added as it lands, so the ground fills in rather than appearing all at once.
 	 */
 	public async load(material: THREE.Material,
-		load?: (resource: string) => Promise<THREE.Texture | null>): Promise<number> {
+		load?: (resource: string, data?: boolean) => Promise<THREE.Texture | null>): Promise<number> {
 		let terrain: TerrainData;
 
 		try {
@@ -103,6 +115,9 @@ export class Terrain {
 		} catch (e) {
 			return 0;
 		}
+
+		this.side = terrain.samplesPerSide;
+		this.scaleY = terrain.worldScaleY;
 
 		// The level's own terrain textures, where it has any.
 		let painted: THREE.Material | null = null;
@@ -215,6 +230,8 @@ export class Terrain {
 				if (samples === null) {
 					continue;
 				}
+
+				this.decoded.push({ min: tile.min, max: tile.max, samples: samples });
 
 				const mesh = this.patch(tile.min, tile.max, samples, terrain, material);
 
@@ -348,6 +365,58 @@ export class Terrain {
 		geometry.setIndex(kept);
 
 		return kept.length / 3;
+	}
+
+	/**
+	 * Ground height at a world point, or null where no decoded tile covers it.
+	 *
+	 * Bilinear, and off the finest tile covering the point, so it agrees with the surface actually
+	 * drawn rather than with a coarser ancestor of it. Tiles whose samples there are the filler
+	 * zeroes a refined parent leaves behind are skipped, for the same reason the patches drop them.
+	 */
+	public heightAt(x: number, z: number): number | null {
+		const inner = this.side - BORDER * 2;
+		let best: number | null = null;
+		let finest = Infinity;
+
+		for (const tile of this.decoded) {
+			const { min, max, samples } = tile;
+
+			if (x < min[0] || x > max[0] || z < min[2] || z > max[2]) {
+				continue;
+			}
+
+			const span = max[0] - min[0];
+
+			if (span > finest) {
+				continue;
+			}
+
+			const fu = (x - min[0]) / span * (inner - 1);
+			const fv = (z - min[2]) / (max[2] - min[2]) * (inner - 1);
+			const u0 = Math.max(0, Math.min(inner - 1, Math.floor(fu)));
+			const v0 = Math.max(0, Math.min(inner - 1, Math.floor(fv)));
+			const u1 = Math.min(inner - 1, u0 + 1);
+			const v1 = Math.min(inner - 1, v0 + 1);
+			const at = (u: number, v: number): number =>
+				samples[(v + BORDER) * this.side + (u + BORDER)];
+			const floor = (min[1] - 1) / this.scaleY;
+			const corners = [at(u0, v0), at(u1, v0), at(u0, v1), at(u1, v1)];
+
+			if (corners.some((sample) => sample < floor)) {
+				continue;
+			}
+
+			const tu = fu - u0;
+			const tv = fv - v0;
+			const top = corners[0] * (1 - tu) + corners[1] * tu;
+			const bottom = corners[2] * (1 - tu) + corners[3] * tu;
+
+			best = (top * (1 - tv) + bottom * tv) * this.scaleY;
+			finest = span;
+		}
+
+		return best;
 	}
 
 	/** One node's surface, as a grid of its interior samples. */

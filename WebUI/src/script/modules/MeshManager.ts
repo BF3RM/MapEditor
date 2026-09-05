@@ -75,6 +75,9 @@ export class MeshManager {
 	public static readonly VOLUME =
 		/invisiblecollision|charactercollision|_collision|lightpoly|_dimmer|occluder|volumemesh|^fx\/|^fx_/i;
 
+	/** Requests that have come back, either with a texture or with nothing. */
+	private texturesSettled = 0;
+
 	/** One load per texture resource, shared by every material using it. */
 	private loadedTextures = new Map<string, Promise<THREE.Texture | null>>();
 
@@ -189,7 +192,108 @@ export class MeshManager {
 	}
 
 	/** A named map for one subset, whatever the shader happens to call it. */
-	private textureFor(meshPath: string, subset: number, names: string[]): string | null {
+	/**
+	 * A name reduced to what can be compared: lowercase, punctuation gone, DIGITS KEPT.
+	 *
+	 * Digits are the whole reason a wall mesh's `Wall1`, `Wall2` and `Wall3` can be told apart at
+	 * all. Stripping them -- the obvious way to write this -- collapses all three to `wall`, which
+	 * then matches every subset and identifies none.
+	 */
+	private static token(name: unknown): string {
+		return String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+	}
+
+	/** Everything one subset's bindings SAY: its slot names and its textures' base names. */
+	private static said(binding: any): string {
+		const words: string[] = [];
+
+		for (const slot of Object.keys(binding || {})) {
+			if (slot.charAt(0) === '$') {
+				continue;
+			}
+
+			words.push(MeshManager.token(slot));
+			words.push(MeshManager.token(String(binding[slot] || '').split('/').pop()));
+		}
+
+		return words.join(' ');
+	}
+
+	/**
+	 * A material name too common to identify a subset with.
+	 *
+	 * These are the names artists give a mesh's ONLY material, so they appear on meshes whose
+	 * subsets are otherwise unnamed and would match everything.
+	 */
+	private static GENERIC = ['default', 'material', 'opaque', 'lambert', 'phong', 'standard',
+		'mesh', 'none', 'main', 'base'];
+
+	/**
+	 * Which binding paints which part.
+	 *
+	 * A .glb's primitives and the MeshVariationDatabase's material list are both per-subset, and
+	 * they are NOT in the same order. Measured over MP_001: of 199 multi-subset meshes, 78 have a
+	 * part whose own material name matches a DIFFERENT subset's bindings than its position gives
+	 * it, against 82 where position and name agree. Half the level's multi-material meshes were
+	 * painted from the wrong subset. The linden tree is the visible case -- its leaf cards were
+	 * given the BARK texture, opaque, and rendered as black slabs, while its trunk was given the
+	 * leaf atlas and cut into leaf shapes by that atlas's alpha.
+	 *
+	 * The join is the subset's own authored material name, which Rime writes into the .glb from
+	 * `MeshSubset.MaterialName`, against the names in the same mesh's bindings -- the texture
+	 * resources and the shader's own parameter slots, which echo it (`DiffuseLeaves`,
+	 * `DiffuseBark`). Authored name against authored name: an identity join, not an inference
+	 * about what a texture contains, which is what the pixel classifier is for.
+	 *
+	 * A part only moves on an UNAMBIGUOUS match. Where a name matches several subsets, a match at
+	 * the part's own position wins -- position and name agreeing is the normal case and must not
+	 * be disturbed -- and otherwise the first match is taken. Where it matches none, the part
+	 * stays exactly where it was, so a mesh this cannot speak about behaves as it did before.
+	 */
+	private subsetOrder(meshPath: string, parts: any[]): number[] {
+		const identity = parts.map((unused, i) => i);
+		const variations = this.textures[meshPath.toLowerCase()];
+
+		if (variations === undefined) {
+			return identity;
+		}
+
+		const subsets = variations['0'] || Object.values(variations)[0];
+
+		if (subsets === undefined || subsets.length < 2) {
+			return identity;
+		}
+
+		const said = subsets.map((binding: any) => MeshManager.said(binding));
+		const order = identity.slice();
+
+		for (let part = 0; part < parts.length; part++) {
+			const token = MeshManager.token((parts[part].userData || {}).glbMaterial);
+
+			if (token.length < 4 || MeshManager.GENERIC.indexOf(token) >= 0) {
+				continue;
+			}
+
+			const matches: number[] = [];
+
+			for (let subset = 0; subset < said.length; subset++) {
+				if (said[subset].indexOf(token) >= 0) {
+					matches.push(subset);
+				}
+			}
+
+			if (matches.length === 0) {
+				continue;
+			}
+
+			order[part] = matches.indexOf(part) >= 0 ? part : matches[0];
+		}
+
+		return order;
+	}
+
+	private textureFor(meshPath: string, subset: number, names: string[],
+		hint = ''): string | null {
 		const variations = this.textures[meshPath.toLowerCase()];
 
 		if (variations === undefined) {
@@ -205,9 +309,37 @@ export class MeshManager {
 
 		const bindings = subsets[Math.min(subset, subsets.length - 1)] || {};
 
+		// A slot NAMED after this part's own material, before any general slot list.
+		//
+		// One subset can carry a whole tree: BF3's linden LOD binds `DiffuseBark` AND
+		// `DiffuseLeaves` in a single material, and a fixed list of slot names has no way to say
+		// which of the two a given part wants. The part's own name does say, and it is the same
+		// word the artist put in the slot.
+		const forColour = names[0] === 'Diffuse';
+
+		if (hint.length >= 4) {
+			const shape = forColour ? /diffuse|colou?r|albedo|texture|atlas/i : /normal/i;
+
+			for (const slot of Object.keys(bindings)) {
+				if (slot.charAt(0) === '$' || !shape.test(slot)
+					|| MeshManager.token(slot).indexOf(hint) < 0) {
+					continue;
+				}
+
+				// The slot's shape and the part's name agreeing is not enough on its own: a
+				// material can bind a normal under a diffuse-shaped slot, and the same pixel test
+				// that catches `Window_01_nm` catches it here too.
+				if (MeshManager.colourMap(bindings[slot]) === forColour) {
+					return bindings[slot];
+				}
+			}
+		}
+
 		for (const name of names) {
 			if (bindings[name] !== undefined) {
-				return bindings[name];
+				if (MeshManager.colourMap(bindings[name])) {
+					return bindings[name];
+				}
 			}
 		}
 
@@ -229,7 +361,23 @@ export class MeshManager {
 	}
 
 	/** The diffuse texture for one subset, whatever the shader happens to call it. */
-	private diffuseFor(meshPath: string, subset: number): string | null {
+	/**
+	 * Whether a texture resource is a COLOUR map rather than a normal, mask or noise.
+	 *
+	 * Materials are authored data and one of MP_001's binds `Window_01_nm` -- a normal map -- to
+	 * its Diffuse slot. Painted as colour it comes out blue-violet, which is a normal map's own
+	 * colour, and it is the only such binding in 4322. Checked at the point of USE because the
+	 * binding is what the game ships; nothing upstream can correct it.
+	 */
+	private static colourMap(resource: string): boolean {
+		const low = resource.toLowerCase();
+
+		return !(low.endsWith('_n') || low.endsWith('_m') || low.endsWith('_nm')
+			|| low.indexOf('mask') >= 0 || low.indexOf('noise') >= 0
+			|| low.indexOf('perlin') >= 0 || low.indexOf('normal') >= 0);
+	}
+
+	private diffuseFor(meshPath: string, subset: number, hint = ''): string | null {
 		// Every slot a colour map arrives under, most specific first -- the shader's own parameter
 		// names, taken from the material. A storefront binds DetailTexture rather than Diffuse, a
 		// shop sign binds Background/Logo/BrandTexture, a window frame binds Frame_D. Kept in step
@@ -238,12 +386,23 @@ export class MeshManager {
 			'Diffuse', 'MainDiffuse', 'TileDiffuse', 'DetailDiffuse', 'DetailTexture',
 			'Background', 'Frame_D', 'BrandTexture', 'Logo', 'ColorTexture', 'diffuseAtlas',
 			'Texture3'
-		]);
+		], hint);
 	}
 
 	/** A level texture by resource path, for callers outside the mesh pipeline (the sky). */
 	public load(resource: string): Promise<THREE.Texture | null> {
 		return this.texture(resource);
+	}
+
+	/**
+	 * A level texture that is NOT colour: a normal map, a mask, a noise field.
+	 *
+	 * Routed through the same path meshes use for their normals, which reads the four-CC first and
+	 * decodes server-side what the browser's DDS loader cannot. Colour maps go through `load`;
+	 * asking for a normal there gamma-corrects vectors and bends the lighting.
+	 */
+	public loadData(resource: string): Promise<THREE.Texture | null> {
+		return this.normal(resource);
 	}
 
 	private async texture(resource: string, colour = true): Promise<THREE.Texture | null> {
@@ -286,6 +445,8 @@ export class MeshManager {
 			// every cached promise and deciding asynchronously (which repainted before it had
 			// finished deciding).
 			void pending.then((map) => {
+				this.texturesSettled++;
+
 				if (map === null) {
 					this.failedTextures.add(resource);
 				}
@@ -315,15 +476,21 @@ export class MeshManager {
 			return;
 		}
 
+		// WHICH binding paints WHICH part is not the part's position. See subsetOrder.
+		const order = this.subsetOrder(meshPath, parts);
+
 		for (let subset = 0; subset < parts.length; subset++) {
-			const resource = this.diffuseFor(meshPath, subset);
+			const bound = order[subset];
+			const hint = MeshManager.token((parts[subset].userData || {}).glbMaterial);
+			const resource = this.diffuseFor(meshPath, bound, hint);
 
 			if (resource === null) {
 				continue;
 			}
 
-			const normal = this.textureFor(meshPath, subset,
-				['Normal', 'MainNormal', 'TileNormal', 'Normalmap', 'NormalMap', 'TileNormalTexCoord1']);
+			const normal = this.textureFor(meshPath, bound,
+				['Normal', 'MainNormal', 'TileNormal', 'Normalmap', 'NormalMap', 'TileNormalTexCoord1'],
+				hint);
 			const material = await this.materialFor(resource, normal);
 
 			if (material !== this.material) {
@@ -368,6 +535,7 @@ export class MeshManager {
 				);
 			});
 
+			void pending.then(() => { this.texturesSettled++; });
 			this.loadedTextures.set(key, pending);
 		}
 
@@ -539,6 +707,20 @@ export class MeshManager {
 		return filled;
 	}
 
+	/**
+	 * How far the TEXTURES are, which is what a level load actually spends its time on.
+	 *
+	 * Counted as settled-out-of-requested rather than against the manifest: the binding table
+	 * covers every mesh in the game and every slot on it (normals, masks), while a level requests
+	 * a colour map only for the meshes it actually places. Measuring against the table would put
+	 * the denominator in the thousands and the bar would stop short of 100% forever. Geometry
+	 * lands within seconds and textures stream for minutes, so the request set is known early and
+	 * this converges on a true 100% exactly when the last texture is in.
+	 */
+	public get textureProgress(): { loaded: number; total: number } {
+		return { loaded: this.texturesSettled, total: this.loadedTextures.size };
+	}
+
 	public get pendingCount(): number {
 		return this.pending.size;
 	}
@@ -565,6 +747,7 @@ export class MeshManager {
 		// after their texture was resolved, found and cached.
 		for (const resource of Array.from(this.failedTextures)) {
 			this.loadedTextures.delete(resource);
+			this.texturesSettled = Math.max(0, this.texturesSettled - 1);
 
 			for (const key of Array.from(this.materials.keys())) {
 				if (key === resource || key.startsWith(resource + '|')) {
@@ -769,6 +952,14 @@ export class MeshManager {
 						const parts: any[] = [];
 						gltf.scene.traverse((child: any) => {
 							if (child.isMesh) {
+								// The subset's OWN material name, kept before the neutral material
+								// takes its place. Rime writes it into the .glb from
+								// MeshSubset.MaterialName ("Leaves", "Bark", "Glass"), and it is
+								// the only thing that says WHICH subset a primitive is -- see
+								// subsetOrder. userData survives the clone every instance is made
+								// from; the material does not.
+								child.userData.glbMaterial =
+									(child.material && child.material.name) || '';
 								child.material = this.material;
 								parts.push(child);
 							}

@@ -12,6 +12,7 @@ import { MeshManager } from '@/script/modules/MeshManager';
 import { StaticModels } from '@/script/modules/StaticModels';
 import * as THREE from 'three';
 import { RoadRibbons } from '@/script/modules/RoadRibbons';
+import { TerrainDecals } from '@/script/modules/TerrainDecals';
 import { StandaloneProgress } from '@/script/modules/StandaloneProgress';
 import { Terrain } from '@/script/modules/Terrain';
 import { Lighting } from '@/script/modules/Lighting';
@@ -494,7 +495,11 @@ export class VEXTemulator {
 		// level whose tiles are chunked, so it starts HERE rather than at the end. Waiting until
 		// after the EBX walk, the statics and the instancing left the first tile a minute out; from
 		// here the coarse levels are down while the objects are still arriving.
-		const terrain = new Terrain(level).load(meshes.groundMaterial, (resource) => meshes.load(resource))
+		const ground = new Terrain(level);
+		// `data` marks a texture that is not colour -- a normal or a mask -- so it skips the sRGB
+		// decode and takes the route that can read the formats the DDS loader cannot.
+		const terrain = ground.load(meshes.groundMaterial,
+			(resource, data) => (data ? meshes.loadData(resource) : meshes.load(resource)))
 			.then((patches) => {
 				if (patches > 0) {
 					console.log('Rime: terrain built from ' + patches + ' heightfield patches');
@@ -578,11 +583,30 @@ export class VEXTemulator {
 
 			// Each ribbon carries the texture ITS shader binds, so the material above is only the
 			// fallback for one that resolved none.
+			// The roads are draped onto the ground, so the ground has to be decoded first. It is
+			// cheap next to the terrain itself -- 109 ribbons against hundreds of tiles.
+			await terrain;
+
+			// The BAKED decals first. RoadData is the authoring form of the road network; the
+			// `.decals` resource is what the engine actually draws, and it holds the crossings
+			// and the tank tracks that were never ribbons at all. Where a level ships one, the
+			// ribbons are the worse copy of a subset of it and must not be drawn on top.
+			const baked = await new TerrainDecals(level).load(
+				(resource: string, data?: boolean) =>
+					(data ? meshes.loadData(resource) : meshes.load(resource)),
+				(x: number, z: number) => ground.heightAt(x, z));
+
+			if (baked > 0) {
+				(window as any).editor.threeManager.setPendingRender();
+				return;
+			}
+
 			const drawn = await new RoadRibbons(level).load(material,
-				(resource: string) => meshes.load(resource));
+				(resource: string) => meshes.load(resource),
+				(x: number, z: number) => ground.heightAt(x, z));
 
 			if (drawn > 0) {
-				console.log('Rime: ' + drawn + ' road ribbon(s) drawn');
+				console.log('Rime: ' + drawn + ' road ribbon(s) drawn (no baked decals for this level)');
 				(window as any).editor.threeManager.setPendingRender();
 			}
 		})();

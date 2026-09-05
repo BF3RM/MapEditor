@@ -205,6 +205,18 @@ class Rime:
         return self._command('dump_visual_terrain %s "%s"' % (resource.lower(), destination),
                              destination, timeout)
 
+    def terrain_decals(self, resource, destination, timeout=600):
+        """A level's BAKED terrain decals: the geometry the engine drapes over the heightfield.
+
+        Roads, crossings, lane markings and tank tracks are not splines the engine draws at
+        runtime -- they are baked into a .decals resource as real triangles with per-vertex blend
+        weights, in two LODs (a flat 2d one keyed on (x,z), and a terrain-conforming 3d one that
+        carries its own y). Rebuilding ribbons from the RoadData control points approximates the
+        markings and misses everything that was never a ribbon.
+        """
+        return self._command('dump_terrain_decals_json %s "%s"' % (resource.lower(), destination),
+                             destination, timeout)
+
     def chunk(self, guid, destination, timeout=120):
         """One streamed chunk. A terrain tile's height samples live in one of these rather than in
         the tree, on every level whose heightfield tree carries no samples of its own."""
@@ -583,17 +595,46 @@ class Meshes:
             # shader's name. That is the binding -- read it before any scan or inference.
             s_ByLayer = self._terrain_layer_textures(map_name, info)
 
+            layer_indexed = False
+
             if s_ByLayer:
-                diffuse = [s_ByLayer[i] for i in sorted(s_ByLayer)]
+                # Indexed BY LAYER, with a hole where a layer binds no colour of its own: the
+                # splat names layers by number, so compacting the list shifts every layer after
+                # the hole onto the wrong texture.
+                count = max(info.get('LayerCount', 0), max(s_ByLayer) + 1)
+                diffuse = [s_ByLayer.get(i) for i in range(count)]
                 normal, masks = [], []
+                layer_indexed = True
             elif not diffuse:
                 diffuse, normal, masks = self._terrain_shader_textures(map_name)
 
+            normal_of = getattr(self, '_terrain_normal_of', {})
+
             layers = {
+                # Texels per metre of ground. With the layer texture's own size this IS the tile
+                # size -- a 1024px texture at 32 samples/m repeats every 32 m -- so the client
+                # stops guessing one.
+                'samplesPerMeter': info.get('TextureSamplesPerMeterMax', 0),
+                # RGB blend weights over the layer materials -- the terrain's real arrangement.
+                'splat': getattr(self, '_terrain_splat', None),
+                # Per-material normals, aligned with the blend's material order.
+                'normalMaps': getattr(self, '_terrain_normals', []),
+                # Indexed BY LAYER like `diffuse`, so normalByLayer[i] is layer i's own normal
+                # map. `normalMaps` above is a flat list in binding order and its order does NOT
+                # match `diffuse` -- MP_001 serves it rubble-first and its colours sand-first.
+                'normalByLayer': [normal_of.get(d) if d else None for d in diffuse]
+                if layer_indexed else [],
+                # Break-up textures the terrain shaders bind alongside the materials, most-bound
+                # first: what stops a 32 m tile from reading as one repeated photograph.
+                'detail': getattr(self, '_terrain_detail', []),
+                # The wetness mask, where the terrain binds one.
+                'wetness': getattr(self, '_terrain_wetness', None),
                 'layerCount': info.get('LayerCount', 0),
                 'surfaceShader': info.get('SurfaceShader', ''),
                 'draws': info.get('Draws', []),
-                'diffuse': sorted(diffuse),
+                # Sorting a layer-indexed palette alphabetically puts every layer on the wrong
+                # texture, which is how the ground came out asphalt everywhere.
+                'diffuse': diffuse if layer_indexed else sorted(diffuse),
                 'normal': sorted(normal),
                 'masks': sorted(masks),
             }
@@ -605,6 +646,209 @@ class Meshes:
                   % (map_name, layers['layerCount'], len(diffuse)), flush=True)
 
         return open(path, 'rb').read()
+
+    # Suffixes and words that mean "this is not a colour map".
+    #
+    # `_nm` is here because one MP_001 material binds Window_01_nm to its Diffuse slot: a normal
+    # map in a colour slot. A filter that knew only `_n` and `_m` let it through, and it painted
+    # blue-violet -- a normal map's own colour -- onto the ground.
+    # ------------------------------------------------------------------ #
+    # What a texture IS, decided from its pixels rather than from its name.
+    #
+    # Names lie, and they lie in ways that silently corrupt the render. MP_001's terrain binds
+    # `Asphalt_01_D` as its base layer: the suffix says diffuse, and it is a SPLAT MAP -- three
+    # independent blend-weight channels. Painted as colour it turns the ground into red, green and
+    # blue patches, which is exactly how it rendered. Three separate name-based rules were added to
+    # catch three separate cases of this (`_nm`, `noise`/`perlin`, and masks) and each one only ever
+    # covered the case that happened to be visible at the time.
+    #
+    # Pixels settle it in one measurement, and the same test works for content whose naming
+    # conventions we have never seen -- a Source engine map's materials, say.
+    # ------------------------------------------------------------------ #
+
+    @staticmethod
+    def _correlation(a, b):
+        n = len(a)
+
+        if n == 0:
+            return 0.0
+
+        mean_a = sum(a) / n
+        mean_b = sum(b) / n
+        cov = sum((x - mean_a) * (y - mean_b) for x, y in zip(a, b))
+        var = (sum((x - mean_a) ** 2 for x in a) * sum((y - mean_b) ** 2 for y in b)) ** 0.5
+
+        return cov / var if var else 0.0
+
+    #: Version of the measurement rules below. Cached verdicts from an older version are redone.
+    CLASSIFIER_RULES = 4
+
+    @classmethod
+    def classify_pixels(cls, path, step=8):
+        """A texture's ROLE, measured: colour, splat, normal or data.
+
+        A photograph's channels move together -- r(R,G) and friends sit at 0.97..1.00, because
+        lighting and albedo affect all three. Packed data has independent channels, near 0.00. If
+        those independent channels also sum to a constant they are blend weights (partition of
+        unity), which is a splat map. A tangent-space normal is its own shape: blue pinned high,
+        red and green centred on 128.
+        """
+        try:
+            from PIL import Image
+
+            # RGBA, not RGB: a two-channel normal packed DXT5nm-style keeps one of its axes in
+            # ALPHA, and reading only RGB throws that axis away -- which makes the texture look
+            # like a constant with one noisy channel rather than the detail normal it is.
+            image = Image.open(path).convert('RGBA')
+        except Exception:
+            return None
+
+        width, height = image.size
+        pixels = image.load()
+        red, green, blue, alpha, sums = [], [], [], [], []
+
+        for y in range(0, height, step):
+            for x in range(0, width, step):
+                r, g, b, a = pixels[x, y]
+                red.append(r)
+                green.append(g)
+                blue.append(b)
+                alpha.append(a)
+                sums.append(r + g + b)
+
+        if not red:
+            return None
+
+        rg = cls._correlation(red, green)
+        rb = cls._correlation(red, blue)
+        gb = cls._correlation(green, blue)
+        correlated = min(rg, rb, gb)
+        mean_b = sum(blue) / len(blue)
+        mean_r = sum(red) / len(red)
+        mean_g = sum(green) / len(green)
+        mean_sum = sum(sums) / len(sums)
+        spread = sum(abs(v - mean_sum) for v in sums) / len(sums)
+
+        # Per-channel spread, alpha included. A channel that does not vary carries no information,
+        # whatever its mean -- which is how a packed two-channel normal is told from a four-channel
+        # one, and it cannot be seen in the means alone.
+        deviations = []
+
+        for channel in (red, green, blue, alpha):
+            mean = sum(channel) / len(channel)
+            deviations.append((sum((v - mean) ** 2 for v in channel) / len(channel)) ** 0.5)
+
+        means = [mean_r, mean_g, mean_b, sum(alpha) / len(alpha)]
+        # Channels that actually carry signal, and whether the ones that do are centred like a
+        # normal's axes rather than like a colour.
+        carrying = [i for i, d in enumerate(deviations) if d >= 8.0]
+        centred = all(110.0 <= means[i] <= 146.0 for i in carrying)
+
+        if max(mean_r, mean_g, mean_b) - min(mean_r, mean_g, mean_b) < 3.0 and correlated > 0.9:
+            # GREYSCALE. Its channels correlate perfectly -- they are equal -- so the colour test
+            # above claims it, and BF3's `Textures/Perlin` measures exactly that: r(R,G)=0.999 with
+            # all three means at 128.9. It is a break-up mask, not ground colour, and only the
+            # name rule was catching it. A real ground photograph is never neutral to within three
+            # levels across every channel (Sand_01_D spreads 28.7, Rubble_01_D 9.6).
+            role = 'detail'
+        elif correlated > 0.6:
+            role = 'colour'
+        elif mean_b > 180 and 96 < mean_r < 160 and 96 < mean_g < 160:
+            # Blue pinned high with red/green around the midpoint: a tangent-space normal.
+            role = 'normal'
+        elif (deviations[2] < 1.0 and deviations[3] < 1.0 and mean_b < 8.0
+                and 110.0 <= mean_r <= 146.0 and 110.0 <= mean_g <= 146.0):
+            # BC5/DXN: two axes in red and green, blue and alpha not stored at all -- blue decodes
+            # to a flat ZERO and alpha to a flat 255. That shape is the FORMAT, so it identifies a
+            # normal map however shallow its relief is, which the deviation test below cannot:
+            # `Decal_Crossing_01_N` is a real BC5 normal whose axes deviate 7.6 and 8.3, just under
+            # the 8.0 signal floor, and it was coming out `splat` -- its sum is near-constant
+            # because two of its four channels are constants.
+            role = 'packednormal'
+        elif len(carrying) == 2 and centred:
+            # Exactly two channels vary, both centred on the midpoint, and blue is not pinned high:
+            # a TWO-CHANNEL normal, the other axes dropped and the flat channels padding. MP_001's
+            # `Noise_N` measures R sd 17.9 and A sd 25.2 about 127, against G sd 3.8 and B sd 1.2 --
+            # its detail normal, which the sum-spread test below was calling a splat map because
+            # two constant channels do make the sum constant.
+            role = 'packednormal'
+        elif spread / mean_sum < 0.18 if mean_sum else False:
+            # Independent channels that nonetheless sum to a near-constant are weights.
+            role = 'splat'
+        else:
+            role = 'data'
+
+        return {
+            'role': role,
+            # Bumped whenever the rules change, so verdicts cached under the old ones are redone
+            # rather than believed forever.
+            'rules': cls.CLASSIFIER_RULES,
+            'correlation': [round(rg, 3), round(rb, 3), round(gb, 3)],
+            'means': [round(m, 1) for m in means],
+            'deviations': [round(d, 1) for d in deviations],
+            # Which channels carry the signal, for a role whose axes are not where a name says.
+            'channels': carrying,
+            'sumMean': round(mean_sum, 1),
+            'sumSpread': round(spread / mean_sum, 3) if mean_sum else None,
+        }
+
+    def classify(self, resource):
+        """classify_pixels for a texture resource, extracted and cached on first ask."""
+        key = resource.replace('/', '_').lower() + '.class.json'
+        path = os.path.join(CACHE, key)
+
+        if os.path.exists(path):
+            try:
+                cached = json.load(open(path))
+
+                if cached.get('rules') == self.CLASSIFIER_RULES:
+                    return cached
+            except Exception:
+                pass
+
+        dds = self.dds(resource)
+
+        if dds is None:
+            return None
+
+        verdict = self.classify_pixels(dds)
+
+        if verdict is not None:
+            verdict['resource'] = resource
+
+            with open(path, 'w') as handle:
+                json.dump(verdict, handle)
+
+        return verdict
+
+    NOT_COLOUR_SUFFIX = ('_n', '_m', '_nm')
+    NOT_COLOUR_WORD = ('mask', 'noise', 'perlin', 'normal')
+
+    @classmethod
+    def is_colour_map_by_name(cls, texture):
+        """The NAME's opinion. A prior, used before the pixels have been looked at."""
+        low = (texture or '').lower()
+
+        return not (low.endswith(cls.NOT_COLOUR_SUFFIX)
+                    or any(word in low for word in cls.NOT_COLOUR_WORD))
+
+    def is_colour_map(self, texture):
+        """Whether a texture is a COLOUR map -- measured where possible, guessed otherwise.
+
+        The measurement wins because names are wrong in both directions: `Asphalt_01_D` carries a
+        diffuse suffix and is a splat map, and a texture with no telling suffix at all can still be
+        packed data. The name check stays as the answer for a texture not yet extracted, where
+        there are no pixels to look at.
+        """
+        if not self.is_colour_map_by_name(texture):
+            return False
+
+        verdict = self.classify(texture)
+
+        if verdict is None:
+            return True
+
+        return verdict.get('role') == 'colour'
 
     # Ground materials a terrain layer is plausibly painted with, by BF3's own naming.
     GROUND_WORDS = ('dirt', 'ground', 'sand', 'gravel', 'asphalt', 'concrete', 'rubble',
@@ -647,6 +891,307 @@ class Meshes:
               % (map_name, len(diffuse), len(normal)), flush=True)
 
         return sorted(diffuse), sorted(normal), sorted(masks)
+
+    # ------------------------------------------------------------------ #
+    # BAKED TERRAIN DECALS
+    #
+    # A BF3 level's road network is not drawn from the RoadData splines at runtime. The splines
+    # are the AUTHORING form; the shipped form is a `.decals` resource holding baked triangles
+    # with per-vertex blend weights that fade every edge, end and crossing into the terrain.
+    # There are two LODs of the same content: `2d`, keyed on (x, z) alone and draped onto
+    # whatever height the ground has, drawn beyond Decal3dFarDrawDistance; and `3d`, which
+    # carries its own y and follows the terrain, drawn inside it.
+    #
+    # Rebuilding ribbons from the control points (RoadRibbons) resamples a two-point spline into
+    # a strip and gets the markings roughly right, but it cannot produce anything that was never
+    # a ribbon -- the crossings, the tank tracks, the junction fills -- and it has no blend
+    # weights, so every strip ends in a hard rectangle.
+    # ------------------------------------------------------------------ #
+
+    @staticmethod
+    def _half(bits):
+        """IEEE half -> float. The per-vertex blend weights are stored as raw 16-bit."""
+        sign = -1.0 if bits & 0x8000 else 1.0
+        exponent = (bits >> 10) & 0x1F
+        fraction = bits & 0x3FF
+
+        if exponent == 0:
+            return sign * (fraction / 1024.0) * (2.0 ** -14)
+
+        if exponent == 31:
+            return sign * (65504.0 if fraction == 0 else 0.0)
+
+        return sign * (1.0 + fraction / 1024.0) * (2.0 ** (exponent - 15))
+
+    def _decals_resource(self, map_name):
+        """The level's .decals resource, named by its terrain rather than guessed.
+
+        The visual terrain dump carries the name outright (`Decals`), which is the only place it
+        is stated; the streaming tree's own path with the extension swapped is the fallback for a
+        level whose visual dump has not been produced.
+        """
+        visual = os.path.join(CACHE, map_name + '.visual.json')
+
+        if not os.path.exists(visual):
+            # terrain_layers writes it as a side effect; asking for the layers is the cheapest way
+            # to make sure it exists.
+            self.terrain_layers(map_name)
+
+        try:
+            named = json.load(open(visual)).get('Decals')
+
+            if named:
+                return named
+        except Exception:
+            pass
+
+        resource = self._terrain_resource(map_name)
+
+        return None if resource is None else resource.rsplit('.', 1)[0] + '.decals'
+
+    def _decal_paint(self, texture):
+        """How a decal texture is COMPOSITED, measured rather than assumed from its name.
+
+        Three cases, and the difference between them is the whole reason road markings currently
+        render as rainbow static:
+
+        `alpha`  -- RGB is the colour and the ALPHA channel is the coverage mask. BF3's
+                    `Decal_Crossing_01_D` (near-white RGB, alpha sd 118.6) and `T_Tracks_01_D`
+                    (near-black RGB, alpha sd 103.5) are both this.
+        `mask`   -- alpha is a constant 255 and the coverage is the LUMINANCE: the marking is
+                    drawn bright on a black field, and black means "not here". `parkingLines01`
+                    is this -- 64x1024, alpha sd 0.0, and its most common pixel by far is pure
+                    black. Painted as albedo its per-channel compression noise (r(R,G)=0.54 with
+                    each channel's sd near 96) is exactly the iridescent stripe on the ground.
+        `opaque` -- a real surface with no cut-out at all: a baked asphalt or gravel road, which
+                    is what several other levels put in this resource. Only the per-vertex blend
+                    weight fades it.
+
+        The discriminator between `mask` and `opaque` is the BLACK FRACTION. A cut-out mask is
+        mostly empty field; a road surface photograph has no pure black in it at all.
+        """
+        key = texture.replace('/', '_').lower() + '.decalpaint.json'
+        path = os.path.join(CACHE, key)
+
+        if os.path.exists(path):
+            try:
+                cached = json.load(open(path))
+
+                if cached.get('rules') == self.CLASSIFIER_RULES:
+                    return cached
+            except Exception:
+                pass
+
+        dds = self.dds(texture)
+        verdict = self.classify_pixels(dds) if dds is not None else None
+
+        if verdict is None:
+            return {'paint': 'alpha', 'rules': self.CLASSIFIER_RULES}
+
+        black = self._black_fraction(dds)
+        alpha_varies = len(verdict.get('deviations') or [0, 0, 0, 0]) > 3 \
+            and verdict['deviations'][3] >= 8.0
+
+        if alpha_varies:
+            paint = 'alpha'
+        elif black is not None and black >= 0.25:
+            paint = 'mask'
+        else:
+            paint = 'opaque'
+
+        result = {
+            'paint': paint,
+            'rules': self.CLASSIFIER_RULES,
+            'role': verdict.get('role'),
+            'black': None if black is None else round(black, 3),
+            'alphaDeviation': verdict['deviations'][3] if len(verdict['deviations']) > 3 else None,
+            'means': verdict.get('means'),
+        }
+
+        try:
+            with open(path, 'w') as handle:
+                json.dump(result, handle)
+        except Exception:
+            pass
+
+        return result
+
+    @staticmethod
+    def _black_fraction(path, step=4):
+        """Share of a texture that is essentially black -- the empty field of a cut-out mask."""
+        try:
+            from PIL import Image
+
+            image = Image.open(path).convert('RGB')
+        except Exception:
+            return None
+
+        width, height = image.size
+        pixels = image.load()
+        black = 0
+        total = 0
+
+        for y in range(0, height, step):
+            for x in range(0, width, step):
+                r, g, b = pixels[x, y]
+                total += 1
+
+                if max(r, g, b) < 16:
+                    black += 1
+
+        return None if total == 0 else black / float(total)
+
+    def _decal_shader_textures(self, shader, registers):
+        """A decal shader's colour and normal, split by MEASUREMENT of what each register holds.
+
+        The registers a decal shader binds are not labelled, and the order differs between the 2d
+        and 3d forms of the same material (MP001_Decal_Crossing binds its colour at register 1 in
+        2d and at register 2 in 3d, with the normal at 4). Classifying the pixels is what tells
+        them apart without a table of shader names.
+        """
+        bound = registers.get(shader.lower()) or {}
+        colour = None
+        normal = None
+
+        for register in sorted(bound, key=lambda k: int(k)):
+            candidate = bound[register]
+            verdict = self.classify(candidate) or {}
+            role = verdict.get('role')
+
+            if role in ('normal', 'packednormal'):
+                if normal is None:
+                    normal = candidate
+            elif colour is None:
+                colour = candidate
+
+        return colour, normal
+
+    def _shader_registers(self):
+        """Every shader's texture registers, from whatever shaderdb dumps exist."""
+        registers = {}
+
+        for part in glob.glob(os.path.join(CACHE, '*.shaders.json')):
+            try:
+                for name, by_register in (json.load(open(part)).get('registers') or {}).items():
+                    registers.setdefault(name.lower(), by_register)
+            except Exception:
+                continue
+
+        return registers
+
+    def decals(self, map_name):
+        """The level's baked terrain decals, grouped by the shader that draws them.
+
+        Served as one vertex array per LOD with an index list per shader, which is how the
+        resource itself is laid out: block indices are absolute into the geometry's vertex array
+        and the blocks of one shader are contiguous runs of it, so nothing has to be re-indexed.
+        """
+        path = os.path.join(CACHE, map_name + '.decalgeom.json')
+
+        if os.path.exists(path):
+            return open(path, 'rb').read()
+
+        raw = os.path.join(CACHE, map_name + '.decals.json')
+
+        if not os.path.exists(raw):
+            with self.lock:
+                resource = self._decals_resource(map_name)
+
+                if resource is None or not self.rime.terrain_decals(resource, raw):
+                    print('[mesh] no terrain decals for %s' % map_name, flush=True)
+                    return None
+
+        try:
+            source = json.load(open(raw))
+        except Exception as e:
+            print('[mesh] terrain decals for %s unreadable: %s' % (map_name, e), flush=True)
+            return None
+
+        registers = self._shader_registers()
+        payload = {
+            'level': map_name,
+            # Beyond this the engine draws the flat 2d LOD; inside it, the conforming 3d one.
+            'far3d': source.get('Decal3dFarDrawDistance', 0.0),
+            'near2d': source.get('Decal2dNearDrawDistance', 0.0),
+            'cellsPerTile': source.get('DecalCellsPerHeightfieldTileSide', 0),
+            'geometries': [],
+        }
+
+        for field, kind in (('Geometry2d', '2d'), ('Geometry3d', '3d'), ('GeometryWater', 'water')):
+            geometry = source.get(field) or {}
+            vertices = geometry.get('Vertices') or []
+            indices = geometry.get('Indices') or []
+            blocks = geometry.get('Blocks') or []
+
+            if not vertices or not blocks:
+                continue
+
+            positions = []
+            uvs = []
+            fades = []
+
+            for vertex in vertices:
+                position = vertex.get('Position') or []
+
+                # 2d carries (x, z) only: its y is whatever the ground is, which is the point of
+                # the LOD. Emitted as a zero y and draped by the client.
+                if kind == '2d' and len(position) == 2:
+                    positions.extend([position[0], 0.0, position[1]])
+                elif len(position) >= 3:
+                    positions.extend([position[0], position[1], position[2]])
+                else:
+                    positions.extend([0.0, 0.0, 0.0])
+
+                texcoord = vertex.get('TexCoord') or [0.0, 0.0]
+                uvs.extend([texcoord[0], texcoord[1]])
+
+                masks = vertex.get('UserMasks') or [0, 0, 0, 0]
+                # All four masks carry the same value on every level measured; one blend weight is
+                # what the geometry actually has, and four copies of it is what it stores.
+                fades.append(min(1.0, max(0.0, self._half(masks[0]))))
+
+            groups = {}
+
+            for block in blocks:
+                shader = block.get('SurfaceShaderName') or ''
+                start = int(block.get('StartIndex') or 0)
+                count = int(block.get('PrimitiveCount') or 0) * 3
+                held = groups.get(shader)
+
+                if held is None:
+                    colour, normal = self._decal_shader_textures(shader, registers)
+                    paint = self._decal_paint(colour) if colour else {'paint': 'opaque'}
+                    held = {
+                        'shader': shader,
+                        'texture': colour,
+                        'normal': normal,
+                        'paint': paint.get('paint', 'alpha'),
+                        'measured': {k: paint.get(k) for k in ('role', 'black', 'alphaDeviation')},
+                        'blocks': 0,
+                        'indices': [],
+                    }
+                    groups[shader] = held
+
+                held['blocks'] += 1
+                held['indices'].extend(indices[start:start + count])
+
+            payload['geometries'].append({
+                'kind': kind,
+                'positions': positions,
+                'uvs': uvs,
+                'fades': fades,
+                'groups': list(groups.values()),
+            })
+
+            print('[mesh] decals %s %s: %d vertices, %d group(s) -- %s'
+                  % (map_name, kind, len(fades), len(groups),
+                     ', '.join('%s=%s' % ((g['texture'] or '?').split('/')[-1], g['paint'])
+                               for g in groups.values())), flush=True)
+
+        with open(path, 'w') as handle:
+            json.dump(payload, handle)
+
+        return open(path, 'rb').read()
 
     def roads(self, map_name):
         """The level's roads, as ribbons ready to build geometry from.
@@ -727,7 +1272,7 @@ class Meshes:
                 candidate = by_register[register]
                 low = candidate.lower()
 
-                if low.endswith('_n') or low.endswith('_m') or 'mask' in low:
+                if not self.is_colour_map(candidate):
                     continue
 
                 road['texture'] = candidate
@@ -813,6 +1358,19 @@ class Meshes:
             return {}
 
         by_layer = {}
+        candidates = []
+        # Textures measured as blend weights rather than colour, with how many shaders bind them.
+        splats = {}
+        # Per-material normals, in the order their shaders bind them.
+        normals = []
+        # Colour texture -> the normal map bound alongside it, with how many shaders agree.
+        paired = {}
+        # Break-up textures (greyscale masks, and packed data that is not THE splat), most-bound
+        # first, and the wetness mask.
+        details = {}
+        # Two-channel detail normals, which are break-up rather than a material's own normal.
+        packednormals = {}
+        wetness = {}
 
         for part in glob.glob(os.path.join(CACHE, map_name + '.*.shaders.json')):
             try:
@@ -826,29 +1384,155 @@ class Meshes:
                 if not lowered.startswith(shader):
                     continue
 
-                match = re.search(r'__(\d+)[a-z]*__', lowered)
+                # The LAYER SEGMENT of the name, not the whole name. Read with a regex over the
+                # whole thing, `MP001_Terrain__1MV_2MV__2d__0` matches on `__2d__` and reports
+                # layer 2 -- the KIND token, not a layer at all. Every multi-layer shader was
+                # landing on its own kind, which is how three layers ended up sharing one texture.
+                base = lowered.rsplit('/', 1)[-1]
+                parts = base.split('__')
 
-                if match is None:
+                if len(parts) < 3:
                     continue
 
-                layer = int(match.group(1))
+                layers = [int(m.group(1)) for m in re.finditer(r'(\d+)m[vd]', parts[1])]
 
-                # Lowest register first: a terrain layer shader binds its colour map before the
-                # normal and mask that go with it.
+                if not layers:
+                    continue
+
+                # Lowest register first: a terrain layer shader binds its colour maps in layer
+                # order, before the normals and masks that go with them.
+                colours = []
+                # This shader's material normals, in the same register order.
+                shader_normals = []
+                # Everything measured as neither colour nor normal, in register order.
+                packed = []
+
                 for register in sorted(by_register, key=lambda k: int(k)):
                     texture = by_register[register]
-                    low = texture.lower()
 
-                    if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
+                    if not self.is_colour_map(texture):
+                        # A rejected texture is not necessarily useless. The terrain's SPLAT is
+                        # rejected here -- it is the blend weights, not a colour -- and it is the
+                        # thing that says where each material goes. The NORMALS are rejected too,
+                        # and they are most of what makes ground read as ground rather than as a
+                        # flat photograph. Keep both, by measured role.
+                        verdict = self.classify(texture)
+                        role = verdict.get('role') if verdict else None
+
+                        if role == 'normal':
+                            if texture not in shader_normals:
+                                shader_normals.append(texture)
+
+                            if texture not in normals:
+                                normals.append(texture)
+                        elif role == 'packednormal':
+                            packednormals[texture] = packednormals.get(texture, 0) + 1
+                        else:
+                            # Splats, greyscale break-up masks and packed data all land here. Which
+                            # is which is decided below across every shader rather than per shader:
+                            # the terrain's splat is the one nearly all of them bind, and the rest
+                            # are detail.
+                            if texture not in packed:
+                                packed.append(texture)
+
+                            if role == 'splat':
+                                splats[texture] = splats.get(texture, 0) + 1
+                            elif role == 'detail':
+                                details[texture] = details.get(texture, 0) + 1
+                            else:
+                                wetness[texture] = wetness.get(texture, 0) + 1
+
                         continue
 
-                    by_layer.setdefault(layer, texture)
-                    break
+                    if texture not in colours:
+                        colours.append(texture)
+
+                # WHICH normal goes with WHICH material, by position. Measured, not named: over
+                # MP_001's 95 terrain shaders every one that binds normals binds exactly as many as
+                # it binds colours, in the same order -- 60 shaders, zero mismatches, and the
+                # pairing they agree on (Sand_01_D/SP008_Sand01_N, Rubble_01_D/Rubble_01_N) is the
+                # REVERSE of the order a flat list of normals comes out in. Pairing a flat list by
+                # index would have put the sand normal on the rubble.
+                if shader_normals and len(shader_normals) == len(colours):
+                    for colour, normal in zip(colours, shader_normals):
+                        key = (colour, normal)
+                        paired[key] = paired.get(key, 0) + 1
+
+                candidates.append((len(layers), layers, colours))
+
+        # Fewest layers first: `__0MV__` names layer 0's texture outright, and once that is known
+        # `__0MV_1MV__` names layer 1's by elimination. A shader binds each distinct texture ONCE,
+        # so a combination whose layers share a texture reports fewer colours than it has layers --
+        # that is what says they share, rather than something being missing.
+        for _, layers, colours in sorted(candidates, key=lambda c: c[0]):
+            known = {by_layer[l] for l in layers if l in by_layer}
+            unknown = [l for l in layers if l not in by_layer]
+            left = [c for c in colours if c not in known]
+
+            if not unknown:
+                continue
+
+            if len(left) == len(unknown):
+                for layer, texture in zip(unknown, left):
+                    by_layer[layer] = texture
+            elif len(left) == 1:
+                # One texture left over several layers: they are painted with the same one.
+                for layer in unknown:
+                    by_layer[layer] = left[0]
 
         if by_layer:
             print('[mesh] terrain layers for %s from shader registers: %s'
                   % (map_name, ', '.join('%d=%s' % (k, v.rsplit('/', 1)[-1])
                                          for k, v in sorted(by_layer.items()))), flush=True)
+
+        # The most-bound splat is the terrain's own; a stray one bound by a single shader is not.
+        self._terrain_splat = max(splats, key=splats.get) if splats else None
+        self._terrain_normals = normals
+
+        # Anything else measured as packed is break-up detail -- including a texture whose channels
+        # partition like a splat but which is not the one the terrain blends by (MP_001 binds
+        # `Noise_N`, three independent channels summing flat, alongside the real splat).
+        detail = {}
+
+        for texture, count in details.items():
+            detail[texture] = ('grey', count)
+
+        for texture, count in packednormals.items():
+            detail[texture] = ('normal', count)
+
+        for texture, count in splats.items():
+            if texture != self._terrain_splat:
+                detail.setdefault(texture, ('grey', 0))
+                detail[texture] = (detail[texture][0], detail[texture][1] + count)
+
+        # Role-tagged rather than ordered: a client that has to guess which of two detail textures
+        # is the greyscale mask and which is the normal will get it wrong the moment a level binds
+        # them in the other order.
+        self._terrain_detail = [
+            {'resource': texture, 'kind': kind,
+             'channels': (self.classify(texture) or {}).get('channels', [])}
+            for texture, (kind, _) in sorted(detail.items(), key=lambda kv: -kv[1][1])]
+        self._terrain_wetness = (max(wetness, key=wetness.get) if wetness else None)
+
+        # A material's own normal, by the pairing its shaders agree on.
+        best = {}
+
+        for (colour, normal), count in paired.items():
+            if count > best.get(colour, (None, 0))[1]:
+                best[colour] = (normal, count)
+
+        self._terrain_normal_of = {colour: normal for colour, (normal, _) in best.items()}
+
+        if self._terrain_normal_of:
+            print('[mesh] terrain normals for %s paired by register order: %s'
+                  % (map_name, ', '.join('%s->%s' % (c.rsplit('/', 1)[-1], n.rsplit('/', 1)[-1])
+                                         for c, n in sorted(self._terrain_normal_of.items()))),
+                  flush=True)
+
+        if self._terrain_splat is not None:
+            print('[mesh] terrain splat for %s: %s (bound by %d shaders)'
+                  % (map_name, self._terrain_splat.rsplit('/', 1)[-1],
+                     splats[self._terrain_splat]), flush=True)
 
         return by_layer
 
@@ -1214,7 +1898,10 @@ class Meshes:
                     candidate = by_register[register]
                     low = candidate.lower()
 
-                    if low.endswith('_n') or low.endswith('_m') or 'mask' in low or 'noise' in low:
+                    # The shared rule, so this path cannot take a normal map as a colour map
+                    # the way the terrain and road paths no longer can. A `_nm` suffix slipped
+                    # through here and painted destruction meshes, bushes and road props violet.
+                    if not self.is_colour_map(candidate):
                         continue
 
                     diffuse = candidate
@@ -1452,16 +2139,65 @@ class Meshes:
         # Not a format that needs converting: hand back the DDS and let the client try it.
         return None
 
+    #: DX10 dxgiFormat -> the legacy four-CC carrying the identical payload. BC1/2/3 blocks are
+    #: byte-for-byte what DXT1/3/5 blocks are; only the header says otherwise. BC4 and BC5 have no
+    #: equivalent the browser's loader reads, so they are left for the PNG path.
+    DX10_LEGACY = {70: b'DXT1', 71: b'DXT1', 72: b'DXT3', 73: b'DXT3', 74: b'DXT3',
+                   75: b'DXT5', 76: b'DXT5', 77: b'DXT5'}
+
+    @classmethod
+    def _legacy_dds(cls, data):
+        """A DX10-header DDS rewritten to the legacy header the browser's loader understands.
+
+        three.js's DDSLoader knows three four-CCs and no DX10 extension at all, and it fails
+        SILENTLY: a DX10 file comes back as a texture with no image, which the client can only
+        discard. MP_001's terrain detail normal `Noise_N` is BC3 in a DX10 header -- the same
+        blocks as DXT5, behind a header written the other way -- so it was unreadable for the sake
+        of twenty bytes. Returns None when the payload genuinely needs decoding (BC4/BC5) or is
+        already legacy.
+        """
+        if len(data) < 148 or data[:4] != b'DDS ' or data[84:88] != b'DX10':
+            return None
+
+        four_cc = cls.DX10_LEGACY.get(struct.unpack_from('<I', data, 128)[0])
+
+        if four_cc is None:
+            return None
+
+        # Header keeps its length and flags; only the four-CC changes, and the 20-byte DX10
+        # extension between the header and the blocks is dropped.
+        return data[:84] + four_cc + data[88:128] + data[148:]
+
     def dds(self, resource):
         """One texture, extracted on demand. Served as DDS: three.js reads it directly, so there
         is no decode step and the GPU keeps it compressed."""
         name = resource.replace('/', '_').lower() + '.dds'
         path = os.path.join(CACHE, name)
 
-        if os.path.exists(path):
+        if not os.path.exists(path) and self._request('texture', resource, path) is None:
+            return None
+
+        legacy = os.path.join(CACHE, resource.replace('/', '_').lower() + '.legacy.dds')
+
+        if os.path.exists(legacy):
+            return legacy
+
+        try:
+            with open(path, 'rb') as handle:
+                rewritten = self._legacy_dds(handle.read())
+        except Exception:
+            rewritten = None
+
+        if rewritten is None:
             return path
 
-        return self._request('texture', resource, path)
+        with open(legacy, 'wb') as handle:
+            handle.write(rewritten)
+
+        print('[mesh] %s served as legacy DDS (DX10 header the browser cannot read)'
+              % resource.rsplit('/', 1)[-1], flush=True)
+
+        return legacy
 
     def glb(self, name):
         path = os.path.join(CACHE, name)
@@ -1541,6 +2277,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_error(404, 'texture not available')
 
             return self._send(open(path, 'rb').read(), 'image/vnd-ms.dds')
+
+        if name.startswith('decals/') and name.endswith('.json'):
+            body = Handler.meshes.decals(name[len('decals/'):-5])
+
+            if body is None:
+                return self.send_error(404, 'no terrain decals for that level')
+
+            return self._send(body, 'application/json')
 
         if name.startswith('roads/') and name.endswith('.json'):
             body = Handler.meshes.roads(name[len('roads/'):-5])

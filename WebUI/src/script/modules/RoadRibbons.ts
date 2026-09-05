@@ -25,6 +25,15 @@ interface Ribbon {
 /** Lifted off the terrain so the strip wins the depth test instead of z-fighting it. */
 const LIFT = 0.06;
 
+/**
+ * Lift for a ribbon draped onto the terrain.
+ *
+ * Larger than LIFT because the drape samples the surface bilinearly while the surface is DRAWN as
+ * triangles: across a quad's diagonal the drawn face sits slightly above the bilinear value, and
+ * six centimetres is inside that gap.
+ */
+const STICK_LIFT = 0.2;
+
 export class RoadRibbons {
 	private base: string;
 	private level: string;
@@ -38,7 +47,8 @@ export class RoadRibbons {
 	/** Returns how many roads were drawn. */
 	public async load(
 		fallback: THREE.Material,
-		load?: (resource: string) => Promise<THREE.Texture | null>
+		load?: (resource: string) => Promise<THREE.Texture | null>,
+		height?: (x: number, z: number) => number | null
 	): Promise<number> {
 		let ribbons: Ribbon[];
 
@@ -101,7 +111,7 @@ export class RoadRibbons {
 				material = held;
 			}
 
-			const mesh = RoadRibbons.build(ribbon, material);
+			const mesh = RoadRibbons.build(ribbon, material, height);
 
 			if (mesh !== null) {
 				group.add(mesh);
@@ -132,7 +142,8 @@ export class RoadRibbons {
 	 * resampled to however many cross-sections there are, and each one is pushed out to its own
 	 * left and right half width.
 	 */
-	private static build(ribbon: Ribbon, material: THREE.Material): THREE.Mesh | null {
+	private static build(ribbon: Ribbon, material: THREE.Material,
+		height?: (x: number, z: number) => number | null): THREE.Mesh | null {
 		const spine = (ribbon.points || []).map((p) => new THREE.Vector3(p[0], p[1], p[2]));
 		const widths = ribbon.widths || [];
 
@@ -174,10 +185,19 @@ export class RoadRibbons {
 				run += here.distanceTo(samples[i - 1]);
 			}
 
-			position.push(
-				here.x + side.x * left, here.y + LIFT, here.z + side.z * left,
-				here.x + side.x * right, here.y + LIFT, here.z + side.z * right
-			);
+			// StickToTerrain means the engine drapes the road over the ground. The spline itself
+			// carries only its end points, so following it literally sinks the middle of every
+			// road into any ground that rises between them -- which is most of them.
+			const lx = here.x + side.x * left;
+			const lz = here.z + side.z * left;
+			const rx = here.x + side.x * right;
+			const rz = here.z + side.z * right;
+			const ground = ribbon.stick && height !== undefined
+				? [height(lx, lz), height(rx, rz)] : [null, null];
+			const ly = ground[0] === null ? here.y + LIFT : ground[0] + STICK_LIFT;
+			const ry = ground[1] === null ? here.y + LIFT : ground[1] + STICK_LIFT;
+
+			position.push(lx, ly, lz, rx, ry, rz);
 
 			const v = run / tile;
 			uv.push(0, v, 1, v);

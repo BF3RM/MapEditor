@@ -175,7 +175,7 @@ function UIManager:OnUpdateInput(p_Delta)
 	-- Deferred lazy-boot editor enter (requested by OnUIReady): run it HERE, in the input
 	-- context where the eager-boot F1 path always ran it.
 	if self.m_EnterPending then
-		if self.m_ActiveMode == EditorMode.Playing then
+		if self.m_ActiveMode == EditorMode.Playing or ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER then
 			-- Hold the request until it actually takes. EnableFreeCam refuses while the soldier is
 			-- not alive yet, and the request used to be cleared before calling it, so entering
 			-- during a slow spawn was dropped silently and the editor never opened -- a coin flip
@@ -272,7 +272,11 @@ function UIManager:OnDisableEditorMode()
 end
 
 function UIManager:EnableFreeCam()
-	if self.m_ActiveMode ~= EditorMode.Playing then
+	-- The mode gate is lifted by the same flag as the soldier gate below, and for the same reason:
+	-- OnLoadingComplete (which sets Playing) only fires after the deploy/sync the harness cannot
+	-- perform on every level, so on those levels the mode never leaves Loading and the editor can
+	-- never open.
+	if self.m_ActiveMode ~= EditorMode.Playing and not ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER then
 		m_Logger:Write('EnableFreeCam: not in Playing mode (' .. tostring(self.m_ActiveMode) .. '), abort')
 		return false
 	end
@@ -280,9 +284,20 @@ function UIManager:EnableFreeCam()
 	local s_LocalPlayer = PlayerManager:GetLocalPlayer()
 
 	-- Don't change to freecam if the player isnt alive, maybe add message saying so?
+	--
+	-- ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER lifts this. Nothing below reads s_LocalPlayer, and
+	-- FreeCam:Enable -> Create builds its own camera entity and takes its pose from
+	-- ClientUtils:GetCameraTransform() -- the soldier is never touched. So this is a UX guard, not
+	-- a technical requirement, and on a level the harness cannot deploy into it is the single
+	-- reason the editor never opens and no screenshot can be taken.
 	if s_LocalPlayer == nil or s_LocalPlayer.soldier == nil then
-		m_Logger:Write('EnableFreeCam: no local player/soldier, abort')
-		return false
+		if not ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER then
+			print('[MapEditor] EnableFreeCam: no local player/soldier, abort')
+			return false
+		end
+
+		print('[MapEditor] EnableFreeCam: no soldier, continuing anyway '
+			.. '(ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER)')
 	end
 
 	-- Lazy WebUI: this F1 arrives inside the Client:UpdateInput event; calling WebUI:Init()

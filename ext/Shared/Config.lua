@@ -32,5 +32,21 @@ ME_CONFIG = {
 	-- Dev/test: auto-enter the editor (equivalent to the first F1) once the level finishes
 	-- loading, so an e2e harness can drive the editor over CDP without injecting physical input
 	-- (deploy + F1). F1 still toggles back to play. Set false for pure play-testing.
-	DEV_AUTO_ENTER_EDITOR = true
+	DEV_AUTO_ENTER_EDITOR = false,
+
+	-- Dev/test: let the editor open WITHOUT a live soldier.
+	--
+	-- UIManager:EnableFreeCam refuses while PlayerManager:GetLocalPlayer().soldier is nil, and
+	-- FreeCam does not actually need one: FreeCam:Create builds its own camera entity with
+	-- EntityManager:CreateEntity and takes its starting pose from ClientUtils:GetCameraTransform().
+	-- Nothing in the enter chain reads the soldier. The guard is a UX check ("don't drop into
+	-- freecam while dead"), and its own comment says as much.
+	--
+	-- That guard is why no in-game screenshot has ever been captured from this repo on a level the
+	-- harness cannot deploy into: at BF3's deploy screen no soldier exists, so the editor never
+	-- opens, and every capture is a picture of the deploy UI. Forcing a spawn instead breaks the
+	-- join outright on some levels.
+	--
+	-- Default FALSE: normal MapEditor use is unchanged.
+	DEV_FREECAM_WITHOUT_SOLDIER = false
 }

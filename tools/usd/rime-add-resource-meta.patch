@@ -1,0 +1,108 @@
+Give `add_resource` an optional resource-meta argument.
+
+WHY: BundleManifestBuilder defaults a resource's 16-byte meta to zeros when
+TryGetMeta fails, and ResourceFileReader always fails. For most resource types
+that is harmless -- BF3's DxTextures ship all-zero meta -- but a MeshSet keeps
+the length of its relocation table in meta field f2, so a mesh added through
+`add_resource` today relocates nothing. `replace_resource` is not a substitute:
+it inherits the ORIGINAL resource's meta, which is only correct while the new
+payload keeps the same block sizes.
+
+tools/usd/meshset.py already computes the correct 16 bytes; serialize() returns
+them alongside the payload. With this patch:
+
+    add_resource my/new/mesh MeshSet "/tmp/new.meshset" E0040000000000006000000070009400
+
+STATUS: NOT COMPILED. The build was blocked by this environment's permission
+classifier, so this patch is unverified -- it has never been through a compiler.
+Review it as a proposal, not as a tested change. Apply from the Rime root with
+`git apply`, and note that Rime is private: do not commit or push it.
+
+--- a/RimeLib.Cmd/Contexts/BundleBuildingContext.cs
++++ b/RimeLib.Cmd/Contexts/BundleBuildingContext.cs
+@@
+             private readonly ResourceType m_ResourceType;
+             private readonly ResourceRef m_ResourceId;
++            private readonly byte[]? m_Meta;
+ 
+-            public ResourceFileReader(string p_Path, ResourceType p_ResourceType, string p_Name) : base(p_Path)
++            public ResourceFileReader(string p_Path, ResourceType p_ResourceType, string p_Name, byte[]? p_Meta = null) : base(p_Path)
+             {
+                 m_ResourceType = p_ResourceType;
+                 m_ResourceId = new ResourceRef(p_Name, this);
++                m_Meta = p_Meta;
+             }
+ 
+             public ResourceType GetResourceType()
+             {
+                 return m_ResourceType;
+             }
+ 
+             public bool TryGetMeta([NotNullWhen(true)] out byte[]? p_Meta)
+             {
+-                p_Meta = null;
+-                return false;
++                p_Meta = m_Meta;
++                return m_Meta != null;
+             }
+@@
+-        internal void AddResource(string p_Name, ResourceType p_Type, FileInfo p_File)
++        internal void AddResource(string p_Name, ResourceType p_Type, FileInfo p_File, byte[]? p_Meta = null)
+         {
+-            m_Builder.WithResource(p_Name, new ResourceFileReader(p_File.FullName, p_Type, p_Name));
++            m_Builder.WithResource(p_Name, new ResourceFileReader(p_File.FullName, p_Type, p_Name, p_Meta));
+         }
+
+--- a/RimeLib.Cmd/Commands/BundleBuilding/AddResourceCommand.cs
++++ b/RimeLib.Cmd/Commands/BundleBuilding/AddResourceCommand.cs
+@@
+-using System.IO;
++using System;
++using System.IO;
+ using RimeLib.Cmd.Attributes;
+ using RimeLib.Cmd.Contexts;
+ using RimeLib.Content.Frostbite;
+@@
+         [CommandArgument(Description = "The path to the file containing the resource data.")]
+         public FileInfo? FilePath { get; set; }
+ 
++        // A MeshSet keeps its relocation-table length here; without it the engine relocates nothing.
++        [CommandArgument(Description = "Optional 16-byte resource metadata as 32 hex characters.", Optional = true)]
++        public string? Meta { get; set; }
++
+         public override bool Execute(ref ExecutionContext p_Context, TextWriter p_Writer)
+         {
+             if (!FilePath!.Exists)
+             {
+                 p_Writer.WriteLine("The specified file could not be found.");
+                 return false;
+             }
+ 
+-            ((BundleBuildingContext) p_Context).AddResource(Name!, Type, FilePath);
++            byte[]? s_Meta = null;
++
++            if (!string.IsNullOrWhiteSpace(Meta))
++            {
++                var s_Hex = Meta.Trim();
++
++                if (s_Hex.Length != 32)
++                {
++                    p_Writer.WriteLine($"meta must be 32 hex characters (16 bytes), got {s_Hex.Length}.");
++                    return false;
++                }
++
++                try
++                {
++                    s_Meta = Convert.FromHexString(s_Hex);
++                }
++                catch (FormatException)
++                {
++                    p_Writer.WriteLine("meta is not valid hex.");
++                    return false;
++                }
++            }
++
++            ((BundleBuildingContext) p_Context).AddResource(Name!, Type, FilePath, s_Meta);
+ 
+             return true;
+         }

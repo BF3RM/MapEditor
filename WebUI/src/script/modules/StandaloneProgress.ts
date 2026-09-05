@@ -29,6 +29,7 @@ export class StandaloneProgress {
 	private panel: HTMLDivElement | null = null;
 	private body: HTMLDivElement | null = null;
 	private hint: HTMLDivElement | null = null;
+	private overall: HTMLSpanElement | null = null;
 	private timer = 0;
 	private hintTimer = 0;
 	private hintIndex = 0;
@@ -49,8 +50,17 @@ export class StandaloneProgress {
 		].join(';');
 
 		const title = document.createElement('div');
-		title.textContent = 'Loading ' + level.split('/').pop();
-		title.style.cssText = 'font-weight:600;margin-bottom:6px;color:#fff';
+		title.style.cssText = 'font-weight:600;margin-bottom:6px;color:#fff;' +
+			'display:flex;justify-content:space-between;gap:18px';
+
+		const name = document.createElement('span');
+		name.textContent = 'Loading ' + level.split('/').pop();
+
+		this.overall = document.createElement('span');
+		this.overall.style.cssText = 'color:#6ea8fe';
+
+		title.appendChild(name);
+		title.appendChild(this.overall);
 
 		this.body = document.createElement('div');
 		this.hint = document.createElement('div');
@@ -84,6 +94,17 @@ export class StandaloneProgress {
 		}
 
 		this.panel = null;
+	}
+
+	/** A bar for a known fraction; nothing at all for an unknown one. */
+	private static bar(fraction: number): string {
+		if (fraction < 0) {
+			return '';
+		}
+
+		return '<div style="height:3px;background:#2c2f34;border-radius:2px;margin:1px 0 5px">' +
+			'<div style="height:3px;border-radius:2px;background:#6ea8fe;width:' +
+			Math.round(fraction * 100) + '%"></div></div>';
 	}
 
 	private showHint(): void {
@@ -120,17 +141,36 @@ export class StandaloneProgress {
 				: (typeof size === 'number' ? size : (editor.gameObjects.values() || []).length);
 		}
 		const stats = meshes && meshes.stats ? meshes.stats : { attached: 0, missing: 0 };
-		const rows: Array<[string, string]> = [
-			['Objects', String(objects)],
-			['Meshes drawn', String(stats.attached)],
-			['Terrain tiles', String(count('terrain'))],
-			['Roads', String(count('roads'))]
+		const waiting = meshes && meshes.pendingCount !== undefined ? meshes.pendingCount : 0;
+		const textures = meshes && meshes.textureProgress !== undefined
+			? meshes.textureProgress : { loaded: 0, total: 0 };
+
+		// A fraction only where a real denominator exists, and none invented where it does not.
+		// Textures are the one that matters: geometry is in within seconds, textures take minutes,
+		// so their share IS the load's progress -- which is why it drives the headline percentage.
+		const rows: Array<[string, string, number]> = [
+			['Objects', String(objects), -1],
+			['Meshes drawn',
+				String(stats.attached) + (waiting > 0 ? '  (+' + waiting + ' waiting)' : ''),
+				waiting > 0 ? stats.attached / (stats.attached + waiting) : -1],
+			['Textures',
+				textures.total > 0 ? textures.loaded + ' / ' + textures.total : String(textures.loaded),
+				textures.total > 0 ? Math.min(1, textures.loaded / textures.total) : -1],
+			['Terrain tiles', String(count('terrain')), -1],
+			['Roads', String(count('roads')), -1]
 		];
 
-		this.body.innerHTML = rows.map(([k, v]) =>
+		this.body.innerHTML = rows.map(([k, v, fraction]) =>
 			'<div style="display:flex;justify-content:space-between;gap:18px">' +
-			'<span>' + k + '</span><span style="color:#fff">' + v + '</span></div>'
+			'<span>' + k + '</span><span style="color:#fff">' + v + '</span></div>' +
+			StandaloneProgress.bar(fraction)
 		).join('');
+
+		if (this.overall !== null) {
+			this.overall.textContent = textures.total > 0
+				? Math.round(100 * Math.min(1, textures.loaded / textures.total)) + '%'
+				: '';
+		}
 
 		// Nothing has moved for a while and something did arrive -> the level is in.
 		const signature = rows.map((r) => r[1]).join('|');
