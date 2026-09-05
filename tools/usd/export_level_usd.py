@@ -266,6 +266,77 @@ def _export_roads(stage, path):
 
 
 
+def _export_terrain_nodes(stage, doc):
+    """One mesh per quadtree node, at the node's OWN sample count, as the editable surface.
+
+    The flattened composite cannot be edited losslessly. Going composite -> node grid needs a
+    resample, and a resample changes samples that nobody touched: an untouched terrain would come
+    back "edited" and rewrite trees the game already ships. Vanilla accuracy demands the opposite --
+    edit nothing, emit nothing.
+
+    So each node is authored at its own interior size (129x129 on BF3's 133 grid with a 2-sample
+    skirt) over its own bounding box, with Y = sample * worldScaleY. That is a pure scale, so
+    dividing it back recovers the stored integer exactly and the round trip is lossless by
+    construction rather than by tolerance.
+
+    Marked `guide`: the composite at /World/Terrain stays the surface you look at, since node meshes
+    from different depths overlap in space and would z-fight. These are what terrain_write reads.
+    """
+    import terrain_lod
+
+    side = int(doc["samplesPerSide"])
+    skirt = int(doc.get("nodeBorderWidth", terrain_lod.SKIRT))
+    scale_y = float(doc["worldScaleY"])
+    inner = side - 2 * skirt
+    nodes = [n for n in doc.get("nodes") or [] if n.get("data") and n.get("embedded")]
+
+    if not nodes or inner < 2:
+        return 0
+
+    UsdGeom.Scope.Define(stage, "/World/TerrainNodes")
+
+    # One topology for every node -- same sample count, so the indices never differ.
+    faces = []
+
+    for j in range(inner - 1):
+        for i in range(inner - 1):
+            a = j * inner + i
+            faces.extend([a, a + inner, a + inner + 1, a, a + inner + 1, a + 1])
+
+    counts = Vt.IntArray([3] * (len(faces) // 3))
+    indices = Vt.IntArray(faces)
+    made = 0
+
+    for node in nodes:
+        grid = terrain_lod._grid(node, side, skirt)
+
+        if grid.shape != (inner, inner):
+            continue
+
+        nlo, nhi = node["min"], node["max"]
+        xs = np.linspace(nlo[0], nhi[0], inner, dtype=np.float32)
+        zs = np.linspace(nlo[2], nhi[2], inner, dtype=np.float32)
+        heights = grid * scale_y
+        pts = [Gf.Vec3f(float(xs[i]), float(heights[j, i]), float(zs[j]))
+               for j in range(inner) for i in range(inner)]
+
+        name = "node_%d_%d_%d" % (int(node.get("depth", 0)), int(node.get("indexX", 0)),
+                                  int(node.get("indexY", 0)))
+        mesh = UsdGeom.Mesh.Define(stage, "/World/TerrainNodes/" + name)
+        mesh.CreatePointsAttr(Vt.Vec3fArray(pts))
+        mesh.CreateFaceVertexIndicesAttr(indices)
+        mesh.CreateFaceVertexCountsAttr(counts)
+        mesh.CreateSubdivisionSchemeAttr(UsdGeom.Tokens.none)
+        mesh.CreatePurposeAttr(UsdGeom.Tokens.guide)
+        mesh.GetPrim().SetCustomDataByKey(BF3 + ":terrainNode", json.dumps(
+            {"depth": int(node.get("depth", 0)), "indexX": int(node.get("indexX", 0)),
+             "indexY": int(node.get("indexY", 0)), "samples": inner, "skirt": skirt,
+             "worldScaleY": scale_y}))
+        made += 1
+
+    return made
+
+
 def _export_terrain(stage, path, layers_path=None):
     """The terrain heightfield, at the detail the quadtree actually holds.
 
@@ -615,6 +686,8 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
 
     if terrain:
         print("terrain      %d triangles" % _export_terrain(stage, terrain, layers))
+        print("terrain nodes %d editable node mesh(es)"
+              % _export_terrain_nodes(stage, json.load(open(terrain))))
 
     if decals:
         print("decals       %d group(s)" % _export_decals(stage, decals))

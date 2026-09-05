@@ -72,14 +72,19 @@ def edits_from_stage(stage_path, terrain_json, out_path, tolerance=1e-4):
 
         now = now / scale_y
 
-        if now.shape != was.shape or np.array_equal(now.astype('<u2'), was.astype('<u2')):
+        # ROUND, do not truncate. astype('<u2') truncates toward zero, so a float32 divide landing
+        # on 12344.9999 reads as 12344 and an untouched sample reports as an edit. Rounding is what
+        # makes "unedited terrain emits nothing" true rather than nearly true.
+        now_u16 = np.rint(now).astype('<u2')
+
+        if now.shape != was.shape or np.array_equal(now_u16, was.astype('<u2')):
             continue                          # byte-identical: keep referencing the game's own tree
 
         # Rebuild the node's full sample block, skirt included, so only the interior changes.
         raw = bytearray(base64.b64decode(node['data']))
         full = np.frombuffer(bytes(raw[:side * side * 2]), dtype='<u2').astype(np.float32) \
                  .reshape(side, side).copy()
-        full[skirt:side - skirt, skirt:side - skirt] = np.clip(now, 0, 65535)
+        full[skirt:side - skirt, skirt:side - skirt] = np.clip(np.rint(now), 0, 65535)
         packed = full.astype('<u2').tobytes()
         raw[:len(packed)] = packed
 

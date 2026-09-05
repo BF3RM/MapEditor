@@ -41,10 +41,34 @@ instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop b
 | Collision | UsdPhysics prims -> HavokPhysicsData | decodes valid: both packfiles, hkpBoxShape/hkpConvexTranslateShape |
 | Audio headers | BitWriter + SndPlayer/Chunk serialize | round trip lossless (plain/looping/stream) |
 | Lights, volumes, triggers, areas | UsdLux / boxes | ~2000 area+trigger volumes now visible |
+| Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
+
+## Terrain heights round-trip byte-exact (2026-09-06)
+
+The composite at `/World/Terrain` is a VIEW. Editing it could never be lossless: composite -> node
+grid needs a resample, and a resample changes samples nobody touched, so an untouched terrain came
+back "edited" and would rewrite trees the game ships.
+
+Each node is now authored as its own mesh (`/World/TerrainNodes/node_<d>_<x>_<y>`, `guide` purpose)
+at its own interior size -- 129x129 of BF3's 133 grid, 2-sample skirt -- with `Y = sample *
+worldScaleY`. That is a pure scale, so the inverse recovers the stored integer exactly.
+
+`tools/usd/terrain_roundtrip_test.py`, on mp_001:
+
+    export       30 node mesh(es) authored
+    untouched    0 changed node(s)                    PASS
+    samples      499230 checked, worst deviation 0    PASS
+    one edit     1 changed node(s)                    PASS
+    edited bytes PASS (0 sample(s) differ from expectation)
+
+One correctness fix went with it: the writeback used `astype('<u2')`, which TRUNCATES, so a float32
+divide landing on 12344.9999 read as 12344 and an untouched sample reported as an edit. It rounds
+now -- that is what makes "unedited terrain emits nothing" true rather than nearly true.
 
 ## Open
 
-1. **TERRAIN'S PAINTED DETAIL IS NOT AUTHORED.** Audited 2026-09-06: 9 types are pure MARKERS
+1. **TERRAIN'S PAINTED DETAIL IS NOT AUTHORED.** (Heights are done -- see below. This is the
+   painted/scattered layer on top of them.) Audited 2026-09-06: 9 types are pure MARKERS
    carrying no fields at all (1897 instances) -- their data lives in resources, so a round-tripping
    instance proves nothing. `TerrainMeshScatteringType` (490), `SingleTerrainLayerData` (268),
    `TerrainColorTree`/`MaskTree`/`MaterialTree`/`DestructionDepthTree` (33 each),
