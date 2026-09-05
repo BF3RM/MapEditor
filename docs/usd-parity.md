@@ -41,7 +41,34 @@ instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop b
 | Collision | UsdPhysics prims -> HavokPhysicsData | decodes valid: both packfiles, hkpBoxShape/hkpConvexTranslateShape |
 | Audio headers | BitWriter + SndPlayer/Chunk serialize | round trip lossless (plain/looping/stream) |
 | Lights, volumes, triggers, areas | UsdLux / boxes | ~2000 area+trigger volumes now visible |
+| Terrain mesh scattering | typed prims per type | MP_007 23 / SP_Valley 22 / MP_001 5 types; 598+572+130 fields, **0 changed** |
 | Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
+
+## Terrain mesh scattering now round trips (2026-09-06)
+
+EBX carries none of it: `TerrainMeshScatteringType` is a bare DataContainer with no fields, so a
+level could export and come back with its grass gone while every check passed. The parameters live
+per-layer in the VisualTerrain resource.
+
+Rime could read them and no further: every field past `RandomPositionOffset` was private,
+`Serialize` threw, and `VisualTerrainInfo` carried nothing about scattering. That is fixed in Rime
+(`3180763c`), and `tools/usd/scattering.py` authors each type as a prim with all 26 fields as typed
+`bf3:` attributes -- deliberately NOT a PointInstancer, since scattering is procedural and explicit
+instances would invent data the game never stored.
+
+    MP_007     23 types over 10 layers   598 fields   0 changed
+    SP_Valley  22 types                  572 fields   0 changed
+    MP_001      5 types                  130 fields   0 changed
+
+MP_001's 5 is exactly its count of `TerrainMeshScatteringType` markers in EBX -- an independent
+check that the parse is right rather than merely self-consistent.
+
+**The trap this hid behind, worth remembering:** the first run reported 0 types on EVERY level
+including Caspian Border. That was not the format -- `RimeLib.*.Frostbite2_0` assemblies load at
+runtime and are NOT referenced by RimeREPL, so building the REPL alone left the reader STALE while
+the interface change in `RimeLib.Terrain` went through. A present-but-empty field reads exactly like
+"this level has none", and cost a full byte-level reverse-engineering pass that only proved Rime's
+existing layout was already correct.
 
 ## Terrain heights round-trip byte-exact (2026-09-06)
 
@@ -67,8 +94,10 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
 
 ## Open
 
-1. **TERRAIN'S PAINTED DETAIL IS NOT AUTHORED.** (Heights are done -- see below. This is the
-   painted/scattered layer on top of them.) Audited 2026-09-06: 9 types are pure MARKERS
+1. **TERRAIN'S PAINTED DETAIL: scattering and heights done, the rest open.** Mesh scattering now
+   round trips on real game data (below), and heights are byte-exact. What remains is
+   `SingleTerrainLayerData` (268) and the four raster trees (33 each), which Rime already reads and
+   writes byte-exact but which nothing authors into USD yet. Audited 2026-09-06: 9 types are pure MARKERS
    carrying no fields at all (1897 instances) -- their data lives in resources, so a round-tripping
    instance proves nothing. `TerrainMeshScatteringType` (490), `SingleTerrainLayerData` (268),
    `TerrainColorTree`/`MaskTree`/`MaterialTree`/`DestructionDepthTree` (33 each),
