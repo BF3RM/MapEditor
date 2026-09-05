@@ -467,6 +467,7 @@ def _material_ebx_index(path):
 
 def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, textures=None,
          decals=None, roads=None, terrain=None, layers=None, texture_dir=None, material_dir=None,
+         scattering_path=None,
          ebx_dir=None, parts_list=None):
     doc = json.load(open(placements_path))
 
@@ -689,6 +690,13 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
         print("terrain nodes %d editable node mesh(es)"
               % _export_terrain_nodes(stage, json.load(open(terrain))))
 
+    # What the ground GROWS. EBX carries none of it, so a level exported without this comes back
+    # with its grass and rubble gone while every other check still passes.
+    if scattering_path:
+        import scattering
+
+        print("scattering   %d type(s)" % scattering.author(stage, scattering_path))
+
     if decals:
         print("decals       %d group(s)" % _export_decals(stage, decals))
 
@@ -726,7 +734,7 @@ if __name__ == "__main__":
 
     for flag in ("--meshes", "--corpus", "--chunks", "--textures", "--decals", "--roads",
                  "--terrain", "--layers", "--texture-dir", "--material-dir",
-                 "--ebx-dir", "--parts-list"):
+                 "--ebx-dir", "--parts-list", "--scattering"):
         if flag in argv:
             i = argv.index(flag)
             opts[flag.lstrip("-")] = argv[i + 1]
@@ -735,4 +743,5 @@ if __name__ == "__main__":
     main(argv[0], argv[1], opts.get("meshes"), opts.get("corpus"), opts.get("chunks"),
          opts.get("textures"), opts.get("decals"), opts.get("roads"),
          opts.get("terrain"), opts.get("layers"), opts.get("texture-dir"),
-         opts.get("material-dir"), opts.get("ebx-dir"), opts.get("parts-list"))
+         opts.get("material-dir"), opts.get("ebx-dir"), opts.get("parts-list"),
+         opts.get("scattering"))
