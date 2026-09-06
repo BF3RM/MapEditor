@@ -1743,6 +1743,21 @@ common case rather than the exception:
 | Mesh resource + chunk | 68 / 68 unedited byte-identical; 2078 / 166 regression clean |
 | Terrain heights | untouched terrain emits 0 changed nodes; 499,230 samples, deviation 0 |
 
+**Three emitter defects found by the partition diff, real whatever the freeze turns out to be.**
+They were corrected experimentally and the client still hung, so they are NOT the freeze -- but each
+is wrong on its own terms and a dedicated server can never reveal any of them:
+
+1. **27/27 emitted meshes bind one generic shader** (`objects/shaders/proppreset`) where the game
+   binds a per-mesh shader (`levels/frontend/objects/calibrationsquareshader`). A server never
+   compiles or looks up a shader, so a wrong binding is invisible headless and wrong on screen.
+2. **27/27 carry their own `MeshLodGroup`** where every shipped mesh points at one shared lodgroup
+   partition (`64991a4a-...`).
+3. **Each takes a fresh guid under a name BF3 already ships**, so it collides by name while every
+   existing reference -- MVDB, shaderdb -- still points at the game's guid.
+
+Also measured: emitted material `VectorParameters` is always exactly 2, where the game carries 0 on
+this mesh and 3 on jets and tanks.
+
 **Not complete:**
 
 1. **VBR's per-frame blocks are not decoded.** All five animation codecs now have writers -- DCT
