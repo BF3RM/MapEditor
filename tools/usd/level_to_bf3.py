@@ -169,6 +169,23 @@ def _materials_from_stage(proto_path):
     return [found.get(i) for i in range(max(found) + 1)]
 
 
+def is_referenced(payload, original, geom_ok):
+    """Embed if edited, reference if not -- the whole rule, in one place so the test can prove the
+    rule the emitter actually runs rather than a restatement of it.
+
+    A mesh is referenced from the player's install only when all three hold:
+      * the game ships it under this name          (original is not None)
+      * its resource rebuilt to the game's bytes   (payload == original)
+      * its geometry rebuilt to the exported bytes (geom_ok is not False)
+
+    The third is the one that was missing. Without it a UV or normal edit -- which changes the
+    chunk and not the payload -- referenced the game's geometry and the edit vanished.
+    `geom_ok is None` means the stage carries no digest, so the first two decide and the caller
+    reports how many meshes that covers.
+    """
+    return original is not None and payload == original and geom_ok is not False
+
+
 def shipped_index(res_dir):
     """mesh name (lowercased) -> the bytes the game ships, so 'changed' is a byte comparison."""
     import glob
@@ -349,6 +366,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         build_dust2.WORLD_NAME = 'levels/realitymod/%s' % bundle_name.lower()
 
     referenced, changed, unresolved = [], [], []
+    unproven = 0
 
     for name in sorted(protos):
         proto = os.path.join(stage_dir, 'meshes', _safe(name) + '.usdc')
@@ -367,7 +385,18 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         original = index.get(name.lower())
 
-        if original is not None and payload == original:
+        # The resource is only half the mesh. Positions, normals, UVs and tangents are in the
+        # CHUNK, and the payload changes only when a count or the bbox does -- so `payload ==
+        # original` calls a retextured or re-normalled mesh untouched and references the game's
+        # geometry over the top of the edit. MEASURED before the fix, on a corpus mesh: a UV nudge
+        # and a flipped normal each left the payload byte-identical and the chunk different, and
+        # the emitter dropped both. The digest `bf3_usd.export` authors covers the chunk.
+        geom_ok = bf3_usd.unedited_geometry(proto, chunks)
+
+        if geom_ok is None:
+            unproven += 1               # no digest carried: say so rather than assume untouched
+
+        if is_referenced(payload, original, geom_ok):
             # Untouched. The GEOMETRY comes from the game -- add_existing_resource, no bytes of
             # ours -- but the EBX is still authored under our own namespace, exactly as a changed
             # mesh's is.
@@ -406,6 +435,12 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
     if referenced:
         print('referenced %d mesh resource(s) -- the game supplies the geometry' % len(referenced))
+
+    if unproven:
+        # An old stage carries no chunk digest, so "unedited" rests on the resource bytes alone --
+        # which cannot see a UV or normal edit. Named, not hidden: re-export to close it.
+        print('WARNING %d mesh(es) carry no chunk digest; geometry edits to them cannot be '
+              'detected. Re-export the stage.' % unproven)
 
     # EBX for the meshes we ship. A referenced mesh keeps the game's own blueprint, so nothing is
     # authored for it; a changed one needs its mesh asset, its blueprint, and a placement.

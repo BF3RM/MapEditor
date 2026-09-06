@@ -12,6 +12,7 @@ chunk; see docs/usd-roundtrip.md for the commands.
 """
 
 import base64
+import hashlib
 import json
 import os
 import re
@@ -458,6 +459,24 @@ def export(ms, chunks, out_path, textures=None, variations=None, material_ebx=No
         if li > 0:
             lod_scope.CreateVisibilityAttr(UsdGeom.Tokens.invisible)
         chunk = chunks.get(li)
+
+        # The fingerprint of the geometry as it left BF3, so the emitter can tell an edited mesh
+        # from an untouched one WITHOUT holding the game's bytes.
+        #
+        # It is needed because the MeshSet resource does not describe the geometry: positions,
+        # normals, UVs and tangents all live in the chunk. Deciding "edited" on the resource bytes
+        # alone -- which is what the emitter did -- calls a mesh untouched whenever the edit did not
+        # move the bounding box or change a count, so a retextured or re-normalled mesh was
+        # REFERENCED from the player's install and the edit was silently dropped. (Measured on
+        # weapons/pecheneg/pecheneg_ironsight_1p_Mesh: a one-vertex UV nudge and a flipped normal
+        # each left the 1,140-byte payload byte-identical while the 67,776-byte chunk differed.)
+        #
+        # Same shape as collision.py's `bf3:originalDigest`: a digest, not the bytes, because
+        # carrying 67 KB per LOD would multiply a 527-mesh stage by its own geometry for data the
+        # game already ships.
+        if chunk is not None:
+            lod_scope.GetPrim().SetCustomDataByKey("bf3:chunkDigest",
+                                                   hashlib.sha256(chunk).hexdigest())
         for si, sub in enumerate(lod.subsets):
             p = "/Mesh/LOD%d/subset%d" % (li, si)
             subset_paths[(li, si)] = p
@@ -713,6 +732,43 @@ def load(path):
         ms.total_subset_count = sum(len(l.subsets) for l in ms.lods)
 
     return ms, chunks
+
+
+def unedited_geometry(path, chunks):
+    """Did the geometry come back exactly as it went out?
+
+    The resource payload cannot answer this. Geometry lives in the CHUNK, and a MeshSet that
+    describes it changes only when a count or the bounding box changes -- so a UV or normal edit
+    leaves the payload byte-identical. Comparing the rebuilt chunk against the digest `export`
+    authored is the check that actually covers the geometry.
+
+    -> True   every LOD that was exported with a chunk rebuilt to the same bytes
+       False  at least one differs, or a LOD that had geometry came back without it: it must ship
+       None   the stage carries no digests at all (exported before they existed), so nothing can
+              be proven and the caller has to say so rather than assume untouched
+    """
+    stage = Usd.Stage.Open(path)
+    seen = False
+
+    for li in range(len(_rebuild_meshset(
+            json.loads(stage.GetPrimAtPath("/Mesh").GetCustomDataByKey(BF3))).lods)):
+        prim = stage.GetPrimAtPath("/Mesh/LOD%d" % li)
+
+        if not prim:
+            continue
+
+        want = prim.GetCustomDataByKey("bf3:chunkDigest")
+
+        if not want:
+            continue
+
+        seen = True
+        got = chunks.get(li)
+
+        if got is None or hashlib.sha256(got).hexdigest() != want:
+            return False
+
+    return True if seen else None
 
 
 def _relayout(lod, per_subset_attrs):

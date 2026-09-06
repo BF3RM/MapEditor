@@ -113,12 +113,32 @@ def encode_subset(attrs, subset):
 
 
 def rebuild_chunk(lod, per_subset_attrs):
-    """Reassemble a whole LOD chunk from per-subset attribute dicts."""
+    """Reassemble a whole LOD chunk from per-subset attribute dicts.
+
+    Subsets normally pack end to end, but not always: BF3 ships meshes whose subsets ALIAS one
+    vertex block (xp2/objects/decalplanes_02/leaves_01_Mesh has two subsets both at VertexOffset 0,
+    VertexDataSize 128 = one block of 4 vertices). Writing them in order then means the last subset
+    overwrites the first, so an edit to the first is thrown away -- which round-trips clean and
+    reports nothing, the exact failure this whole area keeps producing.
+
+    Identical writes to a shared range are fine and are what an untouched mesh does; a CONFLICTING
+    write is refused, with the offset, so the caller learns the edit cannot be represented instead
+    of shipping a mesh that quietly lost it.
+    """
     vblock = bytearray(lod.vertex_data_size)
     iblock = bytearray(lod.index_data_size)
-    for sub, attrs in zip(lod.subsets, per_subset_attrs):
+    written = bytearray(lod.vertex_data_size)          # 1 where some subset has already written
+    for si, (sub, attrs) in enumerate(zip(lod.subsets, per_subset_attrs)):
         vb = encode_subset(attrs, sub)
-        vblock[sub.vertex_offset:sub.vertex_offset + len(vb)] = vb
+        lo, hi = sub.vertex_offset, sub.vertex_offset + len(vb)
+        for k in range(lo, min(hi, len(vblock))):
+            if written[k] and vblock[k] != vb[k - lo]:
+                raise ValueError(
+                    "subset %d aliases vertex bytes another subset already wrote, and disagrees "
+                    "at chunk offset %d. This mesh shares one vertex block between subsets, so an "
+                    "edit has to be made to every subset that reads it." % (si, k))
+            written[k] = 1
+        vblock[lo:hi] = vb
         idx = np.asarray(attrs["indices"], dtype="<u2").reshape(-1)
         off = sub.start_index * 2
         iblock[off:off + idx.nbytes] = idx.tobytes()
