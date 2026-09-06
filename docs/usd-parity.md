@@ -548,23 +548,43 @@ audio `UsdMedia`, skinning `UsdSkel`, animation `UsdSkelAnimation`, roads `Basis
 decals real `Mesh`, scattering preview `PointInstancer`. Everything else is typed `bf3:` attributes
 with the record in customData.
 
+**Byte-identical against the game's own bytes** -- the strongest claim available, and now the
+common case rather than the exception:
+
+| | evidence |
+|---|---|
+| Animation clips (DCT) | 3,778 / 3,778 clips, 38,366,576 / 38,366,576 payload bytes |
+| Terrain layers + scattering | 33 / 33 resources, 1,036,583 / 1,036,583 bytes |
+| StreamingPartitionHeader | 73,371 / 73,371 -- every EBX partition in BF3 |
+| ExternalValue / TextureConstant | 190,486 and 102,528, all identical |
+| RelocPtr / RelocArray / Matrix44 | 68,558 / 113,075 / 14,115, all identical |
+| HavokPhysicsData | 7,593 / 7,593 (5.2% written from fields, the rest carried verbatim) |
+| Mesh resource + chunk | 68 / 68 unedited byte-identical; 2078 / 166 regression clean |
+| Terrain heights | untouched terrain emits 0 changed nodes; 499,230 samples, deviation 0 |
+
 **Not complete:**
 
-1. **Terrain's 7-layer splat has no USD form.** Layer 0 is bound as a material and the rest are
-   carried; USD has no splat shader, and a faithful preview needs a custom one. The data is all
-   there (mask, material tree, palette) -- what is missing is a way to LOOK at it blended.
-2. **"0 changed" is not byte-perfect.** It measures USD fidelity, not our bytes against BF3's. Only
-   terrain heights, the Havok wrapper and unedited collision are byte-verified against the game.
-3. **Refs and nested records stay in customData**, so a reference between objects is not editable
-   the way a scalar is.
-4. **Edited collision rebuilds to 81 objects against the game's 120.**
-5. **Shared object blueprints are not descended into** -- 403,352 instances (72%) stay filed by
-   partition path rather than under the object that owns them. Deliberate: a prop used 60 times
-   would give 60 prims writing back to one record and 59 edits would vanish.
-6. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
-7. **1,077 partitions** under the game's namespaces are EBX we author rather than reference, and
-   referencing partitions is measured to be impossible -- it inflates the superbundle 6x and breaks
-   the load.
+1. **Not boot-tested: the mesh and animation writers.** Both are byte-proven and neither has been
+   built into a bundle and loaded. That is the single largest gap now -- capability exists, evidence
+   of it working in the engine does not.
+2. **3,000 of 8,972 animation clips stay read-only** (VBR and CURV), and no clip can be added,
+   removed or re-typed: there is no Ant GenericData archive writer.
+3. **Havok shape geometry** -- the rebuild emits 81 objects against the game's 120. Editing part
+   translations, AABBs and material indices works; editing the shapes themselves does not.
+4. **24 `.water.mesh` resources do not parse at all** -- `Big endian Havok data is not supported`.
+   A pre-existing READER gap, so water collision on 12 levels is neither readable nor writable.
+5. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader,
+   so looking at it blended needs a custom one.
+6. **Shared object blueprints are not descended into** -- 403,352 instances (72%) stay filed by
+   partition path. Deliberate: a prop used 60 times would give 60 prims writing back to one record
+   and 59 edits would vanish.
+7. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
+8. **1,077 partitions** are EBX we author rather than reference, and referencing partitions is
+   measured impossible -- it inflates the superbundle 6x and breaks the load.
+
+**Superseded by the writers landing:** "0 changed is not byte-perfect" was item 2 of this list.
+Eight subsystems now have byte equality against BF3's own bytes, so the distinction it drew has
+mostly been closed rather than argued away.
 
 ## The one-line state
 
