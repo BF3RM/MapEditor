@@ -144,6 +144,126 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## NO exported level has ever been RENDERED, and the reason is measured (2026-09-06)
+
+**There is still no picture of an exported level, and this section is why.** The attempt below got
+a VU client onto the box, into the MapEditor freecam, and flying -- on a STOCK level. Pointed at an
+exported level it never leaves a black loading screen, and the cause is not the emitter.
+
+    exported mp_001   client joins, level never finishes loading, 15+ min, CDP dead   NO IMAGE
+    exported frontend client joins, same, and frontend is 27 meshes / 60 placements   NO IMAGE
+    stock blank sb    server registers teams; client reaches the deploy screen        (control)
+    stock MP_001      client + freecam + capture works end to end                     IMAGES
+
+### The measurement: an exported level registers no teams, so no player can ever enter it
+
+Server log, the two runs differing only in which `REALITYMOD.sb` is on disk:
+
+    STOCK Blank_Level_Test superbundle          EXPORTED level superbundle
+    ------------------------------------        ------------------------------------
+    LoadBundles comp=3 REALITYMOD               LoadBundles comp=3 REALITYMOD
+    LoadBundles comp=4 REALITYMOD/teamdeathmatch  LoadBundles comp=4 realitymod/usdlevel
+    LoadBundles comp=5 REALITYMOD/tdm2          (nothing)
+    Registering team 0 with 0 player slots      (nothing)
+    Registering team 1 with 16 player slots     (nothing)
+    Registering team 2 with 16 player slots     (nothing)
+    Level:Loaded                                Level:Loaded
+
+`Registering team` appears **0 times** in the saved sweep logs of `mp_001`, `frontend` and
+`sp_paris` -- so this is not one bad run, it is every level in the table above. A player who joins
+one of these servers sits at `team=0 squad=0 alive=false soldier=false` forever; the client hangs on
+a black loading screen burning ~6 cores with its RSS pinned to the kilobyte, and its CDP endpoint
+stops answering. **Every "LOADED" in the table above is a level no player can enter.**
+
+### It is the Blank_Level_Test REBUILD that loses the game mode, not the USD emitter
+
+Rebuilding the harness superbundle from its own `RimeCommands.txt` with **zero USD content** already
+loses it. Bundle lists, straight out of the `.toc`:
+
+    SHIPPED REALITYMOD.sb (5,933,667 B)      REBUILT (48,448 B, recipe only, no USD)
+      Levels/REALITYMOD/REALITYMOD             win32/levels/realitymod/realitymod
+      .../REALITYMOD_Settings_Win32            .../realitymod_settings_win32
+      .../REALITYMOD_GameConfigLight_Win32     .../realitymod_gameconfiglight_win32
+      .../REALITYMOD_loading_music             .../realitymod_loading_music
+      .../REALITYMOD_UiLoadingMp               .../realitymod_uiloadingmp
+      .../REALITYMOD_UiPlaying                 .../realitymod_uiplaying
+      .../teamdeathmatch          <-- GONE
+      .../tdm2                    <-- GONE
+
+The shipped superbundle also carries `levels/realitymod/realitymod/shaderdb`,
+`.../meshvariationdb_win32`, `levels/realitymod/teamdeathmatch/{layer0_teamdeathmatch_logic,
+layer1_teamdeathmatch_spawners,layer3_teamdeathmatch_friendzones,meshvariationdb_win32}` and
+`levels/realitymod/tdm2`. The recipe has no source for any of them -- 5.88 MB of the 5.93 MB shipped
+superbundle is content `RimeCommands.txt` cannot reproduce. The recipe also never builds
+`levels/realitymod/water` (`RealityMod_Water.json`), which the shipped `TestJson1.json` LevelData
+*references* through `5c000001-...`, and never builds `levels/realitymod/teamdeathmatch`
+(`RealityMod_TdmSubWorld.json`), which ships beside it and is used by nothing.
+
+**So the harness has been booting a level with no game mode since before the USD work started, and
+the boot check could not see it** -- `Level:Loaded` fires, the world parts resolve, and the entity
+count comes out at placements+1, all with no teams and no possible player.
+
+### How far the fix got
+
+Three changes, each verified against the server log:
+
+1. `add_json_partition levels/realitymod/water RealityMod_Water.json` -- resolves the dangling
+   sub-world the shipped LevelData already references.
+2. A second `SubWorldReferenceObjectData` in the host LevelData with
+   `BundleName: levels/realitymod/teamdeathmatch` (same shape the emitter uses for its own
+   `usdlevel`), plus a bundle of that name holding `RealityMod_TdmSubWorld.json`.
+
+That **works as far as it goes**: the engine now loads `comp=5 levels/realitymod/teamdeathmatch`
+next to `comp=4 levels/realitymod/usdlevel`. Teams still do not register, because the shipped
+`RealityMod_TdmSubWorld.json` is a `SubWorldData` with `Objects: []` -- the team entities live in the
+three `layer*_teamdeathmatch_*` partitions that only exist inside the shipped `.sb`. Adding a bundle
+by NAME alone does nothing; the engine only loads a sub-level the LevelData points at.
+
+**Next step, concrete:** put the SHIPPED `REALITYMOD.sb` back, boot it, and dump
+`levels/realitymod/teamdeathmatch` and its layers with `Blank_Level_Test`'s own
+`ext/Shared/PartitionDumper.lua` (Rime cannot read a standalone superbundle -- there is no
+`mount_standalone_sb` in this build). Feed those JSONs back into the recipe and the game mode is
+reproducible; then, and only then, is an exported level enterable.
+
+### What DOES work, with images
+
+The capture half is proven, on stock MP_001 (`ConquestSmall0`), MapEditor mod, no physical input:
+
+- `ME_CONFIG.DEV_AUTO_ENTER_EDITOR` + `DEV_FREECAM_WITHOUT_SOLDIER` open the editor over CDP.
+- `tools/e2e/dust2_shot.py`'s `FocusCamera` walk flies the real freecam to arbitrary world
+  coordinates; six viewpoints over Grand Bazaar were flown and captured, and the shots show the
+  actual level -- building facades, street, skyline, the antenna mast -- from the coordinates asked
+  for.
+
+Two things the harness still cannot do, both visible in those images and both worth fixing before
+the next attempt:
+
+- **The editor's Gameface panels cannot be hidden.** `visibility:hidden` and `opacity:0` on
+  `document.documentElement` both report success over CDP and change nothing on screen, so roughly
+  half the frame is editor UI. Only the centre "Viewport" region is game.
+- **Without a deployed soldier the deploy screen's blue tint and blur sit over the render.**
+  `HudToggle` fires `ExitUIGraph` on the HUD graph only (`133D3825-...`); the deploy screen is a
+  different `ClientUIGraphEntity`. Firing it on every UIGraph is the obvious thing to try.
+
+Images: `~/Pictures/vu-level-shots/` --
+`stock_{overhead,oblique_se,oblique_nw,street,close,low_wide}.png` (stock MP_001 from the six
+viewpoints an exported-level run would use, i.e. the comparison set that was missing), plus
+`stock_mp001_editor_open.png` and the two `exported_*_client_stuck_loading.png` black-screen frames.
+
+### Reproducing
+
+Server + client were run from a THIRD instance, `~/Games/VeniceUnleashed/shot-instance`, because
+another session was using `iso-instance` at the time. Only one VU server can run on this box: both
+instances share one `server.key` (same Zeus GUID) and the ports 7948/udp and 47200/tcp are fixed.
+
+    /tmp/shot_build.sh <level>      build an emitted level into iso-instance's BLT sb
+    /tmp/shot_build2.sh NONE [tdm]  rebuild the harness recipe alone (the control)
+    /tmp/shot_build3.sh <level>     the water + teamdeathmatch attempt above
+    /tmp/lvshot.py <outdir> <tag> /tmp/views_mp001.json    fly + capture
+
+Note `/tmp/shot_build.sh` writes into `iso-instance`'s `Blank_Level_Test/sb`; the frontend build
+done here overwrote what was there.
+
 ## Every level BF3 ships BOOTS, and the engine counts the objects (2026-09-06)
 
 **48 of 49 levels had never been started.** The pipeline was verified on mp_001 and on authoring
@@ -172,6 +292,11 @@ an empty bundle cannot produce:
 
 That third number is the one that cannot be faked: the objects are in the world, at the count the
 USD stage carried, on every level BF3 ships.
+
+**Read the section above this one before trusting any of it as a level you could PLAY.** Every one
+of these 48 servers registers ZERO teams, so no player can enter and no client finishes loading --
+measured 2026-09-06. `Level:Loaded` plus the world parts plus the entity count is a statement about
+the CONTENT and nothing more.
 
 **What the probe did NOT find:** the same pass counted `ServerStaticModelGroupEntity`,
 `ServerPointLightEntity` and `ServerSpatialEntity` and got **0 on every level** -- 0, not the -1
