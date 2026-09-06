@@ -253,10 +253,10 @@ time:
 
 ### The next step, and it is not another bisect
 
-Get an emit that HAS an `mvdb.json`: create `<level>_textures/` (or relax the gate to
-`mvdb_inputs` alone), re-emit, build, boot a client. If the client loads, everything above was a
-long way round to a missing database. If it still hangs, the MVDB is eliminated too and what remains
-is the resource layer -- the MeshSet chunks and metas -- which nothing in this effort has yet varied.
+**DONE, see the section above.** The gate is fixed in the emitter (`if mvdb_inputs:` alone) and an
+MVDB-bearing build was tested: the client stops hanging and starts REFUSING in 15 seconds, under
+either database name. The database is necessary but not sufficient, and the resource layer -- the
+MeshSet chunks and metas -- is what is left.
 
 **One thing worth fixing in the emitter meanwhile:** the new `_flat_used` guard sits INSIDE the
 `if texture_dir ...` block, so on an emit with no texture directory -- which is what `mod_ee.sh`
