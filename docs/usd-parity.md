@@ -7,6 +7,19 @@ Last updated: 2026-09-06.
 
 ## Animation clips are writable (2026-09-06)
 
+**BOOTED (2026-09-06).** A patched `ak74` bank -- 184 of 183,068 bytes changed by the encoder --
+built into a bundle and loaded in the isolated instance:
+
+    UsdRoundTrip: prepending usdroundtrip/scaledb to 1 bundles
+      bundle: usdroundtrip/scaledb
+    Level:Loaded name=Levels/REALITYMOD/REALITYMOD
+
+No "could not be read". What this proves is that the engine ACCEPTS a re-encoded DCT payload -- a
+corrupt encode would fail to load or crash on use. It does not prove the animation looks different;
+the edit was 3.0e-8, deliberately chosen to be measurable rather than visible.
+
+Both writers that were byte-proven-but-unbooted are now booted (see the mesh section).
+
 The last asset class that could be exported and not returned. `Header.Serialize` and
 `DofTable.Serialize` threw, so a clip could be decoded, given real bone names and edited in USD, and
 then had nowhere to go.
