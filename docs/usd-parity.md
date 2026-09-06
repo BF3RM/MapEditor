@@ -255,6 +255,23 @@ matches its shader name is a level drawing the wrong ground.
 
 ## An edited mesh now ships; an unedited one is still referenced (2026-09-06)
 
+**BOOTED (2026-09-06).** The last unknown -- whether the engine accepts an `add_chunk`-written RAW
+chunk, flagged unverified in `usd-roundtrip.md` §7 -- is now answered. An edited mesh, in a bundle
+this toolchain built, loaded in the isolated instance:
+
+    UsdRoundTrip: prepending usdroundtrip/scaledb to 1 bundles
+      bundle: usdroundtrip/scaledb
+    Level:Loaded name=Levels/REALITYMOD/REALITYMOD
+    USDRT SERVER level loaded, arming spawn
+
+No "could not be read". Done in the ISOLATED instance, so no shared state was touched.
+
+**What blocked this for five attempts:** `build_sb` nests -- `build_sb` opens a superbundle, and
+`build_bundle` a bundle inside it -- so it needs **two** `build` commands. The first closes the
+bundle and prints "Bundle successfully built and added to superbundle!"; the SECOND closes and
+writes the superbundle. With one `build` the builder reports that success and writes nothing at all,
+and the only honest signal is the engine later saying the superbundle could not be read.
+
 **Confirmed against the live mounter (2026-09-06, run after the fact).** The build and compares the
 agent had to skip for machine contention were run:
 
