@@ -468,7 +468,7 @@ def _material_ebx_index(path):
 def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, textures=None,
          decals=None, roads=None, terrain=None, layers=None, texture_dir=None, material_dir=None,
          scattering_path=None,
-         ebx_dir=None, parts_list=None):
+         ebx_dir=None, parts_list=None, enlighten_path=None):
     doc = json.load(open(placements_path))
 
     # The merged, shader-filled material bindings, keyed by mesh name. Without these the level
@@ -707,6 +707,16 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
         print("terrain layers %d layer(s), %d combination draw(s)" % (nl, nd))
         print("scattering   %d type(s)" % scattering.author(stage, scattering_path))
 
+    # The level's global illumination. It is a BAKE -- computed against the geometry that was
+    # there when it ran -- so it is carried as the shipped bytes rather than regenerated, and a
+    # level exported without this says "lighting: referenced" and leaves it in the game's bundles.
+    if enlighten_path:
+        import enlighten
+
+        made = enlighten.author(stage, json.load(open(enlighten_path)))
+        print("enlighten    %s" % ", ".join("%s %d" % (k, v)
+                                            for k, v in sorted(made.items()) if v))
+
     if decals:
         print("decals       %d group(s)" % _export_decals(stage, decals))
 
@@ -744,7 +754,7 @@ if __name__ == "__main__":
 
     for flag in ("--meshes", "--corpus", "--chunks", "--textures", "--decals", "--roads",
                  "--terrain", "--layers", "--texture-dir", "--material-dir",
-                 "--ebx-dir", "--parts-list", "--scattering"):
+                 "--ebx-dir", "--parts-list", "--scattering", "--enlighten"):
         if flag in argv:
             i = argv.index(flag)
             opts[flag.lstrip("-")] = argv[i + 1]
@@ -754,4 +764,4 @@ if __name__ == "__main__":
          opts.get("textures"), opts.get("decals"), opts.get("roads"),
          opts.get("terrain"), opts.get("layers"), opts.get("texture-dir"),
          opts.get("material-dir"), opts.get("ebx-dir"), opts.get("parts-list"),
-         opts.get("scattering"))
+         opts.get("scattering"), opts.get("enlighten"))
