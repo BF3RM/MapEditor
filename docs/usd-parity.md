@@ -5,6 +5,137 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## Every level BF3 ships BOOTS, and the engine counts the objects (2026-09-06)
+
+**48 of 49 levels had never been started.** The pipeline was verified on mp_001 and on authoring
+tests that never touch an engine, and this project's own lesson was that "MP_001 loading did not
+mean the emitter worked" -- a second level exposed three separate defects. So every level was
+emitted, built and booted in the isolated instance, one at a time.
+
+    48 of 49 LOADED     1 refused by the content guard (web_loading: 0 meshes, 0 placements)
+    static entities     316,586 created by the engine against 316,538 placements emitted
+    build errors        72, all one class (below); every affected level still loads
+    superbundles        49,594,592 .. 61,182,672 bytes, mean 54,351,428
+
+**The verdict alone would be worthless.** A level that emits nothing loads perfectly, and four
+variants of that have already fooled this pipeline, so each level is scored on three numbers that
+an empty bundle cannot produce:
+
+1. **What was emitted** -- mesh partitions, placements, textures and mesh references, refused
+   before booting if the level emitted no geometry.
+2. **World parts the ENGINE resolved** -- `SearchForDataContainer` on `levels/realitymod/usdlevel`
+   and each `part<N>`. Every level resolved EXACTLY the number it emitted: 25/25 on mp_001,
+   55/55 on sp_paris, 1/1 on frontend, and so on for all 48.
+3. **Entities the engine actually created** -- a new `ServerStaticModelEntity` count on
+   `Level:Loaded`. Across all 48 it is **placements + 1, every time, with no exception**; the +1
+   is the blank host level's own single `ReferenceObjectData`. mp_001 6,200/6,199, sp_paris
+   13,833/13,832, sp_new_york 1,588/1,587, frontend 61/60.
+
+That third number is the one that cannot be faked: the objects are in the world, at the count the
+USD stage carried, on every level BF3 ships.
+
+**What the probe did NOT find:** the same pass counted `ServerStaticModelGroupEntity`,
+`ServerPointLightEntity` and `ServerSpatialEntity` and got **0 on every level** -- 0, not the -1
+this probe returns when an iterator does not exist, so the types resolve and are empty. Levels do
+author `PointLightEntityData` (frontend 6 spot + 1 point, mp_001 113 point), so either a dedicated
+server creates no light entities at all, or these are the wrong runtime type names. Unresolved; the
+static-model count is the only entity number this section claims.
+
+| level | meshes | placements | textures | mesh refs | build err | .sb bytes | world parts | static entities | boot |
+|---|---|---|---|---|---|---|---|---|---|
+| `coop_002` | 305 | 5,128 | 261 | 376 | 3 | 53,812,336 | 21/21 | 5129/5128 | **LOADED** |
+| `coop_003` | 328 | 3,684 | 357 | 530 | 1 | 53,950,720 | 15/15 | 3685/3684 | **LOADED** |
+| `coop_006` | 98 | 1,916 | 356 | 209 | 0 | 50,594,496 | 8/8 | 1917/1916 | **LOADED** |
+| `coop_007` | 308 | 3,789 | 646 | 685 | 2 | 53,726,752 | 15/15 | 3790/3789 | **LOADED** |
+| `coop_009` | 377 | 8,732 | 266 | 441 | 1 | 55,088,992 | 35/35 | 8733/8732 | **LOADED** |
+| `coop_010` | 421 | 4,770 | 285 | 475 | 0 | 55,389,760 | 19/19 | 4771/4770 | **LOADED** |
+| `frontend` | 27 | 60 | 264 | 37 | 0 | 49,594,592 | 1/1 | 61/60 | **LOADED** |
+| `mp_001` | 534 | 6,199 | 795 | 1066 | 1 | 56,007,312 | 25/25 | 6200/6199 | **LOADED** |
+| `mp_003` | 306 | 8,726 | 604 | 637 | 0 | 53,121,744 | 35/35 | 8727/8726 | **LOADED** |
+| `mp_007` | 258 | 7,214 | 532 | 502 | 0 | 52,905,456 | 29/29 | 7215/7214 | **LOADED** |
+| `mp_011` | 382 | 11,244 | 586 | 726 | 1 | 55,597,648 | 44/44 | 11245/11244 | **LOADED** |
+| `mp_012` | 322 | 6,548 | 482 | 549 | 3 | 55,420,992 | 26/26 | 6549/6548 | **LOADED** |
+| `mp_013` | 325 | 7,536 | 503 | 579 | 6 | 55,322,912 | 30/30 | 7537/7536 | **LOADED** |
+| `mp_017` | 361 | 6,025 | 500 | 662 | 0 | 54,121,040 | 24/24 | 6026/6025 | **LOADED** |
+| `mp_018` | 270 | 5,855 | 487 | 476 | 0 | 54,147,744 | 23/23 | 5856/5855 | **LOADED** |
+| `mp_subway` | 640 | 11,425 | 736 | 1209 | 8 | 59,841,568 | 45/45 | 11426/11425 | **LOADED** |
+| `sp_bank` | 745 | 11,527 | 257 | 898 | 4 | 60,834,640 | 46/46 | 11528/11527 | **LOADED** |
+| `sp_earthquake` | 548 | 9,015 | 275 | 708 | 0 | 58,115,616 | 36/36 | 9016/9015 | **LOADED** |
+| `sp_earthquake2` | 418 | 8,055 | 258 | 424 | 0 | 54,142,368 | 32/32 | 8056/8055 | **LOADED** |
+| `sp_finale` | 484 | 6,543 | 258 | 519 | 0 | 54,806,976 | 26/26 | 6544/6543 | **LOADED** |
+| `sp_jet` | 173 | 4,810 | 254 | 229 | 0 | 53,893,008 | 19/19 | 4811/4810 | **LOADED** |
+| `sp_new_york` | 98 | 1,587 | 258 | 124 | 0 | 50,573,648 | 7/7 | 1588/1587 | **LOADED** |
+| `sp_paris` | 663 | 13,832 | 257 | 763 | 1 | 61,182,672 | 55/55 | 13833/13832 | **LOADED** |
+| `sp_sniper` | 636 | 9,018 | 254 | 681 | 0 | 58,030,304 | 36/36 | 9019/9018 | **LOADED** |
+| `sp_tank` | 299 | 6,238 | 258 | 361 | 9 | 53,914,032 | 25/25 | 6239/6238 | **LOADED** |
+| `sp_tank_b` | 349 | 3,533 | 260 | 354 | 0 | 52,974,336 | 14/14 | 3534/3533 | **LOADED** |
+| `sp_valley` | 123 | 3,573 | 265 | 143 | 2 | 51,439,344 | 14/14 | 3574/3573 | **LOADED** |
+| `sp_villa` | 353 | 5,956 | 256 | 427 | 0 | 54,104,976 | 24/24 | 5957/5956 | **LOADED** |
+| `web_loading` | 0 | 0 | 0 | 0 | 0 | -- | - | - | **NOT_RUN** |
+| `xp1_001` | 439 | 9,699 | 594 | 720 | 0 | 54,819,408 | 38/38 | 9700/9699 | **LOADED** |
+| `xp1_002` | 359 | 7,273 | 542 | 597 | 0 | 53,862,496 | 29/29 | 7274/7273 | **LOADED** |
+| `xp1_003` | 346 | 8,913 | 526 | 569 | 0 | 53,999,824 | 35/35 | 8914/8913 | **LOADED** |
+| `xp1_004` | 201 | 5,170 | 441 | 361 | 0 | 51,968,672 | 21/21 | 5171/5170 | **LOADED** |
+| `xp2_factory` | 452 | 4,078 | 384 | 708 | 10 | 55,570,032 | 16/16 | 4079/4078 | **LOADED** |
+| `xp2_office` | 537 | 5,957 | 637 | 841 | 0 | 55,508,208 | 24/24 | 5958/5957 | **LOADED** |
+| `xp2_palace` | 540 | 4,160 | 535 | 803 | 0 | 55,157,456 | 17/17 | 4161/4160 | **LOADED** |
+| `xp2_skybar` | 268 | 4,439 | 464 | 423 | 0 | 52,585,888 | 18/18 | 4440/4439 | **LOADED** |
+| `xp3_alborz` | 151 | 4,813 | 369 | 261 | 0 | 51,500,816 | 19/19 | 4814/4813 | **LOADED** |
+| `xp3_desert` | 241 | 7,933 | 500 | 470 | 0 | 53,870,592 | 31/31 | 7934/7933 | **LOADED** |
+| `xp3_shield` | 191 | 7,922 | 480 | 381 | 0 | 52,484,256 | 31/31 | 7923/7922 | **LOADED** |
+| `xp3_valley` | 245 | 7,767 | 447 | 425 | 0 | 52,843,904 | 31/31 | 7768/7767 | **LOADED** |
+| `xp4_fd` | 379 | 8,962 | 597 | 671 | 0 | 54,516,480 | 36/36 | 8963/8962 | **LOADED** |
+| `xp4_parl` | 424 | 10,551 | 671 | 781 | 0 | 55,111,152 | 42/42 | 10552/10551 | **LOADED** |
+| `xp4_quake` | 423 | 8,245 | 583 | 723 | 0 | 54,935,792 | 33/33 | 8246/8245 | **LOADED** |
+| `xp4_rubble` | 460 | 8,377 | 627 | 789 | 1 | 54,755,936 | 33/33 | 8378/8377 | **LOADED** |
+| `xp5_001` | 258 | 5,664 | 474 | 470 | 5 | 53,016,048 | 23/23 | 5665/5664 | **LOADED** |
+| `xp5_002` | 259 | 3,887 | 452 | 509 | 8 | 53,366,864 | 16/16 | 3888/3887 | **LOADED** |
+| `xp5_003` | 259 | 5,466 | 452 | 449 | 3 | 53,115,776 | 22/22 | 5467/5466 | **LOADED** |
+| `xp5_004` | 237 | 4,724 | 396 | 400 | 3 | 53,222,960 | 19/19 | 4725/4724 | **LOADED** |
+
+### The one level that does not boot is the one with nothing in it
+
+`web_loading` is the loading screen, not a map: 59 instances, **0 distinct meshes and 0
+placements**, so nothing is emitted and the content guard refuses it before the harness runs.
+Forced through anyway, the engine reaches `bundle: levels/realitymod/usdlevel` and the process
+exits -- an EMPTY usdlevel bundle does not load. Worth recording, because the standing assumption
+here was the opposite ("a level that emits nothing loads perfectly"); in THIS harness an empty
+sub-level bundle is fatal, and only a non-empty one gets as far as being able to lie.
+
+### The 49 is provably the whole set
+
+`levels/` holds 69 directories, and 49 of them contain a `<level>/<level>` partition with the
+LevelData. The other 20 -- `mp_canyon`, `mp_whitepeak`, `xp3_legrandval`, `xp4_parliament`,
+`xp4_financialdistrict`, the `testrange_*` set and the rest -- carry art under a level namespace
+and **no LevelData at all**, so there is no 50th level being quietly skipped. The list of
+directories that hold a LevelData is exactly the list that was swept.
+
+### The 72 build errors are one bug, and it is ours
+
+Every "Could not find resource" across the whole sweep, 71 distinct names, was put in the recipe by
+the emitter's `HavokAsset` pass -- it references `HavokAsset.Name` for every such record the level
+owns. Asked of the mounted game, **0 of 71 resolve**:
+
+    where_is  levels/coop_003/props/coop003sidewalk_short_physics_1_win32   Not mounted
+    where_is  levels/coop_003/props/coop003sidewalk_short_physics_0_win32   resource
+                win32/levels/coop_003/coop_003 -> win32/levels/coop_003/ab02_art_parent
+
+The same object declares two `HavokAsset`s, `_Physics_0_Win32` (Scale 1.0) and `_Physics_1_Win32`
+(Scale 2.0). BF3 shipped a resource for the first and not the second. 70 of the 71 are that shape
+(`_physics_<n>_win32`, n from 0 to 6); the 71st is the already-known `objects/rugpile_01/rugpile_01_n`
+texture that BF3 never shipped either. The fix is to reference only names that resolve; the cost
+today is noise, not a failure -- all 19 levels that hit it boot.
+
+### Reproducing
+
+    /tmp/mod_ee.sh <level>      USD export + emit          (no Rime, no VU; ~16 s)
+    /tmp/mod_bb.sh <level>      build + boot + score       (holds flock /tmp/rime.lock; ~90 s)
+    /tmp/mod_sweep.sh           all 49, resumable from /tmp/mod_results.tsv
+
+The `ServerStaticModelEntity` probe is appended to the ISOLATED instance's
+`Blank_Level_Test/ext/Shared/__init__.lua` (the shared instance's copy is untouched; backup at
+/tmp/mod_blt_init.lua.bak).
+
 ## Every animation codec BF3 ships now writes (2026-09-06)
 
 The 3,000 clips this document called read-only -- `VBR` 2,225 and `CURV` 775 -- decode and
@@ -1012,8 +1143,14 @@ common case rather than the exception:
 3. **99,781 of 155,290 Havok placement wrappers are unreached**, every one held only by
    `hkpExtendedMeshShape`, whose subparts point at a few hundred shared wrappers from 819,307 slots.
 4. **Water is readable, not writable** -- rebuilding a triangle mesh needs its MOPP.
-5. **834 blueprint placements still unresolved** on mp_001 (2,337 link). Their blueprints are not in
-   the closure at all.
+5. **163 blueprint placements unresolved** on mp_001, of 3,525 (3,362 link, 95.4%). Getting there
+   established something about the goal's two halves: the 132 blueprints behind 832 of those
+   placements -- bicycles, office chairs, cardboard boxes -- are **not in the shipped closure at
+   all**, and the level still boots with the right entity count because they resolve from the
+   player's own install. That is "100% referenced" working correctly. But "100% editable" needs them
+   IN THE STAGE. The two pull opposite ways, and the resolution is the split everything else here
+   uses: author for editing, ship only if edited. Dumping the 132 took linkage from 258 to 1,107
+   without adding a byte to the bundle.
 6. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader.
 7. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
 8. **48 of 49 levels have never been booted** (a sweep is running).
@@ -1106,7 +1243,7 @@ which looks exactly like three lossy fields. Identity is `(partition, instance)`
 | | status | evidence |
 |---|---|---|
 | Placements | 334,367 across 49 levels | after the sub-world fix; was 223,739 (+1.5x) |
-| Levels loading | 46/49 | 3 correctly FAIL as zero-geometry, not passed |
+| Levels BOOTING | **48/49** | emitted, built and started in the engine; 316,586 static entities against 316,538 placements; the 49th (`web_loading`) has 0 meshes |
 | Meshes / textures | referenced from the player's install | bundle 297 MB -> 7 MB (41x); ships no original art |
 | Entity fields, all 440 types | typed USD attributes | 35,298 authored; round trip **0 changed fields** |
 | Level graph (ownership) | `/World/Level`, world parts own their objects | 49/49 levels; 151,362 owned objects = 151,362 in the EBX; **0 changed** over 23,526,728 fields |
@@ -1429,7 +1566,10 @@ from nearly true into true.
    its own scope and have the reference objects point at it the way a mesh prototype is pointed
    at, which needs the object-blueprint EBX (`objects/`, `props/`) dumped; the corpus here holds
    only `levels/`.
-3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
+3. ~~**No completed 49-level sweep against the corrected (post-sub-world) data.**~~ **DONE 2026-09-06** (section at the top): 48 of 49 boot, with the world parts and the entity
+   count the engine reports checked against what was emitted, level by level. What the sweep does
+   NOT show is anything DRAWING -- it is a headless server, so it proves the objects exist at the
+   right count, not that they render.
 4. **Havok: byte-perfect UNEDITED; an edited shape rebuilds and is not BF3's bake.** (Reading is
    substantially fixed since -- section at the top of this file; the rebuild gap below still holds.) Rime reads the
    shapes, planes and Frostbite wrapper, and an untouched resource now hands back the game's own
