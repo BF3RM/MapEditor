@@ -2735,3 +2735,47 @@ from nearly true into true.
   `dotnet test` rebuilt `RimeLib.Terrain` and the mount then died with
   "Method 'WriteVisualTerrain' ... does not have an implementation" -- the interface moved, the
   `Frostbite2_0` assembly that implements it did not. Rebuild every `*.Frostbite2_0` before a mount.
+
+## Measured coverage, 2026-09-06
+
+Against `levels/mp_001` (144 instance types, 13,903 instances), an export carries **33 types /
+4,076 instances**. The number is worth stating plainly because "the roundtrip is byte-exact" is
+true of what we carry and says nothing about what we never look at.
+
+Carried into the LEVEL but NOT represented in USD -- present in game, not editable in a DCC:
+
+| type | in mp_001 | in USD |
+| --- | --- | --- |
+| `MaterialRelationDamageData` | 466 | 0 |
+| `MaterialRelationSoundData` | 310 | 0 |
+| `MaterialRelationEffectData` | 298 | 0 |
+| `MaterialRelationPenetrationData` | 172 | 0 |
+| `MaterialRelationDecalData` | 135 | 0 |
+| `MaterialRelationTerrainDestructionData` | 9 | 0 |
+
+These are the level's material grid -- what a surface does when it is shot, broken or walked on.
+The exported level shipped a grid holding ONE instance (a `LevelData` stub) until
+`tools/usd/material_grid.py` carried the real one, so destruction and impact audio were absent
+entirely and nothing errored: the systems find no relation and do nothing. They are carried at
+BUILD time, straight from the source partition, and are not in the stage.
+
+Absent from USD altogether:
+
+| type | in mp_001 | in USD closure |
+| --- | --- | --- |
+| `RigidMeshEntityData` | 307 | 0 |
+| `RoadData` | 115 | 0 |
+| `CompositeMeshEntityData` | 83 | 0 |
+| `OccluderVolumeEntityData` | 56 | 0 |
+
+Partially carried: `EffectReferenceObjectData` 68 of 139, `SoundAreaEntityData` 24 of 43,
+`IrReverbEntityData` 24 of 43.
+
+Two stages exist and they are not interchangeable. `mp_001.usdc` carries 8 entity types / 1,176
+instances; `mp_001_closure.usdc` carries **804 types / 212,941 instances** (44,638
+`SoundWaveVariation` alone). The emitter has been fed the small one. `level_entities.author()`
+applies no type filter, so this is a question of which stage is built and consumed, not of the
+exporter dropping types.
+
+Entity records live in a prim's `bf3Entity` customData blob keyed `type` -- NOT in a `bf3:type`
+attribute. Probing for the attribute reports zero entities on a stage that carries thousands.
