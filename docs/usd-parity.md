@@ -31,7 +31,16 @@ edited 4.0 -> 11.5 in USD comes back as 11.5 keyed to its partition
 guid FILE name and ships under its partition NAME, so the writeback looks under both -- keyed on one
 alone, an edit to a weapon silently never lands.
 
-Not yet run: a full emit with an edited closure, confirming the change reaches the built bundle.
+**Verified end to end.** A combined level+closure stage (66.6 MB) with one edited field, emitted:
+
+    closure   1 partition(s) rewritten with edits from the stage
+    closure   10396 partition(s): 10396 shipped, 0 referenced
+    FOUND     DistanceScaleFarValue = 11.5 in
+              clo_fx_impacts_metal_emitter_m_em_impact_metal_sparks_01_m.json
+
+Exactly one partition rewritten out of 10,396 -- the rule holds under a real emit, not just in
+principle. The level's own 490 partitions and the closure's 10,396 are DISJOINT (measured: 0 in
+both), so nothing is authored twice and two prims cannot hold conflicting edits for one instance.
 
 ## Are we at 100%? (2026-09-06)
 
@@ -155,6 +164,7 @@ which looks exactly like three lossy fields. Identity is `(partition, instance)`
 | Levels loading | 46/49 | 3 correctly FAIL as zero-geometry, not passed |
 | Meshes / textures | referenced from the player's install | bundle 297 MB -> 7 MB (41x); ships no original art |
 | Entity fields, all 440 types | typed USD attributes | 35,298 authored; round trip **0 changed fields** |
+| Level graph (ownership) | `/World/Level`, world parts own their objects | 49/49 levels; 151,362 owned objects = 151,362 in the EBX; **0 changed** over 23,526,728 fields |
 | Skinned meshes | UsdSkel | 535/535 byte-identical, 1632/1632 chunks |
 | Animation clips | UsdSkelAnimation | 8,136/8,136 channels identical |
 | AnimTrackData | time samples + Bezier | 1484/1484 byte-exact |
@@ -187,6 +197,78 @@ the original is REFUSED. Both resources pass both halves.
 
 **Still open:** the rebuild path. Our packfile holds 81 objects against the game's 120, so editing
 collision produces a correct resource, not BF3's bytes.
+
+## The scene graph is now the level graph (2026-09-06)
+
+Entities nested by partition path, which made a level browsable and left it structurally wrong. A
+partition is a FILE; a world part is a CONTAINER, and the two are not the same thing -- so a
+`WorldPartData` prim's children were "other instances that happen to live in the same file", you
+could not select a layer and get the layer, and the meshes were not in the tree at all. They sat
+in a flat `/World/<mesh>/inst_N` list beside it, which meant the geometry and the EBX record that
+places it were two separate things a DCC could move independently and disagree about.
+
+BF3 spells its own graph out in the EBX and nothing here had to be guessed:
+
+    LevelData.Objects
+      WorldPartReferenceObjectData -> Blueprint    -> a partition whose primary is a WorldPartData
+      SubWorldReferenceObjectData  -> BundleName   -> a partition whose primary is a SubWorldData
+        ReferenceObjectData        -> BlueprintTransform places an object blueprint
+
+That is now the hierarchy: `/World/Level` is the LevelData, each reference object owns the
+blueprint it points at, and each `WorldPartData` owns the objects its `Objects` list names.
+`tools/usd/level_graph_roundtrip_test.py`, run over all 49 levels:
+
+    instances       558,864 authored of 558,864, 0 authored twice
+    in the graph    155,512 (27.8%), up to 7 containers deep
+    containers      151,362 owned objects against 151,362 named by the EBX's own Objects lists
+    reference objs  4,103 structural, 4,101 own their blueprint
+    placements      55,658 of 334,367 (16.6%) now sit under the object that places them,
+                    all 55,658 at the transform they were dumped with, to the bit
+    round trip      23,526,728 fields compared, 0 changed
+
+mp_001 alone: 3,566 of its 14,033 instances owned, 5 deep, 1,297 of 6,525 placements anchored,
+594,912 fields compared, 0 changed. The prims read like the level did -- `o000_layer0_default`,
+`o004_layer4_buildings`, `o005_squad_deathmatch`, and inside a layer `o003_acunit_01_Mesh`.
+
+**No regression, measured against the same run on HEAD before the change:** `level_roundtrip_test`
+534/534 prototypes byte-identical and 534/570 placement sets preserved, both before and after;
+`import_level_usd --verify` 78,300 floats compared, largest disagreement `0.000000000`, EXACT,
+both before and after; `level_entities.read` 14,033 records / 594,912 fields / 0 changed, both
+before and after. Same numbers, different tree.
+
+Three things this turned up, all measured:
+
+- **A placement can only be anchored on an EXACT transform match.** `placements.json` is the
+  ENGINE's flattened list, so the link back to the reference object that produced it is the
+  transform and nothing else. Matching to 1e-9 found 71 more on mp_001 than exact equality did,
+  and every one would have parked a mesh on a transform that is not bit-identical to the dumped
+  one -- which is the only thing the placement round trip measures. Exact it is; of mp_001's 1,297,
+  8 land on a transform more than one reference object shares.
+- **The read-back had to become LOCAL.** With Scopes for parents, local and local-to-world were
+  the same matrix; with a world part as a real parent they are not, and writing the world
+  transform back would fold the owner's placement into every child on every trip. It is a no-op
+  today -- **0 of 4,103** world-part and sub-world reference objects across the 49 levels carries a
+  non-identity `BlueprintTransform` -- but that is a fact about BF3's data, not about the code.
+- **A USD prim name cannot start with a digit.** `AppendChild('000_layer0_default')` returns the
+  EMPTY path with no error, and the failure surfaces hundreds of prims later as "Path must be an
+  absolute path: <>". Names are `o000_...`.
+
+Two honest limits:
+
+- **Shared object blueprints are not descended into.** A prop used sixty times would be authored
+  sixty times, sixty prims writing back to one EBX record, and fifty-nine edits would vanish with
+  nothing reported. So 403,352 instances -- the contents of those blueprints -- are still filed by
+  partition path under `/World/Entities`, and the 278,709 placements whose mesh is inside one stay
+  in the flat per-mesh groups. Both are found by the same key (`bf3:mesh` on the placement prim),
+  so nothing is lost; it is the tree that is incomplete, and completing it needs the
+  `objects/`/`props/` EBX this corpus does not have.
+- **mp_subway names two sub-worlds that are not there** -- `Levels/MP_Subway/ART_PC_only` and
+  `Levels/MP_Subway/Conquest_Large`. That is the entire gap behind 4,101 of 4,103, and it is the
+  data, not the resolver.
+
+One unrelated bug fell out of running the exporter from a shell: `export_level_usd.py`'s CLI
+passed its options POSITIONALLY into a signature they no longer matched, so `--ebx-dir` landed on
+`scattering_path` and `--scattering` on `parts_list`. It now passes by keyword.
 
 ## Collision can now be read, not only written (2026-09-06)
 
@@ -337,9 +419,13 @@ ask for them. One mount now answers the whole level.
    `TerrainColorTree` has nothing to author on mp_001 -- the resource's own slot table reads
    `slot2=null` -- so it is unverified rather than done, and wants a level that populates it.
 
-2. **USD scene graph is still not the level graph.** Entities nest by partition path, which is
-   browsable, but a `WorldPartData` prim does not own its objects and mesh placements sit outside
-   the hierarchy entirely.
+2. ~~**USD scene graph is still not the level graph.**~~ **DONE 2026-09-06** for the level's own
+   structure (section above). What is still filed by partition path is the 72% of instances that
+   live inside SHARED object blueprints, and with them the 83% of placements whose mesh is inside
+   one. Those are not the level's to own -- the honest fix is to author each blueprint ONCE under
+   its own scope and have the reference objects point at it the way a mesh prototype is pointed
+   at, which needs the object-blueprint EBX (`objects/`, `props/`) dumped; the corpus here holds
+   only `levels/`.
 3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
 4. **Havok: byte-perfect UNEDITED; an edited shape rebuilds and is not BF3's bake.** Rime reads the
    shapes, planes and Frostbite wrapper, and an untouched resource now hands back the game's own
