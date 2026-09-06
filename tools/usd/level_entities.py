@@ -634,6 +634,87 @@ def _read_fields(prim, record, orig=None):
 STRUCTURAL = ('WorldPartReferenceObjectData', 'SubWorldReferenceObjectData')
 
 
+def link_blueprints(stage, ebx_dir, partitions, extra_dirs=()):
+    """Point every placement at the blueprint it places, without copying it.
+
+    A ReferenceObjectData names a SHARED object blueprint -- a prop used sixty times. Authoring that
+    blueprint's contents under each placement would put sixty prims on one EBX record and lose
+    fifty-nine edits, which is why the graph never descended into them and why 403,352 instances
+    (72%) stay filed by partition path.
+
+    USD already has the right shape for this: the blueprint is authored ONCE, and each placement
+    carries an INTERNAL REFERENCE to it. A DCC then shows the prop at all sixty placements while
+    exactly one prim writes back to the record, so an edit cannot be silently dropped. Overriding a
+    single placement is a USD `over`, which is a thing BF3 cannot express at all -- so those are
+    read back as transforms only, and the reference is what makes the tree complete.
+
+    -> (linked, unresolved). Unresolved is reported, never silently skipped.
+    """
+    docs, by_partition, by_primary = _index(ebx_dir, partitions)
+
+    # A shared blueprint usually lives OUTSIDE the level's own partitions -- that is what makes it
+    # shared. Indexing only the level found 258 of 1,840 placements; the rest point into the
+    # closure. Extra directories are indexed the same way and merged, first definition winning.
+    for d in extra_dirs or ():
+        if not d or not os.path.isdir(d):
+            continue
+
+        more = sorted(f[:-5] for f in os.listdir(d) if f.endswith('.json'))
+        d2, bp2, bi2 = _index(d, more)
+        docs.update({k: v for k, v in d2.items() if k not in docs})
+
+        for k, v in bp2.items():
+            by_partition.setdefault(k, v)
+
+        for k, v in bi2.items():
+            by_primary.setdefault(k, v)
+
+    # Where each (partition, instance) was authored, so a reference can point at the real prim.
+    where = {}
+
+    for prim in stage.Traverse():
+        blob = prim.GetCustomDataByKey(BF3 + 'Entity')
+
+        if not blob:
+            continue
+
+        try:
+            rec = json.loads(blob)
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        where[(rec.get('partition'), str(rec.get('instance')))] = prim
+
+    linked = unresolved = 0
+
+    for (part, guid), prim in list(where.items()):
+        blob = prim.GetCustomDataByKey(BF3 + 'Entity')
+        rec = json.loads(blob)
+        inst = rec.get('record') or {}
+
+        if inst.get('$type') != 'ReferenceObjectData':
+            continue
+
+        target = _blueprint_partition(inst, docs, by_partition, by_primary)
+
+        if target is None:
+            unresolved += 1
+            continue
+
+        primary = str(docs[target].get('PrimaryInstanceGuid') or '')
+        proto = where.get((target, primary))
+
+        if proto is None or proto.GetPath() == prim.GetPath():
+            unresolved += 1
+            continue
+
+        prim.GetReferences().AddInternalReference(proto.GetPath())
+        prim.SetCustomDataByKey(BF3 + ':blueprintPartition', target)
+        linked += 1
+
+    return linked, unresolved
+
+
 def _short(kind):
     """`SoundAreaEntityData` -> `SoundArea`, for a prim name a person can read."""
     return kind.replace('EntityData', '').replace('Data', '') or kind
@@ -945,6 +1026,7 @@ def author(stage, root, ebx_dir, partitions, level=None, placements=None):
     the graph's own numbers -- including `anchors`, {mesh name: {placement index: prim path}}.
     """
     docs, by_partition, by_primary = _index(ebx_dir, partitions)
+
     kids, ordinal = _graph(docs, by_partition, by_primary)
     start = _root(docs, level)
 
@@ -1003,7 +1085,26 @@ def read(stage_path):
     stage = Usd.Stage.Open(stage_path)
     edits, fields = {}, []
 
+    # A placement REFERENCES the blueprint it places, so the blueprint's instances compose in
+    # underneath it. Those composed prims carry the prototype's record and are NOT its owner:
+    # measured on mp_001, linking put 17,468 prims on 13,903 records, 3,565 claimed twice. Writing
+    # from them would let a placement's transform overwrite the shared blueprint -- the exact loss
+    # the tree was built to avoid. The prototype keeps ownership; everything under a placement is a
+    # view of it.
+    placements = [p.GetPath() for p in stage.Traverse()
+                  if p.GetCustomDataByKey(BF3 + ':blueprintPartition')]
+
+    def _composed_under_placement(path):
+        for root in placements:
+            if path != root and path.HasPrefix(root):
+                return True
+
+        return False
+
     for prim in stage.Traverse():
+        if _composed_under_placement(prim.GetPath()):
+            continue
+
         raw = prim.GetCustomDataByKey(BF3 + 'Entity')
 
         if raw:
