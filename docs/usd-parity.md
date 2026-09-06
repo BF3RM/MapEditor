@@ -423,6 +423,31 @@ path entirely.
 USD measurement, but "editable end to end" requires a working writer AND a boot test. Only entity
 and reference edits, terrain heights and unedited collision meet the second bar today.
 
+## Does a level actually RENDER in Blender? (2026-09-06)
+
+Geometry, yes. Importing mp_001's stage:
+
+    objects 9,214   meshes 116   verts 1,057,970   faces 2,099,262   materials 118
+    lights 0        images 3
+
+Two things were wrong, and neither was Blender:
+
+- **0 lights** because that stage was exported without `--ebx-dir`, so no entities were authored at
+  all. Lights exist in the pipeline as UsdLux; they were simply not in that file.
+- **3 images of 636** because `_stage_texture` fell back to `resource + ".dds"` -- a path that
+  resolves to nothing -- whenever a texture was not in the dump. 117 of 118 texture inputs pointed
+  at files that do not exist, so the materials read from nothing and rendered grey while every check
+  passed. The 117 are **5 distinct resources**, all cross-level decal and road textures
+  (MP_017, SP_Earthquake, SP_Sniper) that an mp_001 mesh-texture dump was never going to include.
+
+The slot is now left UNBOUND with `bf3:textureMissing` set and a count printed, because a material
+with no texture is honest and one bound to nothing is not.
+
+**A wrong turn worth recording:** the first fix attempted was converting all 636 DDS to PNG for
+Blender -- roughly 500 MB of duplication. Blender reads DXT1/DXT5 natively; the fault was five
+absent files. Measuring which formats were actually present, and whether the paths resolved at all,
+cost minutes and made the conversion unnecessary.
+
 ## Blender loses almost everything -- do not trust its export (2026-09-06)
 
 The whole "editable in a DCC" claim rested on an assumption nobody had tested. Measured, on a
