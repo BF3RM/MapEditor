@@ -79,6 +79,9 @@ def _corpus_index(corpus):
     return index
 
 
+MISSING_TEXTURES = set()
+
+
 def _stage_texture(resource):
     """Asset path for a texture used by a prim on the STAGE itself, not in a prototype.
 
@@ -91,7 +94,14 @@ def _stage_texture(resource):
     if bf3_usd.TEXTURE_DIR and os.path.exists(os.path.join(bf3_usd.TEXTURE_DIR, flat)):
         return "./%s/%s" % (os.path.basename(bf3_usd.TEXTURE_DIR.rstrip("/")), flat)
 
-    return resource + ".dds"
+    # NOT dumped. This used to return `resource + ".dds"`, a path that resolves to nothing, so a
+    # material bound a phantom texture and the surface rendered grey with every check passing.
+    # Measured on mp_001: 117 of 118 texture inputs in the stage pointed at files that do not
+    # exist -- decal and road textures, which the mesh-texture dump never covered. Reported and
+    # left unbound, because a material with no texture is honest and one bound to nothing is not.
+    MISSING_TEXTURES.add(str(resource))
+
+    return None
 
 
 def _texture_material(stage, path, slots, label):
@@ -115,9 +125,21 @@ def _texture_material(stage, path, slots, label):
         if not resource:
             continue
 
+        asset = _stage_texture(resource)
+
+        if asset is None:
+            # The texture was never dumped. Binding it anyway gives a shader reading from nothing,
+            # which renders exactly like a shader with no texture -- so the resource name is kept in
+            # customData and the slot is left unbound rather than faked.
+            unbound = UsdShade.Shader.Define(stage, "%s/%s" % (path, slot))
+            unbound.CreateIdAttr("UsdUVTexture")
+            unbound.GetPrim().SetCustomDataByKey(BF3 + ":resource", resource)
+            unbound.GetPrim().SetCustomDataByKey(BF3 + ":textureMissing", True)
+            continue
+
         tex = UsdShade.Shader.Define(stage, "%s/%s" % (path, slot))
         tex.CreateIdAttr("UsdUVTexture")
-        tex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set(_stage_texture(resource))
+        tex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set(asset)
         tex.CreateInput("st", Sdf.ValueTypeNames.Float2).ConnectToSource(st_out)
         tex.GetPrim().SetCustomDataByKey(BF3 + ":resource", resource)
         out = tex.CreateOutput("rgb", Sdf.ValueTypeNames.Float3)
@@ -728,6 +750,10 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
                 xf.GetPrim().SetInstanceable(True)
 
             placed += 1
+
+    if MISSING_TEXTURES:
+        print("textures  %d resource(s) referenced by materials were never dumped -- "
+              "those slots are unbound, not faked" % len(MISSING_TEXTURES))
 
     if terrain:
         print("terrain      %d triangles" % _export_terrain(stage, terrain, layers))
