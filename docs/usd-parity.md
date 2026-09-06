@@ -144,6 +144,77 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## The mesh partition diff: three real differences, none of them the freeze (2026-09-06)
+
+Blueprints are cleared and the partition-level diff is done. **The diff found three genuine
+differences, all three were corrected, and the client still hangs** -- which moves the suspicion off
+the partition and onto the resource or the bundle. That is the result, and it is worth having.
+
+### Blueprints are innocent
+
+`build.cmds.frontend_B`, the 27 emitted blueprint partitions alone into the empty sub-world:
+**`enter_game: True`**, client reaches `team=1 squad=1` and the editor opens. So of the three kinds,
+textures load (bar the generated DDS), blueprints load, and only the mesh partitions freeze.
+
+### What our mesh partition and the game's actually differ in
+
+`levels/frontend/objects/calibrationsquare_Mesh`, ours against the game's, dumped with
+`dump_partition_json` on both sides:
+
+| | GAME | OURS |
+|---|---|---|
+| PartitionGuid | `3878b181-01d9-b98d-4fe0-007b36d8260a` | `1b3f4290-feeb-52a8-aa46-0328363c24be` |
+| instances | `RigidMeshAsset` + `MeshMaterial` | + a third, `MeshLodGroup` |
+| `LodGroup` -> | the SHARED `64991a4a-4c5e-11de-b1f5-fe435f0a1d8f` | its own partition |
+| shader | `levels/frontend/objects/calibrationsquareshader` | `objects/shaders/proppreset` |
+| material VectorParameters | 0 (3 on the jets and the tank) | always exactly 2 |
+| NameHash | 3701969152 | 3701969152 (same) |
+
+All three differences are systematic, not one bad partition: **27 of 27** emitted meshes bind the
+single shader `objects/shaders/proppreset` where the game binds a per-mesh one
+(`.../calibrationsquareshader`, `levels/frontend/ui_propshader`, ...), and **27 of 27** carry their
+own `MeshLodGroup` where every game mesh points at one shared lodgroup partition. Each emitted
+partition also takes a FRESH guid under a partition name BF3 already ships, so it collides by name
+while every existing reference to that mesh -- MVDB entries, the shaderdb, other partitions -- still
+points at the game's guid.
+
+The shader one looked decisive: a dedicated server never compiles or looks up a shader, so a wrong
+shader binding is invisible server-side and fatal client-side, which is exactly the shape of this
+bug.
+
+### All three corrected, one cycle each, and the client still hangs
+
+| what was corrected (cumulative) | server | CLIENT |
+|---|---|---|
+| material rebound to the GAME's own shader + its parameters, 27/27 | `static=61` | HANGS |
+| + `LodGroup` repointed at the shared lodgroup, our `MeshLodGroup` deleted, 27/27 | `static=61` | HANGS |
+| + partition and instance guids replaced with the GAME's, remapped through the 27 blueprints and the world partition (55 files) | `static=61` | HANGS |
+
+At the last row the emitted mesh partition is structurally the game's partition -- same guid, same
+primary instance, same material instance guid, same shader, same lodgroup reference -- and the
+client still never leaves `team=0`. **So it is not the fields.**
+
+### Where that points, and what to test next
+
+What is left, in order of how well it fits the evidence:
+
+1. **A mesh partition that OVERRIDES a shipped one may simply not be legal from a SUB-LEVEL
+   bundle.** Update-in-place is proven on this machine, but it was proven from a separately mounted
+   superbundle whose bundle is PREPENDED ahead of the level bundle -- a different load path from a
+   sub-level compartment (comp=6 here). The test is cheap: emit the meshes under names BF3 does NOT
+   ship (`levels/realitymod/usdlevel/<mesh>`) and repoint the blueprints, so nothing collides.
+2. **The MeshSet RESOURCE, not the partition.** `frontend_nres` showed the freeze survives removing
+   every `add_existing_resource`, but the mesh partitions still NAME resources the bundle then does
+   not carry -- which is also what the 476 "could not find a valid variant" warnings are about.
+3. **The generated DDS** (`add_dds_texture ... flat_normal`) is the other, independent cause and is
+   untouched by any of this. Worth checking whether the level needs it at all: if every material
+   that binds it can bind a normal map BF3 already ships, the resource disappears. If it is needed,
+   its DDS header and meta want comparing against a shipped normal map.
+
+Both sides of the diff, and the version with all three fixes applied, are in
+`~/Games/VeniceUnleashed/shot-instance/artifacts/partition_diff/`; the recipes are
+`build.cmds.frontend_{B,shader,lod,guid}`.
+
 ## The closure is DEAD WEIGHT, and the client freeze has two named causes (2026-09-06)
 
 ### The closure buys nothing: 49.4 MB of every 61.9 MB
@@ -203,8 +274,9 @@ build does not save it, which is how we know there are two causes and not one.
 hangs, 0 loads); the `add_existing_resource` mesh registrations; and the 10 stub `TextureAsset`
 partitions, which load fine.
 
-**Not tested:** the 27 blueprint partitions. The recipe is built (`build.cmds.frontend_B`) and never
-booted -- one cycle would settle it.
+~~**Not tested:** the 27 blueprint partitions.~~ **TESTED 2026-09-06, see the section above: they
+LOAD.** Only the mesh partitions freeze, and the field-level diff against the game's own partition
+does not explain why.
 
 ### What a stub TextureAsset looks like, since it is the shape of the pending question
 
