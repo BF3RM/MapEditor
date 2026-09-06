@@ -1944,6 +1944,15 @@ common case rather than the exception:
 | Mesh resource + chunk | 68 / 68 unedited byte-identical; 2078 / 166 regression clean |
 | Terrain heights | untouched terrain emits 0 changed nodes; 499,230 samples, deviation 0 |
 
+**THE CLIENT WRITES NO LOG, AND THAT IS WHY ALL OF THIS TOOK A DAY (2026-09-06).**
+`powos mods vu play` passes `-debuglog` and ~30 client boots produced not one non-empty
+`vu_*.log`. Every client-side conclusion in this effort was inferred from the SERVER log, a
+screenshot, and whether CDP was still answering. A missing MeshVariationDatabase, a generated normal
+map that freezes the client, and a level no player could enter all survived a full day of headless
+verification that could not, even in principle, observe any of them.
+
+Fixing the log is worth more than the next several bisect cycles, and is the current task.
+
 **THE MeshVariationDatabase WAS NEVER SHIPPED (2026-09-06).** The block that writes it was gated on
 `texture_dir and os.path.isdir(texture_dir)`, so any caller that did not create `<level>_textures/`
 emitted a level with **no MVDB at all**. `/tmp/mod_ee.sh` -- which produced every bisect variant and
