@@ -144,6 +144,62 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## With an MVDB the client stops hanging and starts REFUSING, in 15 seconds (2026-09-06)
+
+The MVDB-bearing build was tested. **It does not fix the load, and it does not leave the MVDB
+eliminated either** -- it changes the failure from an unbounded spin into a bounded, repeatable
+event, which is a much better place to debug from.
+
+`/tmp/emit_noclosure` (mp_001, 5,863 placements, closure-free, `mvdb.json` 786,681 bytes / 527
+entries) built into the host superbundle that registers teams:
+
+    superbundle           11,737,249 bytes
+    world parts resolved  23/23
+    ServerStaticModelEntity  5864  (5,863 + 1)
+    teams                 0 / 1 / 2 registered
+    CLIENT                joins at 13:23:00, LEAVES at 13:23:15, process exits
+
+Fifteen seconds, three times over, against the many minutes of nothing that every MVDB-less variant
+produced. No crash dump is written and the process exits cleanly, so this is the client deciding to
+leave, not dying.
+
+**The database's NAME is not the variable.** Run once as emitted, `dust2/meshvariationdb_win32`, and
+once renamed into the level's own namespace,
+`levels/realitymod/usdlevel/meshvariationdb_win32` (the convention the shipped
+`levels/realitymod/teamdeathmatch/meshvariationdb_win32` follows). Both disconnect at 15 s:
+13:23:00->13:23:15 renamed, 13:29:58->13:30:13 as emitted.
+
+So the tally for the MeshVariationDatabase is: **necessary but not sufficient**. It is now the third
+independent time that adding one has changed the failure mode and the only class of change that ever
+has --
+
+    no MVDB                       client spins forever, CDP dies, RSS pinned, team=0
+    MVDB added by mesh_variation_db_add_all (frontend)   disconnects after ~20 s
+    MVDB from the emitter (mp_001), either name          disconnects after 15 s
+
+-- and it is still not the whole answer.
+
+### What that leaves, and it is a shorter list than it was
+
+Everything content-side and load-path-side is eliminated by the sections above. What has never been
+varied, in the order I would try it:
+
+1. **The resource layer.** MeshSet chunks and metas. `add_existing_resource` puts the game's MeshSet
+   into our bundle by name; nothing has checked that the meta and chunk the client then reads are
+   the ones it expects. The 618 "could not find a valid variant" warnings this build produces are
+   the builder saying it could not bind that many.
+2. **The 15-second window itself.** It is bounded and repeatable, so it can be instrumented -- a
+   `Level:LoadingInfo` hook on the CLIENT realm would say how far the load got before the client
+   gave up, which no test in this effort has been able to ask.
+
+### A harness gap that cost this whole effort its diagnosis
+
+**The client writes no log.** `powos mods vu play` always passes `-debuglog`, and
+`%LOCALAPPDATA%/VeniceUnleashed/` has not gained a single non-empty `vu_*.log` in any of the ~30
+client boots today, including the ones that exit cleanly. Every client-side conclusion in this
+document was therefore inferred from the server log, a screenshot and CDP liveness. Fixing that is
+probably worth more than the next three bisect cycles.
+
 ## The load path is exonerated too, and the emit has no MVDB at all (2026-09-06)
 
 ### Putting the same content in the MAIN level bundle changes nothing
