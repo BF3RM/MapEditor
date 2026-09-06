@@ -13,6 +13,11 @@ than as an opaque blob of hex.
 MEASURED before building this: 256,459 of 256,460 references in the closure resolve to an instance
 that is also in the closure. So this is not a partial mapping with a long tail; it is essentially
 total, and the one exception is reported rather than hidden.
+
+ONE LIMIT, stated because it is invisible otherwise: a USD relationship cannot name the same target
+twice. A record that lists one reference several times keeps that multiplicity in customData, and
+the relationship shows the distinct set. Re-pointing works; changing how many times a reference
+repeats does not, and is not reported as an edit.
 """
 import json
 import os
@@ -162,7 +167,17 @@ def read(stage, dirs):
             # A field whose targets were not all in the stage authored a shorter list, and comparing
             # the two lengths reported a re-point that never happened -- measured: 9 false edits on
             # an untouched 400-partition slice.
-            was = [t for t in _refs(record.get(field)) if t in index]
+            # De-duplicated, order preserved. A USD relationship CANNOT hold the same target
+            # twice, so a record listing one reference several times -- WaveSwitcherNodeData.Waves
+            # names 7 with duplicates -- comes back shorter with an identical set. Measured: 561
+            # such fields across the closure, every one reported as a re-point that never happened.
+            # Comparing against the deduplicated list compares like with like.
+            was, seen = [], set()
+
+            for t in _refs(record.get(field)):
+                if t in index and t not in seen:
+                    seen.add(t)
+                    was.append(t)
             now = [back.get(t) for t in r.GetTargets()]
             now = [t for t in now if t]
 
