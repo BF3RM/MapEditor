@@ -5,6 +5,205 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## Animation clips are writable (2026-09-06)
+
+The last asset class that could be exported and not returned. `Header.Serialize` and
+`DofTable.Serialize` threw, so a clip could be decoded, given real bone names and edited in USD, and
+then had nowhere to go.
+
+**Two things were in the way, and only one of them was the codec.**
+
+*The format does have a less-compressed storage type, and BF3 uses it.* `AnimationAsset.CodecType`
+is a fourcc, and across all 322 antanimation banks the 8,972 clips split:
+
+    DCT   3,778     VBR  2,225     RAW  1,534     CURV  775     FRAM  660
+
+`RawAnimationAsset` is plain float keys. Its payload is
+`NumKeys x (QuatCount x 4 + Vec3Count x 4 + FloatCount)` floats with the scalar block padded to a
+multiple of 4 -- which accounts for all 1,534 exactly (1,522 fit at four floats per Vec3 with no
+padding needed; the other 12 declare `FloatCount` 93 and pad it to 96). So uncompressed float keys
+are a codec the engine already accepts.
+
+*But that alone writes nothing*, because there is no writer for the CONTAINER. An Ant bank is a
+relocatable GenericData archive whose every pointer is a file offset; emitting one from the object
+graph means re-laying-out the whole archive and its reflection table, and nothing in Rime does that.
+Switching a clip to a different codec changes its size, and changing its size means exactly that
+re-layout. So the uncompressed codec is the wrong lever on its own.
+
+**What the data supports is keeping each clip's own header and overwriting its payload where it
+already lies.** Re-encoded against its own bit widths, delta bases and quantisation multipliers, a
+DCT clip produces exactly as many bytes as it shipped with; the bank's layout, its reflection table,
+every other clip and every pointer are untouched. `RimeLib.Animation.Frostbite2_0/EA/Compression/DCT/Compressor.cs`
+is the encoder, `patch_animation_bank` does the write, and the result goes into a bundle with the
+ordinary `add_resource <partition> AssetBank <blob>` path.
+
+### The bitstream re-encodes byte for byte
+
+`check_animation_codec`, over every bank BF3 ships (one full mount, 322 banks, 71,485 Ant objects):
+
+    DCT clips             3,778 of  3,778  re-encode BYTE-IDENTICAL
+    payload bytes    38,366,576 of 38,366,576  identical
+    coefficients clamped          0
+    decode failures               0
+    header round trip     3,778 of  3,778  (Header/DofTable write -> read -> every field equal)
+    patchable             3,778 of  3,778
+    uncompressed clips    2,191 of  2,191  patchable
+
+Not byte-identical by luck: `patchable` means the recorded file offset was checked to ALREADY HOLD
+that clip's payload before anything is claimed. The first version of this passed a length check,
+wrote a correctly sized file, and corrupted the bank -- see the traps below.
+
+Three `RawAnimationAsset` clips are excluded above because they are EMPTY (`IK_NoAddon_StandPose
+Anim`, 0 floats, three times in `b_basicassetsmp`); there is nothing to patch. One bank of the 322,
+`b_sp10_sub_halo jump`, holds 9 objects and no clips at all.
+
+### The float trip is lossy, and here is how lossy
+
+Byte-identical applies to COEFFICIENTS in and coefficients out. Going all the way to floats and back
+cannot be exact, and this document should not pretend otherwise: the decoder normalises quaternions,
+so their magnitude is gone before an encoder ever sees them, and re-quantisation rounds. Measured
+over all 3,778 clips, largest disagreement per clip between `decode(x)` and
+`decode(encode(decode(x)))`, on the channels the comparison is meaningful for:
+
+    median 1.9e-4     p90 1.2e-3     p99 2.4e-3     max 2.1e-2
+
+630 clips (16.7%) exceed 1e-3 and 4 exceed 1e-2. The worst is a 3P melee animation in
+`s_basicassets`. The delta bases the encoder derives sit within 5 quantisation steps of the shipped
+ones and within 1 step for 3,405 of 3,778 clips.
+
+### An edit actually lands
+
+`patch_animation_bank`, on a real bank, with one translation channel nudged by 0.25 in a DCT clip
+and one float key nudged in a `RawAnimationAsset`:
+
+    ak74    2 clip(s) patched, 184 of 183,068 byte(s) changed, blob same length
+            reloads to 38 objects, 2/2 edits landed (max error 3.0e-8)
+            23/23 untouched clips byte-identical
+    ah-1z   2 clip(s) patched, 1,070 of 50,156 byte(s) changed, blob same length
+            reloads to 4 objects, 2/2 edits landed (max error 9.9e-5)
+            1/1 untouched clip byte-identical
+
+The untouched-clip count is the half that matters: a writer that clobbered a neighbouring array
+would produce a bank that loads perfectly and animates wrong.
+
+The USD half is `antanim.edits_from_stage` and `tools/usd/antanim_edit_test.py`: an untouched stage
+emits ZERO edit files, one nudged channel emits exactly one clip in the right partition at the right
+index, and of the 9,180 floats in it, 17 carry the edit, 9,163 are unchanged and 0 are neither.
+`RimeLib.Tests/Animation/DctCodecTest.cs` pins the codec without a game mount.
+
+### What this does NOT do
+
+- **A clip cannot gain frames or precision.** Re-encoding against the clip's own header means
+  `NumKeys` frames in, `NumKeys` frames out, and a coefficient that outgrows its shipped bit width
+  is CLAMPED, not widened. The 0.25 probe clamped 20 coefficients on one ah-1z clip and 10 on an
+  ak74 clip; the command says so rather than writing quietly. A clip needing more than it shipped
+  with would have to be rewritten as `RawAnimationAsset`, which needs the archive writer below.
+- **No Ant GenericData archive writer.** Clips can be edited in place; a clip cannot be ADDED,
+  REMOVED or re-typed, and no new bank can be created.
+- **VBR and CURV clips are still read-only** -- 3,000 of the 8,972. Only DCT re-encodes and only
+  RAW/FRAME can be overwritten as float keys.
+- **Not boot-tested.** The patched blob reloads through Rime's own reader and decodes to the edited
+  values; it has not been built into a superbundle and loaded by the game. Every claim above is a
+  byte or a value, not a frame on screen.
+
+### Two traps this cost
+
+- **Blob-relative offsets look absolute.** Each object is parsed from its own `GD.DATA` blob, which
+  is COPIED out first, so every array pointer the parser reads is relative to that copy. Recording
+  them raw put two clips' 14 KB payloads 14 bytes apart, and the patch wrote a file of exactly the
+  right length into the middle of the bank's own structure. The fix is `Blob.DataOffset` plus a
+  refusal to write unless the target bytes already ARE the clip's current payload.
+- **The blob carries its own endianness and it is not the file's.** `AssetBank.Load` reads the outer
+  file big-endian, but a `GD.DATA` blob has an endian flag and BF3's are LITTLE-endian -- while the
+  DCT sample stream inside them is read big-endian regardless. A DCT payload is a byte array and
+  does not care; the float and short arrays beside it do, and writing those the wrong way round
+  produces a clip that decodes to noise instead of failing. The byte order is now taken from the
+  blob, not assumed.
+
+Also measured on the way: BF3 pads a DCT payload past its last real bit -- 16, 24 or 32 bytes over
+the 8-byte-aligned length (1,872 / 1,852 / 54 clips). That slack is never decoded. The encoder
+matches the shipped LENGTH rather than re-deriving a padding rule from a handful of clips.
+
+## The remaining export-only writers now write, and the bytes match (2026-09-06)
+
+Seven `Serialize` methods that threw `NotImplementedException` -- the shader constants, both
+`StreamingPartitionHeader`s, the three RimeLibLite core primitives and `HavokPhysicsData` -- now
+mirror their `Deserialize` field for field. Measured against every resource BF3 ships, by reading
+the shipped bytes, writing them back, and diffing at the offset the reader consumed them from
+(`round_trip_writers`, one full mount):
+
+    STREAMINGPARTITIONHEADER   73,371 of  73,371 byte-identical   PASS
+    EXTERNALVALUECONSTANT     190,486 of 190,486 byte-identical   PASS
+    EXTERNALTEXTURECONSTANT   102,528 of 102,528 byte-identical   PASS
+    RELOCPTR                   68,558 of  68,558 byte-identical   PASS
+    RELOCARRAY                113,075 of 113,075 byte-identical   PASS
+    MATRIX44                   14,115 of  14,115 byte-identical   PASS
+    HAVOKPHYSICSDATA            7,593 of   7,593 byte-identical   PASS
+
+**How often BF3 actually uses each, because a writer for something it never ships is wasted
+effort.** Across 41,278 mounted resources and 73,371 partitions:
+
+| type | count | what it gates |
+|---|---|---|
+| `StreamingPartitionHeader` (FB2.0) | 73,371 | every EBX partition in the game |
+| `DxTexture` | 13,017 | |
+| `MeshSet` | 9,794 | 68,558 RelocPtr slots, 113,075 RelocArray slots |
+| **`HavokPhysicsData`** | **7,617** | third most common resource type in BF3 |
+| `OccluderMesh` | 705 | 14,115 Matrix44 transforms |
+| `IShaderDatabase` | 49 | 190,486 value + 102,528 texture external constants |
+| `StreamingPartitionHeader` (FB2013.2) | **0** | BF3 is Frostbite2_0; this engine is off its path |
+
+Two of the seven were mis-stated in the table below and are corrected there: both
+`StreamingPartitionHeader.Serialize(RimeWriter)` and `RelocArray.Serialize(RimeWriter)` were already
+implemented and the FB2.0 one is live in `EbxWriter` -- only the `out byte[]` overloads threw. The
+73,371 number is what the working one is worth, not a new capability.
+
+**Two fields had to be added to survive byte comparison, and both were found by it.**
+`ExternalValueConstant` skipped the two bytes between `Required` and the default `Vec4`; they are
+now read and written as `Reserved`, because a writer that assumed they were zero would have been
+assuming the thing under test. And `HavokPhysicsData` discarded its four trailing relocations --
+the file offsets of the four array pointers -- which are now kept.
+
+### HavokPhysicsData: byte-exact, but only 5.2% of the bytes are modelled
+
+    corpus       7,617 resources (366 MB)
+    parsed       7,593; 24 unparseable
+    bytes        7,593 / 7,593 byte-identical
+    content      170,686 class descriptors, 799,818 virtual fixups,
+                 14,125 part translations, 22,349 local aabbs
+    edit probe   7,593 / 7,593 moved exactly the edited bytes and nothing else
+    RESULT       PASS
+
+This is the honest split, and the second number is the point: **18,960,056 bytes are written from
+decoded fields and 348,741,728 are carried verbatim.** Everything the reader decodes is written from
+a field -- the wrapper header, all four arrays at the offsets they were read from, both packfiles'
+headers and section headers, the class-name descriptors and the virtual fixups. What is copied is
+what the reader never decodes: the `__data__` section objects and the Frostbite fixup blobs. That is
+declared on `HavokInstance.ObjectData` and `HavokInstance.FixupData` rather than left to be
+discovered. So Rime can now write collision, and an editor can move a part translation, a local
+AABB, a material index or the scale -- but the SHAPES still belong to the Python builder in
+`tools/havok/build_collision.py`, and the 81-vs-120-object frontier is untouched by this.
+
+**Byte equality alone would not have caught a copier, so it is not the only test.** An edit probe
+changes one decoded value in every resource and requires that exactly the bytes behind that field
+move: 7,593 of 7,593. Without it, a `Serialize` that returned a stashed copy of the input would
+score a perfect 7,593 and be worthless.
+
+**The bug byte equality did catch:** the virtual-fixup region rarely ends on a whole 12-byte record
+-- `DeserializeData` divides the region by the record size and drops the remainder -- and that
+remainder is `0xFF`, not zero. Writing zero there was the *only* difference in **2,887 of 7,593**
+resources: 8 leftover bytes at 0x2288 of MEHouse01Large, 4 at 0x59C of the canals bridge pillar. No
+field comparison would have seen it, since no field lives there.
+
+**Still not writable, named:** 24 resources fail to parse at all, every one a `.water.mesh` -- the
+reader throws `NotSupportedException: Big endian Havok data is not supported`. That is a pre-existing
+gap in the READER, not in the writer, and it means water collision on 12 levels is neither readable
+nor writable.
+
+Run it with `round_trip_writers <dir>` inside a mount (which also dumps the physics payloads), then
+`dotnet Utils/HavokRoundTrip/bin/Release/HavokRoundTrip.dll <dir>` offline -- a full BF3 mount is
+shared and expensive, so the Havok corpus is dumped once and iterated against the files.
+
 ## Terrain layers and scattering can now be WRITTEN back (2026-09-06)
 
 This doc has been overstating terrain since the section below. Layers and mesh scattering round
@@ -208,12 +407,14 @@ Every `Serialize` in Rime that still throws `NotImplementedException`, and what 
 | resource | consequence |
 |---|---|
 | `VisualTerrain`, `VisualTerrainLayer`, `TerrainLayerCombinationDraw`, `Surface2d/3dDrawMethod` | **terrain layers and mesh scattering cannot be written back** -- only the leaf `MeshScatteringType.Serialize` was implemented |
-| Ant DCT `Header`/`DofTable`, `PackageMeta` | animation clips are export-only |
+| ~~Ant DCT `Header`/`DofTable`~~, `PackageMeta` | **`Header`/`DofTable` now write** (2026-09-06, above); `PackageMeta` still throws, which costs nothing while banks are patched in place |
 | `MeshLayout`, `GeometryDeclarationDesc`, `OccluderMeshData` | mesh geometry is export-only |
-| `HavokPhysicsData.Serialize` | collision is written only by the Python builder, never by Rime |
-| `ExternalTextureConstant`, `ExternalValueConstant` | shader constants are export-only |
-| `StreamingPartitionHeader` (both engines) | streaming partition headers are export-only |
-| `RelocPtr`, `RelocArray`, `Matrix44` | core primitives; used by 5, 1 and 9 files, so not systemic |
+
+~~`HavokPhysicsData`, `ExternalTextureConstant`, `ExternalValueConstant`, `StreamingPartitionHeader`,
+`RelocPtr`, `RelocArray`, `Matrix44`~~ -- all seven now write, byte-verified against the whole game;
+see the section at the top of this document. Two of those rows were wrong when written: the
+`Serialize(RimeWriter)` on `StreamingPartitionHeader` and on `RelocArray` was already implemented,
+and only the `out byte[]` overload threw.
 
 Not a blocker: `EALayer3Header`/`EaLayer32Block` -- BF3 ships 100% XaSeekable1, so they are off its
 path entirely.
@@ -262,14 +463,15 @@ The honest table, because "represented" and "editable end to end" are different 
 | Re-point a reference (weapon -> projectile) | yes -- 256,459 references are USD relationships |
 | Add entries to a list (sockets, chunks) | yes -- arrays are child prims and can be appended |
 | Save field and reference edits into a working game | **yes, verified**: edit -> emit -> build -> Level:Loaded |
-| Save edited ANIMATION CURVES back | **no** -- Ant DCT `Header.Serialize`/`DofTable.Serialize` throw |
+| Save edited ANIMATION CURVES back | **yes** -- 3,778/3,778 DCT clips re-encode byte-identical and an edit patches in place; not boot-tested, and a clip cannot gain frames |
 | Save edited MESH GEOMETRY back | **yes** -- an edited mesh ships, an unedited one is still referenced |
 | Move things in BLENDER and save back | yes, **via `dcc_merge`** -- never by trusting Blender's own export |
 | Save edited textures | yes, but that texture then ships as a copy |
 | Save edited collision | rebuilds, but not byte-identical to BF3's bake |
 | Save edited terrain LAYERS and SCATTERING back | **yes** -- unedited rebuilds are byte-identical on all 33 resources; an edited density changes exactly its 4 bytes |
 
-So data is editable end to end and is most of a weapon. Animation curves are still export-only.
+So data is editable end to end and is most of a weapon. Animation curves now write too, in place
+and within the header a clip shipped with.
 Mesh geometry is not: the writer is `tools/usd/meshset.py`, in Python, and Rime is not in that path
 at all -- checked, and every `Serialize` on `RimeLib.Mesh`'s MeshSet types writes a fixed-size
 header echoing the pointers it read, `RelocPtr<T>.Serialize` throws, and nothing emits a relocation
@@ -750,6 +952,10 @@ from nearly true into true.
    but not byte-identical to what BF3 would bake. Reproducing the packfile exactly (object order,
    padding, fixups, and the object types we do not model) is the remaining work.
 
+4b. ~~**Ant clips cannot be written back.**~~ **DONE 2026-09-06** (section at the top): every DCT
+   clip re-encodes byte-identical and an edited one patches into the bank in place. What is NOT
+   done is an Ant GenericData archive writer, so a clip cannot be added, removed or re-typed, and
+   VBR/CURV (3,000 of 8,972 clips) stay read-only.
 5. ~~**Ant clips carry indexed joints** (`dof037`).~~ **DONE 2026-09-06** for 6,428 of BF3's
    8,972 clips (measured above). The remaining 2,541 keep indexed names because their channel map is
    read the same way by several unrelated DOF sets, and this refuses to pick one.
@@ -783,3 +989,11 @@ from nearly true into true.
 - A crashed build leaves the PREVIOUS level's `.sb`; booting then measures that. Assert the
   superbundle was rebuilt.
 - Scope process checks to your own PID, and assert `ModList.txt` every run.
+- **`pgrep -f RimeREPL.dll` matches the WAITING SHELL of every other agent doing the same check**,
+  because their command line contains the string. Three sessions sat waiting on each other with no
+  REPL running at all. Match on the process instead:
+  `ps -eo pid,comm,args | awk '$2=="dotnet" && /RimeREPL\.dll/'`.
+- **Building one project restages its dependencies and leaves the runtime-loaded plugins stale.**
+  `dotnet test` rebuilt `RimeLib.Terrain` and the mount then died with
+  "Method 'WriteVisualTerrain' ... does not have an implementation" -- the interface moved, the
+  `Frostbite2_0` assembly that implements it did not. Rebuild every `*.Frostbite2_0` before a mount.

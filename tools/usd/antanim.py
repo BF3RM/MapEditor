@@ -21,10 +21,18 @@ drops that float, so it rides alongside in `bf3:dofW` and the trip back is exact
 """
 import json
 import os
+import struct
 
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdSkel, Vt
 
 BF3 = 'bf3'
+
+
+def _f32(x):
+    # USD stores rotations and translations as float32; a bank dump is JSON, so its numbers arrive
+    # as doubles. Comparing the two without this rounds every clip "changed" and an untouched
+    # stage would rewrite the whole game's animation.
+    return struct.unpack('<f', struct.pack('<f', float(x)))[0]
 
 
 def _quat(v):
@@ -222,5 +230,90 @@ def read(stage_path):
         meta['joints'] = [str(j) for j in (anim.GetJointsAttr().Get() or [])]
         meta['named'] = json.loads(prim.GetCustomDataByKey(BF3 + 'DofNamed') or 'false')
         out.append(meta)
+
+    return out
+
+
+def edits_from_stage(stage_path, banks, out_dir, tolerance=0.0):
+    """Edited clips out of a USD stage, in the shape `patch_animation_bank` consumes.
+
+    -> {partition: path written}. Only clips that ACTUALLY CHANGED are emitted, on the same rule
+    terrain and the closure follow: an untouched stage produces no edit files at all, so a bank
+    nobody touched keeps referencing the game's own resource instead of shipping a rewritten copy
+    that happens to be equal.
+
+    `banks` is {partition: bank dump}, the same dumps `author` was given -- the comparison is
+    against the values the clip decoded to, not against a re-decode, so a difference here is an
+    edit and nothing else.
+
+    A DCT clip is re-encoded against its OWN bit-allocation table, which is why the frame count
+    cannot change: `numKeys` frames go in and `numKeys` frames come out. A clip needing more keys
+    than it shipped with has to be written as an uncompressed RawAnimationAsset, which this does
+    not do -- see docs/usd-parity.md.
+    """
+    out = {}
+    by_partition = {}
+
+    for clip in read(stage_path):
+        part = clip.get('partition')
+        index = clip.get('index')
+        bank = banks.get(part)
+
+        if bank is None or index is None:
+            continue
+
+        src = None
+
+        for obj in (bank.get('objects') or ()):
+            if obj.get('index') == index:
+                src = obj
+                break
+
+        if src is None or not src.get('sample'):
+            continue
+
+        before = src['sample']
+        after = clip.get('sample') or []
+
+        # A frame count that moved is not an edit this codec can express, and silently truncating
+        # would ship a clip that plays the wrong length.
+        if len(after) != len(before):
+            raise ValueError('%s clip %d: %d frame(s) authored, %d in the bank -- re-encoding '
+                             'against the clip\'s own header cannot change its length'
+                             % (part, index, len(after), len(before)))
+
+        changed = False
+
+        for fa, fb in zip(before, after):
+            for va, vb in zip(fa['values'], fb['values']):
+                for i in range(4):
+                    if abs(_f32(va[i]) - _f32(vb[i])) > tolerance:
+                        changed = True
+                        break
+
+                if changed:
+                    break
+
+            if changed:
+                break
+
+        if not changed:
+            continue
+
+        by_partition.setdefault(part, []).append({
+            'index': index,
+            'frames': [[[float(x) for x in v] for v in f['values']] for f in after],
+        })
+
+    if not os.path.isdir(out_dir):
+        os.makedirs(out_dir)
+
+    for part, clips in by_partition.items():
+        path = os.path.join(out_dir, part.replace('/', '_') + '.edits.json')
+
+        with open(path, 'w') as fp:
+            json.dump({'partition': part, 'clips': clips}, fp)
+
+        out[part] = path
 
     return out
