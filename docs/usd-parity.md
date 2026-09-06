@@ -255,6 +255,21 @@ matches its shader name is a level drawing the wrong ground.
 
 ## An edited mesh now ships; an unedited one is still referenced (2026-09-06)
 
+**Confirmed against the live mounter (2026-09-06, run after the fact).** The build and compares the
+agent had to skip for machine contention were run:
+
+    build             Bundle successfully built and added to superbundle
+                      closure +8 partition(s), +5 resource(s), +6 chunk(s)
+    compare unedited  IDENTICAL  (1032 bytes, metaIdentical=True)
+    compare edited    IDENTICAL  (1032 bytes, metaIdentical=True)
+
+Both identical is not a failure -- it is the bug, reproduced against the game's own reader. A
+MeshSet does not hold the geometry, so a UV edit changes only the CHUNK and `compare_resource` on
+the resource cannot see it. That is exactly why comparing the resource referenced the mesh and lost
+the edit, and why the fix hashes the chunk.
+
+Still not done: no BOOT. The bundle builds; a level has not been loaded with an edited mesh in it.
+
     corpus       68 mesh(es) with every LOD chunk present
     unedited     68/68 resource byte-identical to the game
     unedited     68/68 chunk byte-identical to the game
