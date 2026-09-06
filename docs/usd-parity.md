@@ -144,11 +144,136 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## The zero-teams defect is FIXED: an exported level now registers teams (2026-09-06)
+
+**An exported level, built by this toolchain, now boots with a working game mode.** `mp_001`,
+6,199 placements, in the isolated shot instance:
+
+    LoadBundles comp=4  Levels/REALITYMOD/teamdeathmatch
+    LoadBundles comp=5  Levels/REALITYMOD/tdm2
+    LoadBundles comp=6  levels/realitymod/usdlevel
+    Registering team 0 with 0 player slots and 4 squad slots.
+    Registering team 1 with 16 player slots and 4 squad slots.
+    Registering team 2 with 16 player slots and 4 squad slots.
+    Level:Loaded name=Levels/REALITYMOD/REALITYMOD mode=TeamDeathMatch0
+    CONTENT_TOTAL parts=25 instances=25 absent=40
+    ENTITY static=6200 group=0 light=0 spatial=0
+
+Same for `frontend` (61/60). The generator is `tools/usd/build_host_superbundle.py`.
+
+**A player still cannot DEPLOY, for a different reason, isolated below.** Teams register; the
+client is what fails now.
+
+### Where the team entities actually come from
+
+`Blank_Level_Test`'s own `mod.json` (v0.0.110) says it, and the dumps confirm it: the game mode is
+**mp_subway's TDM sub-level, renamed `levels/mp_subway/*` -> `levels/realitymod/*`** with the static
+art stripped. Read out of the shipped `.sb` with `mount_standalone_sb` + `dump_partition_json`
+(Rime's `mount_standalone_sb` lives in the mounted-GAME context, after `select_game`, and wants the
+`.sb` FILE, not its directory -- both cost a run to find out):
+
+| partition | instances | what it holds |
+|---|---|---|
+| `levels/realitymod/teamdeathmatch` | 6 | `SubWorldData` + 3 `WorldPartReferenceObjectData` |
+| `.../layer0_teamdeathmatch_logic` | 105 | **102 `AlternateSpawnEntityData`** + the `full_teamdeathmatch` LevelSetup ref |
+| `.../layer1_teamdeathmatch_spawners` | 2 | `UICombatAreaEntityData` |
+| `.../layer3_teamdeathmatch_friendzones` | 9 | 7 `VolumeVectorShapeData` + `PathfindingBuildOrderData` |
+| `levels/realitymod/tdm2` | 3 | `SubWorldData` |
+
+**Authoring those five as JSON is NOT enough.** A build that adds exactly them with
+`add_json_partition` produces a 360,288-byte superbundle, loads both bundles at comp=4/5 -- and the
+server **exits at `LoadingInfo: Creating physics manager`**, before `Spawning level`. The shipped
+`teamdeathmatch` bundle carries **6,323 partitions**, not 5: the other 6,318 are the LevelSetup's
+closure (2,768 `weapons/`, 1,003 `sound/`, 764 `characters/`, 694 `persistence/` ...), and they are
+in a 5.9 MB file only because they are CAS refs. `reference_existing_partition` pulls that closure
+but EMBEDS it: **2,278,182,240 bytes**.
+
+### The recipe that works: clone the shipped superbundle, override one partition
+
+    build_sb Win32/Levels/REALITYMOD/REALITYMOD Frostbite2_0 <sb dir> true   <-- the CAS flag
+    clone_sb_chunks Win32/Levels/REALITYMOD/REALITYMOD
+    build_bundle <b> ; clone_bundle <b> ; build       for each of the SHIPPED 8 bundles
+      (on the main bundle only, add_json_partition the patched LevelData after clone_bundle)
+    <the emitted level's own bundle> ; build
+    build
+
+`clone_bundle` + the CAS flag reproduce the shipped superbundle to **5,950,017 bytes against
+5,933,667**, with the original bundle-name casing, and it boots with teams. Without the CAS flag the
+same clone is **782,062,080 bytes**. With `mp_001`'s content on top it is 61,924,317 bytes.
+
+**The LevelData to patch is `ext/Shared/TestJson1_nowater.json`, not `TestJson1.json`.** Dumped out
+of the shipped `.sb`, `levels/realitymod/realitymod` matches nowater on all 11 instances -- the only
+differences are three engine-assigned bookkeeping ints per object (`IndexInBlueprint`,
+`IsEventConnectionTarget`, `IsPropertyConnectionTarget`). It is the one that wires both
+`SubWorldReferenceObjectData` with a `SubWorldInclusionSetting` on the shared GameMode criterion
+`8553f314-...:8b89e816-...`, `EnabledOptions ["TeamDeathMatch0", "TeamDeathMatchC0"]`. `TestJson1.json`
+-- which every emitted level has been built from -- is three revisions older, references a
+`levels/realitymod/water` partition the recipe never builds, and names no sub-level at all. **That
+single stale file is the whole zero-teams defect.**
+
+Our own sub-level is appended as a fourth `SubWorldReferenceObjectData` with `InclusionSettings:
+null` (ungated, so it loads under any mode) and `BundleName: levels/realitymod/usdlevel`.
+
+### What is broken NOW: the CLIENT cannot load a level containing the emitted bundle
+
+This is a different defect from the one above and the control is clean. Same client, same host
+level, same MapEditor build, same machine, back to back:
+
+    SHIPPED superbundle, no usdlevel bundle    joins, team=1 squad=1, level completes,
+                                               enter_game True, webui://mapeditor target exists
+    + emitted usdlevel bundle (60 placements)  joins, team=0 forever, black loading screen,
+                                               CDP endpoint stops answering, ~2 cores spinning
+                                               with RSS pinned to the kilobyte
+    + emitted usdlevel bundle (6,199)          identical, 13 min, RSS 1.12 GB creeping 12 kB/20 s
+
+So it is not content volume (60 placements fails), not the game mode (teams now register), and not
+the client's ability to load this host level (the control loads it and opens the editor).
+
+Adding a `MeshVariationDatabase` for the sub-level bundle --
+`mesh_variation_db_add_all levels/frontend/frontend/meshvariationdb_win32
+levels/realitymod/usdlevel/meshvariationdb_win32 1 false ""`, which registered 30 meshes and skipped
+974 as base-universal -- **changes the failure but does not fix it**: the client now disconnects
+after ~20 s and exits instead of hanging forever. Reproduced twice.
+
+**The lead for the next attempt is in Rime's own help text** for that command: *"Re-registering a
+mesh the level already provides freezes the client."* Every emitted level bundle re-registers its
+meshes with `add_existing_resource`, and the client freeze is exactly the symptom described. The
+`exclude_bundles` argument (with its `keepbase` token) exists for this. Nothing has tested whether
+the emitted bundle's `add_existing_resource` set overlaps what the base game already provides -- that
+census is the next measurement, and it is offline.
+
+### Harness: the deploy-screen tint is FIXED, the editor panels are not
+
+`HudToggle:HideAll()` fires `ExitUIGraph` on **every** `ClientUIGraphEntity`, not just the HUD graph
+`133D3825-...`, and the vanilla deploy screen's blue tint and blur come off the render. Verified by
+image: `~/Pictures/vu-level-shots/control_realitymod_editor_clean_viewport.png` has a clean viewport
+where every earlier shot carried "SQUAD / CUSTOMIZE / DEPLOY POINTS / US" burned across it. It is
+called only when `ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER` is set, because this file's own header is
+right that touching the game-menu graph can cost freecam input on the normal deployed path.
+
+The Gameface editor panels still cannot be hidden: `visibility:hidden` and `opacity:0` on
+`document.documentElement` both report success over CDP and change nothing on screen. Roughly a
+third of the frame is still editor UI; only the centre "Viewport" region is game.
+
+### Reproducing
+
+    tools/usd/build_host_superbundle.py --level mp_001 \
+        --shipped-sb <mod>/sb/Win32/Levels/REALITYMOD/REALITYMOD.sb.bak_v0104 > /tmp/b.cmds
+    RimeREPL /tmp/b.cmds
+
+Dumps of the five game-mode partitions, the patched LevelData and the recipes are kept in
+`~/Games/VeniceUnleashed/shot-instance/artifacts/`. The shot instance holds its own copy of
+`Blank_Level_Test` and `MapEditor`; the shared instance and `iso-instance` were not touched.
+
 ## NO exported level has ever been RENDERED, and the reason is measured (2026-09-06)
 
 **There is still no picture of an exported level, and this section is why.** The attempt below got
 a VU client onto the box, into the MapEditor freecam, and flying -- on a STOCK level. Pointed at an
 exported level it never leaves a black loading screen, and the cause is not the emitter.
+
+**PARTLY SUPERSEDED by the section above (2026-09-06):** the zero-teams defect diagnosed here is
+FIXED and an exported level now registers teams. The client still does not finish loading one, for a
+separate reason isolated there.
 
     exported mp_001   client joins, level never finishes loading, 15+ min, CDP dead   NO IMAGE
     exported frontend client joins, same, and frontend is 27 meshes / 60 placements   NO IMAGE

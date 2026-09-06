@@ -317,6 +317,13 @@ function UIManager:EnableFreeCam()
 
 	-- Hide the vanilla BF3 HUD (minimap/tickets/ammo/etc) while in the editor.
 	pcall(function() m_HudToggle:Hide() end)
+
+	-- Screenshot mode only: with no soldier the vanilla DEPLOY graph is still up and tints the
+	-- whole render. Nothing else can reach it, so drop every UIGraph. Gated, because on the normal
+	-- deployed path the HUD graph alone is what should go.
+	if ME_CONFIG.DEV_FREECAM_WITHOUT_SOLDIER then
+		pcall(function() m_HudToggle:HideAll() end)
+	end
 	-- Enable the native DebugRenderer viewport overlay (object boxes).
 	pcall(function() m_NativeViewport:SetActive(true) end)
 
