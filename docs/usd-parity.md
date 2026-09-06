@@ -137,6 +137,123 @@ Also measured on the way: BF3 pads a DCT payload past its last real bit -- 16, 2
 the 8-byte-aligned length (1,872 / 1,852 / 54 clips). That slack is never decoded. The encoder
 matches the shipped LENGTH rather than re-deriving a padding rule from a handful of clips.
 
+## Collision geometry: the placements, not just the shapes (2026-09-06)
+
+    corpus       7,617 HavokPhysicsData resources (the whole game)
+    parsed       7,617; 0 unparseable   (was 7,593 parsed, 24 rejected)
+    bytes        7,617 / 7,617 byte-identical
+    edit probe   7,617 / 7,617 moved exactly the edited bytes and nothing else
+    shapes       68,436 placements, of which 21,495 carry a rotation
+                 55,628 box, 11,053 convex, 1,523 cylinder, 92 mesh, 82 capsule, 58 sphere
+    meshes       14,017 vertices, 16,306 triangles from storage subparts
+    wrappers     55,509 of 155,290 reached; 27,497 of 27,497 where nothing is undecodable
+    rotations    0 of 68,436 with a non-unit determinant (worst |det - 1| = 8.3e-7)
+    RESULT       PASS
+
+Three things were wrong here and all three were invisible: the reader rejected 24 resources for a
+reason that was not true, dropped two thirds of every placement in the ones it accepted, and had a
+pointer-table bug that emptied the graph in 3,335 of them.
+
+### The 24 `.water.mesh` resources were never big endian
+
+`HavokPhysicsData` threw `NotSupportedException: Big endian Havok data is not supported` on 24
+resources, and the diagnosis was wrong. **BF3 ships two shapes of this header** -- 7,593 resources
+carry four `(count, offset)` array slots and 24 carry five -- and the five-slot ones are exactly the
+24. A four-slot reader computes a packfile offset 16 bytes short, lands on the tail of
+`MaterialFlagsAndIndices`, reads that as an `hkPackfileHeader`, and finds a zero where the
+layout-rule byte lives. Zero means big endian.
+
+The resource names its own shape and nothing has to be sniffed: **the first array's offset IS the
+end of the header** -- 0x40 for four slots, 0x50 for five -- and the count of trailing relocations
+matches, four against five. The fifth array declares ZERO elements in all 24, so its element type is
+unobservable; it is carried as a count and an offset, which is enough to write the header back
+exactly, and `Deserialize` throws rather than guess if one ever ships non-empty.
+
+All 24 now parse and round-trip byte-identically, and the edit probe covers them.
+
+**What they contain, measured:** each is the same six objects -- `hkRootLevelContainer`,
+`HavokPhysicsContainer`, `hkpMoppBvTreeShape`, `hkpMoppCode`, `hkpStorageExtendedMeshShape` and its
+subpart storage. That is a MOPP-accelerated triangle mesh, so the reader now decodes one:
+**7,548 vertices and 6,941 triangles across the 24**, from 4 vertices / 2 triangles on `mp_017` to
+1,596 / 1,546 on `sp_valley`. Water reads as water: `mp_011` is 26 vertices dead flat at
+y = -8.32 over 320 x 43 units, `sp_valley` is a river varying in height across 5.8 x 5.6 km.
+
+Nothing about the index width is assumed. An `hkArray` payload is inline and the next one begins
+where it ends, so the array's FOOTPRINT is known, and the element size is the one of 4, 2 or 1 that
+the footprint fits with only 16-byte alignment left over; it is then required that every index
+addresses a vertex that exists. A wrong width is rejected rather than turned into confident
+garbage. **All 92 subpart storages BF3 ships decode, 0 rejected** -- 61 with 8-bit indices, 7 with
+16-bit, 24 with 32-bit, which is why guessing one width would have failed.
+
+### Two thirds of every placement was being dropped
+
+`GetShapes` swept the virtual fixups for shape classes and used `hkpConvexTranslateShape` for
+position. Corpus-wide that is the wrong wrapper two times in five: BF3 places shapes through
+**102,842 `hkpConvexTranslateShape` and 52,448 `hkpConvexTransformShape`**, and only the second
+carries a rotation. Nothing decoded `hkpConvexTransformShape` at all.
+
+Measured against the old code on the same corpus:
+
+    OLD   176,340 shapes returned, 127,927 of them (72.5%) at the ORIGIN, none with a rotation
+    NEW    68,436 placements, every one positioned, 21,495 with a rotation
+
+The new number is SMALLER and that is the point. The old sweep returned every box and hull object in
+the file whether anything placed it or not, gave most of them no position, and collapsed instancing:
+BigRadioTower places **26 distinct boxes 69 times**, and the sweep reported 26. The walk reports the
+89 shapes the game actually puts in the world -- 69 box placements, 11 cylinders, 9 hulls, 67 of
+them rotated -- spanning y = 0 to 282.7 rather than the 0 to 33 the two readable wrappers implied.
+
+`hkpCylinderShape`, `hkpSphereShape` and `hkpCapsuleShape` are read too (1,523 + 58 + 82). The walk
+takes the graph from the FIXUP TABLE -- a pointer slot inside object A resolving to object B is an
+edge -- rather than decoding each class's array counts, so a list with a disabled or null child is
+walked correctly without the reader knowing what "disabled" looks like.
+
+**The bug that made it worse, and would have hidden the fix.** `SetOffsets` read the two fixup
+regions back to back, resuming the second loop wherever the first stopped. The first region is
+terminated by `-1` with padding after it in **3,335 of the 7,617 resources**, so the second loop
+read that `-1` and stopped immediately -- leaving `ObjectOffsets` EMPTY. That dictionary is every
+pointer the shape graph is made of, and **1,238,946 object pointers were being lost**, silently,
+because an empty table reads exactly like a resource with no children. Both regions are now located
+from the section header.
+
+**Two guards, because a shape count with nothing to compare it against proves nothing.** The flat
+virtual-fixup census names every wrapper object; the traversal reaches them by a completely
+different route; they must agree. They do: **27,497 of 27,497** in the 3,081 resources with no
+undecodable class. And a Havok placement is rigid, so its rotation determinant is 1 -- columns read
+at the wrong offset still produce confident-looking geometry: **0 of 68,436 off by more than 1e-3**,
+worst 8.3e-7.
+
+### What is still not read, named
+
+**99,781 of the 155,290 placement wrappers are held only by `hkpExtendedMeshShape`** and are not
+reached. That is deliberate, not an oversight: its subparts hold **819,307 pointer slots** onto a
+few hundred shared wrappers, so walking it would emit the same shape thousands of times. The classes
+the walk reaches and refuses are `hkpCompressedMeshShape` (8,872), `hkpExtendedMeshShape` (324) and
+`hkpConstraintInstance` (5) -- the first two are Havok SDK bakes with 24.9 MB and 22.9 MB of object
+data behind them.
+
+And the REBUILD is untouched by all of this. `tools/havok/build_collision.py` still emits boxes and
+hulls behind `hkpConvexTranslateShape`, so an edited BigRadioTower is 81 objects against the game's
+120. The 39 are now itemised rather than a mystery:
+
+| missing from the rebuild | count |
+|---|---|
+| `hkpConvexTransformShape` (rotated placement) where the builder writes a translate | +34 net |
+| `hkpCylinderShape` | +11 |
+| `hkpListShape` + `hkpMoppBvTreeShape` + `hkpMoppCode` | +3 |
+| `hkpConvexVerticesConnectivity` the builder emits and BF3 does not | -9 |
+
+Corpus-wide the builder's classes cover 299,746 of BF3's 400,053 packfile objects (74.9%); the
+44.3 MB of `hkpMoppCode` and 24.9 MB of `hkpCompressedMeshShape` are SDK output and are not
+reproducible without it. So a rebuild remains a correct resource rather than BF3's bytes, and an
+UNEDITED resource still hands back the game's own bytes -- which is the path that matters.
+
+USD authoring follows the reader as far as it honestly can: `tools/usd/collision.py` now writes the
+rotation as an orient op, gives cylinders, spheres and capsules real `UsdGeom` prims instead of the
+empty mesh the convex branch would have made of them, builds faces for a triangle mesh from its
+index list, and folds rotation, the cylinder axis and the triangle list into the edit digest -- a
+field the digest ignores is a field an edit can change without the trip noticing.
+
 ## The remaining export-only writers now write, and the bytes match (2026-09-06)
 
 Seven `Serialize` methods that threw `NotImplementedException` -- the shader constants, both
@@ -180,7 +297,7 @@ the file offsets of the four array pointers -- which are now kept.
 ### HavokPhysicsData: byte-exact, but only 5.2% of the bytes are modelled
 
     corpus       7,617 resources (366 MB)
-    parsed       7,593; 24 unparseable
+    parsed       7,593; 24 unparseable          (SUPERSEDED: all 7,617 parse -- section above)
     bytes        7,593 / 7,593 byte-identical
     content      170,686 class descriptors, 799,818 virtual fixups,
                  14,125 part translations, 22,349 local aabbs
@@ -209,9 +326,10 @@ resources: 8 leftover bytes at 0x2288 of MEHouse01Large, 4 at 0x59C of the canal
 field comparison would have seen it, since no field lives there.
 
 **Still not writable, named:** 24 resources fail to parse at all, every one a `.water.mesh` -- the
-reader throws `NotSupportedException: Big endian Havok data is not supported`. That is a pre-existing
-gap in the READER, not in the writer, and it means water collision on 12 levels is neither readable
-nor writable.
+reader throws `NotSupportedException: Big endian Havok data is not supported`. **FIXED
+2026-09-06** (section above): the diagnosis was wrong, they carry a five-slot header, and all 7,617
+now parse and round trip byte-identically. Still not writable, because the triangle mesh behind them
+needs a MOPP that only the Havok SDK bakes.
 
 Run it with `round_trip_writers <dir>` inside a mount (which also dumps the physics payloads), then
 `dotnet Utils/HavokRoundTrip/bin/Release/HavokRoundTrip.dll <dir>` offline -- a full BF3 mount is
@@ -620,7 +738,7 @@ common case rather than the exception:
 | StreamingPartitionHeader | 73,371 / 73,371 -- every EBX partition in BF3 |
 | ExternalValue / TextureConstant | 190,486 and 102,528, all identical |
 | RelocPtr / RelocArray / Matrix44 | 68,558 / 113,075 / 14,115, all identical |
-| HavokPhysicsData | 7,593 / 7,593 (5.2% written from fields, the rest carried verbatim) |
+| HavokPhysicsData | 7,617 / 7,617 (5.2% written from fields, the rest carried verbatim) |
 | Mesh resource + chunk | 68 / 68 unedited byte-identical; 2078 / 166 regression clean |
 | Terrain heights | untouched terrain emits 0 changed nodes; 499,230 samples, deviation 0 |
 
@@ -631,10 +749,12 @@ common case rather than the exception:
    of it working in the engine does not.
 2. **3,000 of 8,972 animation clips stay read-only** (VBR and CURV), and no clip can be added,
    removed or re-typed: there is no Ant GenericData archive writer.
-3. **Havok shape geometry** -- the rebuild emits 81 objects against the game's 120. Editing part
-   translations, AABBs and material indices works; editing the shapes themselves does not.
-4. **24 `.water.mesh` resources do not parse at all** -- `Big endian Havok data is not supported`.
-   A pre-existing READER gap, so water collision on 12 levels is neither readable nor writable.
+3. **Havok shape geometry** -- the rebuild still emits 81 objects against the game's 120, now
+   itemised (section above): rotated placements, cylinders and the MOPP list. READING is fixed --
+   68,436 placements with their rotations, against 176,340 shapes of which 72.5% sat at the origin.
+4. ~~**24 `.water.mesh` resources do not parse at all.**~~ **DONE 2026-09-06**: not big endian, a
+   five-slot header. All 7,617 resources parse and round trip, and the water meshes decode to
+   7,548 vertices / 6,941 triangles. Not writable: rebuilding a triangle mesh needs its MOPP.
 5. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader,
    so looking at it blended needs a custom one.
 6. **Shared object blueprints are not descended into** -- 403,352 instances (72%) stay filed by
@@ -848,6 +968,11 @@ passed its options POSITIONALLY into a signature they no longer matched, so `--e
     BigRadioTower     35 shapes (26 box, 9 convex)   537 values   0 changed
     MEHouse01Large    39 shapes (38 box, 1 convex)   265 values   0 changed
 
+**SUPERSEDED 2026-09-06** (section at the top). Those 35 were the distinct box and hull OBJECTS, not
+the placements: BigRadioTower actually places 89 shapes -- 26 boxes instanced 69 times, 11 cylinders
+and 9 hulls -- and 67 of them are rotated by an `hkpConvexTransformShape` nothing decoded. The tower
+spans y = 0 to 282.7, not 0 to 33; the 0-33 below was two readable wrappers out of 69.
+
 The tower's boxes reach 27 m half-extent over centres spanning 0-33 m; the house tops out at 7.65 m
 and 4.5 m. A tower reading as a tower is the check that these are geometry rather than plausible
 noise.
@@ -1051,7 +1176,8 @@ from nearly true into true.
    at, which needs the object-blueprint EBX (`objects/`, `props/`) dumped; the corpus here holds
    only `levels/`.
 3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
-4. **Havok: byte-perfect UNEDITED; an edited shape rebuilds and is not BF3's bake.** Rime reads the
+4. **Havok: byte-perfect UNEDITED; an edited shape rebuilds and is not BF3's bake.** (Reading is
+   substantially fixed since -- section at the top of this file; the rebuild gap below still holds.) Rime reads the
    shapes, planes and Frostbite wrapper, and an untouched resource now hands back the game's own
    bytes -- MEHouse01Large 21,304 and BigRadioTower 47,272, **identical**, with a guard proving a
    moved shape refuses preservation and forces a rebuild. What is NOT solved is the rebuild itself:

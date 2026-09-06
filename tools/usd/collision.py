@@ -25,8 +25,32 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 SCOPE = 'Collision'
 
 
-def _xform(prim, centre):
-    UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(*[float(c) for c in centre]))
+def _xform(prim, centre, rotation=None):
+    """Translate, then rotate, in that order -- and only if there IS a rotation.
+
+    Rime reads placements out of hkpConvexTransformShape now, and 21,495 of BF3's 68,436 placements
+    carry one. Dropping it would put a rotated girder back axis-aligned, which looks like geometry
+    and is not.
+    """
+    x = UsdGeom.Xformable(prim)
+    x.AddTranslateOp().Set(Gf.Vec3d(*[float(c) for c in centre]))
+
+    if not rotation:
+        return
+
+    # Havok gives three COLUMNS; USD's Matrix4d is row-major with the translation in row 3, so the
+    # columns become rows here. Getting this backwards mirrors the shape instead of rotating it.
+    c0, c1, c2 = [[float(v) for v in col] for col in rotation]
+
+    if (c0, c1, c2) == ([1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]):
+        return
+
+    m = Gf.Matrix4d(c0[0], c1[0], c2[0], 0.0,
+                    c0[1], c1[1], c2[1], 0.0,
+                    c0[2], c1[2], c2[2], 0.0,
+                    0.0, 0.0, 0.0, 1.0)
+
+    x.AddOrientOp().Set(Gf.Quatf(Gf.Rotation(m.ExtractRotation()).GetQuat()))
 
 
 def author(stage, root, shapes, original=None):
@@ -53,14 +77,45 @@ def author(stage, root, shapes, original=None):
     for i, sh in enumerate(shapes or ()):
         path = scope.GetPath().AppendChild('shape%04d' % i)
 
-        if sh.get('kind') == 'box':
+        kind = sh.get('kind')
+
+        if kind in ('cylinder', 'capsule', 'sphere'):
+            # READ but not yet built: tools/havok/build_collision.py writes boxes and hulls only, so
+            # these are authored as real prims to be seen and moved, and a resource holding one is
+            # preserved rather than rebuilt. Authoring them as an empty mesh -- which is what the
+            # convex branch below would have done -- would have looked like success and shown
+            # nothing.
+            if kind == 'sphere':
+                gprim = UsdGeom.Sphere.Define(stage, path)
+                gprim.CreateRadiusAttr(float(sh.get('radius', 0.0)))
+            else:
+                a = [float(c) for c in sh.get('vertexA', (0.0, 0.0, 0.0))]
+                b = [float(c) for c in sh.get('vertexB', (0.0, 0.0, 0.0))]
+                axis = [b[i] - a[i] for i in range(3)]
+                length = sum(c * c for c in axis) ** 0.5
+                radius = float(sh.get('cylinderRadius') or sh.get('radius') or 0.0)
+
+                gprim = (UsdGeom.Cylinder if kind == 'cylinder' else UsdGeom.Capsule).Define(stage, path)
+                gprim.CreateRadiusAttr(radius)
+                gprim.CreateHeightAttr(length)
+
+            prim = gprim.GetPrim()
+            prim.CreateAttribute('bf3ShapeKind', Sdf.ValueTypeNames.String).Set(kind)
+
+            for name, key in (('bf3VertexA', 'vertexA'), ('bf3VertexB', 'vertexB')):
+                if sh.get(key):
+                    prim.CreateAttribute(name, Sdf.ValueTypeNames.Float3).Set(
+                        Gf.Vec3f(*[float(c) for c in sh[key]]))
+
+            _xform(prim, sh.get('centre', (0.0, 0.0, 0.0)), sh.get('rotation'))
+        elif kind == 'box':
             cube = UsdGeom.Cube.Define(stage, path)
             cube.CreateSizeAttr(2.0)
             half = [float(h) for h in sh.get('half', (0.5, 0.5, 0.5))]
             prim = cube.GetPrim()
             # Translate BEFORE scale. The other order multiplies the translation by the scale --
             # measured: centre (1,2,3) with half (0.5,1,1.5) came back as (0.5,2,4.5).
-            _xform(prim, sh.get('centre', (0.0, 0.0, 0.0)))
+            _xform(prim, sh.get('centre', (0.0, 0.0, 0.0)), sh.get('rotation'))
             UsdGeom.Xformable(cube).AddScaleOp().Set(Gf.Vec3f(*half))
         else:
             mesh = UsdGeom.Mesh.Define(stage, path)
@@ -77,6 +132,13 @@ def author(stage, root, shapes, original=None):
                 counts.append(len(face))
                 idx.extend(int(i) for i in face)
 
+            # A triangle mesh read out of an hkpStorageExtendedMeshShape -- every .water.mesh
+            # resource is one -- already has its faces, as triples.
+            if not counts and sh.get('indices'):
+                tri = [int(i) for i in sh['indices']]
+                counts = [3] * (len(tri) // 3)
+                idx = tri[:len(counts) * 3]
+
             mesh.CreateFaceVertexCountsAttr(counts)
             mesh.CreateFaceVertexIndicesAttr(idx)
             prim = mesh.GetPrim()
@@ -89,7 +151,10 @@ def author(stage, root, shapes, original=None):
                 mesh.GetPrim().CreateAttribute(
                     'bf3ConvexPlanes', Sdf.ValueTypeNames.Float4Array).Set(
                     Vt.Vec4fArray([Gf.Vec4f(*[float(c) for c in p]) for p in sh['planes']]))
-            _xform(prim, sh.get('centre', (0.0, 0.0, 0.0)))
+            if kind and kind != 'convex':
+                prim.CreateAttribute('bf3ShapeKind', Sdf.ValueTypeNames.String).Set(kind)
+
+            _xform(prim, sh.get('centre', (0.0, 0.0, 0.0)), sh.get('rotation'))
 
         UsdPhysics.CollisionAPI.Apply(prim)
 
@@ -119,10 +184,18 @@ def _digest(shapes):
     h = hashlib.sha256()
 
     for sh in shapes or ():
+        # Rotation, the cylinder axis and the triangle list are in the fingerprint because they
+        # are now READ: a field the digest ignores is a field an edit can change without the trip
+        # noticing, which would silently preserve the original bytes over a real edit.
         h.update(repr((sh.get('kind'),
                        tuple(_q(c) for c in sh.get('centre', ())),
+                       tuple(tuple(_q(c) for c in col) for col in (sh.get('rotation') or ())),
                        tuple(_q(c) for c in sh.get('half', ())),
                        tuple(tuple(_q(c) for c in v) for v in sh.get('verts', ())),
+                       tuple(int(i) for i in (sh.get('indices') or ())),
+                       tuple(_q(c) for c in sh.get('vertexA', ())),
+                       tuple(_q(c) for c in sh.get('vertexB', ())),
+                       _q(sh.get('cylinderRadius', 0.0)),
                        _q(sh.get('radius', 0.0)))).encode())
 
     return h.hexdigest()
