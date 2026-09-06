@@ -144,6 +144,71 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## The client freeze is NOT duplication: bisected to the emitted mesh partitions (2026-09-06)
+
+The lead from Rime's own help -- *"Re-registering a mesh the level already provides freezes the
+client"* -- was worth chasing and is **WRONG for this failure**. Six boots, one variable each, all on
+`frontend` (27 meshes, 60 placements) in the host superbundle that now registers teams:
+
+| what the `usdlevel` bundle contained | server | CLIENT |
+|---|---|---|
+| sub-world only: `SubWorldData` + `WorldPartData` with **0 objects**, no partitions | `static=0` | **JOINS, team=1, editor opens** |
+| + the 66 mesh/blueprint/texture partitions + 37 mesh resources, **still 0 placements** | `static=0` | HANGS |
+| + 66 partitions + **61** placements, **no** `add_existing_resource` at all | `static=61` | HANGS |
+| + 66 partitions + 37 resources + **1** placement | `static=1` | HANGS |
+| + all of the above, lights and sound entities removed | `static=61` | HANGS |
+| + all of the above, **10,396 duplicated closure partitions dropped** | `static=61` | HANGS |
+| the untouched emit (10,462 partitions) | `static=61` | HANGS |
+
+**Everything below the first row hangs and the first row does not.** So it is not volume (one
+placement is enough), not duplication, not the lights or the `SoundEntityData`, and not MeshSet
+re-registration. **The emitted mesh/blueprint/texture partitions being PRESENT in the bundle is
+sufficient, with nothing instantiated from them.**
+
+Every one of these boots the SERVER handled identically and correctly -- teams registered, world
+parts resolved, `ServerStaticModelEntity` came out at placements+1 -- which is one more thing the
+headless sweep cannot see.
+
+### The duplication census, since it was the hypothesis
+
+The host superbundle (its 8 shipped bundles) provides **7,119** distinct partitions. Against that:
+
+    frontend   emits 10,457   6,711 also in the host (64.2%)   3,746 genuinely new
+    mp_001     emits 11,839   6,712 also in the host (56.7%)   5,127 genuinely new
+
+The overlap is the game-mode closure the host already carries: all 2,756 `weapons/`, 1,142
+`sound/`, 763 `characters/`, 762 `fx/`, 694 `persistence/`, 332 `ui/`. And it is real duplication,
+not a near-miss: a closure JSON is a verbatim copy -- `weapons/knife/u_knife` is emitted with the
+game's own PartitionGuid `0003de1b-f3ba-11df-9818-9f37ab836ac2` and its single instance.
+
+**10,396 of `frontend`'s 10,462 build commands are that closure**, and dropping all of them costs
+nothing measurable: the superbundle falls from 56,013,281 to 6,196,911 bytes, the server still
+reports the same 61 entities, and the client hangs exactly as before. The 66 that remain are the
+level: 22 mesh partitions, 22 blueprints, 11 textures and the sub-world. **The emitter should stop
+authoring the closure regardless** -- it is 50 MB of the 56 MB every level ships and it buys nothing
+-- but it is not what breaks the client.
+
+Adding a `MeshVariationDatabase` for the sub-level bundle (`mesh_variation_db_add_all`, 30 meshes
+registered, 974 skipped as base-universal) *changes* the failure -- the client disconnects after
+~20 s and exits instead of hanging -- and does not fix it. Reproduced twice.
+
+### What the freeze looks like, precisely
+
+The client joins (the server logs the connection), is assigned `team=0 squad=0 alive=false
+soldier=false` and never leaves it; the window stays on the black loading screen; the CDP endpoint
+stops answering entirely; ~2 cores spin with RSS pinned to the kilobyte (754,828 kB on the first
+runs, 1.12 GB creeping 12 kB/20 s on mp_001). In the one variant that loads, the same client reaches
+`team=1 squad=1`, `enter_game True`, and a `webui://mapeditor` CDP target inside ~3 minutes.
+
+### Next step, bounded to three boots
+
+The remaining suspect is 66 partitions of exactly three kinds. Ship them one kind at a time --
+textures only, then + blueprints, then + mesh partitions -- into the empty sub-world that is known
+to load. That pins it to one kind, and each boot is the ~8 minutes the cycle above takes. The
+variants and their recipes are in `~/Games/VeniceUnleashed/shot-instance/artifacts/`
+(`build.cmds.frontend_{empty,pnp,nres,one,nl,nc}`, `world_{empty,one,nolights}.json`,
+`census_ours_*.txt`, `parts_*.txt`).
+
 ## The zero-teams defect is FIXED: an exported level now registers teams (2026-09-06)
 
 **An exported level, built by this toolchain, now boots with a working game mode.** `mp_001`,
@@ -235,12 +300,12 @@ levels/realitymod/usdlevel/meshvariationdb_win32 1 false ""`, which registered 3
 974 as base-universal -- **changes the failure but does not fix it**: the client now disconnects
 after ~20 s and exits instead of hanging forever. Reproduced twice.
 
-**The lead for the next attempt is in Rime's own help text** for that command: *"Re-registering a
-mesh the level already provides freezes the client."* Every emitted level bundle re-registers its
-meshes with `add_existing_resource`, and the client freeze is exactly the symptom described. The
-`exclude_bundles` argument (with its `keepbase` token) exists for this. Nothing has tested whether
-the emitted bundle's `add_existing_resource` set overlaps what the base game already provides -- that
-census is the next measurement, and it is offline.
+~~**The lead for the next attempt is in Rime's own help text** for that command: *"Re-registering a
+mesh the level already provides freezes the client."*~~ **TESTED AND WRONG, see the section above
+(2026-09-06).** The census was run (6,711 of frontend's 10,457 partitions duplicate the host) and
+dropping every one of them does not change the freeze; neither does dropping the mesh resources
+entirely. The freeze bisects to the emitted mesh/blueprint/texture partitions being present at
+all.
 
 ### Harness: the deploy-screen tint is FIXED, the editor panels are not
 
