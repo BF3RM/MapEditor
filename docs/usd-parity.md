@@ -144,7 +144,70 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
-## Name collision is not it either, and `flat_normal` is bound by nothing (2026-09-06)
+## The load path is exonerated too, and the emit has no MVDB at all (2026-09-06)
+
+### Putting the same content in the MAIN level bundle changes nothing
+
+Every variant so far shipped through a sub-level bundle at `comp=6` behind a
+`SubWorldReferenceObjectData`. This one does not: the emitted partitions go into
+`Levels/REALITYMOD/REALITYMOD` itself, and the host LevelData reaches our `WorldPartData` through a
+plain `WorldPartReferenceObjectData` -- the same shape the shipped LevelData uses for
+`aab10001-...-000000030000`. There is **no `usdlevel` bundle in the toc and no `comp=6` in the log**:
+
+    LoadBundles comp=3  mapeditor/shellsb + Levels/REALITYMOD/REALITYMOD
+    LoadBundles comp=4  Levels/REALITYMOD/teamdeathmatch
+    LoadBundles comp=5  Levels/REALITYMOD/tdm2
+    Registering team 0 / 1 / 2
+    ENTITY static=61
+
+Server perfect, 61 entities created out of the main bundle. **Client: `team=0`, black screen, never
+finishes** (`build.cmds.frontend_mainbundle`). So the sub-level compartment is not the problem
+either.
+
+That closes the two big variables. **The content is exonerated** -- the emitted partition was made
+structurally identical to the game's, renamed out of BF3's namespace, and removed altogether, and it
+hangs all three ways. **The load path is exonerated** -- sub-level bundle and main level bundle hang
+identically.
+
+### What is actually left: every level in this document was emitted with NO MeshVariationDatabase
+
+The emitter DOES build one (`level_to_bf3.py:754`), but the block is gated:
+
+    if texture_dir and os.path.isdir(texture_dir) and mvdb_inputs:
+
+`texture_dir` is `<usd out>/<level>_textures`, and **`/tmp/mod_ee.sh` never creates it** -- the USD
+export it calls takes `--textures <json>` and writes no such directory. Checked on a forced
+re-export of `frontend`: the export reports `materials 27 of 27 meshes have texture bindings`,
+writes a fresh 68,927,291-byte stage, and there is still no `frontend_textures/` and still no
+`mvdb.json` in the emit. The build.cmds are byte-for-byte the same 10,505 lines.
+
+So **every variant in every bisect above, and every level in the 49-level table, shipped its meshes
+with no MeshVariationDatabase.** A dedicated server never needs one; a client cannot bind a single
+material without it. That is the one client-side requirement that was missing from all ~25 boots,
+and it was missing without anyone noticing because nothing in the headless path reads it.
+
+Two pieces of evidence already in this document point the same way and were not recognised at the
+time:
+
+- adding an MVDB by hand with `mesh_variation_db_add_all` **changed the failure** (the client
+  disconnected after ~20 s instead of hanging) -- the only intervention out of a dozen that changed
+  anything at all;
+- the 476 "could not find a valid variant" warnings are the builder saying exactly this: the
+  variants it wants to bind are not there.
+
+### The next step, and it is not another bisect
+
+Get an emit that HAS an `mvdb.json`: create `<level>_textures/` (or relax the gate to
+`mvdb_inputs` alone), re-emit, build, boot a client. If the client loads, everything above was a
+long way round to a missing database. If it still hangs, the MVDB is eliminated too and what remains
+is the resource layer -- the MeshSet chunks and metas -- which nothing in this effort has yet varied.
+
+**One thing worth fixing in the emitter meanwhile:** the new `_flat_used` guard sits INSIDE the
+`if texture_dir ...` block, so on an emit with no texture directory -- which is what `mod_ee.sh`
+produces -- it never runs, and `flat_normal` ships with no database to bind it. That is precisely
+the build whose client freezes.
+
+## Name collision is not it either (2026-09-06)
 
 Two more results, and one correction to a claim made earlier tonight.
 
@@ -181,17 +244,23 @@ nothing. The claim survives on `frontend_M`, which is the mesh partitions and re
 `flat_normal` and no placements, and which hangs. Recording it because the confound was real and a
 reader would otherwise inherit a result that had two variables in it.
 
-### `flat_normal` is referenced by nothing and can simply be deleted
+### ~~`flat_normal` is referenced by nothing~~ WRONG -- and the reason it was wrong matters
 
-Cause 1 needs no diff of its DDS header, because the resource is dead weight:
+**RETRACTED 2026-09-06.** The counts below are real but they are of the wrong table, and the
+conclusion drawn from them -- "delete it" -- would have broken every future build. **Texture binding
+does not live in `MeshMaterial.TextureParameters`; it lives in the MeshVariationDatabase**, where
+`flat_normal` is bound **586 times** on mp_001, every one as a `Normal` parameter. Do not delete it.
+
+What I measured, which is true of the emit I had:
 
     frontend   27 of 27 MeshMaterials have TextureParameters: []
     mp_001    892 of 892 MeshMaterials have TextureParameters: []
     the only file in either emit that mentions flat_normal is its own partition
 
-The emitter generates one `add_dds_texture ... _flat_n.dds ... World_SkipNoStr` plus a partition per
-level, **no material binds it**, and its presence alone stops the client from finishing the load.
-Deleting it from the emitter costs nothing and removes one of the three causes outright.
+And why it read as zero: **that emit contains no MeshVariationDatabase at all** -- see the section
+below. There was nowhere for a binding to live, so counting bindings found none, and I generalised a
+property of one build into a property of the emitter. The guard now in the emitter asks the database
+instead, which is the right question.
 
 ### The three emitter defects the diff found, worth fixing whatever the freeze turns out to be
 
