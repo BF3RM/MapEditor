@@ -5,6 +5,147 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## Every animation codec BF3 ships now writes (2026-09-06)
+
+The 3,000 clips this document called read-only -- `VBR` 2,225 and `CURV` 775 -- decode and
+re-encode, byte for byte, over every bank in the game. One mount, 322 banks, 0 parse errors:
+
+    CURV clips           775 of   775  re-encode BYTE-IDENTICAL, 775 patchable
+    VBR clips          2,225 of 2,225  re-encode BYTE-IDENTICAL, 2,225 patchable
+    VBR sections       2,225 of 2,225  header size fields account for Data exactly
+    VBR const quats   14,891 of 14,891 decode to UNIT quaternions
+    DCT clips          3,778 of  3,778  (unchanged)
+    uncompressed       2,191 of  2,194  (unchanged; 3 are empty)
+    payload bytes  338,458,436 of 338,458,436 identical   (all four codecs; the DCT-only
+                                                          figure below is still 38,366,576)
+
+Neither codec had a reader at all. `dump_animation_bank` printed a CURV clip's array COUNTS and
+called it `decoded: true`, and had no branch for VBR whatsoever -- which is how 3,000 clips could
+look handled and be untouchable. Neither was a bit-packing problem in the end; both were LAYOUT
+problems, and each was cracked by an invariant the format cannot fake.
+
+### CURV: the payload is float32 keys, and the layout is the whole job
+
+    channel slots   NumRotations*3 + NumVectors*3 + NumFloats
+    ChannelGroups   {NumKeys, NumChannels}, concatenating: each takes NumChannels entries from
+                    ChannelOffsets and NumKeys from Keys, in order
+    Values          per group, NumKeys x NumChannels floats, KEY-MAJOR
+    Consts          the slots that never move, paired with ConstOffsets
+
+A rotation occupies THREE slots, not four -- measured, because at three
+`len(ChannelOffsets) + len(ConstOffsets)` equals the slot count on 770 of the 775 clips and at four
+it matches none. Key-major was measured too rather than assumed: read that way a channel's samples
+are a smooth series on 672 clips against 5 the other way, and `sum(NumKeys*NumChannels)` accounts
+for `Values` exactly on 775 of 775. 682 clips have one channel group, 46 have two, 30 have four, so
+a single-group reader would have passed every length check and mixed two clips' channels together.
+
+Being plain about it: a CURV round trip is exact because nothing is quantised. 775/775
+byte-identical is a statement that the group/key/channel walk is right, not that a bit packer was
+reproduced.
+
+23 of the 775 carry a `Keys` array that does not add up to their groups' key counts (15 of them
+have no groups at all). Those clips still decode and still WRITE -- what is missing is the frame
+number of each key, and `keyTimesAccounted` says so per clip instead of inventing times.
+
+### VBR: six sections named only by size, and they add up
+
+`VbrAnimationAsset` names its sections by SIZE, which made the layout checkable offline:
+
+    Data = KeyTimes[KeyTimeSize]
+         + ConstIndices[ConstQuaternionCount*4 + ConstVector3Count*3 + ConstFloatCount]
+         + ConstChanMap[ConstChanMapSize]
+         + VectorOffsets[VectorOffsetSize] + FloatOffsets[FloatOffsetSize]
+         + Descriptors[(QuaternionCount*4 + Vector3Count*3 + FloatCount) * 4]
+         + FrameBlocks[sum(FrameBlockSizes)]
+
+That sum equals `Data.Count` on 2,225 of 2,225 clips and on none of them is it off by a byte. The
+last unknown was the four bytes per ANIMATED component: a constant channel costs one byte per
+component, an animated one costs four plus its share of the blocks, and until that term was in the
+equation the residual ran from 16 to 2,792 bytes with no pattern.
+
+A constant channel is a palette reference -- one byte per component into `ConstantPalette`, whose
+entries are NORMALISED into the clip's own window, so the value is `min + palette[i] * (max - min)`
+with min/max per channel kind. The oracle that settled this is one the format cannot fake: read
+that way, 14,891 of 14,891 constant quaternions in the game come out UNIT. Read any other way --
+palette entries as raw values, or the sections in any other order -- it collapses to 63-72%.
+`TrajMin/TrajMax` sit beside `Vec3Min/Vec3Max` and are the obvious place for a trajectory channel
+to differ; they are equal to the Vec3 pair on 2,225 of 2,225 clips, so which vector channel is the
+trajectory never has to be decided.
+
+A nearest-entry encode is exact rather than approximate because NO clip's palette holds a duplicate
+finite entry, so a decoded constant has exactly one index that could have produced it. 523 of
+173,545 constants come back with a nonzero value error and its worst is 1.0e-6 -- float32 rounding
+through the normalised fraction -- and every one of them still picks the same index, which is why
+the bytes are identical anyway.
+
+### What VBR still cannot do, with the measurement
+
+**The per-frame blocks are not decoded.** 133,985 of the 307,530 VBR channel components (43.6%)
+are animated and stay read-only; the 173,545 constant ones (56.4%) read and write. Only 11 of the
+2,225 clips have no animated channel at all, and the median clip is 57% animated.
+
+The four bytes per animated component look like eight nibbles of per-coefficient bit widths --
+mostly monotonically decreasing, `0x0000000b` for a component that only ever holds a DC term
+against `0x5667788a` for one that moves -- but they do not determine a block's size. Across 2,225
+clips no function of them predicts a block length (`ceil8(sum)`, per-component `ceil8`, 32-bit
+padding and 64-bit slice padding were all tried and all miss), only 42 clips have all their blocks
+the same size, and one clip's blocks range 963..1,286 bytes against a descriptor sum of 8,106 bits
+-- both above and below. So the blocks carry a per-block adaptive coding that has not been
+recovered, and no amount of matching byte counts would make an encoder for it.
+
+That is the honest position: a VBR clip's frame data is COPIED through the encoder, and only the
+constant-index bytes are rebuilt from values. The edit probe below is what tells those apart.
+
+### An edit lands, and only where it was aimed
+
+Three banks, `check_animation_codec` writing the probe and `patch_animation_bank` applying it:
+
+    b_sp05_sub_bankentry   CURV Values      4 of  46,464 byte(s) changed
+                           CURV Consts      0 of   1,496
+                           VBR  Data        1 of  80,484
+                           5 of 1,727,204 bytes in the bank, 2/2 edits landed, max error 0.0
+                           17/17 untouched clip(s) byte-identical
+    b_sharedaisoldier      CURV Values      1 of  51,376   VBR Data 1 of 6,056
+                           DCT  Data      211 of   3,552
+                           3/3 landed (max error 6.0e-8), 54/54 untouched clip(s) byte-identical
+    b_shared_coop          3 clips, 1,250 of 1,373,688, 3/3 landed (max error 2.9e-4)
+                           32/32 untouched clip(s) byte-identical
+
+One CURV float nudged by 0.25 moves the four bytes behind it and nothing else -- and lands EXACTLY,
+because the codec quantises nothing. One VBR constant repointed at another palette entry moves ONE
+byte of an 80 KB payload. That is the difference between a writer and a copier, and byte equality
+alone could not have shown it.
+
+`RimeLib.Tests/Animation/CurveVbrCodecTest.cs` pins both codecs without a game mount: the
+group/key/channel walk on a two-group clip whose groups have different key AND channel counts, the
+VBR section offsets on a clip with every section non-empty, and the one-value-in-one-value-out
+property for each.
+
+### The bug this nearly shipped with
+
+The first run of this reported **CURV 775/775 byte-identical** and had compared **zero bytes**. The
+check handed a `float[]` to a `FloatBytes` helper that reflects a `Data` property off its argument;
+a `float[]` has none, so it returned an empty array, the comparison loop ran zero times and every
+clip passed. It was caught by cross-checking the reported payload total against an offline sum of
+the same arrays -- 43,664,076 where 338,458,436 was expected. `CheckCurve` now records
+`comparedBytes` and refuses to call a clip byte-exact on an empty comparison, and the helper has a
+real `float[]` overload.
+
+### Not done
+
+- **The USD side still only carries DCT clips.** `antanim.author` reads the per-frame samples
+  `dump_animation_bank` produces, and it produces them for DCT only. CURV and VBR are writable
+  through `check_animation_codec` / `patch_animation_bank`, not yet through a stage. Wiring CURV in
+  would mean deciding what its three-float rotation channel MEANS, and that is not measured: the
+  values reach 45.7 radians, which rules out any bounded encoding and is consistent with unwrapped
+  Euler, but consistent is not proven and a wrong guess is a bank that loads and animates wrong.
+- **Still no Ant GenericData archive writer**, so no clip can be added, removed or re-typed.
+- **Not boot-tested.** The DCT path has been booted (below); these two have not.
+
+New command on the way: `dump_anim_codec_clips <outdir>` sweeps every mounted Ant bank and writes
+each VBR/CURV clip's header fields and base64 payload, which is what made the codec work possible
+offline -- a full mount is too expensive to pay for once per hypothesis.
+
 ## Animation clips are writable (2026-09-06)
 
 **BOOTED (2026-09-06).** A patched `ak74` bank -- 184 of 183,068 bytes changed by the encoder --
@@ -113,8 +254,9 @@ index, and of the 9,180 floats in it, 17 carry the edit, 9,163 are unchanged and
   with would have to be rewritten as `RawAnimationAsset`, which needs the archive writer below.
 - **No Ant GenericData archive writer.** Clips can be edited in place; a clip cannot be ADDED,
   REMOVED or re-typed, and no new bank can be created.
-- **VBR and CURV clips are still read-only** -- 3,000 of the 8,972. Only DCT re-encodes and only
-  RAW/FRAME can be overwritten as float keys.
+- ~~**VBR and CURV clips are still read-only** -- 3,000 of the 8,972.~~ **DONE 2026-09-06**, see
+  the section above: CURV re-encodes byte-identical and VBR's constant channels do, with its
+  animated frame blocks still undecoded.
 - **Not boot-tested.** The patched blob reloads through Rime's own reader and decodes to the edited
   values; it has not been built into a superbundle and loaded by the game. Every claim above is a
   byte or a value, not a frame on screen.
@@ -668,7 +810,7 @@ The honest table, because "represented" and "editable end to end" are different 
 | Re-point a reference (weapon -> projectile) | yes -- 256,459 references are USD relationships |
 | Add entries to a list (sockets, chunks) | yes -- arrays are child prims and can be appended |
 | Save field and reference edits into a working game | **yes, verified**: edit -> emit -> build -> Level:Loaded |
-| Save edited ANIMATION CURVES back | **yes** -- 3,778/3,778 DCT clips re-encode byte-identical and an edit patches in place; not boot-tested, and a clip cannot gain frames |
+| Save edited ANIMATION CURVES back | **yes** -- DCT 3,778/3,778, CURV 775/775 and VBR 2,225/2,225 re-encode byte-identical and an edit patches in place; VBR's animated channels (43.6% of its components) are copied, not rebuilt; not boot-tested, and a clip cannot gain frames |
 | Save edited MESH GEOMETRY back | **yes** -- an edited mesh ships, an unedited one is still referenced |
 | Move things in BLENDER and save back | yes, **via `dcc_merge`** -- never by trusting Blender's own export |
 | Save edited textures | yes, but that texture then ships as a copy |
@@ -734,6 +876,8 @@ common case rather than the exception:
 | | evidence |
 |---|---|
 | Animation clips (DCT) | 3,778 / 3,778 clips, 38,366,576 / 38,366,576 payload bytes |
+| Animation clips (CURV) | 775 / 775 clips, all patchable |
+| Animation clips (VBR) | 2,225 / 2,225 clips, sections exact, 14,891 / 14,891 const quats unit |
 | Terrain layers + scattering | 33 / 33 resources, 1,036,583 / 1,036,583 bytes |
 | StreamingPartitionHeader | 73,371 / 73,371 -- every EBX partition in BF3 |
 | ExternalValue / TextureConstant | 190,486 and 102,528, all identical |
@@ -747,7 +891,9 @@ common case rather than the exception:
 1. **Not boot-tested: the mesh and animation writers.** Both are byte-proven and neither has been
    built into a bundle and loaded. That is the single largest gap now -- capability exists, evidence
    of it working in the engine does not.
-2. **3,000 of 8,972 animation clips stay read-only** (VBR and CURV), and no clip can be added,
+2. ~~**3,000 of 8,972 animation clips stay read-only** (VBR and CURV)~~ -- both codecs now write
+   (2026-09-06); what remains read-only is VBR's ANIMATED channels, 133,985 of its 307,530
+   components. No clip can be added,
    removed or re-typed: there is no Ant GenericData archive writer.
 3. **Havok shape geometry** -- the rebuild still emits 81 objects against the game's 120, now
    itemised (section above): rotated placements, cylinders and the MOPP list. READING is fixed --
@@ -1188,7 +1334,8 @@ from nearly true into true.
 4b. ~~**Ant clips cannot be written back.**~~ **DONE 2026-09-06** (section at the top): every DCT
    clip re-encodes byte-identical and an edited one patches into the bank in place. What is NOT
    done is an Ant GenericData archive writer, so a clip cannot be added, removed or re-typed, and
-   VBR/CURV (3,000 of 8,972 clips) stay read-only.
+   VBR/CURV now write too (2026-09-06, section at the top); the residue is VBR's animated frame
+   blocks, which are not decoded.
 5. ~~**Ant clips carry indexed joints** (`dof037`).~~ **DONE 2026-09-06** for 6,428 of BF3's
    8,972 clips (measured above). The remaining 2,541 keep indexed names because their channel map is
    read the same way by several unrelated DOF sets, and this refuses to pick one.
