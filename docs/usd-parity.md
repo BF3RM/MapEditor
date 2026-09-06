@@ -37,10 +37,16 @@ references saved nothing.
     before   add_json_partition 12,114   reference_existing_partition 10,396
     after    add_json_partition  1,718   reference_existing_partition 10,396
 
-The earlier measurement that forced the whole closure to ship ("shipping only the 171 named ones
-died during entity creation") was taken when only those 171 blueprints were referenced and the rest
-were resolvable from nothing. With all 10,396 referenced the duplicate copy is redundant --
-*pending the load test*, which is the only thing that settles it.
+**TESTED, AND IT FAILS.** With all 10,396 referenced and none shipped the build succeeds (its only
+error is the known `rugpile_01_n`, a texture BF3 itself never shipped) and then the level dies during
+load: 3 ticks, `Level:Loaded=0`, process gone. The superbundle also grew to **1,832,446,064 bytes**,
+6x the shipped version, which is the tell -- `reference_existing_partition` is not a pointer. It
+pulls the partition AND its resources into our superbundle, so referencing the closure costs more
+than shipping it and breaks the load as well.
+
+So the rule "embed if edited, reference if not" holds for RESOURCES (meshes, textures) and does NOT
+hold for the closure's partitions. The closure must ship. `reference_closure=True` is kept only so
+the experiment can be re-run against a future builder; the default stays off.
 
 Of the 1,718 that remain, 641 are ours (`dust2/...`: mesh partitions, MVDB, world parts) and 1,077
 are our own EBX authored under the GAME's names for meshes and blueprints. Referencing those
