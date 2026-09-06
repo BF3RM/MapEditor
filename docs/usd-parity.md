@@ -1055,6 +1055,20 @@ from nearly true into true.
 
 ## Traps that cost real time here
 
+- **`build_sb` with a name missing the `Win32/` prefix writes NOTHING and reports success.**
+  `build_sb usdroundtrip/scaled ...` printed "Bundle successfully built and added to superbundle!"
+  and produced no file anywhere on disk; the engine then said
+  `Superbundle 'Win32/UsdRoundTrip/Scaled' could not be read`. The documented form is
+  `build_sb Win32/UsdRoundTrip/Scaled` with the prefix and the capitalisation. Same shape as every
+  other trap here: success reported, nothing emitted.
+
+- **`pgrep -f <pattern>` matches the WAITING SHELLS of other agents**, not just real processes.
+  Several agents ran `while pgrep -f RimeREPL.dll; do sleep; done` to avoid concurrent mounts and
+  deadlocked on each other: `pgrep -f` said 4-8, `ps` said **0**, and the machine sat idle for
+  ~40 minutes while three agents reported "still busy". Match the process instead:
+  `ps -eo pid,comm,args | awk '$2=="dotnet" && /RimeREPL\.dll/'`. The same self-match makes
+  `pkill -f` kill your own shell -- it happened three times in one session.
+
 - A level that emits NOTHING loads perfectly. Guard on content, never on the verdict. Four separate
   variants were hit: zero textures, zero meshes, zero placements, zero entities.
 - **"Has this been edited?" has to be asked of the bytes that hold the thing.** The mesh emitter
