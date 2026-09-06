@@ -144,6 +144,82 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## Name collision is not it either, and `flat_normal` is bound by nothing (2026-09-06)
+
+Two more results, and one correction to a claim made earlier tonight.
+
+### Renaming the meshes off BF3's namespace does not fix it
+
+The suggestion was mine and the reasoning was sound -- update-in-place is proven from a PREPENDED
+separate superbundle, which is a different load path from a sub-level compartment, so a name
+collision legal on one might be fatal on the other. It is not. All 27 emitted mesh partitions
+renamed `levels/frontend/objects/<x>_Mesh` -> `levels/realitymod/usdlevel/meshes/<x>` (partition
+name only; the `RigidMeshAsset.Name` that binds the resource left alone), nothing colliding with
+anything BF3 ships: **client still never leaves `team=0`** (`build.cmds.frontend_rename`).
+
+### Nor does removing the emitted meshes altogether
+
+The architecturally correct version -- emit NO mesh partitions and NO `add_existing_resource` at
+all, and repoint the 27 blueprints at the GAME's own mesh partitions by its guids (55 files
+remapped) -- **also hangs** (`build.cmds.frontend_ref`). That variant's bundle is blueprints, the
+world partition and its 61 placements, and nothing else.
+
+Which is a third cause, because the blueprints on their own LOAD. So the tally is now:
+
+    LOADS   empty sub-world (0 objects, 0 partitions)
+    LOADS   + the 10 stub TextureAsset partitions
+    LOADS   + the 27 blueprint partitions
+    HANGS   + flat_normal's add_dds_texture and its partition        <-- cause 1
+    HANGS   + 27 mesh partitions + 37 resources, 0 placements        <-- cause 2
+    HANGS   blueprints + 61 placements, NO meshes, NO resources      <-- cause 3
+
+### The correction
+
+The earlier row "27 mesh partitions + 37 resources with ZERO placements hangs" was measured on
+`frontend_pnp`, and `frontend_pnp` **also carried `flat_normal`** -- so on its own it proved
+nothing. The claim survives on `frontend_M`, which is the mesh partitions and resources with no
+`flat_normal` and no placements, and which hangs. Recording it because the confound was real and a
+reader would otherwise inherit a result that had two variables in it.
+
+### `flat_normal` is referenced by nothing and can simply be deleted
+
+Cause 1 needs no diff of its DDS header, because the resource is dead weight:
+
+    frontend   27 of 27 MeshMaterials have TextureParameters: []
+    mp_001    892 of 892 MeshMaterials have TextureParameters: []
+    the only file in either emit that mentions flat_normal is its own partition
+
+The emitter generates one `add_dds_texture ... _flat_n.dds ... World_SkipNoStr` plus a partition per
+level, **no material binds it**, and its presence alone stops the client from finishing the load.
+Deleting it from the emitter costs nothing and removes one of the three causes outright.
+
+### The three emitter defects the diff found, worth fixing whatever the freeze turns out to be
+
+None of these is the freeze -- each was corrected and the client still hung -- but each is a real
+defect that only a rendering client could ever reveal, and the pipeline has no rendering client:
+
+1. **Every emitted mesh binds one generic shader.** 27 of 27 bind `objects/shaders/proppreset`; the
+   game binds a per-mesh shader (`levels/frontend/objects/calibrationsquareshader`,
+   `levels/frontend/ui_propshader`). A dedicated server never compiles or looks up a shader.
+2. **Every emitted mesh carries its own `MeshLodGroup`.** 27 of 27; every game mesh points at the
+   one shared lodgroup partition `64991a4a-4c5e-11de-b1f5-fe435f0a1d8f`.
+3. **Every emitted mesh partition takes a fresh guid under a name BF3 already ships**, so every
+   existing reference to that mesh -- MVDB, shaderdb, other partitions -- still points at the game's
+   guid while the name resolves to ours.
+
+Plus the two structural findings from the sections above: the 10,396-partition closure is dead
+weight (49.4 MB of mp_001's 61.9 MB), and `flat_normal` is referenced by nothing.
+
+### What is left to test
+
+The content hypothesis is exhausted: the emitted partition has been made structurally identical to
+the game's, renamed out of its namespace, and removed entirely, and the client hangs in all three
+cases. What has never been varied is **the bundle**: every one of these variants ships its content
+in a sub-level bundle loaded at `comp=6` through a `SubWorldReferenceObjectData`. The next
+experiment should change that rather than the content -- put the same partitions in the MAIN
+`Levels/REALITYMOD/REALITYMOD` bundle instead of a sub-level, which is one line in
+`build_host_superbundle.py`, and see whether the client survives.
+
 ## The mesh partition diff: three real differences, none of them the freeze (2026-09-06)
 
 Blueprints are cleared and the partition-level diff is done. **The diff found three genuine
@@ -250,7 +326,7 @@ Continuing the bisect, each row one variable, `frontend` on the fixed host:
 | sub-world only, 0 objects, 0 partitions | `static=0` | **LOADS** |
 | + the **10 stub `TextureAsset` partitions** | `static=0` | **LOADS** |
 | + all 11 texture partitions, i.e. the 10 stubs **plus `flat_normal` + its `add_dds_texture`** | `static=0` | HANGS |
-| + the **27 mesh partitions + 37 `add_existing_resource`**, 0 placements | `static=0` | HANGS |
+| + the **27 mesh partitions + 37 `add_existing_resource`**, 0 placements | `static=0` | HANGS (see the correction above: the `pnp` row also carried `flat_normal`; the claim survives on `frontend_M`) |
 | + 27 mesh partitions, **61 placements, no `add_existing_resource` at all** | `static=61` | HANGS |
 | everything **except** `flat_normal` | `static=61` | HANGS |
 | everything, closure dropped | `static=61` | HANGS |
