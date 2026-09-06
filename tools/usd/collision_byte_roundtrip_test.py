@@ -58,7 +58,7 @@ def main(orig_path, shapes_path):
     print("via USD      %d descriptor(s)" % len(back))
 
     try:
-        rebuilt = build_collision.build(back)
+        rebuilt = build_collision.build(back, wrapper_spec=dump.get("Wrapper"))
     except Exception as e:                                              # noqa: BLE001
         print("rebuild      FAILED: %s: %s" % (type(e).__name__, e))
         return 1

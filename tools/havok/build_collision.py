@@ -341,7 +341,7 @@ def meta(blob):
 MIN_SHAPES = int(os.environ.get("HAVOK_MIN_SHAPES", "2"))
 
 
-def build(shapes, mass=1.0):
+def build(shapes, mass=1.0, wrapper_spec=None):
     """shapes: box(...) / convex(...) descriptors, in metres.
 
     A container holding ONE convex shape is padded to two by repeating it.
@@ -381,6 +381,50 @@ def build(shapes, mass=1.0):
 
     lo = [min(extent(s, i, -1) for s in shapes) for i in range(3)]
     hi = [max(extent(s, i, 1) for s in shapes) for i in range(3)]
+
+    if wrapper_spec:
+        # Reproduce the GAME's wrapper rather than a synthetic one. Emitting only the packfiles
+        # writes PartCount 1 against a shipped 21 and differs from byte 0. The four arrays follow
+        # each other from offset 64, with the byte-wide material indices padded to 16 before the
+        # flags array -- measured on MEHouse01Large: 64 -> 400 -> 1072 -> 1104.
+        w = wrapper_spec
+        trans = w.get('PartTranslations') or []
+        aabbs = w.get('LocalAabbs') or []
+        midx = w.get('MaterialIndices') or []
+        flags = w.get('MaterialFlagsAndIndices') or []
+
+        o_trans = 64
+        o_aabbs = o_trans + len(trans) * 16
+        o_midx = o_aabbs + len(aabbs) * 32
+        o_flags = align(o_midx + len(midx), 16)
+        end = align(o_flags + len(flags) * 4, 16)
+
+        wrapper = bytearray(end)
+        struct.pack_into("<13I", wrapper, 0, int(w.get('PartCount', 0)),
+                         len(trans), o_trans, 0, len(aabbs), o_aabbs, 0,
+                         len(midx), o_midx, 0, len(flags), o_flags, 0)
+        struct.pack_into("<f", wrapper, 52, float(w.get('Scale', 1.0)))
+        struct.pack_into("<I", wrapper, 56,
+                         (int(w.get('MaterialCountUsed', 0)) & 0xFF) |
+                         ((int(w.get('HighestMaterialIndex', 0)) & 0xFF) << 8))
+
+        for i, t in enumerate(trans):
+            struct.pack_into("<4f", wrapper, o_trans + i * 16, t[0], t[1], t[2], 0.0)
+
+        for i, a in enumerate(aabbs):
+            struct.pack_into("<8f", wrapper, o_aabbs + i * 32,
+                             a[0], a[1], a[2], 0.0, a[3], a[4], a[5], 0.0)
+
+        for i, m in enumerate(midx):
+            wrapper[o_midx + i] = int(m) & 0xFF
+
+        for i, f in enumerate(flags):
+            struct.pack_into("<I", wrapper, o_flags + i * 4, int(f))
+
+        trailer = struct.pack("<2I", len(blocks[0]), len(blocks[1]))
+        trailer += blocks[0] + blocks[1] + struct.pack("<4I", 8, 20, 32, 44)
+
+        return bytes(wrapper) + b"".join(packs) + trailer
 
     wrapper = bytearray(128)
     # int[10] is NOT the shape count, whatever it looks like: shipped hk_box carries 2 with three

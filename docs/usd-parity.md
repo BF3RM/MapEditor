@@ -150,16 +150,17 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
    browsable, but a `WorldPartData` prim does not own its objects and mesh placements sit outside
    the hierarchy entirely.
 3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
-4. **Havok: NOT byte-identical, and now we know exactly why.** Rime reads the shapes and their
-   planes (`927a9370`) and BF3 -> USD -> descriptors is lossless (537 and 265 values, 0 changed).
-   The byte test (`tools/usd/collision_byte_roundtrip_test.py`) says the rest plainly: MEHouse01Large
-   is **21,304 bytes original against 16,072 rebuilt, differing from byte 0**. The cause is not the
-   shapes -- it is that a HavokPhysicsData is a Frostbite WRAPPER around the packfiles, and the
-   rebuild emits only the packfiles. The original opens `PartCount=21`; the rebuild writes 1. Rime
-   already models the missing half (`PartCount`, `Scale`, `MaterialCountUsed`,
-   `HighestMaterialIndex`, `PartTranslations`, `LocalAabbs`, `MaterialIndices`,
-   `MaterialFlagsAndIndices`) -- none of it is extracted or re-emitted yet. That is the work, and it
-   is well-defined rather than exploratory.
+4. **Havok: wrapper reproduces byte-exactly; the PACKFILES do not yet.** Rime reads the shapes,
+   their planes and now the Frostbite wrapper (`927a9370`, `ca64e15a`), and `build_collision.build`
+   re-emits the wrapper verbatim. Measured on MEHouse01Large (21,304 bytes): the rebuild went from
+   *differing at byte 0* to **the first 1,108 bytes identical** -- the whole wrapper header and all
+   four arrays. Two things remain, both named:
+   - **A 12-byte array rotation.** The file holds `[0, 1164, 0]` at offset 1104;
+     `GetWrapper` returns `MaterialFlagsAndIndices` as `[0, 0, 1164]`. The file is truth, so Rime's
+     reader is a slot out. Small and precisely located.
+   - **The packfiles themselves differ** (12,861 of 21,304 bytes). Our builder lays out its own
+     Havok data; matching BF3's byte-for-byte is the larger remaining piece, and nothing should
+     claim collision round trips until it does.
 
 5. **Ant clips carry indexed joints** (`dof037`). Values are exact; names need
    `AntAnimationSetAsset` -> `SkeletonAsset` + actor channel maps resolved.
