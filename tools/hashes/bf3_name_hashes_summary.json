@@ -1,0 +1,103 @@
+{
+  "collisions": {
+    "lower": 5,
+    "quick": 12
+  },
+  "comparisons": {
+    "assetHashes.json": {
+      "agrees_with_this_table": 22531,
+      "disagrees_with_this_table": 0,
+      "entries": 23055,
+      "hash_absent_from_this_table": 1,
+      "hash_present_in_this_table": 22531,
+      "name_does_not_hash_to_its_own_key": 523
+    },
+    "eventHashes.json": {
+      "agrees_with_this_table": 12998,
+      "disagrees_with_this_table": 2,
+      "entries": 19704,
+      "hash_absent_from_this_table": 6704,
+      "hash_present_in_this_table": 13000,
+      "name_does_not_hash_to_its_own_key": 0
+    }
+  },
+  "distinct_hashes": 325288,
+  "distinct_hashquick_hashes": 251183,
+  "distinct_hashquicklowercase_hashes": 172012,
+  "distinct_names": 251195,
+  "dump_summary": {
+    "ant_banks_failed": 1,
+    "ant_banks_loaded": 322,
+    "ant_names": 30485,
+    "ant_objects": 71485,
+    "ant_partitions": 323,
+    "bundles": 1159,
+    "chunks": 61101,
+    "dbx_partitions": 0,
+    "ebx_partitions_failed": 0,
+    "ebx_partitions_not_little_endian": 0,
+    "ebx_partitions_read": 73371,
+    "ebx_type_strings": 9422,
+    "ebx_value_strings": 120991,
+    "gt_chunk_asset_hashes": 13660,
+    "gt_ebx_descriptor_hashes": 9422,
+    "gt_ebx_descriptor_statements": 6169691,
+    "gt_ebx_descriptor_statements_unresolved_in_own_file": 0,
+    "gt_mvdb_partitions": 716,
+    "gt_mvdb_partitions_failed": 0,
+    "gt_mvdb_variation_hashes": 2353,
+    "gt_objectvariation_partitions": 8247,
+    "gt_objectvariation_partitions_failed": 0,
+    "gt_objectvariation_rows": 2326,
+    "partitions": 73371,
+    "resources": 41278,
+    "superbundles": 64
+  },
+  "ground_truth": {
+    "chunk_asset_names": {
+      "distinct_hashes": 13660,
+      "fn": "quick",
+      "resolved": 13660,
+      "resolved_to_exactly_one_name": 13660,
+      "resolved_under_the_other_fn": 13660,
+      "unresolved": 0
+    },
+    "ebx_descriptors": {
+      "distinct_hashes": 9422,
+      "fn": "quick",
+      "resolved": 9422,
+      "resolved_to_exactly_one_name": 9422,
+      "resolved_under_the_other_fn": 24,
+      "unresolved": 0
+    },
+    "mvdb_variations": {
+      "distinct_hashes": 2353,
+      "fn": "lower",
+      "resolved": 2323,
+      "resolved_to_exactly_one_name": 2323,
+      "resolved_under_the_other_fn": 2323,
+      "unresolved": 30
+    },
+    "objectvariation": {
+      "namehash_is_hashQuick": 2,
+      "namehash_is_hashQuickLowerCase": 2326,
+      "resolved_to_exactly_one_name": 2326,
+      "resolved_to_some_name": 2326,
+      "resolved_to_the_same_name": 2326,
+      "rows": 2326
+    }
+  },
+  "name_sources": {
+    "ant": 30485,
+    "bundle": 1159,
+    "dbx": 0,
+    "ebxstring": 120991,
+    "ebxtype": 9422,
+    "partition": 73371,
+    "resource": 41278,
+    "superbundle": 64
+  },
+  "non_ascii_names": 288,
+  "source_dir": "/tmp/bf3_names2",
+  "table_rows": 404486
+}

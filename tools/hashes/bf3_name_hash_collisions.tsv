@@ -1,0 +1,18 @@
+# hash	fn	count	names (tab separated)
+00596E31	lower	2	au	g3
+00597211	quick	2	FR	G3
+0B874DA4	lower	2	cqs	cs1
+0B87541C	lower	2	id4	ifv
+0C321AE5	quick	2	Objects/MetalSheetFence_01/MetalSheetFence_01_cluster3	specboost
+12758F90	quick	2	Localization/us_loc	sound/levels/xp5_riverside/ambients/xp5_bigworld_riverside_twigsnaprustle_01
+29DBA8AE	lower	2	\toliver krietsch mazura	levels/xp2_skybar/xp2_skybar/layer13_floor_2_outside
+3AC9FD98	quick	2	LodGroups/XP2_World_MicroDestruction_ShortFirstLod_10mShadow	levels/sp_earthquake/prefabs/anim/colebriefing
+4BE31031	quick	2	Levels/SP_Villa/Scattermeshes/Shaders/WildGrass_01_Shader	levels/sp_bank/architecture/sewercanal_01/sewercanalfence_01_cluster
+60EB4367	quick	2	PatrolOrder 3FEF85C0-264A-4D44-A1C6-00BC36B3F2B7	XP2/Objects/WallModulesPalace_02/Archway_556x512x32
+6B58C882	quick	2	CString "_MI28"	Props/StreetProps/Generator_04/XP4_Generator_04_ruin_Physics_0_Win32
+95F8E449	quick	2	Sound/Vehicles/Air/AC130_Hercules/AC130_Hercules_Interior 001	win32/weapons/scar-h/scar-h_soldierweaponbundle
+A90B715C	quick	2	architecture/facadeclusters/me_facade_cluster_wall_01	co10_01_sc32_01_Coop_Player1 Anim
+BBE2D67D	quick	2	LinearTransform ((0.4242103,-1.411976E-08,0.9055637),(0.5399387,0.8028018,-0.2529337),(-0.7269881,0.5962459,0.3405567),(-21.73606,-131.9783,-122.6166))	xp_raw/props/fence_wakeisland/fence_wakeisland_04_xp3_physics_0_win32
+BBEDB0D1	lower	2	architecture/shaders/rg_2mask_5color	coop_exitvenom_rearl_idle anim
+BEF7D7C0	quick	2	FX/DLC/XP3/Vehicles/MissleExplosions/Emitters/Em_DLC_XP3_Vehicles_HIMARS_Missile_Explosion_Smoke	vehicles/su37_sp/su37_heatseeker_projectile_sp_mesh
+CE3F435A	quick	2	FX/Impacts/SandBright/Emitter_M/Em_Impact_LowEnd_SandBright_M_MainParent	MP_US_Engi_Cap01_Wood01
