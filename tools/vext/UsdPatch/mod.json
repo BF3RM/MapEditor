@@ -1,0 +1,10 @@
+{
+	"Name": "UsdPatch",
+	"Authors": ["USD pipeline"],
+	"Description": "Reference update-in-place mod: overrides EBX partitions AND resources of a level BF3 ships, without rebuilding the level.",
+	"Version": "1.0.0",
+	"HasWebUI": false,
+	"HasVeniceEXT": true,
+	"Dependencies": { "veniceext": "^1.0.0" },
+	"Superbundles": ["Win32/UsdPatch/Patch"]
+}

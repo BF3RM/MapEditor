@@ -5,6 +5,145 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## A mod now MODIFIES a level BF3 ships, and the order decides what wins (2026-09-06)
+
+**Update-in-place is no longer unproven.** A mod with its own superbundle, booted against STOCK
+`MP_001` in the isolated instance, changed both an EBX partition and a resource that BF3 itself
+ships -- and the engine reported the edited values, predicted before the run:
+
+    control   name=Objects/LoadingPallet_01/LoadingPallet_01
+              trans(0.000,0.000,0.000)  aabb min(-0.500,0.000,-0.815) max(0.505,0.180,0.825)
+              usdpatch/loadingpallet_01 -> NOT_FOUND
+
+    patched   name=USDPATCH_EDIT_OK_C
+              trans(12.500,34.250,56.750)  aabb min(-7.500,-2.250,-6.750) max(8.375,3.125,9.500)
+
+Nothing in BF3 contains the string `USDPATCH_EDIT_OK_C`, `(12.5, 34.25, 56.75)` is the vector this
+toolchain wrote into `StaticModelEntityData.Transform.trans`, and the AABB is the `LocalAabbs[0]`
+this toolchain wrote into the object's `HavokPhysicsData`. The engine BUILT AN ENTITY from our
+bytes on a map we did not build, and the level loaded.
+
+### The finding: partitions resolve FIRST-wins, resources LAST-wins
+
+Every previous attempt prepended one bundle, because the working precedent (`UsdRoundTrip`) does.
+That is right for half the problem and silently wrong for the other half. The same superbundle, the
+same bundle, only its POSITION in `ResourceManager:LoadBundles` changed:
+
+| bundle position | EBX partition under the game's name | resource under the game's name |
+|---|---|---|
+| **PREPENDED** | **WINS** -- `name=USDPATCH_EDIT_OK_C`, `trans(12.500,34.250,56.750)` | LOSES -- `aabb min(-0.500,0.000,-0.815)` |
+| **APPENDED** | LOSES -- stock name, `trans(0.000,0.000,0.000)` | **WINS** -- `aabb min(-7.500,-2.250,-6.750) max(8.375,3.125,9.500)` |
+
+Four boots, one variable. That is why "partitions never shadow" was recorded as a law here: the
+partition experiments that failed were resource-shaped, and the one arrangement that works for a
+partition is the one that cannot work for a resource.
+
+**The complete recipe is TWO bundles in one superbundle**, one at each end of the list -- which also
+respects the standing rule that a bundle requested twice wedges the load, because neither is:
+
+    local s_New = { PART_BUNDLE }
+    for _, l_B in ipairs(p_Bundles) do s_New[#s_New + 1] = l_B end
+    s_New[#s_New + 1] = RES_BUNDLE
+    p_Hook:Pass(s_New, p_Compartment)
+
+Booted that way against stock `MP_001`, BOTH edits land in one run: `name=USDPATCH_EDIT_OK_C`,
+`trans(12.500,34.250,56.750)`, `aabb min(-7.500,-2.250,-6.750) max(8.375,3.125,9.500)`. The
+superbundle is 9,504 bytes of `.sb` and 843 of `.toc` -- an update-in-place mod does not carry the
+level.
+
+### What was measured, run by run
+
+All against stock `MP_001` (`MP_001 ConquestLarge0 1`) in the ISOLATED instance, one mod in
+`ModList.txt` per run, harness `/tmp/t1_boot.sh`:
+
+| run | bundle carries | position | verdict | engine reported |
+|---|---|---|---|---|
+| base | nothing | -- | LOADED | stock name, `usdpatch/loadingpallet_01` NOT_FOUND |
+| B | partition under a NEW name | prepend | LOADED | `usdpatch/loadingpallet_01` -> ObjectBlueprint `USDPATCH_EDIT_OK_B` |
+| A | partition under BF3's name | prepend | LOADED | `name=USDPATCH_EDIT_OK_A` |
+| C | same + edited transform | prepend | LOADED | `name=USDPATCH_EDIT_OK_C`, `trans(12.500,34.250,56.750)` |
+| Capp | same | append | LOADED | stock name, `trans(0.000,0.000,0.000)` |
+| P | `HavokPhysicsData` resource | prepend | LOADED | stock aabb |
+| Papp | same resource | append | LOADED | `aabb min(-7.500,-2.250,-6.750) max(8.375,3.125,9.500)` |
+| X | both, two bundles | prepend + append | LOADED | both, in one boot |
+
+**The additive case matters on its own.** Run B ships a partition under a name BF3 has never heard
+of and the engine resolves it -- new EBX delivered into a shipped level. The baseline says
+NOT_FOUND for the same name, so this is content, not a lookup that would have succeeded anyway.
+
+### What the mesh run does NOT show
+
+An earlier run overrode the `MeshSet` resource with an edited bounding box and the spawned entity's
+AABB did not move. That is **not** evidence about `MeshSet`: the AABB the server reports is
+`LocalAabbs[0]` of the object's `HavokPhysicsData`, `[-0.5, 0.0, -0.815, 0.505, 0.18, 0.825]`, byte
+for byte what the engine printed -- while the `MeshSet` header's own box is
+`(-0.5, -0.0011, -0.815)`, whose `-0.0011` never appears. The probe was reading a number the
+`MeshSet` does not own. It was also prepended, which is now known to be the losing order for a
+resource. Whether a dedicated server reads `MeshSet` at all is still unmeasured.
+
+### The build side
+
+`replace_resource <name> <id> <file>` is the right tool and was not being used: it keeps the
+original resource's TYPE, META and id and swaps only the payload, so an override does not have to
+guess a meta. It reported the real ones -- `MeshSet E0040000000000006000000070009400`,
+`HavokPhysicsData 80000000900500008006000058010000` -- where hand-written `add_resource` calls had
+been carrying a literal.
+
+Content was verified before any boot, out of the BUILT superbundle rather than from the file that
+went in: `mount_standalone_sb` on our own `.sb`, then `dump_resource` / `dump_partition_json`.
+The partition read back with `Name = USDPATCH_EDIT_OK_B`; the edited 6,997-byte Enlighten payload
+and the edited 1,344-byte `MeshSet` read back sha256-identical to what was written.
+
+## An edited Enlighten bake is in a built level, byte for byte, and the level boots (2026-09-06)
+
+The bake round-tripped through USD with 0 changed bytes months of work ago; what had never happened
+was putting an EDITED one back into a built level's superbundle. `tools/usd/enlighten_inject_test.py`
+does it, and the edit is made IN USD -- on the stage's own `bf3:payload` attribute, with the stage
+saved to disk and REOPENED before anything is read back, so nothing measured here lived only in
+memory:
+
+    level        mp_001
+    source       162 resource(s), 377,036 payload byte(s)
+    authored     162 resource(s)   {databases 1, probeSets 159, staticDatabases 1, shaderDatabases 1}
+    edit         levels/mp_001/mp_001/enlighten/shaderdatabase
+                 189 material(s); material 0 colour (0.782,0.782,0.782) -> (0.125,0.25,0.375)
+    readback     162 resource(s), 377,036 payload byte(s)
+    identical    161 of 162
+    changed      1, by exactly 12 bytes, first at offset 4
+    meta         162 of 162 carry one
+    RESULT       PASS
+
+The change count is the guard that matters. A writer that quietly handed back the source bytes
+would report 162 identical and 0 changed, which is what "0 changed" looks like when it means
+nothing; this refuses unless exactly one payload changed, by exactly the 12 bytes of one Vec3, at
+the offset the format puts the first material's colour.
+
+**Built into a level, and read back out of it.** All 162 were added to the `usdlevel` bundle of the
+standalone `REALITYMOD` build (renamed `levels/mp_001/` -> `levels/realitymod/`), against a control
+build differing only in those lines:
+
+    control    bundles=8  errors=1 (the known rugpile_01_n)  sb=56,007,312   RESULT LOADED
+    injected   bundles=8  errors=1 (the known rugpile_01_n)  sb=56,251,200   RESULT LOADED
+    delta      +243,888 bytes of superbundle for 377,036 bytes of payload
+
+Then `mount_standalone_sb` on that 56,251,200-byte superbundle and `dump_resource` on all 162:
+
+    out of the BUILT level superbundle   162 / 162 byte-identical, 377,036 / 377,036 bytes
+    the edited one                       material 0 colour reads back (0.125, 0.25, 0.375)
+
+That is Rime's own mounter reading our level's own bundle, so "the payload is in there" is not an
+inference from a size delta.
+
+**It also overrides a stock level.** The same edited resource, shipped as a mod bundle against stock
+`MP_001`, loads.
+
+**What this does NOT show, with the measurement.** A DELIBERATELY CORRUPT shader database -- the
+material count set to 65,535 against a 6,997-byte payload, so any reader walking it runs off the
+end -- was shipped in the winning (APPENDED) order and the level **still loaded**. A dedicated
+server does not read the Enlighten bake, so booting it is acceptance of the container, not evidence
+that the engine consumed the payload. Confirming an edited bake looks different needs a client and
+an eye, and that was not done.
+
 ## Every level BF3 ships BOOTS, and the engine counts the objects (2026-09-06)
 
 **48 of 49 levels had never been started.** The pipeline was verified on mp_001 and on authoring
@@ -1100,7 +1239,8 @@ read so an appended element was never seen.
 | USD representation, whole game | 10,396 partitions, 211,765 instances, 802 types, 776,004 fields, **0 changed** |
 | Closure editable end to end | edit -> emit -> build -> **Level:Loaded**, 1 of 10,396 partitions rewritten |
 | Level graph, all 49 levels | 558,864 instances, 0 authored twice, 23,526,728 fields, **0 changed** |
-| Enlighten | 0 changed across three levels |
+| Enlighten | 0 changed across three levels; an EDITED bake ships in a built level, 162/162 byte-identical read back out of the 56,251,200-byte superbundle, **LOADED** |
+| Update-in-place, stock level | partition and resource of stock `MP_001` overridden; engine reports `USDPATCH_EDIT_OK_C`, `trans(12.500,34.250,56.750)`, `aabb min(-7.500,-2.250,-6.750)` |
 | Terrain heights | byte-exact; untouched terrain emits 0 changed nodes |
 | Terrain rasters, layers, scattering | 0 changed |
 | Collision, unedited | byte-identical, with an edit guard |
@@ -1156,7 +1296,12 @@ common case rather than the exception:
    to 1,107 without adding a byte to the bundle.
 
 6. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader.
-7. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
+7. ~~**Update-in-place unproven**; Enlighten is not re-injected into a built bundle.~~
+   **DONE 2026-09-06** (both sections at the top). A mod changes an EBX partition AND a resource
+   of stock `MP_001` and the engine reports the edited values; an edited Enlighten bake is in a
+   built level superbundle, 162/162 byte-identical read back out of it, and boots. What is still
+   NOT shown: a dedicated server does not read Enlighten at all -- a deliberately corrupt bake,
+   shipped in the winning order, loads -- so the GI claim is acceptance, not consumption.
 8. **48 of 49 levels have never been booted** (a sweep is running).
 
 **Superseded by the writers landing:** "0 changed is not byte-perfect" was item 2 of this list.
@@ -1222,7 +1367,9 @@ instead was measured to make the engine reject the bundle, but that measurement 
 closure being referenced, so it is worth re-running.
 
 Checked before booting: 10,392 referenced against 1,718 emitted, **0 names in both** -- nothing
-shadows, which is the one arrangement measured never to work.
+shadows. That was written when shadowing was believed impossible; it is not (top section), but the
+disjointness is still worth keeping, because a name in both would make the winner depend on bundle
+ORDER rather than on intent.
 
 ## The whole game round trips, not just a level (2026-09-06)
 
@@ -1597,7 +1744,10 @@ from nearly true into true.
    whose geometry is edited keeps lighting for the geometry it used to have. That is a limit of the
    format, not of the carrier -- nothing outside Enlighten itself can bake it -- but it means an
    edited level's GI is stale rather than wrong-and-detectable.
-7. **Update-in-place** unproven. **No equivalence check** against BF3's own bake.
+7. ~~**Update-in-place** unproven.~~ **DONE 2026-09-06** (section at the top): partitions resolve
+   FIRST-wins and resources LAST-wins, so a mod needs two bundles, one prepended and one appended,
+   and then both kinds of edit land on a level BF3 ships. **No equivalence check** against BF3's
+   own bake.
 
 ## Not blockers (corrected)
 
@@ -1609,6 +1759,12 @@ from nearly true into true.
   The game's own MVDB binds a texture that was never shipped; the warning is correct.
 
 ## Traps that cost real time here
+
+- **A bundle can only override one KIND of thing at a time, and the failure is silent.** An EBX
+  partition resolves from the FIRST bundle in the list that holds the name; a resource from the
+  LAST. Prepending -- which every previous attempt did, because the shipped `UsdRoundTrip` mod does
+  -- makes a partition override work and a resource override quietly do nothing, and appending
+  reverses it exactly. Four boots, one variable, in the top section. Ship two bundles.
 
 - **`build_sb` with a name missing the `Win32/` prefix writes NOTHING and reports success.**
   `build_sb usdroundtrip/scaled ...` printed "Bundle successfully built and added to superbundle!"
