@@ -170,6 +170,10 @@ def main():
                         help="fail if fewer than this many name source files carried anything")
     parser.add_argument("--gzip", action="store_true",
                         help="write bf3_name_hashes.tsv.gz instead of the 28 MB plain file")
+    parser.add_argument("--int-fields", default=None,
+                        help="directory written by Rime's dump_int_fields; every 32-bit integer "
+                             "field is scored against this table and the ones that are name "
+                             "hashes are identified by their resolution rate")
     parser.add_argument("--compare", action="append", default=[],
                         help="a public hash list (JSON of hash -> name) to audit against this "
                              "table; may be given more than once")
@@ -410,9 +414,94 @@ def main():
             "hash_absent_from_this_table": len(public) - unreproducible - hash_known,
         }
 
+    # ---- which integer fields are name hashes -------------------------------------------------
+    # Frostbite stores name hashes in fields that mostly do not say "hash", and there is no list of
+    # them. The detector is the resolution rate against this table: a field that really holds
+    # hashQuick/hashQuickLowerCase of a name resolves at or near 100%, and a packed bitfield, an
+    # index or a size resolves at ~0% because its values are small integers no name produces.
+    # Offering EVERY integer field to the test is what makes 0% a disqualifier rather than an
+    # absence of evidence.
+    fields = {}
+
+    if args.int_fields:
+        stats = {}
+        stats_path = os.path.join(args.int_fields, "int_field_stats.tsv")
+
+        with open(stats_path, "r", encoding="utf-8") as handle:
+            for line in handle:
+                if line.startswith("#"):
+                    continue
+
+                key, distinct, occurrences, truncated = line.rstrip("\n").split("\t")
+                stats[key] = (int(distinct), int(occurrences), truncated == "1")
+
+        values = {}
+
+        with open(os.path.join(args.int_fields, "int_field_values.tsv"), "r",
+                  encoding="utf-8") as handle:
+            for line in handle:
+                key, value = line.rstrip("\n").split("\t")
+                values.setdefault(key, set()).add(int(value, 16))
+
+        rows = []
+
+        for key, seen in values.items():
+            # Zero is every hash field's "none" -- MVDB writes 0 for the base appearance -- and
+            # hashQuick never returns it, so scoring it would depress every rate by its share.
+            non_zero = {v for v in seen if v}
+
+            if not non_zero:
+                continue
+
+            by_lower = sum(1 for v in non_zero if v in lower_keys)
+            by_quick = sum(1 for v in non_zero if v in quick_names)
+            best = max(by_lower, by_quick)
+            rows.append({
+                "field": key,
+                "distinct": len(seen),
+                "distinct_non_zero": len(non_zero),
+                "occurrences": stats.get(key, (0, 0, False))[1],
+                "resolved_hashQuick": by_quick,
+                "resolved_hashQuickLowerCase": by_lower,
+                "rate": round(best / len(non_zero), 4),
+                "truncated": stats.get(key, (0, 0, False))[2],
+            })
+
+        rows.sort(key=lambda r: (-r["rate"], -r["distinct_non_zero"]))
+
+        with open(os.path.join(out_dir, "bf3_hash_fields.tsv"), "w", encoding="utf-8") as handle:
+            handle.write("# field\trate\tdistinct_non_zero\tresolved_hashQuick\t"
+                         "resolved_hashQuickLowerCase\toccurrences\tverdict\n")
+            handle.write("# verdict: hash >= 0.90, partial 0.10-0.90, not-a-hash < 0.10\n")
+
+            for row in rows:
+                verdict = ("hash" if row["rate"] >= 0.90
+                           else ("partial" if row["rate"] >= 0.10 else "not-a-hash"))
+                row["verdict"] = verdict
+                handle.write("%s\t%.4f\t%d\t%d\t%d\t%d\t%s\n"
+                             % (row["field"], row["rate"], row["distinct_non_zero"],
+                                row["resolved_hashQuick"], row["resolved_hashQuickLowerCase"],
+                                row["occurrences"], verdict))
+
+        confirmed = [r for r in rows if r["rate"] >= 0.90]
+        partial = [r for r in rows if 0.10 <= r["rate"] < 0.90]
+        fields = {
+            "integer_fields_scored": len(rows),
+            "hash_fields": len(confirmed),
+            "partial_fields": len(partial),
+            "not_hash_fields": len(rows) - len(confirmed) - len(partial),
+            "hash_field_references_distinct": sum(r["distinct_non_zero"] for r in confirmed),
+            "hash_field_references_resolved": sum(max(r["resolved_hashQuick"],
+                                                      r["resolved_hashQuickLowerCase"])
+                                                  for r in confirmed),
+            "hash_field_occurrences": sum(r["occurrences"] for r in confirmed),
+            "confirmed": [r["field"] for r in confirmed],
+        }
+
     summary = {
         "source_dir": os.path.abspath(args.source_dir),
         "comparisons": comparisons,
+        "hash_fields": fields,
         "name_sources": source_counts,
         "distinct_names": len(names),
         "non_ascii_names": non_ascii,

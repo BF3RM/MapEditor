@@ -1,0 +1,15 @@
+# Names RECOVERED BY SEARCH, not strings BF3 stores. Each is a verified preimage:
+# hashQuickLowerCase(name) == hash, asserted on load. They are kept OUT of
+# bf3_name_hashes.tsv, which is built only from strings the game itself contains.
+# Search: 60,147,020 candidate-target tests over corpus-derived candidates,
+# expected false hits 0.0140; a control of 126 random hashes over the same
+# generators produced 0. Every hit is a directory sibling of the mesh that
+# references it, which is the corroboration a wide search cannot offer.
+# hash	fn	name	generator	donor	referencing mesh
+3337905D	lower	architecture/me_storefronts/me_storefront_twoopening_irag02_wet	context	architecture/me_storefronts/me_storefront_twoopening_irag02_inside	architecture/me_storefronts/me_storefront_twoopening_iraq01_wet_mesh
+5E5CA06C	lower	levels/xp4_financialdistrict/objects/escalator_01/escalator_01_ov	context	levels/xp4_financialdistrict/objects/escalator_01/escalator_01_d	levels/xp4_financialdistrict/objects/escalator_01/mall_01_escalator_01_xp4_mesh
+615E8C65	lower	xp_raw/props/metalawening/metalawening_02_orange	context	xp_raw/props/metalawening/metalawening_02_xpack	xp_raw/props/metalawening/metalawening_02_xpack_mesh
+661F13B6	lower	objects/sprinkler_01/sprinkler_01_short_black	context	objects/sprinkler_01/sprinkler_01_short_mesh	objects/sprinkler_01/sprinkler_01_mesh
+7F667ADA	lower	props/streetprops/me_storesignset_01/me_storesignset_01_512x192_v3	context-digits	props/streetprops/me_storesignset_01/me_storesignset_01_512x128_v3	props/streetprops/me_storesignset_01/me_storesignset_01_512x192_cluster02_mesh
+BE452C2C	lower	architecture/me_storefronts/me_storefront_windows_iraq02_wet	context-digits	architecture/me_storefronts/me_storefront_windows_iraq01_wet	architecture/me_storefronts/me_storefront_windows_iraq01_wet_mesh
+F60C7C45	lower	architecture/me_storefronts/me_storefront_wall_iraq02_wet	context-digits	architecture/me_storefronts/me_storefront_wall_iraq01_wet	architecture/me_storefronts/me_storefront_wall_iraq01_wet_mesh

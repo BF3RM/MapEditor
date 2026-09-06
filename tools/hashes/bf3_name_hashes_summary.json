@@ -87,6 +87,36 @@
       "rows": 2326
     }
   },
+  "hash_fields": {
+    "confirmed": [
+      "MeshAsset.NameHash",
+      "SoundDataAsset.NameHash",
+      "UnlockAssetBase.Identifier",
+      "ObjectVariation.NameHash",
+      "BasicUnlockInfo.Identifier",
+      "InstanceOutputNode.Id",
+      "ModelAnimationEntityData.JointOutputPropertyIds[]",
+      "WeaponStateData.ReferencedAssetHashes[]",
+      "WeaponSocketObjectData.ReferencedAssetHashes[]",
+      "ActionNode.ActionKey",
+      "StatsCategoryWeaponData.SoldierWeaponId",
+      "OutputNodeData.OutputNameHash",
+      "AudioLanguageSetting.NameHash",
+      "StreamPoolAsset.StreamPoolId",
+      "FaceAnimationWaveMapping.WaveNameHash",
+      "WeaponComponentData.WeaponItemHash",
+      "MeshVariationDatabaseEntry.VariationAssetNameHash",
+      "StaticModelGroupMemberData.InstanceObjectVariation[]",
+      "UIItemDescription.ItemIds[]"
+    ],
+    "hash_field_occurrences": 324527,
+    "hash_field_references_distinct": 32337,
+    "hash_field_references_resolved": 32181,
+    "hash_fields": 19,
+    "integer_fields_scored": 462,
+    "not_hash_fields": 436,
+    "partial_fields": 7
+  },
   "name_sources": {
     "ant": 30485,
     "bundle": 1159,
@@ -98,6 +128,6 @@
     "superbundle": 64
   },
   "non_ascii_names": 288,
-  "source_dir": "/tmp/bf3_names2",
+  "source_dir": "/tmp/bf3_names3",
   "table_rows": 404486
 }
