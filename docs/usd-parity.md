@@ -2850,3 +2850,22 @@ instances in 144 types, and its loop has no type filter. The stage simply predat
 The lesson, having now made the same mistake four times in one session: **check the artefact's date
 against the code's before concluding the code is lossy.** Four "X is absent" findings -- three
 measurement artifacts and one stale file -- and not one of them was a defect in the exporter.
+
+### What the fresh stage is worth to the EMITTER
+
+Re-exporting did not only fix the USD side. Feeding the emitter the fresh stage instead of the
+Sep-05 one nearly doubles what reaches the built level:
+
+    emitted from the stale stage    23 types /  2640 instances
+    emitted from the fresh stage    32 types /  5019 instances
+
+Newly carried, and absent entirely before: `RoadData` 115, `EffectReferenceObjectData` 139,
+`VolumeVectorShapeData` 123. Same emitter, same `WORLD_PART_TYPES`, better input -- the stale stage
+was starving it.
+
+Verified: bundles=9, superbundle 51.51 MB -> 52.23 MB, server LOADED, ENTITY static=799,
+TEAMENT team=2 autoteam=1. The emitter warns that 1216 instances have a blueprint in neither our
+bundle nor the closure and authors them anyway; the load does not reject them, but that warning is
+the place to look first if a future build dies during entity creation.
+
+**Re-export the stage before measuring anything.** A stage is a build artefact, not a fixture.
