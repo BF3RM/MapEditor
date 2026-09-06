@@ -13,7 +13,7 @@ import json
 import os
 import sys
 
-from pxr import Usd, UsdGeom
+from pxr import Usd, UsdGeom, UsdPhysics
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -31,11 +31,22 @@ def _descriptors(dump):
         d = {"kind": s["Kind"], "centre": tuple(s["Centre"]),
              "radius": float(s.get("Radius", 0.0))}
 
+        rot = [tuple(c) for c in (s.get("Rotation") or ())]
+        d["rotation"] = None if rot in ([], [(1, 0, 0), (0, 1, 0), (0, 0, 1)]) else rot
+
         if s["Kind"] == "box":
             d["half"] = tuple(s["HalfExtents"])
-        else:
+        elif s["Kind"] in ("cylinder", "capsule"):
+            d["vertexA"] = tuple(s.get("VertexA") or (0.0, 0.0, 0.0))
+            d["vertexB"] = tuple(s.get("VertexB") or (0.0, 0.0, 0.0))
+            d["cylinderRadius"] = float(s.get("CylinderRadius", 0.0))
+        elif s["Kind"] == "mesh":
+            d["verts"] = [tuple(v) for v in s.get("Vertices") or []]
+            d["indices"] = list(s.get("Indices") or [])
+        elif s["Kind"] != "sphere":
             d["verts"] = [tuple(v) for v in s.get("Vertices") or []]
             d["planes"] = [tuple(p) for p in s.get("Planes") or []]
+            d["connectivity"] = bool(s.get("HasConnectivity"))
 
         out.append(d)
 
@@ -74,16 +85,33 @@ def main(orig_path, shapes_path):
         edited = Usd.Stage.Open(tmp)
         moved = False
 
+        # ANY collision prim, and whichever op it carries. A rotated placement is authored as a
+        # matrix op now, and a resource that holds no cube at all -- every .water.mesh is one
+        # triangle mesh -- would otherwise leave the guard unexercised and the test red for a
+        # reason that has nothing to do with preservation.
         for prim in edited.Traverse():
-            if prim.IsA(UsdGeom.Cube):
-                op = UsdGeom.Xformable(prim).GetOrderedXformOps()[0]
-                t = op.Get()
-                op.Set(type(t)(t[0] + 1.0, t[1], t[2]))
-                moved = True
+            if not prim.HasAPI(UsdPhysics.CollisionAPI):
+                continue
+
+            for op in UsdGeom.Xformable(prim).GetOrderedXformOps():
+                if op.GetOpType() == UsdGeom.XformOp.TypeTranslate:
+                    t = op.Get()
+                    op.Set(type(t)(t[0] + 1.0, t[1], t[2]))
+                    moved = True
+                elif op.GetOpType() == UsdGeom.XformOp.TypeTransform:
+                    m = op.Get()
+                    m[3] = type(m[3])(m[3][0] + 1.0, m[3][1], m[3][2], m[3][3])
+                    op.Set(m)
+                    moved = True
+
+                if moved:
+                    break
+
+            if moved:
                 break
 
         if not moved:
-            print("edit guard   no cube to move -- guard NOT exercised")
+            print("edit guard   no collision prim to move -- guard NOT exercised")
             return 1
 
         edited.GetRootLayer().Export(tmp)
@@ -95,9 +123,6 @@ def main(orig_path, shapes_path):
         print("edit guard   moved shape correctly forces a rebuild  -> PASS")
 
         return 0
-
-        print("BYTES        preserved copy DIFFERS from source -> FAIL")
-        return 1
 
     try:
         rebuilt = build_collision.build(back, wrapper_spec=dump.get("Wrapper"))

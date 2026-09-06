@@ -25,11 +25,22 @@ def _descriptors(dump):
     for s in dump.get("Shapes") or []:
         d = {"kind": s["Kind"], "centre": tuple(s["Centre"]), "radius": float(s.get("Radius", 0.0))}
 
+        rot = [tuple(c) for c in (s.get("Rotation") or ())]
+        d["rotation"] = None if rot in ([], [(1, 0, 0), (0, 1, 0), (0, 0, 1)]) else rot
+
         if s["Kind"] == "box":
             d["half"] = tuple(s["HalfExtents"])
-        else:
+        elif s["Kind"] in ("cylinder", "capsule"):
+            d["vertexA"] = tuple(s.get("VertexA") or (0.0, 0.0, 0.0))
+            d["vertexB"] = tuple(s.get("VertexB") or (0.0, 0.0, 0.0))
+            d["cylinderRadius"] = float(s.get("CylinderRadius", 0.0))
+        elif s["Kind"] == "mesh":
+            d["verts"] = [tuple(v) for v in s.get("Vertices") or []]
+            d["indices"] = list(s.get("Indices") or [])
+        elif s["Kind"] != "sphere":
             d["verts"] = [tuple(v) for v in s.get("Vertices") or []]
             d["planes"] = [tuple(p) for p in s.get("Planes") or []]
+            d["connectivity"] = bool(s.get("HasConnectivity"))
 
         out.append(d)
 
@@ -39,10 +50,12 @@ def _descriptors(dump):
 def main(path):
     dump = json.load(open(path))
     src = _descriptors(dump)
-    boxes = [d for d in src if d["kind"] == "box"]
-    hulls = [d for d in src if d["kind"] == "convex"]
-    print("extracted    %d shape(s): %d box, %d convex  (%s)"
-          % (len(src), len(boxes), len(hulls), os.path.basename(path)))
+    import collections
+    kinds = collections.Counter(d["kind"] for d in src)
+    rotated = sum(1 for d in src if d.get("rotation"))
+    print("extracted    %d placement(s): %s; %d rotated  (%s)"
+          % (len(src), ", ".join("%d %s" % (v, k) for k, v in kinds.most_common()),
+             rotated, os.path.basename(path)))
 
     if not src:
         print("FAIL         nothing extracted")
@@ -81,6 +94,19 @@ def main(path):
                 print("FAIL         shape %d centre[%d] %r -> %r" % (i, k, a["centre"][k], b["centre"][k]))
                 bad += 1
 
+        # The rotation has to survive too, or a rebuild straightens every rotated placement and
+        # every other check still passes.
+        ra = a.get("rotation") or ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+        rb = b.get("rotation") or ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+
+        for c in range(3):
+            for k in range(3):
+                checked += 1
+
+                if not close(ra[c][k], rb[c][k]):
+                    print("FAIL         shape %d rotation[%d][%d] %r -> %r" % (i, c, k, ra[c][k], rb[c][k]))
+                    bad += 1
+
         if a["kind"] == "box":
             for k in range(3):
                 checked += 1
@@ -88,6 +114,35 @@ def main(path):
                 if not close(a["half"][k], b["half"][k]):
                     print("FAIL         shape %d half[%d] %r -> %r" % (i, k, a["half"][k], b["half"][k]))
                     bad += 1
+        elif a["kind"] == "sphere":
+            checked += 1
+
+            if not close(a["radius"], b["radius"]):
+                print("FAIL         shape %d radius %r -> %r" % (i, a["radius"], b["radius"]))
+                bad += 1
+        elif a["kind"] in ("cylinder", "capsule"):
+            for name in ("vertexA", "vertexB"):
+                for k in range(3):
+                    checked += 1
+
+                    if not close(a[name][k], b[name][k]):
+                        print("FAIL         shape %d %s[%d] %r -> %r" % (i, name, k, a[name][k], b[name][k]))
+                        bad += 1
+
+            if a["kind"] == "cylinder":
+                checked += 1
+
+                if not close(a["cylinderRadius"], b["cylinderRadius"]):
+                    print("FAIL         shape %d cylinderRadius %r -> %r"
+                          % (i, a["cylinderRadius"], b["cylinderRadius"]))
+                    bad += 1
+        elif a["kind"] == "mesh":
+            checked += 1
+
+            if len(a["indices"]) != len(b.get("indices") or []):
+                print("FAIL         shape %d indices %d -> %d"
+                      % (i, len(a["indices"]), len(b.get("indices") or [])))
+                bad += 1
         else:
             if len(a["verts"]) != len(b.get("verts") or []):
                 print("FAIL         shape %d verts %d -> %d" % (i, len(a["verts"]), len(b.get("verts") or [])))

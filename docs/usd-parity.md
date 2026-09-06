@@ -279,6 +279,117 @@ Also measured on the way: BF3 pads a DCT payload past its last real bit -- 16, 2
 the 8-byte-aligned length (1,872 / 1,852 / 54 clips). That slack is never decoded. The encoder
 matches the shipped LENGTH rather than re-deriving a padding rule from a handful of clips.
 
+## Collision REBUILDS at the game's object count (2026-09-06)
+
+    swept        7,617 resources: 2,149 rebuilt, 5,468 preserve-only, 0 failed
+    objects      45,274 built against 45,989 in the game (98.4%)
+    round trip   22,714 placements, 348,518 values compared, 0 changed
+    edit probe   every rebuild: the moved shape moves, nothing else does
+    BigRadioTower  120 objects in the game, 118 rebuilt -- the 2 are its MOPP
+    RESULT       PASS
+
+The section above fixed the reader and left the writer at **81 objects against BF3's 120**. That
+gap is now **2**, and both are named: `hkpMoppBvTreeShape` and `hkpMoppCode`.
+
+Class by class on BigRadioTower, which is the resource the 81-vs-120 number came from:
+
+| class | game | built |
+|---|---|---|
+| hkRootLevelContainer | 1 | 1 |
+| HavokPhysicsContainer | 1 | 1 |
+| hkpListShape | 1 | 1 |
+| hkpConvexTransformShape | 67 | 67 |
+| hkpConvexTranslateShape | 2 | 2 |
+| hkpBoxShape | 26 | 26 |
+| hkpCylinderShape | 11 | 11 |
+| hkpConvexVerticesShape | 9 | 9 |
+| **hkpMoppBvTreeShape** | **1** | **0** |
+| **hkpMoppCode** | **1** | **0** |
+| TOTAL | 120 | 118 |
+
+**Four changes, each answering one line of that table.**
+
+*Rotated placements are `hkpConvexTransformShape`.* 52,448 of BF3's placements are, against 102,842
+translates, and the builder had no class for them -- so 67 of the tower's 69 wrappers were the
+wrong object AND lost their rotation. The layout is an hkTransform: three rotation COLUMNS then the
+translation, 32/96 bytes at 32-bit and 64/128 at 64-bit, measured off the game's own two packfiles
+rather than derived.
+
+*Placements and LEAVES are separate objects.* BF3 puts **26 distinct boxes in the tower and points
+69 wrappers at them**; one box per placement wrote 69. Sharing is driven by the leaf the reader
+says a placement points at, so a rebuild reproduces the game's own instancing exactly -- a
+geometry-only key merged 58 boxes BF3 had kept apart over a 250-resource sweep.
+
+*A shape at the origin with no rotation gets no wrapper at all.* The tower's 11 cylinders and 9
+hulls are direct children of the list; wrapping them wrote 20 `hkpConvexTranslateShape` objects the
+game does not have.
+
+*Connectivity is emitted only where the game has one.* 5,330 of BF3's 36,004 hulls carry an
+`hkpConvexVerticesConnectivity` and the rest leave the pointer null; the builder emitted one every
+time. Rime now reports which, off the fixup table -- a null pointer has no fixup, and reading the
+slot only ever sees an unrelocated zero.
+
+Plus `hkpCylinderShape`, `hkpSphereShape` and `hkpCapsuleShape` writers, and an `hkpListShape` --
+emitted only where the game has one, because 1,272 resources put a bare translate under the
+container and 900 put a bare list. **The class-name table is now only the classes actually used, in
+the order they first appear in the data section**, which is the game's own rule: checked on
+BigRadioTower, MEHouse01Large and big_curtain, whose tables match their objects exactly.
+
+**Every signature was read out of the game and every one of the five guesses was wrong.** The five
+new classes were first written with plausible-looking checksums; the real ones
+(`hkpConvexTransformShape` 0xAE3E5017, `hkpListShape` 0xA1937CBD, `hkpCylinderShape` 0x3E463C3A,
+`hkpSphereShape` 0x0795D9FA, `hkpCapsuleShape` 0xDD0B1FD3) are unanimous across all 7,617
+resources.
+
+### What is NOT rebuilt, and why the pipeline refuses rather than approximates
+
+**5,468 of 7,617 resources are preserve-only.** They hold an `hkpCompressedMeshShape`,
+`hkpExtendedMeshShape` or `hkpStorageExtendedMeshShape` -- the SHAPES themselves are Havok SDK
+bakes, and emitting the resource without them would ship a level whose water you fall through.
+`build_collision.can_rebuild()` is the gate and `build()` raises rather than drop a mesh; the
+pipeline preserves the original bytes, which is the rule terrain and meshes already follow.
+
+**1,006 of the 2,149 rebuilt lose their MOPP**, reported as `degraded`. That is a different claim
+from the one above and is why it is a different word: `hkpMoppBvTreeShape` + `hkpMoppCode` are an
+ACCELERATION structure, not geometry, and a bare `hkpListShape` under the container is an
+arrangement BF3 ships in 900 resources. The collision is complete; the broadphase is slower.
+`hkpMoppUtility::buildCode` lives in the SDK and is not synthesised here.
+
+**Byte equality against BF3's bake is not available and is not claimed.** Two measured reasons: the
+MOPP above, and the padding lanes of an `hkpConvexTransformShape`'s rotation carry SIMD leftovers
+with no rule -- `col0.w` is zero in 28,191 of the 52,448 and equals `col1.z` in 24,257. So the proof
+here is the object census plus a full round trip -- game bytes to Rime's reader to descriptors to
+the builder and back through Rime's reader -- requiring the same placements at the same positions
+with the same rotations, and an edit probe on every one, because a builder that ignored its input
+would pass a round trip that only ever fed it the same thing.
+
+Corpus-wide the builder's classes now cover **362,062 of BF3's 400,053 packfile objects (90.5%)**,
+up from 299,746 (74.9%).
+
+Residual, measured and not explained away: 245 nested `hkpListShape` are flattened into one, and
+1,036 wrappers are emitted that the game does not have -- 861 of them the documented one-shape pad
+(a container whose only entry is a bare convex wedges the server), the other 175 unaccounted for.
+
+**Not boot-tested.** An edited collision resource has not been built into a bundle and loaded in
+the isolated instance. Everything above is bytes and decode, not engine acceptance.
+
+### USD keeps the rotation now
+
+`tools/usd/collision_extract_roundtrip_test.py` and `collision_byte_roundtrip_test.py` both pass on
+BigRadioTower, MEHouse01Large and two `.water.mesh` resources:
+
+    tower   89 placements (69 box, 11 cylinder, 9 convex), 67 rotated -- 1,706 values, 0 changed
+    house   39 placements, 16 rotated -- 616 values, 0 changed
+    water   1 mesh -- 13 values, 0 changed; 47,272 / 21,304 / 5,420 / 137,580 bytes preserved
+            verbatim, and a moved shape correctly forces a rebuild in all four
+
+Two things had to change for that. A rotated placement is authored as a **matrix** xform op, not
+translate + orient: going through a quaternion re-normalises the rotation, and BF3's are float32
+and not exactly orthonormal -- the tower's shape 10 came back with `rotation[2][2] = -1.0e-4`
+against the game's 0, which is the size of the tolerance the test compares at. And a triangle mesh
+is read back as a mesh rather than as a hull; reading a water surface back as a convex solid would
+have turned it into a block.
+
 ## Collision geometry: the placements, not just the shapes (2026-09-06)
 
     corpus       7,617 HavokPhysicsData resources (the whole game)
@@ -374,9 +485,10 @@ the walk reaches and refuses are `hkpCompressedMeshShape` (8,872), `hkpExtendedM
 `hkpConstraintInstance` (5) -- the first two are Havok SDK bakes with 24.9 MB and 22.9 MB of object
 data behind them.
 
-And the REBUILD is untouched by all of this. `tools/havok/build_collision.py` still emits boxes and
-hulls behind `hkpConvexTranslateShape`, so an edited BigRadioTower is 81 objects against the game's
-120. The 39 are now itemised rather than a mystery:
+And the REBUILD is untouched by all of this -- **SUPERSEDED, see the section above: the writer now
+emits 118 of BigRadioTower's 120.** As it stood, `tools/havok/build_collision.py` emitted boxes and
+hulls behind `hkpConvexTranslateShape`, so an edited BigRadioTower was 81 objects against the game's
+120. The 39 itemised, which became the work list:
 
 | missing from the rebuild | count |
 |---|---|
@@ -814,7 +926,7 @@ The honest table, because "represented" and "editable end to end" are different 
 | Save edited MESH GEOMETRY back | **yes** -- an edited mesh ships, an unedited one is still referenced |
 | Move things in BLENDER and save back | yes, **via `dcc_merge`** -- never by trusting Blender's own export |
 | Save edited textures | yes, but that texture then ships as a copy |
-| Save edited collision | rebuilds, but not byte-identical to BF3's bake |
+| Save edited collision | rebuilds at 98.4% of the game's object count; not byte-identical to BF3's bake |
 | Save edited terrain LAYERS and SCATTERING back | **yes** -- unedited rebuilds are byte-identical on all 33 resources; an edited density changes exactly its 4 bytes |
 
 So data is editable end to end and is most of a weapon. Animation curves now write too, in place

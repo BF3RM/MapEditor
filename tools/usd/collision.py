@@ -33,9 +33,9 @@ def _xform(prim, centre, rotation=None):
     and is not.
     """
     x = UsdGeom.Xformable(prim)
-    x.AddTranslateOp().Set(Gf.Vec3d(*[float(c) for c in centre]))
 
     if not rotation:
+        x.AddTranslateOp().Set(Gf.Vec3d(*[float(c) for c in centre]))
         return
 
     # Havok gives three COLUMNS; USD's Matrix4d is row-major with the translation in row 3, so the
@@ -43,14 +43,19 @@ def _xform(prim, centre, rotation=None):
     c0, c1, c2 = [[float(v) for v in col] for col in rotation]
 
     if (c0, c1, c2) == ([1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]):
+        x.AddTranslateOp().Set(Gf.Vec3d(*[float(c) for c in centre]))
         return
 
-    m = Gf.Matrix4d(c0[0], c1[0], c2[0], 0.0,
-                    c0[1], c1[1], c2[1], 0.0,
-                    c0[2], c1[2], c2[2], 0.0,
-                    0.0, 0.0, 0.0, 1.0)
+    t = [float(c) for c in centre]
 
-    x.AddOrientOp().Set(Gf.Quatf(Gf.Rotation(m.ExtractRotation()).GetQuat()))
+    # A MATRIX op, not translate + orient. Going through a quaternion normalises the rotation, and
+    # BF3's are float32 and not exactly orthonormal: the radio tower's shape 10 came back with
+    # rotation[2][2] = -1.0e-4 against the game's 0, which is the size of the tolerance the round
+    # trip compares at. A matrix carries the columns the game stored, unchanged.
+    x.AddTransformOp().Set(Gf.Matrix4d(c0[0], c0[1], c0[2], 0.0,
+                                       c1[0], c1[1], c1[2], 0.0,
+                                       c2[0], c2[1], c2[2], 0.0,
+                                       t[0], t[1], t[2], 1.0))
 
 
 def author(stage, root, shapes, original=None):
@@ -241,14 +246,60 @@ def read(stage_path):
         r = prim.GetAttribute('bf3ConvexRadius')
         radius = float(r.Get()) if r and r.HasAuthoredValue() else 0.0
 
-        if prim.IsA(UsdGeom.Cube):
+        # The rotation the placement carries, as Havok stores it: three COLUMNS. Without this a
+        # rotated girder read back axis-aligned and the rebuild silently straightened 21,495 of
+        # BF3's placements.
+        #
+        # Straight out of the authored matrix op when there is one -- RemoveScaleShear
+        # re-orthonormalises, which moves a float32 rotation the game already rounded.
+        m = None
+
+        for op in UsdGeom.Xformable(prim).GetOrderedXformOps():
+            if op.GetOpType() == UsdGeom.XformOp.TypeTransform:
+                m = op.Get()
+
+        if m is None:
+            m = xf.RemoveScaleShear()
+            rotation = ((m[0][0], m[1][0], m[2][0]),
+                        (m[0][1], m[1][1], m[2][1]),
+                        (m[0][2], m[1][2], m[2][2]))
+        else:
+            rotation = ((m[0][0], m[0][1], m[0][2]),
+                        (m[1][0], m[1][1], m[1][2]),
+                        (m[2][0], m[2][1], m[2][2]))
+
+        if rotation == ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)):
+            rotation = None
+
+        kind = prim.GetAttribute('bf3ShapeKind')
+        kind = kind.Get() if kind and kind.HasAuthoredValue() else None
+
+        def _vec(name):
+            a = prim.GetAttribute(name)
+
+            return tuple(float(c) for c in a.Get()) if a and a.HasAuthoredValue() else (0.0, 0.0, 0.0)
+
+        if kind == 'sphere':
+            out.append(build_collision.sphere(centre, float(UsdGeom.Sphere(prim).GetRadiusAttr().Get() or 0.0),
+                                              rotation=rotation))
+        elif kind in ('cylinder', 'capsule'):
+            r = float((UsdGeom.Cylinder(prim) if kind == 'cylinder'
+                       else UsdGeom.Capsule(prim)).GetRadiusAttr().Get() or 0.0)
+
+            if kind == 'cylinder':
+                out.append(build_collision.cylinder(centre, _vec('bf3VertexA'), _vec('bf3VertexB'),
+                                                    r, radius, rotation=rotation))
+            else:
+                out.append(build_collision.capsule(centre, _vec('bf3VertexA'), _vec('bf3VertexB'),
+                                                   r, rotation=rotation))
+        elif prim.IsA(UsdGeom.Cube):
             sc = Gf.Vec3d(1, 1, 1)
 
             for op in UsdGeom.Xformable(prim).GetOrderedXformOps():
                 if op.GetOpType() == UsdGeom.XformOp.TypeScale:
                     sc = op.Get()
 
-            out.append(build_collision.box(centre, (sc[0], sc[1], sc[2]), radius))
+            out.append(build_collision.box(centre, (sc[0], sc[1], sc[2]), radius, rotation=rotation))
         elif prim.IsA(UsdGeom.Mesh):
             pts = UsdGeom.Mesh(prim).GetPointsAttr().Get() or []
 
@@ -258,6 +309,14 @@ def read(stage_path):
             verts = [(p[0], p[1], p[2]) for p in pts]
             counts = UsdGeom.Mesh(prim).GetFaceVertexCountsAttr().Get() or []
             idx = UsdGeom.Mesh(prim).GetFaceVertexIndicesAttr().Get() or []
+
+            # A triangle mesh is NOT a hull, and reading it back as one would turn a water surface
+            # into a solid. It is carried so the pipeline can see it and refuse the rebuild --
+            # an hkpStorageExtendedMeshShape needs a MOPP, which only the Havok SDK bakes.
+            if kind == 'mesh':
+                out.append(dict(kind='mesh', centre=centre, radius=radius, rotation=rotation,
+                                verts=verts, indices=[int(i) for i in idx]))
+                continue
 
             # The game's own planes win when they are present: they are exact, and a hull
             # extracted from BF3 has no faces to derive from.
@@ -272,7 +331,8 @@ def read(stage_path):
                 # actually form; build_collision re-applies it on the way out.
                 out.append(build_collision.convex(
                     centre, verts,
-                    [(p[0], p[1], p[2], -(p[3]) - radius) for p in carried.Get()], radius))
+                    [(p[0], p[1], p[2], -(p[3]) - radius) for p in carried.Get()], radius,
+                    rotation=rotation, connectivity=False))
                 continue
 
             # Otherwise derive one plane per face: normal from the winding, offset through its
@@ -298,6 +358,7 @@ def read(stage_path):
             if not planes:
                 continue                        # a hull with no faces is not a shape
 
-            out.append(build_collision.convex(centre, verts, planes, radius))
+            out.append(build_collision.convex(centre, verts, planes, radius,
+                                              rotation=rotation))
 
     return out
