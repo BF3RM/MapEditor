@@ -333,25 +333,42 @@ back, not to a previous run of this codec. The whole 2,078-resource corpus still
 byte-identical after the change (2078/2078 resources, 166/166 chunks) -- the digest is USD
 customData and touches no emitted byte.
 
-**Three things were NOT done, and none of them should be read as done:**
+**Confirmed against Rime's own reader, not only ours.** `compare_resource` compares a candidate
+against the MOUNTED game rather than a dump, so it has no third state, and it checks the meta too.
+On `objects/cableboxsystem_01/cablebox_01_Mesh`:
 
-- **`compare_resource` against the live mounter was not run.** It is the stronger check -- Rime's
-  reader rather than ours, and it compares the meta too -- and the plan was to run it on both
-  files. The machine had four concurrent RimeREPL mounts and 12 GB free at the time; a fifth mount
-  is the OOM this project has already hit once, so it was skipped rather than risked.
-- **No build.** The edited resource and chunk were prepared
-  (`objects/cableboxsystem_01/cablebox_01_Mesh`: 1,032-byte resource, 1,616-byte LOD0 chunk,
-  meta `B0030000000000005800000070009400`) but not put through `build_sb` / `add_resource` /
-  `add_chunk`, for the same reason.
-- **No boot, and no UV edit looked at on screen.** What IS verified in-game is a POSITION edit:
-  `docs/usd-roundtrip.md` §0 predicted an AABB before the run and the engine reported it exactly,
-  from bytes this toolchain wrote. A chunk-only edit appears in no number the server prints, so
-  confirming one means looking at a texture, and that was not done.
+    compare_resource ..._Mesh unedited.meshset   IDENTICAL (1032 bytes, metaIdentical=True)
+    compare_resource ..._Mesh edited.meshset     IDENTICAL (1032 bytes, metaIdentical=True)
 
-What the test does assert about acceptability is the invariant that decides it: the edited
-resource's meta satisfies `f0 + f1 + f2 == len(payload)`, without which the engine relocates past
-the end of the block. And in this case the edited resource is byte-identical to the game's own --
-the edit is entirely in the chunk -- so there is nothing in it for the engine to reject.
+The second line is the finding, not a formality: after a UV edit the resource is byte-identical to
+the game's under Rime's own comparator, meta included. Asked of the resource, an edited mesh and an
+untouched one are the same file. The edit is entirely in the 1,616-byte chunk, at offset 24.
+
+**It builds.** `build_sb` / `reference_existing_partition` / `add_resource` (with meta
+`B0030000000000005800000070009400`) / `add_chunk` / `build`:
+
+    Closure of 'objects/cableboxsystem_01/cablebox_01': +8 partition(s), +5 resource(s), +6 chunk(s)
+    Bundle successfully built and added to superbundle!
+    Superbundle successfully built!
+    sb 89,536 bytes   toc 741 bytes   0 errors
+
+**And the edited bytes are demonstrably IN it.** A superbundle is compressed, so the chunk is not
+findable verbatim; the check that works is a control build differing in exactly one input. Same
+commands, same everything, only `edited_0.chunk` swapped for the game's own:
+
+    edited  sb 89,536 bytes
+    control sb 89,536 bytes
+    DIFFER  634 byte(s), first at offset 296, last at 12,327
+
+Same size, 634 bytes apart in the compressed chunk region. Had the emitter referenced the mesh, or
+dropped the chunk, the two would be identical -- which is exactly what the old rule produced.
+
+**Still NOT done, and not to be read as done:** no boot. The bundle builds and the engine's
+acceptance of an `add_chunk`-written RAW chunk (the referenced path copies it compressed) remains
+UNVERIFIED, as `docs/usd-roundtrip.md` §7 already flags. What is verified in-game is a POSITION
+edit: §0 predicted an AABB before the run and the engine reported it exactly, from bytes this
+toolchain wrote. A UV edit appears in no number the server prints, so confirming one means looking
+at a texture on screen, and that was not done.
 
 ## The closure is editable, not just shipped (2026-09-06)
 
