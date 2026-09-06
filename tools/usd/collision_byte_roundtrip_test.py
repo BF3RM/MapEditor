@@ -51,11 +51,53 @@ def main(orig_path, shapes_path):
 
     stage = Usd.Stage.CreateInMemory()
     root = UsdGeom.Xform.Define(stage, "/World")
-    collision.author(stage, root, src)
+    collision.author(stage, root, src, original=orig)
     tmp = "/tmp/collision_byte_rt.usda"
     stage.GetRootLayer().Export(tmp)
     back = collision.read(tmp)
     print("via USD      %d descriptor(s)" % len(back))
+
+    # Unedited: hand back the game's own bytes, the same rule terrain and meshes follow.
+    preserved = collision.original_bytes(tmp)
+
+    if preserved is not None:
+        print("unedited     %d byte(s) preserved verbatim" % len(preserved))
+
+        if preserved != orig:
+            print("BYTES        preserved copy DIFFERS from source -> FAIL")
+            return 1
+
+        print("BYTES        identical (preserved)  -> PASS")
+
+        # A preservation check that always preserves proves nothing. Move one shape and the
+        # digest must refuse to hand back the original, or "unchanged" means "never looked".
+        edited = Usd.Stage.Open(tmp)
+        moved = False
+
+        for prim in edited.Traverse():
+            if prim.IsA(UsdGeom.Cube):
+                op = UsdGeom.Xformable(prim).GetOrderedXformOps()[0]
+                t = op.Get()
+                op.Set(type(t)(t[0] + 1.0, t[1], t[2]))
+                moved = True
+                break
+
+        if not moved:
+            print("edit guard   no cube to move -- guard NOT exercised")
+            return 1
+
+        edited.GetRootLayer().Export(tmp)
+
+        if collision.original_bytes(tmp) is not None:
+            print("edit guard   FAIL: a moved shape still returned the original bytes")
+            return 1
+
+        print("edit guard   moved shape correctly forces a rebuild  -> PASS")
+
+        return 0
+
+        print("BYTES        preserved copy DIFFERS from source -> FAIL")
+        return 1
 
     try:
         rebuilt = build_collision.build(back, wrapper_spec=dump.get("Wrapper"))

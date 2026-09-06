@@ -46,6 +46,27 @@ instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop b
 | Terrain mesh scattering | typed prims per type | MP_007 23 / SP_Valley 22 / MP_001 5 types; 598+572+130 fields, **0 changed** |
 | Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
 
+## Collision: byte-perfect when unedited (2026-09-06)
+
+    MEHouse01Large    21,304 bytes   identical (preserved)   + edit guard PASS
+    BigRadioTower     47,272 bytes   identical (preserved)   + edit guard PASS
+
+The rule is the one the rest of the pipeline already runs on -- terrain emits only the nodes that
+changed, meshes reference the player's install -- applied to collision: an unedited resource hands
+back the game's own bytes rather than a rebuild. A rebuild can only approximate BF3's baker (object
+order, padding and fixup layout are its choices), so regenerating data nobody touched would be
+guessing where the real bytes are already in hand.
+
+The digest that decides "unedited" quantises to **float32**, not to a fixed number of decimals: a
+half-extent came back 1.011325 against 1.011324, which is one float32 seen through a double, not an
+edit.
+
+A preservation test that always preserves proves nothing, so the test also moves a shape and asserts
+the original is REFUSED. Both resources pass both halves.
+
+**Still open:** the rebuild path. Our packfile holds 81 objects against the game's 120, so editing
+collision produces a correct resource, not BF3's bytes.
+
 ## Collision can now be read, not only written (2026-09-06)
 
     BigRadioTower     35 shapes (26 box, 9 convex)   537 values   0 changed
@@ -150,17 +171,13 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
    browsable, but a `WorldPartData` prim does not own its objects and mesh placements sit outside
    the hierarchy entirely.
 3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
-4. **Havok: wrapper reproduces byte-exactly; the PACKFILES do not yet.** Rime reads the shapes,
-   their planes and now the Frostbite wrapper (`927a9370`, `ca64e15a`), and `build_collision.build`
-   re-emits the wrapper verbatim. Measured on MEHouse01Large (21,304 bytes): the rebuild went from
-   *differing at byte 0* to **the first 1,108 bytes identical** -- the whole wrapper header and all
-   four arrays. Two things remain, both named:
-   - **A 12-byte array rotation.** The file holds `[0, 1164, 0]` at offset 1104;
-     `GetWrapper` returns `MaterialFlagsAndIndices` as `[0, 0, 1164]`. The file is truth, so Rime's
-     reader is a slot out. Small and precisely located.
-   - **The packfiles themselves differ** (12,861 of 21,304 bytes). Our builder lays out its own
-     Havok data; matching BF3's byte-for-byte is the larger remaining piece, and nothing should
-     claim collision round trips until it does.
+4. **Havok: byte-perfect UNEDITED; an edited shape rebuilds and is not BF3's bake.** Rime reads the
+   shapes, planes and Frostbite wrapper, and an untouched resource now hands back the game's own
+   bytes -- MEHouse01Large 21,304 and BigRadioTower 47,272, **identical**, with a guard proving a
+   moved shape refuses preservation and forces a rebuild. What is NOT solved is the rebuild itself:
+   our packfile holds 81 objects against the game's 120, so an EDITED collision resource is correct
+   but not byte-identical to what BF3 would bake. Reproducing the packfile exactly (object order,
+   padding, fixups, and the object types we do not model) is the remaining work.
 
 5. **Ant clips carry indexed joints** (`dof037`). Values are exact; names need
    `AntAnimationSetAsset` -> `SkeletonAsset` + actor channel maps resolved.

@@ -13,6 +13,8 @@ descriptors build_collision.build() consumes.
 MOPP is not involved. It is a Havok SDK acceleration structure for large mesh shapes; boxes and
 convex hulls do not use one.
 """
+import base64
+import hashlib
 import os
 import sys
 
@@ -27,10 +29,26 @@ def _xform(prim, centre):
     UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(*[float(c) for c in centre]))
 
 
-def author(stage, root, shapes):
-    """Write box/convex descriptors into the stage as collision prims."""
+def author(stage, root, shapes, original=None):
+    """Write box/convex descriptors into the stage as collision prims.
+
+    `original` is the resource these shapes came out of. It is carried verbatim so an UNEDITED
+    round trip can hand back the game's own bytes instead of a rebuild.
+
+    That is not a shortcut, it is the same rule the rest of this pipeline runs on: terrain emits
+    only the nodes that actually changed, and meshes reference the player's install rather than
+    shipping copies. A rebuild can only ever approximate BF3's baker -- object order, padding and
+    fixup layout are its choices, not ours -- so reproducing them for data nobody touched would be
+    guessing where the real bytes are already in hand. Edited shapes still rebuild, and that is the
+    only case where a rebuild is unavoidable.
+    """
     scope = UsdGeom.Scope.Define(stage, root.GetPath().AppendChild(SCOPE))
     n = 0
+
+    if original:
+        scope.GetPrim().SetCustomDataByKey(
+            'bf3:originalResource', base64.b64encode(bytes(original)).decode('ascii'))
+        scope.GetPrim().SetCustomDataByKey('bf3:originalDigest', _digest(shapes))
 
     for i, sh in enumerate(shapes or ()):
         path = scope.GetPath().AppendChild('shape%04d' % i)
@@ -82,6 +100,55 @@ def author(stage, root, shapes):
         n += 1
 
     return n
+
+
+def _q(x):
+    """Quantise to what USD actually stores: float32.
+
+    Rounding to a fixed number of decimals is wrong here -- a half-extent came back 1.011325
+    against 1.011324, which is the same float32 seen through a double, not an edit. Comparing at
+    the storage precision makes "unchanged" mean unchanged rather than "unchanged to 6 places".
+    """
+    import struct as _s
+
+    return _s.unpack('f', _s.pack('f', float(x)))[0]
+
+
+def _digest(shapes):
+    """A stable fingerprint of the shapes, so an edit can be told from an untouched trip."""
+    h = hashlib.sha256()
+
+    for sh in shapes or ():
+        h.update(repr((sh.get('kind'),
+                       tuple(_q(c) for c in sh.get('centre', ())),
+                       tuple(_q(c) for c in sh.get('half', ())),
+                       tuple(tuple(_q(c) for c in v) for v in sh.get('verts', ())),
+                       _q(sh.get('radius', 0.0)))).encode())
+
+    return h.hexdigest()
+
+
+def original_bytes(stage_path):
+    """The untouched source resource, when the stage still holds exactly what came out of it.
+
+    -> bytes, or None if anything was edited (or nothing was carried).
+    """
+    stage = Usd.Stage.Open(stage_path)
+
+    for prim in stage.Traverse():
+        blob = prim.GetCustomDataByKey('bf3:originalResource')
+
+        if not blob:
+            continue
+
+        want = prim.GetCustomDataByKey('bf3:originalDigest')
+
+        if want and _digest(read(stage_path)) != want:
+            return None                     # edited: it has to be rebuilt
+
+        return base64.b64decode(blob)
+
+    return None
 
 
 def read(stage_path):
