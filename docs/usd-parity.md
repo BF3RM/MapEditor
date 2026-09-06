@@ -5,6 +5,80 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## An edited mesh now ships; an unedited one is still referenced (2026-09-06)
+
+    corpus       68 mesh(es) with every LOD chunk present
+    unedited     68/68 resource byte-identical to the game
+    unedited     68/68 chunk byte-identical to the game
+    unedited     68/68 REFERENCED (the game supplies the geometry)
+    uv edit      67/68 SHIPPED (the edit reaches the bundle)
+    uv edit      1 REFUSED (subsets alias one vertex block; loud, not dropped)
+    RESULT       PASS
+
+The writer was never the missing piece. `tools/usd/meshset.py` has emitted MeshSet payloads,
+relocation table and resource meta since the first round trip, and Rime has no MeshSet writer at
+all -- its `Serialize` methods write a struct header echoing the pointers they read,
+`RelocPtr<T>.Serialize` throws, and nothing anywhere emits a relocation table. What was missing was
+the DECISION.
+
+**The emitter asked the wrong bytes whether the mesh had been edited.** It compared the rebuilt
+MeshSet resource against the game's:
+
+    if original is not None and payload == original:      # reference it
+
+but a MeshSet does not contain the geometry. Positions, normals, UVs and tangents all live in the
+CHUNK, and the resource changes only when a count or the bounding box changes. So every edit that
+moved neither was called untouched, `add_existing_resource` handed the game's geometry back over
+the top of it, and the chunk was never emitted at all -- `for li, chunk in ... if res_path else []`.
+
+Measured on `objects/cableboxsystem_01/cablebox_01_Mesh`, before the fix:
+
+| edit | resource | chunk | old verdict |
+|---|---|---|---|
+| none | identical | identical | referenced, correct |
+| one UV moved 0.25 | **identical** | differs at byte 24 | **referenced -- edit lost** |
+| one normal flipped | **identical** | differs | **referenced -- edit lost** |
+| one vertex moved | differs | differs | shipped |
+
+A position edit survived only by accident: `_rebound` rewrites the bounding box to the exact
+min/max of the positions, and BF3's stored box is not exactly that, so the payload changed as a
+side effect. Nothing was relying on the geometry.
+
+**The fix is the pattern collision already uses.** `bf3_usd.export` now authors
+`bf3:chunkDigest` on each LOD scope -- the sha256 of the chunk as it left BF3, the same shape as
+collision's `bf3:originalDigest`, a digest rather than the bytes because 67 KB per LOD across a
+527-mesh stage would carry the game's geometry twice over. `bf3_usd.unedited_geometry` rebuilds the
+chunk and compares, and the emitter's rule now reads all three facts:
+
+    def is_referenced(payload, original, geom_ok):
+        return original is not None and payload == original and geom_ok is not False
+
+It lives in one function so `tools/usd/mesh_edit_test.py` measures the rule the emitter runs rather
+than a restatement of it. A stage exported before digests existed returns `None`, which references
+as before and prints how many meshes that covers -- named, not assumed.
+
+**One mesh in BF3 cannot represent a partial edit, and now says so.**
+`xp2/objects/decalplanes_02/leaves_01_Mesh` has two subsets that ALIAS one vertex block (both at
+VertexOffset 0, VertexDataSize 128 for 4 vertices), so writing them in order made the second
+overwrite the first and a UV edit to subset 0 vanished -- clean round trip, nothing reported.
+`geom.rebuild_chunk` now refuses a CONFLICTING write to a shared range and names the offset;
+identical writes, which is what an untouched mesh does, still pass and byte-identity is unaffected.
+
+**Verified against Rime's own reader, not only ours.** `compare_resource` compares a candidate
+against the mounted game rather than against a dump, and it is the independent confirmation that
+the resource is the wrong thing to ask:
+
+    compare_resource ..._Mesh unedited.meshset   IDENTICAL (1032 bytes, metaIdentical=True)
+    compare_resource ..._Mesh edited.meshset     IDENTICAL (1032 bytes, metaIdentical=True)
+
+The UV-edited resource is byte-identical to the game's under Rime's own comparator. The 1,616-byte
+chunk is where the edit is.
+
+**Still open, stated plainly:** a UV edit has not been LOOKED at in the running game. What is
+verified in-game is a position edit (`docs/usd-roundtrip.md` §0: the engine reported the predicted
+AABB from bytes this toolchain wrote). A chunk-only edit is not visible in any number the server
+prints, so confirming one means looking at a texture on screen, and that was not done.
+
 ## The closure is editable, not just shipped (2026-09-06)
 
 A level export that stops at the level's own partitions exports a fraction of what the level IS.
@@ -60,6 +134,34 @@ Exactly one partition rewritten out of 10,396 -- the rule holds under a real emi
 principle. The level's own 490 partitions and the closure's 10,396 are DISJOINT (measured: 0 in
 both), so nothing is authored twice and two prims cannot hold conflicting edits for one instance.
 
+## "Round trips" is not "can be written back" (2026-09-06)
+
+A correction to claims made earlier in this document, including by the agent that wrote them.
+
+Several rows here report **0 changed fields** -- scattering, terrain layers, Enlighten, the whole
+802-type closure. That measures REPRESENTATION: the data survives BF3 -> USD -> BF3-shaped JSON
+unchanged. It does NOT mean an edit can reach the game, because that needs a WRITER for the
+resource, and several of those writers throw.
+
+Every `Serialize` in Rime that still throws `NotImplementedException`, and what it costs:
+
+| resource | consequence |
+|---|---|
+| `VisualTerrain`, `VisualTerrainLayer`, `TerrainLayerCombinationDraw`, `Surface2d/3dDrawMethod` | **terrain layers and mesh scattering cannot be written back** -- only the leaf `MeshScatteringType.Serialize` was implemented |
+| Ant DCT `Header`/`DofTable`, `PackageMeta` | animation clips are export-only |
+| `MeshLayout`, `GeometryDeclarationDesc`, `OccluderMeshData` | mesh geometry is export-only |
+| `HavokPhysicsData.Serialize` | collision is written only by the Python builder, never by Rime |
+| `ExternalTextureConstant`, `ExternalValueConstant` | shader constants are export-only |
+| `StreamingPartitionHeader` (both engines) | streaming partition headers are export-only |
+| `RelocPtr`, `RelocArray`, `Matrix44` | core primitives; used by 5, 1 and 9 files, so not systemic |
+
+Not a blocker: `EALayer3Header`/`EaLayer32Block` -- BF3 ships 100% XaSeekable1, so they are off its
+path entirely.
+
+**The rule this document should have followed from the start:** a row may claim "round trips" on a
+USD measurement, but "editable end to end" requires a working writer AND a boot test. Only entity
+and reference edits, terrain heights and unedited collision meet the second bar today.
+
 ## Blender loses almost everything -- do not trust its export (2026-09-06)
 
 The whole "editable in a DCC" claim rested on an assumption nobody had tested. Measured, on a
@@ -101,13 +203,16 @@ The honest table, because "represented" and "editable end to end" are different 
 | Add entries to a list (sockets, chunks) | yes -- arrays are child prims and can be appended |
 | Save field and reference edits into a working game | **yes, verified**: edit -> emit -> build -> Level:Loaded |
 | Save edited ANIMATION CURVES back | **no** -- Ant DCT `Header.Serialize`/`DofTable.Serialize` throw |
-| Save edited MESH GEOMETRY back | **no** -- meshes are referenced, not rebuilt |
+| Save edited MESH GEOMETRY back | **yes** -- an edited mesh ships, an unedited one is still referenced |
 | Move things in BLENDER and save back | yes, **via `dcc_merge`** -- never by trusting Blender's own export |
 | Save edited textures | yes, but that texture then ships as a copy |
 | Save edited collision | rebuilds, but not byte-identical to BF3's bake |
 
-So data is editable end to end and is most of a weapon; animation curves and mesh geometry are
-export-only, and both need a writer in Rime that today is a stub that throws.
+So data is editable end to end and is most of a weapon. Animation curves are still export-only.
+Mesh geometry is not: the writer is `tools/usd/meshset.py`, in Python, and Rime is not in that path
+at all -- checked, and every `Serialize` on `RimeLib.Mesh`'s MeshSet types writes a fixed-size
+header echoing the pointers it read, `RelocPtr<T>.Serialize` throws, and nothing emits a relocation
+table. There is no C# writer to fix; the Python one is byte-exact against the game.
 
 ## How much is actually editable (2026-09-06)
 
