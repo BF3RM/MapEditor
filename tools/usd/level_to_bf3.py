@@ -751,7 +751,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     #
     # This is what BF3 resolves a mesh's textures through. Geometry and texture partitions alone
     # give a bundle that loads and draws grey.
-    if texture_dir and os.path.isdir(texture_dir) and mvdb_inputs:
+    # Gated on HAVING ENTRIES, not on a texture directory existing. It used to require
+    # `texture_dir and os.path.isdir(texture_dir)`, and any caller that did not create
+    # `<level>_textures/` silently shipped a level with NO MeshVariationDatabase at all. A dedicated
+    # server never needs one, so every headless check still passed -- 48 levels reported LOADED, and
+    # a client cannot bind a single material without it. The builder was saying so all along, in the
+    # 476 "could not find a valid variant" warnings nobody read as fatal.
+    if mvdb_inputs:
         entries = []
 
         for name, mesh_pg, mesh_g, mats, names_, binding in mvdb_inputs:

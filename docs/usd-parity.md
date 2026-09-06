@@ -1888,6 +1888,23 @@ common case rather than the exception:
 | Mesh resource + chunk | 68 / 68 unedited byte-identical; 2078 / 166 regression clean |
 | Terrain heights | untouched terrain emits 0 changed nodes; 499,230 samples, deviation 0 |
 
+**THE MeshVariationDatabase WAS NEVER SHIPPED (2026-09-06).** The block that writes it was gated on
+`texture_dir and os.path.isdir(texture_dir)`, so any caller that did not create `<level>_textures/`
+emitted a level with **no MVDB at all**. `/tmp/mod_ee.sh` -- which produced every bisect variant and
+every level in the 49-level table -- is such a caller.
+
+A dedicated server never needs an MVDB. A client cannot bind a single material without one. So the
+entire headless record is consistent with a level no client could ever use: 48 LOADED verdicts,
+world parts resolving exactly, entities at placements+1.
+
+Two entries in this document already said so and were not read that way:
+`mesh_variation_db_add_all` was **the only intervention out of a dozen that changed the failure**,
+and the **476 "could not find a valid variant"** build warnings are the builder reporting exactly
+this, in every single build.
+
+The gate is now `if mvdb_inputs:`. Whether the missing database is the client freeze is being
+tested; either way, no level built before this fix had one.
+
 **Three emitter defects found by the partition diff, real whatever the freeze turns out to be.**
 They were corrected experimentally and the client still hung, so they are NOT the freeze -- but each
 is wrong on its own terms and a dedicated server can never reveal any of them:
