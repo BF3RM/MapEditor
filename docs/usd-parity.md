@@ -5,6 +5,55 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## Terrain layers and scattering can now be WRITTEN back (2026-09-06)
+
+This doc has been overstating terrain since the section below. Layers and mesh scattering round
+tripped through USD with 0 changed fields, which is true and was reported honestly -- but there was
+no path back into the game. Every `Serialize` under Rime's `Frostbite/VisualTerrain` threw
+`NotImplementedException` except the leaf `MeshScatteringType`, so an edited density had nowhere to
+go. "Round trips" was doing work it had not earned.
+
+Six writers implemented (`VisualTerrain`, `VisualTerrainLayer`, `TerrainLayerCombinationDraw`,
+`Surface2dDrawMethod`, `Surface3dDrawMethod`, `MeshScatteringMaskScaleMethod`), each an exact mirror
+of its `Deserialize`. Measured against every VisualTerrain resource BF3 ships, with
+`check_visual_terrain`:
+
+    resources    33/33 byte-identical to the game
+    bytes        1,036,583 / 1,036,583 identical
+    content      268 layers, 443 mesh scattering types, 6,479 combination draws
+    edit probe   33/33 -- one density changed, read back, every other type untouched
+    RESULT       PASS
+
+And end to end through the writeback command, `write_visual_terrain`:
+
+    unedited     mp_001 18,447 / mp_007 28,388 / sp_valley 45,765 bytes -- IDENTICAL (compare_resource)
+    edited       mp_007 density 0.9 -> 4.25: exactly 4 bytes changed, the float32 at offset 204
+
+**Byte equality is the only reason this is correct, and it is not a formality.**
+`MeshScatteringMaskScaleLevelEnd` was read as a bool and is not one: across MP_007's 98 layer
+combinations it takes the values 0, 3, 4, 5, 6, 9, 10, 11 and 13, and **90 of the 98 are something
+other than 0 or 1**. Read as a bool they all collapse to true; written back they all come out as 1.
+That is 90 changed bytes in a resource nobody edited, in a field every field-level check called
+unchanged, with the parse staying perfectly aligned either way. It is a byte -- a level index, like
+the `Level` on the draw methods beside it. No field comparison anywhere in this pipeline would have
+found it.
+
+Two design points, both because the alternative silently loses edits:
+
+- **A scattering type is addressed by `(Layer, Index)`, never by mesh name or by prim order.** A
+  layer may grow the same mesh twice at different densities and MP_007 does; the mesh name may
+  itself be what was edited; and USD hands children back in NAME order, so `layer_10` traverses
+  before `layer_2`. `scattering.py` now authors `bf3:scatterIndex`, and the round-trip test keys on
+  the pair rather than on traversal order. Two edits landing on one address is an error, not a
+  last-write-wins.
+- **Edits are applied ONTO the shipped resource, not rebuilt from the dump.** `VisualTerrainInfo`
+  is a deliberately lossy view -- it carries none of the 164 mask-scale draw methods on MP_007 and
+  most of the resource header. Rebuilding from it would drop them and still report a clean trip.
+
+Still not writable this way: the layer index lists on a draw are passed through rather than taken
+from the edit, because they are what the shader was compiled against -- a list that no longer
+matches its shader name is a level drawing the wrong ground.
+
 ## An edited mesh now ships; an unedited one is still referenced (2026-09-06)
 
     corpus       68 mesh(es) with every LOD chunk present
@@ -64,20 +113,31 @@ overwrite the first and a UV edit to subset 0 vanished -- clean round trip, noth
 `geom.rebuild_chunk` now refuses a CONFLICTING write to a shared range and names the offset;
 identical writes, which is what an untouched mesh does, still pass and byte-identity is unaffected.
 
-**Verified against Rime's own reader, not only ours.** `compare_resource` compares a candidate
-against the mounted game rather than against a dump, and it is the independent confirmation that
-the resource is the wrong thing to ask:
+**What the bytes are compared against.** The corpus is Rime's own `dump_resource` /
+`dump_chunk` output, so "identical to the game" means identical to what the mounted game hands
+back, not to a previous run of this codec. The whole 2,078-resource corpus still round-trips
+byte-identical after the change (2078/2078 resources, 166/166 chunks) -- the digest is USD
+customData and touches no emitted byte.
 
-    compare_resource ..._Mesh unedited.meshset   IDENTICAL (1032 bytes, metaIdentical=True)
-    compare_resource ..._Mesh edited.meshset     IDENTICAL (1032 bytes, metaIdentical=True)
+**Three things were NOT done, and none of them should be read as done:**
 
-The UV-edited resource is byte-identical to the game's under Rime's own comparator. The 1,616-byte
-chunk is where the edit is.
+- **`compare_resource` against the live mounter was not run.** It is the stronger check -- Rime's
+  reader rather than ours, and it compares the meta too -- and the plan was to run it on both
+  files. The machine had four concurrent RimeREPL mounts and 12 GB free at the time; a fifth mount
+  is the OOM this project has already hit once, so it was skipped rather than risked.
+- **No build.** The edited resource and chunk were prepared
+  (`objects/cableboxsystem_01/cablebox_01_Mesh`: 1,032-byte resource, 1,616-byte LOD0 chunk,
+  meta `B0030000000000005800000070009400`) but not put through `build_sb` / `add_resource` /
+  `add_chunk`, for the same reason.
+- **No boot, and no UV edit looked at on screen.** What IS verified in-game is a POSITION edit:
+  `docs/usd-roundtrip.md` §0 predicted an AABB before the run and the engine reported it exactly,
+  from bytes this toolchain wrote. A chunk-only edit appears in no number the server prints, so
+  confirming one means looking at a texture, and that was not done.
 
-**Still open, stated plainly:** a UV edit has not been LOOKED at in the running game. What is
-verified in-game is a position edit (`docs/usd-roundtrip.md` §0: the engine reported the predicted
-AABB from bytes this toolchain wrote). A chunk-only edit is not visible in any number the server
-prints, so confirming one means looking at a texture on screen, and that was not done.
+What the test does assert about acceptability is the invariant that decides it: the edited
+resource's meta satisfies `f0 + f1 + f2 == len(payload)`, without which the engine relocates past
+the end of the block. And in this case the edited resource is byte-identical to the game's own --
+the edit is entirely in the chunk -- so there is nothing in it for the engine to reject.
 
 ## The closure is editable, not just shipped (2026-09-06)
 
@@ -207,6 +267,7 @@ The honest table, because "represented" and "editable end to end" are different 
 | Move things in BLENDER and save back | yes, **via `dcc_merge`** -- never by trusting Blender's own export |
 | Save edited textures | yes, but that texture then ships as a copy |
 | Save edited collision | rebuilds, but not byte-identical to BF3's bake |
+| Save edited terrain LAYERS and SCATTERING back | **yes** -- unedited rebuilds are byte-identical on all 33 resources; an edited density changes exactly its 4 bytes |
 
 So data is editable end to end and is most of a weapon. Animation curves are still export-only.
 Mesh geometry is not: the writer is `tools/usd/meshset.py`, in Python, and Rime is not in that path
@@ -253,6 +314,7 @@ read so an appended element was never seen.
 | Collision, unedited | byte-identical, with an edit guard |
 | Emitters and scattering | visible GUIDE geometry; 209 markers, 0 that render |
 | Art referencing | 527 meshes + 639/640 textures from the player's install; 55 MB; loads |
+| Mesh geometry, editable | unedited 68/68 referenced and byte-identical; UV edit 67/68 ships, 1 refused |
 
 **Native USD forms:** lights `UsdLux` (Distant/Sphere/Disk + ShapingAPI), physics `UsdPhysics`,
 audio `UsdMedia`, skinning `UsdSkel`, animation `UsdSkelAnimation`, roads `BasisCurves`, terrain and
@@ -366,6 +428,7 @@ which looks exactly like three lossy fields. Identity is `(partition, instance)`
 | Entity fields, all 440 types | typed USD attributes | 35,298 authored; round trip **0 changed fields** |
 | Level graph (ownership) | `/World/Level`, world parts own their objects | 49/49 levels; 151,362 owned objects = 151,362 in the EBX; **0 changed** over 23,526,728 fields |
 | Skinned meshes | UsdSkel | 535/535 byte-identical, 1632/1632 chunks |
+| Meshes, whole corpus | parse/serialize + USD | 2078/2078 resources, 166/166 chunks byte-identical |
 | Animation clips | UsdSkelAnimation | 113,066/113,066 channels identical, **named joints** |
 | AnimTrackData | time samples + Bezier | 1484/1484 byte-exact |
 | Collision | UsdPhysics prims -> HavokPhysicsData | decodes valid: both packfiles, hkpBoxShape/hkpConvexTranslateShape |
@@ -374,6 +437,7 @@ which looks exactly like three lossy fields. Identity is `(partition, instance)`
 | Terrain rasters (mask/material/destruction) | base64 node blocks | mp_001 344 nodes, 2.6 MB, **0 changed**; header 15 fields 0 changed |
 | Terrain layer palette + draws | typed prims | mp_001 7/128, mp_007 10/184, sp_valley 10/234 -- **0 changed** |
 | Terrain mesh scattering | typed prims per type | MP_007 23 / SP_Valley 22 / MP_001 5 types; 598+572+130 fields, **0 changed** |
+| Terrain layers + scattering WRITTEN back | Rime `VisualTerrain` writers | 33/33 resources, 1,036,583/1,036,583 bytes byte-identical; edit probe passes on all 33 |
 | Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
 | Enlighten bake (probes, databases, systems) | base64 resources + probe points | mp_001 162 res / 377 KB, mp_007 156 / 240 KB, sp_valley 236 / 59.6 MB -- **0 changed** |
 
@@ -520,9 +584,12 @@ level could export and come back with its grass gone while every check passed. T
 per-layer in the VisualTerrain resource.
 
 Rime could read them and no further: every field past `RandomPositionOffset` was private,
-`Serialize` threw, and `VisualTerrainInfo` carried nothing about scattering. That is fixed in Rime
-(`3180763c`), and `tools/usd/scattering.py` authors each type as a prim with all 26 fields as typed
-`bf3:` attributes -- deliberately NOT a PointInstancer, since scattering is procedural and explicit
+`Serialize` threw, and `VisualTerrainInfo` carried nothing about scattering. READING that is fixed
+in Rime (`3180763c`) -- and only reading: `3180763c` implemented the leaf `MeshScatteringType`
+writer alone, and everything above it still threw, so nothing measured below is evidence that an
+edit could be saved. That gap is closed separately (top section, same day); the numbers here are
+the READ round trip and nothing more. `tools/usd/scattering.py` authors each type as a prim with
+all 26 fields as typed `bf3:` attributes -- deliberately NOT a PointInstancer, since scattering is procedural and explicit
 instances would invent data the game never stored.
 
     MP_007     23 types over 10 layers   598 fields   0 changed
@@ -660,7 +727,9 @@ from nearly true into true.
 
 1. ~~**TERRAIN'S PAINTED DETAIL.**~~ **DONE 2026-09-06.** Heights (byte-exact), mesh scattering,
    the mask/material/destruction rasters and the layer palette with its combination draws all round
-   trip on real game data. What is carried is not yet all *editable*: the rasters are preserved
+   trip on real game data, and layers and scattering now WRITE back too -- 33 of 33 VisualTerrain
+   resources rebuild byte-identical and an edited density lands (top section). What is carried is
+   not yet all *editable*: the rasters are preserved
    byte-for-byte but cannot be painted in a DCC, which needs the per-node story heights now have.
    `TerrainColorTree` has nothing to author on mp_001 -- the resource's own slot table reads
    `slot2=null` -- so it is unverified rather than done, and wants a level that populates it.
@@ -705,6 +774,10 @@ from nearly true into true.
 
 - A level that emits NOTHING loads perfectly. Guard on content, never on the verdict. Four separate
   variants were hit: zero textures, zero meshes, zero placements, zero entities.
+- **"Has this been edited?" has to be asked of the bytes that hold the thing.** The mesh emitter
+  asked the MeshSet resource, which describes the geometry without containing it, so every UV,
+  normal and tangent edit came back "unedited" and was referenced away. The resource and the chunk
+  are two files; a rule that reads one of them decides on half the asset.
 - `add_existing_resource` failure prints `Could not find resource (...)` -- no "error", no
   "exception". A build-log error grep must include it.
 - A crashed build leaves the PREVIOUS level's `.sb`; booting then measures that. Assert the

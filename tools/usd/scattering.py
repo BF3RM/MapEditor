@@ -89,6 +89,13 @@ def author(stage, visual_terrain_json):
 
         prim = stage.DefinePrim(path, "Scope")
         prim.CreateAttribute(BF3 + ":scatterLayer", Sdf.ValueTypeNames.Int).Set(layer)
+        # (layer, index) is the record's address in the resource, and the writeback needs it.
+        # Prim ORDER cannot stand in for it: USD traverses children by name, so layer_10 sorts
+        # before layer_2 and two grass types on one layer come back in alphabetical order. Matching
+        # on MeshName is no better -- a layer may grow the same mesh twice (MP_007 does), and the
+        # mesh name may itself be what was edited.
+        prim.CreateAttribute(BF3 + ":scatterIndex", Sdf.ValueTypeNames.Int).Set(
+            int(entry.get("Index", entry.get("index", n))))
 
         for field, vtype in FIELDS:
             value = entry.get(field, entry.get(field[0].lower() + field[1:]))
@@ -122,6 +129,11 @@ def read_back(stage):
             continue
 
         entry = {"Layer": int(attr.Get())}
+
+        index = prim.GetAttribute(BF3 + ":scatterIndex")
+
+        if index and index.IsValid() and index.Get() is not None:
+            entry["Index"] = int(index.Get())
 
         for field, _ in FIELDS:
             a = prim.GetAttribute("%s:%s" % (BF3, field))
