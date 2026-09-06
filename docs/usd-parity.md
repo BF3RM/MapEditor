@@ -60,40 +60,44 @@ Exactly one partition rewritten out of 10,396 -- the rule holds under a real emi
 principle. The level's own 490 partitions and the closure's 10,396 are DISJOINT (measured: 0 in
 both), so nothing is authored twice and two prims cannot hold conflicting edits for one instance.
 
-## Are we at 100%? (2026-09-06)
+## Are we at 100%? (2026-09-06, updated)
 
-No -- and the parts that ARE complete are worth stating precisely, because "0 changed" and
-"byte-perfect" are different claims and only some of this earns the second.
-
-**Complete, measured:**
+**Complete and measured:**
 
 | | evidence |
 |---|---|
-| USD representation, whole game | 10,396 partitions, 211,765 instances, 802 types, 776,004 fields, **0 changed**, 0 unauthored |
+| USD representation, whole game | 10,396 partitions, 211,765 instances, 802 types, 776,004 fields, **0 changed** |
+| Closure editable end to end | edit -> emit -> build -> **Level:Loaded**, 1 of 10,396 partitions rewritten |
+| Level graph, all 49 levels | 558,864 instances, 0 authored twice, 23,526,728 fields, **0 changed** |
 | Enlighten | 0 changed across three levels |
-| Terrain heights | byte-exact; an untouched terrain emits 0 changed nodes |
+| Terrain heights | byte-exact; untouched terrain emits 0 changed nodes |
 | Terrain rasters, layers, scattering | 0 changed |
-| Collision, unedited | byte-identical, with a guard proving an edit is refused |
+| Collision, unedited | byte-identical, with an edit guard |
+| Emitters and scattering | visible GUIDE geometry; 209 markers, 0 that render |
 | Art referencing | 527 meshes + 639/640 textures from the player's install; 55 MB; loads |
+
+**Native USD forms:** lights `UsdLux` (Distant/Sphere/Disk + ShapingAPI), physics `UsdPhysics`,
+audio `UsdMedia`, skinning `UsdSkel`, animation `UsdSkelAnimation`, roads `BasisCurves`, terrain and
+decals real `Mesh`, scattering preview `PointInstancer`. Everything else is typed `bf3:` attributes
+with the record in customData.
 
 **Not complete:**
 
-1. ~~**The export does not author the closure.**~~ **DONE 2026-09-06.** `tools/usd/closure_export.py`
-   authors the whole closure under `/World/Library`: 10,396 partitions, 211,765 instances, 802
-   types, 211,765 prims read back, 776,004 fields, **0 changed**, 0 unauthored, 10,396 names
-   carried. The stage is 243 MB. Still to do: a `--closure` flag on `export_level_usd`, which is
-   held by concurrent work.
-2. **"0 changed" is not byte-perfect.** That test measures USD round-trip fidelity, not our rebuilt
-   bytes against BF3's. Only terrain heights, the Havok wrapper and unedited collision are truly
-   byte-verified against the game.
-3. **Refs and nested records stay in customData** -- carried losslessly, not typed, so a reference
-   between two objects is not editable the way a scalar is.
+1. **Terrain's 7-layer splat has no USD form.** Layer 0 is bound as a material and the rest are
+   carried; USD has no splat shader, and a faithful preview needs a custom one. The data is all
+   there (mask, material tree, palette) -- what is missing is a way to LOOK at it blended.
+2. **"0 changed" is not byte-perfect.** It measures USD fidelity, not our bytes against BF3's. Only
+   terrain heights, the Havok wrapper and unedited collision are byte-verified against the game.
+3. **Refs and nested records stay in customData**, so a reference between objects is not editable
+   the way a scalar is.
 4. **Edited collision rebuilds to 81 objects against the game's 120.**
-5. **47 of 49 levels never swept.** MP_001 loading did not mean the emitter worked once before; a
-   second level exposed three defects.
-6. **Update-in-place unproven**, and Enlighten is not re-injected into a built bundle.
-7. **1,077 partitions** under the game's own namespaces are still EBX we author rather than
-   reference.
+5. **Shared object blueprints are not descended into** -- 403,352 instances (72%) stay filed by
+   partition path rather than under the object that owns them. Deliberate: a prop used 60 times
+   would give 60 prims writing back to one record and 59 edits would vanish.
+6. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
+7. **1,077 partitions** under the game's namespaces are EBX we author rather than reference, and
+   referencing partitions is measured to be impossible -- it inflates the superbundle 6x and breaks
+   the load.
 
 ## The one-line state
 
