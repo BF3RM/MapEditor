@@ -186,6 +186,24 @@ def is_referenced(payload, original, geom_ok):
     return original is not None and payload == original and geom_ok is not False
 
 
+_RESOURCE_NAMES = None
+
+
+def _resource_names():
+    """Every resource name the game contains, lowercased. Empty set if the list is absent."""
+    global _RESOURCE_NAMES
+
+    if _RESOURCE_NAMES is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'hashes', 'bf3_resources.txt')
+        try:
+            _RESOURCE_NAMES = {ln.strip().lower() for ln in open(path) if ln.strip()}
+        except Exception:                                    # noqa: BLE001
+            _RESOURCE_NAMES = set()
+
+    return _RESOURCE_NAMES
+
+
 def shipped_index(res_dir):
     """mesh name (lowercased) -> the bytes the game ships, so 'changed' is a byte comparison."""
     import glob
@@ -923,6 +941,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         # Resources named by an asset rather than placed. Referenced, never rebuilt.
         asset_res = set()
+        _skipped_res = 0
 
         for _record in authored.values():
             _n = _record.get('Name')
@@ -952,8 +971,27 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                           'DestructionDepthTreeAsset', 'TerrainDecalsAsset'):
                     asset_res.add(_n.lower())
 
+        # Reference only what the game HAS. An asset's Name is not a promise that a resource
+        # exists behind it: an object declares both `_Physics_0_Win32` (Scale 1.0) and
+        # `_Physics_1_Win32` (Scale 2.0) and DICE ships a resource only for the first. Measured
+        # across the 49-level sweep, that produced 72 build errors over 19 levels from 71 distinct
+        # names, and `where_is` resolves 0 of 71 against a positive control that resolves.
+        #
+        # tools/hashes/bf3_resources.txt is every resource name the game contains, dumped from the
+        # mounted game. Checked against it, 0 of the 1,065 names that failed are present -- so the
+        # filter removes exactly the errors and nothing else. Without the list the behaviour is
+        # unchanged, because guessing which names are real is what caused this.
+        _known = _resource_names()
+
         for _n in sorted(asset_res):
+            if _known and _n not in _known:
+                _skipped_res += 1
+                continue
+
             cmds.append('add_existing_resource %s 1' % _n)
+
+        if _skipped_res:
+            print('assets    %d name(s) skipped: no such resource in the game' % _skipped_res)
 
         # COLLISION AUTHORED IN THE DCC. Any prim carrying UsdPhysics.CollisionAPI is turned into a
         # real HavokPhysicsData resource by tools/havok/build_collision.py -- boxes and convex hulls,
