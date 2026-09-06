@@ -186,6 +186,19 @@ def is_referenced(payload, original, geom_ok):
     return original is not None and payload == original and geom_ok is not False
 
 
+def _q(name):
+    """Quote a command argument that carries a space.
+
+    Rime's tokenizer (RimeLib.Cmd/CommandUtils.ParseArguments) splits on spaces and honours double
+    quotes, so a name with a space MUST be quoted or it arrives truncated. BF3 ships exactly one
+    such resource -- `objects/rugpile_01/rugpile_01_n ` has a trailing space, a DICE typo -- and
+    unquoted it reached the builder as `..._n`, which does not exist: "Could not find resource".
+
+    Quoted only when needed, so every other emitted command stays byte-identical.
+    """
+    return '"%s"' % name if (' ' in name or '\t' in name) else name
+
+
 _RESOURCE_NAMES = None
 
 
@@ -514,17 +527,17 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             json.dump(obj, open(path, 'w'), indent=1)
 
         if res_path is None:
-            cmds.append('add_existing_resource %s 1' % name)
+            cmds.append('add_existing_resource %s 1' % _q(name))
         else:
             cmds.append('add_resource %s MeshSet "%s" %s'
-                        % (name, res_path, meta.hex().upper()))
+                        % (_q(name), res_path, meta.hex().upper()))
 
         for li, chunk in sorted(chunks.items()) if res_path else []:
             guid = uuid.UUID(bytes_le=ms.lods[li].data_chunk_id)
             path = os.path.join(out_dir, '%s.chunk' % guid)
             data = chunk + b'\0' * ((-len(chunk)) % 16)
             open(path, 'wb').write(data)
-            cmds.append('add_chunk %s %s "%s"' % (guid, name, path))
+            cmds.append('add_chunk %s %s "%s"' % (guid, _q(name), path))
 
         cmds.append('add_json_partition %s "%s"'
                     % (build_dust2.MESH_NAME, os.path.join(part_dir, 'mesh_%s.json' % _safe(name))))
@@ -621,7 +634,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 json.dump(doc, open(tex_json, 'w'), indent=1)
                 cmds.append('add_dds_texture %s "%s" true false false World_SkipNoStr'
                             % (tex_name, shipped[base]))
-                cmds.append('add_json_partition %s "%s"' % (tex_name, tex_json))
+                cmds.append('add_json_partition %s "%s"' % (_q(tex_name), tex_json))
                 continue
 
             # Unedited: OUR partition, the GAME's bytes -- the same split the meshes use.
@@ -637,9 +650,9 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                     inst['Name'] = base
 
             json.dump(ref_doc, open(tex_json, 'w'), indent=1)
-            cmds.append('add_existing_resource %s 1' % base)
+            cmds.append('add_existing_resource %s 1' % _q(base))
             cmds.append('add_json_partition %s "%s"'
-                        % (build_dust2.texture_partition_name(base), tex_json))
+                        % (_q(build_dust2.texture_partition_name(base)), tex_json))
             referenced_tex += 1
 
         print('textures  %d referenced from the game, %d shipped (%d slot(s) from the stage)'
@@ -653,7 +666,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         road_json, _rpg, _rg, n_roads = build_dust2.roads_partition(roads, road_name)
         path = os.path.join(part_dir, 'roads.json')
         json.dump(road_json, open(path, 'w'), indent=1)
-        cmds.append('add_json_partition %s "%s"' % (road_name, path))
+        cmds.append('add_json_partition %s "%s"' % (_q(road_name), path))
         build_dust2.WORLD_NAME = saved_world
         print('roads     %d ribbon(s) authored' % n_roads)
 
@@ -704,7 +717,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
             out = os.path.join(part_dir, 'ent_%s.json' % _safe(part))
             json.dump(doc, open(out, 'w'), indent=1)
-            cmds.append('add_json_partition %s "%s"' % (part, out))
+            cmds.append('add_json_partition %s "%s"' % (_q(part), out))
             edited_parts.add(part)
 
         if edited_parts:
@@ -726,7 +739,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             if not part or part in referenced or part in edited_parts:
                 continue
 
-            cmds.append('reference_existing_partition %s 1' % part)
+            cmds.append('reference_existing_partition %s 1' % _q(part))
             named += 1
 
         print('level     %d partition(s) referenced (effects, decals, probes, volumes, spawns)'
@@ -742,7 +755,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         terrain_parts = [ln.strip() for ln in terrain_of if ln.strip()]
 
         for part in terrain_parts:
-            cmds.append('reference_existing_partition %s 1' % part)
+            cmds.append('reference_existing_partition %s 1' % _q(part))
 
         if terrain_parts:
             print('terrain   %d partition(s) referenced' % len(terrain_parts))
@@ -768,7 +781,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         mvdb_json = build_dust2.mvdb_partition(entries)
         path = os.path.join(part_dir, 'mvdb.json')
         json.dump(mvdb_json, open(path, 'w'), indent=1)
-        cmds.append('add_json_partition %s "%s"' % (build_dust2.MVDB_NAME, path))
+        cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.MVDB_NAME), path))
         print('mvdb      %d entries' % len(entries))
 
         # `flat_normal` is a 4x4 normal map this emitter GENERATES, bound wherever a mesh has no
@@ -966,7 +979,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                             json.dump(_doc, open(_cf, 'w'), indent=1)
                             _edited_closure += 1
 
-                cmds.append('add_json_partition %s "%s"' % (_cn, _cf))
+                cmds.append('add_json_partition %s "%s"' % (_q(_cn), _cf))
                 _shipped_closure += 1
 
             if _edited_closure:
@@ -1044,7 +1057,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 _skipped_res += 1
                 continue
 
-            cmds.append('add_existing_resource %s 1' % _n)
+            cmds.append('add_existing_resource %s 1' % _q(_n))
 
         if _skipped_res:
             print('assets    %d name(s) skipped: no such resource in the game' % _skipped_res)
@@ -1073,7 +1086,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             _cpath = os.path.join(part_dir, 'authored_collision.bin')
             open(_cpath, 'wb').write(_blob)
             _cname = '%s/authored_physics_0_win32' % build_dust2.WORLD_NAME
-            cmds.append('add_resource %s "%s" 0' % (_cname, _cpath))
+            cmds.append('add_resource %s "%s" 0' % (_q(_cname), _cpath))
             print('collision %d authored shape(s) -> %d byte HavokPhysicsData'
                   % (len(_shapes), len(_blob)))
 
@@ -1125,22 +1138,64 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                   '%d duplicate object(s) dropped in favour of the real world parts'
                   % (len(own_parts), _before - len(authored)))
 
+        # The source level's own gameplay declarations, carried through. Measured on mp_001: the
+        # game's sub-world root lists 1,628 assets and 132 entities, ours listed none, and the
+        # client dies loading exactly that partition. See world_partition().
+        _src_reg = {}
+
+        if ebx_dir:
+            # Found by SHAPE, not by a guessed filename: the level root is the partition holding
+            # both a LevelData and a RegistryContainer. An earlier version built the path from a
+            # `level` name that does not exist in this scope, so it silently carried nothing.
+            import glob as _glob
+
+            for _f in sorted(_glob.glob(os.path.join(ebx_dir, '**', '*.json'), recursive=True)):
+                try:
+                    _ldoc = json.load(open(_f))
+                except Exception:                            # noqa: BLE001
+                    continue
+
+                _types = {_i.get('$type') for _i in (_ldoc.get('Instances') or {}).values()}
+
+                if 'LevelData' not in _types or 'RegistryContainer' not in _types:
+                    continue
+
+                for _i in (_ldoc.get('Instances') or {}).values():
+                    if _i.get('$type') != 'RegistryContainer':
+                        continue
+
+                    if _i.get('EntityRegistry') or _i.get('AssetRegistry'):
+                        _src_reg = {'EntityRegistry': _i.get('EntityRegistry') or [],
+                                    'AssetRegistry': _i.get('AssetRegistry') or []}
+                        break
+
+                if _src_reg:
+                    break
+
+            if _src_reg:
+                print('registry  carried %d asset(s) and %d entity(ies) from the source level'
+                      % (len(_src_reg['AssetRegistry']), len(_src_reg['EntityRegistry'])))
+            else:
+                print('registry  WARNING: no populated RegistryContainer found under %s -- the '
+                      'root will declare no assets, which a client cannot survive' % ebx_dir)
+
         world_json, world_parts = build_dust2.world_partition(
-            extra[0][0], extra[0][1], extra=extra, entities=authored, own_parts=own_parts)
+            extra[0][0], extra[0][1], extra=extra, entities=authored, own_parts=own_parts,
+            source_registries=_src_reg)
 
         # Parts first: a WorldPartReferenceObjectData whose blueprint partition is not in the
         # bundle yet resolves to nothing, and the object silently does not appear.
         for part_json in world_parts:
             part_path = os.path.join(part_dir, '%s.json' % _safe(part_json['Name']))
             json.dump(part_json, open(part_path, 'w'), indent=1)
-            cmds.append('add_json_partition %s "%s"' % (part_json['Name'], part_path))
+            cmds.append('add_json_partition %s "%s"' % (_q(part_json['Name']), part_path))
 
         if world_parts:
             print('world     %d part partition(s)' % (len(world_parts) + 1))
 
         path = os.path.join(part_dir, 'world.json')
         json.dump(world_json, open(path, 'w'), indent=1)
-        cmds.append('add_json_partition %s "%s"' % (build_dust2.WORLD_NAME, path))
+        cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.WORLD_NAME), path))
 
     cmds += ['build', 'build']
     open(os.path.join(out_dir, 'build.cmds'), 'w').write('\n'.join(cmds) + '\n')

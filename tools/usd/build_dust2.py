@@ -1073,7 +1073,8 @@ WORLD_PART_TYPES = (
 
 
 def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
-                    register_placements=False, entities=None, own_parts=None):
+                    register_placements=False, entities=None, own_parts=None,
+                    source_registries=None):
     """A sub-level holding dust2 at the identity, plus a ReferenceObjectData per extra placement.
 
     `extra` is [(partition guid, instance guid, transform)] -- the props. Each needs its own
@@ -1110,7 +1111,21 @@ def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
                 'RememberStateOnStreamOut': False},
         desc_g: {'$type': 'InterfaceDescriptorData', 'Fields': [], 'InputEvents': [],
                  'OutputEvents': [], 'InputLinks': [], 'OutputLinks': []},
-        reg_g: {'$type': 'RegistryContainer', 'EntityRegistry': [], 'AssetRegistry': [],
+        # EntityRegistry and AssetRegistry carry the level's GAMEPLAY declarations, not its
+        # geometry: on mp_001 the game lists 1,628 assets (1,231 UnlockAsset, 172
+        # SoldierWeaponUnlockAsset, 141 ValueUnlockAsset, 42 ObjectVariation) and 132 entities
+        # (90 SoldierWeaponData, 8 MissileEntityData, 6 VehicleEntityData...).
+        #
+        # Ours were hardcoded EMPTY. Both real sub-world roots -- the game's own and the shipped
+        # realitymod/teamdeathmatch -- populate them, and a client dies while loading the very
+        # partition that holds them. A dedicated server binds no assets and can skip the registry;
+        # a client cannot, which is why 48 headless LOADED verdicts never noticed.
+        #
+        # They are carried from the SOURCE level rather than invented: the exported level declares
+        # the same weapons, vehicles and unlocks it always did.
+        reg_g: {'$type': 'RegistryContainer',
+                'EntityRegistry': list((source_registries or {}).get('EntityRegistry') or []),
+                'AssetRegistry': list((source_registries or {}).get('AssetRegistry') or []),
                 'BlueprintRegistry': [ref(pg, swd_g), ref(pg, wpd_g), ref(bp_pg, bp_g)],
                 'ReferenceObjectRegistry': [ref(pg, wprod_g), ref(pg, rod_g)]},
         wprod_g: {'$type': 'WorldPartReferenceObjectData', 'IndexInBlueprint': 3000,
@@ -1148,8 +1163,32 @@ def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
     #
     # Keeping every part inside one partition, as this did, produces a partition unlike anything
     # the engine is ever handed.
+    parts = []                  # one partition per world part -- part 0 included
+    part_of = {}                # WorldPartData guid -> the partition dict holding it
     limit = part_max or PART_MAX
     part = wpd_g                                  # the first part is the one built above
+
+    # Part 0 gets its OWN partition too, exactly like parts 1..n.
+    #
+    # MEASURED across the game's corpus: 617 partitions hold a LevelData or SubWorldData root, and
+    # NOT ONE of them also holds a WorldPartData -- every world part is the primary instance of a
+    # separate partition. Leaving part 0 inline put 257 ReferenceObjectData in the sub-world root,
+    # a partition shaped like nothing the engine is ever handed.
+    part0_pg = guid('partition', WORLD_NAME, 'part', 0)
+    part0 = {'PartitionGuid': part0_pg, 'PrimaryInstanceGuid': wpd_g,
+             'Name': '%s/part0' % WORLD_NAME,
+             'Instances': {wpd_g: instances.pop(wpd_g), rod_g: instances.pop(rod_g)}}
+    parts.append(part0)
+    part_of[wpd_g] = part0              # placements 0..limit-1 now land here, via the loop's owner
+
+    # Every reference that named part 0 in the root partition has to follow it across.
+    part0['Instances'][wpd_g]['Objects'] = [] if empty else [ref(part0_pg, rod_g)]
+    instances[wprod_g]['Blueprint'] = ref(part0_pg, wpd_g)
+    instances[reg_g]['BlueprintRegistry'] = [ref(part0_pg, wpd_g) if r == ref(pg, wpd_g) else r
+                                             for r in instances[reg_g]['BlueprintRegistry']]
+    instances[reg_g]['ReferenceObjectRegistry'] = [
+        ref(part0_pg, rod_g) if r == ref(pg, rod_g) else r
+        for r in instances[reg_g]['ReferenceObjectRegistry']]
 
     # A blueprint is registered ONCE, however many times it is placed.
     #
@@ -1159,8 +1198,6 @@ def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
     # seconds, and at 527 the server sat at 73% of a core for twenty-three minutes without
     # finishing, which is the shape of a lookup that walks the list.
     seen_blueprints = {(bp_pg, bp_g)}
-    parts = []                      # the extra partitions, one per world part after the first
-    part_of = {}                    # WorldPartData guid -> the partition dict holding it
 
     for i, e in enumerate(extra or []):
         # A placement is (blueprint partition, blueprint instance, transform) and OPTIONALLY the
@@ -1219,7 +1256,10 @@ def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
         # was ever put down. Registering all 5327 gave a container sixteen times the largest the
         # game ships, and the load never finished.
         if register_placements:
-            instances[reg_g]['ReferenceObjectRegistry'].append(ref(pg, e_rod))
+            # The placement lives in the PART's partition, so that is the guid the registry has to
+            # name -- ref(pg, ...) would point into the root, where the object is not.
+            instances[reg_g]['ReferenceObjectRegistry'].append(
+                ref(owner['PartitionGuid'] if owner else pg, e_rod))
 
         if (e_pg, e_g) not in seen_blueprints:
             seen_blueprints.add((e_pg, e_g))
