@@ -60,6 +60,34 @@ Exactly one partition rewritten out of 10,396 -- the rule holds under a real emi
 principle. The level's own 490 partitions and the closure's 10,396 are DISJOINT (measured: 0 in
 both), so nothing is authored twice and two prims cannot hold conflicting edits for one instance.
 
+## Blender loses almost everything -- do not trust its export (2026-09-06)
+
+The whole "editable in a DCC" claim rested on an assumption nobody had tested. Measured, on a
+40-partition slice through Blender 5.2:
+
+    bf3Entity records   1,208 -> 0        all lost
+    typed attributes   10,407 -> 27       99.7% lost
+    relationships         436 -> 0        all lost
+    prims               2,862 -> 445
+
+Blender drops customData, custom attributes and relationships wholesale. Feeding its export back in
+would destroy every field, every reference and the records the writeback reads -- while LOOKING
+correct, because the geometry survives and a level still builds.
+
+`tools/usd/dcc_merge.py` takes Blender's output as what it actually is -- transforms and geometry --
+and merges those onto the pristine stage. Three things had to be measured to make prims match:
+
+- Blender **re-roots** the stage (`/World/...` -> `/root/...`): 82 of 82 prims "missing".
+- It applies its Y-up/Z-up conversion **on the root**, leaving children in its own space, so a
+  child's LOCAL transform comes back `(x, y, z) -> (x, -z, y)` and 31 of 82 read as moved when
+  nothing was touched. Comparing WORLD transforms cancels it; the new local is derived back out.
+- Blender objects share **one flat namespace**, so repeated leaf names are uniquified
+  (`e00000` -> `e00000_005`) -- on every path component, not just the leaf.
+
+    untouched trip   0 moved, 0 missing
+    one Blender move 1 moved, 0 missing
+    data preserved   1,208 records / 10,407 attributes / 436 relationships, unchanged
+
 ## Can I open a weapon, change it, and save it back? (2026-09-06)
 
 The honest table, because "represented" and "editable end to end" are different claims:
@@ -74,6 +102,7 @@ The honest table, because "represented" and "editable end to end" are different 
 | Save field and reference edits into a working game | **yes, verified**: edit -> emit -> build -> Level:Loaded |
 | Save edited ANIMATION CURVES back | **no** -- Ant DCT `Header.Serialize`/`DofTable.Serialize` throw |
 | Save edited MESH GEOMETRY back | **no** -- meshes are referenced, not rebuilt |
+| Move things in BLENDER and save back | yes, **via `dcc_merge`** -- never by trusting Blender's own export |
 | Save edited textures | yes, but that texture then ships as a copy |
 | Save edited collision | rebuilds, but not byte-identical to BF3's bake |
 
