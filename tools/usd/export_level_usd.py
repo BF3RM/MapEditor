@@ -690,11 +690,21 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
         print("terrain nodes %d editable node mesh(es)"
               % _export_terrain_nodes(stage, json.load(open(terrain))))
 
+        # The painted rasters beside the heights: which layer shows where, which material a bullet
+        # finds, how deep the ground can be dug.
+        import terrain_trees
+
+        made = terrain_trees.author(stage, json.load(open(terrain)))
+        print("terrain trees %s" % ", ".join("%s %d" % (k, v) for k, v in sorted(made.items())))
+
     # What the ground GROWS. EBX carries none of it, so a level exported without this comes back
     # with its grass and rubble gone while every other check still passes.
     if scattering_path:
         import scattering
+        import terrain_layers
 
+        nl, nd = terrain_layers.author(stage, scattering_path)
+        print("terrain layers %d layer(s), %d combination draw(s)" % (nl, nd))
         print("scattering   %d type(s)" % scattering.author(stage, scattering_path))
 
     if decals:
