@@ -2779,3 +2779,30 @@ exporter dropping types.
 
 Entity records live in a prim's `bf3Entity` customData blob keyed `type` -- NOT in a `bf3:type`
 attribute. Probing for the attribute reports zero entities on a stage that carries thousands.
+
+### Correction: what "33 of 144 types" actually measured
+
+That figure counted instances in the partitions we EMIT, against every type in the source level's
+dump, and the denominator is wrong. Most of the source's types are sub-records living inside assets
+we REFERENCE rather than re-author -- `SoundWaveVariation`, `MaterialContainerPair`, `UINodePort`,
+shader and sound graph nodes. They reach the level through their own partitions; authoring them into
+a world part would be meaningless.
+
+Measured properly, on the closure stage: `level_entities.read()` returns **212,941 records across
+10,488 partitions in 804 types**. Of those, 2,591 pass `WORLD_PART_TYPES` and 210,350 are filtered
+out -- correctly, because they are not world-part content. USD representation is therefore far
+broader than the emitted-partition count suggests.
+
+What remains genuinely missing is specific LEVEL content, and that list is short:
+
+| type | in mp_001 | in USD |
+| --- | --- | --- |
+| `RigidMeshEntityData` | 307 | 0 |
+| `RoadData` | 115 | 0 |
+| `CompositeMeshEntityData` | 83 | 0 |
+| `OccluderVolumeEntityData` | 56 | 0 |
+| `MaterialRelation*` | 1404 | 0 (carried at build time) |
+
+Feeding the emitter the closure stage instead of the small one changes nothing on its own -- 23
+types either way -- because the limiter is which types belong in a world part, not what the stage
+holds. The remaining work is representing those five, not widening the filter.
