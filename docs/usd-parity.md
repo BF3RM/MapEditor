@@ -31,7 +31,25 @@ edited 4.0 -> 11.5 in USD comes back as 11.5 keyed to its partition
 guid FILE name and ships under its partition NAME, so the writeback looks under both -- keyed on one
 alone, an edit to a weapon silently never lands.
 
-**Verified end to end.** A combined level+closure stage (66.6 MB) with one edited field, emitted:
+**Verified end to end, into a running game.** A combined level+closure stage (66.6 MB) with one
+edited emitter field: emitted, built, booted.
+
+    build   bundles=8  errors=1 (the known rugpile_01_n)  sb=55,050,624
+    boot    Level:Loaded
+
+Getting there cost two fixes, both the same root cause -- once the closure is authored into the
+stage, `stage_entities` stops meaning "this level's entities":
+
+- **Asset referencing went global.** The emitter referenced every `SoundWaveAsset` it could see --
+  tank cannons, sniper layers -- 2,629 resources instead of 1,166, and 992 of them do not resolve.
+- **Closure reference objects were copied into our world parts.** That is the arrangement this
+  document already records as fatal, and it failed exactly as recorded: the load reaches "Creating
+  entities for autoloaded sublevels" and the process exits.
+
+Both are fixed by the same rule: only partitions the LEVEL owns are the level's. The closure is a
+library, and its assets resolve from the game's own bundles.
+
+The earlier stage-layer result:
 
     closure   1 partition(s) rewritten with edits from the stage
     closure   10396 partition(s): 10396 shipped, 0 referenced

@@ -777,6 +777,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             skipped = 0
 
             for _part, by_guid in stage_entities.items():
+                # The LEVEL's entities only. A closure partition authored into the stage is a
+                # library asset, not something placed in this world, and copying its reference
+                # objects into our world part is the one arrangement measured to be fatal: the load
+                # reaches "Creating entities for autoloaded sublevels" and the process exits.
+                if ebx_dir and not os.path.exists(os.path.join(ebx_dir, _part + '.json')):
+                    continue
+
                 for guid_str, record in by_guid.items():
                     if record.get('$type') not in build_dust2.WORLD_PART_TYPES:
                         continue
@@ -889,6 +896,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 asset_res.add(_n.lower())
 
         for _part, _by_guid in (stage_entities or {}).items():
+            # Only assets the LEVEL owns. Once the closure is authored into the stage this loop can
+            # see every SoundWaveAsset in the game -- tank cannons, sniper layers -- and referencing
+            # them fails 992 times and the level stops loading. The closure's own assets resolve
+            # from the game's bundles; they are not this bundle's to name.
+            if ebx_dir and not os.path.exists(os.path.join(ebx_dir, _part + '.json')):
+                continue
+
             for _record in _by_guid.values():
                 _t = _record.get('$type', '')
                 _n = _record.get('Name')
