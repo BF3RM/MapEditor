@@ -395,6 +395,17 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     # right -- bundle Win32/Levels/REALITYMOD/dust2, world partition levels/realitymod/dust2.
     if level_sb:
         build_dust2.WORLD_NAME = 'levels/realitymod/%s' % bundle_name.lower()
+        # The MVDB is resolved BY NAME from the sub-level's own name: the game ships
+        # levels/mp_001/mp_001/meshvariationdb_win32 next to sub-level levels/mp_001/mp_001, one
+        # per gamemode, and never a database named outside the level it belongs to.
+        #
+        # WORLD_NAME was overridden here and MVDB_NAME was not, so the database kept its dust2-era
+        # name (dust2/meshvariationdb_win32) while the world became levels/realitymod/<x>. The
+        # build still succeeds -- nothing refers to the database by path -- but the CLIENT then
+        # binds mesh variations against a database it cannot find and spins forever in an empty
+        # 16-slot GUID table (vu.com+0xC1CAC), which is the black screen. A dedicated server never
+        # binds variations, which is why 48 headless LOADED verdicts never caught it.
+        build_dust2.MVDB_NAME = build_dust2.WORLD_NAME + '/meshvariationdb_win32'
 
     referenced, changed, unresolved = [], [], []
     unproven = 0
@@ -487,6 +498,17 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     # partition nothing else refers to is still a valid build.
     if level_sb:
         build_dust2.WORLD_NAME = 'levels/realitymod/%s' % bundle_name.lower()
+        # The MVDB is resolved BY NAME from the sub-level's own name: the game ships
+        # levels/mp_001/mp_001/meshvariationdb_win32 next to sub-level levels/mp_001/mp_001, one
+        # per gamemode, and never a database named outside the level it belongs to.
+        #
+        # WORLD_NAME was overridden here and MVDB_NAME was not, so the database kept its dust2-era
+        # name (dust2/meshvariationdb_win32) while the world became levels/realitymod/<x>. The
+        # build still succeeds -- nothing refers to the database by path -- but the CLIENT then
+        # binds mesh variations against a database it cannot find and spins forever in an empty
+        # 16-slot GUID table (vu.com+0xC1CAC), which is the black screen. A dedicated server never
+        # binds variations, which is why 48 headless LOADED verdicts never caught it.
+        build_dust2.MVDB_NAME = build_dust2.WORLD_NAME + '/meshvariationdb_win32'
 
     part_dir = os.path.join(out_dir, 'partitions')
     os.makedirs(part_dir, exist_ok=True)
@@ -527,7 +549,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             json.dump(obj, open(path, 'w'), indent=1)
 
         if res_path is None:
-            cmds.append('add_existing_resource %s 1' % _q(name))
+            cmds.append('add_existing_resource_with_chunks %s 1' % _q(name))
         else:
             cmds.append('add_resource %s MeshSet "%s" %s'
                         % (_q(name), res_path, meta.hex().upper()))
@@ -650,7 +672,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                     inst['Name'] = base
 
             json.dump(ref_doc, open(tex_json, 'w'), indent=1)
-            cmds.append('add_existing_resource %s 1' % _q(base))
+            cmds.append('add_existing_resource_with_chunks %s 1' % _q(base))
             cmds.append('add_json_partition %s "%s"'
                         % (_q(build_dust2.texture_partition_name(base)), tex_json))
             referenced_tex += 1
@@ -1057,7 +1079,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 _skipped_res += 1
                 continue
 
-            cmds.append('add_existing_resource %s 1' % _q(_n))
+            cmds.append('add_existing_resource_with_chunks %s 1' % _q(_n))
 
         if _skipped_res:
             print('assets    %d name(s) skipped: no such resource in the game' % _skipped_res)

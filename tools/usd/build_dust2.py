@@ -1064,6 +1064,14 @@ WORLD_PART_TYPES = (
     'LightProbeVolumeData', 'VolumeVectorShapeData', 'SoundEntityData', 'LocatorEntityData',
     'OccluderVolumeEntityData', 'EmitterExclusionVolumeData', 'IrReverbEntityData',
     'SoundAreaEntityData', 'PointLightEntityData', 'SpotLightEntityData',
+    # SPAWNS. Without these the level loads and a player connects, but the server reports
+    # `team=0 squad=0 alive=false soldier=false` and there is nowhere to deploy, so the client
+    # never enters. MEASURED on mp_001: 411 AlternateSpawnEntityData, 20
+    # CharacterSpawnReferenceObjectData, 21 VehicleSpawnReferenceObjectData -- ours carried zero
+    # of all three, because these are not named plain ReferenceObjectData and so failed this
+    # filter. A geometry-only export is a level you can look at but not play.
+    'CharacterSpawnReferenceObjectData', 'VehicleSpawnReferenceObjectData',
+    'AlternateSpawnEntityData',
     # NOT TransformPartPropertyTrackData. It is a property-ANIMATION TRACK belonging to a
     # blueprint's part, not a placeable object, and authoring 120 of them into mp_003's world parts
     # killed the server inside "Creating entities for autoloaded sublevels" -- silently, exit 0.
