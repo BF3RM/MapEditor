@@ -144,6 +144,71 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## The client DOES log, and it says the load gets to world part 22 of 23 (2026-09-06)
+
+Two harness defects, both fixed or worked around, and the first client-side evidence this effort has
+ever had.
+
+### Why thirty client boots produced no log
+
+**`-debuglog` was never passed.** The installed PowOS module and the source have diverged:
+
+    /usr/lib/powos/mods/vu.sh        image, mtime epoch   0 occurrences of debuglog, execs vu.com
+    /var/lib/powos/src/lib/mods/vu.sh  2026-08-21 17:42   5 occurrences, execs vu.exe
+
+`vu_play_cmd` regenerates `~/.local/bin/venice-unleashed` on every launch **from the installed
+module**, so the wrapper on disk has no `-debuglog` in it, and `powos mods vu play` has never
+written a log on this machine. The fix is already in the source tree and simply has not shipped to
+this image.
+
+Being straight about my own half of it: `tools/e2e_run.sh` in THIS repo passes `-debuglog`
+explicitly (line 90) and always has. Every client I launched this session was a hand-rolled
+`powos mods vu play` that omitted it. Either fix alone would have given me a log on the first boot.
+
+Verified by running it: `powos mods vu play -debuglog ...` produces a real log immediately.
+
+### The second defect: the log loses its last page, which is the only page that matters
+
+`-debuglog` writes in **4096-byte pages and does not flush on exit**. The first log came out at
+exactly 4,096 bytes and ended mid-line; a client that dies fifteen seconds into a level load loses
+precisely the lines that say why. Worked around by making the client print enough to push each page
+out while the load is still running -- a `Partition:Loaded` tracer in `Blank_Level_Test`'s client
+realm, plus 30 padding lines after each of our world parts so each one flushes its own page. That
+took the log from 4,096 bytes to **1,191,936** and then **1,347,584**.
+
+### What the log actually says
+
+mp_001, 5,863 placements, MVDB present, in the host that registers teams:
+
+    09041  dust2/meshvariationdb_win32
+    09042  levels/realitymod/usdlevel/part1
+    ...
+    09063  levels/realitymod/usdlevel/part22        <-- last line in the file
+           (23 world parts emitted; the server resolves 23/23)
+
+**The client loads 9,063 partitions -- every emitted mesh, every texture, the MeshVariationDatabase
+and 22 of the 23 world parts -- and then stops.** There is not one `[error]` or `[warning]` in
+1.35 MB of log except an unrelated `LSX ... Connection refused` from the EA-app probe at startup.
+
+So the failure is **not** a partition that fails to load. Everything loads. The client dies at the
+END of partition loading, at the transition into whatever comes next -- and that is a different
+place from anywhere this effort has been looking, which was inside the content.
+
+### What that changes for the next session
+
+- The mesh partitions, the textures and the MVDB are all **observed loading on the client**. That
+  retires them as suspects far more directly than any of the bisect boots above did.
+- The remaining window is between the last world part and the deploy screen: entity creation from
+  those parts, which is exactly where the server-side `LoadingInfo` sequence goes next
+  (`Registering entity resources` -> `Creating material grid` -> `Spawning level` ->
+  `Creating entities for autoloaded sublevels`). None of those lines appear in the client log,
+  because `Level:LoadingInfo` fires on the client too and the tracer proves the client never gets
+  there.
+- The instrument now exists: add prints to the client realm and they come out. That is the tool this
+  effort was missing all day.
+
+Both logs are kept at `~/Games/VeniceUnleashed/shot-instance/artifacts/client_logs/`.
+
 ## With an MVDB the client stops hanging and starts REFUSING, in 15 seconds (2026-09-06)
 
 The MVDB-bearing build was tested. **It does not fix the load, and it does not leave the MVDB
@@ -194,11 +259,10 @@ varied, in the order I would try it:
 
 ### A harness gap that cost this whole effort its diagnosis
 
-**The client writes no log.** `powos mods vu play` always passes `-debuglog`, and
-`%LOCALAPPDATA%/VeniceUnleashed/` has not gained a single non-empty `vu_*.log` in any of the ~30
-client boots today, including the ones that exit cleanly. Every client-side conclusion in this
-document was therefore inferred from the server log, a screenshot and CDP liveness. Fixing that is
-probably worth more than the next three bisect cycles.
+~~**The client writes no log.** `powos mods vu play` always passes `-debuglog` ...~~ **FIXED, see
+the section above.** `powos mods vu play` does NOT pass `-debuglog` on this machine -- the installed
+module predates the flag -- and the log also loses its last 4096-byte page on exit. Both are
+worked around, and the resulting 1.35 MB of client log is what finally located the failure.
 
 ## The load path is exonerated too, and the emit has no MVDB at all (2026-09-06)
 
