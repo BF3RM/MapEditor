@@ -2827,3 +2827,26 @@ so is referenced but not DCC-editable.
 The lesson for anyone measuring this again: count native prims AND blobs, and check whether a type's
 content arrives under a different but equivalent representation before calling it missing. Three
 separate "X is absent from USD" claims in one session were all measurement artifacts.
+
+### Correction 3 (the real one): the STAGE was stale, not the exporter
+
+Every "missing from USD" claim above was an artifact of measuring a stage exported on 2026-09-05,
+before the current entity-authoring code. Re-exporting mp_001 with the same exporter, same inputs,
+`--ebx-dir /tmp/mp001ebx`:
+
+    entities  13903 instances carried, 3875 of them placed
+              (ReferenceObject 1840, AlternateSpawn 411, Decal 348, RigidMesh 307, PartComponent 142)
+    level graph  3566 instance(s) under /World/Level, 5 levels deep; 10337 carried by partition path
+
+**13,903 entities across 144 types -- 100% of the source level's instances and types**, against the
+old stage's 1,176 / 8. Everything previously called absent is present: RigidMeshEntityData 307,
+RoadData 115, CompositeMeshEntityData 83, OccluderVolumeEntityData 56, and the whole material grid
+(MaterialRelationDamageData 466, SoundData 310, EffectData 298, ...), which means destruction and
+impact audio are DCC-editable and not only carried at build time.
+
+`author()` never filtered anything: handed the level's 490 partitions it receives all 13,903
+instances in 144 types, and its loop has no type filter. The stage simply predated the code.
+
+The lesson, having now made the same mistake four times in one session: **check the artefact's date
+against the code's before concluding the code is lossy.** Four "X is absent" findings -- three
+measurement artifacts and one stale file -- and not one of them was a defect in the exporter.
