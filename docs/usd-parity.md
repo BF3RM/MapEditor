@@ -27,6 +27,16 @@ inside a world part we invented**. Pointing our sub-level at the level's own
 `WorldPartReferenceObjectData` instead -- their `WorldPartData` partitions ship with the closure --
 instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop being emitted.
 
+## A level that ships no original art (2026-09-06)
+
+    build   bundles=8  errors=1 (the known rugpile_01_n)  sb=55,050,624
+    boot    RESULT LOADED -- LoadingInfo: Running, Level:Loaded name=Levels/REALITYMOD/REALITYMOD
+
+**297 MB -> 55 MB**, and it loads. 527 mesh resources and 639 of 640 textures come from the
+player's own install; the single exception is a flat normal map that is ours. What remains in the
+bundle is EBX -- the 10,396-partition closure plus 1,718 partitions we author -- and no pixels or
+geometry of DICE's.
+
 ## Referenced vs shipped: the closure was doing both (2026-09-06)
 
 The rule is embed if EDITED, reference if not. Meshes and textures follow it -- 527 mesh resources
