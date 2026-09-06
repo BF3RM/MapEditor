@@ -765,6 +765,30 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         cmds.append('add_json_partition %s "%s"' % (build_dust2.MVDB_NAME, path))
         print('mvdb      %d entries' % len(entries))
 
+        # `flat_normal` is a 4x4 normal map this emitter GENERATES, bound wherever a mesh has no
+        # normal slot. Shipped alone in a sub-level bundle it FREEZES THE CLIENT -- one of the
+        # causes that made every exported level unenterable, and invisible to a server, which is
+        # how it survived 48 "LOADED" verdicts.
+        #
+        # It is NOT unused, and the check is here because a first measurement said it was. Counting
+        # `MeshMaterial.TextureParameters` in the mesh PARTITIONS finds them empty -- 27 of 27 on
+        # frontend, 892 of 892 on mp_001 -- but that is the wrong place to look: binding happens in
+        # the MeshVariationDatabase, where this guid appears **586 times** on mp_001 as the `Normal`
+        # parameter. Dropping it on the strength of the partition count would have left 586
+        # bindings pointing at a partition that no longer exists.
+        #
+        # So the test asks the database, not the partitions. Today it keeps the texture; if a
+        # future change stops binding it, the dead weight disappears on its own.
+        _flat_used = build_dust2.guid('instance', build_dust2.texture_partition_name(flat_name)) \
+            in json.dumps(mvdb_json)
+
+        if not _flat_used:
+            _before = len(cmds)
+            cmds = [c for c in cmds
+                    if flat_name not in c or not c.startswith(('add_dds_texture', 'add_json_partition'))]
+            print('flat      dropped %d flat-normal command(s): the database binds it 0 times'
+                  % (_before - len(cmds)))
+
     # The sub-level, plus one partition per world part -- the shape the game's own levels have.
     if extra:
         # The level's content, straight from the stage: every instance the game would keep in a
