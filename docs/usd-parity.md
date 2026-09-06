@@ -41,8 +41,31 @@ instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop b
 | Collision | UsdPhysics prims -> HavokPhysicsData | decodes valid: both packfiles, hkpBoxShape/hkpConvexTranslateShape |
 | Audio headers | BitWriter + SndPlayer/Chunk serialize | round trip lossless (plain/looping/stream) |
 | Lights, volumes, triggers, areas | UsdLux / boxes | ~2000 area+trigger volumes now visible |
+| Terrain rasters (mask/material/destruction) | base64 node blocks | mp_001 344 nodes, 2.6 MB, **0 changed**; header 15 fields 0 changed |
+| Terrain layer palette + draws | typed prims | mp_001 7/128, mp_007 10/184, sp_valley 10/234 -- **0 changed** |
 | Terrain mesh scattering | typed prims per type | MP_007 23 / SP_Valley 22 / MP_001 5 types; 598+572+130 fields, **0 changed** |
 | Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
+
+## Terrain rasters and layer palette (2026-09-06)
+
+`SingleTerrainLayerData` (268) and the mask/material/destruction trees (33 each) were bare EBX
+markers with their data in resources, so a level kept its heights and forgot what the ground was
+MADE of.
+
+    mp_001    344 raster nodes, 2.6 MB, 0 changed; tree header 15 fields, 0 changed
+    layers    mp_001 7/128 draws, mp_007 10/184, sp_valley 10/234 -- 0 changed
+
+Rasters are base64 sample blocks rather than images, deliberately: a mask node is a quadtree cell at
+its own resolution (66/side against 256 material, 133 destruction), so one flattened picture is the
+lossy trap the heightfield already taught us. Editable painting is listed above as still open.
+
+Two identity traps worth keeping, both measured:
+
+- Mask nodes are **not** identified by `(level, indexX, indexY)` -- 307 nodes over 6 distinct cells,
+  up to 88 sharing one. Naming by the triple collapsed 307 prims into 6, and the round trip caught
+  it only because it counts what came back. Ordinal is the identity.
+- Raster nodes carry **2D** bounds (`[x, z]`); the heightfield carries 3D. A fixed `Vec3f` drops or
+  invents a component, so bounds are float arrays.
 
 ## Terrain mesh scattering now round trips (2026-09-06)
 
@@ -94,16 +117,13 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
 
 ## Open
 
-1. **TERRAIN'S PAINTED DETAIL: scattering and heights done, the rest open.** Mesh scattering now
-   round trips on real game data (below), and heights are byte-exact. What remains is
-   `SingleTerrainLayerData` (268) and the four raster trees (33 each), which Rime already reads and
-   writes byte-exact but which nothing authors into USD yet. Audited 2026-09-06: 9 types are pure MARKERS
-   carrying no fields at all (1897 instances) -- their data lives in resources, so a round-tripping
-   instance proves nothing. `TerrainMeshScatteringType` (490), `SingleTerrainLayerData` (268),
-   `TerrainColorTree`/`MaskTree`/`MaterialTree`/`DestructionDepthTree` (33 each),
-   `EventSyncEntityData` (982). Rime already READS AND WRITES the terrain trees (33/33 x 5
-   byte-exact) and models scattering (`MeshScatteringType`: MeshName, Density, LockDensity,
-   RandomPositionOffset) -- so this is authoring into USD, not reversing.
+1. ~~**TERRAIN'S PAINTED DETAIL.**~~ **DONE 2026-09-06.** Heights (byte-exact), mesh scattering,
+   the mask/material/destruction rasters and the layer palette with its combination draws all round
+   trip on real game data. What is carried is not yet all *editable*: the rasters are preserved
+   byte-for-byte but cannot be painted in a DCC, which needs the per-node story heights now have.
+   `TerrainColorTree` has nothing to author on mp_001 -- the resource's own slot table reads
+   `slot2=null` -- so it is unverified rather than done, and wants a level that populates it.
+
 2. **USD scene graph is still not the level graph.** Entities nest by partition path, which is
    browsable, but a `WorldPartData` prim does not own its objects and mesh placements sit outside
    the hierarchy entirely.
