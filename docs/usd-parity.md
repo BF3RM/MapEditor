@@ -5,6 +5,24 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## The closure is editable, not just shipped (2026-09-06)
+
+A level export that stops at the level's own partitions exports a fraction of what the level IS.
+MP_001 owns 490; the closure it pulls in is 10,396 -- the weapons, soldiers, vehicles, sounds and
+voice-over it cannot run without. Those already shipped, so they travelled with a mod either way;
+what they could not do was be EDITED.
+
+    closure      10,396 partition(s), 211,765 instance(s), 802 type(s)
+    read back    211,765 prim(s) under /World/Library
+    fields       776,004 compared, 0 changed
+    instances    0 never authored
+    names        10,396 partition name(s) carried
+    stage        243 MB
+
+Authored under `/World/Library` rather than into the level's world: a soldier blueprint is an asset
+the level draws on, not something placed somewhere, and putting it in the spatial hierarchy would
+say it was.
+
 ## Are we at 100%? (2026-09-06)
 
 No -- and the parts that ARE complete are worth stating precisely, because "0 changed" and
@@ -23,9 +41,11 @@ No -- and the parts that ARE complete are worth stating precisely, because "0 ch
 
 **Not complete:**
 
-1. **The export does not author the closure.** Weapons, characters and sounds SHIP with a level but
-   are not written into USD, so they are not editable in a DCC. The round-trip proof for all 802
-   types already exists; the export path does not.
+1. ~~**The export does not author the closure.**~~ **DONE 2026-09-06.** `tools/usd/closure_export.py`
+   authors the whole closure under `/World/Library`: 10,396 partitions, 211,765 instances, 802
+   types, 211,765 prims read back, 776,004 fields, **0 changed**, 0 unauthored, 10,396 names
+   carried. The stage is 243 MB. Still to do: a `--closure` flag on `export_level_usd`, which is
+   held by concurrent work.
 2. **"0 changed" is not byte-perfect.** That test measures USD round-trip fidelity, not our rebuilt
    bytes against BF3's. Only terrain heights, the Havok wrapper and unedited collision are truly
    byte-verified against the game.
