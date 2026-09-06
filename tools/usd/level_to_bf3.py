@@ -431,6 +431,46 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         print('guids     %d shipped partition name(s) will keep their own guid'
               % len(build_dust2.SHIPPED_GUIDS))
 
+        # Second pass: each shipped mesh's own MeshLodGroup VALUES, so a re-emitted mesh keeps its
+        # LOD distances instead of the 100000 placeholder that never switches LOD. Only the handful
+        # of lodgroup partitions are re-read, not the whole corpus.
+        _lod_refs, _lod_parts = {}, {}
+
+        for _f in _files:
+            try:
+                _pd = json.load(open(_f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            _pn = (_pd.get('Name') or '').lower()
+
+            for _i in (_pd.get('Instances') or {}).values():
+                if _i.get('$type') == 'MeshLodGroup':
+                    _lod_parts[(_pd.get('PartitionGuid') or '').lower()] = _pd
+
+                if _i.get('$type') in ('RigidMeshAsset', 'MeshAsset') and _pn:
+                    _lg = _i.get('LodGroup')
+
+                    if isinstance(_lg, dict):
+                        _lod_refs[_pn] = ((_lg.get('PartitionGuid') or '').lower(),
+                                          (_lg.get('InstanceGuid') or '').lower())
+
+        for _pn, (_lpg, _lig) in _lod_refs.items():
+            _part = _lod_parts.get(_lpg)
+
+            if not _part:
+                continue
+
+            for _g, _i in (_part.get('Instances') or {}).items():
+                if _g.lower() == _lig and _i.get('$type') == 'MeshLodGroup':
+                    build_dust2.SHIPPED_LODGROUPS[_pn] = {
+                        _k: _i[_k] for _k in _i
+                        if _k.startswith('Lod') or _k in ('ShadowDistance', 'CullScreenArea')}
+                    break
+
+        print('lodgroups %d mesh(es) will keep their shipped LOD distances'
+              % len(build_dust2.SHIPPED_LODGROUPS))
+
     if level_sb:
         build_dust2.WORLD_NAME = 'levels/realitymod/%s' % bundle_name.lower()
         # The MVDB is resolved BY NAME from the sub-level's own name: the game ships

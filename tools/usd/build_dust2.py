@@ -133,6 +133,14 @@ STATIC_MESH_SHADER = {'PartitionGuid': '7d695128-2252-11e0-af13-c7d193512d44',
 # edit-in-place export means.
 SHIPPED_GUIDS = {}
 
+# Shipped MeshLodGroup VALUES, keyed by lowercased mesh partition name. Populated by the emitter.
+#
+# The local lodgroup below stays local -- borrowing the shipped one would make this bundle depend on
+# another object's partition being loaded -- but its numbers should be the mesh's OWN. Hardcoding
+# Lod1-5Distance to 100000 means the LODs never switch, and these meshes do ship several
+# (MEASURED: shipped lodgroups cluster on 20/40/70/100/150, and one mesh carries 3 LOD chunks).
+SHIPPED_LODGROUPS = {}
+
 
 def partition_guid(name):
     """The shipped guid for `name` if the game ships one, else a stable derived guid."""
@@ -668,17 +676,23 @@ def mesh_partition(material_names, material_ebx=None):
     # Authored here rather than referenced: every shipped mesh points at a MeshLodGroup living in
     # some other object's partition, and borrowing one would make this bundle depend on that object
     # being loaded. It is seven floats.
+    _lod = SHIPPED_LODGROUPS.get(MESH_NAME.lower()) or {}
+
     instances[lod_g] = {
         '$type': 'MeshLodGroup', 'Name': MESH_NAME + '_lodgroup',
-        'Lod1Distance': 100000.0, 'Lod2Distance': 100000.0, 'Lod3Distance': 100000.0,
-        'Lod4Distance': 100000.0, 'Lod5Distance': 100000.0,
+        'Lod1Distance': _lod.get('Lod1Distance', 100000.0),
+        'Lod2Distance': _lod.get('Lod2Distance', 100000.0),
+        'Lod3Distance': _lod.get('Lod3Distance', 100000.0),
+        'Lod4Distance': _lod.get('Lod4Distance', 100000.0),
+        'Lod5Distance': _lod.get('Lod5Distance', 100000.0),
         # 0.02, matching every shipped lodgroup measured.
         #
         # This used to be 0.0 on the reasoning that "zero area means never cull by screen coverage,
         # which is what a single-LOD mesh wants". That was an assumption, never checked, and it is
         # the kind of value a screen-coverage test divides by. The complete vanilla lodgroup
         # (lodgroups/Xenon_SkipAndStreamNoLODs, dumped from the game) uses 0.02, so use that.
-        'ShadowDistance': 0.0, 'CullScreenArea': 0.02,
+        'ShadowDistance': _lod.get('ShadowDistance', 0.0),
+        'CullScreenArea': _lod.get('CullScreenArea', 0.02),
     }
 
     instances[mesh_g] = {
