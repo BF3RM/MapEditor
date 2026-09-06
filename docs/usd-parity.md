@@ -5,6 +5,39 @@ came from a run; anything unmeasured says so. Updated as work lands.
 
 Last updated: 2026-09-06.
 
+## Are we at 100%? (2026-09-06)
+
+No -- and the parts that ARE complete are worth stating precisely, because "0 changed" and
+"byte-perfect" are different claims and only some of this earns the second.
+
+**Complete, measured:**
+
+| | evidence |
+|---|---|
+| USD representation, whole game | 10,396 partitions, 211,765 instances, 802 types, 776,004 fields, **0 changed**, 0 unauthored |
+| Enlighten | 0 changed across three levels |
+| Terrain heights | byte-exact; an untouched terrain emits 0 changed nodes |
+| Terrain rasters, layers, scattering | 0 changed |
+| Collision, unedited | byte-identical, with a guard proving an edit is refused |
+| Art referencing | 527 meshes + 639/640 textures from the player's install; 55 MB; loads |
+
+**Not complete:**
+
+1. **The export does not author the closure.** Weapons, characters and sounds SHIP with a level but
+   are not written into USD, so they are not editable in a DCC. The round-trip proof for all 802
+   types already exists; the export path does not.
+2. **"0 changed" is not byte-perfect.** That test measures USD round-trip fidelity, not our rebuilt
+   bytes against BF3's. Only terrain heights, the Havok wrapper and unedited collision are truly
+   byte-verified against the game.
+3. **Refs and nested records stay in customData** -- carried losslessly, not typed, so a reference
+   between two objects is not editable the way a scalar is.
+4. **Edited collision rebuilds to 81 objects against the game's 120.**
+5. **47 of 49 levels never swept.** MP_001 loading did not mean the emitter worked once before; a
+   second level exposed three defects.
+6. **Update-in-place unproven**, and Enlighten is not re-injected into a built bundle.
+7. **1,077 partitions** under the game's own namespaces are still EBX we author rather than
+   reference.
+
 ## The one-line state
 
 **The complete configuration loads.** mp_003: 53,121,744 bytes, 0 errors, 0 unresolved, 35/35 world
