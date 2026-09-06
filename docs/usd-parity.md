@@ -150,13 +150,16 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
    browsable, but a `WorldPartData` prim does not own its objects and mesh placements sit outside
    the hierarchy entirely.
 3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
-4. **Havok: extraction works, the BYTE round trip is not proven yet.** Rime now reads
-   `hkpBoxShape`, `hkpConvexVerticesShape` and the `hkpConvexTranslateShape` that places them,
-   including the hull PLANES (`927a9370`), and `dump_collision_shapes` writes them as JSON. Game
-   shapes -> USD -> descriptors is verified: BigRadioTower 537 values and MEHouse01Large 265, **0
-   changed**. What is NOT done is the leg that matters most -- descriptors -> rebuilt
-   HavokPhysicsData -> **compare bytes against the original resource**. Until that runs, "collision
-   round trips" means representation is lossless, not that BF3 would bake the same file.
+4. **Havok: NOT byte-identical, and now we know exactly why.** Rime reads the shapes and their
+   planes (`927a9370`) and BF3 -> USD -> descriptors is lossless (537 and 265 values, 0 changed).
+   The byte test (`tools/usd/collision_byte_roundtrip_test.py`) says the rest plainly: MEHouse01Large
+   is **21,304 bytes original against 16,072 rebuilt, differing from byte 0**. The cause is not the
+   shapes -- it is that a HavokPhysicsData is a Frostbite WRAPPER around the packfiles, and the
+   rebuild emits only the packfiles. The original opens `PartCount=21`; the rebuild writes 1. Rime
+   already models the missing half (`PartCount`, `Scale`, `MaterialCountUsed`,
+   `HighestMaterialIndex`, `PartTranslations`, `LocalAabbs`, `MaterialIndices`,
+   `MaterialFlagsAndIndices`) -- none of it is extracted or re-emitted yet. That is the work, and it
+   is well-defined rather than exploratory.
 
 5. **Ant clips carry indexed joints** (`dof037`). Values are exact; names need
    `AntAnimationSetAsset` -> `SkeletonAsset` + actor channel maps resolved.
