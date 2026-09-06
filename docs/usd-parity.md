@@ -46,6 +46,28 @@ instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop b
 | Terrain mesh scattering | typed prims per type | MP_007 23 / SP_Valley 22 / MP_001 5 types; 598+572+130 fields, **0 changed** |
 | Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
 
+## Collision can now be read, not only written (2026-09-06)
+
+    BigRadioTower     35 shapes (26 box, 9 convex)   537 values   0 changed
+    MEHouse01Large    39 shapes (38 box, 1 convex)   265 values   0 changed
+
+The tower's boxes reach 27 m half-extent over centres spanning 0-33 m; the house tops out at 7.65 m
+and 4.5 m. A tower reading as a tower is the check that these are geometry rather than plausible
+noise.
+
+Two things this turned up, both invisible until real game data went through:
+
+- **Havok's planes are POST-radius.** They describe the hull after the convex radius inflates it, so
+  no vertex lies on any plane: measured 0 vertices at 1e-3 and 3-5 at 1e-2 against a radius of
+  0.0085. Fed back raw they match nothing.
+- **`convex_layout.faces` used eps=1e-3, which is too tight for the game's own float32 hulls.** Two
+  radio-tower hulls came back with 11 of their 12 planes -- silently rounding a face off a shape BF3
+  ships. Across 1e-3 .. 2e-2 the kept count is 11 at 1e-3 and a stable 12 from 3e-3 up; a plateau
+  that wide says 12 is the true count. Default is now 5e-3.
+
+**This is not yet a 1:1 BF3 -> USD -> BF3 trip.** The rebuild-and-compare-bytes leg is unwritten,
+and that is the only evidence that would justify the claim.
+
 ## Terrain rasters and layer palette (2026-09-06)
 
 `SingleTerrainLayerData` (268) and the mask/material/destruction trees (33 each) were bare EBX
@@ -128,9 +150,14 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
    browsable, but a `WorldPartData` prim does not own its objects and mesh placements sit outside
    the hierarchy entirely.
 3. **No completed 49-level sweep against the corrected (post-sub-world) data.**
-4. **Havok is one-directional** -- collision can be authored, but the game's existing collision is
-   not extracted into USD, so it cannot be edited. Needs half-extents out of `hkpBoxShape` and
-   vertices out of `hkpConvexVerticesShape`; `dump_collision.read()` already resolves the graph.
+4. **Havok: extraction works, the BYTE round trip is not proven yet.** Rime now reads
+   `hkpBoxShape`, `hkpConvexVerticesShape` and the `hkpConvexTranslateShape` that places them,
+   including the hull PLANES (`927a9370`), and `dump_collision_shapes` writes them as JSON. Game
+   shapes -> USD -> descriptors is verified: BigRadioTower 537 values and MEHouse01Large 265, **0
+   changed**. What is NOT done is the leg that matters most -- descriptors -> rebuilt
+   HavokPhysicsData -> **compare bytes against the original resource**. Until that runs, "collision
+   round trips" means representation is lossless, not that BF3 would bake the same file.
+
 5. **Ant clips carry indexed joints** (`dof037`). Values are exact; names need
    `AntAnimationSetAsset` -> `SkeletonAsset` + actor channel maps resolved.
 6. **Enlighten** probe data referenced, not authored.

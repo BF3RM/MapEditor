@@ -76,13 +76,19 @@ def bounds(verts):
     return half, centre
 
 
-def faces(verts, planes, eps=1e-3):
+def faces(verts, planes, eps=5e-3):
     """(vertex indices per face, indices of the planes that are real faces).
 
     Source adds BEVEL planes to brushes -- extra half-spaces that clip nothing, there to keep
     swept collision from catching on edges. They touch the hull along an edge or a single point,
     so they are not faces and must not appear in m_planeEquations, which shipped data has exactly
     one entry of per face.
+
+    eps was 1e-3, which is too tight for the game's own float32 hulls: two of the radio tower's
+    hulls came back with 11 of their 12 planes, silently rounding a face off a shape BF3 ships.
+    Measured across 1e-3 .. 2e-2, the kept count is 11 at 1e-3 and a stable 12 everywhere from
+    3e-3 up -- a plateau that wide says 12 is the true face count and 1e-3 was simply under it,
+    rather than a looser value over-matching.
     """
     import math
 

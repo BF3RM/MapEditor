@@ -16,7 +16,7 @@ convex hulls do not use one.
 import os
 import sys
 
-from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics
+from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics, Vt
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'havok'))
 
@@ -62,6 +62,15 @@ def author(stage, root, shapes):
             mesh.CreateFaceVertexCountsAttr(counts)
             mesh.CreateFaceVertexIndicesAttr(idx)
             prim = mesh.GetPrim()
+
+            # A hull extracted FROM the game arrives with its own plane equations and no faces --
+            # Havok stores planes, not a face list, and rebuilding faces from bare vertices needs a
+            # convex-hull solver this toolchain does not have. Carry them verbatim so the trip is
+            # exact; a hull modelled in a DCC still comes back through its faces below.
+            if sh.get('planes'):
+                mesh.GetPrim().CreateAttribute(
+                    'bf3ConvexPlanes', Sdf.ValueTypeNames.Float4Array).Set(
+                    Vt.Vec4fArray([Gf.Vec4f(*[float(c) for c in p]) for p in sh['planes']]))
             _xform(prim, sh.get('centre', (0.0, 0.0, 0.0)))
 
         UsdPhysics.CollisionAPI.Apply(prim)
@@ -110,7 +119,24 @@ def read(stage_path):
             counts = UsdGeom.Mesh(prim).GetFaceVertexCountsAttr().Get() or []
             idx = UsdGeom.Mesh(prim).GetFaceVertexIndicesAttr().Get() or []
 
-            # One plane per face: normal from the winding, offset through its first vertex.
+            # The game's own planes win when they are present: they are exact, and a hull
+            # extracted from BF3 has no faces to derive from.
+            carried = prim.GetAttribute('bf3ConvexPlanes')
+
+            if carried and carried.HasAuthoredValue() and carried.Get():
+                # Havok's planes are POST-radius: plane_equations writes w = -(d + radius), so the
+                # surface sits a convex radius further out than the vertices. Feeding them back raw
+                # means no vertex lies on any plane and face matching drops them -- measured on the
+                # radio tower, where every plane had 0 vertices at 1e-3 and 3-5 at 1e-2 against a
+                # radius of 0.01. Undo the inflation so the planes describe the hull the vertices
+                # actually form; build_collision re-applies it on the way out.
+                out.append(build_collision.convex(
+                    centre, verts,
+                    [(p[0], p[1], p[2], -(p[3]) - radius) for p in carried.Get()], radius))
+                continue
+
+            # Otherwise derive one plane per face: normal from the winding, offset through its
+            # first vertex.
             planes, at = [], 0
 
             for c in counts:
