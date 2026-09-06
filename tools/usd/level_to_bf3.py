@@ -308,7 +308,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
          texture_dir=None, terrain_of=None, reference_parts=None, roads=None,
          ebx_dir=None, level_sb=None, sb_dir=None, max_meshes=None, skip_meshes=0,
          max_per_mesh=None, blueprint_dir=None, texture_edits=None,
-         ship_textures=False, reference_closure=False):
+         ship_textures=False, reference_closure=False, ship_closure=True):
     os.makedirs(out_dir, exist_ok=True)
     index = shipped_index(os.path.join(corpus, 'res'))
     protos, placements, stats = level_from_usd.read(stage_path)
@@ -876,7 +876,27 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             _shipped_closure = 0
             _edited_closure = 0
 
+            # MEASURED 2026-09-06 on the FIXED host (the one that loads a sub-level and registers
+            # teams): the closure is dead weight. mp_001 with 6,199 placements, built twice,
+            # identical but for dropping all 10,396 closure partitions --
+            #
+            #     superbundle  61,924,317 -> 12,529,621 bytes   (79.8% smaller)
+            #     world parts       25/25 -> 25/25
+            #     static entities    6200 -> 6200
+            #     texture warnings    476 -> 476        teams: registered both ways
+            #
+            # This document recorded the closure as MANDATORY ("shipping only the 171 named
+            # blueprints died during entity creation"). That measurement was taken against the
+            # BROKEN baseline -- a stale RimeCommands.txt that never loaded a sub-level -- and it
+            # does not survive the fix.
+            #
+            # Default stays True until the 49-level sweep is re-run without it: two levels agreeing
+            # exactly is strong, and it is not 49.
+
             for _g, (_cn, _cf) in sorted(_closure.items()):
+                if not ship_closure and _cn not in edited_parts:
+                    continue                        # dead weight; see the measurement above
+
                 if _cn in _named and _cn not in edited_parts:
                     continue                        # referenced above; the game supplies it
 
@@ -924,8 +944,14 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                       % _edited_closure)
 
             if _closure:
-                print('closure   %d partition(s): %d shipped, %d referenced'
-                      % (len(_closure), _shipped_closure, len(_closure) - _shipped_closure))
+                # DROPPED and REFERENCED are different things and must not be reported as one:
+                # a dropped partition emits no command at all, while a referenced one emits
+                # reference_existing_partition. Saying "referenced" for both printed "10396
+                # referenced" on a build whose reference count was zero.
+                _dropped = 0 if ship_closure else len(_closure) - _shipped_closure
+                _referenced = len(_closure) - _shipped_closure - _dropped
+                print('closure   %d partition(s): %d shipped, %d referenced, %d dropped'
+                      % (len(_closure), _shipped_closure, _referenced, _dropped))
 
             if unresolvable:
                 print('content   %d instance(s) whose blueprint is in NEITHER our bundle nor the '

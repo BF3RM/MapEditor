@@ -1732,6 +1732,27 @@ inside a world part we invented**. Pointing our sub-level at the level's own
 `WorldPartReferenceObjectData` instead -- their `WorldPartData` partitions ship with the closure --
 instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop being emitted.
 
+## The bundle is 6 MB, not 55 (2026-09-06)
+
+Dropping the closure, confirmed independently on mp_001 through the emitter's own `ship_closure`
+option and booted:
+
+    with closure     55,050,624 bytes    errors=1    LOADED
+    without          6,157,728 bytes     errors=1    LOADED, full chain to Running
+    add_json_partition  12,114 -> 1,718
+
+**89% smaller, and it still loads.** That 49 MB was EBX we AUTHORED -- verbatim copies of the game's
+own partitions, `weapons/knife/u_knife` emitted with DICE's own PartitionGuid. Removing it is not
+just a size win: it is the largest block of original game data the mod was carrying, which is what
+"referenced, not shipped" was always about.
+
+A separate run on the fixed host measured the rest of the numbers unchanged: world parts 25/25,
+static entities 6200, texture warnings 476, teams registered, with and without.
+
+The default is still `ship_closure=True`. Two levels agreeing exactly is strong and it is not 49 --
+the sweep that booted 48 levels ran WITH the closure, so it has to be re-run before the default
+moves.
+
 ## A level that ships no original art (2026-09-06)
 
     build   bundles=8  errors=1 (the known rugpile_01_n)  sb=55,050,624
