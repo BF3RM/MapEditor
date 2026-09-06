@@ -814,13 +814,54 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 _named = {p.strip() for p in reference_parts if p.strip()}
 
             _shipped_closure = 0
+            _edited_closure = 0
 
             for _g, (_cn, _cf) in sorted(_closure.items()):
                 if _cn in _named and _cn not in edited_parts:
                     continue                        # referenced above; the game supplies it
 
+                # A closure partition the STAGE edited ships with the edit applied. Without this
+                # the closure is exportable and not editable: a weapon or soldier could be changed
+                # in a DCC, the change would round trip through USD, and the bundle would still
+                # carry the game's original -- authoring in one direction only, which is the exact
+                # failure the level's own entities already guard against.
+                # The closure is authored into the stage under its FILE name, which is a guid,
+                # while it ships under its partition name. Look under both, or an edit to a weapon
+                # silently never lands.
+                _changes = (stage_entities.get(_cn) or stage_entities.get(_g)
+                            or stage_entities.get(str(_g).lower()))
+
+                if _changes:
+                    try:
+                        _doc = json.load(open(_cf))
+                    except Exception:                            # noqa: BLE001
+                        _doc = None
+
+                    if _doc is not None:
+                        _touched = 0
+
+                        for _ig, _rec in _changes.items():
+                            _old = (_doc.get('Instances') or {}).get(_ig)
+
+                            # Only what actually CHANGED, the same rule the level's entities
+                            # follow: read() returns everything it authored, not just edits.
+                            if _old is None or _old == _rec:
+                                continue
+
+                            _doc['Instances'][_ig] = _rec
+                            _touched += 1
+
+                        if _touched:
+                            _cf = os.path.join(part_dir, 'clo_%s.json' % _safe(_cn))
+                            json.dump(_doc, open(_cf, 'w'), indent=1)
+                            _edited_closure += 1
+
                 cmds.append('add_json_partition %s "%s"' % (_cn, _cf))
                 _shipped_closure += 1
+
+            if _edited_closure:
+                print('closure   %d partition(s) rewritten with edits from the stage'
+                      % _edited_closure)
 
             if _closure:
                 print('closure   %d partition(s): %d shipped, %d referenced'

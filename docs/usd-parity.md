@@ -23,6 +23,16 @@ Authored under `/World/Library` rather than into the level's world: a soldier bl
 the level draws on, not something placed somewhere, and putting it in the spatial hierarchy would
 say it was.
 
+**Edits go back.** A closure partition the stage changed now ships with the change applied, on the
+same rule the level's own entities follow -- only records that actually differ, so an unedited
+closure rewrites nothing. Verified end to end at the stage layer: an `EmitterTemplateData` field
+edited 4.0 -> 11.5 in USD comes back as 11.5 keyed to its partition
+(`tools/usd/closure_edit_test.py`). One wrinkle worth keeping: the closure is authored under its
+guid FILE name and ships under its partition NAME, so the writeback looks under both -- keyed on one
+alone, an edit to a weapon silently never lands.
+
+Not yet run: a full emit with an edited closure, confirming the change reaches the built bundle.
+
 ## Are we at 100%? (2026-09-06)
 
 No -- and the parts that ARE complete are worth stating precisely, because "0 changed" and
