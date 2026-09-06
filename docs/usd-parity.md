@@ -188,7 +188,7 @@ which looks exactly like three lossy fields. Identity is `(partition, instance)`
 | Entity fields, all 440 types | typed USD attributes | 35,298 authored; round trip **0 changed fields** |
 | Level graph (ownership) | `/World/Level`, world parts own their objects | 49/49 levels; 151,362 owned objects = 151,362 in the EBX; **0 changed** over 23,526,728 fields |
 | Skinned meshes | UsdSkel | 535/535 byte-identical, 1632/1632 chunks |
-| Animation clips | UsdSkelAnimation | 8,136/8,136 channels identical |
+| Animation clips | UsdSkelAnimation | 113,066/113,066 channels identical, **named joints** |
 | AnimTrackData | time samples + Bezier | 1484/1484 byte-exact |
 | Collision | UsdPhysics prims -> HavokPhysicsData | decodes valid: both packfiles, hkpBoxShape/hkpConvexTranslateShape |
 | Audio headers | BitWriter + SndPlayer/Chunk serialize | round trip lossless (plain/looping/stream) |
@@ -432,6 +432,52 @@ the per-resource `dump_enlighten` cannot be driven from outside: probe-set names
 only from the database's own `probeSetNames`, so a caller has to have mounted and read before it can
 ask for them. One mount now answers the whole level.
 
+## Ant clips now name the bone each curve drives (2026-09-06)
+
+`dof037` is now `LeftHandThumb2`. The chain is not the one the old note guessed at
+(`AntAnimationSetAsset` -> `SkeletonAsset`): those partitions hold nothing but an
+`AntPackageAsset`, and no EBX in the game binds a weapon bank to a skeleton. The names come from
+the bank side:
+
+    AnimationAsset.ChannelToDofAsset -> IndexData[channel] = slot in a DOF set
+    LayoutHierarchyAsset             -> the DOF set, an ordered list of LayoutAssets
+    LayoutAsset.Slots                -> "LeftHandThumb2.q" / ".t" / ".s" / a scalar
+
+All of it lives in ONE package, `animations/antanimations/s_basicassets` -- the only one of the
+322 that holds a rig (5 RigAssets, 5 ant::SkeletonAssets, 97 DOF sets, 47 channel maps). Rime
+surfaces it now (`DumpAnimationBankCommand`), along with each object's guid, its position in the
+bank and its ObjectName -- so clips also stopped being anonymous: they are `M26_Fire Anim`, not
+`clip0004`.
+
+`tools/usd/antanim_roundtrip_test.py`, over the 85 weapon banks that carry decoded frames:
+
+    export       830 clip(s) from 86 bank(s), 830 with named joints
+    names        79909 joint token(s): 79893 in a shipped SkeletonAsset, 16 rig-only, 0 unaccounted
+    spot check   ak74 M26_Fire Anim channels [0, 3, 96] -> Neck.q, Wep_Root.q, Wep_Root.t   PASS
+    values       830 clip(s), 14524312 float(s) compared, 0 changed                         PASS
+
+Across the whole game: **6,428 of 8,972 clips named, 1,018,205 channels; 2,541 clips (203,680
+channels) left indexed.** The 16 "rig-only" tokens are the IK effector aux joints and the
+foot-plant velocity signals -- rig channels BF3's skeletons correctly do not carry.
+
+Three things this cost, all measured rather than assumed:
+
+- **`IndexData` is big-endian** for StorageType 2. Little-endian puts the largest index at 65280,
+  which no DOF set could hold; big-endian tops out at 411 against a 746-slot rig.
+- **A trajectory-led DOF set repeats its first 8 slots.** Of the 43 (map, DOF set) pairs BF3
+  itself states via `ClipControllerAsset.Target`, 18 address indices past the end of the plain
+  slot concatenation -- every one by exactly 8 -- and all 18 validate with zero type violations
+  once the block is repeated. Without it every 3P soldier clip stayed anonymous.
+- **The obvious tie-break is wrong.** Preferring the smallest matching DOF set would name 8,920
+  of 8,972 clips, but it contradicts BF3's own bindings on 3 of 57. The shipped rule names a
+  channel only when EVERY DOF set that can admit the map agrees, which is 46 right / 0 wrong /
+  11 undecided against those 57.
+
+One correctness fix rode along: the DCT codec returns every DOF as a Vector4 and a clip's
+trailing `NumFloatVec` channels really use the fourth float (213 of them in this corpus). A
+`Vec3f` translation drops it, so it now rides in `bf3:dofW` -- which is what turns "0 changed"
+from nearly true into true.
+
 ## Open
 
 1. ~~**TERRAIN'S PAINTED DETAIL.**~~ **DONE 2026-09-06.** Heights (byte-exact), mesh scattering,
@@ -457,8 +503,9 @@ ask for them. One mount now answers the whole level.
    but not byte-identical to what BF3 would bake. Reproducing the packfile exactly (object order,
    padding, fixups, and the object types we do not model) is the remaining work.
 
-5. **Ant clips carry indexed joints** (`dof037`). Values are exact; names need
-   `AntAnimationSetAsset` -> `SkeletonAsset` + actor channel maps resolved.
+5. ~~**Ant clips carry indexed joints** (`dof037`).~~ **DONE 2026-09-06** for 6,428 of BF3's
+   8,972 clips (measured above). The remaining 2,541 keep indexed names because their channel map is
+   read the same way by several unrelated DOF sets, and this refuses to pick one.
 6. ~~**Enlighten** probe data referenced, not authored.~~ **DONE 2026-09-06** (above): every
    Enlighten resource a level ships is authored into USD and round trips with 0 changed bytes on
    three levels. What is NOT done is re-baking: the data is carried, never recomputed, so a level

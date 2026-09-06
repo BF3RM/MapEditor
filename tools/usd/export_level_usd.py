@@ -569,16 +569,18 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
                   % len(_asset_meshes))
 
     # ANIMATION. Every Ant bank the level reaches, authored as UsdSkelAnimation so clips are
-    # editable and scrubable rather than merely decodable. Values round-trip exactly (measured
-    # 8136/8136 channels); joints are named by DOF index where the skeleton binding is unknown,
-    # which is honest about what is unmapped instead of guessing a bone order.
+    # editable and scrubable rather than merely decodable. Values round-trip exactly, and the
+    # joints carry the rig's own bone names wherever the clip's ChannelToDofAsset picks out one
+    # DOF set -- `antrig` refuses to name a channel when it does not, and those keep dof037.
     _bankdir = os.environ.get('USD_ANT_BANKS', '/tmp/antbanks')
 
     if os.path.isdir(_bankdir):
         import antanim as _antanim
+        import antrig as _antrig
         import glob as _bg
 
-        _clips = 0
+        _clips = _named = 0
+        _rig = _antrig.find(os.environ.get('USD_ANT_RIG') or _bankdir)
 
         for _bf in sorted(_bg.glob(os.path.join(_bankdir, '*.json'))):
             try:
@@ -586,11 +588,13 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
             except Exception:                                # noqa: BLE001
                 continue
 
-            _clips += _antanim.author(stage, world, _bank)
+            _c, _n = _antanim.author(stage, world, _bank, _rig)
+            _clips += _c
+            _named += _n
 
         if _clips:
-            print('animation   %d clip(s) authored from %d bank(s)'
-                  % (_clips, len(_bg.glob(os.path.join(_bankdir, '*.json')))))
+            print('animation   %d clip(s) authored from %d bank(s), %d with named joints'
+                  % (_clips, len(_bg.glob(os.path.join(_bankdir, '*.json'))), _named))
 
     # Every EBX instance the level's partitions hold. The ones with a Transform -- spawns, effect
     # placements, decals, probes, volumes -- become Xforms a DCC can move; the rest are carried as
