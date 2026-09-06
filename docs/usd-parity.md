@@ -2806,3 +2806,24 @@ What remains genuinely missing is specific LEVEL content, and that list is short
 Feeding the emitter the closure stage instead of the small one changes nothing on its own -- 23
 types either way -- because the limiter is which types belong in a world part, not what the stage
 holds. The remaining work is representing those five, not widening the filter.
+
+### Correction 2: counting blobs misses native representations
+
+The "absent from USD" table above was built by counting `bf3Entity` customData blobs, which sees
+nothing that USD represents NATIVELY -- and native is the better representation, because it is what
+a DCC can actually edit.
+
+- `RoadData` is NOT absent. The stage carries 109 `BasisCurves` at `/World/Roads/curve_N`; the level
+  has 115 roads. They are editable spline geometry, which is the point.
+- Meshes and materials are `UsdGeom.Mesh` (116) and `UsdShade.Material` (116); lights are UsdLux.
+- `RigidMeshEntityData` is a representation CHOICE, not missing content. BF3 places a static mesh
+  either as a baked `RigidMeshEntityData` inside a world part or as a `ReferenceObjectData`
+  pointing at a blueprint; the export uses the latter (799 of them). The meshes are present.
+
+So the honest gap list is shorter still: `CompositeMeshEntityData` (83) and
+`OccluderVolumeEntityData` (56), plus `MaterialRelation*` (1404) which is carried at build time and
+so is referenced but not DCC-editable.
+
+The lesson for anyone measuring this again: count native prims AND blobs, and check whether a type's
+content arrives under a different but equivalent representation before calling it missing. Three
+separate "X is absent from USD" claims in one session were all measurement artifacts.
