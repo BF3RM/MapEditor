@@ -273,7 +273,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
          texture_dir=None, terrain_of=None, reference_parts=None, roads=None,
          ebx_dir=None, level_sb=None, sb_dir=None, max_meshes=None, skip_meshes=0,
          max_per_mesh=None, blueprint_dir=None, texture_edits=None,
-         ship_textures=False):
+         ship_textures=False, reference_closure=False):
     os.makedirs(out_dir, exist_ok=True)
     index = shipped_index(os.path.join(corpus, 'res'))
     protos, placements, stats = level_from_usd.read(stage_path)
@@ -803,11 +803,28 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             # resolve too, and they are not all in the game's mounted bundles at that point. The
             # closure converged in six rounds (5407 -> 2696 -> 1746 -> 320 -> 61 -> 1), so it is
             # finite and shippable.
+            # Embed if edited, reference if not -- the same rule the meshes and textures follow.
+            # A closure partition we have REFERENCED is already resolvable from the player's own
+            # install, so shipping a copy of it as well is pure duplication: the earlier measurement
+            # that forced the whole closure to ship was taken when only the 171 named blueprints
+            # were referenced and the rest were resolvable from nothing.
+            _named = set()
+
+            if reference_closure and reference_parts:
+                _named = {p.strip() for p in reference_parts if p.strip()}
+
+            _shipped_closure = 0
+
             for _g, (_cn, _cf) in sorted(_closure.items()):
+                if _cn in _named and _cn not in edited_parts:
+                    continue                        # referenced above; the game supplies it
+
                 cmds.append('add_json_partition %s "%s"' % (_cn, _cf))
+                _shipped_closure += 1
 
             if _closure:
-                print('closure   %d partition(s) shipped (full dependency graph)' % len(_closure))
+                print('closure   %d partition(s): %d shipped, %d referenced'
+                      % (len(_closure), _shipped_closure, len(_closure) - _shipped_closure))
 
             if unresolvable:
                 print('content   %d instance(s) whose blueprint is in NEITHER our bundle nor the '

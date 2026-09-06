@@ -27,6 +27,29 @@ inside a world part we invented**. Pointing our sub-level at the level's own
 `WorldPartReferenceObjectData` instead -- their `WorldPartData` partitions ship with the closure --
 instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop being emitted.
 
+## Referenced vs shipped: the closure was doing both (2026-09-06)
+
+The rule is embed if EDITED, reference if not. Meshes and textures follow it -- 527 mesh resources
+and 639 of 640 textures come from the player's own install, the one exception being a flat normal
+that is ours. The closure did not: it was referenced AND shipped in the same build, so the
+references saved nothing.
+
+    before   add_json_partition 12,114   reference_existing_partition 10,396
+    after    add_json_partition  1,718   reference_existing_partition 10,396
+
+The earlier measurement that forced the whole closure to ship ("shipping only the 171 named ones
+died during entity creation") was taken when only those 171 blueprints were referenced and the rest
+were resolvable from nothing. With all 10,396 referenced the duplicate copy is redundant --
+*pending the load test*, which is the only thing that settles it.
+
+Of the 1,718 that remain, 641 are ours (`dust2/...`: mesh partitions, MVDB, world parts) and 1,077
+are our own EBX authored under the GAME's names for meshes and blueprints. Referencing those
+instead was measured to make the engine reject the bundle, but that measurement predates the
+closure being referenced, so it is worth re-running.
+
+Checked before booting: 10,392 referenced against 1,718 emitted, **0 names in both** -- nothing
+shadows, which is the one arrangement measured never to work.
+
 ## The whole game round trips, not just a level (2026-09-06)
 
 A level's own partitions are a narrow slice of BF3 -- weapons, characters, vehicles, sounds and
