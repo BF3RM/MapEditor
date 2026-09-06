@@ -144,6 +144,58 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## The root's registries, measured against the game: duplication fixed, two of them EMPTY (2026-09-06)
+
+No boot needed. The partition the client dies on is our `SubWorldData` root, so its
+`RegistryContainer` was counted and compared against two real ones -- BF3's own `levels/mp_001/mp_001`
+and the shipped `levels/realitymod/teamdeathmatch`, which is a SubWorldData root of exactly the same
+role, pulled out of the shipped `.sb` with `mount_standalone_sb`.
+
+| | OURS `levels/realitymod/usdlevel` | GAME `levels/mp_001/mp_001` | SHIPPED `realitymod/teamdeathmatch` |
+|---|---|---|---|
+| instances | 284 | 457 | 6 |
+| **EntityRegistry** | **0** | **132** | **132** |
+| **AssetRegistry** | **0** | **1,628** | **2,646** |
+| BlueprintRegistry | 551 (1.00x) | 146 (1.00x) | 127 (1.00x) |
+| ReferenceObjectRegistry | 24 (1.00x) | 328 (1.00x) | 14 (1.00x) |
+| `ReferenceObjectData` in the root partition | **257** | **0** | **0** |
+| root carries its own `WorldPartData` | **yes, 257 objects** | no | no |
+
+**The duplication defect is gone.** Every registry in our root is 1.00x unique -- the 11.1x
+`BlueprintRegistry` and the 5,349-entry `ReferenceObjectRegistry` recorded earlier in this effort do
+not reproduce. That hypothesis is closed.
+
+**What replaces it is the opposite problem: two registries are EMPTY.** `EntityRegistry` and
+`AssetRegistry` are both 0 in ours and populated in BOTH real roots -- 132 and 1,628 on BF3's own
+level, 132 and 2,646 on the shipped sub-world. An `AssetRegistry` is where a world declares the
+assets it uses; a dedicated server binds no assets and can skip it, a client cannot. That is the
+same shape as every other defect this effort has found: invisible to the server, fatal to the
+client, and sitting in the one partition the client dies on.
+
+**And our root carries placements the game keeps out of it.** Both real roots hold ZERO
+`ReferenceObjectData`: they reference world parts and nothing else. Ours holds 257 of them plus its
+own unnumbered `WorldPartData`, in addition to the 22 numbered parts beside it. The world parts
+themselves are the right shape -- `WorldPartData` + `ReferenceObjectData`, no RegistryContainer,
+matching the game's `levels/mp_001/mp_001/layer0_default` exactly -- so this is specific to the root.
+
+Size, for whatever it is worth and flagged as unbenchmarked: our parts run 256 objects each
+(part22 is 854: 348 `DecalEntityData`, 231 `ReferenceObjectData`, 105 `LightProbeVolumeData`) against
+26 in the one game layer sampled. One sample is not a distribution and mp_001 has 34 world parts, so
+this is a lead rather than a finding.
+
+### What to do with it
+
+1. **Populate `AssetRegistry` and `EntityRegistry` on the emitted root.** Highest-value and the
+   closest fit to the evidence. The game's own numbers give the target shape.
+2. **Stop putting `ReferenceObjectData` in the root partition** -- move those 257 into a numbered
+   world part like every other placement, so the root only references parts, which is what both real
+   roots do.
+3. Only if both of those change nothing, fall back to the two hooks: `Partition:Loaded` on the root
+   printing its instance count and `$type`s, and a client-realm `CreateFromBlueprint`.
+
+Each of 1 and 2 is an emitter change plus one boot, and either would be visible immediately: the
+client either gets past `levels/realitymod/usdlevel` or it does not.
+
 ## The client dies on ONE partition, and it is the sub-world root (2026-09-06)
 
 The window between the last world part and the deploy screen is instrumented, and it turns out there
