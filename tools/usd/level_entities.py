@@ -32,7 +32,7 @@ prims writing back to one EBX record, and fifty-nine edits would vanish with not
 import json
 import os
 
-from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux, UsdMedia, UsdPhysics        # noqa: F401
+from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux, UsdMedia, UsdPhysics, Vt   # noqa: F401
 
 BF3 = 'bf3'
 
@@ -344,6 +344,70 @@ def _vec_key(v):
     return None
 
 
+def _is_ref(v):
+    """A guid pointer to another instance, rather than a record with fields of its own."""
+    return isinstance(v, dict) and set(v.keys()) <= {'PartitionGuid', 'InstanceGuid', '$type',
+                                                     'Name'}
+
+
+def _author_array(prim, name, v):
+    """A list of scalars as a native USD array, typed by what it holds."""
+    if all(isinstance(x, bool) for x in v):
+        prim.CreateAttribute(name, Sdf.ValueTypeNames.BoolArray).Set(Vt.BoolArray(list(v)))
+    elif all(isinstance(x, str) for x in v):
+        prim.CreateAttribute(name, Sdf.ValueTypeNames.StringArray).Set(Vt.StringArray(list(v)))
+    elif all(isinstance(x, int) and not isinstance(x, bool) for x in v):
+        # Int64: BF3 lookup tables hold values well past 2^31 and a 32-bit array would wrap them.
+        prim.CreateAttribute(name, Sdf.ValueTypeNames.Int64Array).Set(Vt.Int64Array(list(v)))
+    else:
+        prim.CreateAttribute(name, Sdf.ValueTypeNames.DoubleArray).Set(
+            Vt.DoubleArray([float(x) for x in v]))
+
+
+def _read_extra(prim, record):
+    """Put edited arrays and nested-record leaves back, keeping each field's original shape."""
+    for k, old in list(record.items()):
+        if k in _SKIP_FIELDS:
+            continue
+
+        name = BF3 + k
+
+        if isinstance(old, list) and old and not any(isinstance(x, (dict, list)) for x in old):
+            attr = prim.GetAttribute(name)
+
+            if attr and attr.HasAuthoredValue() and attr.Get() is not None:
+                got = list(attr.Get())
+
+                # Keep the element type the record had: a float array read back onto a list of ints
+                # would rewrite every entry as a float and the partition stops matching its type.
+                if all(isinstance(x, bool) for x in old):
+                    record[k] = [bool(x) for x in got]
+                elif all(isinstance(x, int) and not isinstance(x, bool) for x in old):
+                    record[k] = [int(x) for x in got]
+                elif all(isinstance(x, str) for x in old):
+                    record[k] = [str(x) for x in got]
+                else:
+                    record[k] = [float(x) for x in got]
+
+        elif isinstance(old, dict) and not _vec_key(old) and not _is_ref(old):
+            for _sk, _sv in list(old.items()):
+                attr = prim.GetAttribute('%s:%s' % (name, _sk))
+
+                if not attr or not attr.HasAuthoredValue() or attr.Get() is None:
+                    continue
+
+                got = attr.Get()
+
+                if isinstance(_sv, bool):
+                    old[_sk] = bool(got)
+                elif isinstance(_sv, int):
+                    old[_sk] = int(got)
+                elif isinstance(_sv, float):
+                    old[_sk] = float(got)
+                elif isinstance(_sv, str):
+                    old[_sk] = str(got)
+
+
 def _author_fields(prim, inst):
     """Author each editable field as a real, typed USD attribute.
 
@@ -370,11 +434,31 @@ def _author_fields(prim, inst):
                 prim.CreateAttribute(name, Sdf.ValueTypeNames.Double).Set(v)
             elif isinstance(v, str):
                 prim.CreateAttribute(name, Sdf.ValueTypeNames.String).Set(v)
+            elif isinstance(v, list) and v and not any(isinstance(x, (dict, list)) for x in v):
+                # A list of scalars is a native USD array. 4,992 of these were reachable only
+                # through customData, which meant a lookup table or a name list could be read and
+                # never edited.
+                _author_array(prim, name, v)
+            elif isinstance(v, dict) and not _vec_key(v) and not _is_ref(v):
+                # A nested record: one attribute per scalar leaf, namespaced under its field. This
+                # is the single largest carried-only group -- 134,081 fields, things like an
+                # emitter's TextureInfo -- and namespacing keeps them editable without inventing a
+                # child prim for every struct.
+                for _sk, _sv in v.items():
+                    if isinstance(_sv, bool):
+                        prim.CreateAttribute('%s:%s' % (name, _sk),
+                                             Sdf.ValueTypeNames.Bool).Set(_sv)
+                    elif isinstance(_sv, (int, float)):
+                        prim.CreateAttribute('%s:%s' % (name, _sk),
+                                             Sdf.ValueTypeNames.Double).Set(float(_sv))
+                    elif isinstance(_sv, str):
+                        prim.CreateAttribute('%s:%s' % (name, _sk),
+                                             Sdf.ValueTypeNames.String).Set(_sv)
             else:
                 comps = _vec_key(v)
 
                 if not comps:
-                    continue                      # refs and nested records stay in customData
+                    continue                      # refs and record arrays stay in customData
 
                 vals = [float(v.get(c, 0.0)) for c in comps]
 
@@ -866,6 +950,7 @@ def read(stage_path):
             # Generic fields last: an explicit typed attribute (a light's colour, a body's mass)
             # is authored by the specific reader above, and this must not undo it.
             _read_fields(prim, record, meta.get('record'))
+            _read_extra(prim, record)
 
             edits.setdefault(meta['partition'], {})[meta['instance']] = record
             continue
