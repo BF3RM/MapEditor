@@ -188,6 +188,14 @@ level: 22 mesh partitions, 22 blueprints, 11 textures and the sub-world. **The e
 authoring the closure regardless** -- it is 50 MB of the 56 MB every level ships and it buys nothing
 -- but it is not what breaks the client.
 
+**This contradicts a rule recorded earlier in this document, and the earlier one is the suspect.**
+The closure was written down as MANDATORY -- "shipping only the 171 named blueprints authored 2189
+more objects and then died during entity creation" -- and that measurement was taken against the
+BROKEN baseline: the stale `RimeCommands.txt` that never loaded a sub-level and never registered a
+team. Several of this document's "laws" were established the same way, and a law measured on a
+foundation that was itself defective is worth re-measuring before it is trusted. Pending a retest on
+a content-heavy level with the fixed host.
+
 Adding a `MeshVariationDatabase` for the sub-level bundle (`mesh_variation_db_add_all`, 30 meshes
 registered, 974 skipped as base-universal) *changes* the failure -- the client disconnects after
 ~20 s and exits instead of hanging -- and does not fix it. Reproduced twice.
