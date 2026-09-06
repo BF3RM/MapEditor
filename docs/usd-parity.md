@@ -144,6 +144,88 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
+## The closure is DEAD WEIGHT, and the client freeze has two named causes (2026-09-06)
+
+### The closure buys nothing: 49.4 MB of every 61.9 MB
+
+`mp_001`, 6,199 placements, on the host superbundle that now registers teams, built twice --
+identical except that the second drops all 10,396 `/tmp/closure/*.json` partitions:
+
+| mp_001 | with closure | WITHOUT closure |
+|---|---|---|
+| build commands | 13,078 | 2,682 |
+| superbundle | 61,924,317 B | **12,529,621 B** |
+| distinct "could not find a valid variant" | 476 | **476** |
+| missing resources | 1 | **1** |
+| world parts resolved | 25/25 | **25/25** |
+| `ServerStaticModelEntity` | 6200 (6,199 + 1) | **6200** |
+| teams | registered | **registered** |
+
+**Every number is identical and the bundle is 79.8% smaller.** The earlier finding that the closure
+was MANDATORY ("shipping only the 171 named blueprints died during entity creation") was measured
+against the broken baseline -- the stale recipe that never loaded a sub-level and never registered a
+team -- and does not survive the fix. The emitter should stop authoring it: on `frontend` it is
+10,396 of 10,462 commands, and dropping it takes that level from 56,013,281 to 6,196,911 bytes.
+
+The 476 missing texture variants are NOT caused by dropping the closure -- the with-closure build
+has exactly the same 476. They are a separate, pre-existing gap (see the stub `TextureAsset` below).
+
+### The freeze bisected: two independent sufficient causes, and a third of the bundle is innocent
+
+Continuing the bisect, each row one variable, `frontend` on the fixed host:
+
+| the `usdlevel` bundle contained | server | CLIENT |
+|---|---|---|
+| sub-world only, 0 objects, 0 partitions | `static=0` | **LOADS** |
+| + the **10 stub `TextureAsset` partitions** | `static=0` | **LOADS** |
+| + all 11 texture partitions, i.e. the 10 stubs **plus `flat_normal` + its `add_dds_texture`** | `static=0` | HANGS |
+| + the **27 mesh partitions + 37 `add_existing_resource`**, 0 placements | `static=0` | HANGS |
+| + 27 mesh partitions, **61 placements, no `add_existing_resource` at all** | `static=61` | HANGS |
+| everything **except** `flat_normal` | `static=61` | HANGS |
+| everything, closure dropped | `static=61` | HANGS |
+
+**Cause 1 -- the generated DDS.** The texture set hangs and the same set minus `flat_normal` loads,
+so the freeze is in
+
+    add_dds_texture levels/realitymod/frontend/textures/flat_normal \
+        /tmp/lvemit/frontend/partitions/_flat_n.dds true false false World_SkipNoStr
+
+plus its partition. One generated texture resource, in a bundle with nothing else in it, is enough
+to stop the client from ever finishing the level load. Every emitted level ships exactly one.
+
+**Cause 2 -- the emitted mesh partitions.** The mesh set hangs on its own, and it hangs with the
+`add_existing_resource` lines removed entirely, so the MeshSet resources are not what does it: the
+27 emitted `*_Mesh` partitions being present are sufficient. Removing `flat_normal` from the full
+build does not save it, which is how we know there are two causes and not one.
+
+**Innocent, each measured rather than assumed:** the 6,711 duplicated closure partitions; the
+`SpotLightEntityData`/`PointLightEntityData`/`SoundEntityData`; the placement count (1 hangs, 61
+hangs, 0 loads); the `add_existing_resource` mesh registrations; and the 10 stub `TextureAsset`
+partitions, which load fine.
+
+**Not tested:** the 27 blueprint partitions. The recipe is built (`build.cmds.frontend_B`) and never
+booted -- one cycle would settle it.
+
+### What a stub TextureAsset looks like, since it is the shape of the pending question
+
+    levels/realitymod/frontend/textures/levels/frontend/objects/tank3_d
+      TextureAsset  { "Name": "levels/frontend/objects/tank3_d" }
+
+One instance, one field. It names a texture BF3 ships and supplies no resource -- which is exactly
+what the 476 "could not find a valid variant" warnings are about. Those partitions load fine on the
+client, so this is a rendering gap rather than the freeze; recorded because the same emitter writes
+the mesh partitions that DO freeze it, and the next step is to dump one of those and diff it field by
+field against the game's own partition of the same type.
+
+### Reproducing
+
+Every variant is a `build.cmds` in `~/Games/VeniceUnleashed/shot-instance/artifacts/`
+(`build.cmds.frontend_{empty,pnp,nres,one,nl,nc,T,Tstub,Tflat,B,M,noflat}`,
+`build.cmds.mp_001_nc`), fed to `tools/usd/build_host_superbundle.py --level <name>`. A cycle is
+about ten minutes: build ~2 min, server boot ~20 s, client cold start ~3 min, then either
+`enter_game: True` with a `webui://mapeditor` CDP target inside 3 minutes, or nothing for 5 and the
+client sitting at `team=0` on a black screen.
+
 ## The client freeze is NOT duplication: bisected to the emitted mesh partitions (2026-09-06)
 
 The lead from Rime's own help -- *"Re-registering a mesh the level already provides freezes the
@@ -210,12 +292,9 @@ runs, 1.12 GB creeping 12 kB/20 s on mp_001). In the one variant that loads, the
 
 ### Next step, bounded to three boots
 
-The remaining suspect is 66 partitions of exactly three kinds. Ship them one kind at a time --
-textures only, then + blueprints, then + mesh partitions -- into the empty sub-world that is known
-to load. That pins it to one kind, and each boot is the ~8 minutes the cycle above takes. The
-variants and their recipes are in `~/Games/VeniceUnleashed/shot-instance/artifacts/`
-(`build.cmds.frontend_{empty,pnp,nres,one,nl,nc}`, `world_{empty,one,nolights}.json`,
-`census_ours_*.txt`, `parts_*.txt`).
+**DONE, see the section above (2026-09-06):** the three kinds were shipped one at a time. Textures
+hang because of the generated `flat_normal` DDS (the 10 stub partitions beside it load fine); the
+mesh partitions hang on their own; blueprints remain untested.
 
 ## The zero-teams defect is FIXED: an exported level now registers teams (2026-09-06)
 
