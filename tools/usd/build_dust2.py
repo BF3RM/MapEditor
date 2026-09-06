@@ -122,6 +122,23 @@ STATIC_MESH_SHADER = {'PartitionGuid': '7d695128-2252-11e0-af13-c7d193512d44',
 
 # Every guid is derived from a fixed namespace so a rebuild produces the same bundle. A random guid
 # per run would make "did the change take, or is the client holding an old partition" unanswerable.
+# Shipped partition guids, keyed by lowercased partition name. Populated by the emitter from the
+# game corpus.
+#
+# A partition we emit under a name the game ALREADY SHIPS has to keep that name's guid, or it is a
+# different partition wearing the same name. MEASURED: 24 of our partitions reused a shipped name
+# with a fresh guid. Partitions resolve first-wins by name, so ours and the game's compete, and any
+# reference carrying the shipped guid resolves to the ORIGINAL -- which means an edited mesh can
+# silently not appear. Reusing the guid makes our version the same partition, which is what an
+# edit-in-place export means.
+SHIPPED_GUIDS = {}
+
+
+def partition_guid(name):
+    """The shipped guid for `name` if the game ships one, else a stable derived guid."""
+    return SHIPPED_GUIDS.get(name.lower()) or guid('partition', name)
+
+
 NS = uuid.UUID('9d3f1a52-6c41-4f2b-9c7e-0d7a2f0e1b33')
 guid = lambda *parts: str(uuid.uuid5(NS, '|'.join(str(p) for p in parts)))    # noqa: E731
 
@@ -607,7 +624,7 @@ def mesh_partition(material_names, material_ebx=None):
     """The mesh's EBX. With material_ebx, each MeshMaterial is the REAL record read back out of the
     stage rather than the template below -- so a level keeps its own 252 shader graphs instead of
     being flattened onto one."""
-    pg = guid('partition', MESH_NAME)
+    pg = partition_guid(MESH_NAME)
     mesh_g = guid('instance', MESH_NAME, 'asset')
     lod_g = guid('instance', MESH_NAME, 'lodgroup')
     instances = {}
@@ -700,7 +717,7 @@ def mesh_partition(material_names, material_ebx=None):
 
 
 def blueprint_partition(mesh_pg, mesh_g, with_physics=True):
-    pg = guid('partition', BLUEPRINT_NAME)
+    pg = partition_guid(BLUEPRINT_NAME)
     bp_g = guid('instance', BLUEPRINT_NAME, 'blueprint')
     smed_g = guid('instance', BLUEPRINT_NAME, 'staticmodel')
     part_g = guid('instance', BLUEPRINT_NAME, 'partcomponent')

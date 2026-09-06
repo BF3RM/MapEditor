@@ -393,6 +393,44 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     # 3, and one with ZERO content all failed identically, which is only possible if the failure is
     # in how the bundle is addressed rather than in what it holds. The shipped dust2 build gets this
     # right -- bundle Win32/Levels/REALITYMOD/dust2, world partition levels/realitymod/dust2.
+    # A partition emitted under a name the game already ships must keep that name's guid, or it is
+    # a different partition wearing the same name -- and since partitions resolve first-wins by
+    # name, a reference carrying the shipped guid then resolves to the ORIGINAL, so an edited mesh
+    # can silently not appear. MEASURED: 24 of our partitions reused a shipped name with a fresh
+    # guid before this.
+    # Scan the BLUEPRINT dump as well as the level dump: the names we re-emit (meshes, blueprints)
+    # are prefab partitions that live there, not in the level's own EBX. Scanning only ebx_dir found
+    # zero of them and the map came out empty.
+    # The names we re-emit are prefab partitions, which live in the CLOSURE dump -- the blueprint
+    # dump holds the blueprint names (…_model) while we emit mesh names (…_model_Mesh), so neither
+    # ebx_dir nor blueprint_dir contains them and the map came out empty twice.
+    # USD_GUID_DIRS is a colon-separated list of extra dumps to read guids from.
+    _guid_dirs = [d for d in (ebx_dir, blueprint_dir) if d and os.path.isdir(d)]
+    _guid_dirs += [d for d in os.environ.get('USD_GUID_DIRS', '').split(':')
+                   if d and os.path.isdir(d)]
+
+    if _guid_dirs and not build_dust2.SHIPPED_GUIDS:
+        import glob as _g
+
+        _files = []
+
+        for _d in _guid_dirs:
+            _files += _g.glob(os.path.join(_d, '**', '*.json'), recursive=True)
+
+        for _f in _files:
+            try:
+                _d = json.load(open(_f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            _n, _pg = (_d.get('Name') or '').lower(), _d.get('PartitionGuid')
+
+            if _n and _pg:
+                build_dust2.SHIPPED_GUIDS.setdefault(_n, _pg)
+
+        print('guids     %d shipped partition name(s) will keep their own guid'
+              % len(build_dust2.SHIPPED_GUIDS))
+
     if level_sb:
         build_dust2.WORLD_NAME = 'levels/realitymod/%s' % bundle_name.lower()
         # The MVDB is resolved BY NAME from the sub-level's own name: the game ships
@@ -487,7 +525,8 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     # EBX for the meshes we ship. A referenced mesh keeps the game's own blueprint, so nothing is
     # authored for it; a changed one needs its mesh asset, its blueprint, and a placement.
     import build_dust2
-    import json
+    # (json is imported at module scope; a local import here made it a function-local name
+    #  and every earlier use of json raised UnboundLocalError.)
     import uuid
 
     build_dust2.configure(host)
