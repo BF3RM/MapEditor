@@ -67,17 +67,32 @@ def read(stage_path):
         if target is None or not prim.IsA(UsdGeom.Xform):
             continue
 
-        # Name it by whatever identifies the prototype: the group's bf3:mesh where the exporter
-        # recorded one, else the referenced prim or file.
+        # Name it by whatever identifies the prototype: the placement's own bf3:mesh, then the
+        # group's where an older stage only recorded it there, else the referenced prim or file.
+        #
+        # The prim's own key is what makes a placement findable once it has moved INSIDE the level
+        # graph, where its parent is the reference object that places it and knows nothing about
+        # meshes. Reading only the parent named those after their prototype FILE instead, which is
+        # a different string, so every anchored placement looked like a mesh of its own.
+        name = prim.GetCustomDataByKey(BF3 + ':mesh')
         parent = prim.GetParent()
-        name = parent.GetCustomDataByKey(BF3 + ':mesh') if parent else None
+
+        if not name and parent:
+            name = parent.GetCustomDataByKey(BF3 + ':mesh')
 
         if not name:
             name = target.rsplit('/', 1)[-1].replace('.usdc', '').replace('.usda', '')
 
         prototypes.setdefault(name, target)
         xf = UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
-        placements.setdefault(name, []).append(_linear_transform(xf))
+        # Ordered by the index the exporter stamped on each placement, not by traversal: the two
+        # disagree now that a mesh's placements can live in two different parts of the stage.
+        placements.setdefault(name, []).append(
+            (prim.GetCustomDataByKey(BF3 + ':placement'), _linear_transform(xf)))
+
+    for name, rows in placements.items():
+        rows.sort(key=lambda r: r[0] if r[0] is not None else len(rows))
+        placements[name] = [t for _i, t in rows]
 
     stats = {'meshes': len(prototypes), 'placements': sum(len(v) for v in placements.values()),
              'with_prototype': sum(1 for v in prototypes.values() if v),

@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Read a level USD back out to BF3 placements -- the return leg of export_level_usd.py.
 
-The exporter turns a level into /World/<mesh>/inst_N Xforms, each referencing a prototype and
-carrying a 4x4. This walks that back: every placement Xform becomes a BF3 LinearTransform again
-(right.xyz, up.xyz, forward.xyz, trans.xyz), grouped by mesh name, in the same shape mesh_server
-caches as <MAP>.placements.json.
+The exporter turns a level's placements into Xforms that reference a prototype and carry a 4x4.
+This walks that back: every placement Xform becomes a BF3 LinearTransform again (right.xyz, up.xyz,
+forward.xyz, trans.xyz), grouped by mesh name, in the same shape mesh_server caches as
+<MAP>.placements.json.
+
+A placement lives in one of two places now. Where the level's own EBX says which reference object
+places it, it is that object's child inside /World/Level; where it does not -- the mesh is inside a
+shared object blueprint, which the level graph does not own -- it stays in the flat /World/<mesh>
+group. Measured on mp_001, 1297 of 6525 are in the graph and 5228 are not, and both are found by
+the same key: bf3:mesh on the placement prim itself.
 
     import_level_usd.py <level.usda> <out-placements.json> [--verify <original.json>]
 
@@ -35,28 +41,37 @@ def main(usd_path, out_path, verify=None):
     level = world.GetCustomDataByKey(BF3 + ":level") or "unknown"
     cache = UsdGeom.XformCache()
     meshes = {}
-    skipped = []
 
-    for group in world.GetChildren():
-        if group.GetName() in SKIP:
-            skipped.append(group.GetName())
-            continue
+    skipped = [c.GetName() for c in world.GetChildren() if c.GetName() in SKIP]
 
+    # TRAVERSE, rather than reading the direct children of /World. A placement whose owning
+    # reference object is known is now authored as that object's child, deep inside /World/Level,
+    # so the flat groups are no longer the whole story -- on mp_001 they hold 5228 of 6525.
+    for prim in stage.Traverse():
         # The mesh's real BF3 path is in customData; the prim name is a sanitised version of it.
-        name = group.GetCustomDataByKey(BF3 + ":mesh")
+        # Newer stages stamp it on the placement, older ones only on the group it sat in.
+        name = prim.GetCustomDataByKey(BF3 + ":mesh")
+        parent = prim.GetParent()
 
-        if not name:
+        if not name and parent:
+            name = parent.GetCustomDataByKey(BF3 + ":mesh")
+
+        # Xform only: the group itself carries the same key, and counting it would give every mesh
+        # one extra placement at the level origin.
+        if not name or not prim.IsA(UsdGeom.Xform):
             continue
 
-        rows = []
+        m = cache.GetLocalToWorldTransform(prim)
+        # USD rows are BF3's basis vectors: right, up, forward, then translation.
+        meshes.setdefault(name, []).append(
+            (prim.GetCustomDataByKey(BF3 + ":placement"),
+             [float(m[r][c]) for r in range(4) for c in range(3)]))
 
-        for inst in group.GetChildren():
-            m = cache.GetLocalToWorldTransform(inst)
-            # USD rows are BF3's basis vectors: right, up, forward, then translation.
-            rows.append([float(m[r][c]) for r in range(4) for c in range(3)])
-
-        if rows:
-            meshes[name] = rows
+    # Back into the order they were dumped in. Traversal order is not that order once a mesh's
+    # placements are split between the graph and the flat groups, and --verify compares row by row.
+    for name, rows in meshes.items():
+        rows.sort(key=lambda r: r[0] if r[0] is not None else len(rows))
+        meshes[name] = [t for _i, t in rows]
 
     doc = {"level": level, "meshes": meshes}
     json.dump(doc, open(out_path, "w"))

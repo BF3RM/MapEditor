@@ -58,7 +58,7 @@ def main(src="/tmp/closure", limit=0):
 
     stage = Usd.Stage.CreateInMemory()
     root = UsdGeom.Xform.Define(stage, "/World")
-    counts, placed = level_entities.author(stage, root, src, parts)
+    counts, placed, _graph = level_entities.author(stage, root, src, parts)
     authored = sum(counts.values())
     print("authored     %d instance(s) across %d type(s)" % (authored, len(counts)))
 

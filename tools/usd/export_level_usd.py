@@ -20,6 +20,12 @@ With --corpus/--chunks the referenced prototypes are generated from real MeshSet
 stage opens with actual geometry. Without them the placements are still exported and the references
 resolve as soon as the prototype files exist -- the level graph does not depend on having every
 mesh extracted.
+
+With --ebx-dir the stage also gets BF3's own scene graph, at /World/Level: the LevelData at the
+root, each world-part reference object owning the WorldPartData it points at, and that world part
+owning its objects. A placement whose reference object is in the level's own EBX is authored as
+that object's child rather than in the flat /World/<mesh> list, so the geometry and the record that
+places it are one thing to select and one thing to move.
 """
 import json
 import os
@@ -586,8 +592,54 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
             print('animation   %d clip(s) authored from %d bank(s)'
                   % (_clips, len(_bg.glob(os.path.join(_bankdir, '*.json')))))
 
+    # Every EBX instance the level's partitions hold. The ones with a Transform -- spawns, effect
+    # placements, decals, probes, volumes -- become Xforms a DCC can move; the rest are carried as
+    # records so an edit to any field of any instance survives. Without these a level can be
+    # REBUILT but not AUTHORED: you could not move a spawn.
+    #
+    # This runs BEFORE the meshes now, because it is what says where a mesh belongs: it returns the
+    # prim path of the reference object that places each mesh, so the geometry can be authored as
+    # that object's child instead of in a flat list beside the level.
+    anchors = {}
+
+    if ebx_dir:
+        import level_entities
+
+        if parts_list:
+            parts = [ln.strip() for ln in open(parts_list) if ln.strip()]
+        else:
+            # DERIVE it. This used to require a hand-written file, and passing --ebx-dir without
+            # --parts-list silently authored ZERO entities -- a level exported with all its
+            # geometry and none of its lights, decals, sounds or probes, which still loads and
+            # still looks like a pass. Only MP_001 ever had such a file, so every other level was
+            # geometry-only without saying so.
+            #
+            # Recursive, not one directory deep: MP_001's own list is 490 partitions while its top
+            # level holds 9.
+            import glob as _glob
+
+            base = os.path.join(ebx_dir, os.path.dirname(level).lower())
+            parts = sorted(
+                os.path.relpath(f, ebx_dir)[:-5]
+                for f in _glob.glob(os.path.join(base, '**', '*.json'), recursive=True))
+            print('entities     %d partition(s) derived from %s' % (len(parts), base))
+        counts, entity_placed, graph = level_entities.author(
+            stage, world, ebx_dir, parts, level=level, placements=meshes)
+        anchors = graph["anchors"]
+
+        if counts:
+            short = lambda k: k.replace("EntityData", "").replace("Data", "")   # noqa: E731
+            print("entities     %d instances carried, %d of them placed (%s)"
+                  % (sum(counts.values()), sum(entity_placed.values()),
+                     ", ".join("%s %d" % (short(k), v)
+                               for k, v in sorted(entity_placed.items(),
+                                                  key=lambda kv: -kv[1])[:5])))
+            print("level graph  %d instance(s) under /World/Level, %d level(s) deep; "
+                  "%d nothing owns, carried by partition path"
+                  % (graph["nodes"], graph["depth"], graph["loose"]))
+
     built = missing = 0
-    placed = 0
+    placed = anchored = 0
 
     for name in sorted(meshes):
         transforms = meshes[name]
@@ -630,16 +682,39 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
                     print("  prototype failed for %s: %s" % (name, exc))
                     missing += 1
 
-        group = UsdGeom.Scope.Define(stage, "/World/%s" % _safe(name))
-        group.GetPrim().SetCustomDataByKey(BF3 + ":mesh", name)
+        # The flat per-mesh group is now only for the placements the level does NOT own -- the
+        # ones that live inside an object blueprint, which is a level below the level graph. It is
+        # authored lazily so a mesh whose every placement found its owner leaves no empty Scope.
+        group = None
+        owned = anchors.get(name, {})
 
         for i, t in enumerate(transforms):
             if len(t) < 12:
                 continue
 
-            prim_path = "/World/%s/inst_%d" % (_safe(name), i)
-            xf = UsdGeom.Xform.Define(stage, prim_path)
-            xf.AddTransformOp().Set(_matrix(t))
+            owner = owned.get(i)
+
+            if owner:
+                # Inside the hierarchy. The reference object that places this mesh already carries
+                # the transform, so the geometry is its child at IDENTITY -- authoring the matrix
+                # again would place it twice. Composing identity in double precision is exact, so
+                # the placement's local-to-world is still the original 12 floats bit for bit.
+                xf = UsdGeom.Xform.Define(stage, owner + "/mesh")
+                anchored += 1
+            else:
+                if group is None:
+                    group = UsdGeom.Scope.Define(stage, "/World/%s" % _safe(name))
+                    group.GetPrim().SetCustomDataByKey(BF3 + ":mesh", name)
+
+                xf = UsdGeom.Xform.Define(stage, "/World/%s/inst_%d" % (_safe(name), i))
+                xf.AddTransformOp().Set(_matrix(t))
+
+            # The mesh name and the placement's INDEX go on the placement prim itself. The group
+            # used to be the only thing that named the mesh, which stopped working the moment a
+            # placement could live somewhere else; the index is what lets a reader hand the
+            # placements back in the order they were dumped in rather than in traversal order.
+            xf.GetPrim().SetCustomDataByKey(BF3 + ":mesh", name)
+            xf.GetPrim().SetCustomDataByKey(BF3 + ":placement", i)
 
             # Reference the prototype and mark it instanceable: 6185 placements share a handful of
             # prototypes, so the stage stays small and renderers can hardware-instance it.
@@ -649,41 +724,6 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
                 xf.GetPrim().SetInstanceable(True)
 
             placed += 1
-
-    # Every EBX instance the level's partitions hold. The ones with a Transform -- spawns, effect
-    # placements, decals, probes, volumes -- become Xforms a DCC can move; the rest are carried as
-    # records so an edit to any field of any instance survives. Without these a level can be
-    # REBUILT but not AUTHORED: you could not move a spawn.
-    if ebx_dir:
-        import level_entities
-
-        if parts_list:
-            parts = [ln.strip() for ln in open(parts_list) if ln.strip()]
-        else:
-            # DERIVE it. This used to require a hand-written file, and passing --ebx-dir without
-            # --parts-list silently authored ZERO entities -- a level exported with all its
-            # geometry and none of its lights, decals, sounds or probes, which still loads and
-            # still looks like a pass. Only MP_001 ever had such a file, so every other level was
-            # geometry-only without saying so.
-            #
-            # Recursive, not one directory deep: MP_001's own list is 490 partitions while its top
-            # level holds 9.
-            import glob as _glob
-
-            base = os.path.join(ebx_dir, os.path.dirname(level).lower())
-            parts = sorted(
-                os.path.relpath(f, ebx_dir)[:-5]
-                for f in _glob.glob(os.path.join(base, '**', '*.json'), recursive=True))
-            print('entities     %d partition(s) derived from %s' % (len(parts), base))
-        counts, entity_placed = level_entities.author(stage, world, ebx_dir, parts)
-
-        if counts:
-            short = lambda k: k.replace("EntityData", "").replace("Data", "")   # noqa: E731
-            print("entities     %d instances carried, %d of them placed (%s)"
-                  % (sum(counts.values()), sum(entity_placed.values()),
-                     ", ".join("%s %d" % (short(k), v)
-                               for k, v in sorted(entity_placed.items(),
-                                                  key=lambda kv: -kv[1])[:5])))
 
     if terrain:
         print("terrain      %d triangles" % _export_terrain(stage, terrain, layers))
@@ -727,7 +767,8 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
 
     print("level        %s" % level)
     print("meshes       %d distinct" % len(meshes))
-    print("placements   %d instances" % placed)
+    print("placements   %d instances, %d of them owned by the reference object that places them"
+          % (placed, anchored))
     # "without a resource" is not the same as "lost". A level places blueprints, and most but not
     # all of them are meshes: MP_001 names 562 placement targets of which 35 have no MeshSet in the
     # game AT ALL -- 33 are FX effect blueprints and 2 are object blueprints whose real meshes are
@@ -760,8 +801,13 @@ if __name__ == "__main__":
             opts[flag.lstrip("-")] = argv[i + 1]
             del argv[i:i + 2]
 
-    main(argv[0], argv[1], opts.get("meshes"), opts.get("corpus"), opts.get("chunks"),
-         opts.get("textures"), opts.get("decals"), opts.get("roads"),
-         opts.get("terrain"), opts.get("layers"), opts.get("texture-dir"),
-         opts.get("material-dir"), opts.get("ebx-dir"), opts.get("parts-list"),
-         opts.get("scattering"), opts.get("enlighten"))
+    # By KEYWORD. Positionally, --ebx-dir landed on `scattering_path` and --scattering on
+    # `parts_list`, so running this from the command line handed the EBX directory to the terrain
+    # layer reader ("IsADirectoryError") and, before that reader existed, silently exported a level
+    # with no entities at all while reporting nothing wrong.
+    main(argv[0], argv[1], mesh_dir=opts.get("meshes"), corpus=opts.get("corpus"),
+         chunks=opts.get("chunks"), textures=opts.get("textures"), decals=opts.get("decals"),
+         roads=opts.get("roads"), terrain=opts.get("terrain"), layers=opts.get("layers"),
+         texture_dir=opts.get("texture-dir"), material_dir=opts.get("material-dir"),
+         scattering_path=opts.get("scattering"), ebx_dir=opts.get("ebx-dir"),
+         parts_list=opts.get("parts-list"), enlighten_path=opts.get("enlighten"))

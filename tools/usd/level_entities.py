@@ -16,6 +16,18 @@ any instance survives the trip, including for types nobody has thought about yet
 
 That is what makes material relations, shader graphs and the rest "supported": not code that knows
 what a MaterialRelationPropertyData is, but the absence of anywhere for one to fall through.
+
+WHERE each instance goes is the level's own ownership graph, not the partition tree it is filed
+under. A partition is a file; a world part is a container, and BF3 says in the EBX which objects
+are in it. So a WorldPartData prim owns the objects its `Objects` list names, a sub-world owns its
+world parts, and the whole thing hangs off the LevelData at /World/Level -- which means selecting
+a layer in a DCC selects the layer, and moving it moves what is in it. Measured on mp_001: 3566 of
+its 14033 instances have an owner, five levels deep; on mp_003, 4276 of 13393.
+
+The other 10467 are the contents of shared object blueprints -- a prop used sixty times -- which
+nothing in the level owns and which are therefore still filed by partition path under
+/World/Entities. Descending into them would author one blueprint's instances sixty times, sixty
+prims writing back to one EBX record, and fifty-nine edits would vanish with nothing reported.
 """
 import json
 import os
@@ -424,14 +436,40 @@ def _read_fields(prim, record, orig=None):
             record[k] = str(val)
 
 
-def author(stage, root, ebx_dir, partitions):
-    """Write every instance of every partition in `partitions` under <root>/Entities.
+# ---------------------------------------------------------------------------
+# The level graph.
+#
+# Nesting by partition path made a level BROWSABLE -- you could find layer0_default in an outliner
+# -- but a partition tree is a filing system, not the graph the engine descends. BF3 spells the
+# real one out in the EBX, as ownership:
+#
+#     LevelData.Objects
+#       WorldPartReferenceObjectData -> Blueprint -> a partition whose primary instance is a
+#                                       WorldPartData, whose OWN Objects are that layer's contents
+#       SubWorldReferenceObjectData  -> the same, one world down (conquest, rush, tdm ...)
+#         ReferenceObjectData        -> an object blueprint, placed by BlueprintTransform
+#
+# So a WorldPartData prim CAN own its objects: BF3 says which ones they are. Measured over
+# mp_001's 490 partitions: 3754 `Objects` references, every single one naming an instance in its
+# own partition, and 72 structural blueprint edges, every one resolving to a dumped partition.
+# There is nothing here to guess at.
+#
+# Only the STRUCTURAL reference objects are followed into their blueprint. A ReferenceObjectData
+# points at a SHARED object blueprint -- a prop used 60 times -- and descending into it would
+# author that blueprint's instances 60 times over, 60 prims writing back to one EBX instance. The
+# structural ones are singletons: measured on mp_001, 0 of its 72 world-part/sub-world blueprint
+# partitions is referenced more than once.
+STRUCTURAL = ('WorldPartReferenceObjectData', 'SubWorldReferenceObjectData')
 
-    Returns {type: count} for what was placed and what was carried, keyed the same way, so a caller
-    can report both without knowing which types are which.
-    """
-    scope = UsdGeom.Scope.Define(stage, root.GetPath().AppendChild('Entities'))
-    counts, placed = {}, {}
+
+def _short(kind):
+    """`SoundAreaEntityData` -> `SoundArea`, for a prim name a person can read."""
+    return kind.replace('EntityData', '').replace('Data', '') or kind
+
+
+def _index(ebx_dir, partitions):
+    """Load every partition once, indexed the three ways a reference can name one."""
+    docs, by_partition, by_primary = {}, {}, {}
 
     for part in partitions:
         f = os.path.join(ebx_dir, part + '.json')
@@ -444,68 +482,348 @@ def author(stage, root, ebx_dir, partitions):
         except Exception:                                    # noqa: BLE001
             continue
 
+        docs[part] = doc
+        pg = str(doc.get('PartitionGuid') or '').lower()
+        pi = str(doc.get('PrimaryInstanceGuid') or '').lower()
+
+        if pg:
+            by_partition.setdefault(pg, part)
+
+        if pi:
+            by_primary.setdefault(pi, part)
+
+    return docs, by_partition, by_primary
+
+
+def _blueprint_partition(inst, docs, by_partition, by_primary):
+    """Which partition a reference object points at, by whichever link it happens to use.
+
+    A WorldPartReferenceObjectData carries a real Blueprint reference. A SubWorldReferenceObjectData
+    usually does NOT: its Blueprint is null and the sub-level is named by BUNDLE, which the engine
+    resolves at load time. Measured on mp_001, 8 of its 8 sub-worlds are named that way, so a
+    resolver that only followed Blueprint found the world parts and none of the worlds.
+    """
+    bp = inst.get('Blueprint') or {}
+    part = by_partition.get(str(bp.get('PartitionGuid') or '').lower())
+
+    if part is None:
+        part = by_primary.get(str(bp.get('InstanceGuid') or '').lower())
+
+    if part is None and isinstance(inst.get('BundleName'), str):
+        # The bundle name IS the partition path, in the game's own capitalisation.
+        cand = inst['BundleName'].lower()
+        part = cand if cand in docs else None
+
+    return part
+
+
+def _graph(docs, by_partition, by_primary):
+    """-> ({node: [child node]}, {child node: index in its owner's Objects, or None}).
+
+    A node is (partition path, instance guid) -- the same pair the round trip writes back with, so
+    a prim's place in the tree and its identity in the EBX are the same fact.
+    """
+    kids, ordinal = {}, {}
+
+    for part, doc in docs.items():
+        instances = doc.get('Instances') or {}
+
+        for guid, inst in instances.items():
+            node = (part, guid)
+
+            # What the instance OWNS, in the order BF3 stored it -- which is the order the level
+            # editor showed, so an outliner sorted by name still reads like the layer did.
+            for i, ref in enumerate(inst.get('Objects') or []):
+                child = str(ref.get('InstanceGuid') or '')
+
+                if child in instances and (part, child) not in ordinal:
+                    kids.setdefault(node, []).append((part, child))
+                    ordinal[(part, child)] = i
+
+            if inst.get('$type') not in STRUCTURAL:
+                continue
+
+            target = _blueprint_partition(inst, docs, by_partition, by_primary)
+
+            if target is None:
+                continue
+
+            primary = str(docs[target].get('PrimaryInstanceGuid') or '')
+
+            if primary not in (docs[target].get('Instances') or {}):
+                continue
+
+            kids.setdefault(node, []).append((target, primary))
+            # A blueprint root is its reference object's only child, so it needs no ordinal to be
+            # unique -- and its TYPE is the useful name: .../000_layer0_default/WorldPartData.
+            ordinal.setdefault((target, primary), None)
+
+    return kids, ordinal
+
+
+def _root(docs, level):
+    """The LevelData instance the whole graph hangs from."""
+    if level and level in docs:
+        primary = str(docs[level].get('PrimaryInstanceGuid') or '')
+
+        if primary in (docs[level].get('Instances') or {}):
+            return (level, primary)
+
+    # No level path given, or it was not dumped: take the partition whose primary instance IS a
+    # LevelData. Sorted, so a corpus holding two of them picks the same one every run.
+    for part in sorted(docs):
+        primary = str(docs[part].get('PrimaryInstanceGuid') or '')
+        inst = (docs[part].get('Instances') or {}).get(primary)
+
+        if inst and inst.get('$type') == 'LevelData':
+            return (part, primary)
+
+    return None
+
+
+def _reachable(kids, root):
+    """Depth first from the level root -> (nodes parent-before-child, parent map, deepest)."""
+    order, parent, depth = [root], {}, {root: 0}
+    stack = [root]
+
+    while stack:
+        node = stack.pop()
+
+        for child in kids.get(node, ()):
+            # An instance its owner names twice, or a blueprint two reference objects share. The
+            # first owner keeps it: two prims writing back to one EBX instance means the loser's
+            # edits vanish with no error anywhere.
+            if child in depth:
+                continue
+
+            parent[child] = node
+            depth[child] = depth[node] + 1
+            order.append(child)
+            stack.append(child)
+
+    return order, parent, max(depth.values())
+
+
+def _transform_key(t):
+    """A LinearTransform as the same 12 floats a placement dump carries, or None."""
+    if not is_transform(t):
+        return None
+
+    return tuple(float((t.get(k) or {}).get(c, 0.0))
+                 for k in ('right', 'up', 'forward') for c in 'xyz') + \
+        tuple(float((t.get('trans') or {}).get(c, 0.0)) for c in 'xyz')
+
+
+def _anchor(docs, nodes, placements):
+    """Which reference object PLACES each mesh -> ({node: mesh name}, {(name, index): node}).
+
+    placements.json is the ENGINE's flattened list: every mesh the level draws, including the ones
+    that live inside an object blueprint and therefore belong to that blueprint rather than to the
+    level. The level's own EBX holds only the reference objects it places directly, so this can
+    only ever claim the placements the level itself owns -- measured on mp_001, 1297 of 6525
+    (19.9%), out of 1840 reference objects in the level's partitions.
+
+    The match is on EXACTLY equal floats. Matching to 1e-9 instead found 71 more, and every one of
+    them would have parked a mesh on a transform that is not bit-identical to the one it was
+    dumped with -- which is the only thing the placement round trip measures. Of the 1297, just 8
+    land on a transform more than one reference object shares.
+    """
+    pool = {}
+
+    for node in nodes:
+        part, guid = node
+        inst = docs[part]['Instances'][guid]
+
+        if inst.get('$type') != 'ReferenceObjectData':
+            continue
+
+        key = _transform_key(inst.get('BlueprintTransform'))
+
+        if key is not None:
+            pool.setdefault(key, []).append(node)
+
+    mesh_of, anchor = {}, {}
+
+    for name in sorted(placements or {}):
+        for i, t in enumerate(placements[name]):
+            if len(t) < 12:
+                continue
+
+            here = pool.get(tuple(float(x) for x in t[:12]))
+
+            if not here:
+                continue
+
+            node = here.pop(0)
+            mesh_of[node] = name
+            anchor[(name, i)] = node
+
+    return mesh_of, anchor
+
+
+def _label(node, docs, ordinal, mesh, by_partition, by_primary):
+    """The prim name for one graph node."""
+    part, guid = node
+    inst = docs[part]['Instances'][guid]
+    kind = inst.get('$type') or 'Unknown'
+
+    if ordinal is None:
+        return _safe(kind)                    # a blueprint root: its type IS the name
+
+    if mesh:
+        leaf = mesh.rsplit('/', 1)[-1]        # the mesh it turned out to place
+    else:
+        target = _blueprint_partition(inst, docs, by_partition, by_primary)
+        leaf = target.rsplit('/', 1)[-1] if target else _short(kind)
+
+    # `o` first: a USD prim name is an identifier, so it cannot START with the index, and a path
+    # built from one comes back as the empty path with no error until something tries to use it.
+    return 'o%03d_%s' % (ordinal, _safe(leaf))
+
+
+def _assign(docs, order, parent, ordinal, mesh_of, root_path, by_partition, by_primary):
+    """-> {node: prim path}, unique among siblings."""
+    paths = {order[0]: root_path}
+    used = {}
+
+    for node in order[1:]:
+        base = _label(node, docs, ordinal.get(node), mesh_of.get(node), by_partition, by_primary)
+        here = used.setdefault(parent[node], set())
+        name = base
+        n = 1
+
+        # Two siblings cannot share a name: USD would hand back the SAME prim for both, and the
+        # second record would overwrite the first with nothing reported.
+        while name in here:
+            name = '%s_%d' % (base, n)
+            n += 1
+
+        here.add(name)
+        paths[node] = paths[parent[node]].AppendChild(name)
+
+    return paths
+
+
+def _place(stage, path, part, guid, inst, counts, placed):
+    """Author one EBX instance at `path` -- the USD type it IS, its record, its editable fields."""
+    kind = inst.get('$type') or 'Unknown'
+    field, extra = transform_fields(inst)
+
+    counts[kind] = counts.get(kind, 0) + 1
+
+    if field:
+        placed[kind] = placed.get(kind, 0) + 1
+
+    if field and kind in AUDIO:
+        prim = UsdMedia.SpatialAudio.Define(stage, path).GetPrim()
+        UsdGeom.Xformable(prim).AddTransformOp().Set(_matrix(inst[field]))
+    elif field and kind in LIGHTS:
+        prim = _author_light(stage, path, LIGHTS[kind], inst)
+        UsdGeom.Xformable(prim).AddTransformOp().Set(_matrix(inst[field]))
+    elif field:
+        prim = UsdGeom.Xform.Define(stage, path).GetPrim()
+        UsdGeom.Xformable(prim).AddTransformOp().Set(_matrix(inst[field]))
+    else:
+        # A prim with no type rather than a Scope: an unplaced instance is a record, and giving it
+        # a geometric type would put a settings object into a DCC's outliner as though it were
+        # somewhere in the world.
+        prim = stage.DefinePrim(path)
+
+    prim.SetCustomDataByKey(BF3 + 'Entity', json.dumps(
+        {'partition': part, 'instance': guid, 'type': kind,
+         'field': field, 'record': inst}))
+    _author_fields(prim, inst)
+
+    if kind in VOLUMES:
+        _author_volume(stage, prim, kind, inst)
+
+    if kind in PHYSICS:
+        _author_physics(prim, inst)
+
+    # The instance's other transforms, as children. Their values are in the instance's own space,
+    # so they hang off it and are read back LOCAL -- composing them with the parent would move an
+    # airdrop point by wherever its spawner happens to be.
+    for other in extra:
+        child = UsdGeom.Xform.Define(stage, path.AppendChild(_safe(other))).GetPrim()
+        UsdGeom.Xformable(child).AddTransformOp().Set(_matrix(inst[other]))
+        child.SetCustomDataByKey(BF3 + 'EntityField', json.dumps(
+            {'partition': part, 'instance': guid, 'field': other}))
+
+    return prim
+
+
+def author(stage, root, ebx_dir, partitions, level=None, placements=None):
+    """Write every instance of every partition in `partitions` under `root`.
+
+    Whatever the level REACHES goes under <root>/Level, in BF3's own ownership order: the LevelData
+    is the root prim, each world-part reference object owns the WorldPartData it points at, and
+    that WorldPartData owns the objects its `Objects` list names. Selecting a world part in a DCC
+    now selects the layer, and moving it moves the layer -- which is the thing a partition-path
+    tree could not do, because a partition is a file and a world part is a container.
+
+    Everything the graph does NOT reach still goes under <root>/Entities, nested by partition path
+    exactly as before. That is not a fallback so much as an admission: an instance nothing owns has
+    no place in an ownership tree, and hiding it inside one would be an invented parent.
+
+    `placements` is the level's mesh placement dump. Where a placement's transform IS a reference
+    object's BlueprintTransform, the caller is told the prim path of that reference object, so the
+    geometry can be authored as its child instead of in a flat per-mesh list.
+
+    Returns (counts, placed, graph): {type: count} for what was carried and what was placed, and
+    the graph's own numbers -- including `anchors`, {mesh name: {placement index: prim path}}.
+    """
+    docs, by_partition, by_primary = _index(ebx_dir, partitions)
+    kids, ordinal = _graph(docs, by_partition, by_primary)
+    start = _root(docs, level)
+
+    counts, placed = {}, {}
+    graph = {'nodes': 0, 'depth': 0, 'loose': 0, 'anchors': {}}
+    done = set()
+
+    if start is not None:
+        order, parent, depth = _reachable(kids, start)
+        mesh_of, anchor = _anchor(docs, order, placements)
+        paths = _assign(docs, order, parent, ordinal, mesh_of,
+                        root.GetPath().AppendChild('Level'), by_partition, by_primary)
+
+        for node in order:
+            part, guid = node
+            _place(stage, paths[node], part, guid, docs[part]['Instances'][guid], counts, placed)
+            done.add(node)
+
+        for (name, i), node in anchor.items():
+            graph['anchors'].setdefault(name, {})[i] = str(paths[node])
+
+        graph['nodes'] = len(order)
+        graph['depth'] = depth
+
+    scope = UsdGeom.Scope.Define(stage, root.GetPath().AppendChild('Entities'))
+
+    for part in partitions:
+        doc = docs.get(part)
+
+        if doc is None:
+            continue
+
         for guid, inst in (doc.get('Instances') or {}).items():
+            if (part, guid) in done:
+                continue
+
             kind = inst.get('$type') or 'Unknown'
-            field, extra = transform_fields(inst)
 
-            n = counts.get(kind, 0)
-            counts[kind] = n + 1
-
-            if field:
-                placed[kind] = placed.get(kind, 0) + 1
-
-            # Mirror the LEVEL's own structure, not a bucket per type.
-            #
-            # Grouping by $type put SubWorldData and WorldPartData in the stage as rows of a table:
-            # their USD children were "other instances of the same type", so a DCC could not select
-            # a world part, move a sub-world, or see which layer an object belonged to. The level's
-            # organisation IS its partition tree -- each sub-world and each world-part layer is its
-            # own partition -- so nesting by partition path restores the hierarchy the game has.
-            #
-            # The type still appears, as the leaf's own grouping, so nothing that used it is lost.
+            # Nested by partition path, not bucketed by $type. Grouping by type put SubWorldData
+            # and WorldPartData in the stage as rows of a table, so a DCC could not see which layer
+            # an object belonged to; the partition tree at least says which FILE it came from.
             here = scope
             for seg in part.split('/'):
                 here = UsdGeom.Scope.Define(stage, here.GetPath().AppendChild(_safe(seg)))
 
             group = UsdGeom.Scope.Define(stage, here.GetPath().AppendChild(_safe(kind)))
-            path = group.GetPath().AppendChild('e%05d' % n)
+            _place(stage, group.GetPath().AppendChild('e%05d' % counts.get(kind, 0)),
+                   part, guid, inst, counts, placed)
+            graph['loose'] += 1
 
-            if field and kind in AUDIO:
-                prim = UsdMedia.SpatialAudio.Define(stage, path).GetPrim()
-                UsdGeom.Xformable(prim).AddTransformOp().Set(_matrix(inst[field]))
-            elif field and kind in LIGHTS:
-                prim = _author_light(stage, path, LIGHTS[kind], inst)
-                UsdGeom.Xformable(prim).AddTransformOp().Set(_matrix(inst[field]))
-            elif field:
-                prim = UsdGeom.Xform.Define(stage, path).GetPrim()
-                UsdGeom.Xformable(prim).AddTransformOp().Set(_matrix(inst[field]))
-            else:
-                # A prim with no type rather than a Scope: an unplaced instance is a record, and
-                # giving it a geometric type would put a settings object into a DCC's outliner as
-                # though it were somewhere in the world.
-                prim = stage.DefinePrim(path)
-
-            prim.SetCustomDataByKey(BF3 + 'Entity', json.dumps(
-                {'partition': part, 'instance': guid, 'type': kind,
-                 'field': field, 'record': inst}))
-            _author_fields(prim, inst)
-
-            if kind in VOLUMES:
-                _author_volume(stage, prim, kind, inst)
-
-            if kind in PHYSICS:
-                _author_physics(prim, inst)
-
-            # The instance's other transforms, as children. Their values are in the instance's own
-            # space, so they hang off it and are read back LOCAL -- composing them with the parent
-            # would move an airdrop point by wherever its spawner happens to be.
-            for other in extra:
-                child = UsdGeom.Xform.Define(stage, path.AppendChild(_safe(other))).GetPrim()
-                UsdGeom.Xformable(child).AddTransformOp().Set(_matrix(inst[other]))
-                child.SetCustomDataByKey(BF3 + 'EntityField', json.dumps(
-                    {'partition': part, 'instance': guid, 'field': other}))
-
-    return counts, placed
+    return counts, placed, graph
 
 
 def read(stage_path):
@@ -528,7 +846,15 @@ def read(stage_path):
             # that never had one adds a field to the EBX record, and the partition stops matching
             # the type it declares.
             if meta.get('field'):
-                xf = UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
+                # LOCAL, not local-to-world. BF3 stores an object's transform relative to whatever
+                # owns it, and now that a world part's prim really is its objects' parent, the two
+                # are different numbers -- writing the world transform back would fold the owner's
+                # placement into every child on every trip. It happens to be a no-op today: all
+                # 4103 world-part and sub-world reference objects across the 70 dumped levels carry
+                # an identity BlueprintTransform, so local == world for everything under them. The
+                # reason to read local anyway is that a DCC user who moves the world part is then
+                # editing the world part, which is what the hierarchy is FOR.
+                xf = UsdGeom.Xformable(prim).GetLocalTransformation(Usd.TimeCode.Default())
                 record[meta['field']] = _linear_transform(xf)
 
             if meta.get('type') in LIGHTS:
