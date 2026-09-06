@@ -60,6 +60,50 @@ Exactly one partition rewritten out of 10,396 -- the rule holds under a real emi
 principle. The level's own 490 partitions and the closure's 10,396 are DISJOINT (measured: 0 in
 both), so nothing is authored twice and two prims cannot hold conflicting edits for one instance.
 
+## Can I open a weapon, change it, and save it back? (2026-09-06)
+
+The honest table, because "represented" and "editable end to end" are different claims:
+
+| | today |
+|---|---|
+| Open a weapon and see its whole blueprint | yes -- every field, its sounds, sockets, effects |
+| View its animations | yes -- 830 clips with real joint names, as UsdSkelAnimation |
+| Change field values | yes -- ~94% of fields are typed USD attributes |
+| Re-point a reference (weapon -> projectile) | yes -- 256,459 references are USD relationships |
+| Add entries to a list (sockets, chunks) | yes -- arrays are child prims and can be appended |
+| Save field and reference edits into a working game | **yes, verified**: edit -> emit -> build -> Level:Loaded |
+| Save edited ANIMATION CURVES back | **no** -- Ant DCT `Header.Serialize`/`DofTable.Serialize` throw |
+| Save edited MESH GEOMETRY back | **no** -- meshes are referenced, not rebuilt |
+| Save edited textures | yes, but that texture then ships as a copy |
+| Save edited collision | rebuilds, but not byte-identical to BF3's bake |
+
+So data is editable end to end and is most of a weapon; animation curves and mesh geometry are
+export-only, and both need a writer in Rime that today is a stub that throws.
+
+## How much is actually editable (2026-09-06)
+
+Measured across the whole closure -- 1,238,125 fields:
+
+    before   typed scalars 816,247 + vectors 42,268            69.3% editable
+             customData only                     379,610       30.7% carried
+
+    after    + nested records   134,081  ->  namespaced attributes
+             + references        95,826  ->  USD relationships
+             + arrays of refs    19,723  ->  multi-target relationships
+             + arrays of records 52,257  ->  child prims, appendable
+             + empty lists       72,730  ->  appendable scopes
+             + scalar arrays      4,992  ->  native USD arrays
+                                              ~94% editable, remainder appendable
+
+References resolve essentially totally: **256,459 of 256,460** point at an instance that is also in
+the closure. Integer arrays are Int64 because BF3 lookup tables hold values past 2^31.
+
+Two silent failure modes are asserted against, not assumed: a reader that reports every reference as
+changed would rewrite every partition on every trip, and one that reports none would make
+re-pointing impossible. Both were real -- comparing against the record's full guid list rather than
+what was authored reported 9 edits on an untouched slice, and the empty-list path skipped its own
+read so an appended element was never seen.
+
 ## Are we at 100%? (2026-09-06, updated)
 
 **Complete and measured:**
