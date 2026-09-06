@@ -27,6 +27,24 @@ inside a world part we invented**. Pointing our sub-level at the level's own
 `WorldPartReferenceObjectData` instead -- their `WorldPartData` partitions ship with the closure --
 instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop being emitted.
 
+## The whole game round trips, not just a level (2026-09-06)
+
+A level's own partitions are a narrow slice of BF3 -- weapons, characters, vehicles, sounds and
+voice-over live elsewhere -- so judging the pipeline on one level flatters it. Measured against the
+full shipped closure with `tools/usd/partition_coverage_test.py`:
+
+    corpus       10,396 partitions
+    authored     211,765 instances across 802 types
+    fields       776,004 compared, 0 changed
+    instances    0 never authored
+    RESULT       PASS
+
+802 types is effectively everything a level pulls in. The first run reported 3 changed fields in
+`DataSetNode` and `InstanceOutputNode`; those were the TEST aliasing instances, not the pipeline.
+BF3 instance guids are PARTITION-SCOPED and recur across partitions, so indexing by guid alone let a
+later prim overwrite an earlier one and three fields came back holding another instance's values --
+which looks exactly like three lossy fields. Identity is `(partition, instance)`.
+
 ## Coverage
 
 | | status | evidence |
@@ -45,6 +63,7 @@ instantiates the arrangement BF3 itself bakes, and 2949 duplicates simply stop b
 | Terrain layer palette + draws | typed prims | mp_001 7/128, mp_007 10/184, sp_valley 10/234 -- **0 changed** |
 | Terrain mesh scattering | typed prims per type | MP_007 23 / SP_Valley 22 / MP_001 5 types; 598+572+130 fields, **0 changed** |
 | Terrain heights, editable | per-node meshes | untouched: **0** changed nodes; 499,230 samples, worst deviation **0**; one edit -> 1 node, bytes exact |
+| Enlighten bake (probes, databases, systems) | base64 resources + probe points | mp_001 162 res / 377 KB, mp_007 156 / 240 KB, sp_valley 236 / 59.6 MB -- **0 changed** |
 
 ## Collision: byte-perfect when unedited (2026-09-06)
 
@@ -158,6 +177,55 @@ One correctness fix went with it: the writeback used `astype('<u2')`, which TRUN
 divide landing on 12344.9999 read as 12344 and an untouched sample reported as an edit. It rounds
 now -- that is what makes "unedited terrain emits nothing" true rather than nearly true.
 
+## Enlighten now round trips (2026-09-06)
+
+A level's global illumination was the last big category the export named and did not carry. It is
+not in EBX at all: it is a set of resources -- one `EnlightenDatabase` naming its systems and probe
+sets, one `EnlightenProbeSet` each, a `StaticEnlightenDatabase` of baked coefficients, an
+`EnlightenShaderDatabase` of per-material colours, and on one level `EnlightenSystem` resources
+holding Enlighten's own radiosity data. Across BF3: 7095 probe sets, 72 databases, 72 static
+databases, 49 shader databases -- the 7288 Rime already re-encoded byte-exactly -- plus 136
+`EnlightenSystem`.
+
+`tools/usd/enlighten.py` authors all of it under `/World/Enlighten`, and
+`tools/usd/enlighten_roundtrip_test.py` compares DECODED payload bytes:
+
+    mp_001     162 resource(s)     377,036 bytes    0 changed    162/162 reencode exact
+    mp_007     156 resource(s)     240,382 bytes    0 changed    156/156 reencode exact
+    sp_valley  236 resource(s)  62,538,770 bytes    0 changed    100/100 reencode exact
+
+Payloads are carried verbatim on purpose, not as a fallback. An Enlighten bake describes light for
+the geometry that was there when it was computed, so nothing downstream can regenerate one; a tool
+that re-derived it would be inventing lighting the game never had. The parsed header rides along
+whole in `customData` rather than as a hundred typed attributes, because it is name lists, lightmap
+instances and material tables -- and a per-field translation silently drops whatever Rime has not
+been taught to name yet.
+
+Two things are authored as geometry so the bake is visible rather than a number in a header:
+probe positions as guide-purpose `UsdGeom.Points` (mp_001 573, mp_007 164, sp_valley 1206, all
+exact), and each lightmap instance at its transform's translation (1458 / 591 / 148). The instances
+are the record that binds one baked lightmap to one placed object; seeing them is what makes "a
+bake cannot survive an edit to the geometry" concrete instead of a claim.
+
+Three measurements worth keeping:
+
+- **Probe positions are not the probe count.** mp_001's database reports 2707 probes, but only 38
+  of its 159 probe sets ship any positions at all -- 573 in total. The rest carry only the
+  indirection grid. A check that compared points to `probeCount` would fail on every level in the
+  game while nothing was wrong.
+- **All 136 `EnlightenSystem` resources in BF3 belong to sp_valley**, and they are 50.7 MB of that
+  level's 62.5 MB. Nothing in Rime decodes them, so they carry payload and no fields. A dump
+  restricted to the four types that DO parse would have dropped 80% of sp_valley's Enlighten bytes
+  while truthfully reporting 100/100 re-encoded exactly -- the same shape of trap as a level that
+  loads because it emitted nothing.
+- **sp_valley ships two `EnlightenDatabase` resources**, not one, so "the level's database" is a
+  list. Anything keyed on there being exactly one is wrong on the first sub-levelled map it meets.
+
+The new Rime command is `dump_level_enlighten <level> <dest.json>` (`7b6f6de3`). It exists because
+the per-resource `dump_enlighten` cannot be driven from outside: probe-set names are discoverable
+only from the database's own `probeSetNames`, so a caller has to have mounted and read before it can
+ask for them. One mount now answers the whole level.
+
 ## Open
 
 1. ~~**TERRAIN'S PAINTED DETAIL.**~~ **DONE 2026-09-06.** Heights (byte-exact), mesh scattering,
@@ -181,7 +249,12 @@ now -- that is what makes "unedited terrain emits nothing" true rather than near
 
 5. **Ant clips carry indexed joints** (`dof037`). Values are exact; names need
    `AntAnimationSetAsset` -> `SkeletonAsset` + actor channel maps resolved.
-6. **Enlighten** probe data referenced, not authored.
+6. ~~**Enlighten** probe data referenced, not authored.~~ **DONE 2026-09-06** (above): every
+   Enlighten resource a level ships is authored into USD and round trips with 0 changed bytes on
+   three levels. What is NOT done is re-baking: the data is carried, never recomputed, so a level
+   whose geometry is edited keeps lighting for the geometry it used to have. That is a limit of the
+   format, not of the carrier -- nothing outside Enlighten itself can bake it -- but it means an
+   edited level's GI is stale rather than wrong-and-detectable.
 7. **Update-in-place** unproven. **No equivalence check** against BF3's own bake.
 
 ## Not blockers (corrected)

@@ -70,8 +70,10 @@ def main(src="/tmp/closure", limit=0):
     stage.GetRootLayer().Export(tmp)
     reopened = Usd.Stage.Open(tmp)
 
-    # Index by the instance guid inside each prim's bf3Entity record -- that is the identity
-    # level_entities writes, and prim names are positional (e00001) rather than meaningful.
+    # Key on (partition, instance). An instance guid alone is NOT an identity: BF3 guids are
+    # partition-scoped and recur across partitions, so indexing by guid let a later prim overwrite
+    # an earlier one and three fields came back holding a DIFFERENT instance's values -- which
+    # looked exactly like three lossy fields.
     got = {}
 
     for prim in reopened.Traverse():
@@ -81,7 +83,8 @@ def main(src="/tmp/closure", limit=0):
             continue
 
         try:
-            got[str(json.loads(blob).get("instance")).lower()] = prim
+            rec = json.loads(blob)
+            got[(str(rec.get("partition")), str(rec.get("instance")).lower())] = prim
         except Exception:                                               # noqa: BLE001
             continue
 
@@ -101,7 +104,7 @@ def main(src="/tmp/closure", limit=0):
             if not t:
                 continue
 
-            prim = got.get(str(ig).lower())
+            prim = got.get((part, str(ig).lower()))
 
             if prim is None:
                 missing[t] += 1
