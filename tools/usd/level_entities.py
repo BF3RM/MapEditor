@@ -364,6 +364,81 @@ def _author_array(prim, name, v):
             Vt.DoubleArray([float(x) for x in v]))
 
 
+def _author_record_array(stage, prim, field, values):
+    """One child prim per record in an array, scalars typed, order preserved in the name."""
+    scope = stage.DefinePrim(prim.GetPath().AppendChild(_safe(field)))
+    scope.CreateAttribute(BF3 + ':recordArray', Sdf.ValueTypeNames.String).Set(field)
+
+    for i, rec in enumerate(values):
+        child = stage.DefinePrim(scope.GetPath().AppendChild('e%04d' % i))
+
+        for k, v in rec.items():
+            if isinstance(v, bool):
+                child.CreateAttribute(BF3 + k, Sdf.ValueTypeNames.Bool).Set(v)
+            elif isinstance(v, (int, float)):
+                child.CreateAttribute(BF3 + k, Sdf.ValueTypeNames.Double).Set(float(v))
+            elif isinstance(v, str):
+                child.CreateAttribute(BF3 + k, Sdf.ValueTypeNames.String).Set(v)
+
+
+def _read_record_array(prim, field, old):
+    """Edited values back into an array of records, keeping each element's original shape."""
+    scope = prim.GetChild(_safe(field))
+
+    if not scope or not scope.IsValid():
+        return
+
+    # Children BEYOND what was exported are new elements a DCC added. Without this an array could
+    # be edited and never grown, and an empty one -- 72,730 fields across the closure -- could never
+    # be filled at all.
+    extra = []
+    i = len(old)
+
+    while True:
+        child = scope.GetChild('e%04d' % i)
+
+        if not child or not child.IsValid():
+            break
+
+        rec = {}
+
+        for attr in child.GetAttributes():
+            n = attr.GetName()
+
+            if n.startswith(BF3) and ':' not in n and attr.Get() is not None:
+                rec[n[len(BF3):]] = attr.Get()
+
+        if rec:
+            extra.append(rec)
+
+        i += 1
+
+    for i, rec in enumerate(old):
+        child = scope.GetChild('e%04d' % i)
+
+        if not child or not child.IsValid():
+            continue
+
+        for k, v in list(rec.items()):
+            attr = child.GetAttribute(BF3 + k)
+
+            if not attr or not attr.HasAuthoredValue() or attr.Get() is None:
+                continue
+
+            got = attr.Get()
+
+            if isinstance(v, bool):
+                rec[k] = bool(got)
+            elif isinstance(v, int):
+                rec[k] = int(got)
+            elif isinstance(v, float):
+                rec[k] = float(got)
+            elif isinstance(v, str):
+                rec[k] = str(got)
+
+    old.extend(extra)
+
+
 def _read_extra(prim, record):
     """Put edited arrays and nested-record leaves back, keeping each field's original shape."""
     for k, old in list(record.items()):
@@ -388,6 +463,13 @@ def _read_extra(prim, record):
                     record[k] = [str(x) for x in got]
                 else:
                     record[k] = [float(x) for x in got]
+
+        elif (isinstance(old, list)
+              and all(isinstance(x, dict) and not _is_ref(x) for x in old)):
+            # No `and old`: an EMPTY list is exactly the case that needs this, because appending is
+            # the only edit it can have. Skipping it meant a DCC could add an element and the read
+            # never looked -- measured on a Subtitles field that had 0 elements.
+            _read_record_array(prim, k, old)
 
         elif isinstance(old, dict) and not _vec_key(old) and not _is_ref(old):
             for _sk, _sv in list(old.items()):
@@ -439,6 +521,12 @@ def _author_fields(prim, inst):
                 # through customData, which meant a lookup table or a name list could be read and
                 # never edited.
                 _author_array(prim, name, v)
+            elif isinstance(v, list) and all(isinstance(x, dict) and not _is_ref(x) for x in v):
+                # An array of records: one child prim per element, its scalars typed. 52,257 fields
+                # -- a sound's chunk table, a weapon's socket list -- that could otherwise be read
+                # and never changed. A child prim rather than deeper namespacing because the
+                # elements are ORDERED and a DCC has to be able to see them apart.
+                _author_record_array(prim.GetStage(), prim, k, v)
             elif isinstance(v, dict) and not _vec_key(v) and not _is_ref(v):
                 # A nested record: one attribute per scalar leaf, namespaced under its field. This
                 # is the single largest carried-only group -- 134,081 fields, things like an
