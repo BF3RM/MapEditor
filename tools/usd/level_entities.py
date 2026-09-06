@@ -683,7 +683,7 @@ def link_blueprints(stage, ebx_dir, partitions, extra_dirs=()):
         except Exception:                                    # noqa: BLE001
             continue
 
-        where[(rec.get('partition'), str(rec.get('instance')))] = prim
+        where[(rec.get('partition'), str(rec.get('instance')).lower())] = prim
 
     linked = unresolved = 0
 
@@ -701,7 +701,10 @@ def link_blueprints(stage, ebx_dir, partitions, extra_dirs=()):
             unresolved += 1
             continue
 
-        primary = str(docs[target].get('PrimaryInstanceGuid') or '')
+        # Lowercased on both sides: a guid is case-insensitive, and the two sources spell it
+        # differently. Comparing them raw left 162 placements "unresolved" whose prototype was
+        # sitting in the stage all along.
+        primary = str(docs[target].get('PrimaryInstanceGuid') or '').lower()
         proto = where.get((target, primary))
 
         if proto is None or proto.GetPath() == prim.GetPath():

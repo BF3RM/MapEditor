@@ -1143,14 +1143,18 @@ common case rather than the exception:
 3. **99,781 of 155,290 Havok placement wrappers are unreached**, every one held only by
    `hkpExtendedMeshShape`, whose subparts point at a few hundred shared wrappers from 819,307 slots.
 4. **Water is readable, not writable** -- rebuilding a triangle mesh needs its MOPP.
-5. **163 blueprint placements unresolved** on mp_001, of 3,525 (3,362 link, 95.4%). Getting there
-   established something about the goal's two halves: the 132 blueprints behind 832 of those
-   placements -- bicycles, office chairs, cardboard boxes -- are **not in the shipped closure at
-   all**, and the level still boots with the right entity count because they resolve from the
-   player's own install. That is "100% referenced" working correctly. But "100% editable" needs them
-   IN THE STAGE. The two pull opposite ways, and the resolution is the split everything else here
-   uses: author for editing, ship only if edited. Dumping the 132 took linkage from 258 to 1,107
-   without adding a byte to the bundle.
+5. **Blueprint linkage: the level's own placements are 1,839 of 1,840.** Exactly ONE names a
+   blueprint that exists nowhere in the game. The 163 residual reported by `link_blueprints` is
+   closure-INTERNAL -- blueprints referencing other blueprints -- because the pass walks every prim
+   in the stage, not just the level's; 3,362 of 3,525 link overall.
+   Getting there established something about the goal's two halves. The 132 blueprints behind 832
+   of those placements -- bicycles, office chairs, cardboard boxes -- are **not in the shipped
+   closure at all**, and the level still boots with the right entity count because they resolve from
+   the player's own install. That is "100% referenced" working correctly, while "100% editable"
+   needs them IN THE STAGE. The two pull opposite ways, and the resolution is the split the rest of
+   the pipeline uses: author for editing, ship only if edited. Dumping the 132 took linkage from 258
+   to 1,107 without adding a byte to the bundle.
+
 6. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader.
 7. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
 8. **48 of 49 levels have never been booted** (a sweep is running).
