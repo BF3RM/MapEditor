@@ -875,7 +875,7 @@ common case rather than the exception:
 
 | | evidence |
 |---|---|
-| Animation clips (DCT) | 3,778 / 3,778 clips, 38,366,576 / 38,366,576 payload bytes |
+| Animation clips, ALL FIVE codecs | DCT 3,778 + CURV 775 + VBR 2,225 + uncompressed 2,191; **338,458,436 / 338,458,436** payload bytes |
 | Animation clips (CURV) | 775 / 775 clips, all patchable |
 | Animation clips (VBR) | 2,225 / 2,225 clips, sections exact, 14,891 / 14,891 const quats unit |
 | Terrain layers + scattering | 33 / 33 resources, 1,036,583 / 1,036,583 bytes |
@@ -888,27 +888,23 @@ common case rather than the exception:
 
 **Not complete:**
 
-1. **Not boot-tested: the mesh and animation writers.** Both are byte-proven and neither has been
-   built into a bundle and loaded. That is the single largest gap now -- capability exists, evidence
-   of it working in the engine does not.
-2. ~~**3,000 of 8,972 animation clips stay read-only** (VBR and CURV)~~ -- both codecs now write
-   (2026-09-06); what remains read-only is VBR's ANIMATED channels, 133,985 of its 307,530
-   components. No clip can be added,
-   removed or re-typed: there is no Ant GenericData archive writer.
-3. **Havok shape geometry** -- the rebuild still emits 81 objects against the game's 120, now
-   itemised (section above): rotated placements, cylinders and the MOPP list. READING is fixed --
-   68,436 placements with their rotations, against 176,340 shapes of which 72.5% sat at the origin.
-4. ~~**24 `.water.mesh` resources do not parse at all.**~~ **DONE 2026-09-06**: not big endian, a
-   five-slot header. All 7,617 resources parse and round trip, and the water meshes decode to
-   7,548 vertices / 6,941 triangles. Not writable: rebuilding a triangle mesh needs its MOPP.
-5. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader,
-   so looking at it blended needs a custom one.
-6. **Shared object blueprints are not descended into** -- 403,352 instances (72%) stay filed by
-   partition path. Deliberate: a prop used 60 times would give 60 prims writing back to one record
-   and 59 edits would vanish.
+1. **VBR's per-frame blocks are not decoded.** All five animation codecs now have writers -- DCT
+   3,778, CURV 775, VBR 2,225, uncompressed 2,191, all byte-identical, 338,458,436 payload bytes --
+   but 133,985 of VBR's 307,530 channel components (43.6%) are ANIMATED and stay read-only; the
+   56.4% constant ones read and write. No function of the per-component descriptors predicts a
+   block's length, so those bytes are copied rather than re-encoded, and the encoder says so.
+2. **Havok rebuild: 81 objects against the game's 120**, now itemised (+34 rotated placements, +11
+   cylinders, +3 list/MOPP, -9 connectivity). Corpus-wide the builder covers 299,746 of 400,053
+   objects (74.9%). 44.3 MB of `hkpMoppCode` and 24.9 MB of `hkpCompressedMeshShape` are Havok SDK
+   bakes and are NOT reproducible -- those resources can be preserved verbatim, never rebuilt.
+3. **99,781 of 155,290 Havok placement wrappers are unreached**, every one held only by
+   `hkpExtendedMeshShape`, whose subparts point at a few hundred shared wrappers from 819,307 slots.
+4. **Water is readable, not writable** -- rebuilding a triangle mesh needs its MOPP.
+5. **834 blueprint placements still unresolved** on mp_001 (2,337 link). Their blueprints are not in
+   the closure at all.
+6. **Terrain's 7-layer splat has no USD form.** All the data round trips; USD has no splat shader.
 7. **Update-in-place unproven**; Enlighten is not re-injected into a built bundle.
-8. **1,077 partitions** are EBX we author rather than reference, and referencing partitions is
-   measured impossible -- it inflates the superbundle 6x and breaks the load.
+8. **48 of 49 levels have never been booted** (a sweep is running).
 
 **Superseded by the writers landing:** "0 changed is not byte-perfect" was item 2 of this list.
 Eight subsystems now have byte equality against BF3's own bytes, so the distinction it drew has
