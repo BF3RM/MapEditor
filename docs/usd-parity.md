@@ -1519,7 +1519,7 @@ which looks exactly like three lossy fields. Identity is `(partition, instance)`
 | | status | evidence |
 |---|---|---|
 | Placements | 334,367 across 49 levels | after the sub-world fix; was 223,739 (+1.5x) |
-| Levels BOOTING | **48/49** | emitted, built and started in the engine; 316,586 static entities against 316,538 placements; the 49th (`web_loading`) has 0 meshes |
+| Levels whose BUNDLE loads | **48/49** | emitted, built, `Level:Loaded`, 316,586 static entities against 316,538 placements; the 49th (`web_loading`) has 0 meshes. **NOT the same as playable** -- every one registers ZERO teams, so no player can enter. `Level:Loaded` was never evidence of a usable level, and every headless check passed while it was unusable. |
 | Meshes / textures | referenced from the player's install | bundle 297 MB -> 7 MB (41x); ships no original art |
 | Entity fields, all 440 types | typed USD attributes | 35,298 authored; round trip **0 changed fields** |
 | Level graph (ownership) | `/World/Level`, world parts own their objects | 49/49 levels; 151,362 owned objects = 151,362 in the EBX; **0 changed** over 23,526,728 fields |
