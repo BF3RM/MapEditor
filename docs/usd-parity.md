@@ -144,7 +144,89 @@ server does not read the Enlighten bake, so booting it is acceptance of the cont
 that the engine consumed the payload. Confirming an edited bake looks different needs a client and
 an eye, and that was not done.
 
-## The client DOES log, and it says the load gets to world part 22 of 23 (2026-09-06)
+## The client dies on ONE partition, and it is the sub-world root (2026-09-06)
+
+The window between the last world part and the deploy screen is instrumented, and it turns out there
+is no window: the client stops dead on the last partition it loads.
+
+### The trace
+
+A client-realm `Engine:Update` heartbeat (padded, four times a second) plus padded prints on
+`Level:LoadingInfo`, `Level:Loaded`, `Level:Destroy` and `Player:Respawn`, on mp_001 with the MVDB,
+1,638,400 bytes of log:
+
+    09062  levels/realitymod/usdlevel/part21
+    09063  levels/realitymod/usdlevel/part22
+    09064  levels/realitymod/usdlevel          <-- LAST LINE IN THE FILE
+    ...    [BLT-X] TICK t=10.90 ticks=1333     <-- last heartbeat, same second
+
+    BLT-X event kinds in the whole run:  1230 TICK, 30 LOADINGINFO, 30 LEVELDESTROY
+    the only LOADINGINFO the client ever prints is "Level exited" -- the OLD level's teardown
+
+**The client was ticking normally right up to the last partition and then stopped executing Lua
+altogether.** Not one heartbeat afterwards, and the heartbeat flushes a page every quarter second,
+so silence is real rather than the 4096-byte truncation. The server notices the disconnect seven
+seconds later. No `[error]`, no `[warning]`, no crash dump, no wine backtrace.
+
+### Correcting my own count from last round
+
+I said "22 of 23 world parts". Wrong: the emitter names them `part1`..`part22` **plus the sub-world
+root `levels/realitymod/usdlevel`**, which is 23, and the client loads all 23. There is no missing
+`part23` and no partition that failed to arrive. **9,064 partitions load, and the client dies on the
+last one.**
+
+### What that pins
+
+The last partition is the `SubWorldData` root -- the object that owns the 22 world parts and carries
+the `RegistryContainer`. It is the one thing that is processed only after all its children exist,
+and it is where the client goes away.
+
+It also explains a result from the bisect that never fitted: `frontend_empty`, the sub-world root
+with **zero** objects in its world part, is the ONE variant that ever loaded on the client. Same
+partition, same type, same position in the load order -- empty it survives, populated it kills the
+client. So the suspect is not the root's existence but what the engine does when it walks a
+populated one on the client.
+
+### Next, and it is one print away again
+
+The tracer proves the client reaches the root and not past it. What it cannot yet say is whether the
+death is inside the partition's own load or in the first thing that touches it afterwards. Hooks
+worth adding, all in the same padded style: `Partition:Loaded` on the root only, printing the
+instance count and each `$type` it contains; and an `EntityFactory`/`CreateFromBlueprint` hook on
+the client realm, which would fire as the world parts are instantiated and would say whether
+entity creation begins at all.
+
+### Two PowOS `vu.sh` defects, for whoever ships the image
+
+Both bite the same tool and the second makes fixing the first insufficient on its own.
+
+**1. The installed module does not pass `-debuglog`.**
+
+    /usr/lib/powos/mods/vu.sh          shipped image, mtime epoch   0 occurrences of "debuglog"
+                                                                    execs $VU_CLIENT_DIR/vu.com
+    /var/lib/powos/src/lib/mods/vu.sh  2026-08-21 17:42             5 occurrences of "debuglog"
+                                                                    execs $VU_CLIENT_DIR/vu.exe
+
+`vu_play_cmd` calls `vu_write_wrapper` on every launch, which regenerates
+`~/.local/bin/venice-unleashed` **from whichever module is installed**, so on this image the wrapper
+has no `-debuglog` in it and `powos mods vu play` has never written a client log. The source fix
+exists and has not shipped. Verified by hand: `powos mods vu play -debuglog ...` writes a log
+immediately.
+
+**2. `-debuglog` writes in 4096-byte pages and does not flush on exit.**
+
+The first log produced this way was **exactly 4,096 bytes and ended mid-line**. A client that dies
+during a level load loses its last partial page, which is precisely the part worth reading -- so the
+defect only bites on an abnormal exit, which is the only time anybody looks. The workaround here was
+to make the client print enough to push each page out while the load is still running (a
+`Partition:Loaded` tracer plus 30 padding lines per world part); that took the same failure from
+4,096 bytes of log to 1.6 MB. A flush on the log writer, or an unbuffered mode, would remove the
+need.
+
+Traces and the tracer itself are in `~/Games/VeniceUnleashed/shot-instance/artifacts/`
+(`client_logs/*.log`, `blt_client_tracer.lua`).
+
+## The client DOES log (2026-09-06)
 
 Two harness defects, both fixed or worked around, and the first client-side evidence this effort has
 ever had.
@@ -187,7 +269,8 @@ mp_001, 5,863 placements, MVDB present, in the host that registers teams:
            (23 world parts emitted; the server resolves 23/23)
 
 **The client loads 9,063 partitions -- every emitted mesh, every texture, the MeshVariationDatabase
-and 22 of the 23 world parts -- and then stops.** There is not one `[error]` or `[warning]` in
+and 22 of the 23 world parts -- and then stops.** (Count corrected in the section above: it is
+9,064 and all 23; the 23rd is the sub-world ROOT, not a `part23`.) There is not one `[error]` or `[warning]` in
 1.35 MB of log except an unrelated `LSX ... Connection refused` from the EA-app probe at startup.
 
 So the failure is **not** a partition that fails to load. Everything loads. The client dies at the
