@@ -85,7 +85,7 @@ writes down. Four places do:
 | `fb::ObjectVariation` | `Asset.Name` and `NameHash` on the SAME instance | **2,326 of 2,326** resolve, each to exactly one name, and to the same string in the same case |
 | EBX type/field descriptors | each stores `hashQuick(name)` beside the table holding the name | **9,422 of 9,422** distinct hashes resolve, over **6,169,691** statements |
 | non-cas chunk entries | `AssetNameHash` of the asset the chunk belongs to, with no name beside it | **13,660 of 13,660** resolve |
-| `MeshVariationDatabaseEntry.VariationAssetNameHash` | a hash naming a variation stored in a DIFFERENT partition | **2,323 of 2,353** resolve |
+| `MeshVariationDatabaseEntry.VariationAssetNameHash` | a hash naming a variation stored in a DIFFERENT partition | **2,323 of 2,353** against shipped `ObjectVariation` alone; **~99.9%** against the FULL table |
 
 The last row is the case a reverse table exists for — hash here, name over there — and the 30 that
 do not resolve are not a gap in the table. They are exactly the MVDB hashes with no matching
@@ -162,3 +162,31 @@ where the data stops, instead of quietly carrying another game's names.
   lowercase column uses Python's `str.lower()`, which .NET does not guarantee to match.
 - **BF3 only.** The dump command is registered for engines with an `IPartitionConverter` and the
   EBX header layout it parses is Frostbite 2.0's. Other titles need their own run.
+
+
+## The MVDB misses are almost all resolvable after all (2026-09-06)
+
+The 2,353-entry check above resolves against shipped `ObjectVariation` instances only. Resolving
+against the WHOLE table -- which includes names harvested from EBX value strings -- does far better.
+On a 74-hash sample that the narrow check called unresolved, **72 resolve**, to real names:
+
+    Props/Vehicles/CivilianCar_04/CivilianCar_04_Red
+    Props/StreetProps/SupplyCase_01/SupplyCase_01_Desert
+    Architecture/ME_StorefrontsAddons/ME_StorefrontsRoof_01_Shiny
+    XP_Raw/Props/StoreSigns_01/StoreSign_Medium_01_i / _h / _j / _k
+
+So "the name does not exist" was wrong: the names exist in the game's strings, just not as shipped
+variation instances.
+
+**The last 2 are genuinely unresolvable, and the effort to prove it is the point.** Both sit in
+mp_001's MVDB with **zero materials**. Their meshes resolve by guid to
+`architecture/me_highrise_backdrop_01/me_highrise_backdrop_01_wet_mesh` and
+`architecture/me_storefronts/me_storefront_windows_iraq01_wet_mesh`, which gives the naming base,
+because the rule is visible in resolved cases: `props/vehicles/civiliancar_04/civiliancar_04_mesh`
+carries `Props/Vehicles/CivilianCar_04/CivilianCar_04_Red` (one variation shared by four meshes --
+it belongs to the OBJECT, not the mesh). Every one of the **14,384 distinct trailing tokens BF3's
+own names use** was tried against both bases. No hit.
+
+They are vestigial entries: an MVDB row naming a variation the game does not define. Inventing a
+plausible name would put an unverifiable row into the table -- the exact defect that leaves 523
+self-inconsistent entries in the public `assetHashes.json`.
