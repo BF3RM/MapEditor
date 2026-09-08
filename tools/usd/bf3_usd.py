@@ -232,8 +232,21 @@ def _author_bf3_shader(stage, mat, path, material_ebx):
 
 
 def _has_texcoord(lod, subset):
-    """Whether a subset declares any texture coordinates at all."""
-    gdd = getattr(subset, "gdd", None)
+    """Whether a subset declares any texture coordinates at all.
+
+    The attribute is `geom_decl` (meshset.Subset.geom_decl, a GeomDecl with .elements). This read
+    `subset.gdd`, which does not exist on any subset, so getattr returned None, the element loop
+    never ran, and the function answered False for EVERY subset -- marking all of them `guide`.
+
+    That is not cosmetic. `guide` means "helper geometry, do not render", so the exported stage
+    opened in a DCC as thousands of empties and zero visible meshes -- the whole level invisible.
+    MEASURED after the typo: 722 of 722 subsets across 120 prototypes were guide, against the ~30%
+    (434 of 1470) this test is meant to select.
+    """
+    gdd = getattr(subset, "geom_decl", None)
+
+    if gdd is None:                                          # older dumps / dict-shaped records
+        gdd = getattr(subset, "gdd", None)
 
     if isinstance(gdd, dict):
         elements = gdd.get("elements") or []
