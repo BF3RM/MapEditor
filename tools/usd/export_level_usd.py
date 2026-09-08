@@ -496,7 +496,7 @@ def _material_ebx_index(path):
 def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, textures=None,
          decals=None, roads=None, terrain=None, layers=None, texture_dir=None, material_dir=None,
          scattering_path=None,
-         ebx_dir=None, parts_list=None, enlighten_path=None):
+         ebx_dir=None, parts_list=None, enlighten_path=None, registry_dir=None):
     doc = json.load(open(placements_path))
 
     # The merged, shader-filled material bindings, keyed by mesh name. Without these the level
@@ -664,6 +664,40 @@ def main(placements_path, out_path, mesh_dir=None, corpus=None, chunks=None, tex
                   "%d nothing owns, carried by partition path"
                   % (graph["nodes"], graph["depth"], graph["loose"]))
 
+    # The REGISTRY's assets, under /World/Registry.
+    #
+    # A level's RegistryContainer names the gameplay content it expects at runtime and nothing
+    # else: on MP_001 that is 2762 partitions -- 1544 weapons, 693 persistence, 493 characters --
+    # and none of it is level-graph content, so none of it was on the stage. The bundle carried
+    # those partitions raw, which makes them RESOLVE in the engine but leaves them invisible and
+    # uneditable in a DCC: a weapon's firing data, its unlocks and its soldier's appearance were
+    # shipped as opaque bytes.
+    #
+    # Authored the same way as everything the level graph does not reach, so nothing downstream is
+    # special-cased: each record carries its bf3Entity blob, level_entities.read() picks it up from
+    # anywhere on the stage, and the emitter rewrites the partition only where a record CHANGED.
+    if registry_dir and os.path.isdir(registry_dir):
+        import glob as _rg
+        import level_entities as _le
+
+        reg_parts = sorted(
+            os.path.relpath(f, registry_dir)[:-5].replace(os.sep, '/')
+            for f in _rg.glob(os.path.join(registry_dir, '**', '*.json'), recursive=True))
+
+        if reg_parts:
+            reg_root = UsdGeom.Xform.Define(stage, "/World/Registry")
+            reg_counts, _reg_placed, _reg_graph = _le.author(
+                stage, reg_root, registry_dir, reg_parts)
+            namespaces = {}
+
+            for part in reg_parts:
+                namespaces[part.split('/')[0]] = namespaces.get(part.split('/')[0], 0) + 1
+
+            print("registry     %d instance(s) from %d partition(s) under /World/Registry (%s)"
+                  % (sum(reg_counts.values()), len(reg_parts),
+                     ", ".join("%s %d" % kv for kv in
+                               sorted(namespaces.items(), key=lambda kv: -kv[1]))))
+
     built = missing = 0
     placed = anchored = 0
 
@@ -825,7 +859,8 @@ if __name__ == "__main__":
 
     for flag in ("--meshes", "--corpus", "--chunks", "--textures", "--decals", "--roads",
                  "--terrain", "--layers", "--texture-dir", "--material-dir",
-                 "--ebx-dir", "--parts-list", "--scattering", "--enlighten"):
+                 "--ebx-dir", "--parts-list", "--scattering", "--enlighten",
+                 "--registry-dir"):
         if flag in argv:
             i = argv.index(flag)
             opts[flag.lstrip("-")] = argv[i + 1]
@@ -840,4 +875,5 @@ if __name__ == "__main__":
          roads=opts.get("roads"), terrain=opts.get("terrain"), layers=opts.get("layers"),
          texture_dir=opts.get("texture-dir"), material_dir=opts.get("material-dir"),
          scattering_path=opts.get("scattering"), ebx_dir=opts.get("ebx-dir"),
-         parts_list=opts.get("parts-list"), enlighten_path=opts.get("enlighten"))
+         parts_list=opts.get("parts-list"), enlighten_path=opts.get("enlighten"),
+         registry_dir=opts.get("registry-dir"))

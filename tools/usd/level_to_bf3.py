@@ -788,9 +788,22 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         stage_entities = edits
 
         for part, changes in sorted(edits.items()):
-            src = os.path.join(ebx_dir, part + '.json')
+            # The level's OWN dump first, then the other dumps this export was given.
+            #
+            # /World/Registry carries the 2762 partitions the level's RegistryContainer declares --
+            # weapons, persistence, characters -- and those live in their own dump, not the level's.
+            # Looking only in ebx_dir found none of them, so a weapon edited in a DCC read back off
+            # the stage correctly and was then dropped on the floor here, with nothing said.
+            src = None
 
-            if not os.path.exists(src):
+            for base in _guid_dirs:
+                candidate = os.path.join(base, part + '.json')
+
+                if os.path.exists(candidate):
+                    src = candidate
+                    break
+
+            if src is None:
                 continue
 
             try:
