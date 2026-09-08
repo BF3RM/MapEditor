@@ -142,14 +142,6 @@ def main():
         print('%d partition(s) are not dumped and --rime was not given; they will be skipped'
               % len(need))
 
-    lines = []
-
-    for n in kept:
-        f = os.path.join(args.dump_dir, n.replace('/', '_') + '.bin')
-
-        if os.path.exists(f) and os.path.getsize(f) > 0:
-            lines.append('add_raw_partition %s "%s"' % (n, f))
-
     cmds_path = os.path.join(args.emit_dir, 'build.cmds')
     pristine = cmds_path + '.orig'
 
@@ -159,6 +151,36 @@ def main():
 
     src = [l for l in open(pristine).read().split('\n') if l.strip()]
     src = [l for l in src if args.dump_dir not in l]
+
+    # Never re-carry a partition the emitter already wrote out itself.
+    #
+    # The emitter emits `add_json_partition <name>` for any registry partition a DCC EDITED. This
+    # tool then appended `add_raw_partition <name>` for the same name, from the pristine game dump,
+    # LATER in the same bundle -- and the engine takes the later one. MEASURED end to end: the
+    # A-91's DeployTime edited 0.67 -> 0.125 arrived in the built superbundle as 0.125 and the
+    # running engine still read 0.67. Dropping this one raw line makes the same server read 0.125.
+    #
+    # Silent, and it looked exactly like the game shadowing the mod: the value was demonstrably
+    # right in the .sb and demonstrably wrong in the engine. It is not shadowing -- with BOTH of
+    # our copies removed the engine cannot find the instance at all, so the level bundle is the
+    # only source and this tool was overwriting our own edit.
+    emitted = {l.split(' ', 2)[1] for l in src
+               if l.startswith('add_json_partition ') and len(l.split(' ', 2)) > 1}
+    edited = [n for n in kept if n in emitted]
+    lines = []
+
+    for n in kept:
+        if n in emitted:
+            continue
+
+        f = os.path.join(args.dump_dir, n.replace('/', '_') + '.bin')
+
+        if os.path.exists(f) and os.path.getsize(f) > 0:
+            lines.append('add_raw_partition %s "%s"' % (n, f))
+
+    if edited:
+        print('  %d registry partition(s) left to the emitter, which carries an EDITED copy: %s'
+              % (len(edited), ', '.join(sorted(edited)[:4])))
 
     # build_sb NESTS: the trailing pair closes the bundle then writes the superbundle, so anything
     # appended after them runs in a closed context and is silently discarded.
