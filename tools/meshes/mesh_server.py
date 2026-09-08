@@ -821,7 +821,12 @@ class Meshes:
 
         return verdict
 
-    NOT_COLOUR_SUFFIX = ('_n', '_m', '_nm')
+    # `_s` and `_sp` are SPECULAR. They were missing, and MP_001's crane is what that costs: its
+    # platform shader streams CraneAlphaMask_D, MetalGate_01_S and MetalGate_01_N, the mask and the
+    # normal were both rejected by name, and the specular map was accepted as the platform's base
+    # colour. MEASURED over the level's 4341 colour-slot bindings, exactly 2 end in `_s` and both
+    # are that mistake, so nothing legitimate is lost by refusing them.
+    NOT_COLOUR_SUFFIX = ('_n', '_m', '_nm', '_s', '_sp')
     NOT_COLOUR_WORD = ('mask', 'noise', 'perlin', 'normal')
 
     @classmethod
@@ -848,7 +853,40 @@ class Meshes:
         if verdict is None:
             return True
 
-        return verdict.get('role') == 'colour'
+        # 'data' is the classifier's FALL-THROUGH, not a finding: it is what `role` is left at when
+        # no rule matched. Treating it as a rejection is treating "no rule matched" as evidence,
+        # and it costs real textures -- MEASURED, Litter_01_D (channel correlations .84/.57/.85, a
+        # plain brown photograph) and RoofDome_01_D (.81/.60/.93) both land there, because the
+        # colour test takes the MINIMUM of the three correlations and a strong colour cast
+        # decorrelates one pair below the 0.6 floor. Rejecting them dropped 261 bindings that are
+        # unambiguously colour maps.
+        #
+        # The positive verdicts still refuse: 'splat', 'normal', 'packednormal' and 'detail' are
+        # each something a rule RECOGNISED, and Asphalt_01_D -- a splat map wearing a diffuse
+        # suffix -- is still caught by the one that named it.
+        return verdict.get('role') in ('colour', 'data')
+
+    def is_mesh_colour_map(self, texture):
+        """is_colour_map, for a MESH subset rather than for ground, a decal or a road.
+
+        The 'detail' verdict means "neutral greyscale": on terrain that is a break-up mask and
+        never the ground's colour, which is what the rule was written for. On a mesh it is
+        ordinary -- BF3's concrete, plaster and window maps are frequently neutral to within a
+        few levels, and Textures/Generic/Window_01_D is one of them. Refusing it here painted 32
+        glass subsets grey to protect a terrain case that cannot reach this path.
+
+        A shape that is not a colour map ANYWHERE -- a splat, a tangent-space normal, a packed
+        two-channel normal -- is still refused.
+        """
+        if not self.is_colour_map_by_name(texture):
+            return False
+
+        verdict = self.classify(texture)
+
+        if verdict is None:
+            return True
+
+        return verdict.get('role') not in ('splat', 'normal', 'packednormal')
 
     # Ground materials a terrain layer is plausibly painted with, by BF3's own naming.
     GROUND_WORDS = ('dirt', 'ground', 'sand', 'gravel', 'asphalt', 'concrete', 'rubble',
@@ -1901,7 +1939,7 @@ class Meshes:
                     # The shared rule, so this path cannot take a normal map as a colour map
                     # the way the terrain and road paths no longer can. A `_nm` suffix slipped
                     # through here and painted destruction meshes, bushes and road props violet.
-                    if not self.is_colour_map(candidate):
+                    if not self.is_mesh_colour_map(candidate):
                         continue
 
                     diffuse = candidate
@@ -1917,7 +1955,21 @@ class Meshes:
                 #
                 # If nothing here identifies a diffuse, leave the subset unbound. Untextured is
                 # honest; blue is not.
-                diffuse = next((t for t in textures if t.lower().endswith('_d')), None)
+                # Through the NAME check at least. Without it this line was the hole the whole
+                # file's discipline leaked through: the crane's beams shader streams
+                # MetalPaint_t04_Df and CraneAlphaMask_D, the registers walk correctly refused the
+                # mask, and then this took it anyway -- because the real diffuse ends `_df`, not
+                # `_d`, and the mask does. Painted opaque and DXT1, with no alpha to cut it out,
+                # that mask is the solid GREEN lattice the crane renders as.
+                #
+                # The name check, NOT the full is_colour_map: the pixel classifier is too eager to
+                # be a gate on a last resort. MEASURED -- routing this line through it dropped 397
+                # bindings that are plainly colour maps (RoofDome_01_D, PlasticCrate_01_D,
+                # Litter_01_D, ModernSofa01_D) to buy back the 44 that were wrong. Names are enough
+                # to refuse a mask, and refusing a mask is all this needs to do.
+                diffuse = next((t for t in textures
+                                if t.lower().endswith(('_d', '_df'))
+                                and self.is_colour_map_by_name(t)), None)
 
             if diffuse is None:
                 continue
@@ -1927,6 +1979,20 @@ class Meshes:
 
             materials[index]['Diffuse'] = diffuse
             filled += 1
+
+            # The CUTOUT, where the shader streams one alongside the colour.
+            #
+            # BF3's crane beams are Crane_BeamsAlpha_Shader: MetalPaint_t04_Df for the surface and
+            # CraneAlphaMask_D for the shape. Binding the mask as the colour is the green lattice
+            # this file already warns about, but dropping it entirely is not right either -- the
+            # beams then render as SOLID panels instead of open steelwork. Reported separately so
+            # a consumer can alpha-test with it, which is what the game does.
+            mask = next((t for t in textures
+                         if t is not diffuse
+                         and any(word in t.lower() for word in ('mask', 'alpha'))), None)
+
+            if mask:
+                materials[index]['$alphaMask'] = mask
 
         return filled
 

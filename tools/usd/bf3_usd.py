@@ -398,6 +398,29 @@ def _define_material(stage, path, slots, label, material_ebx=None):
         elif channel == "specular":
             shader.CreateInput("specularColor", Sdf.ValueTypeNames.Color3f).ConnectToSource(out)
 
+    # A CUTOUT the material names explicitly, rather than one packed into the diffuse's alpha.
+    #
+    # BF3's alpha-tested geometry comes in two shapes. Foliage carries the leaf shape in its own
+    # diffuse alpha, handled above. Structural steelwork does not: Crane_BeamsAlpha_Shader streams
+    # MetalPaint_t04_Df for the surface and CraneAlphaMask_D for the shape, as two textures, and
+    # the paint is DXT1 with no alpha at all. With nothing wired the crane renders as SOLID panels
+    # where the game draws open lattice -- the same silhouette error as an untextured bush, just
+    # the other way round from the green mask it used to be painted with.
+    #
+    # The shape is in the mask's RGB, not its alpha: it is a DXT1 greyscale, so `r` is the channel
+    # that carries it.
+    mask_resource = slots.get("$alphaMask")
+
+    if mask_resource and not shader.GetInput("opacity"):
+        mask = UsdShade.Shader.Define(stage, path + "/AlphaMask")
+        mask.CreateIdAttr("UsdUVTexture")
+        mask.CreateInput("file", Sdf.ValueTypeNames.Asset).Set(_texture_asset(mask_resource))
+        mask.GetPrim().SetCustomDataByKey(BF3 + ":resource", str(mask_resource))
+        mask.CreateInput("st", Sdf.ValueTypeNames.Float2).ConnectToSource(st_out)
+        cut = mask.CreateOutput("r", Sdf.ValueTypeNames.Float)
+        shader.CreateInput("opacity", Sdf.ValueTypeNames.Float).ConnectToSource(cut)
+        shader.CreateInput("opacityThreshold", Sdf.ValueTypeNames.Float).Set(0.5)
+
     mat.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
     mat.GetPrim().SetCustomDataByKey(BF3 + ":material", json.dumps(label))
     _author_bf3_shader(stage, mat, path, material_ebx)
