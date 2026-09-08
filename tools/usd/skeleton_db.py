@@ -19,18 +19,23 @@ STATUS, measured
 The five referenced partitions are SAFE to carry raw: with them in the bundle and the record left
 out, the server loads normally (weapons still resolve 60/60, teams intact).
 
-Adding the RECORD kills the server silently -- exit 0, during load, no error. Isolated by testing
-the two independently, so it is the AnimatedSkeletonDatabase instance and not its partitions.
+Adding the RECORD alongside BARE partitions kills the server silently -- exit 0, during load, no
+error. Isolated by testing record and partitions independently.
 
-That is the same signature as the invisible-collision placements and the 1701-partition carry, and
-the pattern across all three is consistent: content the engine INSTANTIATES or resolves eagerly at
-load dies when its dependency closure is absent, while content merely looked up by name (weapons,
-unlocks) is fine as a bare partition. The database's Items name skeleton Assets, a SoldierCollision
-and a Ragdoll; carrying the partitions is not the same as carrying what those partitions themselves
-depend on.
+The cause is the dependency closure, and the fix is to give them one. Carried with
+`reference_existing_partition` instead of `add_raw_partition`, the record loads fine: server LOADED,
+ENTITY static=799, TEAMENT team=2 autoteam=1, weapons still 60/60, and the superbundle grows only
+58.16 MB -> 59.34 MB. That is cheap -- the same command on the gamemode level setup cost 1.4 GB, so
+closure is worth measuring per asset rather than avoiding.
 
-So `--add-record` is opt-in and off by default: the partitions ship (harmless, and they are what a
-DCC needs to see the skeletons), and the record waits until its closure is handled.
+The rule this establishes: content the engine INSTANTIATES or resolves eagerly at load needs its
+closure; content merely looked up by name (weapons, unlocks) is fine as a bare partition. The
+database's Items name skeleton Assets, a SoldierCollision and a Ragdoll, and carrying those
+partitions is not the same as carrying what they themselves depend on.
+
+NOT a universal fix: the 9 invisible-collision PLACEMENTS in the gamemode sub-level still die with
+closure, so a placed physics blueprint fails for a further reason -- most likely the Havok collision
+this export does not rebuild.
 """
 import argparse
 import collections
@@ -84,10 +89,13 @@ def main():
     ap.add_argument('level_json', help='the DESTINATION level partition json to add it to')
     ap.add_argument('--closure', default='/tmp/closure',
                     help='closure dump (files named <partition guid>.json) to resolve ref names')
-    ap.add_argument('--add-record', action='store_true',
-                    help='also write the AnimatedSkeletonDatabase into the level partition. OFF by '
-                         'default: measured, the record kills the server silently at load while its '
-                         'referenced partitions are safe on their own.')
+    ap.add_argument('--add-record', action='store_true', default=True,
+                    help='write the AnimatedSkeletonDatabase into the level partition (default). '
+                         'Its referenced partitions must be carried with '
+                         'reference_existing_partition, not add_raw_partition: with bare partitions '
+                         'the record kills the server silently at load.')
+    ap.add_argument('--no-add-record', dest='add_record', action='store_false',
+                    help='ship the skeleton partitions only, without the database record')
     args = ap.parse_args()
 
     src, path = find_level(args.ebx_dir)
