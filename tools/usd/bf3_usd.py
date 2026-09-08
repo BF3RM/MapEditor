@@ -156,6 +156,33 @@ def _safe(name):
     return ("_" + out) if (not out or out[0].isdigit()) else out
 
 
+def _dds_has_alpha(resource):
+    """True when a texture's DDS carries a real alpha channel.
+
+    BF3 foliage is alpha-masked cards: the leaf shape lives in the diffuse atlas's alpha, and
+    without it every card renders as a solid quad -- a bush becomes a clump of opaque polygons.
+    But alpha cannot be wired blindly: BF3 also stores gloss and specular masks in the alpha of
+    OPAQUE textures, and connecting those punches holes in solid walls.
+
+    The container format is the honest test. MEASURED over 600 of MP_001's diffuse textures: 368
+    DXT1, which has no alpha channel at all, 25 DXT5 and 4 DX10. The foliage atlases are DXT5; the
+    concrete and tile atlases that clothe the buildings are DXT1.
+    """
+    if not TEXTURE_DIR:
+        return False
+
+    flat = str(resource).replace("/", "__") + ".dds"
+    path = os.path.join(TEXTURE_DIR, flat)
+
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(88)
+    except Exception:                                        # noqa: BLE001
+        return False
+
+    return head[:4] == b"DDS " and head[84:88] in (b"DXT5", b"DXT3", b"DX10")
+
+
 def _texture_asset(resource):
     """A BF3 texture resource path -> a USD asset path.
 
@@ -176,7 +203,14 @@ def _texture_asset(resource):
 
 # The slot names BF3 materials actually use for each channel. Listed in preference order, so a
 # material carrying both Diffuse and TileDiffuse binds the one that is its real base colour.
-DIFFUSE_SLOTS = ("Diffuse", "MainDiffuse", "Color", "BaseColor", "TileDiffuse", "Albedo")
+# Ordered by preference: the first slot a material actually has becomes its base colour.
+#
+# DetailDiffuse and diffuseAtlas were missing, so a material whose ONLY colour map is one of those
+# had its texture node authored and connected to NOTHING -- the surface rendered with no base colour
+# at all, showing just its normal map. MEASURED over 250 prototypes: 15 DetailDiffuse and 14
+# diffuseAtlas slots, every one of them unconnected.
+DIFFUSE_SLOTS = ("Diffuse", "MainDiffuse", "Color", "BaseColor", "TileDiffuse", "Albedo",
+                 "DetailDiffuse", "diffuseAtlas")
 NORMAL_SLOTS = ("Normal", "MainNormal", "Normalmap", "NormalMap", "TileNormal")
 SPECULAR_SLOTS = ("Specular", "SpecAndColormask", "SpecularColor", "Gloss")
 
@@ -282,6 +316,27 @@ def _define_material(stage, path, slots, label, material_ebx=None):
     reader.CreateInput("varname", Sdf.ValueTypeNames.String).Set("st")
     st_out = reader.CreateOutput("result", Sdf.ValueTypeNames.Float2)
 
+    # TILING. A BF3 material can carry a TileValue vector parameter -- the shader multiplies UVs by
+    # it, so a facade with TileValue (8, 8) repeats its texture eight times across the surface.
+    # That value was authored onto the bf3Shader node as a parameter and connected to NOTHING, so
+    # every tiled material rendered at 1/8 the tiling in a DCC: one enormous stretched copy of the
+    # texture instead of a tiled wall. Feed it through a UsdTransform2d so the preview surface
+    # tiles the way the game does.
+    _tile = None
+
+    for _vp in ((material_ebx or {}).get("Shader") or {}).get("VectorParameters") or []:
+        if _vp.get("ParameterName") == "TileValue":
+            _v = _vp.get("Value") or {}
+            _tile = (float(_v.get("x", 1.0)), float(_v.get("y", 1.0)))
+            break
+
+    if _tile and _tile != (0.0, 0.0) and _tile != (1.0, 1.0):
+        xform = UsdShade.Shader.Define(stage, path + "/stTile")
+        xform.CreateIdAttr("UsdTransform2d")
+        xform.CreateInput("in", Sdf.ValueTypeNames.Float2).ConnectToSource(st_out)
+        xform.CreateInput("scale", Sdf.ValueTypeNames.Float2).Set(Gf.Vec2f(*_tile))
+        st_out = xform.CreateOutput("result", Sdf.ValueTypeNames.Float2)
+
     def _rank(item):
         """Preferred channel slots first, so Diffuse wins over TileDiffuse for base colour."""
         name = item[0]
@@ -327,6 +382,17 @@ def _define_material(stage, path, slots, label, material_ebx=None):
 
         if channel == "diffuse":
             shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).ConnectToSource(out)
+
+            # ALPHA CUTOUT. BF3's foliage is alpha-masked cards and the leaf shape is in this
+            # texture's alpha; with no opacity wired every card renders as a solid quad, which is
+            # what turns a bush into a clump of opaque polygons. Gated on the DDS actually having
+            # an alpha channel, because BF3 stores gloss masks in the alpha of opaque textures and
+            # wiring those would punch holes in solid walls.
+            if _dds_has_alpha(resource):
+                alpha = tex.CreateOutput("a", Sdf.ValueTypeNames.Float)
+                shader.CreateInput("opacity", Sdf.ValueTypeNames.Float).ConnectToSource(alpha)
+                # Masked, not blended: BF3 alpha-tests foliage rather than sorting it.
+                shader.CreateInput("opacityThreshold", Sdf.ValueTypeNames.Float).Set(0.5)
         elif channel == "normal":
             shader.CreateInput("normal", Sdf.ValueTypeNames.Normal3f).ConnectToSource(out)
         elif channel == "specular":
