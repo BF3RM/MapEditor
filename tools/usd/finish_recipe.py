@@ -97,6 +97,9 @@ def main():
                     help='closure dump keyed by partition guid, for resolving registry names')
     ap.add_argument('--dump-dir', default='/tmp/regparts',
                     help='where the registry partitions are dumped as raw .bin')
+    ap.add_argument('--rime', default=os.environ.get('RIME_BIN',
+                                                     '/home/powos/Projects/Rime/bin/Release'),
+                    help='RimeREPL directory, used to dump any registry partition not dumped yet')
     ap.add_argument('--skip-registry', action='store_true')
     ap.add_argument('--skip-skeletons', action='store_true')
     ap.add_argument('--skip-gamemode', action='store_true')
@@ -132,8 +135,11 @@ def main():
     if not args.skip_registry:
         _drop_pristine(args.emit_dir)
 
+        # Pass --rime so a partition with no dump yet gets one, instead of being skipped with a
+        # note. Without it the recipe silently omits whatever has not been dumped before.
         if not _run('registry_assets.py', [args.emit_dir, args.closure,
-                                           '--dump-dir', args.dump_dir], 'registry'):
+                                           '--dump-dir', args.dump_dir,
+                                           '--rime', args.rime], 'registry'):
             return 1
 
     if not args.skip_skeletons:
