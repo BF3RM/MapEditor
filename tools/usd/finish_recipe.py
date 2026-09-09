@@ -137,9 +137,16 @@ def main():
 
         # Pass --rime so a partition with no dump yet gets one, instead of being skipped with a
         # note. Without it the recipe silently omits whatever has not been dumped before.
-        if not _run('registry_assets.py', [args.emit_dir, args.closure,
-                                           '--dump-dir', args.dump_dir,
-                                           '--rime', args.rime], 'registry'):
+        _reg_args = [args.emit_dir, args.closure, '--dump-dir', args.dump_dir,
+                     '--rime', args.rime]
+
+        # REGISTRY_ALL=1 carries every declared namespace, including the placeable blueprints that
+        # are skipped by default. Kept as a switch rather than a default because the reason they
+        # are skipped is measured: carrying them raw has killed the server.
+        if os.environ.get('REGISTRY_ALL') == '1':
+            _reg_args.append('--all-namespaces')
+
+        if not _run('registry_assets.py', _reg_args, 'registry'):
             return 1
 
     if not args.skip_skeletons:

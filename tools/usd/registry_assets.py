@@ -40,8 +40,19 @@ import os
 import subprocess
 import sys
 
-# Namespaces that are safe to carry raw: the level REFERENCES them, nothing places them.
-SAFE = ('weapons/', 'persistence/')
+# The one namespace that cannot be carried, rather than a list of the ones that can.
+#
+# This was an allow-list of weapons/ and persistence/, which left 64 of MP_001's declared
+# partitions on the floor. Bisected one namespace at a time: architecture, props, vehicles, levels,
+# gameplay, xp_raw, characters, animations, ui, fx and sound ALL load. Only objects/ kills the
+# server -- exit 0 during autoloaded-sublevel entity creation, raw or with its dependency closure,
+# and in either half of the eight entries, so it is the class and not one bad partition. It is the
+# same failure signature as the gamemode's collision placements, which were fixed by placing our
+# own blueprint instead of the game's; the registry declares these rather than placing them, so
+# that fix does not reach them.
+#
+# MEASURED after this: MP_001 carries 1744 of 1752 and the engine resolves all 1744.
+UNSAFE = ('objects/',)
 
 
 def registry_of(part_dir):
@@ -59,16 +70,51 @@ def registry_of(part_dir):
     return None, None
 
 
-def names_for(reg, closure_dir, own_guids):
+def resolve_guids(guids, closure_dir, rime, game):
+    """Dump any partition the closure does not cover, so nothing is left unresolved.
+
+    A registry entry the dump has never seen is invisible: not carried, not skipped, not counted as
+    missing. MEASURED before this, per level: 4 to 64 of them, and the number varied only with how
+    much of that level the closure dump happened to cover. Rime can resolve a partition by guid, so
+    ask it rather than reporting a hole.
+    """
+    missing = [g for g in guids if not os.path.exists(os.path.join(closure_dir, '%s.json' % g))]
+
+    if not missing or not rime:
+        return len(missing)
+
+    os.makedirs(closure_dir, exist_ok=True)
+    recipe = os.path.join(closure_dir, 'resolve.cmds')
+    open(recipe, 'w').write('\n'.join(
+        ['mount_game "%s" Frostbite2_0 true' % game, 'select_game 1']
+        + ['dump_partition_json_by_guid %s "%s"' % (g, os.path.join(closure_dir, '%s.json' % g))
+           for g in missing]) + '\n')
+
+    print('resolving %d guid(s) the closure dump does not cover...' % len(missing))
+
+    env = dict(os.environ)
+    env.setdefault('DOTNET_ROOT', os.path.expanduser('~/.dotnet'))
+    binary = os.path.join(rime, 'RimeREPL') if os.path.isdir(rime) else rime
+    subprocess.run([binary, recipe], check=False, env=env,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    return sum(1 for g in missing
+               if not os.path.exists(os.path.join(closure_dir, '%s.json' % g)))
+
+
+def names_for(reg, closure_dir, own_guids, rime=None, game=None):
     """Partition NAMES the registry declares, resolved through a closure dump keyed by guid."""
+    wanted = [pg for pg in
+              ((ref.get('PartitionGuid') or '').lower()
+               for ref in (reg.get('AssetRegistry') or []) + (reg.get('EntityRegistry') or []))
+              if pg and pg not in own_guids]
+
+    if rime:
+        resolve_guids(sorted(set(wanted)), closure_dir, rime, game)
+
     names, unresolved = set(), 0
 
-    for ref in (reg.get('AssetRegistry') or []) + (reg.get('EntityRegistry') or []):
-        pg = (ref.get('PartitionGuid') or '').lower()
-
-        if not pg or pg in own_guids:
-            continue
-
+    for pg in wanted:
         path = os.path.join(closure_dir, '%s.json' % pg)
 
         if not os.path.exists(path):
@@ -110,8 +156,18 @@ def main():
     own = {(json.load(open(f)).get('PartitionGuid') or '').lower()
            for f in glob.glob(os.path.join(part_dir, '*.json'))}
 
-    names, unresolved = names_for(reg, args.closure_dir, own)
-    kept = names if args.all_namespaces else [n for n in names if n.startswith(SAFE)]
+    names, unresolved = names_for(reg, args.closure_dir, own, args.rime, args.game)
+    # REGISTRY_EXTRA names namespaces to carry ANYWAY, comma separated -- i.e. to override UNSAFE.
+    # A bisecting knob: "all of them kills the server" and "this one kills the server" are
+    # different findings, and only the second one tells you what to fix.
+    _extra = tuple(n.strip().rstrip('/') + '/'
+                   for n in os.environ.get('REGISTRY_EXTRA', '').split(',') if n.strip())
+    _closure_ns = tuple(n.strip().rstrip('/') + '/'
+                        for n in os.environ.get('REGISTRY_CLOSURE', '').split(',') if n.strip())
+
+    kept = (names if args.all_namespaces
+            else [n for n in names
+                  if not n.startswith(UNSAFE) or n.startswith(_extra)])
     skipped = [n for n in names if n not in kept]
 
     print('registry declares %d asset(s) and %d entity(ies)'
@@ -122,7 +178,7 @@ def main():
 
     if skipped:
         by_ns = collections.Counter(n.split('/')[0] for n in skipped)
-        print('  skipped namespaces (placeable blueprints kill the server): %s' % dict(by_ns))
+        print('  skipped namespaces (these kill the server; see UNSAFE): %s' % dict(by_ns))
 
     os.makedirs(args.dump_dir, exist_ok=True)
     need = [n for n in kept
@@ -183,6 +239,15 @@ def main():
             continue
 
         f = os.path.join(args.dump_dir, n.replace('/', '_') + '.bin')
+
+        # REGISTRY_CLOSURE names namespaces to carry WITH their dependency closure instead of as
+        # raw bytes. A raw partition has no dependencies, so a blueprint something instantiates
+        # dies on the first thing it reaches for; closure fixes that and costs whatever the closure
+        # costs, which is why it is per-namespace rather than a global default.
+        if n.startswith(_closure_ns):
+            lines.append('reference_existing_partition %s 1' % n)
+            shipped.append(n)
+            continue
 
         if os.path.exists(f) and os.path.getsize(f) > 0:
             lines.append('add_raw_partition %s "%s"' % (n, f))
