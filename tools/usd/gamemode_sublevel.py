@@ -125,7 +125,7 @@ def collect():
                 bp = (i.get('Blueprint') or {}).get('PartitionGuid') or ''
 
                 if (not bp.lower().startswith('fad987c1')
-                        and os.environ.get('CARRY_MODE', 'min') not in ('refs', 'all')):
+                        and os.environ.get('CARRY_MODE', 'all') not in ('refs', 'all')):
                     continue
 
                 # CARRY_REFS bisects WITHIN the 9 collision placements: a count keeps that many,
@@ -146,10 +146,9 @@ def collect():
 
                         _refs_taken[0] += 1
 
-            # CARRY_MODE bisects the silent exit-0: 'min' = spawns + level-setup ref only (known
-            # good), 'vol' = + the 5 boundary volumes, 'refs' = + the 9 collision refs, 'all' = both.
-            # Default 'vol': spawns + the level-setup reference + the boundary volumes = 49 of the
-            # 59 records, and the server loads it.
+            # CARRY_MODE was a bisecting knob for a silent exit-0 that is now FIXED: 'min' =
+            # spawns + level-setup ref only, 'vol' = + boundary volumes, 'refs' = + the collision
+            # refs, 'all' = both, and 'all' is the default because all 59 records load.
             #
             # The 9 remaining ReferenceObjectData place two INVISIBLE COLLISION blueprints, and
             # carrying them kills the server silently (exit 0) during autoloaded-sublevel entity
@@ -177,7 +176,7 @@ def collect():
             #     too. Not the cause.
             # Still open. The remaining untested difference from vanilla is the Havok collision this
             # export does not rebuild (MOPP is an SDK bake).
-            mode = os.environ.get('CARRY_MODE', 'vol')
+            mode = os.environ.get('CARRY_MODE', 'all')
 
             if t == 'VolumeVectorShapeData' and mode not in ('vol', 'all'):
                 continue
@@ -237,6 +236,81 @@ def _raw_dump(name):
           % (name, RAW_DIR))
 
     return None
+
+
+def _our_blueprints(out_dir):
+    """Blueprint partitions the emitter already wrote, indexed by name.
+
+    -> {name.lower(): (partition guid, primary instance guid)}
+    """
+    index = {}
+
+    for f in glob.glob(os.path.join(out_dir, 'partitions', '*.json')):
+        try:
+            doc = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        primary = (doc.get('Instances') or {}).get(doc.get('PrimaryInstanceGuid') or '')
+
+        if primary and primary.get('$type') == 'ObjectBlueprint' and doc.get('Name'):
+            index[doc['Name'].lower()] = (doc['PartitionGuid'], doc['PrimaryInstanceGuid'])
+
+    return index
+
+
+def _repoint(entities, out_dir):
+    """Place OUR blueprint for a mesh, not the game's original.
+
+    The gamemode's reference objects place the game's own ObjectBlueprints, and the engine dies
+    inside creating one of those -- measured with a hook on EntityFactory:CreateFromBlueprint, on
+    entity 5892 of 5892, with every one of the blueprint's 18 references resolving in the bundle.
+    Meanwhile the MAIN level places the very same collision meshes 823 times through the blueprints
+    this exporter writes, and those work.
+
+    So place ours. The emitter names its blueprint for a mesh `<dir>/blueprint_<mesh leaf>`, so the
+    game blueprint's own mesh reference is enough to find it.
+    """
+    ours = _our_blueprints(out_dir)
+    moved = 0
+
+    for record in entities.values():
+        if record.get('$type') != 'ReferenceObjectData':
+            continue
+
+        doc = _closure_doc((record.get('Blueprint') or {}).get('PartitionGuid'))
+
+        if doc is None:
+            continue
+
+        mesh_name = None
+
+        for instance in (doc.get('Instances') or {}).values():
+            for field in ('Mesh', 'MeshAsset'):
+                target = instance.get(field)
+
+                if isinstance(target, dict) and target.get('PartitionGuid'):
+                    mesh_doc = _closure_doc(target['PartitionGuid'])
+
+                    if mesh_doc and mesh_doc.get('Name'):
+                        mesh_name = mesh_doc['Name']
+
+        if not mesh_name:
+            continue
+
+        head, _, leaf = mesh_name.rpartition('/')
+        found = ours.get(('%s/blueprint_%s' % (head, leaf)).lower())
+
+        if not found:
+            continue
+
+        record['Blueprint'] = {'PartitionGuid': found[0], 'InstanceGuid': found[1]}
+        moved += 1
+
+    if moved:
+        print('  repointed %d placement(s) at our own blueprints' % moved)
+
+    return moved
 
 
 def _refs_for(_unused=None):
@@ -533,6 +607,7 @@ def main():
         return 1
 
     print('carrying %d gameplay record(s) from %s: %s' % (len(entities), SRC_GAMEMODE, dict(seen)))
+    _repoint(entities, out_dir)
 
     if not entities:
         print('nothing to carry -- is the ebx dump present?')
