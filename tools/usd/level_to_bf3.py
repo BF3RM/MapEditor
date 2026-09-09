@@ -13,6 +13,7 @@ What it writes is a Rime command list, the same shape build_dust2 produces.
 """
 import os
 import sys
+import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'havok'))
@@ -575,9 +576,8 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     # EBX for the meshes we ship. A referenced mesh keeps the game's own blueprint, so nothing is
     # authored for it; a changed one needs its mesh asset, its blueprint, and a placement.
     import build_dust2
-    # (json is imported at module scope; a local import here made it a function-local name
-    #  and every earlier use of json raised UnboundLocalError.)
-    import uuid
+    # (json and uuid are imported at module scope; a local import here made the name
+    #  function-local and every EARLIER use in this function raised UnboundLocalError.)
 
     build_dust2.configure(host)
 
@@ -1320,6 +1320,59 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         path = os.path.join(part_dir, 'world.json')
         json.dump(world_json, open(path, 'w'), indent=1)
         cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.WORLD_NAME), path))
+
+    # EVERY LOD chunk, named explicitly, from our own parse of the MeshSet.
+    #
+    # `add_existing_resource_with_chunks` resolves a mesh's chunks by parsing the resource inside
+    # Rime, and that parse fails for a lot of BF3's meshes: MEASURED on MP_001, 271 of 1223
+    # resources throw "offset out of bounds" and fall back to searching chunks by asset-name hash,
+    # which finds SOME of them. The result is 256 of 523 meshes shipping short of their LODs --
+    # roofdome_01 wants 5 chunks and gets 4, box_01_wet wants 2 and gets 1.
+    #
+    # A missing LOD is invisible on a dedicated server, which never fetches render payloads, and is
+    # a livelock on the client: BF3's chunk lookup indexes its own empty-bucket sentinel on a miss
+    # instead of terminating, so the player gets a black screen rather than a missing mesh.
+    #
+    # We do not need Rime's parser for this. meshset.py already read every one of these MeshSets to
+    # build the stage, so the LOD chunk guids are known here, and the corpus dump has the bytes.
+    # Chunks are keyed by guid in the builder, so naming one that was already attached overwrites
+    # it with the same content rather than duplicating it.
+    if os.path.isdir(_chunk_dir):
+        _wanted = []
+
+        for _line in cmds:
+            if not _line.startswith('add_existing_resource_with_chunks '):
+                continue
+
+            _rest = _line[len('add_existing_resource_with_chunks '):]
+            _res = _rest.split('"')[1] if _rest.startswith('"') else _rest.split(' ')[0]
+            _data = index.get(_res.lower())
+
+            if _data is None:
+                continue
+
+            try:
+                _ms = MeshSet.parse(_data)
+            except Exception:                                # noqa: BLE001
+                continue
+
+            for _lod in _ms.lods:
+                _cid = getattr(_lod, 'data_chunk_id', None)
+
+                if not _cid:
+                    continue
+
+                _guid = str(uuid.UUID(bytes_le=_cid))
+                _file = os.path.join(_chunk_dir, '%s.chunk' % _guid)
+
+                if os.path.exists(_file):
+                    _wanted.append('add_chunk %s %s "%s"' % (_guid, _q(_res), _file))
+
+        if _wanted:
+            # Before the trailing build pair, like everything else: build_sb nests, and a line after
+            # them runs in a closed context and is silently dropped.
+            cmds += _wanted
+            print('chunks    %d LOD chunk(s) named explicitly from the corpus dump' % len(_wanted))
 
     cmds += ['build', 'build']
     open(os.path.join(out_dir, 'build.cmds'), 'w').write('\n'.join(cmds) + '\n')
