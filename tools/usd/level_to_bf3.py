@@ -459,7 +459,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 if _i.get('$type') == 'MeshLodGroup':
                     _lod_parts[(_pd.get('PartitionGuid') or '').lower()] = _pd
 
-                if _i.get('$type') in ('RigidMeshAsset', 'MeshAsset') and _pn:
+                # Every mesh asset type, not just the rigid one. MEASURED over MP_001's 527
+                # meshes: 244 are RigidMeshAsset, 91 CompositeMeshAsset and 4 SkinnedMeshAsset,
+                # and all 339 carry a LodGroup ref. Matching only the first two names left the
+                # composites and the skinned meshes on the 100000 placeholder, which never
+                # switches LOD.
+                if _i.get('$type') in ('RigidMeshAsset', 'MeshAsset', 'CompositeMeshAsset',
+                                       'SkinnedMeshAsset') and _pn:
                     _lg = _i.get('LodGroup')
 
                     if isinstance(_lg, dict):
