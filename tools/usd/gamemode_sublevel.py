@@ -45,11 +45,16 @@ CLOSURE = os.environ.get('CLOSURE_DIR', '/tmp/closure')
 # its own level instead of beside MP_001's.
 DST = None
 DST_BUNDLE = None
+WORLD_BUNDLE = None      # the level's OWN sub-level bundle, which wire() must never drop
+
+# The level partition the harness injects. Shared by every build, hence the replace-not-append rule
+# in wire(); overridable so a different harness can point somewhere else.
+LEVEL_JSON = os.environ.get('LEVEL_JSON', '/tmp/TestJson1_usd.json')
 
 
 def _derive(out_dir):
     """The destination sub-level name and bundle, from the recipe the emitter just wrote."""
-    global DST, DST_BUNDLE
+    global DST, DST_BUNDLE, WORLD_BUNDLE
 
     leaf = SRC_GAMEMODE.rsplit('/', 1)[-1]
     world, sb = None, None
@@ -64,6 +69,7 @@ def _derive(out_dir):
         raise SystemExit('could not read the level name / superbundle path out of build.cmds')
 
     # The gamemode sub-level is a SIBLING of the level partition: same namespace, its own leaf.
+    WORLD_BUNDLE = world
     DST = world.rsplit('/', 1)[0] + '/' + leaf
     # And its bundle is a sibling of the superbundle, under the same path.
     DST_BUNDLE = sb.rsplit('/', 1)[0] + '/' + leaf
@@ -430,17 +436,53 @@ def build(entities):
 
 
 def wire(level_json):
-    """Add a second SubWorldReferenceObjectData naming our gamemode bundle."""
+    """Point the level at our gamemode bundle, REPLACING any gamemode it pointed at before.
+
+    This file is shared by every build -- the harness injects the same level partition whichever
+    level is being built -- so appending a reference here accumulates across levels. Building
+    MP_003 added a sub-world reference to `levels/realitymod/squaddeathmatch` and left it there;
+    every MP_001 build afterwards inherited it, and since MP_001's recipe never builds a bundle by
+    that name the engine waited for it forever. That is the "hang at Loading terrain" with a clean
+    build and no error, and it survived clearing the superbundle, rebuilding from a byte-identical
+    recipe, and reverting unrelated work, because none of those touch this file.
+
+    So: drop any sub-world reference to a gamemode in our own namespace that is not the one we are
+    wiring now, then add ours. The level's OWN sub-level (the world bundle) is left alone.
+    """
     d = json.load(open(level_json))
     pg = d['PartitionGuid']
     ins = d['Instances']
+
+    world = DST.rsplit('/', 1)[0] + '/'                      # e.g. levels/realitymod/
+    stale = [g for g, i in ins.items()
+             if i.get('$type') == 'SubWorldReferenceObjectData'
+             and (i.get('BundleName') or '').startswith(world)
+             and i.get('BundleName') not in (DST, WORLD_BUNDLE)]
+
+    for g in stale:
+        name = ins[g].get('BundleName')
+        del ins[g]
+
+        for holder in ins.values():
+            for field in ('Objects', 'ReferenceObjectRegistry'):
+                items = holder.get(field)
+
+                if isinstance(items, list):
+                    holder[field] = [r for r in items
+                                     if not (isinstance(r, dict)
+                                             and (r.get('InstanceGuid') or '').lower() == g.lower())]
+
+        print('dropped a stale sub-world reference to %s' % name)
 
     existing = [i for i in ins.values() if i.get('$type') == 'SubWorldReferenceObjectData']
 
     for e in existing:
         if e.get('BundleName') == DST:
+            if stale:
+                json.dump(d, open(level_json, 'w'), indent=1)
+
             print('level already references %s' % DST)
-            return False
+            return bool(stale)
 
     tmpl = dict(existing[0])
     tmpl['BundleName'] = DST
@@ -567,7 +609,7 @@ def main():
     print('emitted %s (%d instances) and part0 (%d instances)'
           % (DST, len(root['Instances']), len(part['Instances'])))
 
-    wire('/tmp/TestJson1_usd.json')
+    wire(LEVEL_JSON)
     return 0
 
 
