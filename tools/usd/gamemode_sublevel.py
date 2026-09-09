@@ -50,6 +50,7 @@ def collect():
     """Every gameplay record in the source gamemode sub-level, keyed by its own instance guid."""
     out = {}
     seen = collections.Counter()
+    _refs_taken = [0]                                        # mutable, for CARRY_REFS below
 
     for f in glob.glob(os.path.join(EBX, '**', '*.json'), recursive=True):
         try:
@@ -81,6 +82,24 @@ def collect():
                         and os.environ.get('CARRY_MODE', 'min') not in ('refs', 'all')):
                     continue
 
+                # CARRY_REFS bisects WITHIN the 9 collision placements: a count keeps that many,
+                # and a partition-guid prefix keeps only the ones placing that blueprint. "All 9
+                # kill it" and "any one of them kills it" are different findings and the fix is
+                # different for each, so the knob has to reach inside the group.
+                if not bp.lower().startswith('fad987c1'):
+                    _only = os.environ.get('CARRY_REFS_BP', '').lower()
+
+                    if _only and not bp.lower().startswith(_only):
+                        continue
+
+                    _limit = os.environ.get('CARRY_REFS')
+
+                    if _limit is not None:
+                        if _refs_taken[0] >= int(_limit):
+                            continue
+
+                        _refs_taken[0] += 1
+
             # CARRY_MODE bisects the silent exit-0: 'min' = spawns + level-setup ref only (known
             # good), 'vol' = + the 5 boundary volumes, 'refs' = + the 9 collision refs, 'all' = both.
             # Default 'vol': spawns + the level-setup reference + the boundary volumes = 49 of the
@@ -95,9 +114,23 @@ def collect():
             #   * carrying all 16 Havok physics resources they own (already present via the closure,
             #     which is why the superbundle came out byte-identical)
             # Both blueprints are physics objects (HavokAsset x11 and x4, RigidBodyData,
-            # PhysicsEntityData) placed with non-uniform scale, and this export does not rebuild
-            # Havok collision -- MOPP is an SDK bake. That is the most likely remaining cause and it
-            # is the same known limitation already on the ledger.
+            # PhysicsEntityData). Narrowed since, and none of it fixed the exit:
+            #   * A hook on EntityFactory:CreateFromBlueprint names the culprit exactly: the last
+            #     blueprint created is objects/invisiblecollision_01/invisiblecollision_charandveh_
+            #     01_scalable, entity 5892 of 5892, and the engine dies INSIDE creating it.
+            #   * ONE placement is enough; it is not cumulative. Either blueprint alone does it.
+            #   * The scale is UNIFORM 0.2 (right/up/forward all measure 0.2), not non-uniform as
+            #     this comment used to say, and replacing the basis with identity changes nothing.
+            #   * Every one of the blueprint's 18 external references resolves inside the built
+            #     superbundle -- checked by mounting it alone and dumping all 3407 partitions.
+            #   * Our re-emitted mesh partition shares its name with the closure's copy, and giving
+            #     ours the shipped INSTANCE guids (a real bug, fixed) did not change it. Nor did
+            #     removing our copies from the main bundle entirely.
+            #   * It names Physics_9_Win32, which exists nowhere in the game -- but MP_001's own
+            #     bundle ships only 9 of the 11 HavokAssets either, so vanilla loads it with gaps
+            #     too. Not the cause.
+            # Still open. The remaining untested difference from vanilla is the Havok collision this
+            # export does not rebuild (MOPP is an SDK bake).
             mode = os.environ.get('CARRY_MODE', 'vol')
 
             if t == 'VolumeVectorShapeData' and mode not in ('vol', 'all'):

@@ -439,8 +439,24 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             if _n and _pg:
                 build_dust2.SHIPPED_GUIDS.setdefault(_n, _pg)
 
-        print('guids     %d shipped partition name(s) will keep their own guid'
-              % len(build_dust2.SHIPPED_GUIDS))
+                # And the INSTANCE guids inside it, in the order the partition stores them.
+                #
+                # A re-emitted partition that keeps the shipped name and partition guid but invents
+                # its instance guids is a different partition wearing the same address: a game
+                # blueprint placing that mesh names (partition, instance) and the instance half no
+                # longer exists. Recorded per type so mesh_partition can hand each record back the
+                # guid the game gave it.
+                if _n not in build_dust2.SHIPPED_INSTANCES:
+                    _by_type = {}
+
+                    for _ig, _inst in (_d.get('Instances') or {}).items():
+                        _by_type.setdefault(_inst.get('$type') or '?', []).append(_ig)
+
+                    build_dust2.SHIPPED_INSTANCES[_n] = _by_type
+
+        print('guids     %d shipped partition name(s) will keep their own guid, '
+              '%d also their instance guids'
+              % (len(build_dust2.SHIPPED_GUIDS), len(build_dust2.SHIPPED_INSTANCES)))
 
         # Second pass: each shipped mesh's own MeshLodGroup VALUES, so a re-emitted mesh keeps its
         # LOD distances instead of the 100000 placeholder that never switches LOD. Only the handful

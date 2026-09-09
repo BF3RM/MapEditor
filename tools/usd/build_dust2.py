@@ -141,6 +141,24 @@ SHIPPED_GUIDS = {}
 # (MEASURED: shipped lodgroups cluster on 20/40/70/100/150, and one mesh carries 3 LOD chunks).
 SHIPPED_LODGROUPS = {}
 
+# partition name -> {record type: [instance guid, ...]}, for a partition the game already ships.
+#
+# Keeping the shipped PARTITION guid is not enough. A game blueprint that places one of these
+# meshes references it as (partition guid, INSTANCE guid), and our re-emitted partition wins that
+# name -- so if the instances inside carry fresh guids the reference resolves to nothing and the
+# placement dies. MEASURED: objects/invisiblecharactercollision_01/charactercollision_01_Mesh keeps
+# the shipped partition guid 6508ebc8 and gave its RigidMeshAsset 9179a57f where the game ships
+# 54e84e85, and placing that blueprint in the gamemode sub-level exited the server rc=0 with
+# nothing logged.
+SHIPPED_INSTANCES = {}
+
+
+def shipped_instance(name, kind, index=0, fallback=None):
+    """The guid the game gives instance `index` of `kind` in partition `name`, if it ships one."""
+    got = (SHIPPED_INSTANCES.get(name.lower()) or {}).get(kind) or []
+
+    return got[index] if index < len(got) else fallback
+
 
 def partition_guid(name):
     """The shipped guid for `name` if the game ships one, else a stable derived guid."""
@@ -633,13 +651,21 @@ def mesh_partition(material_names, material_ebx=None):
     stage rather than the template below -- so a level keeps its own 252 shader graphs instead of
     being flattened onto one."""
     pg = partition_guid(MESH_NAME)
-    mesh_g = guid('instance', MESH_NAME, 'asset')
-    lod_g = guid('instance', MESH_NAME, 'lodgroup')
+    # The shipped instance guids where the game ships this partition, so a game blueprint that
+    # places this mesh still resolves the asset it names. See SHIPPED_INSTANCES.
+    mesh_g = (shipped_instance(MESH_NAME, 'RigidMeshAsset')
+              or shipped_instance(MESH_NAME, 'MeshAsset')
+              or shipped_instance(MESH_NAME, 'CompositeMeshAsset')
+              or shipped_instance(MESH_NAME, 'SkinnedMeshAsset')
+              or guid('instance', MESH_NAME, 'asset'))
+    lod_g = (shipped_instance(MESH_NAME, 'MeshLodGroup')
+             or guid('instance', MESH_NAME, 'lodgroup'))
     instances = {}
     material_guids = []
 
     for i, name in enumerate(material_names):
-        g = guid('instance', MESH_NAME, 'material', i, name)
+        g = (shipped_instance(MESH_NAME, 'MeshMaterial', i)
+             or guid('instance', MESH_NAME, 'material', i, name))
         material_guids.append(g)
 
         if material_ebx and i < len(material_ebx) and material_ebx[i]:

@@ -108,6 +108,22 @@ def main():
         print('no build.cmds under %s -- run the emitter first' % args.emit_dir)
         return 1
 
+    # Keep our OWN copy of the emitter's output, and start every run from it.
+    #
+    # Without this, running twice appends a second registry carry to an already-finished recipe:
+    # both downstream tools treat whatever build.cmds holds as pristine, and after one run that is
+    # no longer the emitter's output. Re-running to change one thing -- CARRY_MODE, say -- would
+    # then double 1688 partitions and the failure would look like a content problem.
+    emitted = os.path.join(args.emit_dir, 'build.cmds.emitted')
+
+    if not os.path.exists(emitted):
+        import shutil
+        shutil.copy(path, emitted)
+    else:
+        import shutil
+        shutil.copy(emitted, path)
+        print('restored the emitter recipe (this directory was finished before)')
+
     print('recipe %d line(s) from the emitter' % len(_lines(path)))
 
     # ORDER MATTERS, and it is the order the bundle needs them in, not a preference: the registry's
