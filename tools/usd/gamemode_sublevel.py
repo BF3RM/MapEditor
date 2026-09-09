@@ -273,14 +273,20 @@ def _repoint(entities, out_dir):
     """
     ours = _our_blueprints(out_dir)
     moved = 0
+    unplaceable = set()
 
-    for record in entities.values():
+    for key, record in entities.items():
         if record.get('$type') != 'ReferenceObjectData':
             continue
 
         doc = _closure_doc((record.get('Blueprint') or {}).get('PartitionGuid'))
 
         if doc is None:
+            # We cannot see what this places, so we cannot know it is safe to place. Placing the
+            # game's own blueprint is the failure this whole function exists to avoid, so an
+            # unresolvable one is dropped rather than gambled on. MEASURED: MP_003's 17 reference
+            # objects resolve through no closure dump we have, and carrying them hangs the load.
+            unplaceable.add(key)
             continue
 
         mesh_name = None
@@ -296,19 +302,33 @@ def _repoint(entities, out_dir):
                         mesh_name = mesh_doc['Name']
 
         if not mesh_name:
-            continue
+            continue                                         # no geometry: a level setup, keep it
 
         head, _, leaf = mesh_name.rpartition('/')
         found = ours.get(('%s/blueprint_%s' % (head, leaf)).lower())
 
         if not found:
+            unplaceable.add(key)
             continue
 
         record['Blueprint'] = {'PartitionGuid': found[0], 'InstanceGuid': found[1]}
         moved += 1
 
-    if moved:
-        print('  repointed %d placement(s) at our own blueprints' % moved)
+    # A placement we could NOT repoint would place the game's own blueprint, and that is the thing
+    # that kills the server during sub-level entity creation. Drop it rather than ship a level that
+    # does not load. MEASURED: MP_003's gamemode has 17 reference objects and none of their meshes
+    # are in our export, so carrying them hangs the load; dropping them, it loads.
+    #
+    # A reference object with no mesh at all is a different animal -- the level SETUP is one, it is
+    # never instantiated as geometry, and it carries the teams. Those stay.
+    dropped = [g for g, r in entities.items() if g in unplaceable]
+
+    for g in dropped:
+        del entities[g]
+
+    if moved or dropped:
+        print('  repointed %d placement(s) at our own blueprints, dropped %d with no blueprint of '
+              'ours to place' % (moved, len(dropped)))
 
     return moved
 
@@ -606,8 +626,10 @@ def main():
         print('  set GAMEMODE_SRC to one of them.')
         return 1
 
-    print('carrying %d gameplay record(s) from %s: %s' % (len(entities), SRC_GAMEMODE, dict(seen)))
+    # After the repoint, so the count is what actually ships rather than what was collected.
     _repoint(entities, out_dir)
+    seen = collections.Counter(i.get('$type') for i in entities.values())
+    print('carrying %d gameplay record(s) from %s: %s' % (len(entities), SRC_GAMEMODE, dict(seen)))
 
     if not entities:
         print('nothing to carry -- is the ebx dump present?')
