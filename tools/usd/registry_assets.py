@@ -52,7 +52,13 @@ import sys
 # that fix does not reach them.
 #
 # MEASURED after this: MP_001 carries 1744 of 1752 and the engine resolves all 1744.
-UNSAFE = ('objects/',)
+# Bisected to the individual partition. Five of MP_001's eight objects/ entries carry fine --
+# ashtray, ceiling light, iraq lamp, both plastic crates. These three do not, and all three are
+# things the level ALSO places through our own blueprints, which is the conflict repoint_registry
+# resolves where it can.
+UNSAFE = ('objects/oilbarrel_01/',
+          'objects/vegetation/bushazalea_m_01/',
+          'objects/vegetation/treelinden_l_01/')
 
 
 def registry_of(part_dir):
@@ -65,9 +71,9 @@ def registry_of(part_dir):
 
         for inst in (doc.get('Instances') or {}).values():
             if inst.get('$type') == 'RegistryContainer' and inst.get('AssetRegistry'):
-                return inst, doc
+                return inst, doc, f
 
-    return None, None
+    return None, None, None
 
 
 def resolve_guids(guids, closure_dir, rime, game):
@@ -132,6 +138,120 @@ def names_for(reg, closure_dir, own_guids, rime=None, game=None):
     return sorted(names), unresolved
 
 
+def our_blueprints(part_dir):
+    """{blueprint partition name: (partition guid, primary instance guid)} for what we emit."""
+    index = {}
+
+    for f in glob.glob(os.path.join(part_dir, '*.json')):
+        try:
+            doc = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        primary = (doc.get('Instances') or {}).get(doc.get('PrimaryInstanceGuid') or '')
+
+        if primary and primary.get('$type') == 'ObjectBlueprint' and doc.get('Name'):
+            index[doc['Name'].lower()] = (doc['PartitionGuid'], doc['PrimaryInstanceGuid'])
+
+    return index
+
+
+def _mesh_of(doc, closure_dir):
+    """The mesh partition NAME a blueprint points at, through any field that names one."""
+    for instance in (doc.get('Instances') or {}).values():
+        for field in ('Mesh', 'MeshAsset'):
+            target = instance.get(field)
+
+            if not isinstance(target, dict) or not target.get('PartitionGuid'):
+                continue
+
+            path = os.path.join(closure_dir, '%s.json' % target['PartitionGuid'].lower())
+
+            if os.path.exists(path):
+                try:
+                    name = json.load(open(path)).get('Name')
+                except Exception:                            # noqa: BLE001
+                    continue
+
+                if name:
+                    return name
+
+    return None
+
+
+def repoint_registry(reg, doc, part_dir, closure_dir, rime, game):
+    """Point registry entries at OUR blueprint wherever we emit one for the same mesh.
+
+    Three of MP_001's declared objects/ partitions kill the server when carried -- the oil barrel
+    and two vegetation blueprints -- and they are all things the level ALSO places through the
+    blueprints this exporter writes. Carrying the game's copy alongside ours puts two blueprints in
+    the bundle for one object, and the placement finds the game's, which has no closure.
+
+    Same fix as the gamemode sub-level: name ours. An entry that repoints needs no copy of the
+    game's partition at all, because ours is already in the bundle.
+
+    Returns the set of names that were repointed.
+    """
+    ours = our_blueprints(part_dir)
+
+    if not ours:
+        return set()
+
+    # The mesh a blueprint names may itself be outside the closure dump; resolve those first.
+    wanted = []
+
+    for ref in (reg.get('AssetRegistry') or []) + (reg.get('EntityRegistry') or []):
+        path = os.path.join(closure_dir, '%s.json' % (ref.get('PartitionGuid') or '').lower())
+
+        if not os.path.exists(path):
+            continue
+
+        try:
+            bp = json.load(open(path))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        for instance in (bp.get('Instances') or {}).values():
+            for field in ('Mesh', 'MeshAsset'):
+                target = instance.get(field)
+
+                if isinstance(target, dict) and target.get('PartitionGuid'):
+                    wanted.append(target['PartitionGuid'].lower())
+
+    if wanted and rime:
+        resolve_guids(sorted(set(wanted)), closure_dir, rime, game)
+
+    moved = set()
+
+    for ref in (reg.get('AssetRegistry') or []) + (reg.get('EntityRegistry') or []):
+        path = os.path.join(closure_dir, '%s.json' % (ref.get('PartitionGuid') or '').lower())
+
+        if not os.path.exists(path):
+            continue
+
+        try:
+            bp = json.load(open(path))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        name = bp.get('Name')
+        mesh = _mesh_of(bp, closure_dir)
+
+        if not name or not mesh:
+            continue
+
+        head, _, leaf = mesh.rpartition('/')
+        found = ours.get(('%s/blueprint_%s' % (head, leaf)).lower())
+
+        if not found:
+            continue
+
+        ref['PartitionGuid'], ref['InstanceGuid'] = found
+        moved.add(name)
+
+    return moved
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -147,16 +267,6 @@ def main():
     args = ap.parse_args()
 
     part_dir = os.path.join(args.emit_dir, 'partitions')
-    reg, _doc = registry_of(part_dir)
-
-    if reg is None:
-        print('no populated RegistryContainer under %s' % part_dir)
-        return 1
-
-    own = {(json.load(open(f)).get('PartitionGuid') or '').lower()
-           for f in glob.glob(os.path.join(part_dir, '*.json'))}
-
-    names, unresolved = names_for(reg, args.closure_dir, own, args.rime, args.game)
     # REGISTRY_EXTRA names namespaces to carry ANYWAY, comma separated -- i.e. to override UNSAFE.
     # A bisecting knob: "all of them kills the server" and "this one kills the server" are
     # different findings, and only the second one tells you what to fix.
@@ -165,6 +275,67 @@ def main():
     _closure_ns = tuple(n.strip().rstrip('/') + '/'
                         for n in os.environ.get('REGISTRY_CLOSURE', '').split(',') if n.strip())
 
+    reg, _doc, _doc_path = registry_of(part_dir)
+
+    if reg is None:
+        print('no populated RegistryContainer under %s' % part_dir)
+        return 1
+
+    own = {(json.load(open(f)).get('PartitionGuid') or '').lower()
+           for f in glob.glob(os.path.join(part_dir, '*.json'))}
+
+    # Repoint before resolving names: an entry now pointing at one of ours needs no copy of the
+    # game's partition, so it must not appear in the carry list at all.
+    moved = repoint_registry(reg, _doc, part_dir, args.closure_dir, args.rime, args.game)
+
+    if moved:
+        json.dump(_doc, open(_doc_path, 'w'), indent=1)
+        print('repointed %d registry entry(ies) at our own blueprints' % len(moved))
+
+    names, unresolved = names_for(reg, args.closure_dir, own, args.rime, args.game)
+    names = [n for n in names if n not in moved]
+
+    # A registry that declares what the bundle does not ship is what makes the engine reach for it.
+    #
+    # objects/oilbarrel_01 is the last partition we cannot carry -- a BangerEntityData with its own
+    # explosion, physics and health states, which exits the server rc=0 whether it is carried raw
+    # or with its full dependency closure, and which this level never places. Leaving the
+    # declaration in place while omitting the partition is the worst of both: the level advertises
+    # an asset that is not there. Drop the declaration instead, so what the level declares and what
+    # it ships are the same set.
+    _drop = {n.lower() for n in names if n.startswith(UNSAFE) and not n.startswith(_extra)}
+    _dropped = 0
+
+    if _drop:
+        for _field in ('AssetRegistry', 'EntityRegistry'):
+            _kept = []
+
+            for _ref in (reg.get(_field) or []):
+                _path = os.path.join(args.closure_dir,
+                                     '%s.json' % (_ref.get('PartitionGuid') or '').lower())
+                _name = None
+
+                if os.path.exists(_path):
+                    try:
+                        _name = (json.load(open(_path)).get('Name') or '').lower()
+                    except Exception:                        # noqa: BLE001
+                        _name = None
+
+                if _name and _name in _drop:
+                    _dropped += 1
+                    continue
+
+                _kept.append(_ref)
+
+            if reg.get(_field) is not None:
+                reg[_field] = _kept
+
+        if _dropped:
+            json.dump(_doc, open(_doc_path, 'w'), indent=1)
+            print('dropped %d declaration(s) for partitions we cannot carry, so the registry '
+                  'declares exactly what ships' % _dropped)
+
+        names = [n for n in names if n.lower() not in _drop]
     kept = (names if args.all_namespaces
             else [n for n in names
                   if not n.startswith(UNSAFE) or n.startswith(_extra)])
