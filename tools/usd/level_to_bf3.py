@@ -452,6 +452,21 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                     for _ig, _inst in (_d.get('Instances') or {}).items():
                         _by_type.setdefault(_inst.get('$type') or '?', []).append(_ig)
 
+                    # MeshMaterials in MATERIAL-INDEX order, which is the mesh asset's own
+                    # `Materials` array -- not the order the dump happens to list instances in.
+                    # MEASURED on the crane: its Materials array runs metal, beams, glass, grating,
+                    # concrete, platform, sign while the dump lists them in a different order
+                    # entirely, so handing material i the i-th dumped guid mismatches every subset.
+                    _asset = next((_i for _i in (_d.get('Instances') or {}).values()
+                                   if (_i.get('$type') or '').endswith('MeshAsset')), None)
+
+                    if _asset and isinstance(_asset.get('Materials'), list):
+                        _ordered = [(_m or {}).get('InstanceGuid') for _m in _asset['Materials']]
+                        _ordered = [_g for _g in _ordered if _g]
+
+                        if _ordered:
+                            _by_type['MeshMaterial'] = _ordered
+
                     build_dust2.SHIPPED_INSTANCES[_n] = _by_type
 
         print('guids     %d shipped partition name(s) will keep their own guid, '

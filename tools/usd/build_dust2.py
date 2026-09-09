@@ -153,8 +153,24 @@ SHIPPED_LODGROUPS = {}
 SHIPPED_INSTANCES = {}
 
 
+# OFF by default, and the measurement is why.
+#
+# Reusing the shipped instance guids is correct in principle -- a game blueprint that places one of
+# our re-emitted meshes names (partition guid, INSTANCE guid), and with fresh instance guids the
+# second half resolves to nothing. But turning it on takes MP_001 from Level:Loaded to hanging at
+# "Loading terrain", with the build still clean, and ordering the materials by the mesh asset's own
+# Materials array (which IS the right order -- the dump lists them differently) does not change it.
+# So something else in the level still expects our derived guids and has not been found yet.
+#
+# The map is built either way, so USD_SHIPPED_INSTANCES=1 re-runs the experiment in one step.
+USE_SHIPPED_INSTANCES = os.environ.get('USD_SHIPPED_INSTANCES') == '1'
+
+
 def shipped_instance(name, kind, index=0, fallback=None):
     """The guid the game gives instance `index` of `kind` in partition `name`, if it ships one."""
+    if not USE_SHIPPED_INSTANCES:
+        return fallback
+
     got = (SHIPPED_INSTANCES.get(name.lower()) or {}).get(kind) or []
 
     return got[index] if index < len(got) else fallback

@@ -23,12 +23,52 @@ import collections
 import glob
 import json
 import os
+import subprocess
 import sys
 import uuid
 
-SRC_GAMEMODE = 'levels/mp_001/team_deathmatch'
-DST = 'levels/realitymod/team_deathmatch'
-EBX = '/tmp/mp001ebx'
+# Which gamemode sub-level to copy the gameplay records out of, and where its EBX dump lives.
+#
+# Both were hardcoded to MP_001, which meant this tool -- and therefore teams and spawns -- worked
+# for exactly one level. Overridable so a second level can be built without editing the file; the
+# defaults keep MP_001 behaving exactly as before.
+SRC_GAMEMODE = os.environ.get('GAMEMODE_SRC', 'levels/mp_001/team_deathmatch')
+EBX = os.environ.get('GAMEMODE_EBX', '/tmp/mp001ebx')
+CLOSURE = os.environ.get('CLOSURE_DIR', '/tmp/closure')
+
+# DST and the bundle it goes in are READ OUT OF THE RECIPE, not written down here.
+#
+# They were `levels/realitymod/team_deathmatch` and `Win32/Levels/REALITYMOD/team_deathmatch`, so
+# this tool only worked for one level under one mod name. The emitter already states both facts in
+# the recipe it wrote -- `build_sb <superbundle path>` and the world partition's own name -- and
+# taking them from there means a level called anything, under a mod called anything, lands beside
+# its own level instead of beside MP_001's.
+DST = None
+DST_BUNDLE = None
+
+
+def _derive(out_dir):
+    """The destination sub-level name and bundle, from the recipe the emitter just wrote."""
+    global DST, DST_BUNDLE
+
+    leaf = SRC_GAMEMODE.rsplit('/', 1)[-1]
+    world, sb = None, None
+
+    for line in open(os.path.join(out_dir, 'build.cmds')):
+        if line.startswith('build_sb '):
+            sb = line.split(' ')[1].strip()
+        elif line.startswith('add_json_partition ') and 'world.json"' in line:
+            world = line.split(' ')[1].strip('"')
+
+    if world is None or sb is None:
+        raise SystemExit('could not read the level name / superbundle path out of build.cmds')
+
+    # The gamemode sub-level is a SIBLING of the level partition: same namespace, its own leaf.
+    DST = world.rsplit('/', 1)[0] + '/' + leaf
+    # And its bundle is a sibling of the superbundle, under the same path.
+    DST_BUNDLE = sb.rsplit('/', 1)[0] + '/' + leaf
+
+    return DST, DST_BUNDLE
 
 # The gameplay records worth carrying. AlternateSpawnEntityData is the spawn mechanism TDM
 # actually uses -- character/vehicle spawn reference objects appear only in rush, squad_rush and
@@ -142,6 +182,179 @@ def collect():
     return out, seen
 
 
+def _closure_doc(partition_guid):
+    """The closure dump's copy of a partition, by guid."""
+    path = os.path.join(CLOSURE, '%s.json' % (partition_guid or '').lower())
+
+    if not os.path.exists(path):
+        return None
+
+    try:
+        return json.load(open(path))
+    except Exception:                                        # noqa: BLE001
+        return None
+
+
+RIME = os.environ.get('RIME_BIN', '/home/powos/Projects/Rime/bin/Release')
+GAME = os.environ.get('BF3_PATH',
+                      '/home/powos/.local/share/Steam/steamapps/common/Battlefield 3')
+RAW_DIR = os.environ.get('RAW_DUMP_DIR', '/tmp/rawparts')
+
+
+def _raw_dump(name):
+    """The partition's raw bytes on disk, dumped with Rime the first time they are asked for."""
+    path = os.path.join(RAW_DIR, name.replace('/', '_') + '.bin')
+
+    if os.path.exists(path) and os.path.getsize(path) > 0:
+        return path
+
+    os.makedirs(RAW_DIR, exist_ok=True)
+    recipe = os.path.join(RAW_DIR, 'dump.cmds')
+    open(recipe, 'w').write('\n'.join([
+        'mount_game "%s" Frostbite2_0 true' % GAME,
+        'select_game 1',
+        'dump_partition %s "%s"' % (name, path),
+    ]) + '\n')
+
+    # DOTNET_ROOT, or the apphost cannot find the runtime and exits without dumping anything --
+    # which reads exactly like "the partition does not exist".
+    env = dict(os.environ)
+    env.setdefault('DOTNET_ROOT', os.path.expanduser('~/.dotnet'))
+
+    subprocess.run([os.path.join(RIME, 'RimeREPL'), recipe], check=False, env=env,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    if os.path.exists(path) and os.path.getsize(path) > 0:
+        return path
+
+    print('  could not dump %s -- set RIME_BIN/BF3_PATH, or pre-dump it into %s'
+          % (name, RAW_DIR))
+
+    return None
+
+
+def _refs_for(_unused=None):
+    """Everything the gamemode's reference objects point OUTSIDE this sub-level.
+
+    Read from EVERY ReferenceObjectData in the source gamemode, not just the ones CARRY_MODE keeps.
+    The blueprints and Havok resources they name are needed whether or not their placements ride
+    along: the MAIN level places the same invisible-collision meshes 823 times over. Deriving from
+    the carried subset alone dropped them at the default carry mode and the level stopped loading --
+    the old hardcoded list had them unconditionally, which hid the distinction.
+
+    These used to be three hardcoded lists -- one level-setup partition, two collision blueprints
+    and a file of physics resource names -- which is to say, MP_001's team_deathmatch written down.
+    Every one of them is derivable from the ReferenceObjectData being carried, so derive it.
+
+    The split is by what the partition is FOR, and that distinction is measured, not stylistic:
+
+      * A level SETUP only has to EXIST for its AutoTeamEntityData and TeamEntityData to register,
+        so its own content is enough -- and it must NOT be given a closure, which reaches soldiers
+        and weapons and took the superbundle from 49 MB to 1.48 GB.
+      * A PLACED blueprint is instantiated, so it needs its dependency closure; a placement of a
+        bare partition dies on its unresolved dependencies.
+      * A placed PHYSICS blueprint needs its Havok RESOURCE as well as its partition. With the
+        partition present and the resource absent the placement killed the server silently, the
+        same shape as a mesh header resolving while its chunk does not.
+    """
+    setups, placed, physics = [], [], []
+    source = []
+
+    for f in glob.glob(os.path.join(EBX, '**', '*.json'), recursive=True):
+        try:
+            doc = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        if not (doc.get('Name') or '').startswith(SRC_GAMEMODE):
+            continue
+
+        source += [i for i in (doc.get('Instances') or {}).values()
+                   if i.get('$type') == 'ReferenceObjectData']
+
+    for record in source:
+
+        guid_of = (record.get('Blueprint') or {}).get('PartitionGuid')
+        doc = _closure_doc(guid_of)
+
+        if doc is None:
+            continue
+
+        name = doc.get('Name')
+
+        if not name:
+            continue
+
+        # A level setup declares teams and is never instantiated; anything else here is placed.
+        kinds = {i.get('$type') for i in (doc.get('Instances') or {}).values()}
+
+        if kinds & {'LevelSetupData', 'AutoTeamEntityData', 'TeamEntityData'}:
+            if name not in setups:
+                setups.append(name)
+
+            continue
+
+        if name not in placed:
+            placed.append(name)
+
+        # The RESOURCES this blueprint's payload comes from: its Havok collision, named directly
+        # by its HavokAsset records, and the MESH its model entity points at -- which is named by
+        # the mesh PARTITION it references, not by anything in the blueprint itself.
+        #
+        # Missing the mesh resource is not cosmetic. The recipe that loads carries
+        # charactercollision_01_mesh and invisiblecollision_charandveh_01_scalable_mesh alongside
+        # the physics; deriving only the Havok names dropped both, and the level stopped loading.
+        for instance in (doc.get('Instances') or {}).values():
+            if instance.get('$type') == 'HavokAsset' and instance.get('Name'):
+                if instance['Name'] not in physics:
+                    physics.append(instance['Name'])
+
+            for field in ('Mesh', 'MeshAsset'):
+                target = instance.get(field)
+
+                if not isinstance(target, dict) or not target.get('PartitionGuid'):
+                    continue
+
+                mesh_doc = _closure_doc(target['PartitionGuid'])
+
+                if mesh_doc and mesh_doc.get('Name') and mesh_doc['Name'] not in physics:
+                    physics.append(mesh_doc['Name'])
+
+    lines = []
+    # RAW bytes for a level setup, not a partition rebuilt from a JSON dump.
+    #
+    # add_json_partition re-serialises it under the game's own name, which makes it OUR partition
+    # wearing that address -- and MEASURED, that is enough to stop the level loading: the same
+    # build that loads with a raw copy hangs at "Loading terrain" with a re-serialised one.
+    lines += ['add_raw_partition %s "%s"' % (n, f)
+              for n, f in ((n, _raw_dump(n)) for n in setups) if f]
+    lines += ['reference_existing_partition %s 1' % n for n in placed]
+    lines += ['add_existing_resource_with_chunks %s 1' % n for n in physics]
+
+    print('  refs: %d level setup(s), %d placed blueprint(s), %d physics resource(s)'
+          % (len(setups), len(placed), len(physics)))
+
+    return lines
+
+
+_NAME_TO_GUID = {}
+
+
+def _guid_of_name(name):
+    """The closure dump's partition guid for a name, indexed once."""
+    if not _NAME_TO_GUID:
+        for f in glob.glob(os.path.join(CLOSURE, '*.json')):
+            try:
+                doc = json.load(open(f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            if doc.get('Name'):
+                _NAME_TO_GUID[doc['Name'].lower()] = os.path.basename(f)[:-5]
+
+    return _NAME_TO_GUID.get((name or '').lower())
+
+
 def build(entities):
     pg = guid('partition', DST)
     swd = guid('instance', DST, 'subworld')
@@ -251,8 +464,32 @@ def wire(level_json):
 
 
 def main():
-    out_dir = sys.argv[1] if len(sys.argv) > 1 else '/tmp/emit_small'
+    if len(sys.argv) < 2:
+        print('usage: gamemode_sublevel.py <emit dir>   '
+              '[GAMEMODE_SRC=levels/<map>/<gamemode>] [GAMEMODE_EBX=<dump>] [CLOSURE_DIR=<dump>]')
+        return 2
+
+    out_dir = sys.argv[1]
+    # Read the destination name and bundle out of the recipe before anything uses them.
+    _derive(out_dir)
+    print('emitting %s into bundle %s' % (DST, DST_BUNDLE))
     entities, seen = collect()
+
+    # An empty carry is not a level without gameplay, it is the wrong source name. Levels do not
+    # all ship the same gamemodes -- MP_001 has team_deathmatch, MP_003 has squaddeathmatch,
+    # conquestsmall, conquestlarge, rush3 and squadrush and no team_deathmatch at all -- and asking
+    # for one that is not there used to carry nothing and say so only in the record count.
+    if not entities:
+        import glob as _g
+        _here = os.path.dirname(SRC_GAMEMODE)
+        _found = sorted(os.path.relpath(f, EBX)[:-5].replace(os.sep, '/')
+                        for f in _g.glob(os.path.join(EBX, _here, '*.json')))
+        print('NO gameplay records under %s.' % SRC_GAMEMODE)
+        print('  sub-levels dumped beside it: %s'
+              % (', '.join(n.rsplit('/', 1)[-1] for n in _found) or '(none)'))
+        print('  set GAMEMODE_SRC to one of them.')
+        return 1
+
     print('carrying %d gameplay record(s) from %s: %s' % (len(entities), SRC_GAMEMODE, dict(seen)))
 
     if not entities:
@@ -317,20 +554,14 @@ def main():
     # of a raw partition dies on its unresolved dependencies: MEASURED, carrying those 9 refs with
     # raw blueprints exits the server rc=0 silently during autoloaded-sublevel entity creation,
     # while dropping them loads fine. A placed blueprint needs its closure.
-    refs = (['add_raw_partition gameplay/level_setups/complete_setup/full_teamdeathmatch '
-             '"/tmp/full_teamdeathmatch.bin"']
-            + ['reference_existing_partition %s 1' % n for n in (
-                'objects/invisiblecollision_01/invisiblecollision_charandveh_01_scalable',
-                'objects/invisiblecharactercollision_01/charactercollision_01')]
-            # A PLACED physics blueprint needs its Havok physics RESOURCE, not just its partition.
-            # Both collision blueprints are physics objects (HavokAsset x11 and x4, RigidBodyData,
-            # PhysicsEntityData); with the partition present but the resource absent, instantiating
-            # the placement killed the server silently (exit 0). Same shape as the mesh/texture chunk
-            # problem: the header resolves, the payload does not.
-            + ['add_existing_resource_with_chunks %s 1' % n
-               for n in open('/tmp/physres.txt').read().split() if n.strip()])
+    refs = _refs_for(entities)
 
-    cmds += (['build', 'build_bundle Win32/Levels/REALITYMOD/team_deathmatch']
+    # The bundle name has to be DST's, not a literal. The sub-level's SubWorldReferenceObjectData
+    # names DST and the engine resolves that to a bundle; with the name pinned to team_deathmatch,
+    # any level whose gamemode is called something else (MP_003 ships squaddeathmatch and has no
+    # team_deathmatch at all) referenced a bundle that was never built and the load died at
+    # "Loading terrain" with nothing said.
+    cmds += (['build', 'build_bundle ' + DST_BUNDLE]
              + refs + add + ['build', 'build'])
     open(cmds_path, 'w').write('\n'.join(cmds) + '\n')
     print('emitted %s (%d instances) and part0 (%d instances)'
