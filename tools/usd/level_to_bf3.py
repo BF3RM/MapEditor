@@ -1308,9 +1308,54 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             # Found by SHAPE, not by a guessed filename: the level root is the partition holding
             # both a LevelData and a RegistryContainer. An earlier version built the path from a
             # `level` name that does not exist in this scope, so it silently carried nothing.
+            #
+            # Scoped to THIS level's own directory when the dump holds more than one. /tmp/allebx
+            # has all 70 levels, and taking the first partition of the right shape meant every
+            # level built from it carried the same arbitrary registry: MP_003, MP_007, MP_011,
+            # MP_012, MP_013 and MP_017 all shipped an identical 476 assets / 90 entities, which is
+            # not any of their registries. MP_001 was right only because its dump holds one level.
             import glob as _glob
 
-            for _f in sorted(_glob.glob(os.path.join(ebx_dir, '**', '*.json'), recursive=True)):
+            # The SOURCE level's name, which the exporter wrote onto /World as bf3:level.
+            _src_level = ''
+
+            try:
+                from pxr import Usd as _Usd
+
+                # Hold the STAGE. Chaining Stage.Open(...).GetPrimAtPath(...) drops the only
+                # reference to the stage, the prim expires the moment it is used, and the except
+                # below turns that into a silent empty level name.
+                _stage = _Usd.Stage.Open(stage_path)
+                _root = _stage.GetPrimAtPath('/World')
+                _src_level = ((_root.GetCustomData().get('bf3') or {}).get('level') or ''
+                              if _root else '')
+            except Exception:                                # noqa: BLE001
+                _src_level = ''
+
+            _level_dir = os.path.join(ebx_dir, os.path.dirname(_src_level))
+            _roots = ([_level_dir] if os.path.isdir(_level_dir) else []) + [ebx_dir]
+
+            _candidates = []
+
+            for _root in _roots:
+                _candidates = sorted(_glob.glob(os.path.join(_root, '**', '*.json'),
+                                                recursive=True))
+
+                if _candidates:
+                    break
+
+            # The level's OWN partition first, then everything else.
+            #
+            # A gamemode sub-level is ALSO a LevelData with a RegistryContainer, so taking the
+            # first partition of the right shape picked levels/mp_007/conquest_large -- 476 assets
+            # where mp_007 itself declares 1623. Alphabetical order was deciding which registry a
+            # level shipped.
+            if _src_level:
+                _own = os.path.join(ebx_dir, _src_level + '.json')
+                _candidates = ([_own] if os.path.exists(_own) else []) + \
+                    [_c for _c in _candidates if _c != _own]
+
+            for _f in _candidates:
                 try:
                     _ldoc = json.load(open(_f))
                 except Exception:                            # noqa: BLE001
