@@ -324,6 +324,16 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
          ship_textures=False, reference_closure=False, ship_closure=True):
     os.makedirs(out_dir, exist_ok=True)
     index = shipped_index(os.path.join(corpus, 'res'))
+
+    # Where a chunk can be read from when the game has no usable variant of it.
+    #
+    # `add_existing_resource_with_chunks` resolves a resource's chunks out of the mounted game, and
+    # for 68 of MP_001's 1681 attachments -- LOD and destruction slices -- the chunk is indexed but
+    # no variant of it is resident, so nothing gets carried. The server never notices; the CLIENT
+    # livelocks on a chunk that is not there, which is the black screen. The corpus dump has all 68,
+    # so hand the builder somewhere to read them from.
+    _chunk_dir = os.path.join(corpus, 'chunks')
+    _chunk_arg = (' "%s"' % _chunk_dir) if os.path.isdir(_chunk_dir) else ''
     protos, placements, stats = level_from_usd.read(stage_path)
     stage_dir = os.path.dirname(os.path.abspath(stage_path))
 
@@ -628,7 +638,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             json.dump(obj, open(path, 'w'), indent=1)
 
         if res_path is None:
-            cmds.append('add_existing_resource_with_chunks %s 1' % _q(name))
+            cmds.append('add_existing_resource_with_chunks %s 1%s' % (_q(name), _chunk_arg))
         else:
             cmds.append('add_resource %s MeshSet "%s" %s'
                         % (_q(name), res_path, meta.hex().upper()))
@@ -751,7 +761,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                     inst['Name'] = base
 
             json.dump(ref_doc, open(tex_json, 'w'), indent=1)
-            cmds.append('add_existing_resource_with_chunks %s 1' % _q(base))
+            cmds.append('add_existing_resource_with_chunks %s 1%s' % (_q(base), _chunk_arg))
             cmds.append('add_json_partition %s "%s"'
                         % (_q(build_dust2.texture_partition_name(base)), tex_json))
             referenced_tex += 1
@@ -1171,7 +1181,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 _skipped_res += 1
                 continue
 
-            cmds.append('add_existing_resource_with_chunks %s 1' % _q(_n))
+            cmds.append('add_existing_resource_with_chunks %s 1%s' % (_q(_n), _chunk_arg))
 
         if _skipped_res:
             print('assets    %d name(s) skipped: no such resource in the game' % _skipped_res)
