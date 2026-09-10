@@ -1399,6 +1399,11 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         if world_parts:
             print('world     %d part partition(s)' % (len(world_parts) + 1))
 
+        if build_dust2.dropped_vehicle_spawns[0]:
+            print('spawns    %d vehicle spawn(s) dropped -- their blueprints are not carried and '
+                  'shipping them stops the server accepting connections (USD_VEHICLE_SPAWNS=1 '
+                  'keeps them)' % build_dust2.dropped_vehicle_spawns[0])
+
         path = os.path.join(part_dir, 'world.json')
         json.dump(world_json, open(path, 'w'), indent=1)
         cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.WORLD_NAME), path))

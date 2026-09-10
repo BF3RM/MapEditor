@@ -1132,6 +1132,22 @@ PART_MAX = 256
 # our own partitions. Referencing the source level's partitions instead does not work: they belong
 # to that level, and dropping them into a different one collides -- its MeshVariationDatabases
 # fight ours, and that is only the first of several conflicts.
+# VehicleSpawnReferenceObjectData is DELIBERATELY absent, and it is the one type that stops a
+# level being playable. Bisected type by type against a live server, using "accepting connections"
+# rather than "Level:Loaded" as the test: an empty world part accepts, and so does every type here
+# -- 1976 ReferenceObjectData, 411 AlternateSpawn, 348 decals, 139 effects, 115 roads, the lights,
+# the volumes, the sound. Add the 21 VehicleSpawnReferenceObjectData and the server loads the level
+# and then refuses connections.
+#
+# They place 7 vehicle blueprints (kornet, m1abrams, bmp2, lav25, tow2, vodnik, humvee) that the
+# bundle does not carry, and carrying them is not cheap: the blueprints alone are 375 instances
+# each and reach 205 further partitions one level out, into weapons, ai, sound and fx. MEASURED --
+# reference_existing_partition on the seven took the superbundle to 357 MB and exited rc=1; raw
+# copies plus their meshes and physics resources built at 6 MB and the server hung instead.
+#
+# So a vehicle spawn is dropped rather than shipped broken, and USD_VEHICLE_SPAWNS=1 puts them
+# back for anyone continuing that work. Everything else about the level is unaffected: 5864
+# entities, teams, and a server that accepts connections.
 WORLD_PART_TYPES = (
     'ReferenceObjectData', 'DecalEntityData', 'EffectReferenceObjectData', 'RoadData',
     'LightProbeVolumeData', 'VolumeVectorShapeData', 'SoundEntityData', 'LocatorEntityData',
@@ -1143,7 +1159,7 @@ WORLD_PART_TYPES = (
     # CharacterSpawnReferenceObjectData, 21 VehicleSpawnReferenceObjectData -- ours carried zero
     # of all three, because these are not named plain ReferenceObjectData and so failed this
     # filter. A geometry-only export is a level you can look at but not play.
-    'CharacterSpawnReferenceObjectData', 'VehicleSpawnReferenceObjectData',
+    'CharacterSpawnReferenceObjectData',
     'AlternateSpawnEntityData',
     # NOT TransformPartPropertyTrackData. It is a property-ANIMATION TRACK belonging to a
     # blueprint's part, not a placeable object, and authoring 120 of them into mp_003's world parts
@@ -1151,6 +1167,10 @@ WORLD_PART_TYPES = (
     # Bisected against RoadData and PointLightEntityData, which both load clean (33/33 world parts
     # confirmed live in the engine), so this type alone is the cause.
 )
+
+
+# Counted here rather than returned, so the message stays next to the rule that causes it.
+dropped_vehicle_spawns = [0]
 
 
 def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
@@ -1350,7 +1370,13 @@ def world_partition(bp_pg, bp_g, empty=False, extra=None, part_max=None,
     # already unique and keeping it means a record that refers to one by guid still resolves --
     # but it now lives in OUR partition.
     for guid_str, record in sorted((entities or {}).items()):
-        if record.get('$type') not in WORLD_PART_TYPES:
+        if record.get('$type') == 'VehicleSpawnReferenceObjectData':
+            if os.environ.get('USD_VEHICLE_SPAWNS') == '1':
+                pass
+            else:
+                dropped_vehicle_spawns[0] += 1
+                continue
+        elif record.get('$type') not in WORLD_PART_TYPES:
             continue
 
         owner = part_of.get(part)
