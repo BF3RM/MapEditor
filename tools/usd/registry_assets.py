@@ -61,12 +61,28 @@ UNSAFE = ('objects/oilbarrel_01/',
           'objects/vegetation/treelinden_l_01/')
 
 
-def registry_of(part_dir):
-    """The exported level's RegistryContainer, or None."""
-    for f in glob.glob(os.path.join(part_dir, '*.json')):
+def registry_of(part_dir, recipe=None):
+    """The exported LEVEL's RegistryContainer, or None.
+
+    Scoped to the partitions the recipe being finished actually adds. This used to take the first
+    populated registry it found anywhere in partitions/, which was fine until the gamemode
+    sub-level got a populated one of its own: on the next run this picked up the PREVIOUS run's
+    gamemode partition, carried its 2644 declarations into the level bundle and never looked at
+    the level's own -- a recipe that builds cleanly and ships the wrong half of the level.
+    """
+    named = None
+
+    if recipe and os.path.exists(recipe):
+        named = {l.split(' ')[1].strip('"').lower() for l in open(recipe)
+                 if l.startswith('add_json_partition ')}
+
+    for f in sorted(glob.glob(os.path.join(part_dir, '*.json'))):
         try:
             doc = json.load(open(f))
         except Exception:                                    # noqa: BLE001
+            continue
+
+        if named is not None and (doc.get('Name') or '').lower() not in named:
             continue
 
         for inst in (doc.get('Instances') or {}).values():
@@ -275,7 +291,7 @@ def main():
     _closure_ns = tuple(n.strip().rstrip('/') + '/'
                         for n in os.environ.get('REGISTRY_CLOSURE', '').split(',') if n.strip())
 
-    reg, _doc, _doc_path = registry_of(part_dir)
+    reg, _doc, _doc_path = registry_of(part_dir, os.path.join(args.emit_dir, 'build.cmds'))
 
     if reg is None:
         print('no populated RegistryContainer under %s' % part_dir)

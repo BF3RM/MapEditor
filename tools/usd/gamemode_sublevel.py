@@ -23,6 +23,7 @@ import collections
 import glob
 import json
 import os
+import re
 import subprocess
 import sys
 import uuid
@@ -236,6 +237,269 @@ def _raw_dump(name):
           % (name, RAW_DIR))
 
     return None
+
+
+def _rime(lines, capture=True):
+    """Run a Rime recipe against the mounted game and hand back its stdout."""
+    os.makedirs(RAW_DIR, exist_ok=True)
+    recipe = os.path.join(RAW_DIR, 'query.cmds')
+    open(recipe, 'w').write('\n'.join([
+        'mount_game "%s" Frostbite2_0 true' % GAME,
+        'select_game 1',
+    ] + list(lines)) + '\n')
+
+    env = dict(os.environ)
+    env.setdefault('DOTNET_ROOT', os.path.expanduser('~/.dotnet'))
+
+    r = subprocess.run([os.path.join(RIME, 'RimeREPL'), recipe], check=False, env=env,
+                       stdout=subprocess.PIPE if capture else subprocess.DEVNULL,
+                       stderr=subprocess.STDOUT)
+
+    return (r.stdout or b'').decode('utf-8', 'replace')
+
+
+def _source_bundle():
+    """The bundle the GAME ships this gamemode sub-level in, e.g. win32/levels/mp_001/team_deathmatch.
+
+    Asked of the game rather than spelled out: a level's gamemode bundle is named after the
+    gamemode sub-level, but only the game knows which superbundle it sits in, and some partitions
+    (soldiers, kits) are duplicated into dozens of bundles -- so the lookup has to be by the
+    sub-level's own name, which appears in exactly one place.
+    """
+    dest = os.path.join(RAW_DIR, 'where_gamemode.json')
+    _rime(['where_is %s "%s"' % (SRC_GAMEMODE, dest)], capture=False)
+
+    try:
+        places = (json.load(open(dest)) or {}).get('places') or []
+    except Exception:                                        # noqa: BLE001
+        return None
+
+    for place in places:
+        if place.get('kind') == 'partition' and place.get('bundle'):
+            return place['bundle']
+
+    return None
+
+
+def _bundle_contents(bundle):
+    """(partition names, resource names) the game's own gamemode bundle carries."""
+    out = _rime(['list_bundle_partitions %s' % bundle])
+    parts = [l[2:].strip() for l in out.split('\n') if l.startswith('- ')]
+
+    out = _rime(['list_bundle_resources %s' % bundle])
+    # "- <name> (<ResourceType>)". The type is not needed for the recipe, but it is the axis a
+    # carry failure splits along (textures vs meshes vs physics), so keep it.
+    res = []
+
+    for l in out.split('\n'):
+        if not l.startswith('- '):
+            continue
+
+        entry = l[2:].strip()
+        m = re.search(r'\s*\(([A-Za-z0-9_]+)\)$', entry)
+        name = re.sub(r'\s*\([A-Za-z0-9_]+\)$', '', entry)
+
+        if name:
+            res.append((name, m.group(1) if m else ''))
+
+    return parts, res
+
+
+def _bulk_raw_dump(names):
+    """Dump every named partition to RAW_DIR in ONE Rime run. -> {name: path}"""
+    os.makedirs(RAW_DIR, exist_ok=True)
+    want = {n: os.path.join(RAW_DIR, n.replace('/', '_').replace(' ', '_') + '.bin') for n in names}
+    todo = [n for n, f in want.items()
+            if not (os.path.exists(f) and os.path.getsize(f) > 0)]
+
+    if todo:
+        print('  dumping %d gamemode-bundle partition(s) with Rime...' % len(todo))
+        _rime(['dump_partition "%s" "%s"' % (n, want[n]) for n in todo], capture=False)
+
+    return {n: f for n, f in want.items() if os.path.exists(f) and os.path.getsize(f) > 0}
+
+
+def _source_bundle_carry(already):
+    """Carry what the GAME's own gamemode bundle carries, minus what we re-emit ourselves.
+
+    WHY THIS EXISTS. The export shipped a gamemode sub-level with 5 partitions where the game ships
+    1578, and the difference is the entire PLAYER: `characters/soldiers/mpsoldier`, the 8
+    `gameplay/kits/*`, `gameplay/teams/us|ru|neutral`, `gameplay/gamemodes/deathmatch` and 778
+    character partitions all live in that bundle and nowhere else the level reaches. MEASURED
+    in-engine: vanilla MP_001 loads 1 SoldierBlueprint, our export loads 0 -- so a player could
+    join, be put on a team and then never spawn, because there was no soldier to spawn.
+
+    Nothing here names an asset. The bundle is found by asking the game where the SOURCE gamemode
+    sub-level lives, and its contents are whatever the game put in it, which is what makes this work
+    for any level and any gamemode rather than for MP_001's team_deathmatch.
+
+    Raw partitions, not `reference_existing_partition`: this set IS the closure the game shipped,
+    so re-deriving one per partition would only re-add what is already here (and closures of
+    soldiers and weapons are what took a 49 MB superbundle to 1.48 GB).
+    """
+    bundle = _source_bundle()
+
+    if not bundle:
+        print('  could not locate the source gamemode bundle -- shipping no character content')
+        return []
+
+    parts, res = _bundle_contents(bundle)
+
+    if not parts:
+        print('  %s reported no partitions -- shipping no character content' % bundle)
+        return []
+
+    # Our own re-emission replaces the source sub-level root and its layers. Everything ELSE under
+    # the gamemode's namespace (the mesh variation database, above all) is content the characters
+    # need and is carried unchanged.
+    skip = set(n.lower() for n in already)
+
+    keep = [n for n in parts
+            if n.lower() not in skip
+            and n.lower() != SRC_GAMEMODE.lower()
+            and not (n.lower().startswith(SRC_GAMEMODE.lower() + '/')
+                     and 'meshvariationdb' not in n.lower())]
+
+    dumped = _bulk_raw_dump(keep)
+    missing = [n for n in keep if n not in dumped]
+
+    lines = []
+    # Resources BEFORE the partitions that reference them -- the ordering rule the VU server wedges
+    # on when it is broken.
+    # Bisecting knobs. The carry has two independent halves (the resources their chunks come with,
+    # and the partitions), and namespaces within the partition half -- and a bad carry does not
+    # report anything, it wedges the load. GAMEMODE_BUNDLE_RES=0 drops the resources;
+    # GAMEMODE_BUNDLE_NS=characters,persistence keeps only those namespaces.
+    ns = tuple(n.strip().lower() for n in os.environ.get('GAMEMODE_BUNDLE_NS', '').split(',')
+               if n.strip())
+
+    if ns:
+        keep = [n for n in keep if n.lower().startswith(ns)]
+        res = [(n, t) for n, t in res if n.lower().startswith(ns)]
+
+    res = [(n, t) for n, t in res if n.lower() not in skip]
+
+    # GAMEMODE_BUNDLE_RES: '1' all, '0' none, or a comma-separated list of resource TYPES to keep
+    # (DxTexture, MeshSet, HavokPhysicsData, AssetBank).
+    want = os.environ.get('GAMEMODE_BUNDLE_RES', '1')
+
+    if want == '0':
+        res = []
+    elif want != '1':
+        keep_types = {t.strip().lower() for t in want.split(',') if t.strip()}
+        res = [(n, t) for n, t in res if t.lower() in keep_types]
+
+    # GAMEMODE_BUNDLE_RES_SLICE=a:b keeps res[a:b] of the sorted list -- a binary search over the
+    # carry, for when a whole resource TYPE wedges the load and the question is whether it is the
+    # type or one bad member of it.
+    sl = os.environ.get('GAMEMODE_BUNDLE_RES_SLICE', '')
+
+    if sl:
+        res = sorted(res)
+        a, _, b = sl.partition(':')
+        res = res[int(a or 0):int(b) if b else None]
+
+    lines += ['add_existing_resource_with_chunks "%s" 1' % n for n, _ in res]
+    lines += ['add_raw_partition "%s" "%s"' % (n, dumped[n]) for n in keep if n in dumped]
+
+    print('  source bundle %s: %d partition(s), %d resource(s); carrying %d, %d undumpable'
+          % (bundle, len(parts), len(res), len(dumped), len(missing)))
+
+    for n in missing[:5]:
+        print('    could not dump %s' % n)
+
+    return lines
+
+
+def _source_registry(shipped=None):
+    """The SOURCE gamemode sub-level's RegistryContainer, minus its own namespace.
+
+    A partition sitting in the bundle is not enough: the sub-level's registry is what tells the
+    engine the assets exist. The game's team_deathmatch registers 130 entities, 2644 assets and 123
+    blueprints, ours registered 4 -- and `characters/soldiers/mpsoldier` is in that list twice
+    (EntityRegistry and BlueprintRegistry) and nowhere else in the level.
+
+    Entries pointing back into the source sub-level's OWN partitions are dropped: those instances
+    are re-emitted here under our own guids, and build() registers the replacements.
+    """
+    own = set()
+    src = None
+
+    for f in glob.glob(os.path.join(EBX, '**', '*.json'), recursive=True):
+        try:
+            doc = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        name = (doc.get('Name') or '')
+
+        if not name.startswith(SRC_GAMEMODE):
+            continue
+
+        own.add((doc.get('PartitionGuid') or '').lower())
+
+        if name.lower() == SRC_GAMEMODE.lower():
+            src = doc
+
+    if src is None:
+        return {}
+
+    reg = None
+
+    for inst in (src.get('Instances') or {}).values():
+        if inst.get('$type') == 'RegistryContainer':
+            reg = inst
+            break
+
+    if reg is None:
+        return {}
+
+    keys = ('EntityRegistry', 'AssetRegistry', 'BlueprintRegistry')
+    kept = {k: [e for e in (reg.get(k) or [])
+                if (e.get('PartitionGuid') or '').lower() not in own] for k in keys}
+
+    if shipped is None:
+        return kept
+
+    # Resolve every declared guid to a partition NAME, dumping the ones the closure has never seen
+    # rather than silently treating them as absent.
+    import registry_assets
+
+    guids = sorted({(e.get('PartitionGuid') or '').lower()
+                    for v in kept.values() for e in v if e.get('PartitionGuid')})
+    registry_assets.resolve_guids(guids, CLOSURE, RIME, GAME)
+
+    name_of = {}
+
+    for g in guids:
+        doc = _closure_doc(g)
+
+        if doc and doc.get('Name'):
+            name_of[g] = doc['Name'].lower()
+
+    out, dropped, unresolved = {}, 0, 0
+
+    for k in keys:
+        out[k] = []
+
+        for e in kept[k]:
+            g = (e.get('PartitionGuid') or '').lower()
+            name = name_of.get(g)
+
+            if name is None:
+                unresolved += 1
+                continue
+
+            if name not in shipped:
+                dropped += 1
+                continue
+
+            out[k].append(e)
+
+    print('  source registry: %s (dropped %d not shipped, %d unresolved)'
+          % (', '.join('%s=%d' % (k, len(out[k])) for k in sorted(keys)), dropped, unresolved))
+
+    return out
 
 
 def _our_blueprints(out_dir):
@@ -455,7 +719,7 @@ def _guid_of_name(name):
     return _NAME_TO_GUID.get((name or '').lower())
 
 
-def build(entities):
+def build(entities, source_registry=None):
     pg = guid('partition', DST)
     swd = guid('instance', DST, 'subworld')
     desc = guid('instance', DST, 'descriptor')
@@ -511,13 +775,21 @@ def build(entities):
               'RememberStateOnStreamOut': False},
         desc: {'$type': 'InterfaceDescriptorData', 'Fields': [], 'InputEvents': [],
                'OutputEvents': [], 'InputLinks': [], 'OutputLinks': []},
-        reg: {'$type': 'RegistryContainer', 'EntityRegistry': [], 'AssetRegistry': [],
+        # The registry the GAME's own gamemode sub-level declares, carried through: 130 entities,
+        # 2644 assets and 123 blueprints on MP_001's team_deathmatch, against the 4 this used to
+        # emit. That list is where `characters/soldiers/mpsoldier` is declared, and it is declared
+        # NOWHERE else in the level -- with the bundle carrying it but the registry silent, the
+        # engine has the soldier on disk and no record that it exists.
+        reg: {'$type': 'RegistryContainer',
+              'EntityRegistry': list((source_registry or {}).get('EntityRegistry') or []),
+              'AssetRegistry': list((source_registry or {}).get('AssetRegistry') or []),
               # Every blueprint the sub-level PLACES has to be registered here or the reference
               # resolves to nothing -- the rule build_dust2 already records for the main world.
               # Ours registered only the world part, so the 9 collision placements pointed at
               # blueprints the level never declared, and the server died silently (exit 0) during
               # autoloaded-sublevel entity creation. The game's own team_deathmatch registers 123.
-              'BlueprintRegistry': [ref(part_pg, wpd)] + blueprints,
+              'BlueprintRegistry': ([ref(part_pg, wpd)] + blueprints
+                                    + list((source_registry or {}).get('BlueprintRegistry') or [])),
               'ReferenceObjectRegistry': [ref(pg, wprod)]},
         wprod: {'$type': 'WorldPartReferenceObjectData', 'IndexInBlueprint': 3000,
                 'IsEventConnectionTarget': 3, 'IsPropertyConnectionTarget': 3,
@@ -635,12 +907,12 @@ def main():
         print('nothing to carry -- is the ebx dump present?')
         return 1
 
-    root, part = build(entities)
+    # Two independent halves of the character carry, switchable so a load failure can be
+    # bisected without editing code: GAMEMODE_REGISTRY=0 ships the bundle without declaring
+    # it, GAMEMODE_BUNDLE=0 declares it without shipping it.
     part_dir = os.path.join(out_dir, 'partitions')
     root_path = os.path.join(part_dir, 'gamemode_tdm.json')
     part_path = os.path.join(part_dir, 'gamemode_tdm_part0.json')
-    json.dump(root, open(root_path, 'w'), indent=1)
-    json.dump(part, open(part_path, 'w'), indent=1)
 
     cmds_path = os.path.join(out_dir, 'build.cmds')
 
@@ -695,13 +967,42 @@ def main():
     # while dropping them loads fine. A placed blueprint needs its closure.
     refs = _refs_for(entities)
 
+    # Everything the game's OWN bundle for this gamemode carries -- soldiers, kits, teams, the
+    # gamemode entity and 778 character partitions. Named after `refs` so a partition `refs`
+    # already carries (the level setup) is not added twice.
+    carried = [l.split(' ')[1].strip('"') for l in refs
+               if l.startswith(('add_raw_partition ', 'reference_existing_partition ',
+                                'add_existing_resource_with_chunks '))]
+    bundle_lines = (_source_bundle_carry(carried)
+                    if os.environ.get('GAMEMODE_BUNDLE', '1') == '1' else [])
+
     # The bundle name has to be DST's, not a literal. The sub-level's SubWorldReferenceObjectData
     # names DST and the engine resolves that to a bundle; with the name pinned to team_deathmatch,
     # any level whose gamemode is called something else (MP_003 ships squaddeathmatch and has no
     # team_deathmatch at all) referenced a bundle that was never built and the load died at
     # "Loading terrain" with nothing said.
+    # DECLARE ONLY WHAT SHIPS -- the rule registry_assets.py already applies to the level's own
+    # registry, applied here to the gamemode's. The first cut of this carried all 2644 of the
+    # source's asset declarations against 1578 shipped partitions, and the server stopped loading:
+    # it sat at "Creating level" with 0% CPU, waiting on declarations nothing would ever satisfy.
+    # Every partition name the whole recipe carries, in either bundle, is the set that may be
+    # declared.
+    shipped = set()
+
+    for line in cmds + bundle_lines + refs + add:
+        head = line.split(' ')[0]
+
+        if head in ('add_raw_partition', 'add_json_partition', 'reference_existing_partition'):
+            shipped.add(line.split(' ')[1].strip('"').lower())
+
+    source_registry = (_source_registry(shipped)
+                       if os.environ.get('GAMEMODE_REGISTRY', '1') == '1' else {})
+    root, part = build(entities, source_registry)
+    json.dump(root, open(root_path, 'w'), indent=1)
+    json.dump(part, open(part_path, 'w'), indent=1)
+
     cmds += (['build', 'build_bundle ' + DST_BUNDLE]
-             + refs + add + ['build', 'build'])
+             + bundle_lines + refs + add + ['build', 'build'])
     open(cmds_path, 'w').write('\n'.join(cmds) + '\n')
     print('emitted %s (%d instances) and part0 (%d instances)'
           % (DST, len(root['Instances']), len(part['Instances'])))
