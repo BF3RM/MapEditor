@@ -804,7 +804,64 @@ def _repair_mvdb_material_order(part_dir):
           % (moved, unmatched, filled))
 
 
-def _close_dangling_refs(part_dir, chunk_arg):
+def _blueprint_without_physics(name, part_dir):
+    """The game's blueprint for a skinned mesh, minus the physics that kills the client.
+
+    Three attempts got three different failures, and together they say what is actually needed:
+      - placing the mesh as a StaticModelEntityData -> it draws, splayed, because nothing poses it;
+      - referencing the game's blueprint (raw OR as a closure) -> the server wedges at "Creating
+        entities for autoloaded sublevels";
+      - carrying only its VegetationTreeEntityData into our own blueprint -> the server wedges too,
+        because that entity declares five runtime components it no longer has.
+    So keep the blueprint whole -- entity, components, pose -- and drop only the PhysicsEntityData,
+    RigidBodyData and HavokAsset, which is the part this bundle has no business instantiating.
+    """
+    import glob as _g
+
+    store = os.environ.get('USD_CLOSURE_DIR', '/tmp/closure')
+    doc = None
+
+    for base in (store, os.path.expanduser('~/Games/VeniceUnleashed/debug/ebx'), '/tmp/allebx'):
+        for f in _g.glob(os.path.join(base, '**', '*.json'), recursive=True):
+            try:
+                d = json.load(open(f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            if (d.get('Name') or '').lower() == name.lower():
+                doc = d
+                break
+
+        if doc:
+            break
+
+    if not doc:
+        return None
+
+    drop = {'PhysicsEntityData', 'RigidBodyData', 'HavokAsset'}
+    keep = {g: v for g, v in (doc.get('Instances') or {}).items() if v.get('$type') not in drop}
+    gone = set(doc.get('Instances', {})) - set(keep)
+
+    def _scrub(o):
+        if isinstance(o, dict):
+            if isinstance(o.get('InstanceGuid'), str) and o['InstanceGuid'] in gone:
+                return None
+
+            return {k: _scrub(v) for k, v in o.items()}
+
+        if isinstance(o, list):
+            return [_scrub(v) for v in o]
+
+        return o
+
+    doc['Instances'] = {g: _scrub(v) for g, v in keep.items()}
+    path = os.path.join(part_dir, 'gbp_%s.json' % _safe(name))
+    json.dump(doc, open(path, 'w'), indent=1)
+
+    return path, doc.get('PartitionGuid'), doc.get('PrimaryInstanceGuid')
+
+
+def _close_dangling_refs(part_dir, chunk_arg, skip=()):
     """Ship every partition the emitted content references but the bundle does not contain.
 
     The specific classes -- shader graphs, the database's textures, lod groups, material variations
@@ -852,7 +909,8 @@ def _close_dangling_refs(part_dir, chunk_arg):
         refs = set()
         _walk(d.get('Instances') or {}, refs)
         want |= {g for g in refs
-                 if g not in have and g != (d.get('PartitionGuid') or '').lower()}
+                 if g not in have and g not in skip
+                 and g != (d.get('PartitionGuid') or '').lower()}
 
     if not want:
         return []
@@ -1388,6 +1446,15 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 if _bp:
                     build_dust2.SHIPPED_BLUEPRINTS[_n] = (_pg, _bp)
 
+                # A tree is posed by its VegetationTreeEntityData's BasePoseTransforms, not by the
+                # mesh. Keep the entity so our own blueprint can carry it, which gets the pose
+                # without the game blueprint's physics entity and Havok assets.
+                _posed = next((_i3 for _i3 in (_d.get('Instances') or {}).values()
+                               if _i3.get('$type') == 'VegetationTreeEntityData'), None)
+
+                if _posed:
+                    build_dust2.SHIPPED_POSED[_n] = _posed
+
         print('guids     %d shipped partition name(s) will keep their own guid, '
               '%d also their instance guids, %d their own asset record'
               % (len(build_dust2.SHIPPED_GUIDS), len(build_dust2.SHIPPED_INSTANCES),
@@ -1564,7 +1631,10 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     tex_index = {}
     flat_name = 'flat_normal'
 
-    _skinned = _dropped = _dropped_named = _skinned_bp = 0
+    _skinned = _dropped = _dropped_named = _skinned_bp = _posed_n = 0
+    # Partitions the closure pass must NOT also carry raw: reference_existing_partition already
+    # brought them with everything they depend on, and a raw copy would shadow that.
+    _closure_only = set()
     _drop_types = tuple(t.strip() for t in os.environ.get('USD_DROP_TYPES', '').split(',')
                         if t.strip())
     # USD_DROP_MESHES is a FILE of mesh partition names -- the other bisect axis. A renderer fault
@@ -1585,6 +1655,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # them is honest; mis-placing them is not.
         _ga = build_dust2.SHIPPED_ASSETS.get((name or '').lower())
         _game_bp = None
+        _posed_ent = None
 
         if _ga and _ga.get('$type') == 'SkinnedMeshAsset':
             # A skinned mesh is posed by the blueprint around it, not by the mesh: the game wraps
@@ -1593,16 +1664,36 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             # bends in wind. Our synthesised blueprint has none of that, so every bone sits at
             # identity and the mesh splays across the map. Use the game's blueprint, which lives at
             # the mesh name minus its _Mesh suffix; the closure carries what it needs.
-            # MEASURED: carrying those blueprints raw WEDGES the server -- they bring a physics
-            # entity, a Havok asset and a 29-part health-state hierarchy, and the level never
-            # finishes loading (301s, no Level:Loaded). So this is opt-in until the carry rule for
-            # them is worked out; the default is still to drop the mesh, which costs 26 placements
-            # and breaks nothing. See bf3-carry-rule-closure-vs-raw.
+            # It has to come as a CLOSURE, not raw. These blueprints are instantiated eagerly and
+            # bring a physics entity, a Havok asset and a 29-part health-state hierarchy with them;
+            # carrying only the partition bytes wedged the server outright (301s, dead at "Creating
+            # entities for autoloaded sublevels"). reference_existing_partition pulls what they
+            # need. See bf3-carry-rule-closure-vs-raw.
             _bp_name = name[:-5] if name.lower().endswith('_mesh') else name
-            _game_bp = (build_dust2.SHIPPED_BLUEPRINTS.get(_bp_name.lower())
-                        if os.environ.get('USD_SKINNED_BLUEPRINT') == '1' else None)
+            # USD_SKINNED_BLUEPRINT: off by default, otherwise a comma-separated list of name
+            # substrings to allow (or any other value for all). Four ways of placing these were
+            # measured and every one of them fails -- see _blueprint_without_physics -- so the
+            # default is to drop the mesh. 100 placements of 5863 on MP_001: 60 trees, 13 bushes,
+            # 19 flags, 6 curtains, 2 building shells.
+            _sel = os.environ.get('USD_SKINNED_BLUEPRINT', '0')
+            _allow = [x.strip().lower() for x in _sel.split(',') if x.strip() and x.strip() != '0']
+            _game_bp = None
+            _posed_ent = None
 
-            if not _game_bp and os.environ.get('USD_PLACE_SKINNED') != '1':
+            if _sel != '0' and (not _allow or any(a in _bp_name.lower() for a in _allow)):
+                # A posed entity we can carry into OUR blueprint beats referencing the game's:
+                # the game's brings a physics entity and Havok assets, and instantiating those
+                # killed the client outright. The pose is all we actually need.
+                _posed_ent = build_dust2.SHIPPED_POSED.get(_bp_name.lower())
+
+                _posed_ent = None                        # the pose alone is not enough
+                _game_bp = build_dust2.SHIPPED_BLUEPRINTS.get(_bp_name.lower())
+
+            if _posed_ent:
+                _posed_n += 1
+
+            if not _game_bp and not _posed_ent \
+                    and os.environ.get('USD_PLACE_SKINNED') != '1':
                 _skinned += 1
                 continue
 
@@ -1671,12 +1762,20 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         binding = {k: v for k, v in binding.items() if v}
         mvdb_inputs.append((name, mesh_pg, mesh_g, _mats, names, binding))
         bp_json, bp_pg, bp_g = build_dust2.blueprint_partition(mesh_pg, mesh_g,
-                                                               with_physics=False)
+                                                               with_physics=False,
+                                                               posed=_posed_ent)
 
         if _game_bp:
-            # Point the placements at the GAME's blueprint and ship it raw instead of ours.
-            bp_pg, bp_g = _game_bp
-            _skinned_bp += 1
+            _stripped = _blueprint_without_physics(_bp_name, part_dir)
+
+            if _stripped:
+                _path, _spg, _sg = _stripped
+                bp_pg, bp_g = _spg, _game_bp[1]
+                _skinned_bp += 1
+                _closure_only.add((_spg or '').lower())
+                cmds.append('add_json_partition %s "%s"' % (_q(_bp_name), _path))
+            else:
+                _game_bp = None
 
         for obj, fname in ((mesh_json, 'mesh_%s.json' % _safe(name)),
                            (bp_json, 'bp_%s.json' % _safe(name))):
@@ -2006,6 +2105,10 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         if _dropped:
             print('droptype  %d mesh(es) dropped by USD_DROP_TYPES=%s'
                   % (_dropped, ','.join(_drop_types)))
+
+        if _posed_n:
+            print('skinned   %d mesh(es) placed with the pose the game gives them '
+                  '(BasePoseTransforms), in our own blueprint' % _posed_n)
 
         if _skinned_bp:
             print("skinned   %d mesh(es) placed through the GAME's blueprint, which poses them"
@@ -2537,7 +2640,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     cmds += ['build', 'build']
     # Now that every partition exists on disk, carry whatever they reference and the bundle lacks.
     if _dangling_at is not None:
-        _late = _close_dangling_refs(part_dir, _chunk_arg)
+        _late = _close_dangling_refs(part_dir, _chunk_arg, _closure_only)
 
         # THE SOURCE LEVEL'S OWN TEXTURE SET.
         #

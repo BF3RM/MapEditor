@@ -164,6 +164,10 @@ SHIPPED_ASSETS = {}
 
 # The game's ObjectBlueprint for a partition name -> (partition guid, blueprint instance guid).
 SHIPPED_BLUEPRINTS = {}
+
+# The game's posed entity for a mesh that is skinned -- a VegetationTreeEntityData and its
+# BasePoseTransforms, which is what actually bends a tree. Keyed by the blueprint partition name.
+SHIPPED_POSED = {}
 USE_GAME_ASSET = os.environ.get('USD_GAME_ASSET', '1') != '0'
 
 
@@ -821,7 +825,7 @@ def mesh_partition(material_names, material_ebx=None):
              'Instances': instances}, pg, mesh_g, material_guids)
 
 
-def blueprint_partition(mesh_pg, mesh_g, with_physics=True):
+def blueprint_partition(mesh_pg, mesh_g, with_physics=True, posed=None):
     pg = partition_guid(BLUEPRINT_NAME)
     bp_g = guid('instance', BLUEPRINT_NAME, 'blueprint')
     smed_g = guid('instance', BLUEPRINT_NAME, 'staticmodel')
@@ -846,7 +850,7 @@ def blueprint_partition(mesh_pg, mesh_g, with_physics=True):
             'AlwaysCreateEntityBusClient': False, 'AlwaysCreateEntityBusServer': False,
             'Object': ref(pg, smed_g),
         },
-        smed_g: {
+        smed_g: (dict(posed, Mesh=ref(mesh_pg, mesh_g)) if posed else {
             # StaticModelEntityData with its COMPLETE field list.
             #
             # This was previously a RigidMeshEntityData carrying only {IndexInBlueprint,
@@ -901,7 +905,7 @@ def blueprint_partition(mesh_pg, mesh_g, with_physics=True):
             'ExcludeFromNearbyObjectDestruction': True,
             'AnimatePhysics': False,
             'Visible': True,
-        },
+        }),
     }
 
     # The part the mesh is drawn as, with the alive/dead health pair every shipped static model
