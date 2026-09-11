@@ -410,7 +410,11 @@ def _source_bundle_carry(already):
     ns = tuple(n.strip().lower() for n in os.environ.get('GAMEMODE_BUNDLE_NS', '').split(',')
                if n.strip())
 
-    if ns:
+    # GAMEMODE_BUNDLE_NS selects PARTITIONS, and by default their resources too: carrying all 340
+    # resources regardless makes the SERVER load pathologically slowly -- MEASURED, still at
+    # partition 4500 after 29 minutes where the filtered carry is up in 20 seconds. Set
+    # GAMEMODE_BUNDLE_RES_ALL=1 to carry every resource anyway.
+    if ns and os.environ.get('GAMEMODE_BUNDLE_RES_ALL', '0') != '1':
         res = [(n, t) for n, t in res if n.lower().startswith(ns)]
 
     res = [(n, t) for n, t in res if n.lower() not in skip]
