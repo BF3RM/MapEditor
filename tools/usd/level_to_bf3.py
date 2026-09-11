@@ -891,6 +891,23 @@ def _close_dangling_refs(part_dir, chunk_arg):
     print('dangling  %d partition(s) referenced but absent over %d round(s), %d named, %d shipped'
           % (len(seen), rounds, len(names), len(got)))
 
+    # The partitions just carried include SHADER GRAPHS of their own -- decal and effect shaders,
+    # which the mesh-material pass never sees -- and a compiled shader names textures the material
+    # does not supply. Without them the decal draws against a null and the renderer faults creating
+    # its sampler state, which is exactly the fault closing the references alone did not remove.
+    shipped_names = {n.lower() for n in got}
+
+    for _b, _d in files:
+        _n = (_d.get('Name') or '').lower()
+
+        if _n:
+            shipped_names.add(_n)
+
+            if _n.startswith('dust2/textures/'):
+                shipped_names.add(_n[len('dust2/textures/'):])
+
+    lines += _shader_streamable_textures(got, shipped_names, chunk_arg)
+
     return lines
 
 
