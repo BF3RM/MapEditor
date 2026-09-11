@@ -764,6 +764,20 @@ def mesh_partition(material_names, material_ebx=None):
         # feature -- dropping it costs frame rate, not pixels.
         if os.environ.get('USD_KEEP_OCCLUDER') != '1':
             _a['OccluderMeshEnable'] = False
+
+        # Nor can EnlightenType be carried. EnlightenType_Static says "this mesh is lit by the
+        # level's BAKED radiosity", and the bundle ships no Enlighten data, so the engine binds
+        # nothing into the lightmap slots the lightmapped permutation reads -- and faults on the
+        # first null while creating its sampler state. MEASURED: the mesh that tipped an otherwise
+        # healthy 90-mesh cut over was the first EnlightenType_Static one to be drawn. 135 of
+        # MP_001's 521 meshes claim Static and another 51 LightProbe. Until the Enlighten carry
+        # works, nothing may claim to be lit by data that is not there.
+        # MEASURED: forcing Dynamic did NOT fix the fault, so the game's value is carried and this
+        # is opt-in only (USD_FORCE_DYNAMIC_ENLIGHTEN=1) -- overriding it would lose fidelity for
+        # nothing.
+        if os.environ.get('USD_FORCE_DYNAMIC_ENLIGHTEN') == '1' \
+                and _a.get('EnlightenType') != 'EnlightenType_Dynamic':
+            _a['EnlightenType'] = 'EnlightenType_Dynamic'
         instances[mesh_g] = _a
 
         return ({'PartitionGuid': pg, 'PrimaryInstanceGuid': mesh_g, 'Name': MESH_NAME,

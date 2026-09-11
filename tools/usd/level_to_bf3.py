@@ -12,6 +12,7 @@ DICE's. It also keeps the bundle small -- an unmodified level emits no geometry 
 What it writes is a Rime command list, the same shape build_dust2 produces.
 """
 import os
+import re
 import sys
 import uuid
 
@@ -1369,7 +1370,17 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     tex_index = {}
     flat_name = 'flat_normal'
 
-    _skinned = 0
+    _skinned = _dropped = _dropped_named = 0
+    _drop_types = tuple(t.strip() for t in os.environ.get('USD_DROP_TYPES', '').split(',')
+                        if t.strip())
+    # USD_DROP_MESHES is a FILE of mesh partition names -- the other bisect axis. A renderer fault
+    # tracks a property of the mesh, so slicing by "every mesh whose shader is absent from the
+    # shipped database" answers in one run what an index bisect needs nine for.
+    _drop_named = set()
+    _dn = os.environ.get('USD_DROP_MESHES')
+
+    if _dn and os.path.exists(_dn):
+        _drop_named = {l.strip().lower() for l in open(_dn) if l.strip()}
 
     for name, res_path, meta, ms, chunks, material_ebx in changed:
         # A SkinnedMeshAsset is not a static model. The game drives these -- destruction building
@@ -1383,6 +1394,17 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         if _ga and _ga.get('$type') == 'SkinnedMeshAsset' \
                 and os.environ.get('USD_PLACE_SKINNED') != '1':
             _skinned += 1
+            continue
+
+        # USD_DROP_TYPES bisects by ASSET CLASS rather than by index: the skinned meshes were found
+        # that way in one run instead of nine, because a renderer fault tracks what a mesh IS, not
+        # where it happens to sit in the list.
+        if _ga and _ga.get('$type') in _drop_types:
+            _dropped += 1
+            continue
+
+        if (name or '').lower() in _drop_named:
+            _dropped_named += 1
             continue
 
         saved = (build_dust2.MESH_NAME, build_dust2.BLUEPRINT_NAME)
@@ -1758,6 +1780,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # gets as far as trying and stops at "LoadingInfo: Blocking on shader creation". The
         # dedicated server never creates a shader, so it reports a perfectly healthy level.
         cmds += _shader_graph_lines(mvdb_inputs, part_dir)
+        if _dropped_named:
+            print('dropname  %d mesh(es) dropped by USD_DROP_MESHES' % _dropped_named)
+
+        if _dropped:
+            print('droptype  %d mesh(es) dropped by USD_DROP_TYPES=%s'
+                  % (_dropped, ','.join(_drop_types)))
+
         if _skinned:
             print('skinned   %d mesh(es) dropped: skinned assets cannot be placed as static models'
                   % _skinned)
@@ -2282,6 +2311,34 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             print('chunks    %d LOD chunk(s) named explicitly from the corpus dump' % len(_wanted))
 
     cmds += ['build', 'build']
+    # ADD EACH TARGET ONCE.
+    #
+    # Textures and partitions shared between meshes were emitted once per mesh that used them --
+    # 496 duplicate adds on MP_001, some targets three times. Bisecting found the fault needed two
+    # meshes and did not care WHICH two: 4..20 alive, 20..36 alive, 4..36 dead, which is what a
+    # shared target being added twice looks like, and a later line wins in a bundle.
+    _seen, _deduped, _dropped_dupes = set(), [], 0
+
+    for _l in cmds:
+        _m = re.match(r'(add_existing_resource_with_chunks|add_raw_partition|add_json_partition|'
+                      r'add_existing_chunk)\s+("[^"]+"|\S+)', _l)
+
+        if _m:
+            _k = (_m.group(1), _m.group(2).strip('"').lower())
+
+            if _k in _seen:
+                _dropped_dupes += 1
+                continue
+
+            _seen.add(_k)
+
+        _deduped.append(_l)
+
+    if _dropped_dupes:
+        print('dedupe    %d duplicate add(s) dropped; each target is added once'
+              % _dropped_dupes)
+
+    cmds = _deduped
     open(os.path.join(out_dir, 'build.cmds'), 'w').write('\n'.join(cmds) + '\n')
 
     return {'meshes': stats['meshes'], 'placements': stats['placements'],
