@@ -876,6 +876,83 @@ def _guid_of_name(name):
     return _NAME_TO_GUID.get((name or '').lower())
 
 
+def _source_connections(entities, pg, part_pg):
+    """The source sub-world's connections, remapped onto the instances we carry.
+
+    The game's gamemode sub-world wires its level setup into the gamemode logic:
+    `InterfaceHasConnections: true` with Property, Link and Event connection lists. Ours emitted
+    none, so a placed level setup is instantiated and left unwired -- the client reaches the in-game
+    UI bundles and then exits cleanly, because the UI flow is connected to nothing.
+
+    A connection is kept only when BOTH ends resolve: to a record we carry (its instance guid is
+    preserved from the source, so the guid matches and only the partition is rewritten), or to a
+    partition outside the source sub-level, which is shipped as-is.
+    """
+    src = None
+    own = set()
+
+    for f in glob.glob(os.path.join(EBX, '**', '*.json'), recursive=True):
+        try:
+            doc = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        name = (doc.get('Name') or '')
+
+        if not name.startswith(SRC_GAMEMODE):
+            continue
+
+        own.add((doc.get('PartitionGuid') or '').lower())
+
+        if name.lower() == SRC_GAMEMODE.lower():
+            src = doc
+
+    if src is None:
+        return {}, False
+
+    sw = (src.get('Instances') or {}).get(src.get('PrimaryInstanceGuid')) or {}
+
+    def remap(end):
+        if not isinstance(end, dict):
+            return None
+
+        g = (end.get('PartitionGuid') or '').lower()
+        i = end.get('InstanceGuid')
+
+        if g not in own:
+            return dict(end)                                 # outside the sub-level, ship as-is
+
+        if i in entities:
+            return ref(part_pg, i)                           # a record we carry, in part0
+
+        if i == src.get('PrimaryInstanceGuid'):
+            return ref(pg, guid('instance', DST, 'subworld'))
+
+        return None                                          # points at something we dropped
+
+    out = {}
+    kept = dropped = 0
+
+    for key in ('PropertyConnections', 'LinkConnections', 'EventConnections'):
+        out[key] = []
+
+        for conn in (sw.get(key) or []):
+            a, b = remap(conn.get('Source')), remap(conn.get('Target'))
+
+            if a is None or b is None:
+                dropped += 1
+                continue
+
+            new = dict(conn)
+            new['Source'], new['Target'] = a, b
+            out[key].append(new)
+            kept += 1
+
+    print('  connections: %d carried, %d dropped (ends we do not ship)' % (kept, dropped))
+
+    return out, kept > 0
+
+
 def build(entities, source_registry=None):
     pg = guid('partition', DST)
     swd = guid('instance', DST, 'subworld')
@@ -885,6 +962,11 @@ def build(entities, source_registry=None):
 
     part_pg = guid('partition', DST, 'part', 0)
     wpd = guid('instance', DST, 'worldpart', 0)
+
+    conns, has_conns = ({}, False)
+
+    if os.environ.get('GAMEMODE_CONNECTIONS', '1') == '1':
+        conns, has_conns = _source_connections(entities, pg, part_pg)
 
     # Part 0 gets its own partition, like every world part the game ships: 617 of the game's
     # level/sub-world roots hold no WorldPartData at all.
@@ -921,6 +1003,39 @@ def build(entities, source_registry=None):
             seen_bp.add(key)
             blueprints.append({'PartitionGuid': key[0], 'InstanceGuid': key[1]})
 
+    # GAMEMODE_OWN_TEAMS=1 authors the team entities directly into the world part instead of
+    # PLACING the vanilla level setup.
+    #
+    # The setup is only wanted for its 1 AutoTeamEntityData + 2 TeamEntityData -- but registering
+    # them means placing it, and a placed setup drags its whole UI/camera/logic graph onto the
+    # CLIENT, which then exits cleanly at the in-game UI bundles. Its team entities carry no
+    # dependencies of their own beyond a gameplay/teams partition the bundle already ships, so
+    # lift them out and leave the rest of the setup behind.
+    if os.environ.get('GAMEMODE_OWN_TEAMS', '0') == '1':
+        setup_doc = None
+
+        for _f in glob.glob(os.path.join(CLOSURE, '*.json')):
+            try:
+                _d = json.load(open(_f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            if (_d.get('Name') or '').lower().endswith('/full_teamdeathmatch'):
+                setup_doc = _d
+                break
+
+        lifted = 0
+
+        for _g, _i in ((setup_doc or {}).get('Instances') or {}).items():
+            if _i.get('$type') not in ('TeamEntityData', 'AutoTeamEntityData'):
+                continue
+
+            part['Instances'][_g] = _i
+            objects.append(ref(part_pg, _g))
+            lifted += 1
+
+        print('  lifted %d team entity(ies) out of the level setup' % lifted)
+
     part['Instances'][wpd] = {
         '$type': 'WorldPartData', 'Name': DST + '/part0',
         'PropertyConnections': [], 'LinkConnections': [], 'EventConnections': [],
@@ -932,9 +1047,11 @@ def build(entities, source_registry=None):
 
     root = {'PartitionGuid': pg, 'PrimaryInstanceGuid': swd, 'Name': DST, 'Instances': {
         swd: {'$type': 'SubWorldData', 'Name': DST,
-              'PropertyConnections': [], 'LinkConnections': [], 'EventConnections': [],
+              'PropertyConnections': conns.get('PropertyConnections', []),
+              'LinkConnections': conns.get('LinkConnections', []),
+              'EventConnections': conns.get('EventConnections', []),
               'Descriptor': ref(pg, desc), 'NeedNetworkId': True,
-              'InterfaceHasConnections': False,
+              'InterfaceHasConnections': has_conns,
               'AlwaysCreateEntityBusClient': False, 'AlwaysCreateEntityBusServer': False,
               'Objects': [ref(pg, wprod)], 'RegistryContainer': ref(pg, reg),
               'IsWin32SubLevel': True, 'IsXenonSubLevel': True, 'IsPs3SubLevel': True,
