@@ -161,6 +161,9 @@ SHIPPED_INSTANCES = {}
 # LodScale reset to 1.0. The geometry itself is the game's -- we only reference the MeshSet -- so a
 # record that disagrees with it describes the wrong mesh.
 SHIPPED_ASSETS = {}
+
+# The game's ObjectBlueprint for a partition name -> (partition guid, blueprint instance guid).
+SHIPPED_BLUEPRINTS = {}
 USE_GAME_ASSET = os.environ.get('USD_GAME_ASSET', '1') != '0'
 
 

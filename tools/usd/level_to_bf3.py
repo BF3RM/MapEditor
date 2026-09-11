@@ -1382,6 +1382,12 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 if _asset:
                     build_dust2.SHIPPED_ASSETS[_n] = _asset
 
+                _bp = next((_g2 for _g2, _i2 in (_d.get('Instances') or {}).items()
+                            if _i2.get('$type') == 'ObjectBlueprint'), None)
+
+                if _bp:
+                    build_dust2.SHIPPED_BLUEPRINTS[_n] = (_pg, _bp)
+
         print('guids     %d shipped partition name(s) will keep their own guid, '
               '%d also their instance guids, %d their own asset record'
               % (len(build_dust2.SHIPPED_GUIDS), len(build_dust2.SHIPPED_INSTANCES),
@@ -1558,7 +1564,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     tex_index = {}
     flat_name = 'flat_normal'
 
-    _skinned = _dropped = _dropped_named = 0
+    _skinned = _dropped = _dropped_named = _skinned_bp = 0
     _drop_types = tuple(t.strip() for t in os.environ.get('USD_DROP_TYPES', '').split(',')
                         if t.strip())
     # USD_DROP_MESHES is a FILE of mesh partition names -- the other bisect axis. A renderer fault
@@ -1578,11 +1584,27 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # draw came out with its vertices stretched across the map. Four of 527 meshes. Dropping
         # them is honest; mis-placing them is not.
         _ga = build_dust2.SHIPPED_ASSETS.get((name or '').lower())
+        _game_bp = None
 
-        if _ga and _ga.get('$type') == 'SkinnedMeshAsset' \
-                and os.environ.get('USD_PLACE_SKINNED') != '1':
-            _skinned += 1
-            continue
+        if _ga and _ga.get('$type') == 'SkinnedMeshAsset':
+            # A skinned mesh is posed by the blueprint around it, not by the mesh: the game wraps
+            # these in an ObjectBlueprint carrying the part hierarchy that drives the bones -- 29
+            # PartComponentData for a destruction shell, a VegetationTreeEntityData for a tree that
+            # bends in wind. Our synthesised blueprint has none of that, so every bone sits at
+            # identity and the mesh splays across the map. Use the game's blueprint, which lives at
+            # the mesh name minus its _Mesh suffix; the closure carries what it needs.
+            # MEASURED: carrying those blueprints raw WEDGES the server -- they bring a physics
+            # entity, a Havok asset and a 29-part health-state hierarchy, and the level never
+            # finishes loading (301s, no Level:Loaded). So this is opt-in until the carry rule for
+            # them is worked out; the default is still to drop the mesh, which costs 26 placements
+            # and breaks nothing. See bf3-carry-rule-closure-vs-raw.
+            _bp_name = name[:-5] if name.lower().endswith('_mesh') else name
+            _game_bp = (build_dust2.SHIPPED_BLUEPRINTS.get(_bp_name.lower())
+                        if os.environ.get('USD_SKINNED_BLUEPRINT') == '1' else None)
+
+            if not _game_bp and os.environ.get('USD_PLACE_SKINNED') != '1':
+                _skinned += 1
+                continue
 
         # USD_DROP_TYPES bisects by ASSET CLASS rather than by index: the skinned meshes were found
         # that way in one run instead of nine, because a renderer fault tracks what a mesh IS, not
@@ -1651,6 +1673,11 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         bp_json, bp_pg, bp_g = build_dust2.blueprint_partition(mesh_pg, mesh_g,
                                                                with_physics=False)
 
+        if _game_bp:
+            # Point the placements at the GAME's blueprint and ship it raw instead of ours.
+            bp_pg, bp_g = _game_bp
+            _skinned_bp += 1
+
         for obj, fname in ((mesh_json, 'mesh_%s.json' % _safe(name)),
                            (bp_json, 'bp_%s.json' % _safe(name))):
             path = os.path.join(part_dir, fname)
@@ -1671,9 +1698,10 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         cmds.append('add_json_partition %s "%s"'
                     % (build_dust2.MESH_NAME, os.path.join(part_dir, 'mesh_%s.json' % _safe(name))))
-        cmds.append('add_json_partition %s "%s"'
-                    % (build_dust2.BLUEPRINT_NAME,
-                       os.path.join(part_dir, 'bp_%s.json' % _safe(name))))
+        if not _game_bp:
+            cmds.append('add_json_partition %s "%s"'
+                        % (build_dust2.BLUEPRINT_NAME,
+                           os.path.join(part_dir, 'bp_%s.json' % _safe(name))))
 
         for t in placements.get(name, []):
             lt = _as_linear_transform(t)
@@ -1978,6 +2006,10 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         if _dropped:
             print('droptype  %d mesh(es) dropped by USD_DROP_TYPES=%s'
                   % (_dropped, ','.join(_drop_types)))
+
+        if _skinned_bp:
+            print("skinned   %d mesh(es) placed through the GAME's blueprint, which poses them"
+                  % _skinned_bp)
 
         if _skinned:
             print('skinned   %d mesh(es) dropped: skinned assets cannot be placed as static models'
