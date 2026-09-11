@@ -2503,6 +2503,36 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             print('chunks    %d LOD chunk(s) named explicitly from the corpus dump' % len(_wanted))
 
     cmds += ['build', 'build']
+    # Now that every partition exists on disk, carry whatever they reference and the bundle lacks.
+    if _dangling_at is not None:
+        _late = _close_dangling_refs(part_dir, _chunk_arg)
+
+        # THE SOURCE LEVEL'S OWN TEXTURE SET.
+        #
+        # Reference-walking cannot reach these: a compiled shader names textures that appear in no
+        # EBX at all, and the shader database's own list of them is incomplete -- it covers 349 of
+        # MP_001's 605 shaders, and for MP001Road_Metal it lists the normal map but not the diffuse
+        # the renderer actually asked for. Reading the faulting record out of the live client is how
+        # that came out: rec[0] resource=NULL name='Levels/SP_Bank/Terrain/Textures/PlazaTiles_01_D'.
+        #
+        # The level's own bundle is the authority on what its shaders can ask for, so carry all of
+        # it. USD_SHIP_NAMES is a file of resource names, from
+        # `list_bundle_resources win32/levels/<level>/<level>`.
+        _extra = os.environ.get('USD_SHIP_NAMES')
+
+        if _extra and os.path.exists(_extra):
+            _names = [l.strip() for l in open(_extra) if l.strip()]
+            _lines, _got = _ship_named_partitions(
+                _names,
+                os.environ.get('TEXTURE_RAW_DIR',
+                               os.path.expanduser('~/Games/VeniceUnleashed/debug/texparts')),
+                _chunk_arg)
+            print('leveltex  %d name(s) from the source level, %d shipped' % (len(_names), len(_got)))
+            _late += _lines
+
+        if _late:
+            cmds[_dangling_at:_dangling_at] = _late
+
     # ADD EACH TARGET ONCE.
     #
     # Textures and partitions shared between meshes were emitted once per mesh that used them --
@@ -2531,13 +2561,6 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
               % _dropped_dupes)
 
     cmds = _deduped
-    # Now that every partition exists on disk, carry whatever they reference and the bundle lacks.
-    if _dangling_at is not None:
-        _late = _close_dangling_refs(part_dir, _chunk_arg)
-
-        if _late:
-            cmds[_dangling_at:_dangling_at] = _late
-
     open(os.path.join(out_dir, 'build.cmds'), 'w').write('\n'.join(cmds) + '\n')
 
     return {'meshes': stats['meshes'], 'placements': stats['placements'],
