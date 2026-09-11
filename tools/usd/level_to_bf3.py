@@ -382,6 +382,622 @@ def _game_material_count(mesh_name, dirs):
     return _GAME_SLOTS.get((mesh_name or '').lower(), 0)
 
 
+
+_GAME_MVDB = None
+_GUID_NAME_CACHE = {}
+
+
+def _game_mvdb_index(dirs):
+    """Every MeshVariationDatabaseEntry the game dumps carry, keyed by the mesh partition guid."""
+    global _GAME_MVDB                                        # noqa: PLW0603
+
+    if _GAME_MVDB is not None:
+        return _GAME_MVDB
+
+    _GAME_MVDB = {}
+
+    import glob as _g
+
+    for base in dirs or []:
+        for f in _g.glob(os.path.join(base, '**', '*.json'), recursive=True):
+            try:
+                doc = json.load(open(f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            for inst in (doc.get('Instances') or {}).values():
+                if inst.get('$type') != 'MeshVariationDatabaseEntry':
+                    continue
+
+                mesh = inst.get('Mesh')
+
+                if not isinstance(mesh, dict) or not mesh.get('PartitionGuid'):
+                    continue
+
+                key = mesh['PartitionGuid'].lower()
+
+                # EVERY candidate, not the first one dumped. A mesh has one entry per
+                # ObjectVariation, keyed by VariationAssetNameHash, and several levels' databases
+                # carry entries for the same mesh with different variations and different material
+                # counts. Keeping only the first left 55 of 527 meshes on a variation our
+                # placements never ask for -- they carry no ObjectVariation, so the renderer looks
+                # up (mesh, 0), finds nothing, and null-derefs the missing variation record the
+                # moment one of those materials wants a texture. Picking happens in
+                # _game_mvdb_entry, which is the only place that knows the slot count to match.
+                _GAME_MVDB.setdefault(key, []).append(inst)
+
+    return _GAME_MVDB
+
+
+def _game_mvdb_entry(index, mesh_name, mesh_pg, mesh_g, mats):
+    """The game's entry for this mesh, repointed at the partition we emit.
+
+    The entry's TextureParameters -- the whole point, since they carry the per-shader parameter
+    names the compiled shader database was baked against -- are kept untouched; they point at
+    texture partitions we reference from the game anyway.
+
+    Its Mesh and Material references are repointed at OUR instances, positionally in material
+    order. They cannot be carried over: we author our own instance guids, so keeping the game's
+    left every reference dangling and the client died even sooner than with a synthesised entry.
+    """
+    game_pg = _game_partition_guid(mesh_name)
+
+    if not game_pg:
+        return None
+
+    # Base variation first, then any variation -- but only ever one whose slot count matches the
+    # materials we emit, because a mismatched entry cannot be repointed without guessing.
+    cands = [c for c in (index.get(game_pg) or [])
+             if c.get('Materials') and len(c['Materials']) == len(mats)]
+    src = next((c for c in cands if (c.get('VariationAssetNameHash') or 0) == 0), None) \
+        or (cands[0] if cands else None)
+
+    if src is None:
+        return None
+
+    entry = json.loads(json.dumps(src))                       # deep copy
+    entry['Mesh'] = {'PartitionGuid': mesh_pg, 'InstanceGuid': mesh_g}
+
+    # Whatever variation this entry was baked for, it is the one our placements get -- they carry
+    # no ObjectVariation, so it has to answer the (mesh, 0) lookup or it answers nothing.
+    entry['VariationAssetNameHash'] = 0
+
+    for n, mat in enumerate(entry['Materials']):
+        mat['Material'] = {'PartitionGuid': mesh_pg, 'InstanceGuid': mats[n]}
+
+    import build_dust2
+
+    entry_g = build_dust2.guid('instance', mesh_name, 'mvdbentry')
+
+    return entry_g, {entry_g: entry}
+
+
+def _game_partition_guid(mesh_name):
+    """The GAME's partition guid for a mesh name -- the index emit() already builds."""
+    import build_dust2
+
+    g = build_dust2.SHIPPED_GUIDS.get((mesh_name or '').lower())
+
+    return g.lower() if g else None
+
+
+
+def _resolve_guid_names(guids, store=None):
+    """Partition names for a set of guids, dumping from the game anything no dump covers."""
+    import subprocess
+
+    store = store or os.environ.get('USD_CLOSURE_DIR', '/tmp/closure')
+    rime = os.environ.get('RIME_BIN', '/home/powos/Projects/Rime/bin/Release')
+    game = os.environ.get('BF3_PATH',
+                          '/home/powos/.local/share/Steam/steamapps/common/Battlefield 3')
+    env = dict(os.environ)
+    env.setdefault('DOTNET_ROOT', os.path.expanduser('~/.dotnet'))
+    missing = [g for g in guids if not os.path.exists(os.path.join(store, '%s.json' % g))]
+
+    if missing:
+        os.makedirs(store, exist_ok=True)
+        recipe = os.path.join(store, 'byguid.cmds')
+        open(recipe, 'w').write('\n'.join(
+            ['mount_game "%s" Frostbite2_0 true' % game, 'select_game 1']
+            + ['dump_partition_json_by_guid %s "%s"' % (g, os.path.join(store, '%s.json' % g))
+               for g in missing]) + '\n')
+        subprocess.run([os.path.join(rime, 'RimeREPL'), recipe], check=False, env=env,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    out = {}
+
+    for g in sorted(guids):
+        try:
+            n = json.load(open(os.path.join(store, '%s.json' % g))).get('Name')
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        if n:
+            out[g] = n
+            _GUID_NAME_CACHE[g.lower()] = n
+
+    return out
+
+
+def _game_texture_lines(part_dir, chunk_arg):
+    """Ship every texture the emitted MeshVariationDatabase actually binds.
+
+    The entries taken from the game name the GAME's texture partitions, by guid. We emit our own
+    textures under `dust2/textures/...` and nothing points at them, so those bindings resolved to
+    nothing: the renderer got a null texture and faulted creating the sampler state for it -- a
+    read of 0x74 off null inside the `device->CreateSamplerState` path, on the first frame that
+    would have drawn the level.
+
+    Both halves have to ship. `add_existing_resource_with_chunks` carries the pixels, and the
+    partition itself is carried raw so it keeps the name AND the guid the entries reference; a
+    re-emitted partition under a fresh guid is a different partition wearing the same address.
+    Resources go in before the partitions that reference them, which is the order the loader wants.
+    """
+    import subprocess
+
+    mvdb = os.path.join(part_dir, 'mvdb.json')
+
+    if not os.path.exists(mvdb):
+        return []
+
+    try:
+        doc = json.load(open(mvdb))
+    except Exception:                                        # noqa: BLE001
+        return []
+
+    want = set()
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        for mat in (inst.get('Materials') or []):
+            for tp in (mat.get('TextureParameters') or []):
+                pg = ((tp.get('Value') or {}).get('PartitionGuid') or '').lower()
+
+                if pg:
+                    want.add(pg)
+
+    # Partitions we emit ourselves are already in the bundle -- the synthesised entries bind our
+    # own `dust2/textures/...` partitions, and treating those as "unshippable" stripped every
+    # binding off the synthesised path and crashed it exactly like the game path.
+    import glob as _g
+
+    ours = set()
+
+    for f in _g.glob(os.path.join(part_dir, '*.json')):
+        try:
+            pg = (json.load(open(f)).get('PartitionGuid') or '').lower()
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        if pg:
+            ours.add(pg)
+
+    want -= ours
+
+    if not want:
+        return []
+
+    names = _resolve_guid_names(want)
+    rime = os.environ.get('RIME_BIN', '/home/powos/Projects/Rime/bin/Release')
+    game = os.environ.get('BF3_PATH',
+                          '/home/powos/.local/share/Steam/steamapps/common/Battlefield 3')
+    env = dict(os.environ)
+    env.setdefault('DOTNET_ROOT', os.path.expanduser('~/.dotnet'))
+    raw_dir = os.environ.get('TEXTURE_RAW_DIR',
+                             os.path.expanduser('~/Games/VeniceUnleashed/debug/texparts'))
+    os.makedirs(raw_dir, exist_ok=True)
+    paths = {n: os.path.join(raw_dir, n.replace('/', '_').replace(' ', '_') + '.bin')
+             for n in names.values()}
+    todo = [n for n, f in paths.items() if not (os.path.exists(f) and os.path.getsize(f) > 0)]
+
+    if todo:
+        recipe = os.path.join(raw_dir, 'dump.cmds')
+        open(recipe, 'w').write('\n'.join(
+            ['mount_game "%s" Frostbite2_0 true' % game, 'select_game 1']
+            + ['dump_partition "%s" "%s"' % (n, paths[n]) for n in todo]) + '\n')
+        subprocess.run([os.path.join(rime, 'RimeREPL'), recipe], check=False, env=env,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    res, parts = [], []
+
+    for n in sorted(set(names.values())):
+        res.append('add_existing_resource_with_chunks %s 1%s' % (n, chunk_arg))
+
+        if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0:
+            parts.append('add_raw_partition "%s" "%s"' % (n, paths[n]))
+
+    # A binding we cannot ship is worse than no binding: the renderer reads the texture object out
+    # of the slot and faults on the null. Strip those parameters back out of the database.
+    shipped = ours | {g for g, n in names.items()
+                      if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0}
+    dropped = 0
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        for mat in (inst.get('Materials') or []):
+            keep = [tp for tp in (mat.get('TextureParameters') or [])
+                    if ((tp.get('Value') or {}).get('PartitionGuid') or '').lower() in shipped]
+            dropped += len(mat.get('TextureParameters') or []) - len(keep)
+            mat['TextureParameters'] = keep
+
+    if dropped:
+        json.dump(doc, open(mvdb, 'w'), indent=1)
+
+    print('mvdbtex   %d texture partition(s) bound by the database, %d named, %d shipped, '
+          '%d binding(s) dropped as unshippable'
+          % (len(want), len(names), len(parts), dropped))
+
+    return res + parts
+
+
+def _repair_mvdb_material_order(part_dir):
+    """Give each material the texture set its OWN shader asks for.
+
+    The entries taken from the game are repointed onto our materials positionally, and the two
+    orders do not correspond: on the 8-mesh cut a material whose shader is
+    `_housetemplateshader_01_...` was handed the parameters of `_house_paintedplaster_01_...`
+    (DetailNormal/DetailTexture/Dirtmap/PlasterMask instead of DetailDiffuse/DetailSpecular/
+    DirtTexture/NormalMap), and a prop-preset material was handed a house's. A parameter name the
+    shader does not use fills nothing, so the slot it should have filled stays null -- and the
+    renderer faults reading the texture out of the first null slot while creating its sampler
+    state, on the first frame that would have drawn the level.
+
+    The shader database says what each shader actually wants: its `external:` entries are exactly
+    the slots the material has to fill. Match on that instead of on position.
+    """
+    import glob as _g
+
+    mvdb = os.path.join(part_dir, 'mvdb.json')
+    index = os.environ.get('SHADERDB_TEXTURES',
+                           os.path.expanduser('~/Games/VeniceUnleashed/debug/'
+                                              'shaderdb_textures.json'))
+
+    if not os.path.exists(mvdb) or not os.path.exists(index):
+        return
+
+    try:
+        doc = json.load(open(mvdb))
+        by_shader = {k.lower(): v for k, v in json.load(open(index))['shaders'].items()}
+    except Exception as _ex:                                 # noqa: BLE001
+        print('mvdbfix    could not read the inputs (%s)' % _ex)
+
+        return
+
+    # Our materials -> the shader graph partition they name -> that shader's `external:` slots.
+    seen, shaders = {}, set()
+
+    for f in _g.glob(os.path.join(part_dir, 'mesh_*.json')):
+        try:
+            d = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        pg = (d.get('PartitionGuid') or '').lower()
+
+        for g, v in (d.get('Instances') or {}).items():
+            if v.get('$type') != 'MeshMaterial':
+                continue
+
+            sh = (((v.get('Shader') or {}).get('Shader') or {}).get('PartitionGuid') or '').lower()
+
+            if sh:
+                seen[(pg, g.lower())] = sh
+                shaders.add(sh)
+
+    names = _resolve_guid_names(shaders)
+    wanted = {k: {t[len('external:'):]
+                  for t in by_shader.get((names.get(sh) or '').lower(), [])
+                  if t.startswith('external:')}
+              for k, sh in seen.items()}
+
+    moved = unmatched = 0
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        mats = inst.get('Materials') or []
+        pool = [m.get('TextureParameters') or [] for m in mats]
+        used = set()
+
+        for n, m in enumerate(mats):
+            r = m.get('Material') or {}
+            want = wanted.get(((r.get('PartitionGuid') or '').lower(),
+                               (r.get('InstanceGuid') or '').lower()))
+
+            if not want:
+                continue                                     # no contract known; leave it alone
+
+            best, score = None, -1
+
+            for j, params in enumerate(pool):
+                if j in used:
+                    continue
+
+                have = {(tp.get('ParameterName') or '') for tp in params}
+                hit = len(want & have)
+
+                if hit > score:
+                    best, score = j, hit
+
+            if best is None or score <= 0:
+                unmatched += 1
+                continue
+
+            used.add(best)
+
+            if best != n:
+                moved += 1
+
+            m['TextureParameters'] = pool[best]
+
+    # Any slot the shader asks for and the entry cannot supply is a NULL texture, and the renderer
+    # faults on the first one while creating its sampler state. It is never worth crashing over: a
+    # shared preset shader is baked per level, so MP_001's copy can want a parameter the entry
+    # (taken from whatever level shipped that mesh) never had. Fill it with the closest texture the
+    # material already binds -- matched on the usual _d/_n/_s/_m suffixes -- so the slot is wrong
+    # rather than absent.
+    guids = set()
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        for m in (inst.get('Materials') or []):
+            for tp in (m.get('TextureParameters') or []):
+                pg = ((tp.get('Value') or {}).get('PartitionGuid') or '').lower()
+
+                if pg:
+                    guids.add(pg)
+
+    texnames = _resolve_guid_names(guids)
+    _suffix = (('normal', '_n'), ('bump', '_n'), ('spec', '_s'), ('gloss', '_s'),
+               ('mask', '_m'), ('diffuse', '_d'), ('color', '_d'), ('albedo', '_d'))
+    filled = 0
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        for m in (inst.get('Materials') or []):
+            r = m.get('Material') or {}
+            want = wanted.get(((r.get('PartitionGuid') or '').lower(),
+                               (r.get('InstanceGuid') or '').lower())) or set()
+            params = m.get('TextureParameters') or []
+            have = {(tp.get('ParameterName') or '') for tp in params}
+
+            if not params:
+                continue                                     # nothing to borrow from
+
+            for missing in sorted(want - have):
+                pick = None
+                low_missing = missing.lower()
+
+                for key, suf in _suffix:
+                    if key not in low_missing:
+                        continue
+
+                    pick = next((tp for tp in params
+                                 if (texnames.get(((tp.get('Value') or {})
+                                                   .get('PartitionGuid') or '').lower())
+                                     or '').lower().endswith(suf)), None)
+
+                    if pick:
+                        break
+
+                pick = pick or params[0]
+                params.append({'ParameterName': missing,
+                               'Value': dict(pick['Value'])})
+                filled += 1
+
+            m['TextureParameters'] = params
+
+    json.dump(doc, open(mvdb, 'w'), indent=1)
+
+    print('mvdbfix   %d material(s) re-paired to the texture set their shader asks for, '
+          '%d with no match, %d empty slot(s) filled with a stand-in'
+          % (moved, unmatched, filled))
+
+
+def _ship_named_partitions(names, store, chunk_arg=''):
+    """`add_existing_resource_with_chunks` + `add_raw_partition` for each name, dumped once.
+
+    Both halves are needed: the resource carries the payload, the raw partition keeps the name AND
+    the guid the references use. Raw bytes are cached in `store`, so a name is only ever dumped out
+    of the game once however many levels get exported.
+    """
+    import subprocess
+
+    names = sorted({n for n in names if n})
+
+    if not names:
+        return []
+
+    rime = os.environ.get('RIME_BIN', '/home/powos/Projects/Rime/bin/Release')
+    game = os.environ.get('BF3_PATH',
+                          '/home/powos/.local/share/Steam/steamapps/common/Battlefield 3')
+    os.makedirs(store, exist_ok=True)
+    paths = {n: os.path.join(store, n.replace('/', '_').replace(' ', '_') + '.bin') for n in names}
+    todo = [n for n, f in paths.items() if not (os.path.exists(f) and os.path.getsize(f) > 0)]
+
+    if todo:
+        recipe = os.path.join(store, 'dump.cmds')
+        open(recipe, 'w').write('\n'.join(
+            ['mount_game "%s" Frostbite2_0 true' % game, 'select_game 1']
+            + ['dump_partition "%s" "%s"' % (n, paths[n]) for n in todo]) + '\n')
+        subprocess.run([os.path.join(rime, 'RimeREPL'), recipe], check=False,
+                       env=dict(os.environ, DOTNET_ROOT=os.path.expanduser('~/.dotnet')),
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    got = [n for n in names if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0]
+    lines = ['add_existing_resource_with_chunks %s 1%s' % (n, chunk_arg) for n in got]
+    lines += ['add_raw_partition "%s" "%s"' % (n, paths[n]) for n in got]
+
+    return lines, got
+
+
+def _shader_streamable_textures(shader_names, shipped, chunk_arg):
+    """Ship the textures the SHADERS themselves bind.
+
+    A compiled shader's texture list is not the material's. Alongside the `external:` slots the
+    material fills through the MeshVariationDatabase, each shader names streamable textures baked
+    into it -- on the 8-mesh cut, 18 of them, 11 of which nothing else in the bundle carried. Those
+    slots come up null, and the renderer faults reading the texture out of the first one while
+    creating its sampler state, on the first frame that would draw the level. The list is in the
+    shader database itself: `dump_shader_textures <shaderdb>`.
+    """
+    index = os.environ.get('SHADERDB_TEXTURES',
+                           os.path.expanduser('~/Games/VeniceUnleashed/debug/'
+                                              'shaderdb_textures.json'))
+
+    if not os.path.exists(index):
+        print('shadertex  no shader-texture index at %s; shaders will bind null textures' % index)
+
+        return []
+
+    try:
+        by_shader = json.load(open(index))['shaders']
+    except Exception as _ex:                                 # noqa: BLE001
+        print('shadertex  could not read %s (%s)' % (index, _ex))
+
+        return []
+
+    low = {k.lower(): v for k, v in by_shader.items()}
+    want, external = set(), 0
+
+    for n in shader_names:
+        for t in low.get((n or '').lower(), []):
+            if t.startswith('external:'):
+                external += 1                                # the material fills these
+            else:
+                want.add(t)
+
+    todo = {t for t in want if t.lower() not in shipped}
+    lines, got = _ship_named_partitions(
+        todo, os.environ.get('TEXTURE_RAW_DIR',
+                             os.path.expanduser('~/Games/VeniceUnleashed/debug/texparts')),
+        chunk_arg)
+    print('shadertex %d texture(s) baked into the shaders, %d already carried, %d shipped, '
+          '%d material slot(s) left to the database'
+          % (len(want), len(want) - len(todo), len(got), external))
+
+    return lines
+
+
+def _shader_graph_lines(mvdb_inputs, part_dir):
+    """`add_raw_partition` for every ShaderGraph our emitted materials reference.
+
+    The guids come off the materials we just wrote. Names are resolved through the closure dump,
+    with anything missing dumped by guid first, and the bytes come from the game.
+    """
+    import glob as _g
+    import subprocess
+
+    want = set()
+
+    # Read the guids back out of the partitions we just wrote -- that is what actually ships.
+    for f in _g.glob(os.path.join(part_dir, 'mesh_*.json')):
+        try:
+            doc = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        for inst in (doc.get('Instances') or {}).values():
+            if inst.get('$type') != 'MeshMaterial':
+                continue
+
+            sh = ((inst.get('Shader') or {}).get('Shader') or {}).get('PartitionGuid')
+
+            if sh:
+                want.add(sh.lower())
+
+    if not want:
+        return []
+
+    closure = os.environ.get('USD_CLOSURE_DIR', '/tmp/closure')
+    rime = os.environ.get('RIME_BIN', '/home/powos/Projects/Rime/bin/Release')
+    game = os.environ.get('BF3_PATH',
+                          '/home/powos/.local/share/Steam/steamapps/common/Battlefield 3')
+    env = dict(os.environ)
+    env.setdefault('DOTNET_ROOT', os.path.expanduser('~/.dotnet'))
+
+    # Resolve names, dumping any guid the closure has never seen.
+    missing = [g for g in want if not os.path.exists(os.path.join(closure, '%s.json' % g))]
+
+    if missing:
+        os.makedirs(closure, exist_ok=True)
+        recipe = os.path.join(closure, 'shadergraphs.cmds')
+        open(recipe, 'w').write('\n'.join(
+            ['mount_game "%s" Frostbite2_0 true' % game, 'select_game 1']
+            + ['dump_partition_json_by_guid %s "%s"' % (g, os.path.join(closure, '%s.json' % g))
+               for g in missing]) + '\n')
+        subprocess.run([os.path.join(rime, 'RimeREPL'), recipe], check=False, env=env,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    names = []
+
+    for g in sorted(want):
+        try:
+            n = json.load(open(os.path.join(closure, '%s.json' % g))).get('Name')
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        if n:
+            names.append(n)
+
+    # Raw bytes for each, dumped once.
+    raw_dir = os.environ.get('SHADER_RAW_DIR', '/tmp/shadergraphs')
+    os.makedirs(raw_dir, exist_ok=True)
+    paths = {n: os.path.join(raw_dir, n.replace('/', '_').replace(' ', '_') + '.bin')
+             for n in names}
+    todo = [n for n, f in paths.items() if not (os.path.exists(f) and os.path.getsize(f) > 0)]
+
+    if todo:
+        recipe = os.path.join(raw_dir, 'dump.cmds')
+        open(recipe, 'w').write('\n'.join(
+            ['mount_game "%s" Frostbite2_0 true' % game, 'select_game 1']
+            + ['dump_partition "%s" "%s"' % (n, paths[n]) for n in todo]) + '\n')
+        subprocess.run([os.path.join(rime, 'RimeREPL'), recipe], check=False, env=env,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # SHADER_GRAPHS=closure gives each graph its dependency closure instead of a raw copy. A
+    # ShaderGraph is resolved EAGERLY when the client builds the material, so by the rule the rest
+    # of this pipeline already follows it wants its closure, not just its bytes.
+    if os.environ.get('SHADER_GRAPHS', 'raw') == 'closure':
+        lines = ['reference_existing_partition %s 1 false' % n for n in names]
+    else:
+        lines = ['add_raw_partition "%s" "%s"' % (n, paths[n]) for n in names
+                 if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0]
+
+    print('shaders   %d graph(s) referenced, %d resolved, %d shipped'
+          % (len(want), len(names), len(lines)))
+
+    # Whatever is already in the bundle by the time we get here does not need carrying again.
+    shipped = set()
+
+    for f in _g.glob(os.path.join(part_dir, '*.json')):
+        try:
+            n = (json.load(open(f)).get('Name') or '').lower()
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        if n:
+            shipped.add(n)
+            # Textures we emit ourselves are named `dust2/textures/<game path>`.
+            if n.startswith('dust2/textures/'):
+                shipped.add(n[len('dust2/textures/'):])
+
+    chunk_dir = os.path.join(os.environ.get('USD_CORPUS', '/tmp/corpusall'), 'chunks')
+    lines += _shader_streamable_textures(
+        names, shipped, (' "%s"' % chunk_dir) if os.path.isdir(chunk_dir) else '')
+
+    return lines
+
+
 def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
          texture_dir=None, terrain_of=None, reference_parts=None, roads=None,
          ebx_dir=None, level_sb=None, sb_dir=None, max_meshes=None, skip_meshes=0,
@@ -1028,7 +1644,32 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     if mvdb_inputs:
         entries = []
 
+        game_mvdb = _game_mvdb_index(_guid_dirs)
+        from_game = 0
+
         for name, mesh_pg, mesh_g, mats, names_, binding in mvdb_inputs:
+            # PREFER THE GAME'S OWN ENTRY. A synthesised entry binds a fixed Diffuse/Normal/
+            # Specular triple, but BF3 materials declare per-shader parameter names -- Camo, AO,
+            # MainDiffuse, CamoTile -- and the compiled shader database is baked against THOSE.
+            # Feed the client a triple the shader does not declare and it cannot bind the material:
+            # with no shaderdb nothing draws at all (sky and sun still do, their shaders are always
+            # resident), and with the shaderdb present it dies at "Blocking on shader creation".
+            # MEASURED: the game's level database carries 1016 entries for MP_001; ours carried 527
+            # identical-shaped ones.
+            # GAME_MVDB=1 only. The game's entries carry the RIGHT per-shader parameter names, but
+            # with them the client gets far enough to attempt real shader creation and stops at
+            # "Blocking on shader creation" -- shader graphs shipped, textures shipped, and the
+            # level's shader database present under its own name or the game's, all the same.
+            # Until that is solved the synthesised entries are what lets a client into the level,
+            # so they stay the default: wrong bindings, but the level is joinable.
+            got = (_game_mvdb_entry(game_mvdb, name, mesh_pg, mesh_g, mats)
+                   if os.environ.get('GAME_MVDB') == '1' else None)
+
+            if got is not None:
+                entries.append(got)
+                from_game += 1
+                continue
+
             entry_g, instances, _bound = build_dust2.mvdb_entry(
                 name, mesh_pg, mesh_g, mats, names_, binding, tex_index, flat_name)
             entries.append((entry_g, instances))
@@ -1036,8 +1677,26 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         mvdb_json = build_dust2.mvdb_partition(entries)
         path = os.path.join(part_dir, 'mvdb.json')
         json.dump(mvdb_json, open(path, 'w'), indent=1)
+
+        # Pair each material with its OWN shader's texture set before anything reads the database.
+        _repair_mvdb_material_order(part_dir)
+
+        # The textures the database binds go in FIRST: a resource has to be in the bundle before
+        # the partition that references it, or the loader wedges.
+        cmds += _game_texture_lines(part_dir, _chunk_arg)
         cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.MVDB_NAME), path))
-        print('mvdb      %d entries' % len(entries))
+
+        # SHIP THE SHADER GRAPHS THE MATERIALS NAME.
+        #
+        # Every MeshMaterial points at a ShaderGraph partition, and the bundle carried NONE of them
+        # -- 0 of 251 on MP_001. Without the graph the client has nothing to build the shader from:
+        # the level loads, the client creates all 5864 static models, and nothing is ever drawn
+        # (sky and sun still are, their shaders are always resident). With correct MVDB bindings it
+        # gets as far as trying and stops at "LoadingInfo: Blocking on shader creation". The
+        # dedicated server never creates a shader, so it reports a perfectly healthy level.
+        cmds += _shader_graph_lines(mvdb_inputs, part_dir)
+        print('mvdb      %d entries (%d from the game, %d synthesised)'
+              % (len(entries), from_game, len(entries) - from_game))
 
         # `flat_normal` is a 4x4 normal map this emitter GENERATES, bound wherever a mesh has no
         # normal slot. Shipped alone in a sub-level bundle it FREEZES THE CLIENT -- one of the

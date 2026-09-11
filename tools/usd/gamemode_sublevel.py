@@ -1026,15 +1026,32 @@ def build(entities, source_registry=None):
 
         lifted = 0
 
+        # Lift the setup's own ENTITY data -- teams, the two character spawns that are the deploy
+        # points, the camera, the UI graph, the round logic -- but NOT its blueprint PLACEMENTS.
+        # The placements (6 LogicReferenceObjectData + 1 ReferenceObjectData) are what pull in
+        # external blueprints the client cannot resolve; the entity data carries no dependencies
+        # beyond the gameplay/teams partitions the bundle already ships.
+        _skip_types = ('LogicReferenceObjectData', 'ReferenceObjectData', 'SpatialPrefabBlueprint',
+                       'InterfaceDescriptorData')
+
+        # GAMEMODE_LIFT_TYPES names exactly which of the setup's types to lift. Lifting all 43 of
+        # its non-placement entities kills the client, so this is a bisect knob as much as a
+        # setting; the default is the smallest set that registers teams.
+        _lift_only = tuple(t.strip() for t in os.environ.get(
+            'GAMEMODE_LIFT_TYPES', 'TeamEntityData,AutoTeamEntityData').split(',') if t.strip())
+
         for _g, _i in ((setup_doc or {}).get('Instances') or {}).items():
-            if _i.get('$type') not in ('TeamEntityData', 'AutoTeamEntityData'):
+            if _i.get('$type') in _skip_types:
+                continue
+
+            if _lift_only and _i.get('$type') not in _lift_only:
                 continue
 
             part['Instances'][_g] = _i
             objects.append(ref(part_pg, _g))
             lifted += 1
 
-        print('  lifted %d team entity(ies) out of the level setup' % lifted)
+        print('  lifted %d entity(ies) out of the level setup (placements left behind)' % lifted)
 
     part['Instances'][wpd] = {
         '$type': 'WorldPartData', 'Name': DST + '/part0',
