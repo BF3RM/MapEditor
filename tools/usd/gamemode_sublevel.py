@@ -806,6 +806,39 @@ def _refs_for(_unused=None):
         'GAMEMODE_SETUP_SKIP',
         'characters/,weapons/,weapons_old/,vehicles/,sound/,fx/,persistence/,animations/,xp5/')
 
+    # The blueprints the level setup's OWN reference objects name. The setup registers teams only
+    # when it is PLACED, and a placed setup is instantiated on the client, which then needs every
+    # blueprint its 6 LogicReferenceObjectData point at. Shipping just those is the bounded middle
+    # ground between a raw copy (client dies) and the full closure (49 MB -> 1.48 GB).
+    if os.environ.get('GAMEMODE_SETUP_DEPS', '1') != '0':
+        _dep_names = []
+
+        for _setup in setups:
+            _doc = _closure_doc(_guid_of_name(_setup))
+
+            for _inst in ((_doc or {}).get('Instances') or {}).values():
+                _bp = _inst.get('Blueprint')
+
+                if not isinstance(_bp, dict) or not _bp.get('PartitionGuid'):
+                    continue
+
+                _d = _closure_doc(_bp['PartitionGuid'])
+
+                if _d and _d.get('Name') and _d['Name'] not in _dep_names:
+                    _dep_names.append(_d['Name'])
+
+        # GAMEMODE_SETUP_DEPS=closure gives them their dependency closure instead of a raw copy --
+        # a raw logic blueprint whose mesh has no shader stops the client at "Blocking on shader
+        # creation". With the level bundle declared as a dependency the closure skips everything
+        # the level already ships, so the cost stays bounded.
+        if os.environ.get('GAMEMODE_SETUP_DEPS') == 'closure':
+            _dep_lines = ['reference_existing_partition %s 1 false' % n for n in _dep_names]
+        else:
+            _dep_lines = ['add_raw_partition "%s" "%s"' % (n, f)
+                          for n, f in ((n, _raw_dump(n)) for n in _dep_names) if f]
+        lines += _dep_lines
+        print('  level-setup blueprints carried: %d of %d' % (len(_dep_lines), len(_dep_names)))
+
     if os.environ.get('GAMEMODE_SETUP_CLOSURE', '1') == '1':
         lines += ['reference_existing_partition %s 1 false "%s"' % (n, _setup_skip)
                   for n in setups]
