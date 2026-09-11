@@ -281,6 +281,23 @@ def _source_bundle():
     return None
 
 
+def _bundle_chunks(bundle):
+    """Every chunk guid the game's own gamemode bundle carries.
+
+    `add_existing_resource_with_chunks` only brings the chunks a resource's payload NAMES. The
+    bundle carries more than that, and a chunk the engine looks up but cannot find is not a missing
+    detail: BF3's chunk lookup is an open-addressed guid probe whose miss path indexes the entry
+    array with the 0xFFFF empty-bucket sentinel, so a miss is an out-of-bounds WRITE. MEASURED --
+    the server died with ACCESS_VIOLATION writing 0xFF970004 (a different wild address each run) in
+    vu.com+0xC8010, next door to the +0xC1CAC lookup, and only in the carries that mix meshes and
+    textures, i.e. exactly when the table gets full enough for a miss to probe off the end.
+    """
+    out = _rime(['list_bundle_chunks %s' % bundle])
+
+    return [l[2:].strip() for l in out.split('\n')
+            if l.startswith('- ') and len(l[2:].strip()) == 36]
+
+
 def _bundle_contents(bundle):
     """(partition names, resource names) the game's own gamemode bundle carries."""
     out = _rime(['list_bundle_partitions %s' % bundle])
@@ -354,6 +371,12 @@ def _source_bundle_carry(already):
     # need and is carried unchanged.
     skip = set(n.lower() for n in already)
 
+    # GAMEMODE_BUNDLE_MVDB=0 leaves the source gamemode's MeshVariationDatabase out. It is the one
+    # partition whose cost depends on meshes AND textures both being resident, which is exactly the
+    # combination that turns a 20s load into a 15-minute one.
+    if os.environ.get('GAMEMODE_BUNDLE_MVDB', '1') != '1':
+        parts = [n for n in parts if 'meshvariationdb' not in n.lower()]
+
     keep = [n for n in parts
             if n.lower() not in skip
             and n.lower() != SRC_GAMEMODE.lower()
@@ -399,8 +422,75 @@ def _source_bundle_carry(already):
         a, _, b = sl.partition(':')
         res = res[int(a or 0):int(b) if b else None]
 
-    lines += ['add_existing_resource_with_chunks "%s" 1' % n for n, _ in res]
-    lines += ['add_raw_partition "%s" "%s"' % (n, dumped[n]) for n in keep if n in dumped]
+    # GAMEMODE_BUNDLE_TEX_SLICE=a:b slices the DxTextures ONLY and keeps every other type whole.
+    # The distinction matters: the load is fine with all 301 textures and no meshes, and fine with
+    # all 33 meshes and no textures, and pathological with both -- so a bisect that drops the meshes
+    # to halve the textures is not bisecting the failure at all. It has to keep the meshes.
+    tsl = os.environ.get('GAMEMODE_BUNDLE_TEX_SLICE', '')
+
+    if tsl:
+        a, _, b = tsl.partition(':')
+        tex = sorted(n for n, t in res if t.lower() == 'dxtexture')
+        tex = set(tex[int(a or 0):int(b) if b else None])
+        res = [(n, t) for n, t in res if t.lower() != 'dxtexture' or n in tex]
+
+    # GAMEMODE_BUNDLE_RES_DROP=<file> drops the resource names listed there, one per line.
+    drop_file = os.environ.get('GAMEMODE_BUNDLE_RES_DROP', '')
+
+    if drop_file and os.path.exists(drop_file):
+        dropped = {l.strip().lower() for l in open(drop_file) if l.strip()}
+        res = [(n, t) for n, t in res if n.lower() not in dropped]
+
+    # INTERLEAVE, the way the game's own recipe does it: each resource immediately before the
+    # partition that names it, not all 340 resources followed by all 1573 partitions.
+    #
+    # "Resources before partitions" is not enough -- the emitter's own level bundle carries 1224
+    # resources this way and loads in 20s, while the same content in two blocks does not. MEASURED
+    # by bisecting the texture carry with the meshes kept: 8 textures load, 9 do not, and the 9th on
+    # its own loads fine, so it is neither the texture nor the count but where the lines sit. Same
+    # shape as the ~14-resource wedge already on record for the wrong order.
+    by_name = {n.lower(): n for n, _ in res}
+    kind_of = {n.lower(): t for n, t in res}
+    attached = set()
+
+    for n in keep:
+        if n.lower() in by_name:
+            attached.add(n.lower())
+
+    # A resource with no same-named partition is referenced by some other partition, so it has to be
+    # in before any of them.
+    # Carry the bundle's OWN chunk list first, so nothing the engine reaches for is absent. The
+    # resource-driven adds below then land on chunks already present, which is a no-op.
+    if os.environ.get('GAMEMODE_BUNDLE_CHUNKS', '1') == '1':
+        chunks = _bundle_chunks(bundle)
+        lines += ['add_existing_chunk %s 1' % g for g in chunks]
+        print('  carrying %d chunk(s) the source bundle holds' % len(chunks))
+
+    # GAMEMODE_TEX_CHUNKS=0 ships a texture's HEADER without its pixel chunk.
+    #
+    # The server does not render, and carrying 301 character texture payloads is what kills it:
+    # with the meshes also present it dies in chunk registration (ACCESS_VIOLATION in
+    # vu.com+0xC8010). The client DOES need the pixels, but a texture chunk is exactly the kind of
+    # payload the engine fetches BY GUID from a mounted chunk superbundle -- which is how the game
+    # streams them and what the ext already mounts MpChunks/SpChunks back for.
+    _tex_chunks = os.environ.get('GAMEMODE_TEX_CHUNKS', '1') == '1'
+
+    def _res_line(name, kind):
+        if not _tex_chunks and kind.lower() == 'dxtexture':
+            return 'add_existing_resource "%s" 1' % name
+
+        return 'add_existing_resource_with_chunks "%s" 1' % name
+
+    lines += [_res_line(n, t) for n, t in res if n.lower() not in attached]
+
+    for n in keep:
+        if n not in dumped:
+            continue
+
+        if n.lower() in attached:
+            lines.append(_res_line(by_name[n.lower()], kind_of.get(n.lower(), '')))
+
+        lines.append('add_raw_partition "%s" "%s"' % (n, dumped[n]))
 
     print('  source bundle %s: %d partition(s), %d resource(s); carrying %d, %d undumpable'
           % (bundle, len(parts), len(res), len(dumped), len(missing)))
@@ -973,6 +1063,13 @@ def main():
     carried = [l.split(' ')[1].strip('"') for l in refs
                if l.startswith(('add_raw_partition ', 'reference_existing_partition ',
                                 'add_existing_resource_with_chunks '))]
+
+    # Everything the LEVEL bundle already carries. Adding any of it again puts one asset in two
+    # bundles of the same superbundle, which the game itself never does.
+    carried += [l.split(' ')[1].strip('"') for l in cmds
+                if l.startswith(('add_raw_partition ', 'add_json_partition ',
+                                 'add_existing_resource_with_chunks ', 'add_existing_resource ',
+                                 'add_resource ', 'reference_existing_partition '))]
     bundle_lines = (_source_bundle_carry(carried)
                     if os.environ.get('GAMEMODE_BUNDLE', '1') == '1' else [])
 
@@ -1001,7 +1098,49 @@ def main():
     json.dump(root, open(root_path, 'w'), indent=1)
     json.dump(part, open(part_path, 'w'), indent=1)
 
-    cmds += (['build', 'build_bundle ' + DST_BUNDLE]
+    # DECLARE THE LEVEL BUNDLE AS A DEPENDENCY.
+    #
+    # The game never registers the same chunk in two bundles of one superbundle -- MEASURED:
+    # win32/levels/mp_001/mp_001 and its team_deathmatch bundle share 0 of 3705 and 607 chunks.
+    # Ours shared 2, both mesh chunks of the invisible-collision blueprints that
+    # reference_existing_partition pulls in as closure while the level bundle already carries them.
+    #
+    # A chunk inserted twice corrupts BF3's open-addressed chunk table, and the server then dies
+    # with ACCESS_VIOLATION writing a wild address in vu.com+0xC8010 (called from the +0xC1AB3
+    # lookup) -- but only once the table is full enough for the collision to matter, which is why
+    # 8 character textures loaded and 9 did not, and why the 9th on its own was fine.
+    #
+    # reference_existing_partition already skips whatever the dependency bundles carry, so naming
+    # the level bundle here is both the fix and the truth: the engine loads it first (comp=4 before
+    # comp=5 in the server's own LoadBundles trace).
+    # Never re-add what the LEVEL bundle already carries. The two mesh chunks our two bundles
+    # shared came in here: _refs_for names the invisible-collision meshes as physics resources, and
+    # the level bundle carries the very same meshes with an explicit add_chunk.
+    _level_names = {l.split(' ')[1].strip('"').lower() for l in cmds
+                    if l.startswith(('add_existing_resource_with_chunks ', 'add_existing_resource ',
+                                     'add_resource ', 'add_raw_partition ', 'add_json_partition ',
+                                     'reference_existing_partition '))}
+    _before = len(refs)
+    refs = [l for l in refs if l.split(' ')[1].strip('"').lower() not in _level_names]
+
+    if len(refs) != _before:
+        print('  dropped %d ref(s) the level bundle already carries' % (_before - len(refs)))
+
+    # GAMEMODE_REFS_PLACED=0 drops the placed-blueprint closures. Their 10 placements are already
+    # repointed at our own blueprints, and their closure is what duplicates the two mesh chunks the
+    # level bundle carries.
+    if os.environ.get('GAMEMODE_REFS_PLACED', '1') != '1':
+        refs = [l for l in refs if not l.startswith('reference_existing_partition ')]
+        print('  dropped the placed-blueprint closures')
+
+    level_bundle = next((l.split(' ', 1)[1].strip() for l in cmds
+                         if l.startswith('build_bundle ')), None)
+    dep = ['add_dependency_bundle ' + level_bundle] if level_bundle else []
+
+    if level_bundle:
+        print('  gamemode bundle depends on %s' % level_bundle)
+
+    cmds += (['build', 'build_bundle ' + DST_BUNDLE] + dep
              + bundle_lines + refs + add + ['build', 'build'])
     open(cmds_path, 'w').write('\n'.join(cmds) + '\n')
     print('emitted %s (%d instances) and part0 (%d instances)'
