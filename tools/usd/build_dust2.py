@@ -152,6 +152,17 @@ SHIPPED_LODGROUPS = {}
 # nothing logged.
 SHIPPED_INSTANCES = {}
 
+# The game's OWN mesh-asset record, by partition name.
+#
+# Everything below used to synthesise a RigidMeshAsset for every mesh. Diffing one against the
+# game's showed why nothing drew properly: meshes the game ships as SkinnedMeshAsset were being
+# re-emitted as RigidMeshAsset, with a LodGroup pointing into our own partition instead of the
+# shared one, no BoundingBoxPositionOffset/SizeOffset at all, DestructionMaterialEnable flipped and
+# LodScale reset to 1.0. The geometry itself is the game's -- we only reference the MeshSet -- so a
+# record that disagrees with it describes the wrong mesh.
+SHIPPED_ASSETS = {}
+USE_GAME_ASSET = os.environ.get('USD_GAME_ASSET', '1') != '0'
+
 
 # OFF by default, and the measurement is why.
 #
@@ -736,6 +747,27 @@ def mesh_partition(material_names, material_ebx=None):
         'ShadowDistance': _lod.get('ShadowDistance', 0.0),
         'CullScreenArea': _lod.get('CullScreenArea', 0.02),
     }
+
+    # Carry the game's own asset record where it ships one: only the material list has to change,
+    # and everything else -- asset TYPE, lod group, bounding-box offsets, lod scale, destruction
+    # and occluder flags -- is exactly what the MeshSet we reference was authored against.
+    _game_asset = SHIPPED_ASSETS.get(MESH_NAME.lower()) if USE_GAME_ASSET else None
+
+    if _game_asset:
+        _a = json.loads(json.dumps(_game_asset))
+        _a['Materials'] = ([BORROWED_MATERIAL] * len(material_guids)) if BORROWED_MATERIAL \
+            else [ref(pg, g) for g in material_guids]
+
+        # The one flag that cannot be carried: an occluder mesh is a separate section of the
+        # MeshSet that this bundle does not bring, and the renderer faults dereferencing it
+        # (_occluderMesh, one mesh in eight on MP_001). Occlusion culling is a performance
+        # feature -- dropping it costs frame rate, not pixels.
+        if os.environ.get('USD_KEEP_OCCLUDER') != '1':
+            _a['OccluderMeshEnable'] = False
+        instances[mesh_g] = _a
+
+        return ({'PartitionGuid': pg, 'PrimaryInstanceGuid': mesh_g, 'Name': MESH_NAME,
+                 'Instances': instances}, pg, mesh_g, material_guids)
 
     instances[mesh_g] = {
         '$type': 'RigidMeshAsset',

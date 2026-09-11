@@ -603,7 +603,7 @@ def _game_texture_lines(part_dir, chunk_arg):
     res, parts = [], []
 
     for n in sorted(set(names.values())):
-        res.append('add_existing_resource_with_chunks %s 1%s' % (n, chunk_arg))
+        res.append('add_existing_resource_with_chunks "%s" 1%s' % (n, chunk_arg))
 
         if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0:
             parts.append('add_raw_partition "%s" "%s"' % (n, paths[n]))
@@ -803,6 +803,47 @@ def _repair_mvdb_material_order(part_dir):
           % (moved, unmatched, filled))
 
 
+def _lodgroup_lines(part_dir, chunk_arg):
+    """Ship the MeshLodGroup partitions the carried asset records point at.
+
+    A shipped mesh asset names a lod group living in some other partition -- often one shared by
+    hundreds of meshes. Carrying the asset verbatim means carrying that reference too, and a
+    reference into a partition the bundle does not have is a dangling one.
+    """
+    import glob as _g
+
+    want = set()
+
+    for f in _g.glob(os.path.join(part_dir, 'mesh_*.json')):
+        try:
+            d = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        pg = (d.get('PartitionGuid') or '').lower()
+
+        for inst in (d.get('Instances') or {}).values():
+            lg = inst.get('LodGroup')
+
+            if isinstance(lg, dict) and lg.get('PartitionGuid') \
+                    and lg['PartitionGuid'].lower() != pg:
+                want.add(lg['PartitionGuid'].lower())
+
+    if not want:
+        return []
+
+    names = _resolve_guid_names(want)
+    lines, got = _ship_named_partitions(
+        names.values(),
+        os.environ.get('LODGROUP_RAW_DIR',
+                       os.path.expanduser('~/Games/VeniceUnleashed/debug/lodgroups')),
+        chunk_arg)
+    print('lodgroups %d external lod group partition(s) referenced, %d shipped'
+          % (len(want), len(got)))
+
+    return lines
+
+
 def _ship_named_partitions(names, store, chunk_arg=''):
     """`add_existing_resource_with_chunks` + `add_raw_partition` for each name, dumped once.
 
@@ -815,7 +856,7 @@ def _ship_named_partitions(names, store, chunk_arg=''):
     names = sorted({n for n in names if n})
 
     if not names:
-        return []
+        return [], []
 
     rime = os.environ.get('RIME_BIN', '/home/powos/Projects/Rime/bin/Release')
     game = os.environ.get('BF3_PATH',
@@ -834,7 +875,7 @@ def _ship_named_partitions(names, store, chunk_arg=''):
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     got = [n for n in names if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0]
-    lines = ['add_existing_resource_with_chunks %s 1%s' % (n, chunk_arg) for n in got]
+    lines = ['add_existing_resource_with_chunks "%s" 1%s' % (n, chunk_arg) for n in got]
     lines += ['add_raw_partition "%s" "%s"' % (n, paths[n]) for n in got]
 
     return lines, got
@@ -1149,9 +1190,15 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
                     build_dust2.SHIPPED_INSTANCES[_n] = _by_type
 
+                # And the asset record itself, so the emitted partition can carry it verbatim
+                # instead of describing the mesh differently from the MeshSet it points at.
+                if _asset:
+                    build_dust2.SHIPPED_ASSETS[_n] = _asset
+
         print('guids     %d shipped partition name(s) will keep their own guid, '
-              '%d also their instance guids'
-              % (len(build_dust2.SHIPPED_GUIDS), len(build_dust2.SHIPPED_INSTANCES)))
+              '%d also their instance guids, %d their own asset record'
+              % (len(build_dust2.SHIPPED_GUIDS), len(build_dust2.SHIPPED_INSTANCES),
+                 len(build_dust2.SHIPPED_ASSETS)))
 
         # Second pass: each shipped mesh's own MeshLodGroup VALUES, so a re-emitted mesh keeps its
         # LOD distances instead of the 100000 placeholder that never switches LOD. Only the handful
@@ -1322,7 +1369,22 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     tex_index = {}
     flat_name = 'flat_normal'
 
+    _skinned = 0
+
     for name, res_path, meta, ms, chunks, material_ebx in changed:
+        # A SkinnedMeshAsset is not a static model. The game drives these -- destruction building
+        # shells, cloth curtains and flags -- from animation, and placing one as a
+        # StaticModelEntityData asks the renderer for a rigid draw of a skinned mesh: on MP_001
+        # that is what faulted it in the sampler-state path, and it is also why the one that DID
+        # draw came out with its vertices stretched across the map. Four of 527 meshes. Dropping
+        # them is honest; mis-placing them is not.
+        _ga = build_dust2.SHIPPED_ASSETS.get((name or '').lower())
+
+        if _ga and _ga.get('$type') == 'SkinnedMeshAsset' \
+                and os.environ.get('USD_PLACE_SKINNED') != '1':
+            _skinned += 1
+            continue
+
         saved = (build_dust2.MESH_NAME, build_dust2.BLUEPRINT_NAME)
         globals_ = vars(build_dust2)
         globals_['MESH_NAME'] = name
@@ -1683,6 +1745,7 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         # The textures the database binds go in FIRST: a resource has to be in the bundle before
         # the partition that references it, or the loader wedges.
+        cmds += _lodgroup_lines(part_dir, _chunk_arg)
         cmds += _game_texture_lines(part_dir, _chunk_arg)
         cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.MVDB_NAME), path))
 
@@ -1695,6 +1758,10 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # gets as far as trying and stops at "LoadingInfo: Blocking on shader creation". The
         # dedicated server never creates a shader, so it reports a perfectly healthy level.
         cmds += _shader_graph_lines(mvdb_inputs, part_dir)
+        if _skinned:
+            print('skinned   %d mesh(es) dropped: skinned assets cannot be placed as static models'
+                  % _skinned)
+
         print('mvdb      %d entries (%d from the game, %d synthesised)'
               % (len(entries), from_game, len(entries) - from_game))
 
