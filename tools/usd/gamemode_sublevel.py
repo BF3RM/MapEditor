@@ -825,7 +825,16 @@ def build(entities, source_registry=None):
             'Instances': {}}
     objects = []
 
+    # GAMEMODE_EMPTY_PART0=1 emits the world part with NO objects. The sub-world, its registry and
+    # the world-part reference object are all still there, so the bundle and the level's reference
+    # to it are unchanged -- only the 59 gameplay records are gone. It separates "the records we
+    # carry are wrong for the client" from "the sub-level we emit is wrong".
+    _empty = os.environ.get('GAMEMODE_EMPTY_PART0', '0') == '1'
+
     for g, rec in sorted(entities.items()):
+        if _empty:
+            continue
+
         part['Instances'][g] = rec
         objects.append(ref(part_pg, g))
 
@@ -1121,10 +1130,20 @@ def main():
                                      'add_resource ', 'add_raw_partition ', 'add_json_partition ',
                                      'reference_existing_partition '))}
     _before = len(refs)
-    refs = [l for l in refs if l.split(' ')[1].strip('"').lower() not in _level_names]
+
+    if os.environ.get('GAMEMODE_REFS_DEDUP', '0') == '1':
+        refs = [l for l in refs if l.split(' ')[1].strip('"').lower() not in _level_names]
 
     if len(refs) != _before:
         print('  dropped %d ref(s) the level bundle already carries' % (_before - len(refs)))
+
+    # GAMEMODE_REFS=0 drops EVERY external reference the gamemode sub-level carries -- the level
+    # setup, the placed blueprints and their physics. Leaves the bundle holding only our own
+    # sub-world and part0, which is the floor of the bisect: if a client still dies loading that,
+    # the defect is in the EBX we emit, not in anything we carry.
+    if os.environ.get('GAMEMODE_REFS', '1') != '1':
+        refs = []
+        print('  dropped ALL external refs')
 
     # GAMEMODE_REFS_PLACED=0 drops the placed-blueprint closures. Their 10 placements are already
     # repointed at our own blueprints, and their closure is what duplicates the two mesh chunks the
@@ -1135,7 +1154,12 @@ def main():
 
     level_bundle = next((l.split(' ', 1)[1].strip() for l in cmds
                          if l.startswith('build_bundle ')), None)
-    dep = ['add_dependency_bundle ' + level_bundle] if level_bundle else []
+    # OPT-IN. The known-good build -- the one a client actually joined and stayed connected to --
+    # had no dependency declaration, and the client dies the instant it loads the gamemode bundle.
+    # Declaring a dependency is a hint to the builder's closure skipping, not something the level
+    # needs, so it does not get to be on by default until a client survives it.
+    dep = (['add_dependency_bundle ' + level_bundle]
+           if level_bundle and os.environ.get('GAMEMODE_DEP', '0') == '1' else [])
 
     if level_bundle:
         print('  gamemode bundle depends on %s' % level_bundle)
