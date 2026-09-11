@@ -804,6 +804,175 @@ def _repair_mvdb_material_order(part_dir):
           % (moved, unmatched, filled))
 
 
+def _close_dangling_refs(part_dir, chunk_arg):
+    """Ship every partition the emitted content references but the bundle does not contain.
+
+    The specific classes -- shader graphs, the database's textures, lod groups, material variations
+    -- were each found the hard way, one renderer fault at a time. This is the general form: walk
+    every reference in every partition we emit and carry whatever is missing. On MP_001 it catches
+    the decal shaders and textures that 348 authored DecalEntityData point at, which nothing else
+    shipped.
+
+    The registry partition is excluded on purpose: its thousands of weapon and unlock entries are
+    NAME lookups the game answers from its own bundles, not content this level has to carry.
+    """
+    import glob as _g
+
+    have = set()
+    files = []
+
+    for f in _g.glob(os.path.join(part_dir, '*.json')):
+        try:
+            d = json.load(open(f))
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        files.append((os.path.basename(f), d))
+
+        if d.get('PartitionGuid'):
+            have.add(d['PartitionGuid'].lower())
+
+    def _walk(o, out):
+        if isinstance(o, dict):
+            if isinstance(o.get('PartitionGuid'), str) and 'InstanceGuid' in o:
+                out.add(o['PartitionGuid'].lower())
+
+            for v in o.values():
+                _walk(v, out)
+        elif isinstance(o, list):
+            for v in o:
+                _walk(v, out)
+
+    want = set()
+
+    for base, d in files:
+        if base == 'world.json':
+            continue
+
+        refs = set()
+        _walk(d.get('Instances') or {}, refs)
+        want |= {g for g in refs
+                 if g not in have and g != (d.get('PartitionGuid') or '').lower()}
+
+    if not want:
+        return []
+
+    # TRANSITIVE. A partition carried to satisfy a reference has references of its own, and
+    # shipping only the first ring just moves the null one level out -- measured: closing 796
+    # references took the renderer past its sampler fault and straight into a different one.
+    # _resolve_guid_names dumps the JSON for each guid it resolves, so the next ring can be read
+    # straight back out of the same store.
+    store = os.environ.get('USD_CLOSURE_DIR', '/tmp/closure')
+    seen, names, rounds = set(), {}, 0
+
+    while want and rounds < int(os.environ.get('USD_CLOSURE_ROUNDS', '8')):
+        rounds += 1
+        names.update(_resolve_guid_names(want))
+        seen |= want
+        nxt = set()
+
+        for g in want:
+            try:
+                d = json.load(open(os.path.join(store, '%s.json' % g)))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            refs = set()
+            _walk(d.get('Instances') or {}, refs)
+            nxt |= {r for r in refs if r not in seen and r not in have}
+
+        want = nxt
+
+    lines, got = _ship_named_partitions(
+        names.values(),
+        os.environ.get('CLOSURE_RAW_DIR',
+                       os.path.expanduser('~/Games/VeniceUnleashed/debug/dangling')),
+        chunk_arg)
+    print('dangling  %d partition(s) referenced but absent over %d round(s), %d named, %d shipped'
+          % (len(seen), rounds, len(names), len(got)))
+
+    return lines
+
+
+def _material_variation_lines(part_dir, chunk_arg):
+    """Ship the MeshMaterialVariation partitions the database's material slots point at.
+
+    A carried entry can name a material variation -- the "_destruction_wet" variants on MP_001 --
+    and those live in their own partitions. Nothing shipped them: 31 partitions referenced by 49
+    slots, every one dangling. A slot whose variation cannot resolve is another null for the
+    renderer to read, and unlike a missing texture it survives every audit aimed at textures.
+
+    Anything that cannot be named is stripped rather than left pointing at nothing.
+    """
+    import glob as _g
+
+    mvdb = os.path.join(part_dir, 'mvdb.json')
+
+    if not os.path.exists(mvdb):
+        return []
+
+    try:
+        doc = json.load(open(mvdb))
+    except Exception:                                        # noqa: BLE001
+        return []
+
+    ours = set()
+
+    for f in _g.glob(os.path.join(part_dir, '*.json')):
+        try:
+            pg = (json.load(open(f)).get('PartitionGuid') or '').lower()
+        except Exception:                                    # noqa: BLE001
+            continue
+
+        if pg:
+            ours.add(pg)
+
+    want = set()
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        for mat in (inst.get('Materials') or []):
+            r = mat.get('MaterialVariation')
+
+            if isinstance(r, dict) and r.get('PartitionGuid') \
+                    and r['PartitionGuid'].lower() not in ours:
+                want.add(r['PartitionGuid'].lower())
+
+    if not want:
+        return []
+
+    names = _resolve_guid_names(want)
+    lines, got = _ship_named_partitions(
+        names.values(),
+        os.environ.get('MATVAR_RAW_DIR',
+                       os.path.expanduser('~/Games/VeniceUnleashed/debug/matvars')),
+        chunk_arg)
+    shipped = ours | {g for g, n in names.items() if n in got}
+    stripped = 0
+
+    for inst in (doc.get('Instances') or {}).values():
+        if inst.get('$type') != 'MeshVariationDatabaseEntry':
+            continue
+
+        for mat in (inst.get('Materials') or []):
+            r = mat.get('MaterialVariation')
+
+            if isinstance(r, dict) and r.get('PartitionGuid') \
+                    and r['PartitionGuid'].lower() not in shipped:
+                mat['MaterialVariation'] = None
+                stripped += 1
+
+    if stripped:
+        json.dump(doc, open(mvdb, 'w'), indent=1)
+
+    print('matvar    %d material variation partition(s) referenced, %d shipped, '
+          '%d slot(s) stripped as unshippable' % (len(want), len(got), stripped))
+
+    return lines
+
+
 def _lodgroup_lines(part_dir, chunk_arg):
     """Ship the MeshLodGroup partitions the carried asset records point at.
 
@@ -1246,6 +1415,8 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         print('lodgroups %d mesh(es) will keep their shipped LOD distances'
               % len(build_dust2.SHIPPED_LODGROUPS))
+
+    _dangling_at = None
 
     if level_sb:
         build_dust2.WORLD_NAME = 'levels/realitymod/%s' % bundle_name.lower()
@@ -1768,6 +1939,10 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # The textures the database binds go in FIRST: a resource has to be in the bundle before
         # the partition that references it, or the loader wedges.
         cmds += _lodgroup_lines(part_dir, _chunk_arg)
+        cmds += _material_variation_lines(part_dir, _chunk_arg)
+        # The world parts are not written yet, so the general closure pass runs at the END and
+        # splices its lines in HERE -- resources have to precede the partitions referencing them.
+        _dangling_at = len(cmds)
         cmds += _game_texture_lines(part_dir, _chunk_arg)
         cmds.append('add_json_partition %s "%s"' % (_q(build_dust2.MVDB_NAME), path))
 
@@ -2339,6 +2514,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
               % _dropped_dupes)
 
     cmds = _deduped
+    # Now that every partition exists on disk, carry whatever they reference and the bundle lacks.
+    if _dangling_at is not None:
+        _late = _close_dangling_refs(part_dir, _chunk_arg)
+
+        if _late:
+            cmds[_dangling_at:_dangling_at] = _late
+
     open(os.path.join(out_dir, 'build.cmds'), 'w').write('\n'.join(cmds) + '\n')
 
     return {'meshes': stats['meshes'], 'placements': stats['placements'],
