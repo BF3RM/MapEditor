@@ -1159,7 +1159,16 @@ WORLD_PART_TYPES = (
     # CharacterSpawnReferenceObjectData, 21 VehicleSpawnReferenceObjectData -- ours carried zero
     # of all three, because these are not named plain ReferenceObjectData and so failed this
     # filter. A geometry-only export is a level you can look at but not play.
-    'CharacterSpawnReferenceObjectData',
+    # NOT CharacterSpawnReferenceObjectData. Spawns belong to the per-gamemode SUB-LEVEL, which
+    # the pipeline emits separately, not to the level's own world parts -- and the game agrees:
+    # MP_001's 20 live in its rush/tdm layers, never in the main level.
+    #
+    # Emitted into a world part it loads fine on the dedicated server, which never builds a visual
+    # for a spawn. The CLIENT instantiates it, with none of the gamemode entities a spawn expects,
+    # and dies at "LoadingInfo: Blocking on shader creation" with no crash dump -- taking the level
+    # down for every player. BISECTED to a single object: world part 22, object 289, the first
+    # CharacterSpawnReferenceObjectData; 0-288 keeps a client alive, adding 289 kills it.
+    # Same rule VehicleSpawnReferenceObjectData is already excluded under.
     'AlternateSpawnEntityData',
     # NOT TransformPartPropertyTrackData. It is a property-ANIMATION TRACK belonging to a
     # blueprint's part, not a placeable object, and authoring 120 of them into mp_003's world parts

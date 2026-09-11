@@ -83,6 +83,12 @@ def _derive(out_dir):
 CARRY = ('AlternateSpawnEntityData', 'ReferenceObjectData', 'VolumeVectorShapeData',
          'SoundEntityData', 'LocatorEntityData')
 
+# GAMEMODE_CARRY_TYPES restricts that set, so a carry that kills the client can be bisected by
+# record TYPE without editing code.
+if os.environ.get('GAMEMODE_CARRY_TYPES'):
+    _want = {t.strip().lower() for t in os.environ['GAMEMODE_CARRY_TYPES'].split(',') if t.strip()}
+    CARRY = tuple(t for t in CARRY if t.lower() in _want)
+
 NS = uuid.UUID('9d3f1a52-6c41-4f2b-9c7e-0d7a2f0e1b33')
 guid = lambda *p: str(uuid.uuid5(NS, 'gamemode|' + '|'.join(str(x) for x in p)))
 ref = lambda pg, ig: {'PartitionGuid': pg, 'InstanceGuid': ig}
@@ -383,6 +389,14 @@ def _source_bundle_carry(already):
             and not (n.lower().startswith(SRC_GAMEMODE.lower() + '/')
                      and 'meshvariationdb' not in n.lower())]
 
+    # Namespace filter BEFORE the dump, or it only trims the printed list and the recipe still
+    # carries everything -- which made a namespace bisect read as "no namespace matters".
+    _ns = tuple(n.strip().lower() for n in os.environ.get('GAMEMODE_BUNDLE_NS', '').split(',')
+                if n.strip())
+
+    if _ns:
+        keep = [n for n in keep if n.lower().startswith(_ns)]
+
     dumped = _bulk_raw_dump(keep)
     missing = [n for n in keep if n not in dumped]
 
@@ -397,7 +411,6 @@ def _source_bundle_carry(already):
                if n.strip())
 
     if ns:
-        keep = [n for n in keep if n.lower().startswith(ns)]
         res = [(n, t) for n, t in res if n.lower().startswith(ns)]
 
     res = [(n, t) for n, t in res if n.lower() not in skip]
@@ -780,8 +793,25 @@ def _refs_for(_unused=None):
     # add_json_partition re-serialises it under the game's own name, which makes it OUR partition
     # wearing that address -- and MEASURED, that is enough to stop the level loading: the same
     # build that loads with a raw copy hangs at "Loading terrain" with a re-serialised one.
-    lines += ['add_raw_partition %s "%s"' % (n, f)
-              for n, f in ((n, _raw_dump(n)) for n in setups) if f]
+    # A level setup shipped RAW registers its teams on the server and kills the CLIENT: the client
+    # instantiates its logic objects (6 LogicReferenceObjectData, a camera, the spawn UI) and finds
+    # none of the blueprints they name, then dies at "LoadingInfo: Blocking on shader creation".
+    # MEASURED: carrying the 43 spawns WITHOUT this placement keeps a client alive 142s with
+    # team=0; adding it back gives team=3 and kills the client.
+    #
+    # Its FULL closure is not an option -- it reaches soldiers and weapons and took a 49 MB
+    # superbundle to 1.48 GB. reference_existing_partition takes skip prefixes, so take the closure
+    # minus the heavy namespaces the level already carries or the game already has resident.
+    _setup_skip = os.environ.get(
+        'GAMEMODE_SETUP_SKIP',
+        'characters/,weapons/,weapons_old/,vehicles/,sound/,fx/,persistence/,animations/,xp5/')
+
+    if os.environ.get('GAMEMODE_SETUP_CLOSURE', '1') == '1':
+        lines += ['reference_existing_partition %s 1 false "%s"' % (n, _setup_skip)
+                  for n in setups]
+    else:
+        lines += ['add_raw_partition %s "%s"' % (n, f)
+                  for n, f in ((n, _raw_dump(n)) for n in setups) if f]
     lines += ['reference_existing_partition %s 1' % n for n in placed]
     lines += ['add_existing_resource_with_chunks %s 1' % n for n in physics]
 

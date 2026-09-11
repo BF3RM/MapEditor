@@ -484,8 +484,30 @@ def _material_ebx_index(path):
         except Exception:                                    # noqa: BLE001
             continue
 
-        mats = [v for v in doc.get('Instances', {}).values()
-                if v.get('$type') == 'MeshMaterial']
+        insts = doc.get('Instances', {}) or {}
+
+        # ORDER AND COUNT come from the mesh asset's own Materials array, not from whatever order
+        # the instances happen to sit in the json. That array IS material-index order, and it lists
+        # every slot the MeshSet has -- including a slot no subset in any LOD references.
+        #
+        # Taking Instances.values() instead got both wrong: the count came up short (5 of 470
+        # meshes on MP_001), and a short material list makes the CLIENT index past the end of it
+        # while building the render mesh and exit with no crash dump, taking the level down for
+        # everyone. The dedicated server never builds a render mesh and never notices.
+        ordered = None
+
+        for v in insts.values():
+            if v.get('$type') in ('RigidMeshAsset', 'MeshAsset', 'CompositeMeshAsset',
+                                  'SkinnedMeshAsset') and isinstance(v.get('Materials'), list):
+                picked = [insts.get(e.get('InstanceGuid')) for e in v['Materials']
+                          if isinstance(e, dict)]
+
+                if picked and all(m and m.get('$type') == 'MeshMaterial' for m in picked):
+                    ordered = picked
+
+                break
+
+        mats = ordered or [v for v in insts.values() if v.get('$type') == 'MeshMaterial']
 
         if mats:
             index[name.lower()] = mats

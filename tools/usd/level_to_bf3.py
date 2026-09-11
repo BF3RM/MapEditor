@@ -318,6 +318,70 @@ def blueprint_index(bp_dir):
     return index
 
 
+
+_GAME_SLOTS = {}
+_GAME_MATS = {}
+
+
+def _game_materials(mesh_name, dirs):
+    """The GAME's own MeshMaterial records for a mesh, in material-index order.
+
+    Fallback for a stage that carries no `bf3Material` customData -- an export made before the
+    exporter wrote it, which is most of them. Without this every material is authored from one
+    hardcoded template and the whole level collapses onto a single ShaderGraph: MEASURED, 889 of
+    889 materials on `objects/shaders/proppreset` where the game uses 252 distinct graphs.
+
+    That is not cosmetic. A material whose real shader is not the preset gets set up against the
+    wrong parameter contract, and the client dies at "LoadingInfo: Blocking on shader creation"
+    with no crash dump, taking the level down for every player. The dedicated server never creates
+    a shader and never notices.
+    """
+    _game_material_count(mesh_name, dirs)                    # builds both caches
+
+    return _GAME_MATS.get((mesh_name or '').lower())
+
+
+def _game_material_count(mesh_name, dirs):
+    """How many material slots the GAME's partition for this mesh declares, or 0 if unknown.
+
+    Read from the mesh asset's own `Materials` array -- the ordered, complete list -- not by
+    counting MeshMaterial instances, which also catches orphans.
+    """
+    if not _GAME_SLOTS:
+        import glob as _g
+
+        for base in dirs or []:
+            for f in _g.glob(os.path.join(base, '**', '*.json'), recursive=True):
+                try:
+                    doc = json.load(open(f))
+                except Exception:                            # noqa: BLE001
+                    continue
+
+                n = (doc.get('Name') or '').lower()
+
+                if not n:
+                    continue
+
+                insts = doc.get('Instances') or {}
+
+                for inst in insts.values():
+                    if isinstance(inst.get('Materials'), list) and str(
+                            inst.get('$type', '')).endswith('MeshAsset'):
+                        _GAME_SLOTS[n] = max(_GAME_SLOTS.get(n, 0), len(inst['Materials']))
+
+                        picked = [insts.get(e.get('InstanceGuid')) for e in inst['Materials']
+                                  if isinstance(e, dict)]
+
+                        if picked and all(m and m.get('$type') == 'MeshMaterial' for m in picked):
+                            _GAME_MATS[n] = picked
+
+                        break
+
+        _GAME_SLOTS.setdefault('', 0)
+
+    return _GAME_SLOTS.get((mesh_name or '').lower(), 0)
+
+
 def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
          texture_dir=None, terrain_of=None, reference_parts=None, roads=None,
          ebx_dir=None, level_sb=None, sb_dir=None, max_meshes=None, skip_meshes=0,
@@ -652,14 +716,44 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # One MeshMaterial per MATERIAL INDEX, not per subset. Subsets share materials -- MP_001's
         # 1354 subsets use 889 materials -- and emitting one each both bloats the EBX and leaves the
         # duplicates with no record to carry, so they fall back to the template.
+        #
+        # EVERY LOD, not just LOD 0. A material index used only by a lower LOD is still a slot in
+        # the MeshSet we reference, and leaving it out makes the EBX one MeshMaterial shorter than
+        # the resource has subsets. The dedicated server never builds a render mesh and does not
+        # care; the CLIENT indexes materials per subset, walks off the end of the short list and
+        # exits without a crash dump, killing the whole level for every player.
+        # MEASURED on MP_001: 5 of 470 meshes were short by exactly one, all of them because of
+        # this -- box_01_wet (2 vs 3) is the one that killed the client, and padding it to 3 by hand
+        # made the same level load and stay up.
         by_index = {}
 
-        for lod in ms.lods[:1]:
+        for lod in ms.lods:
             for sub in lod.subsets:
                 by_index.setdefault(sub.material_index, sub.material_name)
 
         names = [by_index.get(i, 'material%d' % i) for i in range(max(by_index) + 1)] \
             if by_index else []
+
+        # The GAME's own mesh partition is the last authority on the slot count: a mesh whose EBX
+        # was never dumped into the material index still has one on disk in the guid dumps, and its
+        # Materials array is the truth. me_storefronts_rightopening_01_mp_destruction is a
+        # CompositeMeshAsset with 4 slots that the subset scan counts as 3.
+        # A stage with no bf3Material customData leaves material_ebx empty; fall back to the
+        # game's own records so the level keeps its real shaders instead of one template.
+        if not material_ebx:
+            material_ebx = _game_materials(name, _guid_dirs) or material_ebx
+
+        _game_slots = _game_material_count(name, _guid_dirs)
+
+        if _game_slots > len(names):
+            names += ['material%d' % i for i in range(len(names), _game_slots)]
+
+        # The GAME's own MeshMaterial records are the authority on how many slots the MeshSet has.
+        # Subsets can leave a gap -- a material index no subset in any LOD references -- and counting
+        # subsets then still comes up short. material_ebx is read straight out of the shipped mesh
+        # partition, so where it is available its length IS the slot count.
+        if material_ebx and len(material_ebx) > len(names):
+            names += ['material%d' % i for i in range(len(names), len(material_ebx))]
         mesh_json, mesh_pg, mesh_g, _mats = build_dust2.mesh_partition(names, material_ebx)
         slots_by_index = _bindings_for(stage_path, name)
         binding = {names[i]: (slots_by_index.get(i) or {}).get('Diffuse')
