@@ -1494,6 +1494,18 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                 # blueprint placing that mesh names (partition, instance) and the instance half no
                 # longer exists. Recorded per type so mesh_partition can hand each record back the
                 # guid the game gave it.
+                # THIS PARTITION'S asset record, found before anything below can be skipped.
+                #
+                # It used to be found inside the "first time we have seen this name" branch and
+                # used outside it, so a name dumped into two of the guid directories -- which is
+                # every name, once a debugging session has dumped anything twice -- left the
+                # PREVIOUS partition's record bound to it. The emitted mesh then carried another
+                # mesh's asset verbatim, and where that other one was skinned the emitter dropped
+                # the mesh as unplaceable: nine of MP_001's buildings, 221 placements, and a client
+                # that died on the dangling reference. It grew quietly as the dump directories did.
+                _asset = next((_i for _i in (_d.get('Instances') or {}).values()
+                               if (_i.get('$type') or '').endswith('MeshAsset')), None)
+
                 if _n not in build_dust2.SHIPPED_INSTANCES:
                     _by_type = {}
 
@@ -1505,9 +1517,6 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
                     # MEASURED on the crane: its Materials array runs metal, beams, glass, grating,
                     # concrete, platform, sign while the dump lists them in a different order
                     # entirely, so handing material i the i-th dumped guid mismatches every subset.
-                    _asset = next((_i for _i in (_d.get('Instances') or {}).values()
-                                   if (_i.get('$type') or '').endswith('MeshAsset')), None)
-
                     if _asset and isinstance(_asset.get('Materials'), list):
                         _ordered = [(_m or {}).get('InstanceGuid') for _m in _asset['Materials']]
                         _ordered = [_g for _g in _ordered if _g]
