@@ -452,6 +452,12 @@ def _game_mvdb_index(dirs):
 
 _VARIATION_HASH = {}
 
+# Resource names a GAME blueprint we deliberately ship needs, which the level-owned guard in the
+# asset pass would otherwise skip. A tree's four HavokAssets live in objects/vegetation/..., not in
+# the level, so nothing carried its collision data and every attempt to place one killed the server
+# at "Creating entities for autoloaded sublevels" -- with the blueprint present and correct.
+_EXTRA_ASSET_RESOURCES = set()
+
 
 def _variation_hash(ref, dirs):
     """The VariationAssetNameHash an ObjectVariation reference stands for, or 0 for no variation.
@@ -930,7 +936,18 @@ def _blueprint_without_physics(name, part_dir):
     if not doc:
         return None
 
-    drop = {'PhysicsEntityData', 'RigidBodyData', 'HavokAsset'}
+    # USD_SKINNED_KEEP_PHYSICS=1 keeps the lot and ships the resources the HavokAssets name, which
+    # is what the measurements above actually point at. Stripping stays the default only until that
+    # is proven in game.
+    if os.environ.get('USD_SKINNED_KEEP_PHYSICS') == '1':
+        drop = set()
+
+        for _v in (doc.get('Instances') or {}).values():
+            if _v.get('$type') == 'HavokAsset' and isinstance(_v.get('Name'), str):
+                _EXTRA_ASSET_RESOURCES.add(_v['Name'].lower())
+    else:
+        drop = {'PhysicsEntityData', 'RigidBodyData', 'HavokAsset'}
+
     keep = {g: v for g, v in (doc.get('Instances') or {}).items() if v.get('$type') not in drop}
     gone = set(doc.get('Instances', {})) - set(keep)
 
@@ -2549,6 +2566,11 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # mounted game. Checked against it, 0 of the 1,065 names that failed are present -- so the
         # filter removes exactly the errors and nothing else. Without the list the behaviour is
         # unchanged, because guessing which names are real is what caused this.
+        # The game blueprints we chose to ship name resources of their own. They are not
+        # level-owned, so the guard above skips them by design; add them back explicitly rather
+        # than widening the guard, which is what referenced 992 SoundWaveAssets and broke the load.
+        asset_res |= _EXTRA_ASSET_RESOURCES
+
         _known = _resource_names()
 
         for _n in sorted(asset_res):
