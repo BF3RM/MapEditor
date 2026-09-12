@@ -16,6 +16,19 @@ not content any mesh references, so nothing in the emit pipeline can reach them.
 
 Writes /tmp/blank_plus_carry.json (the patched LevelData) and /tmp/carry_lines.txt (recipe lines
 for the partitions those objects reference, closed transitively).
+
+THOSE LINES BELONG IN THE LEVEL'S OWN BUNDLE, not in a sub-bundle alongside the geometry, and in
+front of the LevelData that references them. The client's load order is
+
+    Registering entity resources -> Loading assets -> Init render modules
+        -> Creating entities for autoloaded sublevels
+
+so a render module looking for the level's Enlighten database has already looked by the time a
+sub-bundle's content could matter -- and the Enlighten entities carried here are not created until
+two stages later, so they cannot be what supplies it. Built into Win32/Levels/<LEVEL>/usdlevel the
+database was never found, the level object's Enlighten pointer stayed null, and the client died at
+"Init render modules" with a page fault on a string built from it. Built into
+Win32/Levels/<LEVEL>/<LEVEL> it loads.
 """
 import json, os, sys
 
