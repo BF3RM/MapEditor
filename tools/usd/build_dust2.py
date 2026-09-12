@@ -1223,12 +1223,15 @@ WORLD_PART_TYPES = (
     # CharacterSpawnReferenceObjectData; 0-288 keeps a client alive, adding 289 kills it.
     # Same rule VehicleSpawnReferenceObjectData is already excluded under.
     'AlternateSpawnEntityData',
+    # NOT TerrainEntityData by default -- USD_WORLD_PART_EXTRA=TerrainEntityData opts in. The
+    # terrain is a resource family of its own (TerrainData, VisualTerrain, the streaming/mask/
+    # colour trees) and the level has to carry all of it, so this is a knob rather than a default.
     # NOT TransformPartPropertyTrackData. It is a property-ANIMATION TRACK belonging to a
     # blueprint's part, not a placeable object, and authoring 120 of them into mp_003's world parts
     # killed the server inside "Creating entities for autoloaded sublevels" -- silently, exit 0.
     # Bisected against RoadData and PointLightEntityData, which both load clean (33/33 world parts
     # confirmed live in the engine), so this type alone is the cause.
-)
+) + tuple(t.strip() for t in os.environ.get('USD_WORLD_PART_EXTRA', '').split(',') if t.strip())
 
 
 # Counted here rather than returned, so the message stays next to the rule that causes it.

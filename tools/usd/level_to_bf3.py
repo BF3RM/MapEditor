@@ -1119,11 +1119,17 @@ def _ship_named_partitions(names, store, chunk_arg=''):
                        env=dict(os.environ, DOTNET_ROOT=os.path.expanduser('~/.dotnet')),
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    # THE RESOURCE LINE FOR EVERY NAME, the partition line only where there is a partition.
+    #
+    # Not everything with a name is an EBX partition. VisualTerrain is resource-only -- dumping it
+    # as a partition writes nothing -- and keying both lines off a non-empty partition dump meant
+    # it shipped neither. The terrain then loaded without its visual and the client faulted on the
+    # null. Same for any other resource-only name in a level's resource list.
     got = [n for n in names if os.path.exists(paths[n]) and os.path.getsize(paths[n]) > 0]
-    lines = ['add_existing_resource_with_chunks "%s" 1%s' % (n, chunk_arg) for n in got]
+    lines = ['add_existing_resource_with_chunks "%s" 1%s' % (n, chunk_arg) for n in names]
     lines += ['add_raw_partition "%s" "%s"' % (n, paths[n]) for n in got]
 
-    return lines, got
+    return lines, names
 
 
 def _shader_streamable_textures(shader_names, shipped, chunk_arg):
@@ -1942,6 +1948,40 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         edits = level_entities.read(stage_path)
         stage_entities = edits
+
+        # ENTITIES THE STAGE NEVER CAPTURED.
+        #
+        # The world-part authoring draws from the USD stage, so a type the exporter does not write
+        # out cannot be authored however the filter is set. The terrain is like that: MP_001's
+        # TerrainEntityData lives in layer0_default and no amount of WORLD_PART_TYPES reaches it.
+        # USD_INJECT_TYPES takes them straight from the game's dump of the same level instead, and
+        # the closure pass then carries the terrain resource family they reference.
+        _inject = tuple(t.strip() for t in os.environ.get('USD_INJECT_TYPES', '').split(',')
+                        if t.strip())
+
+        if _inject:
+            import glob as _g
+
+            _added = 0
+
+            for _f in _g.glob(os.path.join(ebx_dir, 'levels', host.lower(), '**', '*.json'),
+                              recursive=True):
+                try:
+                    _d = json.load(open(_f))
+                except Exception:                            # noqa: BLE001
+                    continue
+
+                _pn = (_d.get('Name') or '').lower()
+
+                for _g2, _i2 in (_d.get('Instances') or {}).items():
+                    if _i2.get('$type') not in _inject:
+                        continue
+
+                    stage_entities.setdefault(_pn, {})[_g2] = _i2
+                    _added += 1
+
+            print('inject    %d instance(s) of %s taken from the game level'
+                  % (_added, ','.join(_inject)))
 
         for part, changes in sorted(edits.items()):
             # The level's OWN dump first, then the other dumps this export was given.
