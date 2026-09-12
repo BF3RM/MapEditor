@@ -939,10 +939,22 @@ def _blueprint_without_physics(name, part_dir):
     # USD_SKINNED_KEEP_PHYSICS=1 keeps the lot and ships the resources the HavokAssets name.
     #
     # MEASURED, per blueprint, with USD_SKINNED_BLUEPRINT naming which to try:
-    #   treelinden_l_01      60 placements, 4 physics resources -> server up in 30s, client joined
-    #   bushazalea_m_01      13 placements, 3 physics resources -> server up in 30s
+    #   treelinden_l_01      60 placements, 4 physics resources -> server up in 30s, CLIENT NEVER
+    #                        LOADS (log stuck at one 4096-byte page, Level:Loaded=0)
+    #   bushazalea_m_01      13 placements, 3 physics resources -> server up in 30s, same
     #   mehouse01mediumruin   1 placement,  1 physics resource  -> server DIES at "Creating
     #                        entities for autoloaded sublevels", minidump written
+    # SO THIS IS HALF A FIX, AND THE HALF IT IS NOT IS THE ONE THAT MATTERS. Shipping the physics
+    # resources genuinely clears the server wedge that the four earlier attempts all hit -- that is
+    # a real mechanism and the diagnosis behind it holds. But the CLIENT then cannot load a level
+    # containing these trees at all: its log stops at a single 4096-byte page with Level:Loaded=0,
+    # while the identical build minus the trees loads in full (49 KB, Level:Loaded=1, reaching
+    # "Blocking on shader creation"). Controlled back to back.
+    #
+    # So zero skinned placements are usable, not 73. The server reaching "accepting connections"
+    # was mistaken for a pass because the server does no rendering; check the CLIENT log's size
+    # before believing any skinned-mesh result.
+    #
     # The ruin is a destruction hierarchy under animations/characters/, not vegetation, and one
     # Havok resource for that is suspiciously few. _EXTRA_ASSET_RESOURCES only follows
     # HavokAsset.Name; a part hierarchy almost certainly names a skeleton or an Ant asset the same
