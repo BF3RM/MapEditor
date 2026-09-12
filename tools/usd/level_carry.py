@@ -135,6 +135,29 @@ _added_refs = []
 _REF_ALLOW = {k.strip() for k in os.environ.get(
     'CARRY_REFS', 'EnlightenShaderDatabase').split(',') if k.strip()}
 
+# PLAIN VALUES THE SOURCE ROOT SETS AND OURS DOES NOT.
+#
+# The emitted LevelData is built from a blank, so it is missing more than references:
+# AlwaysCreateEntityBusClient/Server, NeedNetworkId and InterfaceHasConnections are all absent, and
+# a level that does not ask for an entity bus or a network id is a level whose entities are wired
+# up differently from the one we exported. They cost nothing to carry.
+# CARRY_VALUES=0 turns this off. They look free and they are not: the level that came out with
+# them carried also carried a Descriptor and an AnimatedSkeletonDatabase, and the client died in a
+# new place entirely (vu.com+0x1A983D, a null where an asset should be). Anything added here is a
+# change to how the engine wires the level up, so it stays bisectable.
+_added_vals = []
+
+for _k, _v in (src['Instances'][src['PrimaryInstanceGuid']].items()
+               if os.environ.get('CARRY_VALUES', '1') == '1' else ()):
+    if isinstance(_v, (dict, list)) or _k in dst['Instances'][dst['PrimaryInstanceGuid']]:
+        continue
+
+    root[_k] = _v
+    _added_vals.append(_k)
+
+if _added_vals:
+    print('carry     plain value(s) taken from the source root: %s' % ', '.join(_added_vals))
+
 for _k, _v in src['Instances'][src['PrimaryInstanceGuid']].items():
     if _k not in _REF_ALLOW or not isinstance(_v, dict) or not _v.get('PartitionGuid'):
         continue

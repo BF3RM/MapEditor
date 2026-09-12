@@ -193,6 +193,41 @@ def main():
                                 print('    rec[%d] @%08X slot=%s resource=%s name=%r' % (
                                     i, base, blob[0], hex(res) if res else 'NULL', nm), flush=True)
 
+                    # THE OBJECT THE CONSTRUCTOR WAS HANDED.
+                    #
+                    # The render-module fault is a null NAME, not a null object: the constructor
+                    # at vu.com+0x13A7FE0 stores its two arguments at this+0x0C and this+0x10 and
+                    # then formats a string out of a field of the second one. Which field is null
+                    # is the whole question, so lay the object out field by field with whatever
+                    # string each one reaches -- the level's own name comes out at +0x34, which is
+                    # how you know you are looking at the right object.
+                    esi = regs.get('ESI')
+
+                    if esi:
+                        for slot in (0x0C, 0x10):
+                            obj = u32(mem, esi + slot)
+
+                            if not obj or obj > 0xFFFF0000:
+                                continue
+
+                            print('  this+0x%02X -> %08X' % (slot, obj), flush=True)
+
+                            for off in range(0, 0x90, 4):
+                                val = u32(mem, obj + off)
+
+                                if val is None:
+                                    break
+
+                                txt = ascii_at(mem, val) if val else None
+
+                                if txt is None and val:
+                                    inner = u32(mem, val + 8)
+                                    txt = ascii_at(mem, inner) if inner else None
+                                    txt = ('[+8] ' + txt) if txt else None
+
+                                print('    +0x%02X = %08X %s' % (
+                                    off, val, repr(txt) if txt else ''), flush=True)
+
                     for name in ('EDX', 'ESI', 'EBX', 'EDI', 'EBP'):
                         a = regs.get(name)
 

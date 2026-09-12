@@ -26,6 +26,8 @@ import subprocess
 import sys
 
 BASE = 0x400000
+# vu.com maps a 0x2089000 .cdata section plus its own headers and tail sections.
+MAX_IMAGE = 0x2100000
 STORE = os.path.expanduser('~/Games/VeniceUnleashed/debug/vu-image')
 IMAGE = os.path.join(STORE, 'vu-image.bin')
 MANIFEST = os.path.join(STORE, 'vu-image.json')
@@ -63,10 +65,15 @@ def _module_range(pid):
                 lo, hi = a, b
             continue
 
-        # The decrypted body is anonymous rwx immediately after the 4 KB PE header mapping.
-        if a == hi and 'x' in perms:
+        # Keep extending through every CONTIGUOUS mapping, not just the executable ones: the
+        # decrypted body is anonymous rwx, but the module's data follows it read-write and that is
+        # where the string constants live. Stopping at the first non-executable region cut the dump
+        # at 0x22E0000 and every string a crash referenced above that read back empty.
+        # ...but bounded by the module's own size. vu.com's headers declare a ~34 MB image; past
+        # that the contiguous mappings are just heap, and following them produced a 1.7 GB "dump".
+        if a == hi and (b - lo) <= MAX_IMAGE:
             hi = b
-        elif a > hi:
+        elif a > hi or (b - lo) > MAX_IMAGE:
             break
 
     return lo, hi
