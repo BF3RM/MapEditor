@@ -44,7 +44,15 @@ def capture(out):
     env = dict(os.environ,
                XDG_RUNTIME_DIR='/run/user/1000', WAYLAND_DISPLAY='wayland-0', DISPLAY=':0',
                DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus')
-    subprocess.run(['spectacle', '-b', '-n', '-f', '-o', out], env=env,
+    # -a captures the ACTIVE WINDOW, which is the client: it takes focus when it launches and
+    # keeps it. No rectangle, no crop, and no way to silently capture the wrong thing -- the title
+    # bar is in the image, so a capture that found something else is obvious at a glance.
+    #
+    # The whole-desktop-and-crop path below is the fallback for when the client is not focused. It
+    # is the one that reported GEOMETRY DRAWN off a browser window and LOOKS EMPTY off a terminal,
+    # so it is no longer the default.
+    mode = ['-f'] if os.environ.get('VU_SHOT_FULL') == '1' else ['-a']
+    subprocess.run(['spectacle', '-b', '-n'] + mode + ['-o', out], env=env,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
 
     for _ in range(20):
@@ -107,7 +115,8 @@ def main():
     if not capture(a.out):
         sys.exit('capture failed (is a client on screen?)')
 
-    if not a.full:
+    # Only the full-desktop fallback needs cropping; an active-window capture is already the client.
+    if not a.full and os.environ.get('VU_SHOT_FULL') == '1':
         try:
             from PIL import Image
             x, y, w, h = rect(a)
