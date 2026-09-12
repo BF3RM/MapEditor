@@ -13,6 +13,17 @@ bisect step can be scored without a human looking at every frame.
 The client runs under Wayland through Proton, so xdotool cannot see it and there is no window id to
 capture: the whole desktop is grabbed and cropped. The crop rectangle is remembered in
 vu_shot.json next to the shots, because wine puts the window back where it was last time.
+
+MEASURED, because that claim looks like an assumption and is not: with a client running,
+`wmctrl -lG` lists the Xwayland bridge, Steam and other X11 windows and NOT the client. KWin's
+scripting interface loads a script but returns nothing usable over D-Bus either. So there is no
+window lookup to be had, and the remembered rectangle is load-bearing.
+
+WHICH MAKES THIS TOOL DANGEROUS. Once the window moves, or anything is stacked on top of it, the
+crop silently captures that instead and still prints a confident verdict. In one session it
+reported GEOMETRY DRAWN and LOOKS EMPTY off a browser window and off a terminal, and one of those
+was passed on as a result. Check the title bar in the image before believing any verdict, and
+prefer a fresh --rect after anything moves.
 """
 import argparse
 import json
