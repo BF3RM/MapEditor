@@ -936,9 +936,22 @@ def _blueprint_without_physics(name, part_dir):
     if not doc:
         return None
 
-    # USD_SKINNED_KEEP_PHYSICS=1 keeps the lot and ships the resources the HavokAssets name, which
-    # is what the measurements above actually point at. Stripping stays the default only until that
-    # is proven in game.
+    # USD_SKINNED_KEEP_PHYSICS=1 keeps the lot and ships the resources the HavokAssets name.
+    #
+    # MEASURED, per blueprint, with USD_SKINNED_BLUEPRINT naming which to try:
+    #   treelinden_l_01      60 placements, 4 physics resources -> server up in 30s, client joined
+    #   bushazalea_m_01      13 placements, 3 physics resources -> server up in 30s
+    #   mehouse01mediumruin   1 placement,  1 physics resource  -> server DIES at "Creating
+    #                        entities for autoloaded sublevels", minidump written
+    # The ruin is a destruction hierarchy under animations/characters/, not vegetation, and one
+    # Havok resource for that is suspiciously few. _EXTRA_ASSET_RESOURCES only follows
+    # HavokAsset.Name; a part hierarchy almost certainly names a skeleton or an Ant asset the same
+    # way, and those are still not carried. Widening the collector to the other name-bearing asset
+    # types is the next step, not a different way of arranging the blueprint -- that was the trap
+    # the first four attempts fell into.
+    #
+    # Flags, curtains and the second shell never engage at all: SHIPPED_BLUEPRINTS has no game
+    # blueprint under their name, so there is nothing to strip or keep.
     if os.environ.get('USD_SKINNED_KEEP_PHYSICS') == '1':
         drop = set()
 
