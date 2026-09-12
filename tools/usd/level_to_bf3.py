@@ -242,26 +242,40 @@ def shipped_index(res_dir):
     return index
 
 
-def variation_index(ebx_dir, partitions):
-    """-> {(mesh blueprint partition, instance, rounded transform): ObjectVariation ref}.
+def variation_index(ebx_dir, partitions, host=None):
+    """-> {rounded transform: the ObjectVariation the source placed there}.
 
     The placement list this emitter works from is bare transforms, so the variation a placement was
     authored with is not in it -- and 199 of MP_001's 1840 explicit ReferenceObjectData carry one.
     Dropping them puts every object on its default variation, which is a silent visual difference
     rather than a failure.
 
-    The source ReferenceObjectData have both the blueprint and the transform, so a placement is
-    matched back to its original by those. Transforms are rounded before comparing: they survive the
-    USD round trip as float64 and the EBX stores float32, so an exact match finds nothing.
+    The source ReferenceObjectData carry the transform they were authored at, so a placement is
+    matched back to its original by that alone. NOT by the blueprint as well: a mesh that changed on
+    the round trip gets a blueprint of OUR making, with a guid the source has never heard of, so a
+    key including it matched nothing at all -- 0 of 199 -- and the whole index sat there unused.
+    The transform on its own is unambiguous here (194 of 199 placements survive the round trip, and
+    no two of them share one), and it keeps working whoever authored the blueprint.
+
+    Transforms are rounded before comparing: they survive the USD round trip as float64 and the EBX
+    stores float32, so an exact match finds nothing.
     """
+    import glob as _g
     import json as _json
     import os as _os
 
     index = {}
+    files = [_os.path.join(ebx_dir, p.strip() + '.json') for p in partitions or [] if p.strip()]
 
-    for part in partitions:
-        f = _os.path.join(ebx_dir, part + '.json')
+    # THE WHOLE SOURCE LEVEL, not only the partitions the caller happened to name. The variations
+    # are spread across the level's sub-worlds and world parts, and the one caller that named
+    # partitions did so for an unrelated reason (referencing the game's effects data), so every
+    # export that did not use that feature silently dropped all 199 of MP_001's variations.
+    if host:
+        files += _g.glob(_os.path.join(ebx_dir, 'levels', host, '**', '*.json'), recursive=True)
+        files += _g.glob(_os.path.join(ebx_dir, 'levels', host + '.json'))
 
+    for f in files:
         if not _os.path.exists(f):
             continue
 
@@ -279,18 +293,24 @@ def variation_index(ebx_dir, partitions):
             if not bp or not isinstance(t, dict):
                 continue
 
-            index[_placement_key(bp['PartitionGuid'], bp['InstanceGuid'], t)] = \
-                inst['ObjectVariation']
+            index[_placement_key(t)] = inst['ObjectVariation']
 
     return index
 
 
-def _placement_key(pg, ig, transform):
-    """A placement's identity: its blueprint plus its position, to a millimetre."""
-    tr = transform.get('trans') or {}
-    return (str(pg).lower(), str(ig).lower(),
-            round(float(tr.get('x', 0.0)), 3), round(float(tr.get('y', 0.0)), 3),
-            round(float(tr.get('z', 0.0)), 3))
+def _placement_key(transform):
+    """A placement's identity: its whole transform, to a millimetre.
+
+    Position alone would do for MP_001, but co-located objects that differ only in rotation are
+    ordinary, so take the basis vectors too.
+    """
+    out = []
+
+    for axis in ('right', 'up', 'forward', 'trans'):
+        v = transform.get(axis) or {}
+        out += [round(float(v.get(c, 0.0)), 3) for c in 'xyz']
+
+    return tuple(out)
 
 
 def blueprint_index(bp_dir):
@@ -430,8 +450,46 @@ def _game_mvdb_index(dirs):
     return _GAME_MVDB
 
 
-def _game_mvdb_entry(index, mesh_name, mesh_pg, mesh_g, mats):
-    """The game's entry for this mesh, repointed at the partition we emit.
+_VARIATION_HASH = {}
+
+
+def _variation_hash(ref, dirs):
+    """The VariationAssetNameHash an ObjectVariation reference stands for, or 0 for no variation.
+
+    The MeshVariationDatabase is keyed on this hash, and the ObjectVariation partition states it
+    outright as NameHash -- there is no need to reproduce the engine's string hash to get it.
+    """
+    if not isinstance(ref, dict) or not ref.get('PartitionGuid'):
+        return 0
+
+    pg = ref['PartitionGuid'].lower()
+
+    if pg not in _VARIATION_HASH:
+        _VARIATION_HASH[pg] = 0
+
+        for base in dirs or []:
+            f = os.path.join(base, '%s.json' % pg)
+
+            if not os.path.exists(f):
+                continue
+
+            try:
+                doc = json.load(open(f))
+            except Exception:                                # noqa: BLE001
+                continue
+
+            for inst in (doc.get('Instances') or {}).values():
+                if inst.get('$type') == 'ObjectVariation' and inst.get('NameHash'):
+                    _VARIATION_HASH[pg] = int(inst['NameHash'])
+                    break
+
+            break
+
+    return _VARIATION_HASH[pg]
+
+
+def _game_mvdb_entry(index, mesh_name, mesh_pg, mesh_g, mats, wanted=(0,)):
+    """The game's entries for this mesh, repointed at the partition we emit -- one per variation.
 
     The entry's TextureParameters -- the whole point, since they carry the per-shader parameter
     names the compiled shader database was baked against -- are kept untouched; they point at
@@ -446,31 +504,49 @@ def _game_mvdb_entry(index, mesh_name, mesh_pg, mesh_g, mats):
     if not game_pg:
         return None
 
-    # Base variation first, then any variation -- but only ever one whose slot count matches the
-    # materials we emit, because a mismatched entry cannot be repointed without guessing.
+    # Only ever a candidate whose slot count matches the materials we emit: a mismatched entry
+    # cannot be repointed without guessing.
     cands = [c for c in (index.get(game_pg) or [])
              if c.get('Materials') and len(c['Materials']) == len(mats)]
-    src = next((c for c in cands if (c.get('VariationAssetNameHash') or 0) == 0), None) \
-        or (cands[0] if cands else None)
 
-    if src is None:
+    if not cands:
         return None
-
-    entry = json.loads(json.dumps(src))                       # deep copy
-    entry['Mesh'] = {'PartitionGuid': mesh_pg, 'InstanceGuid': mesh_g}
-
-    # Whatever variation this entry was baked for, it is the one our placements get -- they carry
-    # no ObjectVariation, so it has to answer the (mesh, 0) lookup or it answers nothing.
-    entry['VariationAssetNameHash'] = 0
-
-    for n, mat in enumerate(entry['Materials']):
-        mat['Material'] = {'PartitionGuid': mesh_pg, 'InstanceGuid': mats[n]}
 
     import build_dust2
 
-    entry_g = build_dust2.guid('instance', mesh_name, 'mvdbentry')
+    by_hash = {}
 
-    return entry_g, {entry_g: entry}
+    for c in cands:
+        by_hash.setdefault(int(c.get('VariationAssetNameHash') or 0), c)
+
+    # ONE ENTRY PER VARIATION THE PLACEMENTS ASK FOR. The renderer looks up (mesh, variation hash)
+    # and null-derefs the record it does not find, so every hash a placement carries needs an
+    # entry of its own. Collapsing them all onto hash 0 worked only while the export dropped every
+    # ObjectVariation -- 199 of MP_001's placements carry one, and each of those wants the entry
+    # that was baked for it: the "_destruction_wet" building fronts, the coloured cars.
+    out = []
+    base = by_hash.get(0) or cands[0]
+
+    # ALWAYS the unvaried entry as well, even when every placement here is varied. A mesh is
+    # placed from more than one partition -- the gamemode sub-level puts down its own -- and a
+    # placement that finds no entry for its hash is a null the renderer dereferences. An extra
+    # entry costs a few hundred bytes; the game's own database carries 1016 for these 527 meshes.
+    for h in dict.fromkeys(list(wanted or ()) + [0]):
+        src = by_hash.get(h) or base
+        entry = json.loads(json.dumps(src))                   # deep copy
+        entry['Mesh'] = {'PartitionGuid': mesh_pg, 'InstanceGuid': mesh_g}
+        entry['VariationAssetNameHash'] = h
+
+        for n, mat in enumerate(entry['Materials']):
+            mat['Material'] = {'PartitionGuid': mesh_pg, 'InstanceGuid': mats[n]}
+
+        # The unvaried entry keeps its original salt so an export with no variations at all comes
+        # out byte-for-byte as it did before.
+        entry_g = build_dust2.guid(
+            'instance', mesh_name, 'mvdbentry' if h == 0 else 'mvdbentry%d' % h)
+        out.append((entry_g, {entry_g: entry}))
+
+    return out
 
 
 def _game_partition_guid(mesh_name):
@@ -1593,8 +1669,11 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
     # corpus could only compare 65 of 527 meshes -- means a correctly-referenced mesh never appears
     # in the world.
     extra = []                      # (blueprint partition, blueprint instance, transform[, var])
-    var_index = variation_index(ebx_dir, reference_parts or []) if ebx_dir else {}
+    var_index = variation_index(ebx_dir, reference_parts, host) if ebx_dir else {}
     matched_vars = 0
+    # {mesh name: the VariationAssetNameHashes its placements ask for}. The database needs one
+    # entry per hash, and only the placement loop knows which hashes are actually used.
+    _wanted_variations = {}
 
     if referenced:
         print('referenced %d mesh resource(s) -- the game supplies the geometry' % len(referenced))
@@ -1810,18 +1889,21 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
 
         for t in placements.get(name, []):
             lt = _as_linear_transform(t)
-            var = var_index.get(_placement_key(bp_pg, bp_g, lt))
+            var = var_index.get(_placement_key(lt))
 
             if var:
                 matched_vars += 1
 
+            _wanted_variations.setdefault(name, set()).add(_variation_hash(var, _guid_dirs))
             extra.append((bp_pg, bp_g, lt, var))
 
         build_dust2.MESH_NAME, build_dust2.BLUEPRINT_NAME = saved
 
     if var_index:
-        print('variations %d of %d source variations matched onto placements'
-              % (matched_vars, len(var_index)))
+        _varied = sum(1 for v in _wanted_variations.values() if v - {0})
+        print('variations %d of %d source variations matched onto placements, %d mesh(es) need a '
+              'non-default database entry'
+              % (matched_vars, len(var_index), _varied))
 
     # The MVDB and the texture partitions.
     #
@@ -2101,12 +2183,13 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
             # level's shader database present under its own name or the game's, all the same.
             # Until that is solved the synthesised entries are what lets a client into the level,
             # so they stay the default: wrong bindings, but the level is joinable.
-            got = (_game_mvdb_entry(game_mvdb, name, mesh_pg, mesh_g, mats)
+            got = (_game_mvdb_entry(game_mvdb, name, mesh_pg, mesh_g, mats,
+                                    _wanted_variations.get(name) or (0,))
                    if os.environ.get('GAME_MVDB') == '1' else None)
 
-            if got is not None:
-                entries.append(got)
-                from_game += 1
+            if got:
+                entries += got
+                from_game += len(got)
                 continue
 
             entry_g, instances, _bound = build_dust2.mvdb_entry(
