@@ -35,6 +35,7 @@ pg = dst['PartitionGuid']
 root = dst['Instances'][dst['PrimaryInstanceGuid']]
 
 want, added = set(), []
+_src_pg = (src.get('PartitionGuid') or '').lower()
 
 
 def refs(o, out):
@@ -49,16 +50,110 @@ def refs(o, out):
             refs(v, out)
 
 
-for g, v in src['Instances'].items():
+def internal_refs(o, out):
+    """The instances this object names inside its OWN partition.
+
+    Copying an object across is not enough. The source level's objects point at each other
+    constantly -- a StaticModelGroupEntityData names its PhysicsData and one MeshEntityType per
+    member, all of them instances of the source LevelData itself -- and Rime rejects a partition
+    that references an instance it does not contain. The build then fails and the server quietly
+    serves whatever level it can, which reads in-game as "my change did nothing".
+    """
+    if isinstance(o, dict):
+        g = o.get('InstanceGuid')
+
+        if isinstance(g, str) and isinstance(o.get('PartitionGuid'), str) \
+                and o['PartitionGuid'].lower() == _src_pg:
+            out.add(g)
+
+        for v in o.values():
+            internal_refs(v, out)
+    elif isinstance(o, list):
+        for v in o:
+            internal_refs(v, out)
+
+
+def carry(guid):
+    """Copy one source instance into the emitted LevelData with its internal closure.
+
+    Returns the guids it named that the source does not actually contain, which is worth saying out
+    loud: those are the ones Rime will still reject.
+    """
+    pending, missing = {guid}, set()
+
+    while pending:
+        i = pending.pop()
+
+        if i in dst['Instances']:
+            continue
+
+        v = src['Instances'].get(i)
+
+        if v is None:
+            missing.add(i)
+            continue
+
+        dst['Instances'][i] = v
+        r = set()
+        refs(v, r)
+        want.update(x for x in r if x != _src_pg)
+        pulled = set()
+        internal_refs(v, pulled)
+        pending |= pulled - set(dst['Instances'])
+
+    return missing
+
+
+_before = len(dst['Instances'])
+
+for g, v in sorted(src['Instances'].items()):
     if v.get('$type') not in TYPES:
         continue
 
-    dst['Instances'][g] = v
+    gone = carry(g)
     root['Objects'].append({'PartitionGuid': pg, 'InstanceGuid': g})
     added.append(v['$type'])
-    r = set()
-    refs(v, r)
-    want |= {x for x in r if x != pg.lower()}
+
+    if gone:
+        print('carry     WARNING %s names %d instance(s) the source does not contain'
+              % (v['$type'], len(gone)))
+
+json.dump(dst, open('/tmp/blank_plus_carry.json', 'w'), indent=2)
+
+# LEVELDATA'S OWN REFERENCE FIELDS.
+#
+# Carrying the objects is not enough: the root itself points at things. EnlightenShaderDatabase is
+# the one that bites -- the engine composes a name from "<level name>" and that reference during
+# render-module init, and with it null it builds an empty string and dereferences it. The client
+# dies at "Init render modules" nowhere near the word Enlighten. Copy any reference the source sets
+# and ours leaves null.
+#
+# An ALLOWLIST, not everything the source root sets: taking the lot drags in SoundStates and
+# VoiceOverSystem, a separate subsystem each and not what any fault asked for. CARRY_REFS names
+# them. Internal references are fine now -- carry() pulls the instance they name across too.
+_added_refs = []
+_REF_ALLOW = {k.strip() for k in os.environ.get(
+    'CARRY_REFS', 'EnlightenShaderDatabase').split(',') if k.strip()}
+
+for _k, _v in src['Instances'][src['PrimaryInstanceGuid']].items():
+    if _k not in _REF_ALLOW or not isinstance(_v, dict) or not _v.get('PartitionGuid'):
+        continue
+
+    if root.get(_k) is not None:
+        continue
+
+    root[_k] = _v
+
+    if _v['PartitionGuid'].lower() == _src_pg:
+        carry(_v['InstanceGuid'])
+    else:
+        r = set()
+        refs(_v, r)
+        want |= {x for x in r if x != _src_pg}
+
+    _added_refs.append(_k)
+
+print('carry     %d instance(s) pulled into the LevelData' % (len(dst['Instances']) - _before))
 
 json.dump(dst, open('/tmp/blank_plus_carry.json', 'w'), indent=2)
 
@@ -85,6 +180,78 @@ while want and len(seen) < 4000:
 
 lines, got = L._ship_named_partitions(names.values(), STORE, CHUNKS)
 
+
+def bundle_resources(bundle):
+    """Every resource the SOURCE level's own bundle holds, as {name: type}.
+
+    Cached next to the other dumps -- it takes Rime half a minute and never changes.
+    """
+    import subprocess
+
+    cache = os.path.join(STORE, '%s.resources' % bundle.replace('/', '_'))
+
+    if not (os.path.exists(cache) and os.path.getsize(cache)):
+        recipe = os.path.join(STORE, 'listres.cmds')
+        game = '/home/powos/.local/share/Steam/steamapps/common/Battlefield 3'
+        open(recipe, 'w').write('mount_game "%s" Frostbite2_0 true\nselect_game 1\n'
+                                'list_bundle_resources %s\n' % (game, bundle))
+        out = subprocess.run(
+            [os.path.join('/home/powos/Projects/Rime/bin/Release', 'RimeREPL'), recipe],
+            check=False, capture_output=True, text=True,
+            env=dict(os.environ, DOTNET_ROOT=os.path.expanduser('~/.dotnet'))).stdout
+        open(cache, 'w').write(out)
+
+    found = {}
+
+    for line in open(cache):
+        line = line.strip()
+
+        if line.startswith('- ') and line.endswith(')') and ' (' in line:
+            nm, _, ty = line[2:].rpartition(' (')
+            found[nm.strip().lower()] = ty[:-1]
+
+    return found
+
+
+# RESOURCE FAMILIES.
+#
+# Enlighten is not three partitions, it is a family: MP_001 carries 159 EnlightenProbeSet resources
+# beside the static and dynamic databases, and NOTHING in EBX references them -- the system
+# resource names them by string at runtime, so no amount of closure can reach them. Leave them
+# behind and the render module builds its job off a null and the client dies at "Init render
+# modules", nowhere near the word Enlighten.
+#
+# The rule that finds them without a list to hand-maintain: the source level's bundle says what it
+# holds, and a family member's name starts with the name of the resource that owns it. So for every
+# resource we already carry, take the bundle's own resources that extend its name.
+_bundle = os.environ.get('CARRY_FAMILY_BUNDLE')
+
+if _bundle is None:
+    _lvl = os.path.splitext(SRC)[0].split('/levels/')[-1]
+    _bundle = 'win32/levels/%s' % _lvl
+
+_family = []
+
+if _bundle and _bundle != '0':
+    _held = bundle_resources(_bundle)
+    _have = {n.lower() for n in got}
+
+    for _n in sorted(_held):
+        if _n in _have:
+            continue
+
+        if any(_n.startswith(_h) and _n != _h for _h in _have):
+            _family.append(_n)
+
+    lines += ['add_existing_resource_with_chunks "%s" 1%s' % (n, CHUNKS) for n in _family]
+
+    if _family:
+        import collections as _c
+
+        print('carry     %d resource(s) in the families of what we carry: %s'
+              % (len(_family), ', '.join('%s x%d' % (t, c) for t, c
+                                         in _c.Counter(_held[n] for n in _family).most_common())))
+
 # Resources named directly (terrain payloads and the like) have no EBX to walk to.
 if EXTRA:
     lines += ['add_existing_resource_with_chunks "%s" 1%s' % (n, CHUNKS) for n in EXTRA]
@@ -92,3 +259,6 @@ if EXTRA:
 open('/tmp/carry_lines.txt', 'w').write('\n'.join(lines) + '\n')
 print('carry     %s -> %d partition(s) closed, %d shipped, %d extra resource(s)'
       % (','.join(sorted(set(added))), len(seen), len(got), len(EXTRA)))
+
+if _added_refs:
+    print('carry     LevelData references taken from the source: %s' % ', '.join(_added_refs))
