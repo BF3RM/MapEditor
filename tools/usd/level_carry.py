@@ -328,7 +328,9 @@ def repoint_textures(part_names):
         swap = {}
 
         for r in refs_here:
-            if r == guid:
+            # In 'json' mode nothing is repointed, so emitting TextureAssets nothing references
+            # would put dead partitions in the bundle and muddy the one variable being tested.
+            if r == guid or _mode == 'json':
                 continue
 
             tex_doc = _dump_for(r)
@@ -460,6 +462,29 @@ if _bundle and _bundle != '0':
         print('carry     %d resource(s) in the families of what we carry: %s'
               % (len(_family), ', '.join('%s x%d' % (t, c) for t, c
                                          in _c.Counter(_held[n] for n in _family).most_common())))
+
+# THE LEVEL'S UI BUNDLES.
+#
+# A level ships more than geometry: beside <LEVEL> there are <LEVEL>_UiLoadingMp, <LEVEL>_UiPlaying
+# and <LEVEL>_loading_music, and they hold the loading screen, the HUD and -- the one that matters
+# -- ui/assets/spawnscreen. The emitted level declares all three and leaves them EMPTY, so there is
+# no loading screen, no deploy screen, and the player can never spawn. Every "alive=false
+# soldier=false" reading and every empty spawn log came from that.
+#
+# Carried by asking the source level's own bundles what they hold, so it follows any level.
+_ui = {}
+
+for _suffix in [x.strip() for x in os.environ.get(
+        'CARRY_UI_BUNDLES', 'uiloadingmp,uiplaying,loading_music').split(',') if x.strip()]:
+    _held = bundle_resources('%s_%s' % (source_bundle(), _suffix))
+
+    if _held:
+        _ui[_suffix] = sorted(_held)
+
+if _ui:
+    json.dump(_ui, open('/tmp/carry_ui.json', 'w'), indent=1)
+    print('carry     ui bundles: %s'
+          % ', '.join('%s=%d' % (k, len(v)) for k, v in sorted(_ui.items())))
 
 # Resources named directly (terrain payloads and the like) have no EBX to walk to.
 if EXTRA:
