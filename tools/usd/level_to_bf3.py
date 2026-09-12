@@ -887,10 +887,26 @@ def _blueprint_without_physics(name, part_dir):
       - placing the mesh as a StaticModelEntityData -> it draws, splayed, because nothing poses it;
       - referencing the game's blueprint (raw OR as a closure) -> the server wedges at "Creating
         entities for autoloaded sublevels";
-      - carrying only its VegetationTreeEntityData into our own blueprint -> the server wedges too,
-        because that entity declares five runtime components it no longer has.
+      - carrying only its VegetationTreeEntityData into our own blueprint -> the server wedges too.
     So keep the blueprint whole -- entity, components, pose -- and drop only the PhysicsEntityData,
     RigidBodyData and HavokAsset, which is the part this bundle has no business instantiating.
+
+    MEASURED, AND THIS DOES NOT WORK EITHER. On treelinden_l_01 the game's blueprint is exactly
+    {ObjectBlueprint, VegetationTreeEntityData, PhysicsEntityData, RigidBodyData x2, HavokAsset x4},
+    so dropping the physics leaves {ObjectBlueprint, VegetationTreeEntityData} -- which IS the
+    third attempt above, reached by a different route. The server dies at "Creating entities for
+    autoloaded sublevels" and writes a minidump.
+
+    The reason recorded for the third attempt was wrong and is corrected here: the entity does NOT
+    lose components it declares. The GAME's own VegetationTreeEntityData carries
+    `RuntimeComponentCount: 5` with `Components: [null, null, null, null, null]`, byte for byte
+    what ours has. Five null components is how BF3 ships a tree.
+
+    So the physics IS the part a tree needs, and the open question is why the whole blueprint wedges
+    when referenced -- not how to do without it. Next place to look: this tree carries FOUR
+    HavokAssets and two RigidBodyData, and a Havok container holding a single bare convex shape is
+    already known to wedge this server (see the havok-lone-convex-shape note); check the carried
+    containers before assuming the blueprint itself is at fault.
     """
     import glob as _g
 
