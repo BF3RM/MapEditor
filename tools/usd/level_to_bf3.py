@@ -2047,6 +2047,20 @@ def emit(stage_path, corpus, out_dir, host='mp001', bundle_name='UsdLevel',
         # TerrainEntityData lives in layer0_default and no amount of WORLD_PART_TYPES reaches it.
         # USD_INJECT_TYPES takes them straight from the game's dump of the same level instead, and
         # the closure pass then carries the terrain resource family they reference.
+        #
+        # CHECK WHICH PARTITION THE GAME KEEPS A TYPE IN BEFORE INJECTING IT. A BF3 level ships
+        # content for every gamemode it supports, so a parity diff saying "the game has 20 of these
+        # and we have none" is not automatically a gap. MEASURED: injecting the 20
+        # CharacterSpawnReferenceObjectData that diff reports killed the client at 32s in
+        # "Sending spawn messages", three builds running -- every one of them lives in
+        # levels/<level>/rush/* or squad_rush/*, none in the level or in team_deathmatch. They are
+        # Rush spawn points, their Blueprint is null by design, and a plain world part realising one
+        # generically dereferences that null.
+        #
+        # Verified safe on MP_001, all level-scoped: TerrainEntityData, OccluderVolumeEntityData
+        # (56, the game's exact count) and UICombatAreaEntityData (18). Note that this knob only
+        # STAGES a type -- USD_WORLD_PART_EXTRA decides what is written into a world part, and
+        # setting one without the other emits nothing at all, silently.
         _inject = tuple(t.strip() for t in os.environ.get('USD_INJECT_TYPES', '').split(',')
                         if t.strip())
 
